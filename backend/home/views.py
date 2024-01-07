@@ -1,4 +1,7 @@
 from django.shortcuts import render
+from rest_auth.views import LogoutView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework import permissions
 
 
 def home(request):
@@ -11,3 +14,8 @@ def home(request):
         'packages': packages
     }
     return render(request, 'home/index.html', context)
+
+
+class AppLogoutView(LogoutView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = (permissions.IsAuthenticated,)

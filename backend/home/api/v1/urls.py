@@ -1,5 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from home.views import AppLogoutView
 
 from home.api.v1.viewsets import (
     ConfirmEmailOtpViewset,
@@ -16,4 +17,5 @@ router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_e
 
 urlpatterns = [
     path("", include(router.urls)),
+    path("logout/", AppLogoutView.as_view(), name="logout"),
 ]
