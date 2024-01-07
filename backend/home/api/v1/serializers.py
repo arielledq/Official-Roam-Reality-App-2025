@@ -8,6 +8,9 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
+from users.models import UserProfile
+
+from home.utils import EmailOTP
 
 
 User = get_user_model()
@@ -58,17 +61,26 @@ class SignupSerializer(serializers.ModelSerializer):
         user.save()
         request = self._get_request()
         setup_user_email(request, user, [])
+        EmailOTP.send_to_new_user(validated_data.get('email'))
         return user
 
     def save(self, request=None):
         """rest_auth passes request so we must override to accept it"""
         return super().save()
+    
+class UserProfileSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = UserProfile
+        fields = ('is_verified', 'image')
 
 
 class UserSerializer(serializers.ModelSerializer):
+    user_profile = UserProfileSerializer()
+
     class Meta:
         model = User
-        fields = ['id', 'email', 'name']
+        fields = ['id', 'email', 'name', 'user_profile']
 
 
 class PasswordSerializer(PasswordResetSerializer):
