@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.auth.hashers import check_password
 from allauth.account import app_settings as allauth_settings
 from allauth.account.forms import ResetPasswordForm
 from allauth.utils import email_address_exists, generate_unique_username
@@ -86,3 +87,25 @@ class UserSerializer(serializers.ModelSerializer):
 class PasswordSerializer(PasswordResetSerializer):
     """Custom serializer for rest_auth to solve reset password error"""
     password_reset_form_class = ResetPasswordForm
+
+
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField()
+    confirm_password = serializers.CharField()
+
+    def validate(self, attrs):
+        old_password = attrs.get('old_password')
+        new_password = attrs.get('new_password')
+        confirm_password = attrs.get('confirm_password')
+
+        currentpassword = self.context['request'].user.password
+        matchcheck = check_password(old_password, currentpassword)
+
+        if not matchcheck:
+            raise serializers.ValidationError("Password didn't matched with existing password")
+        if new_password != confirm_password:
+            raise serializers.ValidationError("Password didn't matched !!")
+        if self.context['request'].user.check_password(new_password):
+            raise serializers.ValidationError("This password is not acceptable !!")
+        return attrs

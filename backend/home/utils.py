@@ -3,6 +3,8 @@ from django.core.mail import EmailMessage
 from users.models import User,UserOtp
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from rest_framework import status
+from rest_framework.response import Response
 
 class SendgridClient(object):
 
@@ -58,6 +60,25 @@ class SendgridClient(object):
         else:
             raise Exception("Email not provided")
 
+    def send_reset_link(self, request):
+        email = request.get('email', None)
+        if email:
+            mail_subject = request.get('subject', None)
+            mail_message = request.get('message', None)
+            link = request.get('link', None)
+            html_content = render_to_string(
+                'reset_password.html',
+                {
+                    'mail_message': mail_message,
+                    'link': link
+                },
+            )
+            message = strip_tags(html_content)
+            email_obj = EmailMessage(
+                subject=mail_subject, body=message, to=[email]
+            )
+            email_obj.send()
+
 
 class EmailOTP:
     
@@ -72,3 +93,24 @@ class EmailOTP:
     @classmethod
     def send_to_new_user(cls, *args):
         SendgridClient().send_to_new_user(*args)
+
+    @classmethod
+    def send_reset_link(cls, *args):
+        SendgridClient().send_reset_link(*args)
+
+
+def handle_validation_error(e):
+    if hasattr(e, "detail") and isinstance(e.detail, dict):
+        error_messages = []
+        for field, field_errors in e.detail.items():
+            if isinstance(field_errors, list) and len(field_errors) > 0:
+                if "This field is required." in field_errors[0]:
+                    error_messages.append(f"{field.capitalize()} field is required.")
+                else:
+                    error_messages.extend([str(error) for error in field_errors])
+        if error_messages:
+            error_message = ", ".join(error_messages)
+            return Response({"error": error_message}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)

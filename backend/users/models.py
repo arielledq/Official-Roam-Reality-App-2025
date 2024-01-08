@@ -50,3 +50,14 @@ class UserOtp(CommonModel):
 
     def __str__(self) -> str:
         return str(self.email)
+
+
+class EmailTokenVerification(CommonModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.user.email
+
+class PasswordReset(EmailTokenVerification):
+    pass
