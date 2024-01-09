@@ -1,0 +1,52 @@
+import { Button } from '@rneui/themed';
+import React, { FC } from 'react';
+import { StyleSheet } from 'react-native';
+import theme from '../../assets/theme';
+import { FontFamily, FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { ButtonProps } from './type';
+import LinearGradient from 'react-native-linear-gradient';
+
+const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
+  const {
+    buttonStyle = {},
+    titleStyle = {},
+    containerStyle = {},
+    ...otherProps
+  } = props;
+  return (
+    <LinearGradient
+    colors={['#B816E0', '#1158F4', '#9003E0']}
+    start={{ x: 0, y: 1 }}
+    end={{ x: 1, y: 1 }}
+    style={{
+      borderRadius: 8,
+    }}
+    >
+    <Button
+      buttonStyle={[styles.buttonStyle, buttonStyle]}
+      containerStyle={[styles.containerStyle, containerStyle]}
+      titleStyle={[styles.titleStyle, titleStyle]}
+      {...otherProps}
+    />
+    </LinearGradient>
+  );
+};
+
+const BORDER_RADIUS = 16;
+
+const styles = StyleSheet.create({
+  buttonStyle: {
+    borderRadius: BORDER_RADIUS,
+    backgroundColor: 'transparent',
+  },
+  titleStyle: {
+    fontSize: FontSizes.S18,
+    fontFamily: FontFamily.SFUiDisplay,
+    lineHeight: FontLineHeights.LH20,
+    color: theme.darkColors?.white,
+  },
+  containerStyle: { borderRadius: BORDER_RADIUS },
+});
+
+
+export default AppButton;

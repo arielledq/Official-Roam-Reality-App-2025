@@ -8,39 +8,42 @@ import { configureStore, createReducer, combineReducers } from "@reduxjs/toolkit
 import { screens } from "@screens";
 import { modules, reducers, hooks } from "@modules";
 import { connectors } from "@store";
+import SplashScreen from 'react-native-splash-screen';
+import { useEffect } from "react";
 import { GlobalOptionsContext, OptionsContext, getOptions, getGlobalOptions } from "@options";
+import Navigation from './src/navigation';
+
 const Stack = createStackNavigator();
 
-const getNavigation = modules => {
-  const globalOptions = getGlobalOptions();
-  const initialRoute = globalOptions.initialRoute || modules[0] && modules[0].value.title;
+// const getNavigation = modules => {
+//   const globalOptions = getGlobalOptions();
+//   const initialRoute = globalOptions.initialRoute || modules[0] && modules[0].value.title;
+//   const Navigation = () => {
+//     const routes = modules.map(mod => {
+//       const pakage = mod.package;
+//       const name = mod.value.title;
+//       const Navigator = mod.value.navigator;
 
-  const Navigation = () => {
-    const routes = modules.map(mod => {
-      const pakage = mod.package;
-      const name = mod.value.title;
-      const Navigator = mod.value.navigator;
+//       const Component = props => {
+//         return <OptionsContext.Provider value={getOptions(pakage)}>
+//             <Navigator {...props} />
+//           </OptionsContext.Provider>;
+//       };
 
-      const Component = props => {
-        return <OptionsContext.Provider value={getOptions(pakage)}>
-            <Navigator {...props} />
-          </OptionsContext.Provider>;
-      };
+//       return <Stack.Screen key={name} name={name} component={Component} />;
+//     });
+//     const {
+//       screenOptions
+//     } = globalOptions;
+//     return <NavigationContainer>
+//         <Stack.Navigator initialRouteName={initialRoute} screenOptions={screenOptions}>
+//           {routes}
+//         </Stack.Navigator>
+//       </NavigationContainer>;
+//   };
 
-      return <Stack.Screen key={name} name={name} component={Component} />;
-    });
-    const {
-      screenOptions
-    } = globalOptions;
-    return <NavigationContainer>
-        <Stack.Navigator initialRouteName={initialRoute} screenOptions={screenOptions}>
-          {routes}
-        </Stack.Navigator>
-      </NavigationContainer>;
-  };
-
-  return Navigation;
-};
+//   return Navigation;
+// };
 
 const getStore = globalState => {
   const appReducer = createReducer(globalState, _ => {
@@ -59,9 +62,14 @@ const getStore = globalState => {
 
 const App = () => {
   const global = useContext(GlobalOptionsContext);
-  const Navigation = getNavigation(modules.concat(screens));
+  // const Navigation = getNavigation(modules.concat(screens));
   const store = getStore(global);
   let effects = {};
+  useEffect(() => {
+    setTimeout(() => {
+      // SplashScreen.hide();
+    }, 1000 * 3);
+  }, []);
   hooks.map(hook => {
     effects[hook.name] = hook.value();
   });
