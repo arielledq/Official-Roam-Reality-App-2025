@@ -9,9 +9,9 @@ class BuildCommand(build):
 
 
 setup(
-    name="challenges",
+    name="ar",
     version="0.1",
-    packages=["ar"],
+    packages=["challenges"],
     install_requires=[],
     cmdclass={"build": BuildCommand},
 )
