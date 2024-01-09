@@ -33,5 +33,3 @@ google-cloud-storage = "==2.9.0"
 pipenv = "*"
 django-import-export = "*"
 drf-spectacular = "~=0.26.3"
-cb-camera = {editable = true, path = "./modules/camera"}
-cb-django-contact-us = {editable = true, path = "./modules/django_contact_us"}
