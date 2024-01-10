@@ -2,6 +2,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from core.utils import get_file_path
+
+from home.common import CommonModel
 
 
 class User(AbstractUser):
@@ -24,3 +27,37 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
+    
+    def __str__(self):
+        return self.email
+    
+    
+class UserProfile(CommonModel):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE,related_name='user_profile'
+    )
+    is_verified = models.BooleanField(
+        default=False
+    )
+    image = models.ImageField(
+        upload_to=get_file_path,
+        null=True, blank=True
+    )
+
+class UserOtp(CommonModel):
+    email = models.EmailField(_('email address'))
+    otp = models.CharField(max_length=4)
+
+    def __str__(self) -> str:
+        return str(self.email)
+
+
+class EmailTokenVerification(CommonModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.user.email
+
+class PasswordReset(EmailTokenVerification):
+    pass
