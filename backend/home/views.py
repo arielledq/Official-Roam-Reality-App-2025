@@ -31,6 +31,7 @@ def home(request):
 class AppLogoutView(LogoutView):
     authentication_classes = [TokenAuthentication]
     permission_classes = (permissions.IsAuthenticated,)
+    http_method_names = ['post']
 
 
 class SendPasswordToken(APIView):
