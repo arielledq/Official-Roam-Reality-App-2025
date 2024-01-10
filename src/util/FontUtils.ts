@@ -3,17 +3,14 @@ import { moderateScale } from './AppDimensions';
 
 export enum FontFamily {
   NunitoSansRegular = 'Nunito Sans',
-  QuicksandLight = 'Quicksand-Light',
-  QuicksandMedium = 'Quicksand-Medium',
-  QuicksandSemiBold = 'Quicksand-SemiBold',
-  NunitoSansBold = 'Nunito-Sans-Bold',
+  NunitoSansBold = 'Nunito Sans Bold',
   SFUiDisplay = 'SF UI Display'
 }
 
 // Basic fonts size to use in Application
 const fontScale = PixelRatio.getFontScale();
 const getFontSize = (size: number) => {
-  console.log(`${size} >>> ${size / fontScale} (fontScale: ${fontScale}))`);
+  // console.log(`${size} >>> ${size / fontScale} (fontScale: ${fontScale}))`);
   return moderateScale(size * 0.9);
   // return size / fontScale;
 };
@@ -36,9 +33,12 @@ export const FontSizes = {
 
 // Basic Line heights to use in Application
 export const FontLineHeights = {
+  LH14: 14,
+  LH15: 15,
   LH16: 16,
   LH20: 20,
   LH24: 24,
+  LH25: 25,
   LH27: 27,
   LH28: 28,
   LH30: 30,

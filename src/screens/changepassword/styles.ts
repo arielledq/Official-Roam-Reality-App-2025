@@ -31,7 +31,7 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: FontLineHeights.LH24,
     marginBottom: 2,
   },
-//   buttonContainer: { marginBottom: '10%' },
+  buttonContainer: { marginBottom: '8%' },
   buttonStyle: { height: 50 },
   input: {
     height: 58,

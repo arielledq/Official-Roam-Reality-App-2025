@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
   containerStyle: {
     borderBottomWidth: 0,
   },
-  backIcon: { paddingHorizontal: 10 },
+  backIcon: { paddingHorizontal: 5 },
 }));
 
 export default useStyles;
