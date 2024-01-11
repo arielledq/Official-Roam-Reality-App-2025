@@ -3,6 +3,7 @@ import Navigation from './navigation'
 import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, store } from './store'
+import 'react-native-devsettings/withAsyncStorage'
 
 const App = () => {
   return (
