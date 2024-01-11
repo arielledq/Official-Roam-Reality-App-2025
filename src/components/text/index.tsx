@@ -4,6 +4,7 @@ import { TextProps } from './type';
 import { StyleSheet } from 'react-native';
 import { FontFamily } from '../../util/FontUtils';
 import theme from '../../assets/theme';
+import fontGroup from '../../assets/fonts'
 
 const AppText: FC<TextProps> = (props) => {
   const { style = {}, ...otherProps } = props;
@@ -13,7 +14,7 @@ const AppText: FC<TextProps> = (props) => {
 const styles = StyleSheet.create({
   textStyle: {
     color: theme?.darkColors?.white,
-    fontFamily: FontFamily.NunitoSansRegular,
+    ...fontGroup.ns400,
   },
 });
 export default AppText;
