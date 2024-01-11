@@ -24,12 +24,33 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import { DividerWithText } from "../../components"
+import { login } from '../../network'
+import { useDispatch, useSelector } from "react-redux"
+import { updateUserData } from "../../redux/Login"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   navigation
 }) => {
   const _styles = useStyles()
+  const dispatch = useDispatch()
+  const login = useSelector(state => state.login)
   const [passwordVisibility, setPasswordVisibility] = useState(true)
+  console.log({ login })
+
+  const handleLogin = (v) => {
+    dispatch(updateUserData({
+      email: v.email,
+      password: v.password
+    }))
+    // login({
+    //   username: v.email,
+    //   password: v.password
+    // }).then(res => {
+    //   console.log({ res })
+    // }).catch(err => {
+    //   console.log({ err })
+    // })
+  }
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -45,8 +66,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
             email: "",
             password: ""
           }}
-          onSubmit={() => console.log("hello")}
-          // validationSchema={validationSchema}
+          onSubmit={(v) => handleLogin(v)}
+        // validationSchema={validationSchema}
         >
           {({
             handleChange,
@@ -59,7 +80,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
             <View style={_styles.container}>
               <AppInput
                 inputContainerStyle={[_styles.input]}
-                containerStyle={{marginBottom: -10}}
+                containerStyle={{ marginBottom: -10 }}
                 placeholder={"Email Address"}
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.email}
@@ -93,11 +114,11 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 leftIcon={<LockIcon />}
                 rightIcon={<EyeIcon />}
               />
-              
+
               {/* forgot password */}
               <AppText
                 style={_styles.fpText}
-                // onPress={navigateToResetPassword}
+              // onPress={navigateToResetPassword}
               >
                 Forgot Password?
               </AppText>
@@ -107,8 +128,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
                 title={"Sign In"}
-                // onPress={handleSubmit}
-                // loading={isLoading}
+                onPress={handleSubmit}
+              // loading={isLoading}
               />
 
               {/* Terms and Conditions */}
@@ -116,7 +137,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 By clicking "Sign in" you agree to our {""}
                 <AppText
                   style={_styles.TandCLink}
-                  // onPress={navigateToSignUp}
+                // onPress={navigateToSignUp}
                 >
                   Terms and Conditions.
                 </AppText>
@@ -124,7 +145,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
 
               {/* divider */}
               <DividerWithText containerStyle={_styles.divider} label={"OR"} />
-              
+
               {/* social sign in options */}
               <View style={_styles.socialSUcontainer}>
                 <TouchableOpacity>
@@ -146,7 +167,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
         Already have an account? {""}
         <AppText
           style={_styles.SignInLink}
-          // onPress={navigateToSignUp}
+        // onPress={navigateToSignUp}
         >
           Sign In
         </AppText>

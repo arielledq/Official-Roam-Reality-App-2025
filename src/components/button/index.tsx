@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: FontSizes.S18,
-    fontFamily: FontFamily.SFUiDisplay,
+    // fontFamily: FontFamily.SFUiDisplay,
     lineHeight: FontLineHeights.LH20,
     color: theme.darkColors?.white
   },
