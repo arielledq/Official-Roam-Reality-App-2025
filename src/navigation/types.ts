@@ -9,7 +9,7 @@ export type RootStackParamList = {
   SignUp: undefined;
   EmailVerification: undefined;
   VerificationSuccess: undefined;
-  UserProfile: undefined;
+  Profile: undefined;
 };
 
 export type ScreenStackComponent<

@@ -11,7 +11,7 @@ import ForgotPassword from '../screens/forgotpassword/forgotpassword';
 import SignUp from '../screens/signup/signup';
 import EmailVerification from '../screens/emailVerification/emailVerification';
 import VerificationSuccess from '../screens/verificationSuccess/verificationSuccess';
-import { UserProfile } from '../../modules/user-profile';
+import Profile from '../screens/profile/profile';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -25,7 +25,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="SignUp"
+            initialRouteName="Profile"
             screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
@@ -33,7 +33,7 @@ const Navigation = () => {
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="EmailVerification" component={EmailVerification} />
             <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
-            <Stack.Screen name="UserProfile" component={UserProfile} />
+            <Stack.Screen name="Profile" component={Profile} />
 
           </Stack.Navigator>
         </ThemeProvider>

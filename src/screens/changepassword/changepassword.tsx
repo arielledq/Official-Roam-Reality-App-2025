@@ -1,9 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { Keyboard, TouchableOpacity, View } from "react-native"
 import { Formik } from "formik"
-// import { useTranslation } from 'react-i18next';
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-// import { VisibleEye, VisibleEyeClose } from '../../assets/svg';
 import theme from "../../assets/theme"
 import AppButton from "../../components/button"
 import useStyles from "./styles"
@@ -11,7 +9,6 @@ import {
   RootStackParamList,
   ScreenStackComponent
 } from "../../navigation/types"
-// import { handleErrorMessage } from '../../util/util';
 import BackgroundWithImage from "../../components/background"
 import { validationSchema } from "./validation"
 import AppHeader from "../../components/header"

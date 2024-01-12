@@ -1,11 +1,6 @@
-import React, { useEffect, useState } from "react"
-import { Keyboard, TouchableOpacity, View } from "react-native"
-import { Formik } from "formik"
-// import { useTranslation } from 'react-i18next';
+import React from "react"
+import { TouchableOpacity } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-// import { VisibleEye, VisibleEyeClose } from '../../assets/svg';
-import theme from "../../assets/theme"
-import AppButton from "../../components/button"
 import useStyles from "./styles"
 import {
   RootStackParamList,
@@ -14,26 +9,36 @@ import {
 // import { handleErrorMessage } from '../../util/util';
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
-import { EyeIcon } from "../../assets/svg"
+import { MenuIcon } from "../../assets/svg"
+import UserInfoCard from "../../components/userInfoCard"
 
 
-const UserProfile: ScreenStackComponent<
+const Profile: ScreenStackComponent<
   RootStackParamList,
-  "UserProfile"
+  "Profile"
 > = ({ navigation }) => {
   const _styles = useStyles()
 
+  const handleMenuButton = () => {
+    return (
+      <TouchableOpacity style={_styles.menuIcon}>
+        <MenuIcon />
+      </TouchableOpacity>    
+    );
+  };
+
   return (
       <BackgroundWithImage style={_styles.mainContainer}>
-        <AppHeader title={"Change Password"} backgroundColor="transparent" />
+        <AppHeader titleStyle={_styles.headerStyle} title={"Profile"} backgroundColor="transparent" leftComponent={handleMenuButton()} />
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           nestedScrollEnabled
-          contentContainerStyle={_styles.scroll}
+          style={_styles.scroll}
         >
+          <UserInfoCard name={""} email={""} editAction={() => console.log()} />
         </KeyboardAwareScrollView>
       </BackgroundWithImage>
   )
 }
 
-export default UserProfile
+export default Profile

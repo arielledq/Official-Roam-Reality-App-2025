@@ -6,6 +6,7 @@ import FacebookIcon from "./FacebookIcon";
 import GoogleIcon from "./GoogleIcon";
 import LockIcon from "./LockIcon";
 import MailIcon from "./MailIcon";
+import MenuIcon from "./MenuIcon";
 
 export{
 MailIcon,
@@ -16,4 +17,5 @@ FacebookIcon,
 GoogleIcon,
 AppleIcon,
 CubeIcon,
+MenuIcon,
 }
