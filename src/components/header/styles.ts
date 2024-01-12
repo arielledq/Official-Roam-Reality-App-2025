@@ -1,11 +1,11 @@
 import { makeStyles } from '@rneui/themed';
-import { FontFamily, FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 const useStyles = makeStyles((theme) => ({
   heading: {
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
-    fontFamily: FontFamily.NunitoSansBold,
+    ...fontGroup.ns700,
     color: theme.colors.white,
   },
   containerStyle: {

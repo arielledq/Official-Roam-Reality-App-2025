@@ -2,7 +2,7 @@ import { Input } from '@rneui/themed';
 import React, { FC, useState } from 'react';
 import { StyleSheet } from 'react-native';
 import theme from '../../assets/theme';
-import { FontFamily, FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 import { TextInputProps } from './type';
 
 const AppInput: FC<TextInputProps> = (props: TextInputProps) => {
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   container: { paddingHorizontal: 0, paddingVertical: 0 },
   text: {
     fontSize: FontSizes.S14,
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     color: theme.darkColors?.white,
     lineHeight: FontLineHeights.LH20,
     fontWeight: '500',
