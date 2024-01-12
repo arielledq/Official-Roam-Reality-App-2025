@@ -14,8 +14,16 @@ class SendgridClient(object):
         if email and user:
             mail_subject = 'One Time Password'
             otp = format(random.randint(0000, 9999), '04d')
+            html_content = render_to_string(
+                'email.html',
+                {
+                    'email': email,
+                    'code': otp,
+                },
+            )
+            message = strip_tags(html_content)
             email_obj = EmailMessage(
-                subject=mail_subject, body=otp, to=[email]
+                subject=mail_subject, body=message, to=[email]
             )
             email_obj.send()
             user_otp = UserOtp.objects.filter(email=email)
