@@ -12,7 +12,7 @@ const moderateScale = (size: number, factor = 0.5) =>
 
 const tabbarHeight = verticalScale(80);
 
-const screenHorizontalPadding = moderateScale(24);
+const screenHorizontalPadding = moderateScale(26);
 const screenVerticalPadding = moderateScale(10);
 export {
   tabbarHeight,

@@ -1,5 +1,4 @@
 import { makeStyles } from '@rneui/themed';
-import { FontFamily, FontLineHeights, FontSizes } from '../../util/FontUtils';
 import { screenHorizontalPadding } from '../../util/AppDimensions';
 
 /**
@@ -17,21 +16,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '10%',
     flex: 1,
   },
-  titleTop: {
-    // fontFamily: FontFamily.QuicksandBold,
-    fontSize: FontSizes.S18,
-    lineHeight: FontLineHeights.LH24,
-    color: theme.colors.white,
-    marginBottom: 22,
-  },
-  labelStyle: {
-    // fontFamily: FontFamily.QuicksandRegular,
-    color: theme?.colors?.white,
-    fontSize: FontSizes.S14,
-    lineHeight: FontLineHeights.LH24,
-    marginBottom: 2,
-  },
-  buttonContainer: { marginBottom: '8%' },
+  buttonContainer: { marginBottom: '10%' },
   buttonStyle: { height: 50 },
   input: {
     height: 58,

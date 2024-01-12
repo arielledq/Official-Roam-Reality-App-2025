@@ -2,9 +2,12 @@ import { PixelRatio } from 'react-native';
 import { moderateScale } from './AppDimensions';
 
 export enum FontFamily {
-  NunitoSansRegular = 'Nunito Sans',
-  NunitoSansBold = 'Nunito Sans Bold',
-  SFUiDisplay = 'SF UI Display'
+  NunitoSansRegular = 'NunitoSans-Regular',
+  NunitoSansBold = 'NunitoSans-Bold',
+  NunitoSansSemiBold = 'NunitoSans-SemiBold',
+  PoppinsRegular = 'Poppins-Regular',
+  PoppinsBold = 'Poppins-Bold',
+  SFUIDisplay = 'sf-ui-display'
 }
 
 // Basic fonts size to use in Application
@@ -42,7 +45,9 @@ export const FontLineHeights = {
   LH27: 27,
   LH28: 28,
   LH30: 30,
+  LH33: 33,
   LH40: 40,
   LH44: 44,
+  LH48: 48,
   LH55: 55,
 };

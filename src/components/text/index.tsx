@@ -2,7 +2,6 @@ import { Text } from '@rneui/themed';
 import React, { FC } from 'react';
 import { TextProps } from './type';
 import { StyleSheet } from 'react-native';
-import { FontFamily } from '../../util/FontUtils';
 import theme from '../../assets/theme';
 import fontGroup from '../../assets/fonts'
 
