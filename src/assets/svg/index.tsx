@@ -1,5 +1,6 @@
 import AppleIcon from "./AppleIcon";
 import BackArrowIcon from "./BackArrowIcon";
+import CubeIcon from "./CubeIcon";
 import EyeIcon from "./EyeIcon";
 import FacebookIcon from "./FacebookIcon";
 import GoogleIcon from "./GoogleIcon";
@@ -13,5 +14,6 @@ EyeIcon,
 BackArrowIcon,
 FacebookIcon,
 GoogleIcon,
-AppleIcon
+AppleIcon,
+CubeIcon,
 }

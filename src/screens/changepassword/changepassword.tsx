@@ -91,7 +91,6 @@ const ChangePassword: ScreenStackComponent<
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
                   <AppInput
-                    labelStyle={_styles.labelStyle}
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={oldpasswordVisibility}
                     placeholder="Old Password"
@@ -110,7 +109,6 @@ const ChangePassword: ScreenStackComponent<
                     leftIcon={<LockIcon />}
                   />
                   <AppInput
-                    labelStyle={_styles.labelStyle}
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={newpasswordVisibility}
                     onSubmitEditing={Keyboard.dismiss}
@@ -129,7 +127,6 @@ const ChangePassword: ScreenStackComponent<
                     leftIcon={<LockIcon />}
                   />
                   <AppInput
-                    labelStyle={_styles.labelStyle}
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={confirmnewpasswordVisibility}
                     onSubmitEditing={Keyboard.dismiss}
