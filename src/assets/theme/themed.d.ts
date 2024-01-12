@@ -6,6 +6,8 @@ declare module '@rneui/themed' {
     grey: string;
     dividerGrey: string;
     TandCgrey: string;
-    purple: string
+    purple: string;
+    blue: string;
+    pink: string;
   }
 }

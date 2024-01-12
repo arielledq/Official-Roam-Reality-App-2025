@@ -5,6 +5,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 export type RootStackParamList = {
   Login: undefined;
   ChangePassword: undefined;
+  ForgotPassword: undefined;
+  SignUp: undefined;
+  EmailVerification: undefined;
+  VerificationSuccess: undefined;
+  UserProfile: undefined;
 };
 
 export type ScreenStackComponent<
