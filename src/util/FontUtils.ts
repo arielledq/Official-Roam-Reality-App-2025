@@ -1,5 +1,8 @@
 import { PixelRatio } from 'react-native';
 import { moderateScale } from './AppDimensions';
+import fontGroup from '../assets/fonts'
+
+export {fontGroup}
 
 export enum FontFamily {
   NunitoSansRegular = 'NunitoSans-Regular',

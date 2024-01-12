@@ -1,6 +1,6 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes } from "../../util/FontUtils"
+import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -14,14 +14,14 @@ const useStyles = makeStyles(theme => ({
   },
   container: { marginTop: "10%" },
   headerText: {
-    fontFamily: FontFamily.NunitoSansBold,
+    ...fontGroup.ns700,
     fontSize: FontSizes.S40,
     lineHeight: FontLineHeights.LH55,
     color: theme.colors.white,
     marginTop: 10,
   },
   subHeaderText: {
-    fontFamily: FontFamily.PoppinsRegular,
+    ...fontGroup.p400,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
@@ -29,14 +29,14 @@ const useStyles = makeStyles(theme => ({
     fontWeight: "400"
   },
   input: {
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     height: 58,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG
   },
   fpText: {
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH24,
     color: theme.colors.white,
@@ -53,7 +53,7 @@ const useStyles = makeStyles(theme => ({
     marginVertical: '10%',
   },
   termsAndConditionstext: {
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     color: theme.colors.TandCgrey,
@@ -61,13 +61,13 @@ const useStyles = makeStyles(theme => ({
     marginTop: 10
   },
   TandCLink: {
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     fontSize: FontSizes.S12,
     color: theme.colors.purple,
     textDecorationLine: "underline"
   },
   alreadyHaveAccount: {
-    fontFamily: FontFamily.NunitoSansSemiBold,
+    ...fontGroup.ns600,
     fontSize: FontSizes.S13,
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.grey,
@@ -75,7 +75,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: '20%'
   },
   SignInLink: {
-    fontFamily: FontFamily.NunitoSansSemiBold,
+    ...fontGroup.ns600,
     fontSize: FontSizes.S14,
     color: theme.colors.purple,
     textDecorationLine: "underline"

@@ -1,6 +1,6 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes } from "../../util/FontUtils"
+import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -22,13 +22,13 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "center"
   },
   headerText: {
-    fontFamily: FontFamily.NunitoSansBold,
+    ...fontGroup.ns700,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH55,
     color: theme.colors.white
   },
   subHeaderText: {
-    fontFamily: FontFamily.PoppinsRegular,
+   ...fontGroup.p400,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
@@ -36,7 +36,7 @@ const useStyles = makeStyles(theme => ({
     fontWeight: "400"
   },
   input: {
-    fontFamily: FontFamily.SFUIDisplay,
+   ...fontGroup.sf400,
     height: 58,
     paddingHorizontal: 20,
     borderRadius: 6,
@@ -49,13 +49,13 @@ const useStyles = makeStyles(theme => ({
     marginBottom: '10%'
   },
   otptext: {
-    fontFamily: FontFamily.NunitoSansRegular,
+    ...fontGroup.ns400,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
     color: theme.colors.white,
   },
   resendButton: {
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     fontSize: FontSizes.S14,
     color: theme.colors.blue,
     textDecorationLine: "underline"
