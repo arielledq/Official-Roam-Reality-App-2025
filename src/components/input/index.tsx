@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   container: { paddingHorizontal: 0, paddingVertical: 0 },
   text: {
     fontSize: FontSizes.S14,
-    // fontFamily: FontFamily.SFUiDisplay,
+    fontFamily: FontFamily.SFUIDisplay,
     color: theme.darkColors?.white,
     lineHeight: FontLineHeights.LH20,
     fontWeight: '500',

@@ -24,50 +24,35 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import { DividerWithText } from "../../components"
-import { login } from '../../network'
-import { useDispatch, useSelector } from "react-redux"
-import { updateUserData } from "../../redux/Login"
 
-const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
+const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
   navigation
 }) => {
   const _styles = useStyles()
-  const dispatch = useDispatch()
-  const login = useSelector(state => state.login)
   const [passwordVisibility, setPasswordVisibility] = useState(true)
-  console.log({ login })
 
-  const handleLogin = (v) => {
-    dispatch(updateUserData({
-      email: v.email,
-      password: v.password
-    }))
-    // login({
-    //   username: v.email,
-    //   password: v.password
-    // }).then(res => {
-    //   console.log({ res })
-    // }).catch(err => {
-    //   console.log({ err })
-    // })
+  const navigateToVerifyMail = () => {
+    navigation.navigate('EmailVerification')
   }
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={_styles.headerText}>Welcome back!</AppText>
+      <AppText style={_styles.headerText}>Sign up</AppText>
       <AppText style={_styles.subHeaderText}>
         Create an account to ROAM a new dimension with captivating AR
         experiences.
       </AppText>
-      <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView
+        keyboardShouldPersistTaps="always">
         <Formik
           initialValues={{
             email: "",
-            password: ""
+            password: "",
+            confirmPassword: ""
           }}
-          onSubmit={(v) => handleLogin(v)}
-        // validationSchema={validationSchema}
+          onSubmit={navigateToVerifyMail}
+          // validationSchema={validationSchema}
         >
           {({
             handleChange,
@@ -114,14 +99,25 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 leftIcon={<LockIcon />}
                 rightIcon={<EyeIcon />}
               />
-
-              {/* forgot password */}
-              <AppText
-                style={_styles.fpText}
-              // onPress={navigateToResetPassword}
-              >
-                Forgot Password?
-              </AppText>
+              <AppInput
+                inputContainerStyle={[_styles.input]}
+                containerStyle={{ marginTop: -10, marginBottom: -15 }}
+                secureTextEntry={passwordVisibility && true}
+                onSubmitEditing={Keyboard.dismiss}
+                placeholder="Confirm Password"
+                placeholderTextColor={theme.darkColors?.grey}
+                value={values.confirmPassword}
+                onChangeText={handleChange("confirmPassword")}
+                // onBlur={handleBlur('password')}
+                errorMessage={
+                  touched.confirmPassword && errors?.confirmPassword
+                    ? errors.confirmPassword
+                    : undefined
+                }
+                autoCapitalize="none"
+                leftIcon={<LockIcon />}
+                rightIcon={<EyeIcon />}
+              />
 
               {/* login Button */}
               <AppButton
@@ -129,7 +125,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 containerStyle={_styles.buttonContainerStyle}
                 title={"Sign In"}
                 onPress={handleSubmit}
-              // loading={isLoading}
+                // loading={isLoading}
               />
 
               {/* Terms and Conditions */}
@@ -137,7 +133,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 By clicking "Sign in" you agree to our {""}
                 <AppText
                   style={_styles.TandCLink}
-                // onPress={navigateToSignUp}
+                  // onPress={navigateToSignUp}
                 >
                   Terms and Conditions.
                 </AppText>
@@ -158,23 +154,22 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                   <AppleIcon style={_styles.socialSIicon} />
                 </TouchableOpacity>
               </View>
-
             </View>
           )}
         </Formik>
+
         <AppText style={_styles.alreadyHaveAccount}>
-        Already have an account? {""}
-        <AppText
-          style={_styles.SignInLink}
-        // onPress={navigateToSignUp}
-        >
-          Sign In
+          Already have an account? {""}
+          <AppText
+            style={_styles.SignInLink}
+            // onPress={}
+          >
+            Sign In
+          </AppText>
         </AppText>
-      </AppText>
       </KeyboardAwareScrollView>
-      
     </BackgroundWithImage>
   )
 }
 
-export default Login
+export default SignUp

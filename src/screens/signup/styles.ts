@@ -67,15 +67,15 @@ const useStyles = makeStyles(theme => ({
     textDecorationLine: "underline"
   },
   alreadyHaveAccount: {
-    fontFamily: FontFamily.SFUIDisplay,
+    fontFamily: FontFamily.NunitoSansSemiBold,
     fontSize: FontSizes.S13,
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.grey,
     textAlign: "center",
-    marginTop: '35%'
+    marginTop: '20%'
   },
   SignInLink: {
-    fontFamily: FontFamily.SFUIDisplay,
+    fontFamily: FontFamily.NunitoSansSemiBold,
     fontSize: FontSizes.S14,
     color: theme.colors.purple,
     textDecorationLine: "underline"
