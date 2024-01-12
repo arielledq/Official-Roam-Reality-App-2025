@@ -1,5 +1,5 @@
 import { makeStyles } from "@rneui/themed"
-import { FontFamily, FontLineHeights, FontSizes } from "../../util/FontUtils"
+import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
 
 const useStyles = makeStyles(theme => ({
   row: {
@@ -16,13 +16,13 @@ const useStyles = makeStyles(theme => ({
   name: {
     color: theme.colors.black,
     fontSize: FontSizes.S20,
-    fontFamily: FontFamily.NunitoSansBold,
+    ...fontGroup.ns700,
     lineHeight: FontLineHeights.LH27
   },
   userName: {
     color: theme.colors.black,
     fontSize: FontSizes.S12,
-    fontFamily: FontFamily.NunitoSansRegular,
+    ...fontGroup.ns400,
     lineHeight: FontLineHeights.LH16,
   },
   containerBottom: {

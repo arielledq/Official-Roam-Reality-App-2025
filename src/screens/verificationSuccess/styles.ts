@@ -1,6 +1,6 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes } from "../../util/FontUtils"
+import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -20,13 +20,13 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: screenHorizontalPadding,
   },
   headerText: {
-    fontFamily: FontFamily.NunitoSansBold,
+    ...fontGroup.ns700,
     fontSize: FontSizes.S35,
     lineHeight: FontLineHeights.LH48,
     color: theme.colors.white
   },
   subHeaderText: {
-    fontFamily: FontFamily.PoppinsRegular,
+    ...fontGroup.p400,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
