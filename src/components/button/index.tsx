@@ -2,7 +2,7 @@ import { Button } from "@rneui/themed"
 import React, { FC } from "react"
 import { StyleSheet } from "react-native"
 import theme from "../../assets/theme"
-import { FontFamily, FontLineHeights, FontSizes } from "../../util/FontUtils"
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
 import { ButtonProps } from "./type"
 import LinearGradient from "react-native-linear-gradient"
 
@@ -39,7 +39,7 @@ const styles = StyleSheet.create({
   },
   titleStyle: {
     fontSize: FontSizes.S18,
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     lineHeight: FontLineHeights.LH20,
     color: theme.darkColors?.white
   },

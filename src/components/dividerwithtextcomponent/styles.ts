@@ -1,5 +1,5 @@
 import { makeStyles } from '@rneui/themed';
-import { FontFamily, FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { FontFamily, FontLineHeights, FontSizes,fontGroup } from '../../util/FontUtils';
 
 const useStyles = makeStyles((theme) => ({
   container: { flexDirection: 'row' },
@@ -11,7 +11,7 @@ const useStyles = makeStyles((theme) => ({
     alignSelf: 'center',
   },
   label: {
-    fontFamily: FontFamily.SFUIDisplay,
+    ...fontGroup.sf400,
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',

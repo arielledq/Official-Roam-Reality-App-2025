@@ -27,12 +27,15 @@ import { DividerWithText } from "../../components"
 import { login } from '../../network'
 import { useDispatch, useSelector } from "react-redux"
 import { updateUserData } from "../../redux/Login"
+import { useNavigation } from "@react-navigation/native"
+
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
-  navigation
+
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
+  const navigation = useNavigation()
   const login = useSelector(state => state.login)
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   console.log({ login })
@@ -50,6 +53,10 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
     // }).catch(err => {
     //   console.log({ err })
     // })
+  }
+
+  const navigateToResetPassword = () => {
+    navigation.navigate("ForgotPassword")
   }
 
   return (
@@ -118,7 +125,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
               {/* forgot password */}
               <AppText
                 style={_styles.fpText}
-              // onPress={navigateToResetPassword}
+                onPress={navigateToResetPassword}
               >
                 Forgot Password?
               </AppText>
@@ -163,16 +170,16 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
           )}
         </Formik>
         <AppText style={_styles.alreadyHaveAccount}>
-        Already have an account? {""}
-        <AppText
-          style={_styles.SignInLink}
-        // onPress={navigateToSignUp}
-        >
-          Sign In
+          Already have an account? {""}
+          <AppText
+            style={_styles.SignInLink}
+          // onPress={navigateToSignUp}
+          >
+            Sign In
+          </AppText>
         </AppText>
-      </AppText>
       </KeyboardAwareScrollView>
-      
+
     </BackgroundWithImage>
   )
 }
