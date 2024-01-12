@@ -3,8 +3,8 @@ import { FontFamily, FontLineHeights, FontSizes } from '../../util/FontUtils';
 
 const useStyles = makeStyles((theme) => ({
   heading: {
-    fontSize: FontSizes.S20,
-    lineHeight: FontLineHeights.LH28,
+    fontSize: FontSizes.S18,
+    lineHeight: FontLineHeights.LH25,
     fontFamily: FontFamily.NunitoSansBold,
     color: theme.colors.white,
   },
