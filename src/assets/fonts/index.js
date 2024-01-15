@@ -15,6 +15,7 @@ const fonts = {
   P500: 'Poppins Medium',
   P600: 'Poppins SemiBold',
   P700: 'Poppins Bold',
+  P800: 'Poppins ExtraBold',
   P900: 'Poppins Black',
 
   NS200: 'Nunito Sans 10pt ExtraLight',
@@ -23,6 +24,7 @@ const fonts = {
   NS500: 'Nunito Sans 10pt Medium',
   NS600: 'Nunito Sans 10pt SemiBold',
   NS700: 'Nunito Sans 10pt Bold',
+  NS800: 'Nunito Sans 10pt ExtraBold',
   NS900: 'Nunito Sans 10pt Black'
 }
 
@@ -87,6 +89,10 @@ const fontGroup = {
     fontFamily: fonts.P700,
     fontWeight: '700'
   },
+  p800: {
+    fontFamily: fonts.P800,
+    fontWeight: '800'
+  },
   p900: {
     fontFamily: fonts.P900,
     fontWeight: '900'
@@ -114,6 +120,10 @@ const fontGroup = {
   ns700: {
     fontFamily: fonts.NS700,
     fontWeight: '700'
+  },
+  ns800: {
+    fontFamily: fonts.NS800,
+    fontWeight: '800'
   },
   ns900: {
     fontFamily: fonts.NS900,

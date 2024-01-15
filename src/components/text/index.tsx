@@ -7,7 +7,10 @@ import fontGroup from '../../assets/fonts'
 
 const AppText: FC<TextProps> = (props) => {
   const { style = {}, ...otherProps } = props;
-  return <Text style={[styles.textStyle, style]} {...otherProps} />;
+  return <Text
+    suppressHighlighting={true}
+    allowFontScaling={false}
+    style={[styles.textStyle, style]} {...otherProps} />;
 };
 
 const styles = StyleSheet.create({

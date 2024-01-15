@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useState } from "react"
 
-import { View } from "react-native"
+import { Alert, View } from "react-native"
 
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -16,14 +16,47 @@ import AppHeader from "../../components/header"
 import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
+import { useNavigation, useRoute } from "@react-navigation/native"
+import { confirmCode, sendCode } from "../../network"
+import { handleError } from "../../util/helpers"
 
 const EmailVerification: ScreenStackComponent<
   RootStackParamList,
   "EmailVerification"
-> = ({ navigation }) => {
+> = () => {
   const _styles = useStyles()
+  const navigation = useNavigation()
+  const route = useRoute()
+  const email = route?.params?.email
+  const [isLoading, setIsLoading] = useState(false)
+
   const navigatetoSuccess = () => {
-    navigation.navigate('VerificationSuccess')
+    navigation.replace('VerificationSuccess')
+  }
+
+  const handleResend = () => {
+    sendCode({ email }).then(res => {
+      if (res.status == 1) {
+        Alert.alert('Code sent successfully')
+      } else {
+        handleError(res)
+      }
+    })
+  }
+
+  const verifyEmail = (values) => {
+    if (!values.code) { return Alert.alert('Code', 'Please enter the verification code') }
+    setIsLoading(true)
+    confirmCode({ email, otp: values.code }).then(res => {
+      console.log({ res })
+      if (res.status == 1) {
+        navigatetoSuccess()
+      } else {
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
   }
 
   return (
@@ -37,8 +70,10 @@ const EmailVerification: ScreenStackComponent<
           initialValues={{
             code: ""
           }}
-          onSubmit={navigatetoSuccess}
-          // validationSchema={validationSchema}
+          onSubmit={values => {
+            verifyEmail(values)
+          }}
+        // validationSchema={validationSchema}
         >
           {({
             handleChange,
@@ -79,19 +114,28 @@ const EmailVerification: ScreenStackComponent<
                   Didn't receive the OTP?{" "}
                   <AppText
                     style={_styles.resendButton}
-                    // onPress={navigateToSignUp}
+                    onPress={handleResend}
                   >
                     Click here to resend
                   </AppText>
-                  .
                 </AppText>
                 <AppButton
                   buttonStyle={_styles.buttonStyle}
-                  containerStyle={_styles.buttonContainerStyle}
+                  containerStyle={[_styles.buttonContainerStyle]}
+                  title={"Skip"}
+                  onPress={() => {
+                    navigation.popToTop()
+                  }}
+                  disabled={isLoading}
+                />
+                <AppButton
+                  buttonStyle={_styles.buttonStyle}
+                  containerStyle={[_styles.buttonContainerStyle, { marginTop: 10 }]}
                   title={"Verify Now"}
                   onPress={handleSubmit}
-                  // loading={isLoading}
+                  loading={isLoading}
                 />
+
               </View>
             </View>
           )}

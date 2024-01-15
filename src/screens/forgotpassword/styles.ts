@@ -33,7 +33,6 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
     marginTop: 10,
-    fontWeight: "400"
   },
   input: {
    ...fontGroup.sf400,
