@@ -1,8 +1,30 @@
 #import "AppDelegate.h"
 
 #import <React/RCTBundleURLProvider.h>
+#import <GoogleSignIn/GoogleSignIn.h>
+#import <React/RCTLinkingManager.h>
 
 @implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)app
+            openURL:(NSURL *)url
+            options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options
+{
+
+  // if ([[FBSDKApplicationDelegate sharedInstance] application:app openURL:url options:options]) {
+  //   return YES;
+  // }
+
+  if ([GIDSignIn.sharedInstance handleURL:url]) {
+    return YES;
+  }
+
+  if ([RCTLinkingManager application:app openURL:url options:options]) {
+    return YES;
+  }
+
+  return NO;
+}
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
