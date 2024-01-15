@@ -46,10 +46,10 @@ const SocialSignin = () => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={'OR'} />
       <View style={styles.socialSUcontainer}>
-        <TouchableOpacity onPress={handleGoogleLogin}>
+        <TouchableOpacity>
           <FacebookIcon style={styles.socialSIicon} />
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
         </TouchableOpacity>
         <TouchableOpacity>
