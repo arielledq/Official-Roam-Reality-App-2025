@@ -92,15 +92,6 @@ const ForgotPassword: ScreenStackComponent<
                   leftIconContainerStyle={{ marginRight: 5 }}
                   leftIcon={<MailIcon />}
                 />
-                <AppText style={_styles.otptext}>
-                  Didn't receive the OTP?{" "}
-                  <AppText
-                    style={_styles.resendButton}
-                  >
-                    Click here to resend
-                  </AppText>
-                  .
-                </AppText>
               </View>
               <AppButton
                 buttonStyle={_styles.buttonStyle}

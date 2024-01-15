@@ -31,6 +31,7 @@ import { useNavigation } from "@react-navigation/native"
 import { SigninSchema } from "../../util/ValidationSchemas"
 import Icon from "../../components/Icon"
 import { handleError } from "../../util/helpers"
+import SocialSignin from "../../components/socialSignin"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
 
@@ -164,21 +165,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 </AppText>
               </AppText>
 
-              {/* divider */}
-              <DividerWithText containerStyle={_styles.divider} label={"OR"} />
-
               {/* social sign in options */}
-              <View style={_styles.socialSUcontainer}>
-                <TouchableOpacity>
-                  <FacebookIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <GoogleIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <AppleIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-              </View>
+              <SocialSignin />
 
             </View>
           )}
