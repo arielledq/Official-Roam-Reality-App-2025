@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   },
   container: { marginTop: "10%" },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.ns900,
     fontSize: FontSizes.S40,
     lineHeight: FontLineHeights.LH55,
     color: theme.colors.white,
@@ -26,7 +26,6 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
     marginTop: 10,
-    fontWeight: "400"
   },
   input: {
     ...fontGroup.sf400,

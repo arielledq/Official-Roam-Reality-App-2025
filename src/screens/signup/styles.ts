@@ -26,14 +26,12 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
     marginTop: 10,
-    fontWeight: "400"
   },
   input: {
     ...fontGroup.sf400,
-    height: 58,
     paddingHorizontal: 20,
     borderRadius: 6,
-    backgroundColor: theme?.colors?.inputBG
+    backgroundColor: theme?.colors?.inputBG,
   },
   fpText: {
     ...fontGroup.sf400,

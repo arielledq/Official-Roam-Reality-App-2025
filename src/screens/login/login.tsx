@@ -28,7 +28,9 @@ import { login } from '../../network'
 import { useDispatch, useSelector } from "react-redux"
 import { updateUserData } from "../../redux/Login"
 import { useNavigation } from "@react-navigation/native"
-
+import { SigninSchema } from "../../util/ValidationSchemas"
+import Icon from "../../components/Icon"
+import { handleError } from "../../util/helpers"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
 
@@ -36,33 +38,40 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const navigation = useNavigation()
-  const login = useSelector(state => state.login)
   const [passwordVisibility, setPasswordVisibility] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
   console.log({ login })
 
   const handleLogin = (v) => {
-    dispatch(updateUserData({
-      email: v.email,
+    setIsLoading(true)
+    // dispatch(updateUserData())
+    login({
+      username: v.email,
       password: v.password
-    }))
-    // login({
-    //   username: v.email,
-    //   password: v.password
-    // }).then(res => {
-    //   console.log({ res })
-    // }).catch(err => {
-    //   console.log({ err })
-    // })
+    }).then(res => {
+      console.log({ res })
+      if (res.status == 1) {
+        dispatch(updateUserData(res))
+      } else {
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
   }
 
   const navigateToResetPassword = () => {
     navigation.navigate("ForgotPassword")
   }
 
+  const navigateToSignUp = () => {
+    navigation.navigate("SignUp")
+  }
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={_styles.headerText}>Welcome back!</AppText>
+      <AppText style={[_styles.headerText]}>Welcome back!</AppText>
       <AppText style={_styles.subHeaderText}>
         Create an account to ROAM a new dimension with captivating AR
         experiences.
@@ -74,7 +83,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
             password: ""
           }}
           onSubmit={(v) => handleLogin(v)}
-        // validationSchema={validationSchema}
+          validationSchema={SigninSchema}
         >
           {({
             handleChange,
@@ -93,7 +102,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 value={values.email}
                 autoCapitalize="none"
                 onChangeText={handleChange("email")}
-                // onBlur={handleBlur('username')}
+                onBlur={handleBlur('email')}
                 errorMessage={
                   touched.email && errors?.email ? errors.email : undefined
                 }
@@ -111,7 +120,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.password}
                 onChangeText={handleChange("password")}
-                // onBlur={handleBlur('password')}
+                onBlur={handleBlur('password')}
                 errorMessage={
                   touched.password && errors?.password
                     ? errors.password
@@ -119,7 +128,11 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 }
                 autoCapitalize="none"
                 leftIcon={<LockIcon />}
-                rightIcon={<EyeIcon />}
+                rightIcon={
+                  <Icon onPress={() => {
+                    setPasswordVisibility(p => !p)
+                  }} name={passwordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                }
               />
 
               {/* forgot password */}
@@ -136,7 +149,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 containerStyle={_styles.buttonContainerStyle}
                 title={"Sign In"}
                 onPress={handleSubmit}
-              // loading={isLoading}
+                loading={isLoading}
+                disabled={isLoading}
               />
 
               {/* Terms and Conditions */}
@@ -170,12 +184,12 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
           )}
         </Formik>
         <AppText style={_styles.alreadyHaveAccount}>
-          Already have an account? {""}
+          Don’t have an account? {""}
           <AppText
             style={_styles.SignInLink}
-          // onPress={navigateToSignUp}
+            onPress={navigateToSignUp}
           >
-            Sign In
+            Sign Up
           </AppText>
         </AppText>
       </KeyboardAwareScrollView>

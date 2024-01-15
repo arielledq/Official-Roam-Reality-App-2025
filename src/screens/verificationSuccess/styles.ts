@@ -32,7 +32,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     textAlign: 'center',
     marginTop: '10%',
-    fontWeight: "400"
   },
   buttonStyle: {
     height: 50
