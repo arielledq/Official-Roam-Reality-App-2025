@@ -1,7 +1,8 @@
 from django.contrib import admin
-from .models import Challenges
+from .models import Challenges, Sponsor
 
-class ChallengesAdmin(admin.ModelAdmin):
+class ARChallengeAdmin(admin.ModelAdmin):
     pass
 
-admin.site.register(Challenges, ChallengesAdmin)
+admin.site.register(Sponsor, ARChallengeAdmin)
+admin.site.register(Challenges, ARChallengeAdmin)
