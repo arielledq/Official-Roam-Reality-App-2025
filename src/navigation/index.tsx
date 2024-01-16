@@ -15,7 +15,7 @@ import Profile from '../screens/profile/profile';
 import { useSelector } from 'react-redux';
 import EditProfile from '../screens/editProfile/editProfile';
 import Home from '../screens/home';
-
+import TermsAndConditions from '../screens/termsAndConditions';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -37,6 +37,7 @@ const Navigation = () => {
         <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
       </>
     )
   }
