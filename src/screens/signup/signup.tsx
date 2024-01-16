@@ -29,6 +29,7 @@ import { signUp } from "../../network"
 import fontGroup from "../../assets/fonts"
 import { handleError } from "../../util/helpers"
 import { SignUpSchema } from "../../util/ValidationSchemas"
+import SocialSignin from "../../components/socialSignin"
 
 const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
   navigation
@@ -182,21 +183,8 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
                 </AppText>
               </AppText>
 
-              {/* divider */}
-              <DividerWithText containerStyle={_styles.divider} label={"OR"} />
-
               {/* social sign in options */}
-              <View style={_styles.socialSUcontainer}>
-                <TouchableOpacity>
-                  <FacebookIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <GoogleIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <AppleIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-              </View>
+              <SocialSignin />
             </View>
           )}
         </Formik>
