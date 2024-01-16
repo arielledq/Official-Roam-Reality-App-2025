@@ -3,12 +3,14 @@ from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
-
+from rest_framework.decorators import action
+from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 from users.models import UserProfile
 from home.utils import EmailOTP
 from django.utils.translation import ugettext_lazy as _
-
+from django.utils.http import urlsafe_base64_encode
+from django.contrib.auth.tokens import default_token_generator as token_generator
 from home.api.v1.serializers import (
     SignupSerializer,
     UserSerializer,
@@ -86,3 +88,24 @@ class ConfirmEmailOtpViewset(ViewSet):
                 )
         except Exception as e:
             return Response({'status':"fail", 'message':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    @action(methods=['post'], detail=False, url_path=r'token')
+    def token(self, request,  *args, **kwargs):
+        """
+        An endpoint for generating otp.
+        """
+        try:
+            verify_otp = EmailOTP.confirm(self.request)
+            user = User.objects.get(email=request.data.get('email'))
+            return Response(
+                {
+                    "message": verify_otp.get('response'),
+                    "status": "success",
+                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                    "token": token_generator.make_token(user),
+                },
+                status=status.HTTP_200_OK
+            )
+        except Exception as e:
+            return Response({'status':"success", 'message':str(e)}, status=status.HTTP_400_BAD_REQUEST)
