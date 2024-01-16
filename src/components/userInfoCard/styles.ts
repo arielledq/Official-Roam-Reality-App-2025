@@ -10,7 +10,7 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 10,
     backgroundColor: theme.colors.white,
     paddingHorizontal: 20,
-    paddingVertical: 10
+    paddingVertical: 10,
   },
   nameContainer: { flex: 1 },
   name: {

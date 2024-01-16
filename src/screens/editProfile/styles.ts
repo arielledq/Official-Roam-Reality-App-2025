@@ -1,0 +1,104 @@
+import { makeStyles } from '@rneui/themed';
+import { screenHorizontalPadding } from '../../util/AppDimensions';
+import { FontLineHeights, FontSizes } from '../../util/FontUtils';
+
+/**
+ *  Using makeStyles to set colors with theme.
+ * @return useStyles @method
+ */
+
+const useStyles = makeStyles((theme) => ({
+  mainContainer: {
+    flex: 1,
+    backgroundColor: theme?.colors?.inputBG,
+  },
+  container: {
+    paddingHorizontal: screenHorizontalPadding - 5,
+    marginTop: '10%',
+    flex: 1,
+  },
+  buttonContainer: { marginBottom: '10%' },
+  buttonStyle: { height: 50 },
+  input: {
+    height: 50,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    backgroundColor: theme?.colors?.inputBG,
+    marginVertical: -5
+  },
+  timeInput: {
+    height: 50,
+    paddingHorizontal: 20,
+    borderRadius: 6,
+    backgroundColor: theme?.colors?.inputBG,
+    marginVertical: -5,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  chidlView: { flex: 1 },
+  dropdown: {
+    height: 50,
+    backgroundColor: theme.colors.inputBG,
+    borderRadius: 6,
+    paddingHorizontal: 20,
+  },
+  icon: {
+    marginRight: 5,
+  },
+  selectedTextStyle: {
+    color: theme.colors.white,
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH20,
+    paddingLeft: 12
+  },
+  iconStyle: {
+    width: 20,
+    height: 20,
+  },
+  listContent: {
+    paddingBottom: '10%'
+  },
+  dropdownStyle: {
+    backgroundColor: theme.colors.inputBG,
+    borderColor: theme.colors.inputBG,
+    borderRadius: 6,
+  },
+  placeholderStyle: {
+    color: theme.colors.grey,
+    marginStart: 10,
+    fontSize: FontSizes.S14,
+    opacity: 1,
+  },
+  timeteststyle: {
+    color: theme.colors.grey,
+    fontSize: FontSizes.S14,
+    opacity: 1,
+  },
+  itemContainerStyle: {
+    color: theme.colors.grey,
+    backgroundColor: theme.colors.inputBG,
+    borderRadius: 6
+  },
+  dropdownParentView: { zIndex: 1, marginBottom: 20, marginTop: -7 },
+  iconContainer: {
+    marginRight: 10,
+  },
+  textContainer: {
+    flex: 1, // This will make the text take up the available space
+  },
+  privacyContainer: {
+    flexDirection: 'row',
+    // paddingHorizontal: 20,
+    paddingRight: screenHorizontalPadding + 30,
+    marginTop: '10%',
+    marginBottom: 20
+  },
+  privacyText: {
+    color: theme.colors.TandCgrey,
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH20,
+  }
+}));
+
+export default useStyles;

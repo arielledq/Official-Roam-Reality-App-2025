@@ -13,7 +13,9 @@ import EmailVerification from '../screens/emailVerification/emailVerification';
 import VerificationSuccess from '../screens/verificationSuccess/verificationSuccess';
 import Profile from '../screens/profile/profile';
 import { useSelector } from 'react-redux';
+import EditProfile from '../screens/editProfile/editProfile';
 import Home from '../screens/home';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -34,6 +36,7 @@ const Navigation = () => {
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
       </>
     )
   }
