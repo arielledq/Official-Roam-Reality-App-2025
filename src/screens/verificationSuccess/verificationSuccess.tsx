@@ -17,12 +17,14 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import Images from "../../assets/images"
+import { useNavigation } from "@react-navigation/native"
 
 const VerificationSuccess: ScreenStackComponent<
   RootStackParamList,
   "VerificationSuccess"
-> = ({ navigation }) => {
+> = () => {
   const _styles = useStyles()
+  const navigation = useNavigation()
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -38,8 +40,7 @@ const VerificationSuccess: ScreenStackComponent<
         buttonStyle={_styles.buttonStyle}
         containerStyle={_styles.buttonContainerStyle}
         title={"Continue"}
-        // onPress={handleSubmit}
-        // loading={isLoading}
+        onPress={() => navigation.navigate('Login')}
       />
     </BackgroundWithImage>
   )

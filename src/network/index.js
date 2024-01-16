@@ -11,18 +11,41 @@ export const login = data =>
     method: 'POST',
     data
   })
+export const logout = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}logout/`,
+    method: 'POST',
+    data
+  })
+export const signUp = data =>
+  Request.call({
+    url: `${commonApiRoute}signup/`,
+    method: 'POST',
+    data
+  })
+export const sendCode = data =>
+  Request.call({
+    url: `${commonApiRoute}send-email-otp/`,
+    method: 'POST',
+    data
+  })
+export const confirmCode = data =>
+  Request.call({
+    url: `${commonApiRoute}confirm-email-otp/`,
+    method: 'POST',
+    data
+  })
+export const changePassword = data =>
+  Request.call({
+    url: `${commonApiRoute}change-password/`,
+    method: 'POST',
+    data
+  })
 
 export const terms = () =>
   Request.call({
     url: `${commonApiRoute}content/terms/`,
     method: 'GET'
-  })
-
-export const changePassword = data =>
-  Request.callWithToken({
-    url: `${commonApiRoute}change-password/`,
-    method: 'PUT',
-    data
   })
 
 export const saveProfile = payload =>

@@ -4,8 +4,12 @@ export const BASE_URL = 'https://travel-ar-app-42706-staging.botics.co/'
 
 export const commonApiRoute = 'api/v1/'
 
+export const APPLE_CLIENT_ID = 'com.roam.reality.services'
+export const APPLE_REDIRECT_URL =
+  'https://travel-ar-app-42706-staging.botics.co/accounts/apple/login/callback/'
+
 export const MULTIPART_HEADER = async () => {
-  const token = await store.getState().login.token
+  const token = await store.getState().login.data.token
   const header = {
     Accept: 'application/json',
     'Content-Type': 'multipart/form-data'
@@ -22,7 +26,7 @@ export const APP_JSON_HEADER = {
 }
 
 export const TOKEN_HEADER = async () => {
-  const token = await store.getState().login.token
+  const token = await store.getState().login.data.token
   console.log({ token })
   const header = {
     Accept: 'application/json',
