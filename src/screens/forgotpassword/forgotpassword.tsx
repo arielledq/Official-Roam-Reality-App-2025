@@ -1,6 +1,6 @@
-import React from "react"
+import React, { useState } from "react"
 
-import { Image, View } from "react-native"
+import { Alert, Image, View } from "react-native"
 
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -17,12 +17,30 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import Images from "../../assets/images"
+import fontGroup from "../../assets/fonts"
+import { sendCode } from "../../network"
+import { ForgotPasswordSchema } from "../../util/ValidationSchemas"
+import { handleError } from "../../util/helpers"
 
 const ForgotPassword: ScreenStackComponent<
   RootStackParamList,
   "ForgotPassword"
 > = ({ navigation }) => {
   const _styles = useStyles()
+  const [sending, setSending] = useState(false)
+
+  const handleSendMail = (values) => {
+    setSending(true)
+    sendCode({ email: values.email }).then((res) => {
+      if (res.status == 1) {
+        Alert.alert('', "Code sent successfully")
+      } else {
+        handleError(res)
+      }
+    }).finally(() => {
+      setSending(false)
+    })
+  }
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -35,8 +53,8 @@ const ForgotPassword: ScreenStackComponent<
           initialValues={{
             email: ""
           }}
-          onSubmit={() => navigation.navigate('ChangePassword')}
-          // validationSchema={validationSchema}
+          onSubmit={(values) => handleSendMail(values)}
+          validationSchema={ForgotPasswordSchema}
         >
           {({
             handleChange,
@@ -51,7 +69,7 @@ const ForgotPassword: ScreenStackComponent<
                 <View style={_styles.appIconContainer}>
                   <Image source={Images.AppIconCircle} />
                 </View>
-                <AppText style={_styles.headerText}>Forgot Password ?</AppText>
+                <AppText style={[_styles.headerText, { ...fontGroup.ns800 }]}>Forgot Password ?</AppText>
                 <AppText style={_styles.subHeaderText}>
                   Please enter the email address associated with your account,
                   and we'll send you a link to reset your password
@@ -64,7 +82,7 @@ const ForgotPassword: ScreenStackComponent<
                   value={values.email}
                   autoCapitalize="none"
                   onChangeText={handleChange("email")}
-                  // onBlur={handleBlur('username')}
+                  // onBlur={handleBlur('email')}
                   errorMessage={
                     touched.email && errors?.email ? errors.email : undefined
                   }
@@ -74,23 +92,14 @@ const ForgotPassword: ScreenStackComponent<
                   leftIconContainerStyle={{ marginRight: 5 }}
                   leftIcon={<MailIcon />}
                 />
-                <AppText style={_styles.otptext}>
-                  Didn't receive the OTP?{" "}
-                  <AppText
-                    style={_styles.resendButton}
-                    // onPress={navigateToSignUp}
-                  >
-                    Click here to resend
-                  </AppText>
-                  .
-                </AppText>
               </View>
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
                 title={"Send Code"}
                 onPress={handleSubmit}
-                // loading={isLoading}
+                loading={sending}
+                disabled={sending}
               />
             </View>
           )}

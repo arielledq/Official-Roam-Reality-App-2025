@@ -12,7 +12,10 @@ import SignUp from '../screens/signup/signup';
 import EmailVerification from '../screens/emailVerification/emailVerification';
 import VerificationSuccess from '../screens/verificationSuccess/verificationSuccess';
 import Profile from '../screens/profile/profile';
+import { useSelector } from 'react-redux';
 import EditProfile from '../screens/editProfile/editProfile';
+import Home from '../screens/home';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -21,22 +24,39 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
  * @returns JSX.Element
  */
 const Navigation = () => {
+  const token = useSelector(state => state.login?.data?.token)
+
+  const renderAuthStack = () => {
+    return (
+      <>
+        <Stack.Screen name="Login" component={Login} />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="EmailVerification" component={EmailVerification} />
+        <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
+        <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
+      </>
+    )
+  }
+  const renderCommonStack = () => {
+    return (
+      <>
+        <Stack.Screen name="Home" component={Home} />
+      </>
+    )
+  }
   return (
     <NavigationContainer ref={navigationRef}>
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="EditProfile"
+            initialRouteName="Login"
             screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="ChangePassword" component={ChangePassword} />
-            <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-            <Stack.Screen name="SignUp" component={SignUp} />
-            <Stack.Screen name="EmailVerification" component={EmailVerification} />
-            <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
-            <Stack.Screen name="Profile" component={Profile} />
-            <Stack.Screen name="EditProfile" component={EditProfile} />
-
+            {token ?
+              renderCommonStack() : renderAuthStack()
+            }
           </Stack.Navigator>
         </ThemeProvider>
       }

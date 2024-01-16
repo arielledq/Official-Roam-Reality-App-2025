@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-import { Keyboard, TouchableOpacity, View } from "react-native"
+import { Alert, Keyboard, TouchableOpacity, View } from "react-native"
 
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -24,21 +24,54 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import { DividerWithText } from "../../components"
+import Icon from "../../components/Icon"
+import { signUp } from "../../network"
+import fontGroup from "../../assets/fonts"
+import { handleError } from "../../util/helpers"
+import { SignUpSchema } from "../../util/ValidationSchemas"
+import SocialSignin from "../../components/socialSignin"
 
 const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
   navigation
 }) => {
   const _styles = useStyles()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
+  const [rePasswordVisibility, setRePasswordVisibility] = useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
-  const navigateToVerifyMail = () => {
-    navigation.navigate('EmailVerification')
+  const navigateToVerifyMail = (email, resetForm) => {
+    navigation.navigate('EmailVerification', { email })
+    resetForm()
+  }
+
+  const handleSignup = (v, resetForm) => {
+    setIsLoading(true)
+    signUp({
+      email: v.email,
+      password: v.password,
+    }).then(res => {
+      console.log({ res })
+      if (res.status == 1) {
+        Alert.alert('Registration Successful', 'Please verify your email to continue', [{
+          text: 'OK',
+          onPress: () => navigateToVerifyMail(v.email, resetForm)
+        }])
+      } else {
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
+  const navigateToLogin = () => {
+    navigation.navigate('Login')
   }
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={_styles.headerText}>Sign up</AppText>
+      <AppText style={[_styles.headerText, { ...fontGroup.ns900 }]}>Sign up</AppText>
       <AppText style={_styles.subHeaderText}>
         Create an account to ROAM a new dimension with captivating AR
         experiences.
@@ -51,8 +84,8 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
             password: "",
             confirmPassword: ""
           }}
-          onSubmit={navigateToVerifyMail}
-          // validationSchema={validationSchema}
+          onSubmit={(v, { resetForm }) => handleSignup(v, resetForm)}
+          validationSchema={SignUpSchema}
         >
           {({
             handleChange,
@@ -71,10 +104,11 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
                 value={values.email}
                 autoCapitalize="none"
                 onChangeText={handleChange("email")}
-                // onBlur={handleBlur('username')}
+                onBlur={handleBlur('email')}
                 errorMessage={
                   touched.email && errors?.email ? errors.email : undefined
                 }
+                maxLength={100}
                 autoCorrect={false}
                 textContentType="emailAddress"
                 autoComplete="email"
@@ -89,71 +123,68 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.password}
                 onChangeText={handleChange("password")}
-                // onBlur={handleBlur('password')}
+                onBlur={handleBlur('password')}
                 errorMessage={
                   touched.password && errors?.password
                     ? errors.password
                     : undefined
                 }
+                maxLength={20}
                 autoCapitalize="none"
                 leftIcon={<LockIcon />}
-                rightIcon={<EyeIcon />}
+                rightIcon={
+                  <Icon onPress={() => {
+                    setPasswordVisibility(p => !p)
+                  }} name={passwordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                }
               />
               <AppInput
                 inputContainerStyle={[_styles.input]}
                 containerStyle={{ marginTop: -10, marginBottom: -15 }}
-                secureTextEntry={passwordVisibility && true}
+                secureTextEntry={rePasswordVisibility && true}
                 onSubmitEditing={Keyboard.dismiss}
                 placeholder="Confirm Password"
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.confirmPassword}
                 onChangeText={handleChange("confirmPassword")}
-                // onBlur={handleBlur('password')}
+                onBlur={handleBlur('confirmPassword')}
                 errorMessage={
                   touched.confirmPassword && errors?.confirmPassword
                     ? errors.confirmPassword
                     : undefined
                 }
+                maxLength={20}
                 autoCapitalize="none"
                 leftIcon={<LockIcon />}
-                rightIcon={<EyeIcon />}
+                rightIcon={
+                  <Icon onPress={() => {
+                    setRePasswordVisibility(p => !p)
+                  }} name={rePasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                }
               />
 
               {/* login Button */}
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Sign In"}
+                title={"Sign Up"}
                 onPress={handleSubmit}
-                // loading={isLoading}
+                loading={isLoading}
               />
 
               {/* Terms and Conditions */}
               <AppText style={_styles.termsAndConditionstext}>
-                By clicking "Sign in" you agree to our {""}
+                By clicking "Sign Up" you agree to our {""}
                 <AppText
                   style={_styles.TandCLink}
-                  // onPress={navigateToSignUp}
+                // onPress={navigateToSignUp}
                 >
                   Terms and Conditions.
                 </AppText>
               </AppText>
 
-              {/* divider */}
-              <DividerWithText containerStyle={_styles.divider} label={"OR"} />
-
               {/* social sign in options */}
-              <View style={_styles.socialSUcontainer}>
-                <TouchableOpacity>
-                  <FacebookIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <GoogleIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-                <TouchableOpacity>
-                  <AppleIcon style={_styles.socialSIicon} />
-                </TouchableOpacity>
-              </View>
+              <SocialSignin />
             </View>
           )}
         </Formik>
@@ -162,7 +193,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
           Already have an account? {""}
           <AppText
             style={_styles.SignInLink}
-            // onPress={}
+            onPress={navigateToLogin}
           >
             Sign In
           </AppText>

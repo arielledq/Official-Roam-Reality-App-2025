@@ -1,4 +1,4 @@
-package com.travel_ar_app_42706;
+package com.roam_reality;
 
 import android.os.Bundle;
 import com.facebook.react.ReactActivity;
