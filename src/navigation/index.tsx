@@ -26,7 +26,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="EditProfile"
+            initialRouteName="ChangePassword"
             screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />

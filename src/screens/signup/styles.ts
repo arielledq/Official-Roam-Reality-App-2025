@@ -30,7 +30,7 @@ const useStyles = makeStyles(theme => ({
   },
   input: {
     ...fontGroup.sf400,
-    height: 58,
+    height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG
@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: 20
   },
   divider: {
-    marginVertical: '10%',
+    marginBottom: '10%',
   },
   termsAndConditionstext: {
     ...fontGroup.sf400,
@@ -58,7 +58,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH15,
     color: theme.colors.TandCgrey,
     textAlign: "center",
-    marginTop: 10
+    marginVertical: '6%'
   },
   TandCLink: {
     ...fontGroup.sf400,
@@ -72,7 +72,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.grey,
     textAlign: "center",
-    marginTop: '20%'
+    marginTop: '30%'
   },
   SignInLink: {
     ...fontGroup.ns600,
