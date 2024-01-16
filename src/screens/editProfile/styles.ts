@@ -20,14 +20,14 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: { marginBottom: '10%' },
   buttonStyle: { height: 50 },
   input: {
-    height: 58,
+    height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG,
     marginVertical: -5
   },
   timeInput: {
-    height: 60,
+    height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG,
@@ -38,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
   },
   chidlView: { flex: 1 },
   dropdown: {
-    height: 60,
+    height: 50,
     backgroundColor: theme.colors.inputBG,
     borderRadius: 6,
     paddingHorizontal: 20,
