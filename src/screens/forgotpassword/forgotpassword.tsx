@@ -25,7 +25,7 @@ import { handleError } from "../../util/helpers"
 const ForgotPassword: ScreenStackComponent<
   RootStackParamList,
   "ForgotPassword"
-> = ({ }) => {
+> = ({ navigation }) => {
   const _styles = useStyles()
   const [sending, setSending] = useState(false)
 
@@ -96,7 +96,7 @@ const ForgotPassword: ScreenStackComponent<
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Send Link"}
+                title={"Send Code"}
                 onPress={handleSubmit}
                 loading={sending}
                 disabled={sending}

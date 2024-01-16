@@ -89,6 +89,7 @@ const ChangePassword: ScreenStackComponent<
                 <View style={_styles.chidlView}>
                   <AppInput
                     inputContainerStyle={[_styles.input]}
+                    containerStyle={{ marginBottom: -10 }}
                     secureTextEntry={oldpasswordVisibility}
                     placeholder="Old Password"
                     onSubmitEditing={Keyboard.dismiss}
@@ -108,6 +109,7 @@ const ChangePassword: ScreenStackComponent<
                   <AppInput
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={newpasswordVisibility}
+                    containerStyle={{ marginBottom: -10 }}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="Password"
                     placeholderTextColor={theme.darkColors?.grey}
