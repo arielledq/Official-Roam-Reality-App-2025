@@ -76,7 +76,7 @@
 		00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = travel_ar_app_42706Tests.m; sourceTree = "<group>"; };
 		035E791890C347CAA200494B /* sf-ui-display-heavy.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-heavy.otf"; path = "../src/assets/fonts/sf-ui-display-heavy.otf"; sourceTree = "<group>"; };
 		05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-medium.otf"; path = "../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = travel_ar_app_42706.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		13B07F961A680F5B00A75B9A /* Roam Reality.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Roam Reality.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = travel_ar_app_42706/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = travel_ar_app_42706/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = travel_ar_app_42706/Images.xcassets; sourceTree = "<group>"; };
@@ -108,6 +108,7 @@
 		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
 		90AB19B02B559C280085DDEF /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../Project Documents/Roam Reality/GoogleService-Info.plist"; sourceTree = "<group>"; };
+		90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
 		90EF26452B5039E300872709 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
 		90EF26462B5039E300872709 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
 		90EF26472B5039E300872709 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
@@ -174,6 +175,7 @@
 		13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */ = {
 			isa = PBXGroup;
 			children = (
+				90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */,
 				90AB19B02B559C280085DDEF /* GoogleService-Info.plist */,
 				90EF26442B5039E300872709 /* Fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
@@ -256,7 +258,7 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */,
+				13B07F961A680F5B00A75B9A /* Roam Reality.app */,
 				00E356EE1AD99517003FC87E /* travel_ar_app_42706Tests.xctest */,
 			);
 			name = Products;
@@ -340,7 +342,7 @@
 			);
 			name = travel_ar_app_42706;
 			productName = travel_ar_app_42706;
-			productReference = 13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Roam Reality.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -678,6 +680,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
@@ -692,8 +695,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = travel_ar_app_42706;
+				PRODUCT_BUNDLE_IDENTIFIER = "onPress--handleGoogleLogin-";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.roam.reality;
+				PRODUCT_NAME = "Roam Reality";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -706,6 +710,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
@@ -719,8 +724,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = travel_ar_app_42706;
+				PRODUCT_BUNDLE_IDENTIFIER = "onPress--handleGoogleLogin-";
+				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.roam.reality;
+				PRODUCT_NAME = "Roam Reality";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
