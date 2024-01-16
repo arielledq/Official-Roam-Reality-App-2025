@@ -1,14 +1,15 @@
 import uuid
 from django.shortcuts import render
 from django.contrib.auth import get_user_model
-from rest_auth.views import LogoutView
+from rest_auth.views import LogoutView, PasswordResetConfirmView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework import permissions, status, generics, serializers
 from rest_framework.views import APIView
-from home.api.v1.serializers import ChangePasswordSerializer
+from home.api.v1.serializers import ChangePasswordSerializer, UserSerializer
 from home.utils import EmailOTP, handle_validation_error
 from travel_ar_app_42706.settings import DOMAIN
 from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
 
 
 from users.models import PasswordReset, UserProfile
@@ -113,3 +114,25 @@ class ChangePasswordView(generics.GenericAPIView):
                 error_message = str(e.detail.get('non_field_errors')[0])
             return Response({'success': False, 'message': str(e), 'error_message': error_message},
                             status=status.HTTP_400_BAD_REQUEST)
+
+
+class ResetPasswordView(PasswordResetConfirmView):
+    """
+    Password reset e-mail token is verified, therefore
+    this resets the user's password.
+
+    Accepts the following POST parameters: token, uid,
+        new_password1, new_password2
+    Returns the success/fail message.
+    """
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        request.data['email'] = serializer.user.email
+        request.data['password'] = serializer.validated_data['new_password1']
+        user = User.objects.get(email=serializer.user.email)
+        token, created = Token.objects.get_or_create(user=user)
+        user_serializer = UserSerializer(user)
+        return Response({"token": token.key, "user": user_serializer.data},status.HTTP_201_CREATED)
