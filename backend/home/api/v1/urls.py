@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from home.views import AppLogoutView, ChangePasswordView, SendPasswordToken, VerifyPasswordToken
+from home.views import AppLogoutView, ChangePasswordView, ResetPasswordView
 
 from home.api.v1.viewsets import (
     ConfirmEmailOtpViewset,
@@ -20,6 +20,8 @@ urlpatterns = [
     path("", include(router.urls)),
     path("logout/", AppLogoutView.as_view(), name="logout"),
     path("change-password/", ChangePasswordView.as_view(), name="change-password"),
-    path('reset-password/send/', SendPasswordToken.as_view(), name="send_reset_password"),
-    path('reset-password/verify/', VerifyPasswordToken.as_view(), name="verify_reset_password"),
+    # path('reset-password/send/', SendPasswordToken.as_view(), name="send_reset_password"),
+    # path('reset-password/verify/', VerifyPasswordToken.as_view(), name="verify_reset_password"),
+    path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
+
 ]
