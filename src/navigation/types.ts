@@ -10,6 +10,7 @@ export type RootStackParamList = {
   EmailVerification: undefined;
   VerificationSuccess: undefined;
   Profile: undefined;
+  EditProfile: undefined
 };
 
 export type ScreenStackComponent<
