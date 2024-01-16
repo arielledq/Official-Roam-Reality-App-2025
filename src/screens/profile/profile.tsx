@@ -1,5 +1,5 @@
 import React from "react"
-import { TouchableOpacity } from "react-native"
+import { ImageBackground, TouchableOpacity, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import useStyles from "./styles"
 import {
@@ -11,6 +11,8 @@ import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import { MenuIcon } from "../../assets/svg"
 import UserInfoCard from "../../components/userInfoCard"
+import Images from "../../assets/images"
+import { Avatar } from "@rneui/base"
 
 
 const Profile: ScreenStackComponent<
@@ -35,7 +37,13 @@ const Profile: ScreenStackComponent<
           nestedScrollEnabled
           style={_styles.scroll}
         >
-          <UserInfoCard name={""} email={""} editAction={() => console.log()} />
+          <Avatar 
+          size={150}
+          />
+          <ImageBackground source={Images.GradientRectBG} style={_styles.imageBackground}>
+               <UserInfoCard name={""} email={""} editAction={() => console.log()} />
+          </ImageBackground>
+          
         </KeyboardAwareScrollView>
       </BackgroundWithImage>
   )

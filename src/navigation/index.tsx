@@ -12,6 +12,7 @@ import SignUp from '../screens/signup/signup';
 import EmailVerification from '../screens/emailVerification/emailVerification';
 import VerificationSuccess from '../screens/verificationSuccess/verificationSuccess';
 import Profile from '../screens/profile/profile';
+import EditProfile from '../screens/editProfile/editProfile';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -25,7 +26,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="Profile"
+            initialRouteName="EditProfile"
             screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="ChangePassword" component={ChangePassword} />
@@ -34,6 +35,7 @@ const Navigation = () => {
             <Stack.Screen name="EmailVerification" component={EmailVerification} />
             <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
             <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
 
           </Stack.Navigator>
         </ThemeProvider>
