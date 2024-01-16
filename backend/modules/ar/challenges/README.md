@@ -1,4 +1,4 @@
-# Camera
+# AR CHALLENGES
 
 Before starting the server run:
 
