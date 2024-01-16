@@ -19,10 +19,11 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: { marginBottom: '10%' },
   buttonStyle: { height: 50 },
   input: {
-    height: 58,
+    height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG,
+    
   },
   scroll: { flex: 1 },
   chidlView: { flex: 1 },

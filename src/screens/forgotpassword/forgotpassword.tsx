@@ -21,7 +21,7 @@ import Images from "../../assets/images"
 const ForgotPassword: ScreenStackComponent<
   RootStackParamList,
   "ForgotPassword"
-> = ({ }) => {
+> = ({ navigation }) => {
   const _styles = useStyles()
 
   return (
@@ -35,7 +35,7 @@ const ForgotPassword: ScreenStackComponent<
           initialValues={{
             email: ""
           }}
-          onSubmit={() => console.log("hello")}
+          onSubmit={() => navigation.navigate('ChangePassword')}
           // validationSchema={validationSchema}
         >
           {({
@@ -88,8 +88,8 @@ const ForgotPassword: ScreenStackComponent<
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Send Link"}
-                // onPress={handleSubmit}
+                title={"Send Code"}
+                onPress={handleSubmit}
                 // loading={isLoading}
               />
             </View>

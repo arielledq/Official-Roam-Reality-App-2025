@@ -33,7 +33,7 @@ const useStyles = makeStyles(theme => ({
   },
   input: {
     ...fontGroup.sf400,
-    height: 58,
+    height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG

@@ -13,7 +13,6 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme?.colors?.inputBG,
   },
   formContainer: {
-    marginTop: "10%",
     paddingHorizontal: screenHorizontalPadding,
     flex: 1
   },
