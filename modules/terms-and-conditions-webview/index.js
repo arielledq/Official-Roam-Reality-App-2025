@@ -2,10 +2,7 @@ import React, { useEffect, useContext, useState } from "react";
 import { WebView } from "react-native-webview";
 import { OptionsContext } from "@options";
 
-const TermsAndConditionsWebview = ({
-  navigation,
-  url
-}) => {
+const TermsAndConditionsWebview = ({ url }) => {
   const [uri, setUri] = useState("");
   const options = useContext(OptionsContext);
 
@@ -16,13 +13,13 @@ const TermsAndConditionsWebview = ({
       setUri(url);
     }
   };
-
   useEffect(() => {
     handleUri();
   }, []);
-  return <WebView source={{
-    uri: uri
-  }} />;
+
+  return (
+    <WebView source={{ uri: uri }} />
+  );
 };
 
 export default {
