@@ -26,6 +26,24 @@ function modules_camera_upload_image_create(payload) {
 function modules_contact_us_contact_us_create(payload) {
   return travelarappAPI.post(`/modules/contact-us/contact_us/`)
 }
+function modules_privacy_policy_list(payload) {
+  return travelarappAPI.get(`/modules/privacy-policy/`)
+}
+function modules_privacy_policy_create(payload) {
+  return travelarappAPI.post(`/modules/privacy-policy/`, payload)
+}
+function modules_privacy_policy_retrieve(payload) {
+  return travelarappAPI.get(`/modules/privacy-policy/${payload.id}/`)
+}
+function modules_privacy_policy_update(payload) {
+  return travelarappAPI.put(`/modules/privacy-policy/${payload.id}/`, payload)
+}
+function modules_privacy_policy_partial_update(payload) {
+  return travelarappAPI.patch(`/modules/privacy-policy/${payload.id}/`, payload)
+}
+function modules_privacy_policy_destroy(payload) {
+  return travelarappAPI.delete(`/modules/privacy-policy/${payload.id}/`)
+}
 function modules_social_auth_apple_connect_create(payload) {
   return travelarappAPI.post(`/modules/social-auth/apple/connect/`, payload)
 }
@@ -118,6 +136,12 @@ export const apiService = {
   modules_camera_photos_user_retrieve,
   modules_camera_upload_image_create,
   modules_contact_us_contact_us_create,
+  modules_privacy_policy_list,
+  modules_privacy_policy_create,
+  modules_privacy_policy_retrieve,
+  modules_privacy_policy_update,
+  modules_privacy_policy_partial_update,
+  modules_privacy_policy_destroy,
   modules_social_auth_apple_connect_create,
   modules_social_auth_apple_login_create,
   modules_social_auth_facebook_connect_create,
