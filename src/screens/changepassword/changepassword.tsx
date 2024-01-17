@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Keyboard, TouchableOpacity, View } from "react-native"
+import { Alert, Keyboard, TouchableOpacity, View } from "react-native"
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import theme from "../../assets/theme"
@@ -10,10 +10,11 @@ import {
   ScreenStackComponent
 } from "../../navigation/types"
 import BackgroundWithImage from "../../components/background"
-import { validationSchema } from "./validation"
 import AppHeader from "../../components/header"
 import AppInput from "../../components/input"
-import { EyeIcon, LockIcon } from "../../assets/svg"
+import Icon from "../../components/Icon"
+import { ChangePasswordSchema } from "../../util/ValidationSchemas"
+import { changePassword } from "../../network"
 
 type ChangePasswordFormValues = {
   oldPassword: string,
@@ -31,39 +32,23 @@ const ChangePassword: ScreenStackComponent<
   const [newpasswordVisibility, setNewPasswordVisibility] = useState(true)
   const [confirmnewpasswordVisibility, setConfirmNewPasswordVisibility] =
     useState(true)
+  const [isLoading, setIsLoading] = useState(false)
 
-  function handleChangePassword(values: ChangePasswordFormValues) {}
-
-  function eyeIcon() {
-    return (
-      <TouchableOpacity
-        onPress={() => setOldPasswordVisibility(!oldpasswordVisibility)}
-      >
-        {oldpasswordVisibility ? <EyeIcon /> : <EyeIcon />}
-      </TouchableOpacity>
-    )
-  }
-
-  function eyeNIcon() {
-    return (
-      <TouchableOpacity
-        onPress={() => setNewPasswordVisibility(!newpasswordVisibility)}
-      >
-        {newpasswordVisibility ? <EyeIcon /> : <EyeIcon />}
-      </TouchableOpacity>
-    )
-  }
-
-  function eyeCIcon() {
-    return (
-      <TouchableOpacity
-        onPress={() =>
-          setConfirmNewPasswordVisibility(!confirmnewpasswordVisibility)
-        }
-      >
-        {confirmnewpasswordVisibility ? <EyeIcon /> : <EyeIcon />}
-      </TouchableOpacity>
-    )
+  function handleChangePassword(values: ChangePasswordFormValues) {
+    setIsLoading(true)
+    changePassword({
+      old_password: values.oldPassword,
+      new_password: values.newPassword,
+      confirm_password: values.confirmnewPassword
+    }).then(res => {
+      console.log({ res })
+      if (res.status == 1) {
+        Alert.alert('Success', res.message, [{ text: 'OK', onPress: () => navigation.goBack() }])
+      } else {
+        Alert.alert('Error', res.message.error)
+      }
+    })
+      .finally(() => { setIsLoading(false) })
   }
 
   return (
@@ -82,9 +67,9 @@ const ChangePassword: ScreenStackComponent<
               confirmnewPassword: ""
             }}
             onSubmit={handleChangePassword}
-            validationSchema={validationSchema}
+            validationSchema={ChangePasswordSchema}
           >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
+            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
                   <AppInput
@@ -96,15 +81,18 @@ const ChangePassword: ScreenStackComponent<
                     placeholderTextColor={theme.darkColors?.grey}
                     value={values.oldPassword}
                     onChangeText={handleChange("oldPassword")}
-                    // onBlur={handleBlur('oldPassword')}
+                    onBlur={handleBlur('oldPassword')}
                     errorMessage={
                       touched.oldPassword && errors?.oldPassword
                         ? errors.oldPassword
                         : undefined
                     }
                     autoCapitalize="none"
-                    rightIcon={eyeIcon()}
-                    leftIcon={<LockIcon />}
+                    rightIcon={
+                      <Icon onPress={() => {
+                        setOldPasswordVisibility(p => !p)
+                      }} name={oldpasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                    }
                   />
                   <AppInput
                     inputContainerStyle={[_styles.input]}
@@ -115,15 +103,18 @@ const ChangePassword: ScreenStackComponent<
                     placeholderTextColor={theme.darkColors?.grey}
                     value={values.newPassword}
                     onChangeText={handleChange("newPassword")}
-                    // onBlur={handleBlur('password')}
+                    onBlur={handleBlur('newPassword')}
                     errorMessage={
                       touched.newPassword && errors?.newPassword
                         ? errors.newPassword
                         : undefined
                     }
                     autoCapitalize="none"
-                    rightIcon={eyeNIcon()}
-                    leftIcon={<LockIcon />}
+                    rightIcon={
+                      <Icon onPress={() => {
+                        setNewPasswordVisibility(p => !p)
+                      }} name={newpasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                    }
                   />
                   <AppInput
                     inputContainerStyle={[_styles.input]}
@@ -133,15 +124,18 @@ const ChangePassword: ScreenStackComponent<
                     placeholder="Confirm Password"
                     value={values.confirmnewPassword}
                     onChangeText={handleChange("confirmnewPassword")}
-                    // onBlur={handleBlur('password')}
+                    onBlur={handleBlur('confirmnewPassword')}
                     errorMessage={
                       touched.confirmnewPassword && errors?.confirmnewPassword
                         ? errors.confirmnewPassword
                         : undefined
                     }
                     autoCapitalize="none"
-                    rightIcon={eyeCIcon()}
-                    leftIcon={<LockIcon />}
+                    rightIcon={
+                      <Icon onPress={() => {
+                        setConfirmNewPasswordVisibility(p => !p)
+                      }} name={confirmnewpasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                    }
                   />
                 </View>
 
@@ -150,7 +144,8 @@ const ChangePassword: ScreenStackComponent<
                   containerStyle={_styles.buttonContainer}
                   title={"Change Password"}
                   onPress={handleSubmit}
-                  //   loading={isLoading}
+                  loading={isLoading}
+                  disabled={isLoading}
                 />
               </View>
             )}

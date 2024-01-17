@@ -31,7 +31,6 @@ const Navigation = () => {
     return (
       <>
         <Stack.Screen name="Login" component={Login} />
-        <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
@@ -47,6 +46,7 @@ const Navigation = () => {
     return (
       <>
         <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
       </>
     )
   }
