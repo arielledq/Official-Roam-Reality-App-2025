@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   termsAndConditionstext: {
     ...fontGroup.sf400,
     fontSize: FontSizes.S12,
-    lineHeight: FontLineHeights.LH15,
+    lineHeight: FontLineHeights.LH20,
     color: theme.colors.TandCgrey,
     textAlign: "center",
     marginTop: 10

@@ -16,6 +16,7 @@ import { useSelector } from 'react-redux';
 import EditProfile from '../screens/editProfile/editProfile';
 import Home from '../screens/home';
 import TermsAndConditions from '../screens/termsAndConditions';
+import PrivacyPolicy from '../screens/PrivacyPolicy';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -38,6 +39,7 @@ const Navigation = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
       </>
     )
   }
@@ -54,7 +56,10 @@ const Navigation = () => {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
             initialRouteName="Login"
-            screenOptions={{ headerShown: false }}>
+            screenOptions={{
+              headerShown: false,
+              animation: "slide_from_right"
+            }}>
             {token ?
               renderCommonStack() : renderAuthStack()
             }

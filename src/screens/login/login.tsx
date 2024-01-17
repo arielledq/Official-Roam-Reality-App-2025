@@ -156,14 +156,22 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
 
               {/* Terms and Conditions */}
               <AppText style={_styles.termsAndConditionstext}>
-                By clicking "Sign in" you agree to our {""}
+                {` By clicking "Sign in" you agree to our `}
                 <AppText
                   style={_styles.TandCLink}
                   onPress={() => {
                     navigation.navigate('TermsAndConditions')
                   }}
                 >
-                  Terms and Conditions.
+                  {`Terms and Conditions `}
+                </AppText>and
+                <AppText
+                  style={_styles.TandCLink}
+                  onPress={() => {
+                    navigation.navigate('PrivacyPolicy')
+                  }}
+                >
+                  {` Privacy Policy.`}
                 </AppText>
               </AppText>
 
