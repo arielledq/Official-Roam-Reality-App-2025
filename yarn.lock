@@ -1462,6 +1462,9 @@
 "@modules/terms-and-conditions-webview@file:./modules/terms-and-conditions-webview":
   version "1.0.0"
 
+"@modules/terms-and-conditions-webview@file:./modules/terms-and-conditions-webview/":
+  version "1.0.0"
+
 "@modules/user-profile@file:./modules/user-profile":
   version "1.0.0"
   dependencies:
