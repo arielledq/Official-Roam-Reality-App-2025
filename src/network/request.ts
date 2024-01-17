@@ -68,7 +68,7 @@ class RequestClass {
       return {
         status: 0,
         errorStatus,
-        message: get(data, 'message')
+        message: data
       }
     }
   }
@@ -91,7 +91,7 @@ class RequestClass {
       return {
         status: 0,
         errorStatus,
-        message: get(data, 'message')
+        message: data
       }
     }
   }
