@@ -63,6 +63,7 @@ This section will show any installed modules you add from the Storyboard Modules
 - [camera]()
 - [django-contact-us](backend/modules)
 - [terms-and-conditions]()
+- [privacy-policy]()
 
 # Getting started: Frontend
 
