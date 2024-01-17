@@ -47,7 +47,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
     setIsLoading(true)
     // dispatch(updateUserData())
     login({
-      username: v.email,
+      username: v.email.toLowerCase(),
       password: v.password
     }).then(res => {
       console.log({ res })
@@ -159,7 +159,9 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 By clicking "Sign in" you agree to our {""}
                 <AppText
                   style={_styles.TandCLink}
-                // onPress={navigateToSignUp}
+                  onPress={() => {
+                    navigation.navigate('TermsAndConditions')
+                  }}
                 >
                   Terms and Conditions.
                 </AppText>

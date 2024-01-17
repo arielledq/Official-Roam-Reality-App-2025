@@ -47,7 +47,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
   const handleSignup = (v, resetForm) => {
     setIsLoading(true)
     signUp({
-      email: v.email,
+      email: v.email.toLowerCase(),
       password: v.password,
     }).then(res => {
       console.log({ res })
