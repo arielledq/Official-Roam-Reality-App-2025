@@ -3,7 +3,6 @@ import { WebView } from "react-native-webview";
 import { OptionsContext } from "@options";
 
 const TermsAndConditionsWebview = ({
-  navigation,
   url
 }) => {
   const [uri, setUri] = useState("");
