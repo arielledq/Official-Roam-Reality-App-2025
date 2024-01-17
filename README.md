@@ -62,6 +62,7 @@ This section will show any installed modules you add from the Storyboard Modules
 - [react-native-user-profile](modules/user-profile)
 - [camera]()
 - [django-contact-us](backend/modules)
+- [terms-and-conditions]()
 
 # Getting started: Frontend
 
