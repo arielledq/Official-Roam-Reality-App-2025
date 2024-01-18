@@ -4,6 +4,8 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.decorators import action
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 from users.models import UserProfile
@@ -12,7 +14,9 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator as token_generator
 from home.api.v1.serializers import (
+    AccountSetupSerializer,
     SignupSerializer,
+    UserProfileSerializer,
     UserSerializer,
 )
 
@@ -119,3 +123,16 @@ class ConfirmEmailOtpViewset(ViewSet):
                 )
         except Exception as e:
             return Response({'status':"success", 'message':str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class AccountSetupViewset(ModelViewSet):
+    """
+        API for Account Setup
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = AccountSetupSerializer
+    http_method_names = ["get", "patch"]
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(user=self.request.user)
