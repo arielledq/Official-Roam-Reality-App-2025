@@ -73,7 +73,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserProfile
-        fields = ('is_verified', 'image')
+        fields = ('id', 'is_verified', 'image')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -109,3 +109,17 @@ class ChangePasswordSerializer(serializers.Serializer):
         if self.context['request'].user.check_password(new_password):
             raise serializers.ValidationError("This password is not acceptable !!")
         return attrs
+
+
+class AccountSetupSerializer(serializers.ModelSerializer):
+    user = serializers.CharField(required=False)
+
+    class Meta:
+        model = UserProfile
+        fields = "__all__"
+
+    def create(self, validated_data):
+        user_profile = dict()
+        user_profile["user"] = self.context['request'].user
+        user_profile.update(validated_data)
+        return UserProfile.objects.create(**user_profile)
