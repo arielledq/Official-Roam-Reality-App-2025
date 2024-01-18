@@ -29,7 +29,7 @@ import { handleError } from "../../util/helpers"
 import SocialSignin from "../../components/socialSignin"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
-navigation
+  navigation
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
@@ -72,7 +72,7 @@ navigation
         Create an account to ROAM a new dimension with captivating AR
         experiences.
       </AppText>
-      <KeyboardAwareScrollView style={{flex: 1}} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView style={{ flex: 1 }} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
         <Formik
           initialValues={{
             email: "",
@@ -171,22 +171,24 @@ navigation
               </AppText>
 
               {/* social sign in options */}
-              <SocialSignin />
+              <SocialSignin
+                setLoading={setIsLoading}
+              />
 
             </View>
           )}
         </Formik>
-        
+
       </KeyboardAwareScrollView>
       <AppText style={_styles.alreadyHaveAccount}>
-          Don’t have an account? {""}
-          <AppText
-            style={_styles.SignInLink}
-            onPress={navigateToSignUp}
-          >
-            Sign Up
-          </AppText>
+        Don’t have an account? {""}
+        <AppText
+          style={_styles.SignInLink}
+          onPress={navigateToSignUp}
+        >
+          Sign Up
         </AppText>
+      </AppText>
 
     </BackgroundWithImage>
   )

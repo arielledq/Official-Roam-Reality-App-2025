@@ -19,15 +19,30 @@ import appleAuth, {
   appleAuthAndroid
 } from '@invertase/react-native-apple-authentication'
 import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from '../../network/config'
+import { googleLogin } from '../../network'
 
-const SocialSignin = () => {
+const SocialSignin = ({ setLoading }) => {
   const handleGoogleLogin = async () => {
+    setLoading(true)
     try {
       await GoogleSignin.hasPlayServices()
       const userinfo = await GoogleSignin.signIn()
       const tokens = await GoogleSignin.getTokens()
       console.log({ userinfo })
       console.log({ tokens })
+      googleLogin({
+        access_token: tokens.accessToken
+        // code: userinfo.serverAuthCode
+      })
+        .then(res => {
+          console.log({ res })
+        })
+        .catch(err => {
+          console.log({ err })
+        })
+        .finally(() => {
+          setLoading(false)
+        })
       //   dispatch(
       //     LoginActions.google_login({
       //       access_token: tokens.accessToken
