@@ -36,3 +36,4 @@ drf-spectacular = "~=0.26.3"
 cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditions"}
 cb-privacy-policy = {editable = true, path = "./modules/privacy_policy"}
 cb-ar = {editable = true, path = "./modules/ar"}
+sendgrid = "*"
