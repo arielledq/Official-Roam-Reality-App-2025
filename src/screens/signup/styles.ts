@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH20,
     color: theme.colors.TandCgrey,
     textAlign: "center",
-    marginVertical: '6%'
+    marginTop: '5%'
   },
   TandCLink: {
     ...fontGroup.sf400,
@@ -71,7 +71,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.grey,
     textAlign: "center",
-    marginTop: '30%'
+    marginBottom: 10
   },
   SignInLink: {
     ...fontGroup.ns600,

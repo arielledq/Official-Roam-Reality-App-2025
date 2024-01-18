@@ -10,7 +10,7 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/Fo
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
-    paddingHorizontal: screenHorizontalPadding
+    paddingHorizontal: screenHorizontalPadding,
   },
   container: { marginTop: "10%" },
   headerText: {
@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH20,
     color: theme.colors.TandCgrey,
     textAlign: "center",
-    marginTop: 10
+    marginTop: '5%'
   },
   TandCLink: {
     ...fontGroup.sf400,
@@ -71,7 +71,7 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.grey,
     textAlign: "center",
-    marginTop: '35%'
+    marginBottom: 10
   },
   SignInLink: {
     ...fontGroup.sf400,

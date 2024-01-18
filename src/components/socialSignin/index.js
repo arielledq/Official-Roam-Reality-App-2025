@@ -200,7 +200,8 @@ export default SocialSignin
 
 const styles = StyleSheet.create({
   divider: {
-    marginVertical: '10%'
+    marginBottom: '10%',
+    marginTop: 20
   },
   socialSUcontainer: {
     flexDirection: 'row',

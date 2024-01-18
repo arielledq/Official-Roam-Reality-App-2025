@@ -14,8 +14,8 @@ const useStyles = makeStyles((theme) => ({
   },
   container: {
     paddingHorizontal: screenHorizontalPadding - 5,
-    marginTop: '10%',
     flex: 1,
+    marginTop: -15
   },
   buttonContainer: { marginBottom: '10%' },
   buttonStyle: { height: 50 },
@@ -66,11 +66,12 @@ const useStyles = makeStyles((theme) => ({
   },
   placeholderStyle: {
     color: theme.colors.grey,
-    marginStart: 10,
+    marginStart: 3,
     fontSize: FontSizes.S14,
     opacity: 1,
   },
   timeteststyle: {
+    marginStart: 3,
     color: theme.colors.grey,
     fontSize: FontSizes.S14,
     opacity: 1,
@@ -91,14 +92,16 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: 'row',
     // paddingHorizontal: 20,
     paddingRight: screenHorizontalPadding + 30,
-    marginTop: '10%',
-    marginBottom: 20
+    marginVertical: '7%',
   },
   privacyText: {
-    color: theme.colors.TandCgrey,
+    color: theme.colors.grey,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
-  }
+  },
+  focusedInput: {
+    backgroundColor: theme.colors.inputBlue
+  },
 }));
 
 export default useStyles;

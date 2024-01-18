@@ -60,3 +60,17 @@ export const deleteAccount = () =>
     url: `${commonApiRoute}delete-account/`,
     method: 'DELETE'
   })
+
+  export const confirmEmailOtp = data =>
+  Request.call({
+    url: `${commonApiRoute}confirm-email-otp/token/`,
+    method: 'POST',
+    data
+  })
+
+  export const resetPassword = data =>
+  Request.call({
+    url: `${commonApiRoute}reset-password/`,
+    method: 'POST',
+    data
+  })

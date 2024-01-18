@@ -9,5 +9,6 @@ declare module '@rneui/themed' {
     purple: string;
     blue: string;
     pink: string;
+    inputBlue: string
   }
 }
