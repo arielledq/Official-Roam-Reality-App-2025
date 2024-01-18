@@ -27,6 +27,20 @@ class SignupViewSet(ModelViewSet):
     serializer_class = SignupSerializer
     http_method_names = ["post"]
 
+    def create(self, request):
+        try:
+            serializer = self.serializer_class(
+                data=request.data, context={"request": request}
+            )
+            serializer.is_valid(raise_exception=True)
+            serializer.save()
+            user = User.objects.get(email=serializer.validated_data.get('email'))
+            token, created = Token.objects.get_or_create(user=user)
+            user_serializer = UserSerializer(user)
+            return Response({"token": token.key, "user": user_serializer.data})
+        except User.DoesNotExist:
+            return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class LoginViewSet(ViewSet):
     """Based on rest_framework.authtoken.views.ObtainAuthToken"""
