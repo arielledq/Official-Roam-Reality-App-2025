@@ -114,10 +114,10 @@ const ForgotPassword: ScreenStackComponent<
                   value={values.input}
                   autoCapitalize="none"
                   onChangeText={handleChange("input")}
-                  // onBlur={handleBlur('email')}
+                  onBlur={handleBlur('input')}
                   errorMessage={
                     touched.input && errors?.input ? errors.input : undefined
-                  }
+                  }                  
                   autoCorrect={false}
                   textContentType={textContentTypeText}
                   autoComplete={autoCompleteType}
