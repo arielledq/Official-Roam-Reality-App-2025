@@ -3,6 +3,7 @@ from rest_framework.routers import DefaultRouter
 from home.views import AppLogoutView, ChangePasswordView, ResetPasswordView
 
 from home.api.v1.viewsets import (
+    AccountSetupViewset,
     ConfirmEmailOtpViewset,
     SendEmailOtpViewset,
     SignupViewSet,
@@ -14,6 +15,7 @@ router.register("signup", SignupViewSet, basename="signup")
 router.register("login", LoginViewSet, basename="login")
 router.register("send-email-otp", SendEmailOtpViewset, basename="send_email_otp")
 router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_email_otp")
+router.register("account-setup", AccountSetupViewset, basename="account-setup")
 
 
 urlpatterns = [
