@@ -223,6 +223,7 @@ EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
 EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
 
 
 # AWS S3 config
@@ -241,12 +242,15 @@ USE_S3 = (
 if USE_S3:
     AWS_S3_CUSTOM_DOMAIN = env.str("AWS_S3_CUSTOM_DOMAIN", "")
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
-    AWS_DEFAULT_ACL = env.str("AWS_DEFAULT_ACL", "bucket-owner-full-control")
+    AWS_DEFAULT_ACL = env.str("AWS_DEFAULT_ACL", "public-read")
     AWS_MEDIA_LOCATION = env.str("AWS_MEDIA_LOCATION", "media")
     AWS_AUTO_CREATE_BUCKET = env.bool("AWS_AUTO_CREATE_BUCKET", True)
     DEFAULT_FILE_STORAGE = env.str(
         "DEFAULT_FILE_STORAGE", "home.storage_backends.MediaStorage"
     )
+    AWS_S3_SIGNATURE_VERSION = env.str("AWS_S3_SIGNATURE_VERSION", "s3v4")
+    AWS_S3_REGION_NAME = env.str("AWS_STORAGE_REGION", "")
+    AWS_S3_ADDRESSING_STYLE = 'virtual'
 
 SPECTACULAR_SETTINGS = {
     # available SwaggerUI configuration parameters
