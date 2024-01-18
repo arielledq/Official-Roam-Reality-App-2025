@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   },
   input: {
    ...fontGroup.sf400,
-    height: 58,
+    height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG
@@ -59,7 +59,20 @@ const useStyles = makeStyles(theme => ({
     textDecorationLine: "underline"
   },
   childView: { flex: 1 },
-  scroll: { flex: 1 }
+  scroll: { flex: 1 },
+  alreadyHaveAccount: {
+    ...fontGroup.ns600,
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH16,
+    color: theme.colors.white,
+    marginBottom: 10
+  },
+  SignInLink: {
+    ...fontGroup.ns600,
+    fontSize: FontSizes.S14,
+    color: theme.colors.blue,
+    textDecorationLine: "underline"
+  },
 }))
 
 export default useStyles

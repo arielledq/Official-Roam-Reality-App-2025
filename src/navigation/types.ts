@@ -7,10 +7,13 @@ export type RootStackParamList = {
   ChangePassword: undefined;
   ForgotPassword: undefined;
   SignUp: undefined;
-  EmailVerification: undefined;
-  VerificationSuccess: undefined;
+  EmailVerification: {email : string};
+  VerificationSuccess: {ChangePassword : boolean};
   Profile: undefined;
-  EditProfile: undefined
+  EditProfile: undefined;
+  TermsAndConditions: undefined;
+  Home: undefined;
+  FPChangePassword: {token: string, uid: string};
 };
 
 export type ScreenStackComponent<

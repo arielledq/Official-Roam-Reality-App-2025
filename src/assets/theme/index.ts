@@ -13,6 +13,7 @@ const theme = createTheme({
     purple: '#9003E0',
     blue: '#1158F4',
     pink: '#B816E0',
+    inputBlue: '#1158F4'
   },
   darkColors: {
     white: '#FFFFFF',
@@ -22,7 +23,8 @@ const theme = createTheme({
     TandCgrey: '#6B7280',
     purple: '#9003E0',
     blue: '#1158F4',
-    pink: '#B816E0'
+    pink: '#B816E0',
+    inputBlue: '#1158F4'
   },
   mode: 'light',
 });

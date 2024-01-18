@@ -12,10 +12,6 @@ import {
 import AppButton from "../../components/button"
 import AppInput from "../../components/input"
 import {
-  AppleIcon,
-  EyeIcon,
-  FacebookIcon,
-  GoogleIcon,
   LockIcon,
   MailIcon
 } from "../../assets/svg"
@@ -23,9 +19,8 @@ import AppHeader from "../../components/header"
 import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
-import { DividerWithText } from "../../components"
 import { login } from '../../network'
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { updateUserData } from "../../redux/Login"
 import { useNavigation } from "@react-navigation/native"
 import { SigninSchema } from "../../util/ValidationSchemas"
@@ -34,11 +29,11 @@ import { handleError } from "../../util/helpers"
 import SocialSignin from "../../components/socialSignin"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
-
+navigation
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const navigation = useNavigation()
+  // const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   console.log({ login })
@@ -77,7 +72,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
         Create an account to ROAM a new dimension with captivating AR
         experiences.
       </AppText>
-      <KeyboardAwareScrollView keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView style={{flex: 1}} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
         <Formik
           initialValues={{
             email: "",
@@ -181,7 +176,9 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
             </View>
           )}
         </Formik>
-        <AppText style={_styles.alreadyHaveAccount}>
+        
+      </KeyboardAwareScrollView>
+      <AppText style={_styles.alreadyHaveAccount}>
           Don’t have an account? {""}
           <AppText
             style={_styles.SignInLink}
@@ -190,7 +187,6 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
             Sign Up
           </AppText>
         </AppText>
-      </KeyboardAwareScrollView>
 
     </BackgroundWithImage>
   )

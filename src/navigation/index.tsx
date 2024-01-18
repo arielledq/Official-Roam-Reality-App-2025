@@ -17,6 +17,7 @@ import EditProfile from '../screens/editProfile/editProfile';
 import Home from '../screens/home';
 import TermsAndConditions from '../screens/termsAndConditions';
 import PrivacyPolicy from '../screens/PrivacyPolicy';
+import FPChangePassword from '../screens/fpchangepassword/fpchangepassword';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -38,6 +39,7 @@ const Navigation = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+        <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
       </>
     )
