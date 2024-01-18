@@ -7,7 +7,8 @@ const useStyles = makeStyles((theme) => ({
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.ns700,
     color: theme.colors.white,
-    marginTop:5
+    flex: 1,
+    textAlignVertical: 'center',
   },
   containerStyle: {
     borderBottomWidth: 0,
