@@ -30,11 +30,11 @@ import fontGroup from "../../assets/fonts"
 import { handleError } from "../../util/helpers"
 import { SignUpSchema } from "../../util/ValidationSchemas"
 import SocialSignin from "../../components/socialSignin"
+import { useNavigation } from "@react-navigation/native"
 
-const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
-  navigation
-}) => {
+const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   const _styles = useStyles()
+  const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [rePasswordVisibility, setRePasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
@@ -47,7 +47,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
   const handleSignup = (v, resetForm) => {
     setIsLoading(true)
     signUp({
-      email: v.email,
+      email: v.email.toLowerCase(),
       password: v.password,
     }).then(res => {
       console.log({ res })
@@ -174,12 +174,22 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = ({
 
               {/* Terms and Conditions */}
               <AppText style={_styles.termsAndConditionstext}>
-                By clicking "Sign Up" you agree to our {""}
+                {` By clicking "Sign in" you agree to our `}
                 <AppText
                   style={_styles.TandCLink}
-                // onPress={navigateToSignUp}
+                  onPress={() => {
+                    navigation.navigate('TermsAndConditions')
+                  }}
                 >
-                  Terms and Conditions.
+                  {`Terms and Conditions `}
+                </AppText>and
+                <AppText
+                  style={_styles.TandCLink}
+                  onPress={() => {
+                    navigation.navigate('PrivacyPolicy')
+                  }}
+                >
+                  {` Privacy Policy.`}
                 </AppText>
               </AppText>
 

@@ -36,7 +36,7 @@ export const confirmCode = data =>
     data
   })
 export const changePassword = data =>
-  Request.call({
+  Request.callWithToken({
     url: `${commonApiRoute}change-password/`,
     method: 'POST',
     data
