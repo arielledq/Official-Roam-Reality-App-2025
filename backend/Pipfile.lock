@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "dfabb2c122de9f51450bb879b02da0e670193c9c7a5bfcfed64034b6231b9018"
+            "sha256": "dbb06c5ee6e12e5633a69ac80831a3bd3a710923118aefbb6019f3c9c308e21d"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -16,10 +16,6 @@
         ]
     },
     "default": {
-        "ar": {
-            "editable": true,
-            "path": "./modules/ar"
-        },
         "attrs": {
             "hashes": [
                 "sha256:935dc3b529c262f6cf76e50877d35a4bd3c1de194fd41f47a2b7ae8f19971f30",
@@ -60,6 +56,10 @@
             ],
             "markers": "python_version >= '3.7'",
             "version": "==5.3.2"
+        },
+        "cb-ar": {
+            "editable": true,
+            "path": "./modules/ar"
         },
         "cb-privacy-policy": {
             "editable": true,

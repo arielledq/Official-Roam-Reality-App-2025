@@ -9,7 +9,7 @@ class BuildCommand(build):
 
 
 setup(
-    name="ar",
+    name="cb-ar",
     version="0.1",
     packages=["challenges"],
     install_requires=[],
