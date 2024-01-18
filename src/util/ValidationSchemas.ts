@@ -3,15 +3,24 @@ import { emailRegex, passRegex } from './regex';
 import Strings from '../constants/Strings';
 
 export const SigninSchema = Yup.object().shape({
-    email: Yup.string().matches(emailRegex, Strings.EmailError).required('Required'),
-    password: Yup.string().matches(passRegex, Strings.PasswordError).required('Required'),
+    email: Yup.string().matches(emailRegex, Strings.EmailError).required('Please enter your email address'),
+    password: Yup.string().matches(passRegex, Strings.PasswordError).required('Please enter your password'),
   });
 export const SignUpSchema = Yup.object().shape({
-    email: Yup.string().matches(emailRegex, Strings.EmailError).required('Required'),
-    password: Yup.string().matches(passRegex, Strings.PasswordError).required('Required'),
-    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Required'),
+    email: Yup.string().matches(emailRegex, Strings.EmailError).required('Please enter your email address'),
+    password: Yup.string().matches(passRegex, Strings.PasswordError).required('Please enter your password'),
+    confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Please confirm your password'),
   });
 export const ForgotPasswordSchema = Yup.object().shape({
-    email: Yup.string().matches(emailRegex, Strings.EmailError).required('Required'),
+    email: Yup.string().matches(emailRegex, Strings.EmailError).required('Please enter your email address'),
+  });
+
+export const ChangePasswordSchema = Yup.object().shape({
+    oldPassword: Yup.string()
+      .required('Please enter your existing password'),
+    newPassword: Yup.string().matches(passRegex, Strings.PasswordError).required('Please enter a new password'),
+    confirmnewPassword: Yup.string()
+      .oneOf([Yup.ref('newPassword'), null], 'Passwords must match')
+      .required('Please confirm your new password'),
   });
   
