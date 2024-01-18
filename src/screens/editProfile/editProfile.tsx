@@ -86,6 +86,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       _styles.input,
                       isNameInputFocused ? _styles.focusedInput : {}
                     ]}
+                    selectionColor={"white"}
                     onFocus={() => setNameInputFocused(true)}
                     onBlur={() => setNameInputFocused(false)}
                     placeholder="Full name"
@@ -183,6 +184,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         ? theme.darkColors?.white
                         : theme.darkColors?.grey
                     }
+                    selectionColor={"white"}
                     value={values.phoneNumber}
                     onChangeText={handleChange("phoneNumber")}
                     errorMessage={
@@ -218,6 +220,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         ? theme.darkColors?.white
                         : theme.darkColors?.grey
                     }
+                    selectionColor={"white"}
                     placeholder="Home Address"
                     value={values.address}
                     onChangeText={handleChange("address")}
@@ -335,6 +338,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <DateTimePickerModal
                     isVisible={isDatePickerVisible}
                     mode="date"
+                    themeVariant="light"
                     onConfirm={handleConfirm}
                     onCancel={hideDatePicker}
                     maximumDate={new Date()}
