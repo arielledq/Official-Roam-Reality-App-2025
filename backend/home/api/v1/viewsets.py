@@ -98,14 +98,24 @@ class ConfirmEmailOtpViewset(ViewSet):
         try:
             verify_otp = EmailOTP.confirm(self.request)
             user = User.objects.get(email=request.data.get('email'))
+            if verify_otp.get('status'):
+                return Response(
+                    {
+                        "message": verify_otp.get('response'),
+                        "status": "success",
+                        "uid": urlsafe_base64_encode(force_bytes(user.pk)),
+                        "token": token_generator.make_token(user),
+                    },
+                    status=status.HTTP_200_OK
+                )
             return Response(
-                {
-                    "message": verify_otp.get('response'),
-                    "status": "success",
-                    "uid": urlsafe_base64_encode(force_bytes(user.pk)),
-                    "token": token_generator.make_token(user),
-                },
-                status=status.HTTP_200_OK
-            )
+                    {
+                        "message": verify_otp.get('response'),
+                        "status": "fail",
+                        "uid": None,
+                        "token": None,
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
         except Exception as e:
             return Response({'status':"success", 'message':str(e)}, status=status.HTTP_400_BAD_REQUEST)
