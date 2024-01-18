@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-import { Alert, Keyboard, TouchableOpacity, View } from "react-native"
+import { Alert, Keyboard, View } from "react-native"
 
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -12,10 +12,6 @@ import {
 import AppButton from "../../components/button"
 import AppInput from "../../components/input"
 import {
-  AppleIcon,
-  EyeIcon,
-  FacebookIcon,
-  GoogleIcon,
   LockIcon,
   MailIcon
 } from "../../assets/svg"
@@ -23,7 +19,6 @@ import AppHeader from "../../components/header"
 import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
-import { DividerWithText } from "../../components"
 import Icon from "../../components/Icon"
 import { signUp } from "../../network"
 import fontGroup from "../../assets/fonts"
@@ -197,9 +192,9 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
               <SocialSignin />
             </View>
           )}
-        </Formik>
-
-        <AppText style={_styles.alreadyHaveAccount}>
+        </Formik>      
+      </KeyboardAwareScrollView>
+      <AppText style={_styles.alreadyHaveAccount}>
           Already have an account? {""}
           <AppText
             style={_styles.SignInLink}
@@ -208,7 +203,6 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
             Sign In
           </AppText>
         </AppText>
-      </KeyboardAwareScrollView>
     </BackgroundWithImage>
   )
 }

@@ -31,7 +31,7 @@ const EmailVerification: ScreenStackComponent<
   const [isLoading, setIsLoading] = useState(false)
 
   const navigatetoSuccess = () => {
-    navigation.replace('VerificationSuccess')
+    navigation.replace('VerificationSuccess', {ChangePassword: false})
   }
 
   const handleResend = () => {

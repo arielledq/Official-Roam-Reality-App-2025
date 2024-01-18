@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-import { Alert, Image, View } from "react-native"
+import { Alert, Image, KeyboardTypeOptions, View } from "react-native"
 
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
@@ -18,8 +18,8 @@ import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import Images from "../../assets/images"
 import fontGroup from "../../assets/fonts"
-import { sendCode } from "../../network"
-import { ForgotPasswordSchema } from "../../util/ValidationSchemas"
+import { confirmEmailOtp, sendCode } from "../../network"
+import { ForgotPasswordSchema, OTPSchema } from "../../util/ValidationSchemas"
 import { handleError } from "../../util/helpers"
 
 const ForgotPassword: ScreenStackComponent<
@@ -27,19 +27,49 @@ const ForgotPassword: ScreenStackComponent<
   "ForgotPassword"
 > = ({ navigation }) => {
   const _styles = useStyles()
+  const [emailData, setEmailData] = useState('')
   const [sending, setSending] = useState(false)
-
-  const handleSendMail = (values) => {
-    setSending(true)
-    sendCode({ email: values.email }).then((res) => {
+  const [codesent, setCodeSent] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const placeholderText = codesent ? "Enter Code" : "Email Address"
+  const buttonText = codesent ? "Submit" : "Send Code"
+  const textContentTypeText = codesent ? "oneTimeCode" : "emailAddress"
+  const autoCompleteType = codesent ? "sms-otp" : "email"
+  const keyboardType = codesent ? "numeric" : "default" as KeyboardTypeOptions
+  const handleSendMail = (values, { resetForm }) => {   
+    if (!codesent) {   
+      setSending(true) 
+      sendCode({ email: values.input }).then((res) => {
       if (res.status == 1) {
-        Alert.alert('', "Code sent successfully")
+        resetForm()
+        setEmailData(values.input)
+        setCodeSent(true)
+        Alert.alert(
+          'OTP Sent!',
+          `An OTP code has been sent to ${values.input}. Please check your email.`,
+          [
+            { text: 'OK' },
+          ]
+        );
       } else {
         handleError(res)
       }
-    }).finally(() => {
-      setSending(false)
-    })
+      }).finally(() => {
+        setSending(false)
+        setIsLoading(false)
+      })   
+    } else {
+      confirmEmailOtp({email: emailData, otp: values.input}).then((res) => {
+        console.log({ res })
+        if (res.status == 1) {
+          navigation.navigate("FPChangePassword", {token: res.token, uid: res.uid})
+        } else {
+          handleError(res)
+        }
+      }).finally(() => {
+        setIsLoading(false)
+      })  
+    }    
   }
 
   return (
@@ -51,10 +81,10 @@ const ForgotPassword: ScreenStackComponent<
       >
         <Formik
           initialValues={{
-            email: ""
+            input: ""
           }}
-          onSubmit={(values) => handleSendMail(values)}
-          validationSchema={ForgotPasswordSchema}
+          onSubmit={(values, { resetForm }) => handleSendMail(values, { resetForm })}
+          validationSchema={codesent ? OTPSchema : ForgotPasswordSchema}
         >
           {({
             handleChange,
@@ -69,7 +99,9 @@ const ForgotPassword: ScreenStackComponent<
                 <View style={_styles.appIconContainer}>
                   <Image source={Images.AppIconCircle} />
                 </View>
-                <AppText style={[_styles.headerText, { ...fontGroup.ns800 }]}>Forgot Password ?</AppText>
+                <AppText style={[_styles.headerText, { ...fontGroup.ns800 }]}>
+                  Forgot Password ?
+                </AppText>
                 <AppText style={_styles.subHeaderText}>
                   Please enter the email address associated with your account,
                   and we'll send you a link to reset your password
@@ -77,26 +109,38 @@ const ForgotPassword: ScreenStackComponent<
                 <AppInput
                   inputContainerStyle={[_styles.input]}
                   containerStyle={{ marginBottom: -10, marginTop: 10 }}
-                  placeholder={"Email Address"}
+                  placeholder={placeholderText}
                   placeholderTextColor={theme.darkColors?.grey}
-                  value={values.email}
+                  value={values.input}
                   autoCapitalize="none"
-                  onChangeText={handleChange("email")}
-                  // onBlur={handleBlur('email')}
+                  onChangeText={handleChange("input")}
+                  onBlur={handleBlur('input')}
                   errorMessage={
-                    touched.email && errors?.email ? errors.email : undefined
-                  }
+                    touched.input && errors?.input ? errors.input : undefined
+                  }                  
                   autoCorrect={false}
-                  textContentType="emailAddress"
-                  autoComplete="email"
+                  textContentType={textContentTypeText}
+                  autoComplete={autoCompleteType}
                   leftIconContainerStyle={{ marginRight: 5 }}
+                  keyboardType={keyboardType}
                   leftIcon={<MailIcon />}
                 />
+                {codesent ? (
+                  <AppText style={_styles.alreadyHaveAccount}>
+                    Didn't receive the OTP? {""}
+                    <AppText style={_styles.SignInLink}>
+                      Click here to resend
+                    </AppText>
+                    .
+                  </AppText>
+                ) : (
+                  <></>
+                )}
               </View>
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Send Code"}
+                title={buttonText}
                 onPress={handleSubmit}
                 loading={sending}
                 disabled={sending}

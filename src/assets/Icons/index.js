@@ -6,6 +6,7 @@ import FaceIcon from './FaceIcon'
 import DOBIcon from './DOBIcon.svg'
 import Calendar from './Calendar.svg'
 import Shield from './Shield.svg';
+import ProfilePicPlusIcon from './ProfilePicPlusIcon.svg';
 
 export const Icons = {
   password,
@@ -15,5 +16,6 @@ export const Icons = {
   FaceIcon,
   DOBIcon,
   Calendar,
-  Shield
+  Shield,
+  ProfilePicPlusIcon
 }
