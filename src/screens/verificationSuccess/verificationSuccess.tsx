@@ -25,6 +25,7 @@ const VerificationSuccess: ScreenStackComponent<
   const data = route?.params?.data
   const ChangePassword = route?.params?.ChangePassword
   const successText = ChangePassword ? "password has been successfully changed" : "email address has been successfully verified"
+  const buttonText = ChangePassword? "Continue to Login" : "Continue"
   const handleContinue = () => {
     if (ChangePassword) {
       navigation.navigate('Login')
@@ -33,6 +34,7 @@ const VerificationSuccess: ScreenStackComponent<
       dispatch(updateUserData(data))
     }
   }
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
@@ -46,7 +48,7 @@ const VerificationSuccess: ScreenStackComponent<
       <AppButton
         buttonStyle={_styles.buttonStyle}
         containerStyle={_styles.buttonContainerStyle}
-        title={"Continue"}
+        title={buttonText}
         onPress={handleContinue}
       />
     </BackgroundWithImage>

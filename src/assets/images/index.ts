@@ -3,9 +3,11 @@ const Images = {
     AppIconCircle: require('./AppIconCircle.png'),
     CircleCheck: require('./CircleCheck.png'),
     EditIcon: require('./EditIcon.png'),
-    GradientRectBG: require('./GradientRectBG.png'),
     ProfileImage: require('./ProfileImage.png'),
-    ProfileImgGradient: require('./ProfileImageGradient.png')
+    ProfileImgGradient: require('./ProfileImageGradient.png'),
+    GlobalIcon: require('./GlobalIcon.png'),
+    PointsIcon: require('./PointsIcon.png'),
+    RankIcon: require('./RankIcon.png'),
 }
 
 export default Images;
