@@ -4,9 +4,19 @@ from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
 from allauth.socialaccount.providers.oauth2.client import OAuth2Client
 from allauth.socialaccount.providers.apple.views import AppleOAuth2Adapter
 from allauth.socialaccount.providers.apple.client import AppleOAuth2Client
+
+from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
+from allauth.socialaccount.models import SocialAccount, SocialToken
+
 from rest_auth.registration.views import SocialLoginView, SocialConnectView
 from .serializers import CustomAppleSocialLoginSerializer, CustomAppleConnectSerializer
 from django.contrib.sites.shortcuts import get_current_site
+from rest_framework.response import Response
+from rest_framework.authtoken.models import Token
+from home.api.v1.serializers import UserSerializer
+from rest_auth.social_serializers import TwitterLoginSerializer
+from rest_framework import status
+
 
 try:
     APP_DOMAIN = f"https://{get_current_site(None)}"
@@ -17,12 +27,38 @@ except Exception:
 class FacebookLogin(SocialLoginView):
     permission_classes = (AllowAny,)
     adapter_class = FacebookOAuth2Adapter
+    authentication_classes = []
 
+    def get_serializer(self, *args, **kwargs): 
+        serializer_class = self.get_serializer_class() 
+        kwargs['context'] = self.get_serializer_context() 
+        return serializer_class(*args, **kwargs)
+    
+    def get_response(self):
+        token = self.token
+        user = self.user
+        serializer = UserSerializer(user)
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
+    
 
-class GoogleLogin(SocialLoginView):
-    permission_classes = (AllowAny,)
-    adapter_class = GoogleOAuth2Adapter
+class GoogleLogin(SocialLoginView): 
+    '''Login api using to create new account and login'''
+    permission_classes = (AllowAny,) 
+    adapter_class = GoogleOAuth2Adapter 
     client_class = OAuth2Client
+    authentication_classes = []
+
+    def get_serializer(self, *args, **kwargs): 
+        serializer_class = self.get_serializer_class() 
+        kwargs['context'] = self.get_serializer_context() 
+        return serializer_class(*args, **kwargs)
+
+    def get_response(self):
+        token = self.token
+        user = self.user
+        serializer = UserSerializer(user)
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
+
 
 
 class AppleLogin(SocialLoginView):
@@ -30,14 +66,32 @@ class AppleLogin(SocialLoginView):
     client_class = AppleOAuth2Client
     serializer_class = CustomAppleSocialLoginSerializer
     callback_url = f"https://{APP_DOMAIN}/accounts/apple/login/callback/"
+    authentication_classes = []
+    
+    def get_serializer(self, *args, **kwargs): 
+        serializer_class = self.get_serializer_class() 
+        kwargs['context'] = self.get_serializer_context() 
+        return serializer_class(*args, **kwargs)
+    
+    def get_response(self):
+        token = self.token
+        user = self.user
+        serializer = UserSerializer(user)
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 
 
 class FacebookConnect(SocialConnectView):
     permission_classes = (AllowAny,)
     adapter_class = FacebookOAuth2Adapter
 
+    def get_serializer(self, *args, **kwargs): 
+        serializer_class = self.get_serializer_class() 
+        kwargs['context'] = self.get_serializer_context() 
+        return serializer_class(*args, **kwargs)
+
 
 class GoogleConnect(SocialConnectView):
+    '''Connect api using to login for already existing account '''
     permission_classes = (AllowAny,)
     adapter_class = GoogleOAuth2Adapter
     client_class = OAuth2Client
@@ -47,3 +101,21 @@ class AppleConnect(SocialConnectView):
     adapter_class = AppleOAuth2Adapter
     client_class = AppleOAuth2Client
     serializer_class = CustomAppleConnectSerializer
+
+
+
+class TwitterLogin(SocialLoginView):
+    permission_classes = (AllowAny,)
+    serializer_class = TwitterLoginSerializer
+    adapter_class = TwitterOAuthAdapter
+
+    def get_serializer(self, *args, **kwargs): 
+        serializer_class = self.get_serializer_class() 
+        kwargs['context'] = self.get_serializer_context() 
+        return serializer_class(*args, **kwargs)
+    
+    def get_response(self):
+        token = self.token
+        user = self.user
+        serializer = UserSerializer(user)
+        return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)

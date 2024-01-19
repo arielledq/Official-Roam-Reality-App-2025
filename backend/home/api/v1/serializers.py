@@ -10,6 +10,7 @@ from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
 from users.models import UserProfile
+from rest_framework.authtoken.models import Token
 
 from home.utils import EmailOTP
 
