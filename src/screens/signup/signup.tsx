@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useRef, useState } from "react"
 
 import { Alert, Keyboard, View } from "react-native"
 
@@ -26,16 +26,20 @@ import { handleError } from "../../util/helpers"
 import { SignUpSchema } from "../../util/ValidationSchemas"
 import SocialSignin from "../../components/socialSignin"
 import { useNavigation } from "@react-navigation/native"
+import { useDispatch } from "react-redux"
+import { updateAsOldUser } from "../../redux/Persist"
 
 const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   const _styles = useStyles()
   const navigation = useNavigation()
+  const dispatch = useDispatch()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [rePasswordVisibility, setRePasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
+  const resData = useRef({})
 
   const navigateToVerifyMail = (email, resetForm) => {
-    navigation.navigate('EmailVerification', { email })
+    navigation.navigate('EmailVerification', { email: email.toLowerCase(), data: resData.current })
     resetForm()
   }
 
@@ -47,6 +51,8 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
     }).then(res => {
       console.log({ res })
       if (res.status == 1) {
+        resData.current = res
+        dispatch(updateAsOldUser())
         Alert.alert('Registration Successful', 'Please verify your email to continue', [{
           text: 'OK',
           onPress: () => navigateToVerifyMail(v.email, resetForm)
@@ -192,17 +198,17 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
               <SocialSignin />
             </View>
           )}
-        </Formik>      
+        </Formik>
       </KeyboardAwareScrollView>
       <AppText style={_styles.alreadyHaveAccount}>
-          Already have an account? {""}
-          <AppText
-            style={_styles.SignInLink}
-            onPress={navigateToLogin}
-          >
-            Sign In
-          </AppText>
+        Already have an account? {""}
+        <AppText
+          style={_styles.SignInLink}
+          onPress={navigateToLogin}
+        >
+          Sign In
         </AppText>
+      </AppText>
     </BackgroundWithImage>
   )
 }

@@ -61,16 +61,40 @@ export const deleteAccount = () =>
     method: 'DELETE'
   })
 
-  export const confirmEmailOtp = data =>
+export const confirmEmailOtp = data =>
   Request.call({
     url: `${commonApiRoute}confirm-email-otp/token/`,
     method: 'POST',
     data
   })
 
-  export const resetPassword = data =>
+export const resetPassword = data =>
   Request.call({
     url: `${commonApiRoute}reset-password/`,
     method: 'POST',
     data
   })
+
+export const googleLogin = data => {
+  return Request.call({
+    url: `modules/social-auth/google/login/`,
+    method: 'POST',
+    data
+  })
+}
+
+export const appleLogin = data => {
+  return Request.call({
+    url: `modules/social-auth/apple/login/`,
+    method: 'POST',
+    data
+  })
+}
+
+export const fbLogin = data => {
+  return Request.call({
+    url: `modules/social-auth/facebook/login/`,
+    method: 'POST',
+    data
+  })
+}

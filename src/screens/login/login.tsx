@@ -20,19 +20,21 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import { login } from '../../network'
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { updateUserData } from "../../redux/Login"
 import { useNavigation } from "@react-navigation/native"
 import { SigninSchema } from "../../util/ValidationSchemas"
 import Icon from "../../components/Icon"
 import { handleError } from "../../util/helpers"
 import SocialSignin from "../../components/socialSignin"
+import { updateAsOldUser } from "../../redux/Persist"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
-navigation
+  navigation
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
+  const newUser = useSelector(state => state.persist.newUser)
   // const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
@@ -40,7 +42,6 @@ navigation
 
   const handleLogin = (v) => {
     setIsLoading(true)
-    // dispatch(updateUserData())
     login({
       username: v.email.toLowerCase(),
       password: v.password
@@ -48,6 +49,9 @@ navigation
       console.log({ res })
       if (res.status == 1) {
         dispatch(updateUserData(res))
+        if (newUser) {
+          dispatch(updateAsOldUser())
+        }
       } else {
         handleError(res)
       }
@@ -72,7 +76,7 @@ navigation
         Create an account to ROAM a new dimension with captivating AR
         experiences.
       </AppText>
-      <KeyboardAwareScrollView style={{flex: 1}} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView style={{ flex: 1 }} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
         <Formik
           initialValues={{
             email: "",
@@ -171,22 +175,24 @@ navigation
               </AppText>
 
               {/* social sign in options */}
-              <SocialSignin />
+              <SocialSignin
+                setLoading={setIsLoading}
+              />
 
             </View>
           )}
         </Formik>
-        
+
       </KeyboardAwareScrollView>
       <AppText style={_styles.alreadyHaveAccount}>
-          Don’t have an account? {""}
-          <AppText
-            style={_styles.SignInLink}
-            onPress={navigateToSignUp}
-          >
-            Sign Up
-          </AppText>
+        Don’t have an account? {""}
+        <AppText
+          style={_styles.SignInLink}
+          onPress={navigateToSignUp}
+        >
+          Sign Up
         </AppText>
+      </AppText>
 
     </BackgroundWithImage>
   )

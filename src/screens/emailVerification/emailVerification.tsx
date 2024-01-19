@@ -19,6 +19,9 @@ import AppText from "../../components/text"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { confirmCode, sendCode } from "../../network"
 import { handleError } from "../../util/helpers"
+import { useDispatch } from "react-redux"
+import { updateUserData } from "../../redux/Login"
+import Timer from "../../components/timer"
 
 const EmailVerification: ScreenStackComponent<
   RootStackParamList,
@@ -26,18 +29,22 @@ const EmailVerification: ScreenStackComponent<
 > = () => {
   const _styles = useStyles()
   const navigation = useNavigation()
+  const dispatch = useDispatch()
   const route = useRoute()
   const email = route?.params?.email
+  const data = route?.params?.data
   const [isLoading, setIsLoading] = useState(false)
+  const [timerVisible, setTimerVisible] = useState(false)
 
   const navigatetoSuccess = () => {
-    navigation.replace('VerificationSuccess', {ChangePassword: false})
+    navigation.replace('VerificationSuccess', { ChangePassword: false, data })
   }
 
   const handleResend = () => {
     sendCode({ email }).then(res => {
       if (res.status == 1) {
-        Alert.alert('Code sent successfully')
+        setTimerVisible(true)
+        Alert.alert('Success', 'Code sent successfully')
       } else {
         handleError(res)
       }
@@ -47,7 +54,7 @@ const EmailVerification: ScreenStackComponent<
   const verifyEmail = (values) => {
     if (!values.code) { return Alert.alert('Code', 'Please enter the verification code') }
     setIsLoading(true)
-    confirmCode({ email, otp: values.code }).then(res => {
+    confirmCode({ email: email, otp: values.code }).then(res => {
       console.log({ res })
       if (res.status == 1) {
         navigatetoSuccess()
@@ -57,6 +64,11 @@ const EmailVerification: ScreenStackComponent<
     }).finally(() => {
       setIsLoading(false)
     })
+  }
+
+  const handleSkip = () => {
+    // login user
+    dispatch(updateUserData(data))
   }
 
   return (
@@ -110,22 +122,26 @@ const EmailVerification: ScreenStackComponent<
                   keyboardType="numeric"
                   leftIcon={<CubeIcon />}
                 />
-                <AppText style={_styles.otptext}>
-                  Didn't receive the OTP?{" "}
-                  <AppText
-                    style={_styles.resendButton}
-                    onPress={handleResend}
-                  >
-                    Click here to resend
-                  </AppText>
-                </AppText>
+
+                {timerVisible
+                  ? <Timer callback={
+                    () => { setTimerVisible(false) }
+                  } />
+                  :
+                  <AppText style={_styles.otptext}>
+                    {`Didn't receive the Code?  `}
+                    <AppText
+                      style={_styles.resendButton}
+                      onPress={handleResend}
+                    >
+                      Click here to resend
+                    </AppText>
+                  </AppText>}
                 <AppButton
                   buttonStyle={_styles.buttonStyle}
                   containerStyle={[_styles.buttonContainerStyle]}
                   title={"Skip"}
-                  onPress={() => {
-                    navigation.popToTop()
-                  }}
+                  onPress={handleSkip}
                   disabled={isLoading}
                 />
                 <AppButton

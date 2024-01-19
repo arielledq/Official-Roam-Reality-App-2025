@@ -27,13 +27,23 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
  */
 const Navigation = () => {
   const token = useSelector(state => state.login?.data?.token)
+  const newUser = useSelector(state => state.persist?.newUser)
 
   const renderAuthStack = () => {
     return (
       <>
-        <Stack.Screen name="Login" component={Login} />
+        {
+          newUser ?
+            <>
+              <Stack.Screen name="SignUp" component={SignUp} />
+              <Stack.Screen name="Login" component={Login} />
+            </> :
+            <>
+              <Stack.Screen name="Login" component={Login} />
+              <Stack.Screen name="SignUp" component={SignUp} />
+            </>
+        }
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
-        <Stack.Screen name="SignUp" component={SignUp} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
         <Stack.Screen name="Profile" component={Profile} />
@@ -57,7 +67,6 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="Profile"
             screenOptions={{
               headerShown: false,
               animation: "slide_from_right"
