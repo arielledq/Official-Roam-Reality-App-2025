@@ -56,9 +56,9 @@ const ForgotPassword: ScreenStackComponent<
       }
       }).finally(() => {
         setSending(false)
-        setIsLoading(false)
       })   
     } else {
+      setIsLoading(true)
       confirmEmailOtp({email: emailData, otp: values.input}).then((res) => {
         console.log({ res })
         if (res.status == 1) {
@@ -142,7 +142,7 @@ const ForgotPassword: ScreenStackComponent<
                 containerStyle={_styles.buttonContainerStyle}
                 title={buttonText}
                 onPress={handleSubmit}
-                loading={sending}
+                loading={codesent? isLoading : sending}
                 disabled={sending}
               />
             </View>

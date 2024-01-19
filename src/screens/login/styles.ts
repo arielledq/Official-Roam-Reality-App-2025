@@ -18,7 +18,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S40,
     lineHeight: FontLineHeights.LH55,
     color: theme.colors.white,
-    marginTop: 10,
+    marginTop: '10%',
   },
   subHeaderText: {
     ...fontGroup.p400,

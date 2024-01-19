@@ -12,13 +12,13 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     paddingHorizontal: screenHorizontalPadding
   },
-  container: { marginTop: "10%" },
+  container: { marginTop: "9%" },
   headerText: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S40,
     lineHeight: FontLineHeights.LH55,
     color: theme.colors.white,
-    marginTop: 10,
+    marginTop: '10%',
   },
   subHeaderText: {
     ...fontGroup.p400,

@@ -31,6 +31,7 @@ const FPChangePassword: ScreenStackComponent<
     useState(true)
 
   const handleChangePassword = (values) => {
+    setIsLoading(true);
     resetPassword({
       new_password1: values.newPassword,
       new_password2: values.confirmnewPassword,
