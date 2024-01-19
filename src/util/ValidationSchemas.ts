@@ -12,7 +12,7 @@ export const SignUpSchema = Yup.object().shape({
     confirmPassword: Yup.string().oneOf([Yup.ref('password'), null], 'Passwords must match').required('Please confirm your password'),
   });
 export const ForgotPasswordSchema = Yup.object().shape({
-  input: Yup.string().matches(emailRegex, Strings.EmailError).required('Required'),
+  input: Yup.string().matches(emailRegex, Strings.EmailError).required('Please enter your email address'),
   });
 
 export const ChangePasswordSchema = Yup.object().shape({
@@ -25,11 +25,11 @@ export const ChangePasswordSchema = Yup.object().shape({
     
   });
 export const OTPSchema = Yup.object().shape({
-    input: Yup.string().required('Required')
+    input: Yup.string().required('Please enter the code')
 })
 export const FPChangePasswordSchema = Yup.object().shape({
-  newPassword: Yup.string().matches(passRegex, Strings.PasswordError).required('Required'),
-  confirmnewPassword: Yup.string().oneOf([Yup.ref('newPassword'), null], 'Passwords must match').required('Required'),
+  newPassword: Yup.string().matches(passRegex, Strings.PasswordError).required('Please enter a new password'),
+  confirmnewPassword: Yup.string().oneOf([Yup.ref('newPassword'), null], 'Passwords must match').required('Please confirm your new password'),
 });
 
 export const EditProfileSchema = Yup.object().shape({
