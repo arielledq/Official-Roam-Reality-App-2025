@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
+from ckeditor.fields import RichTextField
 
 CHALLENGE_CHOICES = (
     ("SPONSORED", "SPONSORED"),
@@ -29,7 +30,7 @@ class Challenges(models.Model):
     model_file = models.FileField(upload_to='ar/model/')
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
-    description = models.TextField(_("Description"), blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
     sponsor = models.ForeignKey(Sponsor, on_delete=models.CASCADE, null=True,blank=True,related_name='sponsored')
     points = models.IntegerField(verbose_name='Challenge Points', default=0)
     challenge_choice = models.CharField(max_length=50,
