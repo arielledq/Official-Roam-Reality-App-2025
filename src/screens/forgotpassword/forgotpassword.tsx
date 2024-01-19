@@ -21,12 +21,14 @@ import fontGroup from "../../assets/fonts"
 import { confirmEmailOtp, sendCode } from "../../network"
 import { ForgotPasswordSchema, OTPSchema } from "../../util/ValidationSchemas"
 import { handleError } from "../../util/helpers"
+import Timer from "../../components/timer"
 
 const ForgotPassword: ScreenStackComponent<
   RootStackParamList,
   "ForgotPassword"
 > = ({ navigation }) => {
   const _styles = useStyles()
+  const [timerVisible, setTimerVisible] = useState(false)
   const [emailData, setEmailData] = useState('')
   const [sending, setSending] = useState(false)
   const [codesent, setCodeSent] = useState(false)
@@ -36,40 +38,51 @@ const ForgotPassword: ScreenStackComponent<
   const textContentTypeText = codesent ? "oneTimeCode" : "emailAddress"
   const autoCompleteType = codesent ? "sms-otp" : "email"
   const keyboardType = codesent ? "numeric" : "default" as KeyboardTypeOptions
-  const handleSendMail = (values, { resetForm }) => {   
-    if (!codesent) {   
-      setSending(true) 
-      sendCode({ email: values.input }).then((res) => {
-      if (res.status == 1) {
-        resetForm()
-        setEmailData(values.input)
-        setCodeSent(true)
-        Alert.alert(
-          'OTP Sent!',
-          `An OTP code has been sent to ${values.input}. Please check your email.`,
-          [
-            { text: 'OK' },
-          ]
-        );
-      } else {
-        handleError(res)
-      }
+  const handleSendMail = (values, { resetForm }) => {
+    if (!codesent) {
+      setSending(true)
+      const email = values.input.toLowerCase()
+      sendCode({ email }).then((res) => {
+        if (res.status == 1) {
+          resetForm()
+          setEmailData(email)
+          setCodeSent(true)
+          Alert.alert(
+            'Code Sent!',
+            `Code has been sent to ${values.input}. Please check your email.`,
+            [
+              { text: 'OK' },
+            ]
+          );
+        } else {
+          handleError(res)
+        }
       }).finally(() => {
         setSending(false)
         setIsLoading(false)
-      })   
+      })
     } else {
-      confirmEmailOtp({email: emailData, otp: values.input}).then((res) => {
+      confirmEmailOtp({ email: emailData, otp: values.input }).then((res) => {
         console.log({ res })
         if (res.status == 1) {
-          navigation.navigate("FPChangePassword", {token: res.token, uid: res.uid})
+          navigation.replace("FPChangePassword", { token: res.token, uid: res.uid })
         } else {
           handleError(res)
         }
       }).finally(() => {
         setIsLoading(false)
-      })  
-    }    
+      })
+    }
+  }
+  const handleResend = () => {
+    sendCode({ email: emailData }).then(res => {
+      if (res.status == 1) {
+        setTimerVisible(true)
+        Alert.alert('Success', 'Code sent successfully')
+      } else {
+        handleError(res)
+      }
+    })
   }
 
   return (
@@ -104,7 +117,7 @@ const ForgotPassword: ScreenStackComponent<
                 </AppText>
                 <AppText style={_styles.subHeaderText}>
                   Please enter the email address associated with your account,
-                  and we'll send you a link to reset your password
+                  and we'll send you a code to reset your password
                 </AppText>
                 <AppInput
                   inputContainerStyle={[_styles.input]}
@@ -117,7 +130,7 @@ const ForgotPassword: ScreenStackComponent<
                   onBlur={handleBlur('input')}
                   errorMessage={
                     touched.input && errors?.input ? errors.input : undefined
-                  }                  
+                  }
                   autoCorrect={false}
                   textContentType={textContentTypeText}
                   autoComplete={autoCompleteType}
@@ -125,17 +138,23 @@ const ForgotPassword: ScreenStackComponent<
                   keyboardType={keyboardType}
                   leftIcon={<MailIcon />}
                 />
-                {codesent ? (
-                  <AppText style={_styles.alreadyHaveAccount}>
-                    Didn't receive the OTP? {""}
-                    <AppText style={_styles.SignInLink}>
-                      Click here to resend
+                {codesent ?
+                  timerVisible
+                    ? <Timer callback={
+                      () => { setTimerVisible(false) }
+                    } />
+                    :
+                    <AppText style={_styles.alreadyHaveAccount}>
+                      {`Didn't receive the Code?  `}
+                      <AppText
+                        onPress={handleResend}
+                        style={_styles.SignInLink}>
+                        Click here to resend.
+                      </AppText>
                     </AppText>
-                    .
-                  </AppText>
-                ) : (
+                  :
                   <></>
-                )}
+                }
               </View>
               <AppButton
                 buttonStyle={_styles.buttonStyle}
