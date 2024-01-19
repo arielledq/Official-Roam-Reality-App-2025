@@ -20,19 +20,21 @@ import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import { login } from '../../network'
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { updateUserData } from "../../redux/Login"
 import { useNavigation } from "@react-navigation/native"
 import { SigninSchema } from "../../util/ValidationSchemas"
 import Icon from "../../components/Icon"
 import { handleError } from "../../util/helpers"
 import SocialSignin from "../../components/socialSignin"
+import { updateAsOldUser } from "../../redux/Persist"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   navigation
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
+  const newUser = useSelector(state => state.persist.newUser)
   // const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
@@ -40,7 +42,6 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
 
   const handleLogin = (v) => {
     setIsLoading(true)
-    // dispatch(updateUserData())
     login({
       username: v.email.toLowerCase(),
       password: v.password
@@ -48,6 +49,9 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
       console.log({ res })
       if (res.status == 1) {
         dispatch(updateUserData(res))
+        if (newUser) {
+          dispatch(updateAsOldUser())
+        }
       } else {
         handleError(res)
       }
