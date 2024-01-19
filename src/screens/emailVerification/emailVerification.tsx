@@ -43,6 +43,7 @@ const EmailVerification: ScreenStackComponent<
   const handleResend = () => {
     sendCode({ email }).then(res => {
       if (res.status == 1) {
+        setTimerVisible(true)
         Alert.alert('Success', 'Code sent successfully')
       } else {
         handleError(res)
@@ -128,7 +129,7 @@ const EmailVerification: ScreenStackComponent<
                   } />
                   :
                   <AppText style={_styles.otptext}>
-                    Didn't receive the Code?{" "}
+                    {`Didn't receive the Code?  `}
                     <AppText
                       style={_styles.resendButton}
                       onPress={handleResend}
