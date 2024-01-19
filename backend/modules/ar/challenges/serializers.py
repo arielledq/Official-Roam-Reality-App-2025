@@ -1,9 +1,18 @@
-from .models import Challenges
+from .models import Challenges, Sponsor
 from rest_framework import serializers
 
 
-class ChallengesSerializer(serializers.HyperlinkedModelSerializer):
+class SponsorSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = Sponsor
+        fields = (
+            "__all__"
+        )
+  
+class ChallengesSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
+    sponsored = SponsorSerializer(source='sponsor', read_only=True)
 
     def get_image(self, obj):
         return obj.image.url
@@ -15,7 +24,13 @@ class ChallengesSerializer(serializers.HyperlinkedModelSerializer):
             "image",
             "model_file",
             "name",
-            "description"
+            "description",
+            "points",
+            "challenge_choice",
+            "challenge_requirement",
+            "created_at",
+            "expiry_date",
+            "sponsored"
         )
 
 
