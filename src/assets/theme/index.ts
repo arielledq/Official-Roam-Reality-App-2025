@@ -11,9 +11,13 @@ const theme = createTheme({
     dividerGrey: '#4B5563',
     TandCgrey: '#6B7280',
     purple: '#9003E0',
-    blue: '#1158F4',
     pink: '#B816E0',
-    inputBlue: '#1158F4'
+    inputBlue: '#1158F4',
+    buttonGrey: '#FFFFFF1A',
+    yellow: '#EAB308',
+    lightGrey: '#FFFFFF0D',
+    statBG: '#323250',
+    boxStatBG: '#27273F',
   },
   darkColors: {
     white: '#FFFFFF',
@@ -22,9 +26,13 @@ const theme = createTheme({
     dividerGrey: '#4B5563',
     TandCgrey: '#6B7280',
     purple: '#9003E0',
-    blue: '#1158F4',
     pink: '#B816E0',
-    inputBlue: '#1158F4'
+    inputBlue: '#1158F4',
+    buttonGrey: '#FFFFFF1A',
+    yellow: '#EAB308',
+    lightGrey: '#FFFFFF0D',
+    statBG: '#323250',
+    boxStatBG: '#27273F',
   },
   mode: 'light',
 });

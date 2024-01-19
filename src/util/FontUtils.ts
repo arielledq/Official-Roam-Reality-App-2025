@@ -22,6 +22,7 @@ const getFontSize = (size: number) => {
 };
 
 export const FontSizes = {
+  S10: getFontSize(10),
   S12: getFontSize(12),
   S13: getFontSize(13),
   S14: getFontSize(14),
@@ -35,6 +36,7 @@ export const FontSizes = {
   S35: getFontSize(35),
   S40: getFontSize(40),
   S44: getFontSize(44),
+  S48: getFontSize(48),
 };
 
 // Basic Line heights to use in Application
@@ -43,6 +45,7 @@ export const FontLineHeights = {
   LH15: 15,
   LH16: 16,
   LH20: 20,
+  LH22: 22,
   LH24: 24,
   LH25: 25,
   LH27: 27,
@@ -53,4 +56,5 @@ export const FontLineHeights = {
   LH44: 44,
   LH48: 48,
   LH55: 55,
+  LH66: 66,
 };

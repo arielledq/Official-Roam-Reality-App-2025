@@ -1,6 +1,6 @@
 import { makeStyles } from '@rneui/themed';
 import { screenHorizontalPadding } from '../../util/AppDimensions';
-import { FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -13,24 +13,32 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme?.colors?.inputBG,
   }, 
   headerStyle: {
+    ...fontGroup.ns700,
     fontSize: FontSizes.S24,
-    lineHeight: FontLineHeights.LH33
+    lineHeight: FontLineHeights.LH33,
+    marginTop: 0
+  },
+  headerContainer: {
+    paddingVertical: 15,
+    borderBottomWidth: 0,
   },
   menuIcon: {
     paddingLeft: 5
   },
   scroll: {
-    flex: 1,
-    // paddingHorizontal: screenHorizontalPadding - 4
+    paddingHorizontal: screenHorizontalPadding - 4
   },
-  imageBackground: {
-    flex: 1,
-    resizeMode: 'cover', // or 'contain' or 'stretch' or 'repeat'
-    justifyContent: 'center',
+  scoreboard: {
+    ...fontGroup.ns900,
+    color: theme.colors.lightGrey,
+    fontSize: FontSizes.S48,
+    lineHeight: FontLineHeights.LH66,
+    marginTop: '10%'
+  },
+  statContainerStyle: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: '10%',
-    paddingHorizontal: 20,
-    paddingVertical: 23
+    justifyContent: 'space-between',
   },
 }));
 
