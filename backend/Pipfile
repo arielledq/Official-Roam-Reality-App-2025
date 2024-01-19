@@ -37,3 +37,4 @@ cb-privacy-policy = {editable = true, path = "./modules/privacy_policy"}
 cb-ar = {editable = true, path = "./modules/ar"}
 sendgrid = "*"
 django-allauth = "==0.45.0"
+django-ckeditor = "*"
