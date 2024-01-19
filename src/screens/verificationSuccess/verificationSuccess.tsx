@@ -11,17 +11,28 @@ import BackgroundWithImage from "../../components/background"
 import AppText from "../../components/text"
 import Images from "../../assets/images"
 import { useNavigation, useRoute } from "@react-navigation/native"
+import { useDispatch } from "react-redux"
+import { updateUserData } from "../../redux/Login"
 
 const VerificationSuccess: ScreenStackComponent<
   RootStackParamList,
   "VerificationSuccess"
-> = ( ) => {
+> = () => {
   const _styles = useStyles()
   const navigation = useNavigation()
+  const dispatch = useDispatch()
   const route = useRoute()
-  const ChangePassword  = route?.params?.ChangePassword
-  const successText = ChangePassword? "password has been successfully changed" : "email address has been successfully verified"
-
+  const data = route?.params?.data
+  const ChangePassword = route?.params?.ChangePassword
+  const successText = ChangePassword ? "password has been successfully changed" : "email address has been successfully verified"
+  const handleContinue = () => {
+    if (ChangePassword) {
+      navigation.navigate('Login')
+    } else {
+      data.user.user_profile.is_verified = true
+      dispatch(updateUserData(data))
+    }
+  }
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
@@ -36,7 +47,7 @@ const VerificationSuccess: ScreenStackComponent<
         buttonStyle={_styles.buttonStyle}
         containerStyle={_styles.buttonContainerStyle}
         title={"Continue"}
-        onPress={() => navigation.navigate('Login')}
+        onPress={handleContinue}
       />
     </BackgroundWithImage>
   )

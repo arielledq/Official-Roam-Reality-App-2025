@@ -28,7 +28,6 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 const Navigation = () => {
   const token = useSelector(state => state.login?.data?.token)
   const newUser = useSelector(state => state.persist?.newUser)
-  console.log({ newUser })
 
   const renderAuthStack = () => {
     return (
