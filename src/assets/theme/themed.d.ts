@@ -7,8 +7,12 @@ declare module '@rneui/themed' {
     dividerGrey: string;
     TandCgrey: string;
     purple: string;
-    blue: string;
     pink: string;
-    inputBlue: string
+    inputBlue: string;
+    buttonGrey: string;
+    yellow: string;
+    lightGrey: string;
+    statBG: string;
+    boxStatBG: string;
   }
 }

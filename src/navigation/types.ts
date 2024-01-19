@@ -14,6 +14,7 @@ export type RootStackParamList = {
   TermsAndConditions: undefined;
   Home: undefined;
   FPChangePassword: {token: string, uid: string};
+  PrivacyPolicy: undefined;
 };
 
 export type ScreenStackComponent<

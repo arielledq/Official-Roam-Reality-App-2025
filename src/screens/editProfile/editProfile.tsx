@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Keyboard, Pressable, View } from "react-native"
+import { Keyboard, Pressable, Text, View } from "react-native"
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import theme from "../../assets/theme"
@@ -17,9 +17,9 @@ import { Icons } from "../../assets/Icons"
 import DateTimePickerModal from "react-native-modal-datetime-picker"
 import { AppText, ProfileAvatar } from "../../components"
 import { DateFormat, formatDate } from "../../util/DateUtils"
-import { Avatar } from "@rneui/base"
 import Icon from "../../components/Icon"
 import { FontSizes } from "../../util/FontUtils"
+import { EditProfileSchema } from "../../util/ValidationSchemas"
 
 const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   navigation
@@ -32,11 +32,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isAddressInputFocused, setAddressInputFocused] = useState(false)
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false)
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false)
-  const [isDOBFocused, setDOBFocused] = useState(false)
 
   const [country, setCountry] = useState(null)
   const [isFocus, setIsFocus] = useState(false)
-  const [bDate, setBDate] = useState <Date | null>(null)
+  const [bDate, setBDate] = useState<Date|null>(null)
   const [genders, setGenders] = useState([
     { label: "Female", value: "female" },
     { label: "Male", value: "male" },
@@ -75,7 +74,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
               dob: Date.now().toString()
             }}
             onSubmit={handleEditProfile}
-            // validationSchema={validationSchema}
+            validationSchema={EditProfileSchema}
           >
             {({ handleChange, handleSubmit, values, errors, touched }) => (
               <View style={_styles.container}>
@@ -84,7 +83,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <AppInput
                     inputContainerStyle={[
                       _styles.input,
-                      isNameInputFocused ? _styles.focusedInput : {}
+                      isNameInputFocused ? _styles.focusedInput : {},
+                      touched.name && errors?.name ? _styles.inputError : {}
                     ]}
                     selectionColor={"white"}
                     onFocus={() => setNameInputFocused(true)}
@@ -92,7 +92,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     placeholder="Full name"
                     onSubmitEditing={Keyboard.dismiss}
                     placeholderTextColor={
-                      isNameInputFocused
+                      (touched.name && errors?.name) || isNameInputFocused
                         ? theme.darkColors?.white
                         : theme.darkColors?.grey
                     }
@@ -107,7 +107,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         name={"user"}
                         family="feather"
                         color={
-                          isNameInputFocused
+                          (touched.name && errors?.name) || isNameInputFocused
                             ? theme.darkColors?.white
                             : theme.darkColors?.TandCgrey
                         }
@@ -119,12 +119,17 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     <Dropdown
                       style={[
                         _styles.dropdown,
-                        isGenderDropDownFocused ? _styles.focusedInput : {}
+                        isGenderDropDownFocused ? _styles.focusedInput : {},
+                        touched.gender && errors?.gender && !gender
+                          ? _styles.inputError
+                          : {}
                       ]}
                       placeholderStyle={{
-                        color: isGenderDropDownFocused
-                          ? theme.darkColors?.white
-                          : theme.darkColors?.grey,
+                        color:
+                          (touched.gender && errors?.gender && !gender) ||
+                          isGenderDropDownFocused
+                            ? theme.darkColors?.white
+                            : theme.darkColors?.grey,
                         marginStart: 13,
                         fontSize: FontSizes.S14,
                         opacity: 1
@@ -153,6 +158,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       // onFocus={() => setIsFocus(true)}
                       // onBlur={() => setIsFocus(false)}
                       onChange={value => {
+                        handleChange("gender")
                         setGender(value)
                         setIsFocus(false)
                       }}
@@ -161,6 +167,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           name={"meh"}
                           family="feather"
                           color={
+                            (touched.gender && errors?.gender && !gender) ||
                             isGenderDropDownFocused
                               ? theme.darkColors?.white
                               : theme.darkColors?.TandCgrey
@@ -169,17 +176,24 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         />
                       )}
                     />
+                    {touched.gender && errors?.gender && !gender ? (
+                      <Text style={_styles.errorText}>{errors.gender}</Text>
+                    ) : undefined}
                   </View>
                   <AppInput
                     inputContainerStyle={[
                       _styles.input,
-                      isMobileInputFocused ? _styles.focusedInput : {}
+                      isMobileInputFocused ? _styles.focusedInput : {},
+                      touched.phoneNumber && errors?.phoneNumber
+                        ? _styles.inputError
+                        : {}
                     ]}
                     onFocus={() => setMobileInputFocused(true)}
                     onBlur={() => setMobileInputFocused(false)}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="Mobile Number"
                     placeholderTextColor={
+                      (touched.phoneNumber && errors?.phoneNumber) ||
                       isMobileInputFocused
                         ? theme.darkColors?.white
                         : theme.darkColors?.grey
@@ -199,6 +213,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         name={"phone"}
                         family="feather"
                         color={
+                          (touched.phoneNumber && errors?.phoneNumber) ||
                           isMobileInputFocused
                             ? theme.darkColors?.white
                             : theme.darkColors?.TandCgrey
@@ -210,12 +225,16 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <AppInput
                     inputContainerStyle={[
                       _styles.input,
-                      isAddressInputFocused ? _styles.focusedInput : {}
+                      isAddressInputFocused ? _styles.focusedInput : {},
+                      touched.address && errors?.address
+                        ? _styles.inputError
+                        : {}
                     ]}
                     onFocus={() => setAddressInputFocused(true)}
                     onBlur={() => setAddressInputFocused(false)}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholderTextColor={
+                      (touched.address && errors?.address) ||
                       isAddressInputFocused
                         ? theme.darkColors?.white
                         : theme.darkColors?.grey
@@ -235,6 +254,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         name={"map-pin"}
                         family="feather"
                         color={
+                          (touched.address && errors?.address) ||
                           isAddressInputFocused
                             ? theme.darkColors?.white
                             : theme.darkColors?.TandCgrey
@@ -247,12 +267,17 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     <Dropdown
                       style={[
                         _styles.dropdown,
-                        isCountryDropDownFocused ? _styles.focusedInput : {}
+                        isCountryDropDownFocused ? _styles.focusedInput : {},
+                        touched.country && errors?.country && !country
+                          ? _styles.inputError
+                          : {}
                       ]}
                       placeholderStyle={{
-                        color: isCountryDropDownFocused
-                          ? theme.darkColors?.white
-                          : theme.darkColors?.grey,
+                        color:
+                          (touched.country && errors?.country && !country) ||
+                          isCountryDropDownFocused
+                            ? theme.darkColors?.white
+                            : theme.darkColors?.grey,
                         marginStart: 13,
                         fontSize: FontSizes.S14,
                         opacity: 1
@@ -267,7 +292,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       onBlur={() => {
                         setCountryDropDownFocused(false)
                       }}
-                      activeColor="#131450"
+                      activeColor={theme.darkColors?.inputBG}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -281,6 +306,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       // onFocus={() => setIsFocus(true)}
                       // onBlur={() => setIsFocus(false)}
                       onChange={value => {
+                        handleChange("country")
                         setCountry(value)
                         setIsFocus(false)
                       }}
@@ -289,6 +315,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           name={"map-pin"}
                           family="feather"
                           color={
+                            (touched.country && errors?.country && !country) ||
                             isCountryDropDownFocused
                               ? theme.darkColors?.white
                               : theme.darkColors?.TandCgrey
@@ -297,44 +324,70 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         />
                       )}
                     />
+                    {touched.country && errors?.country && !country ? (
+                      <Text style={_styles.errorText}>{errors.country}</Text>
+                    ) : undefined}
                   </View>
-
-                  <Pressable
-                    style={[
-                      _styles.timeInput,
-                      isDOBFocused ? _styles.focusedInput : {}
-                    ]}
-                    onPress={showDatePicker}
-                  >
-                    <View style={_styles.iconContainer}>
+                  <View>
+                    <Pressable
+                      style={[
+                        _styles.timeInput,
+                        touched.dob && errors?.dob && !bDate
+                          ? _styles.inputError
+                          : {}
+                      ]}
+                      onPress={showDatePicker}
+                    >
+                      <View style={_styles.iconContainer}>
+                        <Icon
+                          onPress={() => {}}
+                          name={"aperture"}
+                          family="feather"
+                          color={
+                            touched.dob && errors?.dob && !bDate
+                              ? theme.darkColors?.white
+                              : theme.darkColors?.TandCgrey
+                          }
+                          size={24}
+                        />
+                      </View>
+                      {bDate !== null ? (
+                        <View style={_styles.textContainer}>
+                          <AppText style={_styles.timeteststyle}>
+                            {formatDate(bDate, DateFormat.MMDDYY)}
+                          </AppText>
+                        </View>
+                      ) : (
+                        <View style={_styles.textContainer}>
+                          <AppText
+                            style={
+                              touched.dob && errors?.dob && !bDate
+                                ? _styles.placeholderDOBStyle
+                                : _styles.placeholderStyle
+                            }
+                          >
+                            Date of Birth
+                          </AppText>
+                        </View>
+                      )}
                       <Icon
                         onPress={() => {}}
-                        name={"aperture"}
+                        name={"calendar"}
                         family="feather"
                         color={
-                          isDOBFocused
+                          touched.dob && errors?.dob && !bDate
                             ? theme.darkColors?.white
                             : theme.darkColors?.TandCgrey
                         }
                         size={24}
                       />
-                    </View>
-                    {bDate !== null ? (
-                      <View style={_styles.textContainer}>
-                        <AppText style={_styles.timeteststyle}>
-                          {formatDate(bDate, DateFormat.MMDDYY)}
-                        </AppText>
-                      </View>
-                    ) : (
-                      <View style={_styles.textContainer}>
-                        <AppText style={_styles.placeholderStyle}>
-                          Select a Date
-                        </AppText>
-                      </View>
-                    )}
-                    <Icons.Calendar />
-                  </Pressable>
-
+                    </Pressable>
+                    {touched.dob && errors?.dob && !bDate ? (
+                      <Text style={[_styles.errorText, { marginTop: 5 }]}>
+                        Date of birth is required
+                      </Text>
+                    ) : undefined}
+                  </View>
                   <DateTimePickerModal
                     isVisible={isDatePickerVisible}
                     mode="date"

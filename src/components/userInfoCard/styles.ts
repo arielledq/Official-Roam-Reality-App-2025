@@ -6,33 +6,52 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     flex: 1,
     alignItems: "center",
-    borderWidth: 1,
-    borderRadius: 10,
-    backgroundColor: theme.colors.white,
-    paddingHorizontal: 20,
-    paddingVertical: 10,
   },
   nameContainer: { flex: 1 },
   name: {
-    color: theme.colors.black,
-    fontSize: FontSizes.S20,
     ...fontGroup.ns700,
-    lineHeight: FontLineHeights.LH27
+    color: theme.colors.white,
+    fontSize: FontSizes.S30,
+    lineHeight: FontLineHeights.LH40
   },
   userName: {
-    color: theme.colors.black,
-    fontSize: FontSizes.S12,
     ...fontGroup.ns400,
+    color: theme.colors.grey,
+    fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH16,
   },
   containerBottom: {
     flexDirection: "row",
     flex: 1,
+    alignItems: 'center', 
+    marginTop: '6%'
+  },
+  verificationIcon:{
+    marginHorizontal: 5
   },
   verificationStatus: {
-    color: theme.colors.black,
-    fontSize: FontSizes.S12,
-    marginLeft: 8
+    ...fontGroup.p500,
+    color: theme.colors.yellow,
+    fontSize: FontSizes.S10,
+    lineHeight: FontLineHeights.LH14
+  },
+  verifyNowContainer: {
+    flex: 1,
+    alignItems: 'flex-end',  // Align "Verify Now" to the right
+  },
+  verifyNow: {
+    ...fontGroup.ns700,
+    color: theme.colors.inputBlue,
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH20
+  },
+  verifyButton: {
+    height: 30,
+    width: 95,
+    backgroundColor: theme.colors.buttonGrey,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 5
   }
 }))
 

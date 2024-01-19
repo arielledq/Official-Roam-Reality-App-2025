@@ -1,6 +1,6 @@
 import { makeStyles } from '@rneui/themed';
 import { screenHorizontalPadding } from '../../util/AppDimensions';
-import { FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
   buttonContainer: { marginBottom: '10%' },
   buttonStyle: { height: 50 },
   input: {
+    ...fontGroup.sf500,
     height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
@@ -47,6 +48,7 @@ const useStyles = makeStyles((theme) => ({
     marginRight: 5,
   },
   selectedTextStyle: {
+    ...fontGroup.sf500,
     color: theme.colors.white,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
@@ -65,12 +67,21 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 6,
   },
   placeholderStyle: {
+    ...fontGroup.sf500,
     color: theme.colors.grey,
     marginStart: 3,
     fontSize: FontSizes.S14,
     opacity: 1,
   },
+  placeholderDOBStyle: {
+    ...fontGroup.sf500,
+    color: theme.colors.white,
+    marginStart: 3,
+    fontSize: FontSizes.S14,
+    opacity: 1,
+  },
   timeteststyle: {
+    ...fontGroup.sf500,
     marginStart: 3,
     color: theme.colors.grey,
     fontSize: FontSizes.S14,
@@ -95,12 +106,21 @@ const useStyles = makeStyles((theme) => ({
     marginVertical: '7%',
   },
   privacyText: {
+    ...fontGroup.p400,
     color: theme.colors.grey,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
   },
   focusedInput: {
     backgroundColor: theme.colors.inputBlue
+  },
+  inputError: {
+    backgroundColor: theme.colors.pink
+  },
+  errorText: {
+    color: 'red',
+    fontSize: FontSizes.S13, 
+    marginLeft: 5, 
   },
 }));
 
