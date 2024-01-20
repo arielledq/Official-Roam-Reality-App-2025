@@ -9,61 +9,13 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding
+    flex: 1
   },
   container: { marginTop: "10%" },
-  headerText: {
-    ...fontGroup.ns900,
-    fontSize: FontSizes.S24,
-    color: theme.colors.white,
-    marginTop: 10,
+  f1:{
+    flex:1
   },
-  subHeaderText: {
-    ...fontGroup.p400,
-    fontSize: FontSizes.S12,
-    color: theme.colors.white,
-    marginTop: 10,
-  },
-
-  challengeSponsorName: {
-    ...fontGroup.p700,
-    fontSize: FontSizes.S22,
-    color: theme.colors.white,
-  },
-
-  challengeSponsorStartDateText: {
-    ...fontGroup.p300,
-    fontSize: FontSizes.S12,
-    color: theme.colors.white,
-  },
-  pointCount: {
-    ...fontGroup.p900,
-    fontSize: FontSizes.S24,
-    color: theme.colors.white,
-    margin: 0
-  },
-
-  pointCountText: {
-    ...fontGroup.p400,
-    fontSize: FontSizes.S10,
-    color: theme.colors.white,
-  },
-
-  bottomText: {
-    ...fontGroup.p700,
-    fontSize: FontSizes.S19,
-    textAlign: 'center',
-    color: "#1158F4",
-    marginVertical: 15,
-    fontWeight: "700"
-  },
-  buttonStyle: {
-    height: 50
-  },
-  buttonContainerStyle: {
-    marginTop: 20
-  },
+  bottomContainer:{ width: '100%', height: 110, backgroundColor: "#090A16", borderTopEndRadius: 20, borderTopStartRadius: 20, alignItems: 'center' }
 }))
 
 export default useStyles
