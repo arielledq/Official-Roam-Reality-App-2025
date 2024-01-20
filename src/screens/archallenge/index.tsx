@@ -29,7 +29,6 @@ const ArChallenge: ScreenStackComponent<RootStackParamList, "ArChallenge"> = ({
   const ARSposored = () => {
     setIsLoading(true)
     getARChallenges().then((res) => {
-      console.log("getARSposored", res)
       if (res.status == 1) {
         setSponsoredData(res.data)
       } else {

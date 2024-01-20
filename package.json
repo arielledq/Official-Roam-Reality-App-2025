@@ -29,6 +29,7 @@
     "formik": "^2.4.5",
     "moment": "^2.30.1",
     "react": "18.2.0",
+    "@viro-community/react-viro": "npm:react-viro-sw",
     "react-dom": "^18.2.0",
     "react-native": "0.71.7",
     "react-native-devsettings": "^1.0.5",
