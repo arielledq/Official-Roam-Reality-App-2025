@@ -73,6 +73,32 @@ class RequestClass {
     }
   }
 
+  async callAR(config) {
+    try {
+      const res = await this.axios.request({
+        baseURL: this.serverBaseUrl,
+        APP_JSON_HEADER,
+        ...config
+      })
+      return { data: res.data, status: 1 }
+    } catch (error) {
+      const errorStatus = get(error, 'response.status', null)
+      const data = get(error, 'response.data', {})
+      const method = get(error, 'response.config.method', {})
+      const url = get(error, 'response.config.url', {})
+      console.info('my data', data)
+      console.warn('AXIOS_errorStatus', errorStatus)
+      console.warn('AXIOS_errorURL', url)
+      console.error('AXIOS_errorMethod', method)
+      console.warn('AXIOS_errorData', typeof data)
+      return {
+        status: 0,
+        errorStatus,
+        message: data
+      }
+    }
+  }
+
   async multiPartCall(config) {
     try {
       const tokenHeader = await MULTIPART_HEADER()

@@ -98,3 +98,15 @@ export const fbLogin = data => {
     data
   })
 }
+
+export const getARChallenges = () =>
+  Request.callAR({
+    url: `modules/challenges/user/`,
+    method: 'GET'
+  })
+
+export const getARSposored = () =>
+  Request.callAR({
+    url: `modules/challenges/sponsor/`,
+    method: 'GET'
+  })
