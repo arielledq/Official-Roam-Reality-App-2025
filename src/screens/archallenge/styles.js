@@ -65,7 +65,7 @@ const useStyles = makeStyles(theme => ({
   list_item: {
     paddingHorizontal: 12,
     paddingVertical: 10,
-    width: 166,
+    flex:1,
     height: 113,
     justifyContent: "center",
     alignItems: "center",

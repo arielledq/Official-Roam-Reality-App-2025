@@ -17,7 +17,8 @@ import {
   Viro3DObject,
   ViroScene,
   ViroNode,
-  ViroCamera
+  ViroCamera,
+  ViroImage
 } from '@viro-community/react-viro';
 
 import { useDispatch, useSelector } from "react-redux"
@@ -26,53 +27,41 @@ import CaptureImage from "../../../assets/ar/camera.png"
 
 const { width } = Dimensions.get('window');
 
-const ARScreen = () => {
-  const [text, setText] = useState('Initializing AR...');
 
-  function onInitialized(state, reason) {
-    console.log('guncelleme', state, reason);
-    if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      setText('Hello World!');
-    } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-      // Handle loss of tracking
-    }
-  }
-
-  const handleLoadStart = () => {
-    console.log("OBJ loading has started");
-  }
-  const handleLoadEnd = () => {
-    console.log("OBJ loading has finished");
-  }
-  const handleError = (event) => {
-    console.log("OBJ loading failed with error: " + event.nativeEvent.error);
-  }
-
-  return (
-    <ViroARScene onTrackingUpdated={onInitialized}>
-    </ViroARScene>
-  );
-};
 
 const ArChallengeCapture: ScreenStackComponent<RootStackParamList, "ArChallengeCapture"> = ({
 
 }) => {
   const styles = useStyles()
   const dispatch = useDispatch()
-  const route = useRoute()
+  const route: any = useRoute()
   const challengeObj = route?.params?.challengeObj;
 
-  const onInitialized = (state, reason) => {
-    console.log('guncelleme', state, reason);
-    if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      // setText('Hello World!');
-    } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-      // Handle loss of tracking
+
+
+  const ARScreen = () => {
+
+    function onInitialized(state: any, reason: any) {
+      console.log('guncelleme', state, reason);
+      if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
+      } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
+        // Handle loss of tracking
+      }
     }
-  }
+    return (
+      <ViroARScene onTrackingUpdated={onInitialized}>
+        <ViroImage
+          height={.10}
+          width={.10}
+          source={{ uri: challengeObj.image }}
+        />
+      </ViroARScene>
+    );
+  };
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
+      <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
       <ViroARSceneNavigator
         autofocus={true}
         initialScene={{
