@@ -30,7 +30,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
 
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
-      <View style={{ backgroundColor: "#9003E050", width: '100%', height: 87, marginVertical: 20, borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }}>
+      <View style={styles.pointContainer}>
         <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: "#B816E0", width: 73, height: 63, borderRadius: 8 }}>
           <Text style={styles.pointCount}>{challengeObj.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
@@ -61,7 +61,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
       <View style={{ height: 152 }}>
         <Text style={styles.bottomText}>Let's see an example</Text>
         <AppButton
-          onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj})}
+          onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj })}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainerStyle}
           title={"Start Challenge"}
