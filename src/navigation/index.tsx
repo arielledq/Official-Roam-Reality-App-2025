@@ -21,6 +21,7 @@ import FPChangePassword from '../screens/fpchangepassword/fpchangepassword';
 import ArChallengeDetails from '../screens/archallenge/challengedetails';
 import ArChallengeCapture from '../screens/archallenge/challengecapture';
 import ARChallenge from '../screens/archallenge';
+import ArChallengeShare from '../screens/archallenge/challengeshare';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -57,6 +58,7 @@ const Navigation = () => {
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
+        <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
       </>
     )
   }
@@ -73,7 +75,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="ARChallenge"
+            initialRouteName="ArChallengeShare"
             screenOptions={{
               headerShown: false,
               animation: "slide_from_right"

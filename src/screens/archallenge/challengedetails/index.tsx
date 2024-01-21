@@ -5,7 +5,6 @@ import {
   RootStackParamList,
   ScreenStackComponent
 } from "../../../navigation/types"
-import { getARChallenge, getARSposored } from '../../../network'
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation, useRoute } from "@react-navigation/native"

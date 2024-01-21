@@ -68,7 +68,7 @@ const ArChallenge: ScreenStackComponent<RootStackParamList, "ArChallenge"> = ({
         <BackgroundWithImage
           style={{ backgroundColor: "transparent", flex: .5, height: 94, justifyContent: "center", alignItems: 'center' }}
           imageSource={PointBoardBG}>
-          <AppText style={[_styles.headerText]}>2000</AppText>
+          <AppText style={[_styles.headerText]}>0</AppText>
           <AppText style={[_styles.subHeaderText]}>Your Total Points</AppText>
         </BackgroundWithImage>
       </View>
