@@ -12,6 +12,7 @@ import AppText from "../../../components/text"
 import useStyles from "./styles"
 import ShareImg from "../../../assets/ar/share_img.png"
 import Coke from "../../../assets/ar/sponsored/coke.png"
+import AppButton from "../../../components/button"
 
 const ArChallengeShare = ({
 
@@ -43,6 +44,16 @@ const ArChallengeShare = ({
             </View>
           </View>
         </View>
+      </View>
+
+      <View style={{ flex:1, justifyContent:'flex-end',padding:30}}>
+        <Text style={styles.bottomText}>Link My Profiles</Text>
+        <AppButton
+          onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj })}
+          buttonStyle={styles.buttonStyle}
+          containerStyle={styles.buttonContainerStyle}
+          title={"Share Please!"}
+        />
       </View>
     </BackgroundWithImage>
   )
