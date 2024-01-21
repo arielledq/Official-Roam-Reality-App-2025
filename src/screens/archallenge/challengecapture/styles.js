@@ -11,8 +11,8 @@ let ScreenHeight = Dimensions.get("window").height;
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
-    flex: 1,
-    backgroundColor: '#000'
+    height: ScreenHeight,
+    width: '100%',
   },
   container: { marginTop: "10%" },
   f1: {
@@ -25,7 +25,8 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#090A16",
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
-    alignItems: 'center'
+    alignItems: 'center',
+    position: 'absolute', bottom: 0
   },
 
   challengeSponsorName: {

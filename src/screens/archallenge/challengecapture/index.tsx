@@ -61,25 +61,28 @@ const ArChallengeCapture: ScreenStackComponent<RootStackParamList, "ArChallengeC
 
   return (
     <View style={styles.mainContainer}>
-      <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
-      <View style={{ backgroundColor: "#1158F4", height: 53, borderRadius: 8, marginHorizontal: 20, marginTop: 20, justifyContent: 'center' }}>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Image style={{ width: 37, height: 37, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
-            <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
-          </View>
-          <TouchableOpacity style={{ backgroundColor: '#fff', height: 30, width: 118, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={styles.btnText}>View Details</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
       <ViroARSceneNavigator
         autofocus={true}
         initialScene={{
           scene: ARScreen,
         }}
         style={styles.f1}
-      />
+      >
+      </ViroARSceneNavigator>
+      <View style={{ position: 'absolute' }}>
+        <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
+        <View style={{ backgroundColor: "#1158F4", height: 53, borderRadius: 8, marginHorizontal: 20, marginTop: 20, justifyContent: 'center' }}>
+          <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Image style={{ width: 37, height: 37, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
+              <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
+            </View>
+            <TouchableOpacity style={{ backgroundColor: '#fff', height: 30, width: 118, alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={styles.btnText}>View Details</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
       <View style={styles.bottomContainer}>
         <TouchableOpacity style={{ marginTop: 20 }}>
           <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
