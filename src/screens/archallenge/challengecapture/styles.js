@@ -26,9 +26,25 @@ const useStyles = makeStyles(theme => ({
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
     alignItems: 'center',
-    position: 'absolute', bottom: 0
+    position: 'absolute',
+    bottom: 0,
+    flexDirection: 'row',
+    paddingHorizontal: 10
   },
-
+  bottomButtonContainer:
+  {
+    width: 117,
+    height: 42,
+    borderRadius: 4,
+    backgroundColor: "#ffffff10",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  bottomButtonText: {
+    ...fontGroup.p700,
+    color: theme.colors.white,
+    fontSize: FontSizes.S16,
+  },
   challengeSponsorName: {
     ...fontGroup.p700,
     fontSize: FontSizes.S20,
