@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Dimensions, TouchableOpacity, View, Image } from "react-native";
+import { Dimensions, TouchableOpacity, View, Image, Text } from "react-native";
 import {
   RootStackParamList,
   ScreenStackComponent
@@ -60,8 +60,19 @@ const ArChallengeCapture: ScreenStackComponent<RootStackParamList, "ArChallengeC
   };
 
   return (
-    <BackgroundWithImage style={styles.mainContainer}>
+    <View style={styles.mainContainer}>
       <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
+      <View style={{ backgroundColor: "#1158F4", height: 53, borderRadius: 8, marginHorizontal: 20, marginTop: 20, justifyContent: 'center' }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <Image style={{ width: 37, height: 37, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
+            <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
+          </View>
+          <TouchableOpacity style={{ backgroundColor: '#fff', height: 30, width: 118, alignItems: 'center', justifyContent: 'center' }}>
+            <Text style={styles.btnText}>View Details</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
       <ViroARSceneNavigator
         autofocus={true}
         initialScene={{
@@ -74,7 +85,7 @@ const ArChallengeCapture: ScreenStackComponent<RootStackParamList, "ArChallengeC
           <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
         </TouchableOpacity>
       </View>
-    </BackgroundWithImage>
+    </View>
   )
 }
 
