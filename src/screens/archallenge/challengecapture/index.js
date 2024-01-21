@@ -45,10 +45,10 @@ const ArChallengeCapture = ({
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
         <ViroImage
-          height={.3}
-          width={.3}
+          height={1}
+          width={1}
           source={{ uri: challengeObj.image }}
-          position={[0, 0, -2]}
+          position={[0, 0, -5]}
         />
       </ViroARScene>
     );
