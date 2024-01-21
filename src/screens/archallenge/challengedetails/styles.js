@@ -64,6 +64,7 @@ const useStyles = makeStyles(theme => ({
   buttonContainerStyle: {
     marginTop: 20
   },
+  pointContainer: { backgroundColor: "#9003E050", width: '100%', height: 87, marginVertical: 20, borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }
 }))
 
 export default useStyles

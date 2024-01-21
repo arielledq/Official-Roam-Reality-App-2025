@@ -1,7 +1,7 @@
 import React from "react"
 
 import { TouchableOpacity, View, Image, Text } from "react-native";
-import { useRoute } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
   ViroARScene,
@@ -26,7 +26,12 @@ const ArChallengeCapture = ({
 }) => {
   const styles = useStyles()
   const route = useRoute()
+  const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
+
+  const navigateToShare = (captureData) => {
+    navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
+  }
 
   const ARScreen = () => {
 
@@ -88,6 +93,18 @@ const ArChallengeCapture = ({
         });
     }
 
+    async _takeScreenshot() {
+      this.playCameraSound()
+      this._arNavigator
+        ._takeScreenshot('screenshot', false)
+        .then((retDict) => {
+          console.log("captureImage:", retDict)
+          this.setState({
+            capturedImage: retDict.url
+          });
+        });
+    }
+
     render() {
       return (
         <View style={styles.mainContainer}>
@@ -129,7 +146,9 @@ const ArChallengeCapture = ({
             }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
-            {this.state.capturedImage && <TouchableOpacity activeOpacity={.6} style={styles.bottomButtonContainer}>
+            {this.state.capturedImage && <TouchableOpacity onPress={() => {
+              navigateToShare(this.state.capturedImage)
+            }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
             </TouchableOpacity>
             }

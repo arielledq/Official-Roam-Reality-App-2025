@@ -49,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.p700,
     fontSize: FontSizes.S12,
     color: "#F2F2F2",
-    width:'80%'
+    width: '80%'
   },
   challengeSponsorStartDateText: {
     ...fontGroup.p300,
@@ -70,6 +70,18 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 15,
     fontWeight: "700"
   },
+  detailContainer: { borderRadius: 12, height: 422, width: '100%', backgroundColor: "#272741", marginVertical: 20, overflow: 'hidden' },
+  pointsParentContainer: { width: '100%', height: 104, borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 },
+  detailPointContainter:
+  {
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: "#B816E0",
+    width: 73,
+    height: 63,
+    borderRadius: 8
+  }
 }))
 
 export default useStyles

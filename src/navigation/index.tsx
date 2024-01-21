@@ -75,7 +75,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="ArChallengeShare"
+            initialRouteName="ARChallenge"
             screenOptions={{
               headerShown: false,
               animation: "slide_from_right"

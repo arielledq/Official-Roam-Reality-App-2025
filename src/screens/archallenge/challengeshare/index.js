@@ -13,6 +13,7 @@ import useStyles from "./styles"
 import ShareImg from "../../../assets/ar/share_img.png"
 import Coke from "../../../assets/ar/sponsored/coke.png"
 import AppButton from "../../../components/button"
+import moment from "moment";
 
 const ArChallengeShare = ({
 
@@ -20,33 +21,36 @@ const ArChallengeShare = ({
   const styles = useStyles()
   const route = useRoute()
   const challengeObj = route?.params?.challengeObj;
+  const captureData = route?.params?.captureData;
+  const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
+
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={challengeObj?.sponsored?.name} backgroundColor="transparent" />
-      <AppText style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
-      <AppText style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
-      <View style={{ borderRadius: 12, height: 422, width: '100%', backgroundColor: "#272741", marginVertical: 20, overflow: 'hidden' }}>
-        <Image source={ShareImg} style={{ width: '100%', height: 318 }} />
-        <View style={{ width: '100%', height: 104, borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }}>
-          <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: "#B816E0", width: 73, height: 63, borderRadius: 8 }}>
-            <Text style={styles.pointCount}>50</Text>
+      <AppText numberOfLines={2} style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
+      <AppText numberOfLines={2} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
+      <View style={styles.detailContainer}>
+        <Image source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />
+        <View style={styles.pointsParentContainer}>
+          <View style={styles.detailPointContainter}>
+            <Text style={styles.pointCount}>{challengeObj.points}</Text>
             <Text style={styles.pointCountText}>Points</Text>
           </View>
           <View style={{ paddingHorizontal: 10 }}>
             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={Coke} />
-              <Text style={styles.challengeSponsorName}>Coca Cola</Text>
+              <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
+              <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
             </View>
             <View >
               <Text style={styles.challengeSponsorTipText}>Share your recorded experience for extra credits!</Text>
-              <Text style={styles.challengeSponsorStartDateText}>Started on : 12-12-23</Text>
+              <Text style={styles.challengeSponsorStartDateText}>Started on : {startDate}</Text>
             </View>
           </View>
         </View>
       </View>
 
-      <View style={{ flex:1, justifyContent:'flex-end',padding:30}}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', padding: 30 }}>
         <Text style={styles.bottomText}>Link My Profiles</Text>
         <AppButton
           onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj })}
