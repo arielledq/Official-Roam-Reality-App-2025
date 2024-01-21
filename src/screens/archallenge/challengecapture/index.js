@@ -1,12 +1,7 @@
-import React, { useEffect, useRef, useState } from "react"
+import React from "react"
 
-import { Dimensions, TouchableOpacity, View, Image, Text } from "react-native";
-import {
-  RootStackParamList,
-  ScreenStackComponent
-} from "../../../navigation/types"
-import BackgroundWithImage from "../../../components/background"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { TouchableOpacity, View, Image, Text } from "react-native";
+import { useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
   ViroARScene,
@@ -21,12 +16,10 @@ import {
   ViroImage
 } from '@viro-community/react-viro';
 
-import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
-
-const { width } = Dimensions.get('window');
-
+import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
+var Sound = require('react-native-sound');
 
 const ArChallengeCapture = ({
 
@@ -34,7 +27,6 @@ const ArChallengeCapture = ({
   const styles = useStyles()
   const route = useRoute()
   const challengeObj = route?.params?.challengeObj;
-  const arNavigator = React.useRef();
 
   const ARScreen = () => {
 
@@ -73,7 +65,19 @@ const ArChallengeCapture = ({
       this._arNavigator = ARNavigator;
     }
 
+    playCameraSound() {
+      Sound.setCategory('Playback');
+      let cameraSound = new Sound(CameraSoundFile, error => {
+        if (error) {
+          console.log('failed to load the sound', error);
+        } else {
+          cameraSound.play(); // have to put the call to play() in the onload callback
+        }
+      });
+    };
+
     async _takeScreenshot() {
+      this.playCameraSound()
       this._arNavigator
         ._takeScreenshot('screenshot', false)
         .then((retDict) => {
