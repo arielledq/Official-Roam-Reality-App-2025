@@ -56,6 +56,20 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S10,
     color: "#9CA3AF",
   },
+  buttonStyle: {
+    height: 50
+  },
+  buttonContainerStyle: {
+    marginTop: 20
+  },
+  bottomText: {
+    ...fontGroup.p700,
+    fontSize: FontSizes.S19,
+    textAlign: 'center',
+    color: "#1158F4",
+    marginVertical: 15,
+    fontWeight: "700"
+  },
 }))
 
 export default useStyles
