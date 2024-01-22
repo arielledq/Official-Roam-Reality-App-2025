@@ -10,8 +10,6 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import AppText from "../../../components/text"
 import useStyles from "./styles"
-import ShareImg from "../../../assets/ar/share_img.png"
-import Coke from "../../../assets/ar/sponsored/coke.png"
 import AppButton from "../../../components/button"
 import moment from "moment";
 
@@ -50,7 +48,7 @@ const ArChallengeShare = ({
         </View>
       </View>
 
-      <View style={{ flex: 1, justifyContent: 'flex-end', padding: 30 }}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', paddingVertical:30 }}>
         <Text style={styles.bottomText}>Link My Profiles</Text>
         <AppButton
           onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj })}
