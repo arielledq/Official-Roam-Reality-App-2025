@@ -1,10 +1,19 @@
-from .models import Challenges, Sponsor
-from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer
+from .models import Challenges, Sponsor, Resource3dModel
+from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer
 from rest_framework import viewsets
 from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
+
+class Resource3dModelViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing accounts.
+    """
+    queryset = Resource3dModel.objects.all()
+    serializer_class = Resource3dModelSerializer
+    http_method_names = ["get"]
+
 
 class SponsorViewSet(viewsets.ModelViewSet):
     """
