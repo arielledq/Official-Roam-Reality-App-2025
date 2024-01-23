@@ -58,6 +58,16 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 15,
     fontWeight: "700"
   },
+  p: {
+    ...fontGroup.p400,
+    color: '#fff',
+    fontSize: FontSizes.S14,
+  },
+  strong: {
+    ...fontGroup.p700,
+    color: '#fff',
+    fontSize: FontSizes.S18,
+  },
   buttonStyle: {
     height: 50
   },
