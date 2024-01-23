@@ -111,7 +111,9 @@ const ArChallengeCapture = ({
   }
 
   useEffect(() => {
-    checkIfModelExist()
+    if (challengeObj.challenge_choice == "DANCE") {
+      checkIfModelExist()
+    }
   }, []);
 
   const navigateToShare = (captureData) => {
@@ -180,7 +182,7 @@ const ArChallengeCapture = ({
           position={[0, 0, -5]} />}
 
         {
-          challengeObj.challenge_choice == "DANCE" && <Viro3DObject
+          challengeObj.challenge_choice == "DANCE" && !loading && <Viro3DObject
             key="vvv"
             source={{ uri: modelPath }} /// this works
             position={[-10, -8, -20]}
