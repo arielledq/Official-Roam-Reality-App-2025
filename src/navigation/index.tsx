@@ -67,6 +67,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
+            initialRouteName="Profile"
             screenOptions={{
               headerShown: false,
               animation: "slide_from_right"

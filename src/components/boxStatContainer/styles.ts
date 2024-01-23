@@ -1,6 +1,6 @@
 import { makeStyles } from '@rneui/themed';
 import { widthPercentageToDP as wp } from 'react-native-responsive-screen';
-import { FontLineHeights, FontSizes } from '../../util/FontUtils';
+import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -10,30 +10,27 @@ const useStyles = makeStyles((theme) => ({
     alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius: 16,
-    backgroundColor: theme.colors.boxStatBG
+    borderRadius: 8,
+    backgroundColor: theme.colors.boxStatBG,
+    marginTop: 7,
+    marginHorizontal: 2.6
   },
   cardInner: {
     justifyContent: 'center',
     alignContent: 'center',
     alignItems: 'center',
   },
-  cardBottomContent: {
-    flexDirection: 'row',
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   TextNameTop: {
-    fontSize: FontSizes.S22,
-    lineHeight: FontLineHeights.LH24,
+    ...fontGroup.sf700,
+    fontSize: FontSizes.S16,
+    lineHeight: FontLineHeights.LH20,
     color: theme.colors.white,
   },
   Text: {
-    fontSize: FontSizes.S12,
-    lineHeight: FontLineHeights.LH16,
+    ...fontGroup.sf500,
+    fontSize: FontSizes.S10,
+    lineHeight: FontLineHeights.LH12,
     color: theme.colors.white,
-    // opacity: 0.9,
   },
 }));
 

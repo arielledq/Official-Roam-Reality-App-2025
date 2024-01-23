@@ -41,6 +41,7 @@ export const FontSizes = {
 
 // Basic Line heights to use in Application
 export const FontLineHeights = {
+  LH12: 12,
   LH14: 14,
   LH15: 15,
   LH16: 16,
