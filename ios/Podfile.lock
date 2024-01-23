@@ -524,10 +524,19 @@ PODS:
   - RNScreens (3.20.0):
     - React-Core
     - React-RCTImage
+  - RNSound (0.11.2):
+    - React-Core
+    - RNSound/Core (= 0.11.2)
+  - RNSound/Core (0.11.2):
+    - React-Core
   - RNSVG (14.1.0):
     - React-Core
   - SocketRocket (0.6.1)
   - TOCropViewController (2.6.1)
+  - ViroKit (1.0):
+    - React
+  - ViroReact (1.0):
+    - React
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
     - Yoga (~> 1.14)
@@ -607,7 +616,10 @@ DEPENDENCIES:
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
+  - "ViroKit (from `../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/`)"
+  - "ViroReact (from `../node_modules/@viro-community/react-viro/ios/`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -738,8 +750,14 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSound:
+    :path: "../node_modules/react-native-sound"
   RNSVG:
     :path: "../node_modules/react-native-svg"
+  ViroKit:
+    :path: "../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/"
+  ViroReact:
+    :path: "../node_modules/@viro-community/react-viro/ios/"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -816,12 +834,15 @@ SPEC CHECKSUMS:
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
+  RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
   RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a
   SocketRocket: f32cd54efbe0f095c4d7594881e52619cfe80b17
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
+  ViroKit: 700d3d4ca086368d06224de1cbbc19781aea2094
+  ViroReact: f4980e6b04918c4340637f9cbaae22a6bb7ea440
   Yoga: d56980c8914db0b51692f55533409e844b66133c
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 5649214cf4304957942cf4cae6f18d9d0b523c6c
+PODFILE CHECKSUM: ed368c46a900fb28503df69f548761bde4c096af
 
-COCOAPODS: 1.12.1
+COCOAPODS: 1.14.3
