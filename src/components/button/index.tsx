@@ -11,11 +11,15 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     buttonStyle = {},
     titleStyle = {},
     containerStyle = {},
+    customColors,
     ...otherProps
   } = props
+
+  const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
+  const colors = customColors || defaultColors;
   return (
     <LinearGradient
-      colors={["#B816E0", "#1158F4", "#9003E0"]}
+      colors={colors}
       start={{ x: 0, y: 1 }}
       end={{ x: 1, y: 1 }}
       style={[styles.containerStyle, containerStyle]}

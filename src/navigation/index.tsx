@@ -59,6 +59,8 @@ const Navigation = () => {
       <>
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
+        <Stack.Screen name="EditProfile" component={EditProfile} />
+        <Stack.Screen name="Profile" component={Profile} />
       </>
     )
   }
@@ -67,7 +69,6 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
-            initialRouteName="Profile"
             screenOptions={{
               headerShown: false,
               animation: "slide_from_right"

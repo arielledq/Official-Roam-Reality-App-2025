@@ -1,5 +1,5 @@
-import React from "react"
-import { TouchableOpacity, View } from "react-native"
+import React, { useCallback, useEffect, useRef, useState } from "react"
+import { FlatList, Image, TouchableOpacity, View } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import useStyles from "./styles"
 import {
@@ -12,14 +12,41 @@ import AppHeader from "../../components/header"
 import { MenuIcon } from "../../assets/svg"
 import UserInfoCard from "../../components/userInfoCard"
 import { Avatar } from "@rneui/base"
-import { AppText } from "../../components"
+import { AppButton, AppText } from "../../components"
 import StatContainer from "../../components/statContainer"
 import BoxStatContainer from "../../components/boxStatContainer"
+import Images from "../../assets/images"
+import MemoryContainer from "../../components/memoryContainer"
+import Icon from "../../components/Icon"
+import LinearGradient from "react-native-linear-gradient"
+import { getProfieDetails } from "../../network"
+import { useSelector } from "react-redux"
+import { useFocusEffect } from "@react-navigation/native"
 
 const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
   navigation
 }) => {
   const _styles = useStyles()
+  const userProfile = useSelector(state => state.login?.data?.user)
+  const [profileDetails, setProfileDetails] = useState(null)
+  const resData = useRef({})
+
+  const fetchProfileDetails = async () => {
+    try {
+      const details = await getProfieDetails({
+        id: userProfile.user_profile.id
+      })
+
+      // Store the details in the state variable
+      setProfileDetails(details)
+    } catch (error) {
+      console.error("Error fetching profile details: ", error)
+    }
+  }
+
+  useFocusEffect(useCallback(()=>{
+    fetchProfileDetails()
+  },[]))
 
   const handleMenuButton = () => {
     return (
@@ -44,46 +71,109 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
   for (let i = 0; i < data.length; i += 3) {
     rows.push(data.slice(i, i + 3))
   }
-
-  return (
-    <BackgroundWithImage style={_styles.mainContainer}>
+  const navigateToVerifyMail = (email) => {
+    // navigation.navigate('EmailVerification', { email: email.toLowerCase() })
+  }
+  const renderHeader = () => (
+    <KeyboardAwareScrollView
+      keyboardShouldPersistTaps="always"
+      nestedScrollEnabled
+      style={_styles.header}
+    >
       <AppHeader
         containerStyle={_styles.headerContainer}
         titleStyle={_styles.headerStyle}
         title={"Profile"}
         leftComponent={handleMenuButton()}
       />
-      <KeyboardAwareScrollView
-        keyboardShouldPersistTaps="always"
-        nestedScrollEnabled
-        style={_styles.scroll}
-      >
-        <Avatar size={350} />
-        <UserInfoCard name={""} email={""} editAction={() => console.log()} />
+      <View style={_styles.avatarContainer}>
+        <LinearGradient
+          colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.9)"]}
+          start={{ x: 0.5, y: 0 }}
+          end={{ x: 0.5, y: 1 }}
+        />
+        {profileDetails?.image ? (
+        <Avatar
+          size={405}
+          source={{ uri: profileDetails.image }}
+        />
+      ) : (
+        <View style={{ width: 405, height: 405, backgroundColor: 'gray' }}>
+          <AppText style={{ color: 'white' }}>Image not available</AppText>
+        </View>
+      )}
+        {/* Edit Profile button */}
+        <AppButton
+          customColors={["#7B16FF", "#1158F4"]}
+          buttonStyle={_styles.editButton}
+          containerStyle={_styles.editButtonContainer}
+          onPress={() => navigation.navigate("EditProfile")}
+        >
+          <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+          <AppText style={_styles.buttonText}>Edit Profile</AppText>
+        </AppButton>
+      </View>
+      <View style={_styles.scroll}>
+        <UserInfoCard
+          name={profileDetails?.user.name}
+          email={profileDetails?.user.email}
+          verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
+          isVerified={profileDetails?.user.user_profile.is_verified}
+        />
         <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
-
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
           <StatContainer value={"23"} property={"Points"} />
           <StatContainer value={"23"} property={"TT Rank"} />
         </View>
+      </View>
+    </KeyboardAwareScrollView>
+  )
 
-        <View style={_styles.boxstatContainerStyle}>
-          <View style={_styles.boxstatContainer}>
-            {rows.map((row, rowIndex) => (
-              <View key={rowIndex} style={_styles.boxstatContainerStyle}>
-                {row.map(item => (
-                  <BoxStatContainer
-                    key={item.id}
-                    value={item.value}
-                    property={item.property}
-                  />
-                ))}
-              </View>
-            ))}
-          </View>
+  const renderFooter = () => (
+    <View style={_styles.scroll}>
+      <TouchableOpacity style={_styles.headingView}>
+        <AppText style={_styles.heading}>Player AR Memories</AppText>
+        <View style={_styles.arrow_3}>
+          <Image source={Images.ForwardIcon} />
         </View>
-      </KeyboardAwareScrollView>
+      </TouchableOpacity>
+      <View style={{ marginHorizontal: -22 }}>
+        <FlatList
+          data={data}
+          horizontal={true}
+          showsVerticalScrollIndicator={false}
+          showsHorizontalScrollIndicator={false}
+          renderItem={({ item }) => (
+            <MemoryContainer title={"hELLO"} description={"HI"} image={""} />
+          )}
+          keyExtractor={item => item.id.toString()}
+        />
+      </View>
+    </View>
+  )
+
+  const renderItem = ({ item }) => (
+    <BoxStatContainer
+      key={item.id}
+      boxId={item.id}
+      value={item.value}
+      property={item.property}
+    />
+  )
+
+  return (
+    <BackgroundWithImage style={_styles.mainContainer}>
+      <FlatList
+        data={data}
+        // contentContainerStyle={_styles.scroll}
+        keyExtractor={item => item.id.toString()}
+        renderItem={renderItem}
+        ListHeaderComponent={renderHeader}
+        numColumns={3}
+        ListFooterComponent={renderFooter}
+        nestedScrollEnabled={false}
+      />
     </BackgroundWithImage>
   )
 }

@@ -15,6 +15,18 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 7,
     marginHorizontal: 2.6
   },
+  cardMarginLeft: {
+    height: 60,
+    width: wp('28%'),
+    alignContent: 'center',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8,
+    backgroundColor: theme.colors.boxStatBG,
+    marginTop: 7,
+    marginRight: 2.6,
+    marginLeft: 25
+  },
   cardInner: {
     justifyContent: 'center',
     alignContent: 'center',

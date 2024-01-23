@@ -98,3 +98,17 @@ export const fbLogin = data => {
     data
   })
 }
+
+export const getProfieDetails = payload =>
+  Request.callWithToken({
+    url: `${commonApiRoute}account-setup/${payload.id}/`,
+    method: 'GET',
+    payload
+})
+
+export const updateProfile = payload =>
+  Request.multiPartCall({
+    url: `${commonApiRoute}account-setup/${payload.id}/`,
+    method: 'PATCH',
+    data: payload.data
+})
