@@ -18,9 +18,7 @@ const BoxStatContainer = ({
     <TouchableOpacity style={styles.cardContainer} onPress={onPressAction}>
       <View style={styles.cardInner}>
         <AppText style={styles.TextNameTop}>{value}</AppText>
-        <View style={styles.cardBottomContent}>
-          <AppText style={styles.Text}>{property}</AppText>
-        </View>
+        <AppText style={styles.Text}>{property}</AppText>
       </View>
     </TouchableOpacity>
   );

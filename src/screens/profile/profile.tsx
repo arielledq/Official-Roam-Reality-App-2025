@@ -29,6 +29,22 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
     )
   }
 
+  const data = [
+    { id: 1, value: 50, property: "Sites Viewed" },
+    { id: 2, value: 60, property: "Likes Received" },
+    { id: 3, value: 40, property: "Comments Posted" },
+    { id: 4, value: 75, property: "Photos Uploaded" },
+    { id: 5, value: 55, property: "Friends Added" },
+    { id: 6, value: 30, property: "Articles Read" },
+    { id: 7, value: 80, property: "Messages Sent" },
+    { id: 8, value: 65, property: "Logins This Month" }
+  ]
+  // Split the data into chunks of 3 for each row
+  const rows = []
+  for (let i = 0; i < data.length; i += 3) {
+    rows.push(data.slice(i, i + 3))
+  }
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -52,10 +68,21 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
           <StatContainer value={"23"} property={"TT Rank"} />
         </View>
 
-        <View style={_styles.statContainerStyle}>
-          <BoxStatContainer value={50} property={"Sites Viewed"}/>
+        <View style={_styles.boxstatContainerStyle}>
+          <View style={_styles.boxstatContainer}>
+            {rows.map((row, rowIndex) => (
+              <View key={rowIndex} style={_styles.boxstatContainerStyle}>
+                {row.map(item => (
+                  <BoxStatContainer
+                    key={item.id}
+                    value={item.value}
+                    property={item.property}
+                  />
+                ))}
+              </View>
+            ))}
+          </View>
         </View>
-
       </KeyboardAwareScrollView>
     </BackgroundWithImage>
   )
