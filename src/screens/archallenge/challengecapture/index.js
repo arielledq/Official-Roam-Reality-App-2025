@@ -39,7 +39,7 @@ const ArChallengeCapture = ({
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
   const [modelPath, setModelPath] = useState("");
-  const [loading, setLoading] = useState("");
+  const [loading, setLoading] = useState(true);
   console.log("ArChallengeCapture", modelFile)
   console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
@@ -74,9 +74,12 @@ const ArChallengeCapture = ({
                 console.log(result[i].name)
                 if (result[i].name.includes(".vrx")) {
                   setModelPath(result[i].path)
+                  setLoading(false)
+                  break;
                 }
               }
             }
+            setLoading(false)
           })
       })
       .catch((error) => {
@@ -306,7 +309,15 @@ const ArChallengeCapture = ({
   }
 
   return (
-    <ViroARNavigator />
+    <View style={{ flex: 1 }}>
+      <ViroARNavigator />
+      {loading &&
+        <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
+          <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
+            <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
+          </View>
+        </View>}
+    </View>
   )
 }
 
