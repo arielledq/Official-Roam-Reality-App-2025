@@ -30,7 +30,6 @@ class Challenges(models.Model):
     model_file = models.FileField(upload_to='ar/model/')
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
-    description = RichTextField(_("Description"), blank=True, null=True)
     sponsor = models.ForeignKey(Sponsor, on_delete=models.CASCADE, null=True,blank=True,related_name='sponsored')
     points = models.IntegerField(verbose_name='Challenge Points', default=0)
     challenge_choice = models.CharField(max_length=50,
@@ -40,6 +39,7 @@ class Challenges(models.Model):
                   choices=CHALLENGE_REQUIREMENT,
                   default="PHOTO")
     expiry_date = models.DateTimeField(blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
     
     class Meta:
         verbose_name_plural = "Challenges"
@@ -47,3 +47,14 @@ class Challenges(models.Model):
 
     def __str__(self):
       return self.name
+    
+class Resource3dModel(models.Model):
+    challenge = models.ForeignKey(Challenges, on_delete=models.CASCADE, null=True,blank=True,related_name='challenge')
+    file = models.FileField(upload_to='ar/model/resources/')
+    created_at = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        verbose_name_plural = "Resource3dModel"
+
+    def __str__(self):
+      return self.challenge.name + " " +  self.file.name
