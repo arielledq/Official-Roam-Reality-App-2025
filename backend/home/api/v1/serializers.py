@@ -113,8 +113,8 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class AccountSetupSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(required=False)
-    user_name = serializers.CharField(source='user.name', read_only=True)
+    user = UserSerializer()
+    name = serializers.CharField(required=False)
 
     class Meta:
         model = UserProfile
@@ -125,3 +125,19 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         user_profile["user"] = self.context['request'].user
         user_profile.update(validated_data)
         return UserProfile.objects.create(**user_profile)
+
+    def update(self, instance, validated_data):
+        user_profile = dict()
+        user_profile["user"] = self.context['request'].user
+        user_profile.update(validated_data)
+        instance.home_address = validated_data.get('home_address', instance.home_address)
+        instance.home_country = validated_data.get('home_country', instance.home_country)
+        instance.gender = validated_data.get('gender', instance.gender)
+        instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
+        instance.country_code = validated_data.get('country_code', instance.country_code)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.image = validated_data.get('image', instance.image)
+        instance.user.name = validated_data.get('name', instance.user.name)
+        instance.user.save()
+        instance.save()
+        return instance
