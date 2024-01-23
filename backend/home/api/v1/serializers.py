@@ -114,6 +114,7 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 class AccountSetupSerializer(serializers.ModelSerializer):
     user = serializers.CharField(required=False)
+    user_name = serializers.CharField(source='user.name', read_only=True)
 
     class Meta:
         model = UserProfile
