@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 
 import { TouchableOpacity, View, Image, Text } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
@@ -14,11 +14,14 @@ import {
   ViroDirectionalLight,
   ViroSpotLight
 } from '@viro-community/react-viro';
-
+import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
 import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
-var Sound = require('react-native-sound');
+import { unzip } from 'react-native-zip-archive'
+const RNFS = require('react-native-fs');
+const Sound = require('react-native-sound');
+const { config, fs } = RNFetchBlob;
 
 ViroMaterials.createMaterials({
   pbr: {
@@ -35,8 +38,78 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
+  const [modelPath, setModelPath] = useState("");
+  const [loading, setLoading] = useState("");
   console.log("ArChallengeCapture", modelFile)
   console.log("ArChallengeCapture", challengeObj.challenge_choice)
+
+  const downloadModelFile = (sourcePath, targetPath) => {
+    config({
+      fileCache: true,
+      path: sourcePath,
+    })
+      .fetch('GET', modelFile)
+      .progress((received, total) => {
+        console.log('progress', received / total)
+      })
+      .then((res) => {// the temp file path
+        console.log('The file saved to ', res.path());
+        unzipModelFile(res.path(), targetPath)
+      })
+      .catch((error) => {
+        console.error(error)
+      });
+  }
+
+  const unzipModelFile = (sourcePath, targetPath) => {
+    const charset = 'UTF-8'
+    unzip(sourcePath, targetPath, charset)
+      .then((path) => {
+        console.log(`unzip completed at ${path}`)
+        RNFS.readDir(path)
+          .then((result) => {
+            console.log('GOT RESULT', result);
+            for (let i = 0; i < result.length; i++) {
+              if (result[i].isFile) {
+                console.log(result[i].name)
+                if (result[i].name.includes(".vrx")) {
+                  setModelPath(result[i].path)
+                }
+              }
+            }
+          })
+      })
+      .catch((error) => {
+        console.error(error)
+      })
+  }
+
+  const checkIfModelExist = () => {
+    let filename = modelFile.split('/').pop()
+    filename = filename.split('?')[0];
+    withoutExtFilename = filename.split('.')[0];
+    const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+    const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+    console.log("sourcePath:", sourcePath)
+    console.log("targetPath:", targetPath)
+    RNFS.exists(sourcePath)
+      .then((exists) => {
+        console.log("exists:", exists)
+        if (exists) {
+          console.log('File exists');
+          unzipModelFile(sourcePath, targetPath)
+        } else {
+          downloadModelFile(sourcePath, targetPath)
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+
+  useEffect(() => {
+    checkIfModelExist()
+  }, []);
 
   const navigateToShare = (captureData) => {
     navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -106,7 +179,7 @@ const ArChallengeCapture = ({
         {
           challengeObj.challenge_choice == "DANCE" && <Viro3DObject
             key="vvv"
-            source={{ uri: challengeObj.model_file }} /// this works
+            source={{ uri: modelPath }} /// this works
             position={[-10, -8, -20]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
