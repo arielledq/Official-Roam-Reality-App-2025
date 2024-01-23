@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react"
 
+import { fontGroup, FontSizes } from "../../../util/FontUtils"
 import { Dimensions, Image, Keyboard, ScrollView, Text, View } from "react-native";
 import {
   RootStackParamList,
@@ -53,8 +54,18 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
       >
         <RenderHtml
           contentWidth={width}
+          tagsStyles={{
+            p: {
+              color: '#9CA3AF',
+              fontSize: FontSizes.S14,
+            },
+            strong: {
+              color: '#fff',
+              fontSize: FontSizes.S18,
+            }
+          }}
           source={{
-            html: `<html style="color:#fff;">${challengeObj.description}</html>`
+            html: `${challengeObj.description}`
           }}
         />
       </ScrollView>
