@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { TouchableOpacity, View, Image, Text } from "react-native";
+import { TouchableOpacity, View, Image, Text, Platform } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
@@ -38,89 +38,16 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
-  const [modelPath, setModelPath] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   console.log("ArChallengeCapture", modelFile)
   console.log("ArChallengeCapture", challengeObj.challenge_choice)
-
-  const downloadModelFile = (sourcePath, targetPath) => {
-    config({
-      fileCache: true,
-      path: sourcePath,
-    })
-      .fetch('GET', modelFile)
-      .progress((received, total) => {
-        console.log('progress', received / total)
-      })
-      .then((res) => {// the temp file path
-        console.log('The file saved to ', res.path());
-        unzipModelFile(res.path(), targetPath)
-      })
-      .catch((error) => {
-        console.error(error)
-      });
-  }
-
-  const unzipModelFile = (sourcePath, targetPath) => {
-    const charset = 'UTF-8'
-    unzip(sourcePath, targetPath, charset)
-      .then((path) => {
-        console.log(`unzip completed at ${path}`)
-        RNFS.readDir(path)
-          .then((result) => {
-            console.log('GOT RESULT', result);
-            for (let i = 0; i < result.length; i++) {
-              if (result[i].isFile) {
-                console.log(result[i].name)
-                if (result[i].name.includes(".vrx")) {
-                  setModelPath(result[i].path)
-                  setLoading(false)
-                  break;
-                }
-              }
-            }
-            setLoading(false)
-          })
-      })
-      .catch((error) => {
-        console.error(error)
-      })
-  }
-
-  const checkIfModelExist = () => {
-    let filename = modelFile.split('/').pop()
-    filename = filename.split('?')[0];
-    withoutExtFilename = filename.split('.')[0];
-    const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-    const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-    console.log("sourcePath:", sourcePath)
-    console.log("targetPath:", targetPath)
-    RNFS.exists(sourcePath)
-      .then((exists) => {
-        console.log("exists:", exists)
-        if (exists) {
-          console.log('File exists');
-          unzipModelFile(sourcePath, targetPath)
-        } else {
-          downloadModelFile(sourcePath, targetPath)
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
-
-  useEffect(() => {
-    if (challengeObj.challenge_choice == "DANCE") {
-      checkIfModelExist()
-    }
-  }, []);
 
   const navigateToShare = (captureData) => {
     navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
   }
 
   const ARScreen = () => {
+    const [modelPath, setModelPath] = useState(null);
 
     function onInitialized(state, reason) {
       console.log('guncelleme', state, reason);
@@ -129,6 +56,76 @@ const ArChallengeCapture = ({
         // Handle loss of tracking
       }
     }
+
+    const downloadModelFile = (sourcePath, targetPath) => {
+      config({
+        fileCache: true,
+        path: sourcePath,
+      })
+        .fetch('GET', modelFile)
+        .progress((received, total) => {
+          console.log('progress', received / total)
+        })
+        .then((res) => {// the temp file path
+          console.log('The file saved to ', res.path());
+          unzipModelFile(res.path(), targetPath)
+        })
+        .catch((error) => {
+          console.error(error)
+        });
+    }
+
+    const unzipModelFile = (sourcePath, targetPath) => {
+      const charset = 'UTF-8'
+      unzip(sourcePath, targetPath, charset)
+        .then((path) => {
+          console.log(`unzip completed at ${path}`)
+          RNFS.readDir(path)
+            .then((result) => {
+              console.log('GOT RESULT', result);
+              for (let i = 0; i < result.length; i++) {
+                if (result[i].isFile) {
+                  console.log("unzipModelFile", result[i].name)
+                  if (result[i].name.includes(".vrx")) {
+                    setModelPath(result[i].path)
+                  }
+                }
+              }
+            })
+        })
+        .catch((error) => {
+          console.error(error)
+        })
+    }
+
+    const checkIfModelExist = () => {
+      let filename = modelFile.split('/').pop()
+      filename = filename.split('?')[0];
+      withoutExtFilename = filename.split('.')[0];
+      const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+      const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+      console.log("sourcePath:", sourcePath)
+      console.log("targetPath:", targetPath)
+      RNFS.exists(sourcePath)
+        .then((exists) => {
+          console.log("exists:", exists)
+          if (exists) {
+            console.log('File exists');
+            unzipModelFile(sourcePath, targetPath)
+          } else {
+            downloadModelFile(sourcePath, targetPath)
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+    useEffect(() => {
+      if (challengeObj.challenge_choice == "DANCE") {
+        checkIfModelExist()
+      }
+    }, []);
+
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
         <ViroAmbientLight color="#ffffff" intensity={20} />
@@ -159,22 +156,6 @@ const ArChallengeCapture = ({
           shadowOpacity={1.0}
         />
 
-        {/* <Viro3DObject
-          key="vvv"
-          source={require('../../../assets/ar/Quin_texture_anim2/Quin_texture_anim2.vrx')} /// this works
-          position={[-10, -8, -20]}
-          scale={[0.08, 0.08, 0.08]}
-          type="VRX"
-          materials={"pbr"}
-          rotation={[-270, -10, 0]}
-          animation={{
-            name: 'Take 001',
-            run: true,
-            loop: true,
-            delay: 1000
-          }}
-        /> */}
-
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
@@ -182,14 +163,18 @@ const ArChallengeCapture = ({
           position={[0, 0, -5]} />}
 
         {
-          challengeObj.challenge_choice == "DANCE" && !loading && <Viro3DObject
-            key="vvv"
-            source={{ uri: modelPath }} /// this works
+          challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
+            key="obj_3d1"
+            source={{ uri: Platform.OS === 'android' ? `file://${modelPath}` : modelPath }} /// this works
             position={[-10, -8, -20]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
+            resources={[
+              require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_D.PNG'),
+              require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_Tan.PNG'),
+              require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_D.PNG'),
+              require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_Tan.PNG'),]}
             materials={"pbr"}
-            rotation={[-270, -10, 0]}
             animation={{
               name: 'Take 001',
               run: true,
@@ -198,7 +183,6 @@ const ArChallengeCapture = ({
             }}
           />
         }
-
       </ViroARScene>
     );
   };
@@ -270,7 +254,7 @@ const ArChallengeCapture = ({
           >
           </ViroARSceneNavigator>
 
-          {this.state.capturedImage && <Image style={styles.f1} source={{ uri: this.state.capturedImage }} />}
+          {this.state.capturedImage && <Image style={styles.f1} source={{ uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage }} />}
 
           <View style={{ position: 'absolute' }}>
             <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
@@ -305,21 +289,19 @@ const ArChallengeCapture = ({
             </TouchableOpacity>
             }
           </View>
+          {loading &&
+            <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
+              <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
+                <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
+              </View>
+            </View>}
         </View >
       )
     }
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <ViroARNavigator />
-      {loading &&
-        <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
-          <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
-            <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
-          </View>
-        </View>}
-    </View>
+    <ViroARNavigator />
   )
 }
 
