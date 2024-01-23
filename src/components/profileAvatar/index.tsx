@@ -7,26 +7,30 @@ import { Icons } from "../../assets/Icons"
 
 export interface ProfileAvatarProps {
   avatarUrl?: string | undefined;
+  onChangeProfilePic?: () => void;
 }
 
 const ProfileAvatar: FC<ProfileAvatarProps> = props => {
-  const { avatarUrl = "" } = props
+  const { avatarUrl = "", onChangeProfilePic } = props
   const styles = useStyles()
   return (
     <View style={styles.parent}>
-      {/* {avatarUrl ? (
-        <ImageBackground source={Images.ProfileImgGradient} style={styles.imageBackground}>
-          <TouchableOpacity>
+      {avatarUrl ? (
+        <ImageBackground source={Images.ProfileImgGradient} style={styles.imagePresentBackground}>
+          <TouchableOpacity onPress={onChangeProfilePic}>
+          <View style={[styles.avatarContainer, styles.avatarViewStyles]}>
             <Avatar
               size={AVATAR_SIZE}
               containerStyle={styles.avatarContainer}
               avatarStyle={styles.avatarStyles}
               source={{ uri: avatarUrl }}
             />
+            </View>
           </TouchableOpacity>
+          <Icons.ProfilePicPlusIcon style={styles.plusIconWithImage}/>
         </ImageBackground>
-      ) : ( */}
-      <TouchableOpacity style={styles.parent}>
+      ) : (
+      <TouchableOpacity style={styles.parent} onPress={onChangeProfilePic}>
         <ImageBackground
           source={Images.ProfileImgGradient}
           style={styles.imageBackground}
@@ -39,7 +43,7 @@ const ProfileAvatar: FC<ProfileAvatarProps> = props => {
         </ImageBackground>
         <Icons.ProfilePicPlusIcon style={styles.plusIcon}/>
       </TouchableOpacity>
-      {/* )} */}
+      )} 
     </View>
   )
 }
