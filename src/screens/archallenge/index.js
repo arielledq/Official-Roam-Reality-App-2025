@@ -1,10 +1,6 @@
 import React, { useEffect, useState } from "react"
 
 import { FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
-import {
-  RootStackParamList,
-  ScreenStackComponent
-} from "../../navigation/types"
 import { handleError } from "../../util/helpers"
 import { getARChallenges, getARSposored } from '../../network'
 import BackgroundWithImage from "../../components/background"
@@ -17,12 +13,14 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 
 
-const ArChallenge: ScreenStackComponent<RootStackParamList, "ArChallenge"> = ({
+const ArChallenge = ({
 
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const [challengeChoice, setChallengeChoice] = useState("SPONSORED")
+  const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
   const navigation = useNavigation()
 
@@ -30,13 +28,20 @@ const ArChallenge: ScreenStackComponent<RootStackParamList, "ArChallenge"> = ({
     setIsLoading(true)
     getARChallenges().then((res) => {
       if (res.status == 1) {
-        setSponsoredData(res.data)
+        setSponsoredDataAll(res.data)
+        setSponsoredData(res.data.filter(x => x.challenge_choice == challengeChoice))
       } else {
         handleError(res)
       }
     }).finally(() => {
       setIsLoading(false)
     })
+  }
+
+  const setDataWithChoice = (choice) => {
+    setChallengeChoice(choice);
+    const filteredArray = sponsoredDataAll.filter(x => x.challenge_choice == choice)
+    setSponsoredData(filteredArray.slice())
   }
 
   useEffect(() => {
@@ -47,9 +52,7 @@ const ArChallenge: ScreenStackComponent<RootStackParamList, "ArChallenge"> = ({
     navigation.navigate("ArChallengeDetails", { challengeObj: obj });
   }
 
-  type ItemProps = { title: string, image: string };
-
-  const Item = ({ obj }: ItemProps) => (
+  const Item = ({ obj }) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={_styles.list_item}>
       <Image style={_styles.list_image} source={{ uri: obj.sponsored.image }} />
       <Text style={_styles.list_title}>{obj.sponsored.name}</Text>
@@ -73,10 +76,10 @@ const ArChallenge: ScreenStackComponent<RootStackParamList, "ArChallenge"> = ({
         </BackgroundWithImage>
       </View>
       <View style={_styles.rowView}>
-        <TouchableOpacity activeOpacity={.5} style={_styles.selectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("SPONSORED")} activeOpacity={.5} style={ challengeChoice == "SPONSORED" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Photo Challenges</Text>
         </TouchableOpacity>
-        <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={ challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Dance Challenges </Text>
         </TouchableOpacity>
       </View>
