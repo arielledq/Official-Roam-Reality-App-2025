@@ -5,21 +5,27 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
   ViroARScene,
-  ViroText,
   ViroMaterials,
   ViroTrackingStateConstants,
   ViroARSceneNavigator,
   Viro3DObject,
-  ViroScene,
-  ViroNode,
-  ViroCamera,
-  ViroImage
+  ViroImage,
+  ViroAmbientLight,
+  ViroDirectionalLight,
+  ViroSpotLight
 } from '@viro-community/react-viro';
 
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
 import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
 var Sound = require('react-native-sound');
+
+ViroMaterials.createMaterials({
+  pbr: {
+    lightingModel: "PBR",
+  },
+});
+
 
 const ArChallengeCapture = ({
 
@@ -28,6 +34,9 @@ const ArChallengeCapture = ({
   const route = useRoute()
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
+  const modelFile = challengeObj.model_file;
+  console.log("ArChallengeCapture", modelFile)
+  console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
   const navigateToShare = (captureData) => {
     navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -44,12 +53,74 @@ const ArChallengeCapture = ({
     }
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
-        <ViroImage
+        <ViroAmbientLight color="#ffffff" intensity={20} />
+        <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
+        <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
+
+        <ViroSpotLight
+          innerAngle={5}
+          outerAngle={90}
+          direction={[0, 1, 0]}
+          position={[0, -7, 0]}
+          color="#ffffff"
+          intensity={250} />
+
+        <ViroSpotLight
+          position={[1, 3, 1]}
+          direction={[-1, -1, -1]}
+          color="grey"
+          intensity={750}
+          attenuationStartDistance={1}
+          attenuationEndDistance={10}
+          innerAngle={45}
+          outerAngle={90}
+          castsShadow
+          shadowMapSize={2048}
+          shadowNearZ={1}
+          shadowFarZ={4}
+          shadowOpacity={1.0}
+        />
+
+        {/* <Viro3DObject
+          key="vvv"
+          source={require('../../../assets/ar/Quin_texture_anim2/Quin_texture_anim2.vrx')} /// this works
+          position={[-10, -8, -20]}
+          scale={[0.08, 0.08, 0.08]}
+          type="VRX"
+          materials={"pbr"}
+          rotation={[-270, -10, 0]}
+          animation={{
+            name: 'Take 001',
+            run: true,
+            loop: true,
+            delay: 1000
+          }}
+        /> */}
+
+        {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
           source={{ uri: challengeObj.image }}
-          position={[0, 0, -5]}
-        />
+          position={[0, 0, -5]} />}
+
+        {
+          challengeObj.challenge_choice == "DANCE" && <Viro3DObject
+            key="vvv"
+            source={{ uri: challengeObj.model_file }} /// this works
+            position={[-10, -8, -20]}
+            scale={[0.08, 0.08, 0.08]}
+            type="VRX"
+            materials={"pbr"}
+            rotation={[-270, -10, 0]}
+            animation={{
+              name: 'Take 001',
+              run: true,
+              loop: true,
+              delay: 1000
+            }}
+          />
+        }
+
       </ViroARScene>
     );
   };
@@ -110,6 +181,9 @@ const ArChallengeCapture = ({
         <View style={styles.mainContainer}>
           <ViroARSceneNavigator
             autofocus={true}
+            pbrEnabled={true}
+            hdrEnabled={true}
+            bloomEnabled={true}
             ref={this._setARNavigatorRef}
             initialScene={{
               scene: ARScreen,
