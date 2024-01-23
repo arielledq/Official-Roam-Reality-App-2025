@@ -47,7 +47,8 @@ const useStyles = makeStyles(theme => ({
     flex: .5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginEnd: 2
+    marginEnd: 2,
+    marginStart: 2
   },
   unSelectButtonStyle:
   {
@@ -59,7 +60,8 @@ const useStyles = makeStyles(theme => ({
     flex: .5,
     justifyContent: 'center',
     alignItems: 'center',
-    marginStart: 2
+    marginStart: 2,
+    marginEnd: 2,
   },
   //Flat Item
   list_item: {
