@@ -1,7 +1,15 @@
-from .models import Challenges, Sponsor
+from .models import Challenges, Sponsor, Resource3dModel
 from rest_framework import serializers
 
 
+class Resource3dModelSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = Resource3dModel
+        fields = (
+            "__all__"
+        )
+        
 class SponsorSerializer(serializers.ModelSerializer):
   
     class Meta:
@@ -13,6 +21,7 @@ class SponsorSerializer(serializers.ModelSerializer):
 class ChallengesSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    resources = Resource3dModelSerializer(source='challenge', many=True, read_only=True)
 
     def get_image(self, obj):
         return obj.image.url
@@ -30,7 +39,8 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "challenge_requirement",
             "created_at",
             "expiry_date",
-            "sponsored"
+            "sponsored",
+            "resources"
         )
 
 
