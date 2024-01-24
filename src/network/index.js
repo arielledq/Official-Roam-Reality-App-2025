@@ -98,3 +98,29 @@ export const fbLogin = data => {
     data
   })
 }
+
+export const getProfieDetails = payload =>
+  Request.callWithToken({
+    url: `${commonApiRoute}account-setup/${payload.id}/`,
+    method: 'GET',
+    payload
+})
+
+export const updateProfile = payload =>
+  Request.multiPartCall({
+    url: `${commonApiRoute}account-setup/${payload.id}/`,
+    method: 'PATCH',
+    data: payload.data
+})
+
+export const getARChallenges = () =>
+  Request.callAR({
+    url: `modules/challenges/user/`,
+    method: 'GET'
+})
+
+export const getARSposored = () =>
+  Request.callAR({
+    url: `modules/challenges/sponsor/`,
+    method: 'GET'
+})
