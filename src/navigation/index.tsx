@@ -18,6 +18,7 @@ import Home from '../screens/home';
 import TermsAndConditions from '../screens/termsAndConditions';
 import PrivacyPolicy from '../screens/PrivacyPolicy';
 import FPChangePassword from '../screens/fpchangepassword/fpchangepassword';
+import Menu from '../screens/menu/menu';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -51,6 +52,7 @@ const Navigation = () => {
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="Menu" component={Menu} />
       </>
     )
   }
@@ -61,6 +63,8 @@ const Navigation = () => {
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Menu" component={Menu} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
       </>
     )
   }
@@ -69,6 +73,7 @@ const Navigation = () => {
       {
         <ThemeProvider theme={theme}>
           <Stack.Navigator
+            // initialRouteName='Menu'
             screenOptions={{
               headerShown: false,
               animation: "slide_from_right"
