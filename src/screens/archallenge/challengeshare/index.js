@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Dimensions, Image, Keyboard, ScrollView, Text, View } from "react-native";
+import { Dimensions, Image, Keyboard, Platform, ScrollView, Text, View } from "react-native";
 import {
   RootStackParamList,
   ScreenStackComponent
@@ -29,7 +29,7 @@ const ArChallengeShare = ({
       <AppText numberOfLines={2} style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
       <AppText numberOfLines={2} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
       <View style={styles.detailContainer}>
-        <Image source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />
+        <Image source={{ uri: Platform.OS === 'android' ? `file://${captureData}` : captureData }} style={{ width: '100%', height: 318 }} />
         <View style={styles.pointsParentContainer}>
           <View style={styles.detailPointContainter}>
             <Text style={styles.pointCount}>{challengeObj.points}</Text>
@@ -48,7 +48,7 @@ const ArChallengeShare = ({
         </View>
       </View>
 
-      <View style={{ flex: 1, justifyContent: 'flex-end', paddingVertical:30 }}>
+      <View style={{ flex: 1, justifyContent: 'flex-end', paddingVertical: 30 }}>
         <Text style={styles.bottomText}>Link My Profiles</Text>
         <AppButton
           onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj })}
