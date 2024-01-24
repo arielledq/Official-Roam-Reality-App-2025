@@ -127,9 +127,6 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         return UserProfile.objects.create(**user_profile)
 
     def update(self, instance, validated_data):
-        user_profile = dict()
-        user_profile["user"] = self.context['request'].user
-        user_profile.update(validated_data)
         instance.home_address = validated_data.get('home_address', instance.home_address)
         instance.home_country = validated_data.get('home_country', instance.home_country)
         instance.gender = validated_data.get('gender', instance.gender)
