@@ -9,6 +9,7 @@ const Images = {
     PointsIcon: require('./PointsIcon.png'),
     RankIcon: require('./RankIcon.png'),
     ForwardIcon: require('./ForwardIcon.png'),
+    AppSettingsIcon: require('./AppSettingsIcon.png')
 }
 
 export default Images;
