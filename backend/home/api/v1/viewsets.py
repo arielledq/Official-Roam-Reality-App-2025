@@ -150,3 +150,4 @@ class AccountSetupViewset(ModelViewSet):
 
     def get_queryset(self):
         return UserProfile.objects.filter(user=self.request.user)
+    
