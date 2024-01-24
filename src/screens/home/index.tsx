@@ -26,6 +26,10 @@ const Home = () => {
   const handleProfile = () => {
     navigation.navigate('Profile')
   }
+
+  const handleMenu = () => {
+    navigation.navigate('Menu')
+  }
   
   return (
     <View
@@ -72,6 +76,15 @@ const Home = () => {
         }}
         title="Profile"
         onPress={handleProfile}
+      />
+       <AppButton
+        containerStyle={{
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          width: '70%', marginTop: 100
+        }}
+        title="Menu"
+        onPress={handleMenu}
       />
     </View>
   )
