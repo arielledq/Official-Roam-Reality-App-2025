@@ -12,7 +12,8 @@ import {
   ViroImage,
   ViroAmbientLight,
   ViroDirectionalLight,
-  ViroSpotLight
+  ViroSpotLight,
+  ViroText, ViroARCamera, ViroBox, ViroNode
 } from '@viro-community/react-viro';
 import { fontGroup, FontSizes } from "../../../util/FontUtils"
 import RNFetchBlob from 'rn-fetch-blob';
@@ -43,7 +44,6 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
-  const [loading, setLoading] = useState(false);
   console.log("ArChallengeCapture", modelFile)
   console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
@@ -53,6 +53,10 @@ const ArChallengeCapture = ({
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [scale, setScale] = useState([0.08, 0.08, 0.08]);
+    const [rotate, setRotate] = useState([0, 0, 0]);
+
 
     function onInitialized(state, reason) {
       console.log('guncelleme', state, reason);
@@ -96,10 +100,13 @@ const ArChallengeCapture = ({
                   }
                 }
               }
+              setLoading(false)
             })
         })
         .catch((error) => {
           console.error(error)
+          setLoading(true)
+          downloadModelFile(sourcePath, targetPath)
         })
     }
 
@@ -127,12 +134,35 @@ const ArChallengeCapture = ({
     }
     useEffect(() => {
       if (challengeObj.challenge_choice == "DANCE") {
+        setLoading(true)
         checkIfModelExist()
       }
     }, []);
 
+    const _onRotate = (rotateState, rotationFactor, source) => {
+      if (rotateState == 3) {
+        const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
+        setRotate(rotation)
+        return;
+      }
+      const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
+      setRotate(rotation)
+    }
+
+    const _onDrag = (draggedToPosition, source) => {
+      console.log(
+        "Dragged to: x" +
+        draggedToPosition[0] +
+        " y:" +
+        draggedToPosition[1] +
+        " z: " +
+        draggedToPosition[2]
+      );
+    }
+
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
+
         <ViroAmbientLight color="#ffffff" intensity={20} />
         <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
         <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
@@ -161,9 +191,21 @@ const ArChallengeCapture = ({
           shadowOpacity={1.0}
         />
 
+        {loading &&
+          <ViroText
+            text="Loading Model"
+            color="#ff0000"
+            width={2}
+            height={2}
+            style={styles.loadingText}
+            position={[0, 0, -5]}
+          />
+        }
+
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
+          onDrag={_onDrag}
           source={{ uri: challengeObj.image }}
           position={[0, 0, -5]} />}
 
@@ -171,10 +213,13 @@ const ArChallengeCapture = ({
           challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
             key="obj_3d1"
             source={{ uri: Platform.OS === 'android' ? `file://${modelPath}` : modelPath }} /// this works
-            position={[-10, -8, -20]}
+            position={[0, -5, -30]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
             materials={"pbr"}
+            rotation={rotate}
+            onRotate={_onRotate}
+            onDrag={_onDrag}
             animation={{
               name: 'Take 001',
               run: true,
@@ -339,12 +384,12 @@ const ArChallengeCapture = ({
             </TouchableOpacity>
             }
           </View>
-          {loading &&
+          {/* {loading &&
             <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
                 <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
               </View>
-            </View>}
+            </View>} */}
           {this.state.detailsShow && this.InfoView()}
         </View >
       )
