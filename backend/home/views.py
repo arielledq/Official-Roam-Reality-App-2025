@@ -140,6 +140,7 @@ class ResetPasswordView(PasswordResetConfirmView):
 
 class DeleteAccountView(APIView):
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
 
     def delete(self, request, *args, **kwargs):
         try:
