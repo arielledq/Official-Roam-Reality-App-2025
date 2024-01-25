@@ -3,7 +3,6 @@ import {
   Alert,
   ScrollView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View
 } from "react-native"
@@ -12,7 +11,6 @@ import { resetState } from "../../redux/Login"
 import { deleteAccount, logout } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
-import { handleError } from "../../util/helpers"
 import { MenuIcon } from "../../assets/svg"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
@@ -27,12 +25,10 @@ import BottomSheet from "@gorhom/bottom-sheet"
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
 
-  console.log(openBottomSheet)
   const bottomSheetRef = useRef <BottomSheet>(null)
   const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
-  // const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
 
  
   const handleLogOut = () => {
