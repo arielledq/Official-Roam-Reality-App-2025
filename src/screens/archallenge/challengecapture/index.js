@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { TouchableOpacity, View, Image, Text, Platform } from "react-native";
+import { TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
@@ -12,16 +12,22 @@ import {
   ViroImage,
   ViroAmbientLight,
   ViroDirectionalLight,
-  ViroSpotLight
+  ViroSpotLight,
+  ViroText, ViroARCamera, ViroBox, ViroNode
 } from '@viro-community/react-viro';
+import { fontGroup, FontSizes } from "../../../util/FontUtils"
 import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
 import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
+import LineIcon from '../../../assets/ar/line.png';
 import { unzip } from 'react-native-zip-archive'
+import { AppButton } from "../../../components";
+import RenderHTML from "react-native-render-html";
 const RNFS = require('react-native-fs');
 const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
+const { width } = Dimensions.get('window');
 
 ViroMaterials.createMaterials({
   pbr: {
@@ -38,7 +44,6 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
-  const [loading, setLoading] = useState(false);
   console.log("ArChallengeCapture", modelFile)
   console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
@@ -48,6 +53,10 @@ const ArChallengeCapture = ({
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [scale, setScale] = useState([0.08, 0.08, 0.08]);
+    const [rotate, setRotate] = useState([0, 0, 0]);
+
 
     function onInitialized(state, reason) {
       console.log('guncelleme', state, reason);
@@ -91,10 +100,13 @@ const ArChallengeCapture = ({
                   }
                 }
               }
+              setLoading(false)
             })
         })
         .catch((error) => {
           console.error(error)
+          setLoading(true)
+          downloadModelFile(sourcePath, targetPath)
         })
     }
 
@@ -122,12 +134,35 @@ const ArChallengeCapture = ({
     }
     useEffect(() => {
       if (challengeObj.challenge_choice == "DANCE") {
+        setLoading(true)
         checkIfModelExist()
       }
     }, []);
 
+    const _onRotate = (rotateState, rotationFactor, source) => {
+      if (rotateState == 3) {
+        const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
+        setRotate(rotation)
+        return;
+      }
+      const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
+      setRotate(rotation)
+    }
+
+    const _onDrag = (draggedToPosition, source) => {
+      console.log(
+        "Dragged to: x" +
+        draggedToPosition[0] +
+        " y:" +
+        draggedToPosition[1] +
+        " z: " +
+        draggedToPosition[2]
+      );
+    }
+
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
+
         <ViroAmbientLight color="#ffffff" intensity={20} />
         <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
         <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
@@ -156,9 +191,21 @@ const ArChallengeCapture = ({
           shadowOpacity={1.0}
         />
 
+        {loading &&
+          <ViroText
+            text="Loading Model"
+            color="#ff0000"
+            width={2}
+            height={2}
+            style={styles.loadingText}
+            position={[0, 0, -5]}
+          />
+        }
+
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
+          onDrag={_onDrag}
           source={{ uri: challengeObj.image }}
           position={[0, 0, -5]} />}
 
@@ -166,10 +213,13 @@ const ArChallengeCapture = ({
           challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
             key="obj_3d1"
             source={{ uri: Platform.OS === 'android' ? `file://${modelPath}` : modelPath }} /// this works
-            position={[-10, -8, -20]}
+            position={[0, -5, -30]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
             materials={"pbr"}
+            rotation={rotate}
+            onRotate={_onRotate}
+            onDrag={_onDrag}
             animation={{
               name: 'Take 001',
               run: true,
@@ -185,7 +235,8 @@ const ArChallengeCapture = ({
   class ViroARNavigator extends React.Component {
 
     state = {
-      capturedImage: null
+      capturedImage: null,
+      detailsShow: false
     }
 
     constructor() {
@@ -233,6 +284,53 @@ const ArChallengeCapture = ({
         });
     }
 
+    InfoView = () => {
+      return (
+        <View style={styles.challengeInfoContainer}>
+          <View style={styles.challengeInfoHeaderContainer}>
+            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+            <Text style={styles.challengeInfoHeader}>Waiver details</Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1, width: '100%', padding: 24 }
+            }
+          >
+            <RenderHTML
+              contentWidth={width}
+              tagsStyles={{
+                p: {
+                  color: '#9CA3AF',
+                  fontSize: FontSizes.S14,
+                },
+                strong: {
+                  color: '#fff',
+                  fontSize: FontSizes.S18,
+                }
+              }}
+              source={{
+                html: `${challengeObj.description}`
+              }}
+            />
+          </ScrollView>
+          <View style={{ width: '100%', paddingHorizontal: 24 }}>
+            <AppButton
+              onPress={() => this.setState({ detailsShow: false })}
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
+              title={"Accept and Continue"}
+            />
+            <TouchableOpacity
+              activeOpacity={.6}
+              onPress={() => this.setState({ detailsShow: false })}>
+              <Text style={styles.bottomText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+
     render() {
       return (
         <View style={styles.mainContainer}>
@@ -249,17 +347,19 @@ const ArChallengeCapture = ({
           >
           </ViroARSceneNavigator>
 
-          {this.state.capturedImage && <Image style={styles.f1} source={{ uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage }} />}
+          {this.state.capturedImage &&
+            <Image style={styles.f1} source={{ uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage }} />}
 
           <View style={{ position: 'absolute' }}>
             <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
-            <View style={{ backgroundColor: "#1158F4", height: 53, borderRadius: 8, marginHorizontal: 20, marginTop: 20, justifyContent: 'center' }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }}>
+            <View style={styles.viewDetailsIconContainer}>
+              <View style={styles.viewDetailsIconContainerWrapper}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image style={{ width: 37, height: 37, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
+                  <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
-                <TouchableOpacity style={{ backgroundColor: '#fff', height: 30, width: 118, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={() => this.setState({ detailsShow: true })}
+                  style={styles.viewDetailBtn}>
                   <Text style={styles.btnText}>View Details</Text>
                 </TouchableOpacity>
               </View>
@@ -284,12 +384,13 @@ const ArChallengeCapture = ({
             </TouchableOpacity>
             }
           </View>
-          {loading &&
+          {/* {loading &&
             <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
               <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
                 <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
               </View>
-            </View>}
+            </View>} */}
+          {this.state.detailsShow && this.InfoView()}
         </View >
       )
     }
