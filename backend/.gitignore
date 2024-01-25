@@ -88,3 +88,4 @@ celerybeat-schedule
 venv/
 ENV/
 myvenv/
+mediafiles/

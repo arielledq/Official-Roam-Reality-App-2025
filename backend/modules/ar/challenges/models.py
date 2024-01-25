@@ -2,9 +2,12 @@ from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from ckeditor.fields import RichTextField
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 CHALLENGE_CHOICES = (
-    ("SPONSORED", "SPONSORED"),
+    ("SPONSORED", "PHOTO"),
     ("DANCE", "DANCE"),
 )
 
@@ -42,8 +45,8 @@ class Challenges(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
     
     class Meta:
-        verbose_name_plural = "Challenges"
-        verbose_name = "Challenge"
+        verbose_name_plural = "AR Challenge"
+        verbose_name = "AR Challenge"
 
     def __str__(self):
       return self.name
@@ -57,4 +60,16 @@ class Resource3dModel(models.Model):
         verbose_name_plural = "Resource3dModel"
 
     def __str__(self):
-      return self.challenge.name + " " +  self.file.name
+      return self.challenge.name
+    
+class ARUserProfile(models.Model):
+    points = models.BigIntegerField(verbose_name='Challenge Points', default=0)
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE,related_name='user_ar_profile'
+    )
+    
+    class Meta:
+        verbose_name_plural = "User AR Profile"
+
+    def __str__(self):
+      return self.user.name 
