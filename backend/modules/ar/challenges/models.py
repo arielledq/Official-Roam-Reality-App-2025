@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 CHALLENGE_CHOICES = (
-    ("SPONSORED", "SPONSORED"),
+    ("SPONSORED", "PHOTO"),
     ("DANCE", "DANCE"),
 )
 
