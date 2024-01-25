@@ -14,11 +14,13 @@
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@babel/polyfill": "^7.12.1",
+    "@gorhom/bottom-sheet": "^4.6.0",
     "@invertase/react-native-apple-authentication": "^2.3.0",
     "@react-native-async-storage/async-storage": "^1.21.0",
     "@react-native-community/datetimepicker": "^7.6.2",
     "@react-native-google-signin/google-signin": "^11.0.0",
     "@react-native-masked-view/masked-view": "^0.2.9",
+    "@react-navigation/drawer": "^6.6.6",
     "@react-navigation/native": "^6.1.6",
     "@react-navigation/native-stack": "^6.9.17",
     "@react-navigation/stack": "^6.3.16",

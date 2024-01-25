@@ -46,6 +46,7 @@ export const FontLineHeights = {
   LH15: 15,
   LH16: 16,
   LH20: 20,
+  LH21: 21,
   LH22: 22,
   LH24: 24,
   LH25: 25,
