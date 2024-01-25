@@ -15,8 +15,11 @@ export type RootStackParamList = {
   Home: {openBottomSheet: boolean, deleteAccount: boolean};
   FPChangePassword: {token: string, uid: string};
   PrivacyPolicy: undefined;
-  Menu: undefined;
-  HomeScreen: undefined
+  HomeScreen: undefined;
+  ARChallenge: undefined;
+  ArChallengeDetails: undefined;
+  ArChallengeCapture: undefined;
+  ArChallengeShare: undefined;
 };
 
 export type ScreenStackComponent<

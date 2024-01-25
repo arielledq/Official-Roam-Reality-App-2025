@@ -1,4 +1,4 @@
-import {  NavigationContainer, useNavigation } from '@react-navigation/native';
+import {  NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '@rneui/themed';
 import React from 'react';
@@ -18,14 +18,12 @@ import Home from '../screens/home';
 import TermsAndConditions from '../screens/termsAndConditions';
 import PrivacyPolicy from '../screens/PrivacyPolicy';
 import FPChangePassword from '../screens/fpchangepassword/fpchangepassword';
-import Menu from '../screens/menu/menu';
 import ArChallengeDetails from '../screens/archallenge/challengedetails';
 import ArChallengeCapture from '../screens/archallenge/challengecapture';
 import ARChallenge from '../screens/archallenge';
 import ArChallengeShare from '../screens/archallenge/challengeshare';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import DrawerContent from '../screens/drawerContent/DrawerContent';
-// import DrawerContent from '../screens/drawerContent/DrawerContent';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -61,7 +59,6 @@ const Navigation = () => {
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-        <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
@@ -76,9 +73,12 @@ const Navigation = () => {
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
-        <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+        <Stack.Screen name="ARChallenge" component={ARChallenge} />
+        <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
+        <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
+        <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
       </>
     )
   }
