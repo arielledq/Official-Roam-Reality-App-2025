@@ -1,95 +1,269 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { AppButton } from '../../components'
-import { resetState } from '../../redux/Login'
-import { getProfieDetails, logout } from '../../network'
-import { useDispatch, useSelector } from 'react-redux'
-import { useNavigation } from '@react-navigation/native'
-import { handleError } from '../../util/helpers'
+import React, { useEffect, useMemo, useRef, useState } from "react"
+import {
+  Alert,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native"
+import { AppButton, AppHeader, AppText } from "../../components"
+import { resetState } from "../../redux/Login"
+import { deleteAccount, logout } from "../../network"
+import { useDispatch, useSelector } from "react-redux"
+import { DrawerActions, useNavigation } from "@react-navigation/native"
+import { handleError } from "../../util/helpers"
+import { MenuIcon } from "../../assets/svg"
+import { screenHorizontalPadding } from "../../util/AppDimensions"
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import theme from "../../assets/theme"
+import AppBottomSheet from "../../components/bottomSheet"
+import {
+  RootStackParamList,
+  ScreenStackComponent
+} from "../../navigation/types"
+import BottomSheet from "@gorhom/bottom-sheet"
 
-const Home = () => {
+const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
+  const [openBottomSheet, setOpenBottomSheet] = useState(false)
+
+  console.log(openBottomSheet)
+  const bottomSheetRef = useRef <BottomSheet>(null)
+  const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
   // const navigation = useNavigation<StackNavigationProp<RootStackParamList>>();
-  const handleLogout = () => {
-    logout()
-    dispatch(resetState())
+
+ 
+  const handleLogOut = () => {
+    bottomSheetRef.current?.expand()
   }
   const handleChangePassword = () => {
-    navigation.navigate('ChangePassword')
+    navigation.navigate("ChangePassword")
   }
 
   const handleEditProfile = () => {
-    navigation.navigate('EditProfile')
+    navigation.navigate("EditProfile")
   }
 
   const handleProfile = () => {
-    navigation.navigate('Profile')
+    navigation.navigate("Profile")
   }
 
   const handleMenu = () => {
-    navigation.navigate('Menu')
+    navigation.navigate("Menu")
   }
-  
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center'
 
-      }}
-    >
-      <Text>Home</Text>
-      <AppButton
+  if (openBottomSheet) {
+    handleLogOut()
+    setOpenBottomSheet(false)
+  } else {
+  }
+
+  useEffect(() => {
+    if (route.params?.openBottomSheet === true) {
+      setOpenBottomSheet(true)
+    }else if (route.params?.deleteAccount === true){
+      handleDeleteAccount()
+    }
+  }, [route.params])
+
+  const token = useSelector(state => state.login?.data?.token)
+  console.log(token)
+  const handleDeleteAccount = () => {   
+    Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
+      {
+        text: 'yes',
+        onPress: () => {
+          deleteAccount().then(res => {
+            console.log({ res })
+            if (res.status == 1) {
+              handleLogOutButton();
+              Alert.alert(('Success'), ('Your account has been deleted successfully'));          
+            } else {
+              Alert.alert('Error', res.message.error)
+            }
+          })
+        },
+      },
+      {
+        text: 'No',
+      },
+    ]);
+  };
+
+  const handleLogOutButton = () => {
+    logout()
+    dispatch(resetState())
+  }
+  const handleMenuButton = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
+        style={{ paddingLeft: 5 }}
+      >
+        <MenuIcon />
+      </TouchableOpacity>
+    )
+  }
+
+  return (
+  
+    <>
+      <ScrollView style={styles.mainContainer}>
+        <AppHeader
+          // containerStyle={styles.headerContainer}
+          // titleStyle={styles.headerStyle}
+          title={"Home"}
+          leftComponent={handleMenuButton()}
+        />
+        {/* <AppButton
         containerStyle={{
           paddingHorizontal: 10,
           paddingVertical: 5,
-          width: '70%', marginTop: 100
+          width: '70%', marginTop: 50
         }}
         title="Log Out"
         onPress={handleLogout}
-      />
-      <AppButton
-        containerStyle={{
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          width: '70%', marginTop: 100
-        }}
-        title="Change Password"
-        onPress={handleChangePassword}
-      />
-      <AppButton
-        containerStyle={{
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          width: '70%', marginTop: 100
-        }}
-        title="Edit Profile"
-        onPress={handleEditProfile}
-      />
-      <AppButton
-        containerStyle={{
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          width: '70%', marginTop: 100
-        }}
-        title="Profile"
-        onPress={handleProfile}
-      />
-       <AppButton
-        containerStyle={{
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          width: '70%', marginTop: 100
-        }}
-        title="Menu"
-        onPress={handleMenu}
-      />
-    </View>
+      /> */}
+        <View style={styles.container}>
+          <AppButton
+            containerStyle={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              width: "70%",
+              marginTop: 100
+            }}
+            title="Change Password"
+            onPress={handleChangePassword}
+          />
+          <AppButton
+            containerStyle={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              width: "70%",
+              marginTop: 100
+            }}
+            title="Edit Profile"
+            onPress={handleEditProfile}
+          />
+          <AppButton
+            containerStyle={{
+              paddingHorizontal: 10,
+              paddingVertical: 5,
+              width: "70%",
+              marginTop: 100
+            }}
+            title="Profile"
+            onPress={handleProfile}
+          />
+        </View>
+        </ScrollView>
+
+        <AppBottomSheet bottomSheetRef={bottomSheetRef} snaps={snapPoints}>
+          {/* Header */}
+          <View style={styles.header}>
+            <AppText style={styles.headerText}>Log Out</AppText>
+            <View style={styles.horizontalLine} />
+          </View>
+
+          {/* Button Header */}
+          <View style={styles.buttonheaderContainer}>
+            <AppText style={styles.logoutText}>
+              Are you sure you want to Log Out?
+            </AppText>
+          </View>
+
+          <View style={styles.buttonContainer}>
+            {/* Logout Button */}
+            <AppButton
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
+              titleStyle={styles.buttonTitle}
+              title={"Log out"}
+              onPress={handleLogOutButton}
+            />
+
+            {/* Cancel Button */}
+            <TouchableOpacity
+              style={styles.cancelButton}
+              onPress={() => bottomSheetRef.current?.close()}
+            >
+              <AppText style={styles.cancelButtonText}>Cancel</AppText>
+            </TouchableOpacity>
+          </View>
+        </AppBottomSheet>
+    </>
   )
 }
 
 export default Home
 
-const styles = StyleSheet.create({})
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1
+  },
+  container: {
+    flex: 1,
+    height: "100%",
+    marginVertical: 10,
+    paddingHorizontal: screenHorizontalPadding + 5,
+    justifyContent: "center",
+    alignItems: "center"
+  },
+  header: {
+    alignItems: "center",
+    marginBottom: 12
+  },
+  headerText: {
+    ...fontGroup.ns700,
+    fontSize: FontSizes.S18,
+    lineHeight: FontLineHeights.LH25,
+    marginVertical: 8
+  },
+  logoutText: {
+    ...fontGroup.ns400,
+    fontSize: FontSizes.S18,
+    lineHeight: FontLineHeights.LH20
+  },
+  horizontalLine: {
+    height: 1,
+    alignSelf: "stretch",
+    backgroundColor: theme.darkColors?.dividerGrey,
+    opacity: 0.4,
+    marginVertical: 8
+  },
+  cancelButton: {
+    marginTop: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50
+  },
+  cancelButtonText: {
+    ...fontGroup.ns800,
+    color: theme.darkColors?.inputBlue,
+    fontSize: FontSizes.S16,
+    lineHeight: FontLineHeights.LH20
+  },
+  buttonheaderContainer: {
+    paddingHorizontal: screenHorizontalPadding + 5,
+    alignItems: "center",
+    marginBottom: 15,
+    marginTop: 7
+  },
+  buttonContainer: {
+    paddingHorizontal: screenHorizontalPadding - 5
+  },
+  buttonStyle: {
+    height: 50,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  buttonContainerStyle: {
+    marginTop: 10
+  },
+  buttonTitle: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S16
+  }
+})

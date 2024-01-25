@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import {  NavigationContainer, useNavigation } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '@rneui/themed';
 import React from 'react';
@@ -23,7 +23,12 @@ import ArChallengeDetails from '../screens/archallenge/challengedetails';
 import ArChallengeCapture from '../screens/archallenge/challengecapture';
 import ARChallenge from '../screens/archallenge';
 import ArChallengeShare from '../screens/archallenge/challengeshare';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import DrawerContent from '../screens/drawerContent/DrawerContent';
+// import DrawerContent from '../screens/drawerContent/DrawerContent';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Drawer = createDrawerNavigator();
 
 /**
  * Main Navigation container provided to application.
@@ -73,23 +78,41 @@ const Navigation = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="Menu" component={Menu} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
       </>
+    )
+  }
+
+  const StackNav = () => {
+    return(
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",   
+      }}>
+      {token ?
+        renderCommonStack() : renderAuthStack()
+      }
+    </Stack.Navigator>
+    )
+  }
+
+  const DrawerNav = () => {
+    return(
+      <Drawer.Navigator 
+      drawerContent={props => <DrawerContent {...props}/>}
+      screenOptions={{ 
+        headerShown: false
+      }}>
+      <Drawer.Screen name="HomeScreen" component={StackNav} />
+    </Drawer.Navigator>
     )
   }
   return (
     <NavigationContainer ref={navigationRef}>
       {
         <ThemeProvider theme={theme}>
-          <Stack.Navigator
-            // initialRouteName='Menu'
-            screenOptions={{
-              headerShown: false,
-              animation: "slide_from_right"
-            }}>
-            {token ?
-              renderCommonStack() : renderAuthStack()
-            }
-          </Stack.Navigator>
+          <DrawerNav/>
         </ThemeProvider>
       }
     </NavigationContainer>
