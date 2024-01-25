@@ -9,7 +9,7 @@ import {
 import { AppButton, AppHeader, AppText } from "../../components"
 import { resetState } from "../../redux/Login"
 import { deleteAccount, logout } from "../../network"
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
 import { MenuIcon } from "../../assets/svg"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
@@ -64,8 +64,6 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
     }
   }, [route.params])
 
-  const token = useSelector(state => state.login?.data?.token)
-  console.log(token)
   const handleDeleteAccount = () => {   
     Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
       {
