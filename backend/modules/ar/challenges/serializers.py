@@ -1,7 +1,15 @@
-from .models import Challenges, Sponsor, Resource3dModel
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile
 from rest_framework import serializers
 
 
+class ARUserProfileSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = ARUserProfile
+        fields = (
+            "__all__"
+        )
+        
 class Resource3dModelSerializer(serializers.ModelSerializer):
   
     class Meta:

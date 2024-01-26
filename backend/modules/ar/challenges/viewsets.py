@@ -1,10 +1,13 @@
-from .models import Challenges, Sponsor, Resource3dModel
-from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile
+from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer
 from rest_framework import viewsets
 from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
+from rest_framework import authentication,permissions
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 class Resource3dModelViewSet(viewsets.ModelViewSet):
     """
@@ -23,6 +26,14 @@ class SponsorViewSet(viewsets.ModelViewSet):
     serializer_class = SponsorSerializer
     http_method_names = ["get"]
 
+class ARProfileViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing accounts.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = ARUserProfile.objects.all()
+    serializer_class = ARUserProfileSerializer
 
 class ChallengesViewSet(viewsets.ModelViewSet):
     """
