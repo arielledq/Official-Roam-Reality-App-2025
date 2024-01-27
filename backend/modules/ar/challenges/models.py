@@ -72,4 +72,4 @@ class ARUserProfile(models.Model):
         verbose_name_plural = "User AR Profile"
 
     def __str__(self):
-      return self.user.name 
+      return str(self.user.name) 
