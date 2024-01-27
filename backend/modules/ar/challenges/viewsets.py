@@ -1,9 +1,13 @@
-from .models import Challenges, Sponsor, Resource3dModel
-from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile
+from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer
 from rest_framework import viewsets
 from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
 from rest_framework import permissions, status
+from rest_framework.response import Response
+from rest_framework import authentication,permissions
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 class Resource3dModelViewSet(viewsets.ModelViewSet):
@@ -23,6 +27,26 @@ class SponsorViewSet(viewsets.ModelViewSet):
     serializer_class = SponsorSerializer
     http_method_names = ["get"]
 
+class ARProfileViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing accounts.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = ARUserProfile.objects.all()
+    serializer_class = ARUserProfileSerializer
+		
+    def create(self, request, **kwargs):
+      data = self.request.data
+      request.data._mutable=True
+      serializer = ARUserProfileSerializer(data=data)
+      data['user'] = self.request.user.id
+      if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+		
+    
 
 class ChallengesViewSet(viewsets.ModelViewSet):
     """
