@@ -7,7 +7,7 @@ from .viewsets import ChallengesViewSet, ChallengesUploadView, SponsorViewSet, R
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
-router.register(r'ar-profile', ARProfileViewSet)
+router.register(r'ar-profile', ARProfileViewSet, basename="ar-profile")
 router.register(r'sponsor', SponsorViewSet)
 router.register(r'resource', Resource3dModelViewSet)
 urlpatterns = [
