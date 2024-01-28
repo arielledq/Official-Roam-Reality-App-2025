@@ -238,6 +238,8 @@ const ArChallengeCapture = ({
       this._takeScreenshot = this._takeScreenshot.bind(this);
       this.startRecordVideo = this.startRecordVideo.bind(this);
       this.stopRecordVideo = this.stopRecordVideo.bind(this);
+      this.playRecordSound = this.playRecordSound.bind(this);
+      this.playCameraSound = this.playCameraSound.bind(this);
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -366,10 +368,9 @@ const ArChallengeCapture = ({
           >
           </ViroARSceneNavigator>
 
-          {this.state.capturedImage &&
-            <Image style={styles.f1} source={{
-              uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
-            }} />}
+          {this.state.capturedImage && <Image style={styles.f1} source={{
+            uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
+          }} />}
 
           {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
             uri: Platform.OS === 'android' ? `file://${this.state.capturedVideo}` : this.state.capturedVideo
@@ -394,7 +395,7 @@ const ArChallengeCapture = ({
             <View style={styles.holdTextContainer}>
               <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
             </View>
-            {this.state.capturedImage || this.state.capturedVideo && <TouchableOpacity activeOpacity={.6} onPress={() => {
+            {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Retake</Text>
@@ -417,7 +418,7 @@ const ArChallengeCapture = ({
               }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
-            {this.state.capturedImage || this.state.capturedVideo && <TouchableOpacity onPress={() => {
+            {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
               navigateToShare(this.state.capturedImage)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
