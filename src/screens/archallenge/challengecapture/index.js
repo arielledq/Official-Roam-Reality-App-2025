@@ -15,7 +15,8 @@ import {
   ViroSpotLight,
   ViroText, ViroARCamera, ViroBox, ViroNode
 } from '@viro-community/react-viro';
-import { fontGroup, FontSizes } from "../../../util/FontUtils"
+import uuid from 'react-native-uuid';
+import { FontSizes } from "../../../util/FontUtils"
 import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
@@ -252,19 +253,7 @@ const ArChallengeCapture = ({
     async _takeScreenshot() {
       this.playCameraSound()
       this._arNavigator
-        ._takeScreenshot('screenshot', false)
-        .then((retDict) => {
-          console.log("captureImage:", retDict)
-          this.setState({
-            capturedImage: retDict.url
-          });
-        });
-    }
-
-    async _takeScreenshot() {
-      this.playCameraSound()
-      this._arNavigator
-        ._takeScreenshot('screenshot', false)
+        ._takeScreenshot(uuid.v4(), false)
         .then((retDict) => {
           console.log("captureImage:", retDict)
           this.setState({
