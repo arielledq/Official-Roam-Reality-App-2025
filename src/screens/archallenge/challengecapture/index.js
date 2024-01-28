@@ -226,6 +226,7 @@ const ArChallengeCapture = ({
 
     state = {
       capturedImage: null,
+      capturedVideo: null,
       detailsShow: false
     }
 
@@ -233,6 +234,8 @@ const ArChallengeCapture = ({
       super();
       this._setARNavigatorRef = this._setARNavigatorRef.bind(this);
       this._takeScreenshot = this._takeScreenshot.bind(this);
+      this.startRecordVideo = this.startRecordVideo.bind(this);
+      this.stopRecordVideo = this.stopRecordVideo.bind(this);
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -249,6 +252,20 @@ const ArChallengeCapture = ({
         }
       });
     };
+
+    async startRecordVideo() {
+      this._arNavigator
+        ._startVideoRecording(uuid.v4(), false)
+    }
+
+    async stopRecordVideo() {
+      console.log("stopRecordVideo:")
+      this._arNavigator
+        ._stopVideoRecording()
+        .then((retDict) => {
+          console.log("stopRecordVideo:", retDict)
+        });
+    }
 
     async _takeScreenshot() {
       this.playCameraSound()
@@ -353,9 +370,21 @@ const ArChallengeCapture = ({
               <Text style={styles.bottomButtonText}>Retake</Text>
             </TouchableOpacity>
             }
-            <TouchableOpacity onPress={() => {
-              this._takeScreenshot();
-            }} activeOpacity={.6}>
+            <TouchableOpacity
+              onLongPress={() => {
+                console.log('onLongPress Press')
+                this.startRecordVideo()
+              }}
+              onPressIn={() => {
+                console.log('onPressIn Press')
+              }}
+              onPressOut={() => {
+                console.log('onPressOut Press')
+                this.stopRecordVideo()
+              }}
+              delayLongPress={3000} onPress={() => {
+                this._takeScreenshot();
+              }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
             {this.state.capturedImage && <TouchableOpacity onPress={() => {
