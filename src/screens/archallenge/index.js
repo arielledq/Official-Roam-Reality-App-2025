@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
-import { getARChallenges, getARSposored } from '../../network'
+import { getARChallenges, getARProfile } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import AppText from "../../components/text"
@@ -22,6 +22,7 @@ const ArChallenge = ({
   const [challengeChoice, setChallengeChoice] = useState("SPONSORED")
   const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
+  const [arProfile, setARProfile] = useState({})
   const navigation = useNavigation()
 
   const ARSposored = () => {
@@ -38,6 +39,21 @@ const ArChallenge = ({
     })
   }
 
+  const ARUserProfile = () => {
+    setIsLoading(true)
+    getARProfile().then((res) => {
+      console.log("getARProfile::",res)
+      if (res.status == 1) {
+        setARProfile(res)
+      } else {
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
+
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
     const filteredArray = sponsoredDataAll.filter(x => x.challenge_choice == choice)
@@ -46,6 +62,7 @@ const ArChallenge = ({
 
   useEffect(() => {
     ARSposored()
+    ARUserProfile()
   }, []);
 
   const navigateToChallengeDetails = (obj) => {
@@ -71,7 +88,7 @@ const ArChallenge = ({
         <BackgroundWithImage
           style={{ backgroundColor: "transparent", flex: .5, height: 94, justifyContent: "center", alignItems: 'center' }}
           imageSource={PointBoardBG}>
-          <AppText style={[_styles.headerText]}>0</AppText>
+          <AppText style={[_styles.headerText]}>{arProfile?.points}</AppText>
           <AppText style={[_styles.subHeaderText]}>Your Total Points</AppText>
         </BackgroundWithImage>
       </View>
