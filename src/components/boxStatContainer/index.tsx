@@ -4,23 +4,24 @@ import useStyles from './styles';
 import AppText from '../text';
 
 const BoxStatContainer = ({
+  boxId,
   value,
   property,
   onPressAction
 }: {
+  boxId: number | undefined;
   value: number | undefined;
   property: string;
   onPressAction?: () => void;
 }) => {
   const styles = useStyles();
-
+  const cardStyles = boxId === 1 || boxId === 4 || boxId === 7 ?
+  styles.cardMarginLeft : styles.cardContainer
   return (
-    <TouchableOpacity style={styles.cardContainer} onPress={onPressAction}>
+    <TouchableOpacity style={cardStyles} onPress={onPressAction}>
       <View style={styles.cardInner}>
         <AppText style={styles.TextNameTop}>{value}</AppText>
-        <View style={styles.cardBottomContent}>
-          <AppText style={styles.Text}>{property}</AppText>
-        </View>
+        <AppText style={styles.Text}>{property}</AppText>
       </View>
     </TouchableOpacity>
   );

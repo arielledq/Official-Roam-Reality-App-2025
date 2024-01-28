@@ -1,6 +1,6 @@
 import { makeStyles } from '@rneui/themed';
 
-const AVATAR_SIZE = 166;
+const AVATAR_SIZE = 105;
 
 const useStyles = makeStyles((theme) => ({
   parent: {
@@ -10,11 +10,21 @@ const useStyles = makeStyles((theme) => ({
     marginBottom: 10
   },
   avatarContainer: {
-    backgroundColor: theme.colors.inputBG,
-    borderRadius: AVATAR_SIZE / 2,
+    backgroundColor: 'transparent',
+    borderRadius: 8,
+    // marginTop: 4,
   },
+  avatarViewStyles: {
+    borderWidth: 1,
+    borderColor: theme.colors.purple,
+    borderStyle: 'dashed',
+    borderRadius: 8,
+  },
+  avatarStyles: {
+    borderRadius: 8
+  },
+  
   avatarContainer_2: { justifyContent: 'center', alignItems: 'center' },
-  avatarStyles: { borderRadius: AVATAR_SIZE / 2 },
   imageBG: {
     padding: '3%',
   },
@@ -23,10 +33,21 @@ const useStyles = makeStyles((theme) => ({
     height: 140,
     width: 160,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+  },
+  imagePresentBackground:{
+    height: 140,
+    width: 160,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 15,
+    marginBottom: 7
   },
   plusIcon: {
     marginTop: '-9%'
+  },
+  plusIconWithImage: {
+    marginTop: '-7%'
   }
 }));
 

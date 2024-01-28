@@ -24,7 +24,6 @@ const FPChangePassword: ScreenStackComponent<
 > = ({ navigation, route }) => {
   const _styles = useStyles()
   const { token, uid } = route.params
-  console.log(token + " " + uid)
   const [isLoading, setIsLoading] = useState(false)
   const [newpasswordVisibility, setNewPasswordVisibility] = useState(true)
   const [confirmnewpasswordVisibility, setConfirmNewPasswordVisibility] =
