@@ -344,6 +344,9 @@ const ArChallengeCapture = ({
             </View>
           </View>
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage ? 'space-between' : 'center' }]}>
+            <View style={styles.holdTextContainer}>
+              <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
+            </View>
             {this.state.capturedImage && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null })
             }} style={styles.bottomButtonContainer}>
