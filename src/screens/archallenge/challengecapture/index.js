@@ -31,7 +31,8 @@ const { width } = Dimensions.get('window');
 
 ViroMaterials.createMaterials({
   pbr: {
-    lightingModel: "PBR",
+    lightingModel: "Blinn",
+    chromaKeyFilteringColor: "#00FF00",
   },
 });
 
@@ -163,7 +164,7 @@ const ArChallengeCapture = ({
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
 
-        <ViroAmbientLight color="#ffffff" intensity={20} />
+        <ViroAmbientLight color="#ffffff" intensity={200} />
         <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
         <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
 
@@ -175,21 +176,6 @@ const ArChallengeCapture = ({
           color="#ffffff"
           intensity={250} />
 
-        <ViroSpotLight
-          position={[1, 3, 1]}
-          direction={[-1, -1, -1]}
-          color="grey"
-          intensity={750}
-          attenuationStartDistance={1}
-          attenuationEndDistance={10}
-          innerAngle={45}
-          outerAngle={90}
-          castsShadow
-          shadowMapSize={2048}
-          shadowNearZ={1}
-          shadowFarZ={4}
-          shadowOpacity={1.0}
-        />
 
         {loading &&
           <ViroText
@@ -219,6 +205,7 @@ const ArChallengeCapture = ({
             materials={"pbr"}
             rotation={rotate}
             onRotate={_onRotate}
+            chromaKeyFilteringColor={"transparent"}
             onDrag={_onDrag}
             animation={{
               name: 'Take 001',
@@ -350,7 +337,7 @@ const ArChallengeCapture = ({
           {this.state.capturedImage &&
             <Image style={styles.f1} source={{ uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage }} />}
 
-          <View style={{ position: 'absolute' }}>
+          <View style={styles.mainHeaderContainer}>
             <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
@@ -384,12 +371,6 @@ const ArChallengeCapture = ({
             </TouchableOpacity>
             }
           </View>
-          {/* {loading &&
-            <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
-                <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
-              </View>
-            </View>} */}
           {this.state.detailsShow && this.InfoView()}
         </View >
       )

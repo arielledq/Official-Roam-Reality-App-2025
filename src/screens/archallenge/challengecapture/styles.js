@@ -14,7 +14,13 @@ const useStyles = makeStyles(theme => ({
     height: ScreenHeight,
     width: '100%',
   },
-  container: { marginTop: "10%" },
+  mainHeaderContainer: {
+    padding: screenHorizontalPadding,
+    position: 'absolute'
+  },
+  container: {
+    marginTop: "10%"
+  },
   f1: {
     height: ScreenHeight,
     width: '100%'
