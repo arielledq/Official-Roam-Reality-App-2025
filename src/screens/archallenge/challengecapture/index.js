@@ -272,9 +272,12 @@ const ArChallengeCapture = ({
       this.setState({
         capturedImages: null
       })
+      const onError = (error) => {
+        console.log("startRecordVideo: error:", error)
+      }
       this.playRecordSound()
       this._arNavigator
-        ._startVideoRecording(uuid.v4(), false)
+        ._startVideoRecording(uuid.v4(), false, onError)
     }
 
     async stopRecordVideo() {
@@ -356,6 +359,7 @@ const ArChallengeCapture = ({
       return (
         <View style={styles.mainContainer}>
           <ViroARSceneNavigator
+            videoQuality={"High"}
             autofocus={true}
             pbrEnabled={true}
             hdrEnabled={true}
