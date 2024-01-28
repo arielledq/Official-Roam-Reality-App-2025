@@ -178,14 +178,16 @@ const ArChallengeCapture = ({
 
 
         {loading &&
-          <ViroText
-            text="Loading Model"
-            color="#ff0000"
-            width={2}
-            height={2}
-            style={styles.loadingText}
-            position={[0, 0, -5]}
-          />
+          <ViroARCamera>
+            <ViroText
+              text="Loading Model"
+              color="#ff0000"
+              width={2}
+              height={2}
+              style={styles.loadingText}
+              position={[0, 0, -5]}
+            />
+          </ViroARCamera>
         }
 
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage

@@ -63,7 +63,6 @@ const useStyles = makeStyles(theme => ({
     color: "#2B0143",
   },
   loadingText: {
-    ...fontGroup.ns900,
     fontSize: FontSizes.S24,
     color: theme.colors.black,
     marginTop: 10,
