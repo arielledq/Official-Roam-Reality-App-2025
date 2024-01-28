@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Keyboard, Pressable, Text, View } from "react-native"
+import React, { useEffect, useState } from "react"
+import { Alert, Keyboard, Pressable, Text, View } from "react-native"
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import theme from "../../assets/theme"
@@ -20,29 +20,89 @@ import { DateFormat, formatDate } from "../../util/DateUtils"
 import Icon from "../../components/Icon"
 import { FontSizes } from "../../util/FontUtils"
 import { EditProfileSchema } from "../../util/ValidationSchemas"
+import axios from "axios"
+import {
+  Asset,
+  CameraOptions,
+  launchImageLibrary
+} from "react-native-image-picker"
+import { useSelector } from "react-redux"
+import { getProfieDetails, updateProfile } from "../../network"
+import { handleError } from "../../util/helpers"
+
+interface ImageData {
+  uri: string | undefined;
+  type: string | undefined;
+  name: string;
+}
 
 const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   navigation
 }) => {
   const _styles = useStyles()
-  const [gender, setGender] = useState(null)
+  const [profileDetails, setProfileDetails] = useState(null)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
   const [isNameInputFocused, setNameInputFocused] = useState(false)
   const [isMobileInputFocused, setMobileInputFocused] = useState(false)
   const [isAddressInputFocused, setAddressInputFocused] = useState(false)
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false)
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false)
+  const [pImage, setPImage] = useState <string | undefined>(undefined)
+  const [photoDetails, setPhotoDetails] = useState <ImageData | null>(null)
 
-  const [country, setCountry] = useState(null)
+  const [countryData, setCountryData] = useState([])
+  // Function to fetch 
+  const fetchProfileDetails = async () => {
+    try {
+      const details = await getProfieDetails({
+        id: userProfile.user_profile.id
+      })
+
+      // Store the details in the state variable
+      setProfileDetails(details)
+    } catch (error) {
+      console.error("Error fetching profile details: ", error)
+    }
+  }
+  console.log(JSON.stringify(profileDetails))
+
+  useEffect(() => {
+    fetchProfileDetails()
+    var config = {
+      method: "get",
+      url: "https://api.countrystatecity.in/v1/countries",
+      headers: {
+        "X-CSCAPI-KEY":
+          "QXZWZEV5d1RXVm80ZHNHVzk5S1prRWtHNEhwUjV3R3ltVW9Ta3lENw=="
+      }
+    }
+
+    axios(config)
+      .then(function (response) {
+        var count = Object.keys(response.data).length
+        let countryArray = []
+        for (var i = 0; i < count; i++) {
+          countryArray.push({
+            value: response.data[i].iso2,
+            label: response.data[i].name
+          })
+        }
+        setCountryData(countryArray)
+      })
+      .catch(function (error) {
+        console.log(error)
+      })
+  }, [])
   const [isFocus, setIsFocus] = useState(false)
-  const [bDate, setBDate] = useState<Date|null>(null)
+  const [bDate, setBDate] = useState<Date | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const userProfile = useSelector(state => state.login?.data?.user)
   const [genders, setGenders] = useState([
-    { label: "Female", value: "female" },
-    { label: "Male", value: "male" },
-    { label: "Prefer not to say", value: "other" }
+    { label: "Female", value: 1 },
+    { label: "Male", value: 2 },
+    { label: "Prefer not to say", value: 3 }
   ])
   const handleConfirm = (date: Date) => {
-    // const formattedDate = moment(date).format("DD/MM/yyyy").split("/")
     setBDate(date)
     hideDatePicker()
   }
@@ -53,8 +113,93 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const showDatePicker = () => {
     setDatePickerVisibility(true)
   }
+  const [gender, setGender] = useState({
+    label: profileDetails?.gender ?? "",
+    value: profileDetails?.gender ?? ""
+  })
 
-  function handleEditProfile() {}
+  const [country, setCountry] = useState({
+    label: profileDetails?.home_country ?? "",
+    value: profileDetails?.home_country ?? ""
+  })
+
+  function uploadProfileImage(image: Asset) {
+    setPhotoDetails({
+      uri: image.uri,
+      type: image.type,
+      name: Date.now() + ".jpeg"
+    })
+  }
+
+  async function pickImage() {
+    const options = {
+      mediaType: 'photo',
+      includeBase64: false,
+      //   quality: 0.5,
+      maxHeight: 300,
+      maxWidth: 300,
+    } as CameraOptions;
+
+    await launchImageLibrary(options, (response) => {
+      // setPImage(response?.assets?.[0]?.uri);
+      if (response?.assets) {
+        const selectedImageUri = response?.assets?.[0]?.uri;
+        setPImage(selectedImageUri);
+        uploadProfileImage(response?.assets?.[0]);
+      }
+    });
+
+  }
+
+  const handleEditProfile = values => {
+    const formattedDate = bDate
+      ? new Date(bDate).toISOString().split("T")[0]
+      : null
+
+    // Check if country has a value, if not, use the existing value
+    const updatedCountry = country.value
+      ? country.value
+      : profileDetails?.home_country
+
+    const updatedGender = gender.value ? gender.value : profileDetails?.gender
+
+    // Check if formattedDate has a value, if not, use the existing value
+    const updatedDateOfBirth = formattedDate
+      ? formattedDate
+      : profileDetails?.date_of_birth
+
+    const updatedProfileData = new FormData()
+    updatedProfileData.append("name", values.name)
+    updatedProfileData.append("phone_number", values.phoneNumber)
+    updatedProfileData.append("home_address", values.address)
+    updatedProfileData.append("gender", updatedGender)
+    updatedProfileData.append("home_country", updatedCountry)
+    updatedProfileData.append("date_of_birth", updatedDateOfBirth)
+    if (photoDetails?.name) {
+      updatedProfileData.append("image", photoDetails)
+    }
+
+    console.log("Image details " + JSON.stringify(photoDetails))
+    setIsLoading(true)
+    console.log("Profile Data details " + JSON.stringify(updatedProfileData))
+
+    updateProfile({
+      id: userProfile.user_profile.id,
+      data: updatedProfileData
+    })
+      .then(res => {
+        if (res.status == 1) {
+          Alert.alert("Success", res.message, [
+            { text: "OK", onPress: () => navigation.goBack() }
+          ])
+        } else {
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
 
   return (
     <>
@@ -66,20 +211,26 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         >
           <Formik
             initialValues={{
-              name: "",
-              phoneNumber: "",
-              address: "",
-              gender: "",
-              country: "",
-              dob: Date.now().toString()
+              name: profileDetails?.user.name ?? "",
+              phoneNumber: profileDetails?.phone_number ?? "",
+              address: profileDetails?.home_address ?? "",
+              gender: profileDetails?.gender ?? "",
+              pImage: (pImage || profileDetails?.image) ?? undefined
             }}
-            onSubmit={handleEditProfile}
+            onSubmit={values => handleEditProfile(values)}
+            enableReinitialize
             validationSchema={EditProfileSchema}
           >
             {({ handleChange, handleSubmit, values, errors, touched }) => (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
-                  <ProfileAvatar avatarUrl={undefined} />
+                  {/* profile avatar */}
+                  <ProfileAvatar
+                    onChangeProfilePic={pickImage}
+                    avatarUrl={values.pImage}
+                  />
+
+                  {/* input fields */}
                   <AppInput
                     inputContainerStyle={[
                       _styles.input,
@@ -119,14 +270,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     <Dropdown
                       style={[
                         _styles.dropdown,
-                        isGenderDropDownFocused ? _styles.focusedInput : {},
-                        touched.gender && errors?.gender && !gender
-                          ? _styles.inputError
-                          : {}
+                        isGenderDropDownFocused ? _styles.focusedInput : {}
+                        // touched.gender && errors?.gender && !gender
+                        //   ? _styles.inputError
+                        //   : {}
                       ]}
                       placeholderStyle={{
                         color:
-                          (touched.gender && errors?.gender && !gender) ||
+                          // (touched.gender && errors?.gender && !gender) ||
                           isGenderDropDownFocused
                             ? theme.darkColors?.white
                             : theme.darkColors?.grey,
@@ -154,7 +305,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       labelField="label"
                       placeholder="Select Gender"
                       valueField="value"
-                      value={(gender || values.gender) ?? ""}
+                      value={profileDetails?.gender ?? ""}
                       // onFocus={() => setIsFocus(true)}
                       // onBlur={() => setIsFocus(false)}
                       onChange={value => {
@@ -167,7 +318,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           name={"meh"}
                           family="feather"
                           color={
-                            (touched.gender && errors?.gender && !gender) ||
+                            // (touched.gender && errors?.gender && !gender) ||
                             isGenderDropDownFocused
                               ? theme.darkColors?.white
                               : theme.darkColors?.TandCgrey
@@ -297,17 +448,15 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
                       iconStyle={_styles.iconStyle}
-                      data={genders}
+                      data={countryData}
                       maxHeight={300}
                       labelField="label"
                       placeholder="Home Country"
                       valueField="value"
-                      value={(country || values.country) ?? ""}
-                      // onFocus={() => setIsFocus(true)}
-                      // onBlur={() => setIsFocus(false)}
-                      onChange={value => {
+                      value={profileDetails?.home_country ?? ""}
+                      onChange={item => {
                         handleChange("country")
-                        setCountry(value)
+                        setCountry(item)
                         setIsFocus(false)
                       }}
                       renderLeftIcon={() => (
@@ -331,10 +480,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <View>
                     <Pressable
                       style={[
-                        _styles.timeInput,
-                        touched.dob && errors?.dob && !bDate
-                          ? _styles.inputError
-                          : {}
+                        _styles.timeInput
+                        // touched.dob && errors?.dob && !bDate
+                        //   ? _styles.inputError
+                        //   : {}
                       ]}
                       onPress={showDatePicker}
                     >
@@ -344,9 +493,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           name={"aperture"}
                           family="feather"
                           color={
-                            touched.dob && errors?.dob && !bDate
-                              ? theme.darkColors?.white
-                              : theme.darkColors?.TandCgrey
+                            // touched.dob && errors?.dob && !bDate
+                            //   ? theme.darkColors?.white
+                            //   :
+                            theme.darkColors?.TandCgrey
                           }
                           size={24}
                         />
@@ -357,13 +507,23 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                             {formatDate(bDate, DateFormat.MMDDYY)}
                           </AppText>
                         </View>
+                      ) : profileDetails?.date_of_birth ? (
+                        <View style={_styles.textContainer}>
+                          <AppText style={_styles.timeteststyle}>
+                            {formatDate(
+                              profileDetails.date_of_birth,
+                              DateFormat.MMDDYY
+                            )}
+                          </AppText>
+                        </View>
                       ) : (
                         <View style={_styles.textContainer}>
                           <AppText
                             style={
-                              touched.dob && errors?.dob && !bDate
-                                ? _styles.placeholderDOBStyle
-                                : _styles.placeholderStyle
+                              // touched.dob && errors?.dob && !bDate
+                              //   ? _styles.placeholderDOBStyle
+                              //   :
+                              _styles.placeholderStyle
                             }
                           >
                             Date of Birth
@@ -375,18 +535,19 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         name={"calendar"}
                         family="feather"
                         color={
-                          touched.dob && errors?.dob && !bDate
-                            ? theme.darkColors?.white
-                            : theme.darkColors?.TandCgrey
+                          // touched.dob && errors?.dob && !bDate
+                          //   ? theme.darkColors?.white
+                          //   :
+                          theme.darkColors?.TandCgrey
                         }
                         size={24}
                       />
                     </Pressable>
-                    {touched.dob && errors?.dob && !bDate ? (
+                    {/* {touched.dob && errors?.dob && !bDate ? (
                       <Text style={[_styles.errorText, { marginTop: 5 }]}>
                         Date of birth is required
                       </Text>
-                    ) : undefined}
+                    ) : undefined} */}
                   </View>
                   <DateTimePickerModal
                     isVisible={isDatePickerVisible}
@@ -413,7 +574,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     containerStyle={_styles.buttonContainer}
                     title={"Save & Continue"}
                     onPress={handleSubmit}
-                    //   loading={isLoading}
+                    loading={isLoading}
                   />
                 </View>
               </View>

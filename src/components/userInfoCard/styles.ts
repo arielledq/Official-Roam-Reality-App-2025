@@ -4,7 +4,6 @@ import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/Fon
 const useStyles = makeStyles(theme => ({
   row: {
     flexDirection: "row",
-    flex: 1,
     alignItems: "center",
   },
   nameContainer: { flex: 1 },
@@ -22,7 +21,6 @@ const useStyles = makeStyles(theme => ({
   },
   containerBottom: {
     flexDirection: "row",
-    flex: 1,
     alignItems: 'center', 
     marginTop: '6%'
   },
@@ -37,7 +35,7 @@ const useStyles = makeStyles(theme => ({
   },
   verifyNowContainer: {
     flex: 1,
-    alignItems: 'flex-end',  // Align "Verify Now" to the right
+    alignItems: 'flex-end',
   },
   verifyNow: {
     ...fontGroup.ns700,
