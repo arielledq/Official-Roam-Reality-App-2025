@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     bottom: 0,
     flexDirection: 'row',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   bottomButtonContainer:
   {
@@ -89,6 +89,22 @@ const useStyles = makeStyles(theme => ({
     color: "#1158F4",
     marginVertical: 15,
     fontWeight: "700"
+  },
+  holdTextContainer: {
+    top: -50,
+    position: 'absolute',
+    padding: 5,
+    backgroundColor: "#090A1620",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    width:'100%'
+  },
+  holdText: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S10,
+    textAlign: 'center',
+    color: theme.colors.white,
   },
   descriptionText: {
     ...fontGroup.p400,
