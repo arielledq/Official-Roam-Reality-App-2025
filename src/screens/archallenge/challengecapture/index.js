@@ -15,12 +15,14 @@ import {
   ViroSpotLight,
   ViroText, ViroARCamera, ViroBox, ViroNode
 } from '@viro-community/react-viro';
+import Video from 'react-native-video';
 import uuid from 'react-native-uuid';
 import { FontSizes } from "../../../util/FontUtils"
 import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
 import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
+import RecordSound from '../../../assets/ar/record.mp3';
 import LineIcon from '../../../assets/ar/line.png';
 import { unzip } from 'react-native-zip-archive'
 import { AppButton } from "../../../components";
@@ -253,7 +255,22 @@ const ArChallengeCapture = ({
       });
     };
 
+    playRecordSound() {
+      Sound.setCategory('Playback');
+      let cameraSound = new Sound(RecordSound, error => {
+        if (error) {
+          console.log('failed to load the sound', error);
+        } else {
+          cameraSound.play(); // have to put the call to play() in the onload callback
+        }
+      });
+    };
+
     async startRecordVideo() {
+      this.setState({
+        capturedImages: null
+      })
+      this.playRecordSound()
       this._arNavigator
         ._startVideoRecording(uuid.v4(), false)
     }
@@ -263,11 +280,18 @@ const ArChallengeCapture = ({
       this._arNavigator
         ._stopVideoRecording()
         .then((retDict) => {
+          this.playRecordSound()
           console.log("stopRecordVideo:", retDict)
+          this.setState({
+            capturedVideo: retDict.url
+          });
         });
     }
 
     async _takeScreenshot() {
+      this.setState({
+        capturedVideo: null
+      })
       this.playCameraSound()
       this._arNavigator
         ._takeScreenshot(uuid.v4(), false)
@@ -343,7 +367,13 @@ const ArChallengeCapture = ({
           </ViroARSceneNavigator>
 
           {this.state.capturedImage &&
-            <Image style={styles.f1} source={{ uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage }} />}
+            <Image style={styles.f1} source={{
+              uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
+            }} />}
+
+          {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
+            uri: Platform.OS === 'android' ? `file://${this.state.capturedVideo}` : this.state.capturedVideo
+          }} />}
 
           <View style={styles.mainHeaderContainer}>
             <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
@@ -360,12 +390,12 @@ const ArChallengeCapture = ({
               </View>
             </View>
           </View>
-          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage ? 'space-between' : 'center' }]}>
+          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
             <View style={styles.holdTextContainer}>
               <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
             </View>
-            {this.state.capturedImage && <TouchableOpacity activeOpacity={.6} onPress={() => {
-              this.setState({ capturedImage: null })
+            {this.state.capturedImage || this.state.capturedVideo && <TouchableOpacity activeOpacity={.6} onPress={() => {
+              this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Retake</Text>
             </TouchableOpacity>
@@ -387,7 +417,7 @@ const ArChallengeCapture = ({
               }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
-            {this.state.capturedImage && <TouchableOpacity onPress={() => {
+            {this.state.capturedImage || this.state.capturedVideo && <TouchableOpacity onPress={() => {
               navigateToShare(this.state.capturedImage)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
