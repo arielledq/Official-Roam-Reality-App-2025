@@ -1,6 +1,7 @@
 from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile
 from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer
 from rest_framework import viewsets
+from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
 from rest_framework.views import APIView
 from rest_framework import permissions, status
@@ -27,27 +28,26 @@ class SponsorViewSet(viewsets.ModelViewSet):
     serializer_class = SponsorSerializer
     http_method_names = ["get"]
 
-class ARProfileViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing accounts.
-    """
+class ARProfileViewSet(ViewSet):
+    """Based on rest_framework.authtoken.views.ObtainAuthToken"""
+
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = ARUserProfile.objects.all()
     serializer_class = ARUserProfileSerializer
-		
-    def create(self, request, **kwargs):
-      data = self.request.data
-      request.data._mutable=True
-      serializer = ARUserProfileSerializer(data=data)
-      data['user'] = self.request.user.id
-      if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-      return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-		
-    
 
+    def list(self, request):
+        obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
+        serializer = ARUserProfileSerializer(obj)
+        return Response(serializer.data)
+		
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.queryset.get(pk=kwargs.get('pk'))
+        serializer = self.serializer_class(instance, data=request.data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+		
 class ChallengesViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
@@ -55,7 +55,6 @@ class ChallengesViewSet(viewsets.ModelViewSet):
     queryset = Challenges.objects.all()
     serializer_class = ChallengesSerializer
     http_method_names = ["get"]
-
 
 class ChallengesUploadView(APIView):
 	parser_class = (FileUploadParser,)
