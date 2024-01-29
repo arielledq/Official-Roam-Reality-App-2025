@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Alert, Keyboard, Pressable, Text, View } from "react-native"
+import { ActivityIndicator, Alert, Keyboard, Pressable, Text, View } from "react-native"
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import theme from "../../assets/theme"
@@ -49,7 +49,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false)
   const [pImage, setPImage] = useState <string | undefined>(undefined)
   const [photoDetails, setPhotoDetails] = useState <ImageData | null>(null)
-
+  const [pageLoading, setPageLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(true);
   const [countryData, setCountryData] = useState([])
   // Function to fetch 
   const fetchProfileDetails = async () => {
@@ -64,9 +65,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       console.error("Error fetching profile details: ", error)
     }
   }
-
+console.log(profileDetails)
   useEffect(() => {
     fetchProfileDetails()
+    .then(() => setPageLoading(false))
+    .catch(error => {
+      console.error("Error fetching profile details: ", error);
+      setPageLoading(false);
+    });
     var config = {
       method: "get",
       url: "https://api.countrystatecity.in/v1/countries",
@@ -134,9 +140,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     const options = {
       mediaType: 'photo',
       includeBase64: false,
-      //   quality: 0.5,
-      maxHeight: 300,
-      maxWidth: 300,
+      // maxHeight: 300,
+      // maxWidth: 300,
+      quality: 1, 
     } as CameraOptions;
 
     await launchImageLibrary(options, (response) => {
@@ -166,14 +172,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     const updatedDateOfBirth = formattedDate
       ? formattedDate
       : profileDetails?.date_of_birth
-
+    console.log("dob: " + updatedDateOfBirth)
     const updatedProfileData = new FormData()
     updatedProfileData.append("name", values.name)
     updatedProfileData.append("phone_number", values.phoneNumber)
     updatedProfileData.append("home_address", values.address)
-    updatedProfileData.append("gender", updatedGender)
+    gender.value ? updatedProfileData.append("gender", updatedGender) : {}
     updatedProfileData.append("home_country", updatedCountry)
-    updatedProfileData.append("date_of_birth", updatedDateOfBirth)
+    formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {}
     if (photoDetails?.name) {
       updatedProfileData.append("image", photoDetails)
     }
@@ -198,8 +204,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
   return (
     <>
+    
       <BackgroundWithImage style={_styles.mainContainer}>
         <AppHeader title={"Edit Profile"} backgroundColor="transparent" />
+        {pageLoading ? (
+        <View style={_styles.loaderContainer}>
+          <ActivityIndicator size="large" color={theme.lightColors?.pink}/>
+        </View>
+        ) : (
         <KeyboardAwareScrollView
           keyboardShouldPersistTaps="always"
           nestedScrollEnabled
@@ -300,7 +312,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       labelField="label"
                       placeholder="Select Gender"
                       valueField="value"
-                      value={profileDetails?.gender ?? ""}
+                      value={profileDetails?.gender ?? null}
                       // onFocus={() => setIsFocus(true)}
                       // onBlur={() => setIsFocus(false)}
                       onChange={value => {
@@ -576,7 +588,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
             )}
           </Formik>
         </KeyboardAwareScrollView>
+          )}
       </BackgroundWithImage>
+  
     </>
   )
 }

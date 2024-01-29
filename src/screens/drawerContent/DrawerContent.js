@@ -10,18 +10,18 @@ import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 const DrawerList = [
   { icon: "target", label: "AR Challenges", navigateTo: "ARChallenge" },
-  { icon: "message-square", label: "Chats", navigateTo: "" },
-  { icon: "users", label: "Friends", navigateTo: "" },
-  { icon: "target", label: "Wallet", navigateTo: "" },
-  { icon: "info", label: "About Us", navigateTo: "" },
-  { icon: "target", label: "Invite Friends", navigateTo: "" },
+  { icon: "message-square", label: "Chats", navigateTo: "Home" },
+  { icon: "users", label: "Friends", navigateTo: "Home" },
+  { icon: "target", label: "Wallet", navigateTo: "Home" },
+  { icon: "info", label: "About Us", navigateTo: "Home" },
+  { icon: "target", label: "Invite Friends", navigateTo: "Home" },
   { icon: "target", label: "Privacy Policy", navigateTo: "PrivacyPolicy" },
   {
     icon: "target",
     label: "Terms and Conditions",
     navigateTo: "TermsAndConditions"
   },
-  { icon: "settings", label: "Settings", navigateTo: "" },
+  { icon: "settings", label: "Settings", navigateTo: "Home" },
   { icon: "trash-2", label: "Delete Account", navigateTo: "delete" },
   { icon: "log-out", label: "Logout",  navigateTo: "logout" }
 ]
