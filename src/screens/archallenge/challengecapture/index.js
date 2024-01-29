@@ -33,7 +33,7 @@ import RenderHTML from "react-native-render-html";
 const RNFS = require('react-native-fs');
 const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
-import { request, check, PERMISSIONS } from 'react-native-permissions';
+import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 const { width } = Dimensions.get('window');
 
 ViroMaterials.createMaterials({
@@ -234,11 +234,6 @@ const ArChallengeCapture = ({
       capturedImage: null,
       capturedVideo: null,
       detailsShow: false,
-
-      cameraPermission: false,
-      audioPermission: false,
-      writeAccessPermission: false,
-      readAccessPermission: false,
     }
 
     constructor() {
@@ -282,84 +277,8 @@ const ArChallengeCapture = ({
       });
     };
 
-    async requestAudioPermission() {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
-          {
-            'title': 'AR Audio Permission',
-            'message': 'AR App needs to access your audio ' +
-              'so you can record videos with audio of ' +
-              'your augmented scenes.'
-          }
-        )
-        if (granted == PermissionsAndroid.RESULTS.GRANTED) {
-          this.setState({
-            audioPermission: true,
-          });
-        } else {
-          this.setState({
-            cameraPermission: false,
-          });
-        }
-      } catch (err) {
-        console.warn("[PermissionsAndroid]" + err)
-      }
-    }
-
-    async requestWriteAccessPermission() {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
-          {
-            'title': 'AR Audio Permission',
-            'message': 'AR App needs to access your photos / videos ' +
-              'so you can record cool videos and photos of' +
-              'your augmented scenes.'
-          }
-        )
-        if (granted == PermissionsAndroid.RESULTS.GRANTED) {
-          this.setState({
-            writeAccessPermission: true,
-          });
-        } else {
-          this.setState({
-            writeAccessPermission: false,
-          });
-        }
-      } catch (err) {
-        console.warn("[PermissionsAndroid]" + err)
-      }
-    }
-
-    async requestReadAccessPermission() {
-      try {
-        const granted = await PermissionsAndroid.request(
-          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
-          {
-            'title': 'Figment AR Audio Permission',
-            'message': 'Figment AR App needs to access your audio ' +
-              'so you can view your own images in portals.'
-          }
-        )
-        if (granted == PermissionsAndroid.RESULTS.GRANTED) {
-          this.setState({
-            readAccessPermission: true,
-          });
-        } else {
-          this.setState({
-            readAccessPermission: false,
-          });
-        }
-      } catch (err) {
-        console.warn("[PermissionsAndroid]" + err)
-      }
-    }
 
     async startRecordVideo() {
-      if (!this.state.audioPermission && Platform.OS == 'android') {
-        this.requestAudioPermission();
-      }
       this.setState({
         capturedImages: null,
         recordingStart: true
@@ -446,14 +365,26 @@ const ArChallengeCapture = ({
     }
 
     checkPermission() {
-      console.log();
-      // check(PERMISSIONS.IOS.MICROPHONE).then(response => {
-      //   console.log("MICROPHONE",response);
-      // });
-
-      request(PERMISSIONS.IOS.MICROPHONE).then(response => {
-        console.log("MICROPHONE",response);
-      });
+      if(Platform.OS == 'android'){
+        requestMultiple([PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        ]).then(response => {
+          console.log("PERMISSIONS.ANDROID:: ",response);
+        });
+      }
+      if(Platform.OS =='ios'){
+        requestMultiple([PERMISSIONS.IOS.CAMERA,
+          PERMISSIONS.IOS.MICROPHONE,
+          PERMISSIONS.IOS.MEDIA_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+        ]).then(response => {
+          console.log("PERMISSIONS.OS",response);
+        });
+      }
     };
 
     render() {
