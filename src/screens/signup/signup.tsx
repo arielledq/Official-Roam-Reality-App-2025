@@ -27,7 +27,7 @@ import { SignUpSchema } from "../../util/ValidationSchemas"
 import SocialSignin from "../../components/socialSignin"
 import { useNavigation } from "@react-navigation/native"
 import { useDispatch } from "react-redux"
-import { updateAsOldUser } from "../../redux/Persist"
+import { updateAsOldUser, toggleOnboard } from "../../redux/Persist"
 
 const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   const _styles = useStyles()
@@ -52,6 +52,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
       console.log({ res })
       if (res.status == 1) {
         resData.current = res
+        dispatch(toggleOnboard())
         dispatch(updateAsOldUser())
         Alert.alert('Registration Successful', 'Please verify your email to continue', [{
           text: 'OK',
