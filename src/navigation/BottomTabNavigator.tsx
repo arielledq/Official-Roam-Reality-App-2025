@@ -4,6 +4,9 @@ import LinearGradient from "react-native-linear-gradient"
 
 import { Icons } from '../assets/Icons';
 import Home from '../screens/home';
+import Profile from '../screens/profile/profile';
+import Scores from '../screens/scores';
+import Rally from '../screens/rally';
 
 const Tab = createBottomTabNavigator();
 
@@ -15,63 +18,63 @@ const BottomTabNavigator = () => {
         headerShown: false,
       }}
     >
-      <Tab.Screen 
-        name="Home0" 
-        component={Home} 
-        options = {{
-          tabBarLabel : "Home",
-          tabBarIcon: ({focused}) => (
-            focused ? <Icons.SelectedHomeIcon/> : <Icons.UnselectedHomeIcon />
+      <Tab.Screen
+        name="HomeScreen"
+        component={Home}
+        options={{
+          tabBarLabel: "Home",
+          tabBarIcon: ({ focused }) => (
+            focused ? <Icons.SelectedHomeIcon /> : <Icons.UnselectedHomeIcon />
           ),
-          tabBarIconStyle : styles.tabBarIconStyle,
-          tabBarLabelStyle : styles.tabBarLabelStyle
+          tabBarIconStyle: styles.tabBarIconStyle,
+          tabBarLabelStyle: styles.tabBarLabelStyle
         }}
       />
-      <Tab.Screen 
-        name="Home1" 
-        component={Home} 
-        options = {{
-          tabBarLabel : "Home1",
-          tabBarIcon: ({focused}) => (
-            focused ? <Icons.SelectedBadgeIcon/> : <Icons.UnselectedBadgeIcon />
+      <Tab.Screen
+        name="Scores"
+        component={Scores}
+        options={{
+          tabBarLabel: "Scores",
+          tabBarIcon: ({ focused }) => (
+            focused ? <Icons.SelectedBadgeIcon /> : <Icons.UnselectedBadgeIcon />
           ),
-          tabBarIconStyle : styles.tabBarIconStyle,
-          tabBarLabelStyle : styles.tabBarLabelStyle
+          tabBarIconStyle: styles.tabBarIconStyle,
+          tabBarLabelStyle: styles.tabBarLabelStyle
         }}
       />
-      <Tab.Screen 
-        name="Home2" 
-        component={Home} 
-        options = {{
+      <Tab.Screen
+        name="Go Navigate"
+        component={Home}
+        options={{
           tabBarLabel: () => null,
-          tabBarIcon: ({focused}) => (
-            focused ? <Icons.SelectedCamera/> : <Icons.SelectedCamera />
+          tabBarIcon: ({ focused }) => (
+            focused ? <Icons.SelectedCamera /> : <Icons.SelectedCamera />
           ),
-          tabBarIconStyle : [styles.tabBarIconStyle,styles.cameraTabStyle],
+          tabBarIconStyle: [styles.tabBarIconStyle, styles.cameraTabStyle],
         }}
       />
-       <Tab.Screen 
-        name="Home4" 
-        component={Home} 
-        options = {{
-          tabBarLabel : "Home3",
-          tabBarIcon: ({focused}) => (
-            focused ? <Icons.SelectedFlagIcon/> : <Icons.UnselectedFlagIcon />
+      <Tab.Screen
+        name="Rally"
+        component={Rally}
+        options={{
+          tabBarLabel: "Rally",
+          tabBarIcon: ({ focused }) => (
+            focused ? <Icons.SelectedFlagIcon /> : <Icons.UnselectedFlagIcon />
           ),
-          tabBarIconStyle : styles.tabBarIconStyle,
-          tabBarLabelStyle : styles.tabBarLabelStyle,
+          tabBarIconStyle: styles.tabBarIconStyle,
+          tabBarLabelStyle: styles.tabBarLabelStyle,
         }}
       />
-        <Tab.Screen 
-        name="Profile" 
-        component={Home} 
-        options = {{
-          tabBarLabel : "Profile",
-          tabBarIcon: ({focused}) => (
-            focused ? <Icons.SelectedProfile/> : <Icons.UnselectedProfile />
+      <Tab.Screen
+        name="Profile"
+        component={Profile}
+        options={{
+          tabBarLabel: "Profile",
+          tabBarIcon: ({ focused }) => (
+            focused ? <Icons.SelectedProfile /> : <Icons.UnselectedProfile />
           ),
-          tabBarIconStyle : styles.tabBarIconStyle,
-          tabBarLabelStyle : styles.tabBarLabelStyle
+          tabBarIconStyle: styles.tabBarIconStyle,
+          tabBarLabelStyle: styles.tabBarLabelStyle
         }}
       />
     </Tab.Navigator>
@@ -81,26 +84,26 @@ const BottomTabNavigator = () => {
 export default BottomTabNavigator
 
 const styles = StyleSheet.create({
-  tabBarStyle : { 
-    height : 90,
-    position: 'absolute' ,
-    backgroundColor : '#090A16',
-    borderTopStartRadius : 20,
-    borderTopEndRadius : 20,
-    paddingHorizontal : 25
+  tabBarStyle: {
+    height: 90,
+    position: 'absolute',
+    backgroundColor: '#090A16',
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
+    paddingHorizontal: 25
   },
-  tabBarIconStyle : {
-    marginBottom : -10
+  tabBarIconStyle: {
+    // marginBottom: -10
   },
-  tabBarLabelStyle : {
-    fontSize : 12,
-    fontWeight : '700',
-    lineHeight : 12,
-    color : '#FFFFFF',
-    textAlign : 'center',
-    marginTop : -10
+  tabBarLabelStyle: {
+    fontSize: 12,
+    fontWeight: '700',
+    lineHeight: 12,
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginTop: -10
   },
   cameraTabStyle: {
-    marginTop : 5
+    marginTop: 5
   }
 })

@@ -25,12 +25,12 @@ import BottomSheet from "@gorhom/bottom-sheet"
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
 
-  const bottomSheetRef = useRef <BottomSheet>(null)
+  const bottomSheetRef = useRef<BottomSheet>(null)
   const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
 
- 
+
   const handleLogOut = () => {
     bottomSheetRef.current?.expand()
   }
@@ -59,12 +59,12 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   useEffect(() => {
     if (route.params?.openBottomSheet === true) {
       setOpenBottomSheet(true)
-    }else if (route.params?.deleteAccount === true){
+    } else if (route.params?.deleteAccount === true) {
       handleDeleteAccount()
     }
   }, [route.params])
 
-  const handleDeleteAccount = () => {   
+  const handleDeleteAccount = () => {
     Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
       {
         text: 'yes',
@@ -73,7 +73,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
             console.log({ res })
             if (res.status == 1) {
               handleLogOutButton();
-              Alert.alert(('Success'), ('Your account has been deleted successfully'));          
+              Alert.alert(('Success'), ('Your account has been deleted successfully'));
             } else {
               Alert.alert('Error', res.message.error)
             }
@@ -100,11 +100,8 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
       </TouchableOpacity>
     )
   }
-  const handleARChallenge = () => {
-    navigation.navigate('ARChallenge')
-  }
   return (
-  
+
     <>
       <ScrollView style={styles.mainContainer}>
         <AppHeader
@@ -121,65 +118,45 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
               width: "70%",
               marginTop: 100
             }}
-            title="Change Password"
-            onPress={handleChangePassword}
-          />
-          <AppButton
-            containerStyle={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              width: "70%",
-              marginTop: 100
-            }}
-            title="Edit Profile"
-            onPress={handleEditProfile}
-          />
-          <AppButton
-            containerStyle={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              width: "70%",
-              marginTop: 100
-            }}
-            title="Profile"
-            onPress={handleProfile}
+            title="Log Out"
+            onPress={handleLogOutButton}
           />
         </View>
-        </ScrollView>
+      </ScrollView>
 
-        <AppBottomSheet bottomSheetRef={bottomSheetRef} snaps={snapPoints}>
-          {/* Header */}
-          <View style={styles.header}>
-            <AppText style={styles.headerText}>Log Out</AppText>
-            <View style={styles.horizontalLine} />
-          </View>
+      <AppBottomSheet bottomSheetRef={bottomSheetRef} snaps={snapPoints}>
+        {/* Header */}
+        <View style={styles.header}>
+          <AppText style={styles.headerText}>Log Out</AppText>
+          <View style={styles.horizontalLine} />
+        </View>
 
-          {/* Button Header */}
-          <View style={styles.buttonheaderContainer}>
-            <AppText style={styles.logoutText}>
-              Are you sure you want to Log Out?
-            </AppText>
-          </View>
+        {/* Button Header */}
+        <View style={styles.buttonheaderContainer}>
+          <AppText style={styles.logoutText}>
+            Are you sure you want to Log Out?
+          </AppText>
+        </View>
 
-          <View style={styles.buttonContainer}>
-            {/* Logout Button */}
-            <AppButton
-              buttonStyle={styles.buttonStyle}
-              containerStyle={styles.buttonContainerStyle}
-              titleStyle={styles.buttonTitle}
-              title={"Log out"}
-              onPress={handleLogOutButton}
-            />
+        <View style={styles.buttonContainer}>
+          {/* Logout Button */}
+          <AppButton
+            buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            titleStyle={styles.buttonTitle}
+            title={"Log out"}
+            onPress={handleLogOutButton}
+          />
 
-            {/* Cancel Button */}
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => bottomSheetRef.current?.close()}
-            >
-              <AppText style={styles.cancelButtonText}>Cancel</AppText>
-            </TouchableOpacity>
-          </View>
-        </AppBottomSheet>
+          {/* Cancel Button */}
+          <TouchableOpacity
+            style={styles.cancelButton}
+            onPress={() => bottomSheetRef.current?.close()}
+          >
+            <AppText style={styles.cancelButtonText}>Cancel</AppText>
+          </TouchableOpacity>
+        </View>
+      </AppBottomSheet>
     </>
   )
 }

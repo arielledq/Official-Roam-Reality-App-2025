@@ -86,7 +86,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
       keyboardShouldPersistTaps="always"
       nestedScrollEnabled
       style={_styles.header}
-    >      
+    >
       <AppHeader
         containerStyle={_styles.headerContainer}
         titleStyle={_styles.headerStyle}
@@ -137,7 +137,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
-        
+
         <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
@@ -158,12 +158,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
       </TouchableOpacity>
       <View style={{ marginHorizontal: -22 }}>
         <FlatList
+          contentContainerStyle={{ marginBottom: 50 }}
           data={data}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <MemoryContainer title={"hELLO"} description={"HI"} image={""} />
+            <MemoryContainer title={"Title"} description={"description"} image={""} />
           )}
           keyExtractor={item => item.id.toString()}
         />
