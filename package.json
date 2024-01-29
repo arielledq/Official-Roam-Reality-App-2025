@@ -9,7 +9,8 @@
     "test": "jest",
     "lint": "eslint .",
     "web": "./node_modules/.bin/webpack-dev-server --config ./webpack.config.js --live-reload --color --mode development",
-    "web:build": "./node_modules/.bin/webpack --config ./webpack.config.js --color --mode production"
+    "web:build": "./node_modules/.bin/webpack --config ./webpack.config.js --color --mode production",
+    "postinstall": "patch-package"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
@@ -32,6 +33,8 @@
     "axios": "^1.4.0",
     "formik": "^2.4.5",
     "moment": "^2.30.1",
+    "patch-package": "^8.0.0",
+    "postinstall-postinstall": "^2.1.0",
     "react": "18.2.0",
     "react-dom": "^18.2.0",
     "react-native": "0.71.7",
@@ -39,6 +42,7 @@
     "react-native-dotenv": "^3.4.8",
     "react-native-element-dropdown": "^2.10.1",
     "react-native-elements": "^3.4.3",
+    "react-native-fast-image": "^8.6.3",
     "react-native-fbsdk-next": "^12.1.2",
     "react-native-fs": "^2.20.0",
     "react-native-gesture-handler": "^2.10.0",

@@ -12,12 +12,7 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     backgroundColor: theme?.colors?.inputBG
   },
-  headerStyle: {
-    ...fontGroup.ns700,
-    fontSize: FontSizes.S24,
-    lineHeight: FontLineHeights.LH33,
-    marginTop: 0
-  },
+
   headerContainer: {
     paddingVertical: 15,
     borderBottomWidth: 0,
@@ -94,9 +89,8 @@ const useStyles = makeStyles(theme => ({
   },
   editButtonContainer: {
     position: "absolute",
-    top: "48%",
-    left: "53%",
-    transform: [{ translateX: 55 }, { translateY: -185 }],
+    top: 20,
+    right: 20,
     zIndex: 1
   },
   editButton: {
