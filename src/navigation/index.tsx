@@ -22,6 +22,7 @@ import ArChallengeDetails from '../screens/archallenge/challengedetails';
 import ArChallengeCapture from '../screens/archallenge/challengecapture';
 import ARChallenge from '../screens/archallenge';
 import ArChallengeShare from '../screens/archallenge/challengeshare';
+import Onboarding from '../screens/onboarding/onboarding';
 import DrawerNavigator from './DrawerNavigator'
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -32,7 +33,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
  */
 const Navigation = () => {
   const token = useSelector(state => state.login?.data?.token)
-  const newUser = useSelector(state => state.persist?.newUser)
+  const {newUser,isOnboarded} = useSelector(state => state.persist)
 
   const renderAuthStack = () => {
     return (
