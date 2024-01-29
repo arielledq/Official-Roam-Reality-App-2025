@@ -1,1 +1,1 @@
-export { resetPersist, updateAsOldUser } from './reducer'
+export { resetPersist, updateAsOldUser, toggleOnboard } from './reducer'

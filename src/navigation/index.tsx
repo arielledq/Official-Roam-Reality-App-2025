@@ -1,4 +1,4 @@
-import { NavigationContainer } from '@react-navigation/native';
+import {  NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '@rneui/themed';
 import React from 'react';
@@ -22,7 +22,12 @@ import ArChallengeDetails from '../screens/archallenge/challengedetails';
 import ArChallengeCapture from '../screens/archallenge/challengecapture';
 import ARChallenge from '../screens/archallenge';
 import ArChallengeShare from '../screens/archallenge/challengeshare';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import DrawerContent from '../screens/drawerContent/DrawerContent';
+import Onboarding from '../screens/onboarding/onboarding';
+import DrawerNavigator from './DrawerNavigator'
 const Stack = createNativeStackNavigator<RootStackParamList>();
+const Drawer = createDrawerNavigator();
 
 /**
  * Main Navigation container provided to application.
@@ -31,7 +36,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
  */
 const Navigation = () => {
   const token = useSelector(state => state.login?.data?.token)
-  const newUser = useSelector(state => state.persist?.newUser)
+  const {newUser,isOnboarded} = useSelector(state => state.persist)
 
   const renderAuthStack = () => {
     return (
@@ -62,10 +67,12 @@ const Navigation = () => {
   const renderCommonStack = () => {
     return (
       <>
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Home" component={DrawerNavigator} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
@@ -73,19 +80,37 @@ const Navigation = () => {
       </>
     )
   }
+
+  const StackNav = () => {
+    return(
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: "slide_from_right",   
+      }}>
+      {token ?
+        renderCommonStack() : renderAuthStack()
+      }
+    </Stack.Navigator>
+    )
+  }
+
+  const DrawerNav = () => {
+    return(
+      <Drawer.Navigator 
+      drawerContent={props => <DrawerContent {...props}/>}
+      screenOptions={{ 
+        headerShown: false
+      }}>
+      <Drawer.Screen name="HomeScreen" component={StackNav} />
+    </Drawer.Navigator>
+    )
+  }
   return (
     <NavigationContainer ref={navigationRef}>
       {
         <ThemeProvider theme={theme}>
-          <Stack.Navigator
-            screenOptions={{
-              headerShown: false,
-              animation: "slide_from_right"
-            }}>
-            {token ?
-              renderCommonStack() : renderAuthStack()
-            }
-          </Stack.Navigator>
+          <DrawerNav/>
         </ThemeProvider>
       }
     </NavigationContainer>

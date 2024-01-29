@@ -1,18 +1,27 @@
-import React from 'react'
-import Navigation from './navigation'
-import { Provider } from 'react-redux'
-import { PersistGate } from 'redux-persist/integration/react'
-import { persistor, store } from './store'
-import 'react-native-devsettings/withAsyncStorage'
+import React from "react"
+import Navigation from "./navigation"
+import { Provider } from "react-redux"
+import { PersistGate } from "redux-persist/integration/react"
+import { persistor, store } from "./store"
+import "react-native-devsettings/withAsyncStorage"
+import { StyleSheet } from "react-native"
+import { GestureHandlerRootView } from "react-native-gesture-handler"
 
 const App = () => {
   return (
     <Provider store={store}>
-      <PersistGate loading={null} persistor={persistor}>
-        <Navigation />
-      </PersistGate>
+      {/* this  GestureHandlerRootView is used for https://gorhom.github.io/react-native-bottom-sheet/*/}
+      <GestureHandlerRootView style={styles.root}>
+        <PersistGate loading={null} persistor={persistor}>
+          <Navigation />
+        </PersistGate>
+      </GestureHandlerRootView>
     </Provider>
   )
 }
 
 export default App
+
+const styles = StyleSheet.create({
+  root: { flex: 1 }
+})
