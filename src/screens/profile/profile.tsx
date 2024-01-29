@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useState } from "react"
 import {
   FlatList,
   Image,
-  StyleSheet,
   TouchableOpacity,
   View
 } from "react-native"
@@ -27,11 +26,10 @@ import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
 import { getProfieDetails } from "../../network"
 import { useSelector } from "react-redux"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 
-const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
-  navigation
-}) => {
+const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
+  const navigation = useNavigation()
   const _styles = useStyles()
   const userProfile = useSelector(state => state.login?.data?.user)
   const [profileDetails, setProfileDetails] = useState(null)
@@ -57,7 +55,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
 
   const handleMenuButton = () => {
     return (
-      <TouchableOpacity style={_styles.menuIcon}>
+      <TouchableOpacity
+        onPress={() => navigation.openDrawer()}
+        style={_styles.menuIcon}>
         <MenuIcon />
       </TouchableOpacity>
     )
