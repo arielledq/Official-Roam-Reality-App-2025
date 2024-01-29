@@ -7,6 +7,9 @@ import DOBIcon from './DOBIcon.svg'
 import Calendar from './Calendar.svg'
 import Shield from './Shield.svg';
 import ProfilePicPlusIcon from './ProfilePicPlusIcon.svg';
+import NavigationPoint1 from './NavigationPoint1.svg';
+import NavigationPoint2 from './NavigationPoint2.svg';
+import NavigationPoint3 from './NavigationPoint3.svg';
 
 export const Icons = {
   password,
@@ -17,5 +20,8 @@ export const Icons = {
   DOBIcon,
   Calendar,
   Shield,
-  ProfilePicPlusIcon
+  ProfilePicPlusIcon,
+  NavigationPoint1,
+  NavigationPoint2,
+  NavigationPoint3
 }
