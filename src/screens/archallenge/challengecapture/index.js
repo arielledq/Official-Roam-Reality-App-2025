@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react"
 
-import { TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView } from "react-native";
+import {
+  TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView,
+  PermissionsAndroid
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
@@ -229,7 +232,12 @@ const ArChallengeCapture = ({
     state = {
       capturedImage: null,
       capturedVideo: null,
-      detailsShow: false
+      detailsShow: false,
+
+      cameraPermission: false,
+      audioPermission: false,
+      writeAccessPermission: false,
+      readAccessPermission: false,
     }
 
     constructor() {
@@ -268,29 +276,105 @@ const ArChallengeCapture = ({
       });
     };
 
-    async startRecordVideo() {
-      this.setState({
-        capturedImages: null
-      })
-      const onError = (error) => {
-        console.log("startRecordVideo: error:", error)
+    async requestAudioPermission() {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.RECORD_AUDIO,
+          {
+            'title': 'AR Audio Permission',
+            'message': 'AR App needs to access your audio ' +
+              'so you can record videos with audio of ' +
+              'your augmented scenes.'
+          }
+        )
+        if (granted == PermissionsAndroid.RESULTS.GRANTED) {
+          this.setState({
+            audioPermission: true,
+          });
+        } else {
+          this.setState({
+            cameraPermission: false,
+          });
+        }
+      } catch (err) {
+        console.warn("[PermissionsAndroid]" + err)
       }
-      this.playRecordSound()
-      this._arNavigator
-        ._startVideoRecording(uuid.v4(), false, onError)
+    }
+
+    async requestWriteAccessPermission() {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.WRITE_EXTERNAL_STORAGE,
+          {
+            'title': 'AR Audio Permission',
+            'message': 'AR App needs to access your photos / videos ' +
+              'so you can record cool videos and photos of' +
+              'your augmented scenes.'
+          }
+        )
+        if (granted == PermissionsAndroid.RESULTS.GRANTED) {
+          this.setState({
+            writeAccessPermission: true,
+          });
+        } else {
+          this.setState({
+            writeAccessPermission: false,
+          });
+        }
+      } catch (err) {
+        console.warn("[PermissionsAndroid]" + err)
+      }
+    }
+
+    async requestReadAccessPermission() {
+      try {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_EXTERNAL_STORAGE,
+          {
+            'title': 'Figment AR Audio Permission',
+            'message': 'Figment AR App needs to access your audio ' +
+              'so you can view your own images in portals.'
+          }
+        )
+        if (granted == PermissionsAndroid.RESULTS.GRANTED) {
+          this.setState({
+            readAccessPermission: true,
+          });
+        } else {
+          this.setState({
+            readAccessPermission: false,
+          });
+        }
+      } catch (err) {
+        console.warn("[PermissionsAndroid]" + err)
+      }
+    }
+
+    async startRecordVideo() {
+      if (!this.state.audioPermission && Platform.OS == 'android') {
+        this.requestAudioPermission();
+      }
+      this.setState({
+        capturedImages: null,
+        recordingStart: true
+      }, () => {
+        const onError = (error) => {
+          console.log("startRecordVideo: error:", error)
+        }
+        this.playRecordSound()
+        this._arNavigator
+          ._startVideoRecording('recording', false, onError)
+      })
     }
 
     async stopRecordVideo() {
       console.log("stopRecordVideo:")
-      this._arNavigator
-        ._stopVideoRecording()
-        .then((retDict) => {
-          this.playRecordSound()
-          console.log("stopRecordVideo:", retDict)
-          this.setState({
-            capturedVideo: retDict.url
-          });
-        });
+      const retDict = await this._arNavigator._stopVideoRecording()
+      console.log("stopRecordVideo:", retDict)
+      this.setState({
+        capturedVideo: retDict.url
+      });
+      this.playRecordSound()
     }
 
     async _takeScreenshot() {
@@ -299,7 +383,7 @@ const ArChallengeCapture = ({
       })
       this.playCameraSound()
       this._arNavigator
-        ._takeScreenshot(uuid.v4(), false)
+        ._takeScreenshot(uuid.v4(), true)
         .then((retDict) => {
           console.log("captureImage:", retDict)
           this.setState({
@@ -407,7 +491,6 @@ const ArChallengeCapture = ({
             }
             <TouchableOpacity
               onLongPress={() => {
-                console.log('onLongPress Press')
                 this.startRecordVideo()
               }}
               onPressIn={() => {
@@ -415,9 +498,16 @@ const ArChallengeCapture = ({
               }}
               onPressOut={() => {
                 console.log('onPressOut Press')
-                this.stopRecordVideo()
               }}
-              delayLongPress={3000} onPress={() => {
+              delayLongPress={1500} onPress={() => {
+                if(this.state.recordingStart){
+                  this.stopRecordVideo();
+                  this.setState({
+                    capturedImages: null,
+                    recordingStart: false
+                  })
+                  return;
+                }
                 this._takeScreenshot();
               }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
