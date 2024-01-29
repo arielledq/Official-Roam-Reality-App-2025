@@ -22,6 +22,7 @@ import ArChallengeDetails from '../screens/archallenge/challengedetails';
 import ArChallengeCapture from '../screens/archallenge/challengecapture';
 import ARChallenge from '../screens/archallenge';
 import ArChallengeShare from '../screens/archallenge/challengeshare';
+import DrawerNavigator from './DrawerNavigator'
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 /**
@@ -62,7 +63,7 @@ const Navigation = () => {
   const renderCommonStack = () => {
     return (
       <>
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Home" component={DrawerNavigator} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />

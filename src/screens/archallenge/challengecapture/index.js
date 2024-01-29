@@ -207,6 +207,12 @@ const ArChallengeCapture = ({
             position={[0, -5, -30]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
+            resources={[
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_D.PNG'),
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_Tan.PNG'),
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_D.PNG'),
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_Tan.PNG'),
+            ]}
             materials={"pbr"}
             rotation={rotate}
             onRotate={_onRotate}
