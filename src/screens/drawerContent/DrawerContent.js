@@ -1,14 +1,15 @@
 import React from "react"
-import { View, StyleSheet, Text, Image } from "react-native"
+import { View, StyleSheet, Image } from "react-native"
 import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer"
-import { Title } from "react-native-paper"
 import theme from "../../assets/theme"
 import { useNavigation } from "@react-navigation/native"
 import Images from "../../assets/images"
 import Icon from "../../components/Icon"
+import AppText from "../../components/text"
+import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 const DrawerList = [
-  { icon: "target", label: "AR Challenges", navigateTo: "" },
+  { icon: "target", label: "AR Challenges", navigateTo: "ARChallenge" },
   { icon: "message-square", label: "Chats", navigateTo: "" },
   { icon: "users", label: "Friends", navigateTo: "" },
   { icon: "target", label: "Wallet", navigateTo: "" },
@@ -40,7 +41,7 @@ const DrawerLayout = ({ icon, label, navigateTo, isLastTwoItems, index}) => {
 
   return (
     <DrawerItem
-      icon={({ size }) => (
+      icon={() => (
         <Icon name={icon} family="feather" color={"white"} size={20} style={{ marginLeft: 10 }} />
       )}
       label={() => (
@@ -51,9 +52,9 @@ const DrawerLayout = ({ icon, label, navigateTo, isLastTwoItems, index}) => {
             justifyContent: "space-between"
           }}
         >
-          <Text style={{ color: theme.darkColors?.white, marginLeft: -20 }}>
+          <AppText style={styles.Text}>
             {label}
-          </Text>
+          </AppText>
           {!isLastTwoItems && (
             <Icon
               name="chevron-right"
@@ -66,16 +67,13 @@ const DrawerLayout = ({ icon, label, navigateTo, isLastTwoItems, index}) => {
         </View>
       )}
       labelStyle={{ color: theme.darkColors?.white, marginLeft: -20 }}
-      // onPress={() => {
-      //   navigation.navigate(navigateTo)
-      // }}
       onPress={onPressHandler}
       style={{ backgroundColor: index === 0 ? theme.lightColors.pink : "transparent" }}
     />
   )
 }
 
-const DrawerItems = props => {
+const DrawerItems = () => {
   return DrawerList.map((el, i) => {
     return (
       <DrawerLayout
@@ -112,13 +110,17 @@ const styles = StyleSheet.create({
   drawerContent: {
     flex: 1
   },
- 
   drawerSection: {
     marginTop: 15,
     borderBottomWidth: 0
   },
- 
- 
+  Text: {
+    ...fontGroup.p600,
+    marginLeft: -20,
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH21,
+    color: theme.darkColors?.white,
+  },
   checkIcon: {
     alignItems: "center",
     justifyContent: "center"

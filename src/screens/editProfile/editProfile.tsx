@@ -64,7 +64,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       console.error("Error fetching profile details: ", error)
     }
   }
-  console.log(JSON.stringify(profileDetails))
 
   useEffect(() => {
     fetchProfileDetails()
@@ -178,11 +177,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (photoDetails?.name) {
       updatedProfileData.append("image", photoDetails)
     }
-
-    console.log("Image details " + JSON.stringify(photoDetails))
     setIsLoading(true)
-    console.log("Profile Data details " + JSON.stringify(updatedProfileData))
-
     updateProfile({
       id: userProfile.user_profile.id,
       data: updatedProfileData
