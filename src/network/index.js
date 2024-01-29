@@ -124,3 +124,9 @@ export const getARSposored = () =>
     url: `modules/challenges/sponsor/`,
     method: 'GET'
 })
+
+export const getARProfile = () =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/`,
+    method: 'GET'
+  })

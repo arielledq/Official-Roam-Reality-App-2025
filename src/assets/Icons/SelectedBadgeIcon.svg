@@ -1,0 +1,16 @@
+<svg width="129" height="129" viewBox="0 0 129 129" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g filter="url(#filter0_f_0_1)">
+<rect x="40" y="40" width="49" height="49" rx="20" fill="#9003E0"/>
+<rect x="41" y="41" width="47" height="47" rx="19" stroke="#9003E0" stroke-width="2"/>
+</g>
+<path d="M55.3242 63.7749V69.9874C55.3242 72.2624 55.3242 72.2624 57.4742 73.7124L63.3868 77.1249C64.2743 77.6374 65.7243 77.6374 66.6118 77.1249L72.5243 73.7124C74.6743 72.2624 74.6743 72.2624 74.6743 69.9874V63.7749C74.6743 61.4999 74.6743 61.4999 72.5243 60.0499L66.6118 56.6374C65.7243 56.1249 64.2743 56.1249 63.3868 56.6374L57.4742 60.0499C55.3242 61.4999 55.3242 61.4999 55.3242 63.7749Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M71.875 59.5375V56.25C71.875 53.75 70.625 52.5 68.125 52.5H61.875C59.375 52.5 58.125 53.75 58.125 56.25V59.45" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M65.7877 63.7375L66.5002 64.85C66.6127 65.025 66.8627 65.2 67.0502 65.25L68.3252 65.575C69.1127 65.775 69.3252 66.45 68.8127 67.075L67.9752 68.0875C67.8502 68.25 67.7502 68.5375 67.7627 68.7375L67.8377 70.05C67.8877 70.8625 67.3127 71.275 66.5627 70.975L65.3377 70.4875C65.1502 70.4125 64.8377 70.4125 64.6502 70.4875L63.4252 70.975C62.6752 71.275 62.1002 70.85 62.1502 70.05L62.2252 68.7375C62.2377 68.5375 62.1377 68.2375 62.0127 68.0875L61.1752 67.075C60.6627 66.45 60.8752 65.775 61.6627 65.575L62.9377 65.25C63.1377 65.2 63.3877 65.0125 63.4877 64.85L64.2002 63.7375C64.6502 63.0625 65.3502 63.0625 65.7877 63.7375Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<defs>
+<filter id="filter0_f_0_1" x="0" y="0" width="129" height="129" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+<feFlood flood-opacity="0" result="BackgroundImageFix"/>
+<feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+<feGaussianBlur stdDeviation="20" result="effect1_foregroundBlur_0_1"/>
+</filter>
+</defs>
+</svg>
