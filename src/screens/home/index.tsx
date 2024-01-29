@@ -26,7 +26,10 @@ const Home = () => {
   const handleProfile = () => {
     navigation.navigate('Profile')
   }
-  
+
+  const handleARChallenge = () => {
+    navigation.navigate('ARChallenge')
+  }
   return (
     <View
       style={{
@@ -72,6 +75,15 @@ const Home = () => {
         }}
         title="Profile"
         onPress={handleProfile}
+      />
+      <AppButton
+        containerStyle={{
+          paddingHorizontal: 10,
+          paddingVertical: 5,
+          width: '70%', marginTop: 100
+        }}
+        title="AR Challenge"
+        onPress={handleARChallenge}
       />
     </View>
   )
