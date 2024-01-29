@@ -33,6 +33,7 @@ import RenderHTML from "react-native-render-html";
 const RNFS = require('react-native-fs');
 const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
+import { request, check, PERMISSIONS } from 'react-native-permissions';
 const { width } = Dimensions.get('window');
 
 ViroMaterials.createMaterials({
@@ -248,6 +249,11 @@ const ArChallengeCapture = ({
       this.stopRecordVideo = this.stopRecordVideo.bind(this);
       this.playRecordSound = this.playRecordSound.bind(this);
       this.playCameraSound = this.playCameraSound.bind(this);
+      this.checkPermission = this.checkPermission.bind(this);
+    }
+
+    componentDidMount(){
+      this.checkPermission()
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -383,7 +389,7 @@ const ArChallengeCapture = ({
       })
       this.playCameraSound()
       this._arNavigator
-        ._takeScreenshot(uuid.v4(), true)
+        ._takeScreenshot(uuid.v4(), false)
         .then((retDict) => {
           console.log("captureImage:", retDict)
           this.setState({
@@ -438,6 +444,17 @@ const ArChallengeCapture = ({
         </View>
       )
     }
+
+    checkPermission() {
+      console.log();
+      // check(PERMISSIONS.IOS.MICROPHONE).then(response => {
+      //   console.log("MICROPHONE",response);
+      // });
+
+      request(PERMISSIONS.IOS.MICROPHONE).then(response => {
+        console.log("MICROPHONE",response);
+      });
+    };
 
     render() {
       return (
@@ -500,7 +517,7 @@ const ArChallengeCapture = ({
                 console.log('onPressOut Press')
               }}
               delayLongPress={1500} onPress={() => {
-                if(this.state.recordingStart){
+                if (this.state.recordingStart) {
                   this.stopRecordVideo();
                   this.setState({
                     capturedImages: null,
