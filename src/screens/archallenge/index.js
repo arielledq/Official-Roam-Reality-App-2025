@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
 import { getARChallenges, getARProfile } from '../../network'
 import BackgroundWithImage from "../../components/background"
@@ -32,6 +32,7 @@ const ArChallenge = ({
         setSponsoredDataAll(res.data)
         setSponsoredData(res.data.filter(x => x.challenge_choice == challengeChoice))
       } else {
+        res.message.message = "Error in loading Challenges."
         handleError(res)
       }
     }).finally(() => {
@@ -42,10 +43,11 @@ const ArChallenge = ({
   const ARUserProfile = () => {
     setIsLoading(true)
     getARProfile().then((res) => {
-      console.log("getARProfile::",res)
+      console.log("getARProfile::", res)
       if (res.status == 1) {
         setARProfile(res)
       } else {
+        res.message.message = "Error in loading Challenges."
         handleError(res)
       }
     }).finally(() => {
@@ -93,13 +95,15 @@ const ArChallenge = ({
         </BackgroundWithImage>
       </View>
       <View style={_styles.rowView}>
-        <TouchableOpacity onPress={() => setDataWithChoice("SPONSORED")} activeOpacity={.5} style={ challengeChoice == "SPONSORED" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("SPONSORED")} activeOpacity={.5} style={challengeChoice == "SPONSORED" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Photo Challenges</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={ challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Dance Challenges </Text>
         </TouchableOpacity>
       </View>
+
+      {isLoading && <ActivityIndicator size="large" /> }
       <FlatList
         style={{ flex: 1, marginVertical: 15 }}
         data={sponsoredData}

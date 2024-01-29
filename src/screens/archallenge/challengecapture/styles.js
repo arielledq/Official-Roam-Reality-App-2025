@@ -13,10 +13,12 @@ const useStyles = makeStyles(theme => ({
   mainContainer: {
     height: ScreenHeight,
     width: '100%',
+    position: 'relative',
   },
   mainHeaderContainer: {
     padding: screenHorizontalPadding,
-    position: 'absolute'
+    position: 'absolute',
+    top: -20
   },
   container: {
     marginTop: "10%"
@@ -98,7 +100,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    width:'100%'
+    width: '100%'
   },
   holdText: {
     ...fontGroup.p600,
@@ -116,10 +118,32 @@ const useStyles = makeStyles(theme => ({
   },
 
   //view details styles
-  viewDetailBtn: { backgroundColor: '#fff', height: 30, width: 118, alignItems: 'center', justifyContent: 'center' },
-  viewDetailsIconContainer: { backgroundColor: "#1158F4", height: 53, borderRadius: 8, marginHorizontal: 20, marginTop: 20, justifyContent: 'center' },
-  viewDetailsIconContainerWrapper: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 },
-  viewDetailsIcon: { width: 37, height: 37, marginEnd: 10 }
+  viewDetailBtn: {
+    backgroundColor: '#fff',
+    height: 30,
+    width: 118,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  viewDetailsIconContainer: {
+    backgroundColor: "#1158F4",
+    height: 53,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginTop: 20,
+    justifyContent: 'center'
+  },
+  viewDetailsIconContainerWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20
+  },
+  viewDetailsIcon: {
+    width: 37,
+    height: 37,
+    marginEnd: 10
+  }
 
 }))
 
