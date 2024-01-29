@@ -12,9 +12,14 @@ export type RootStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   TermsAndConditions: undefined;
-  Home: undefined;
+  Home: {openBottomSheet: boolean, deleteAccount: boolean};
   FPChangePassword: {token: string, uid: string};
   PrivacyPolicy: undefined;
+  HomeScreen: undefined;
+  ARChallenge: undefined;
+  ArChallengeDetails: undefined;
+  ArChallengeCapture: undefined;
+  ArChallengeShare: undefined;
 };
 
 export type ScreenStackComponent<
