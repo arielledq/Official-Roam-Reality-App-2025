@@ -7,6 +7,9 @@ import DOBIcon from './DOBIcon.svg'
 import Calendar from './Calendar.svg'
 import Shield from './Shield.svg';
 import ProfilePicPlusIcon from './ProfilePicPlusIcon.svg';
+import NavigationPoint1 from './NavigationPoint1.svg';
+import NavigationPoint2 from './NavigationPoint2.svg';
+import NavigationPoint3 from './NavigationPoint3.svg';
 import UnselectedHomeIcon from './UnselectedHomeIcon.svg';
 import SelectedHomeIcon from './SelectedHomeIcon.svg';
 import UnselectedBadgeIcon from './UnselectedBadgeIcon.svg';
@@ -16,6 +19,7 @@ import SelectedFlagIcon from './SelectedFlagIcon.svg';
 import UnselectedProfile from './UnselectedProfile.svg';
 import SelectedProfile from './SelectedProfile.svg';
 import SelectedCamera from './SelectedCamera.svg';
+
 export const Icons = {
   password,
   UserIcon,
@@ -26,6 +30,9 @@ export const Icons = {
   Calendar,
   Shield,
   ProfilePicPlusIcon,
+  NavigationPoint1,
+  NavigationPoint2,
+  NavigationPoint3,
   UnselectedHomeIcon,
   SelectedHomeIcon,
   UnselectedBadgeIcon,
