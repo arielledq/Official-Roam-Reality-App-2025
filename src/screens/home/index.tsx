@@ -9,7 +9,7 @@ import {
 import { AppButton, AppHeader, AppText } from "../../components"
 import { resetState } from "../../redux/Login"
 import { deleteAccount, logout } from "../../network"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
 import { MenuIcon } from "../../assets/svg"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
@@ -21,8 +21,10 @@ import {
   ScreenStackComponent
 } from "../../navigation/types"
 import BottomSheet from "@gorhom/bottom-sheet"
+import ConfirmationPopUp from "../../components/confirmationPopUp"
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
+  const name = useSelector(state => state.login?.data?.user?.name)
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
 
   const bottomSheetRef = useRef<BottomSheet>(null)
@@ -34,27 +36,18 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const handleLogOut = () => {
     bottomSheetRef.current?.expand()
   }
-  const handleChangePassword = () => {
-    navigation.navigate("ChangePassword")
-  }
-
-  const handleEditProfile = () => {
-    navigation.navigate("EditProfile")
-  }
-
-  const handleProfile = () => {
-    navigation.navigate("Profile")
-  }
-
-  const handleMenu = () => {
-    navigation.navigate("Menu")
-  }
 
   if (openBottomSheet) {
     handleLogOut()
     setOpenBottomSheet(false)
   } else {
   }
+
+  useEffect(() => {
+    if (name == null) {
+      navigation.replace('EditProfile')
+    }
+  }, [])
 
   useEffect(() => {
     if (route.params?.openBottomSheet === true) {
@@ -101,63 +94,26 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
     )
   }
   return (
-
-    <>
-      <ScrollView style={styles.mainContainer}>
-        <AppHeader
-          // containerStyle={styles.headerContainer}
-          // titleStyle={styles.headerStyle}
-          title={"Home"}
-          leftComponent={handleMenuButton()}
+    <ScrollView style={styles.mainContainer}>
+      <AppHeader
+        // containerStyle={styles.headerContainer}
+        // titleStyle={styles.headerStyle}
+        title={"Home"}
+        leftComponent={handleMenuButton()}
+      />
+      <View style={styles.container}>
+        <AppButton
+          containerStyle={{
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            width: "90%",
+            marginTop: 100
+          }}
+          title="Log Out"
+          onPress={handleLogOutButton}
         />
-        <View style={styles.container}>
-          <AppButton
-            containerStyle={{
-              paddingHorizontal: 10,
-              paddingVertical: 5,
-              width: "70%",
-              marginTop: 100
-            }}
-            title="Log Out"
-            onPress={handleLogOutButton}
-          />
-        </View>
-      </ScrollView>
-
-      <AppBottomSheet bottomSheetRef={bottomSheetRef} snaps={snapPoints}>
-        {/* Header */}
-        <View style={styles.header}>
-          <AppText style={styles.headerText}>Log Out</AppText>
-          <View style={styles.horizontalLine} />
-        </View>
-
-        {/* Button Header */}
-        <View style={styles.buttonheaderContainer}>
-          <AppText style={styles.logoutText}>
-            Are you sure you want to Log Out?
-          </AppText>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          {/* Logout Button */}
-          <AppButton
-            buttonStyle={styles.buttonStyle}
-            containerStyle={styles.buttonContainerStyle}
-            titleStyle={styles.buttonTitle}
-            title={"Log out"}
-            onPress={handleLogOutButton}
-          />
-
-          {/* Cancel Button */}
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => bottomSheetRef.current?.close()}
-          >
-            <AppText style={styles.cancelButtonText}>Cancel</AppText>
-          </TouchableOpacity>
-        </View>
-      </AppBottomSheet>
-    </>
+      </View>
+    </ScrollView>
   )
 }
 
