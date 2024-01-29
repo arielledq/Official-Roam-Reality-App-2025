@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react"
 
-import { TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView } from "react-native";
+import {
+  TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView,
+  PermissionsAndroid
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
@@ -30,6 +33,7 @@ import RenderHTML from "react-native-render-html";
 const RNFS = require('react-native-fs');
 const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
+import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 const { width } = Dimensions.get('window');
 
 ViroMaterials.createMaterials({
@@ -235,7 +239,7 @@ const ArChallengeCapture = ({
     state = {
       capturedImage: null,
       capturedVideo: null,
-      detailsShow: false
+      detailsShow: false,
     }
 
     constructor() {
@@ -244,6 +248,13 @@ const ArChallengeCapture = ({
       this._takeScreenshot = this._takeScreenshot.bind(this);
       this.startRecordVideo = this.startRecordVideo.bind(this);
       this.stopRecordVideo = this.stopRecordVideo.bind(this);
+      this.playRecordSound = this.playRecordSound.bind(this);
+      this.playCameraSound = this.playCameraSound.bind(this);
+      this.checkPermission = this.checkPermission.bind(this);
+    }
+
+    componentDidMount(){
+      this.checkPermission()
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -272,26 +283,29 @@ const ArChallengeCapture = ({
       });
     };
 
+
     async startRecordVideo() {
       this.setState({
-        capturedImages: null
+        capturedImages: null,
+        recordingStart: true
+      }, () => {
+        const onError = (error) => {
+          console.log("startRecordVideo: error:", error)
+        }
+        this.playRecordSound()
+        this._arNavigator
+          ._startVideoRecording('recording', false, onError)
       })
-      this.playRecordSound()
-      this._arNavigator
-        ._startVideoRecording(uuid.v4(), false)
     }
 
     async stopRecordVideo() {
       console.log("stopRecordVideo:")
-      this._arNavigator
-        ._stopVideoRecording()
-        .then((retDict) => {
-          this.playRecordSound()
-          console.log("stopRecordVideo:", retDict)
-          this.setState({
-            capturedVideo: retDict.url
-          });
-        });
+      const retDict = await this._arNavigator._stopVideoRecording()
+      console.log("stopRecordVideo:", retDict)
+      this.setState({
+        capturedVideo: retDict.url
+      });
+      this.playRecordSound()
     }
 
     async _takeScreenshot() {
@@ -356,10 +370,34 @@ const ArChallengeCapture = ({
       )
     }
 
+    checkPermission() {
+      if(Platform.OS == 'android'){
+        requestMultiple([PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        ]).then(response => {
+          console.log("PERMISSIONS.ANDROID:: ",response);
+        });
+      }
+      if(Platform.OS =='ios'){
+        requestMultiple([PERMISSIONS.IOS.CAMERA,
+          PERMISSIONS.IOS.MICROPHONE,
+          PERMISSIONS.IOS.MEDIA_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+        ]).then(response => {
+          console.log("PERMISSIONS.OS",response);
+        });
+      }
+    };
+
     render() {
       return (
         <View style={styles.mainContainer}>
           <ViroARSceneNavigator
+            videoQuality={"High"}
             autofocus={true}
             pbrEnabled={true}
             hdrEnabled={true}
@@ -372,10 +410,9 @@ const ArChallengeCapture = ({
           >
           </ViroARSceneNavigator>
 
-          {this.state.capturedImage &&
-            <Image style={styles.f1} source={{
-              uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
-            }} />}
+          {this.state.capturedImage && <Image style={styles.f1} source={{
+            uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
+          }} />}
 
           {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
             uri: Platform.OS === 'android' ? `file://${this.state.capturedVideo}` : this.state.capturedVideo
@@ -400,7 +437,7 @@ const ArChallengeCapture = ({
             <View style={styles.holdTextContainer}>
               <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
             </View>
-            {this.state.capturedImage || this.state.capturedVideo && <TouchableOpacity activeOpacity={.6} onPress={() => {
+            {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Retake</Text>
@@ -408,7 +445,6 @@ const ArChallengeCapture = ({
             }
             <TouchableOpacity
               onLongPress={() => {
-                console.log('onLongPress Press')
                 this.startRecordVideo()
               }}
               onPressIn={() => {
@@ -416,14 +452,21 @@ const ArChallengeCapture = ({
               }}
               onPressOut={() => {
                 console.log('onPressOut Press')
-                this.stopRecordVideo()
               }}
-              delayLongPress={3000} onPress={() => {
+              delayLongPress={1500} onPress={() => {
+                if (this.state.recordingStart) {
+                  this.stopRecordVideo();
+                  this.setState({
+                    capturedImages: null,
+                    recordingStart: false
+                  })
+                  return;
+                }
                 this._takeScreenshot();
               }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
-            {this.state.capturedImage || this.state.capturedVideo && <TouchableOpacity onPress={() => {
+            {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
               navigateToShare(this.state.capturedImage)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
