@@ -24,7 +24,8 @@ import ARChallenge from '../screens/archallenge';
 import ArChallengeShare from '../screens/archallenge/challengeshare';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import DrawerContent from '../screens/drawerContent/DrawerContent';
-
+import Onboarding from '../screens/onboarding/onboarding';
+import DrawerNavigator from './DrawerNavigator'
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
@@ -35,7 +36,7 @@ const Drawer = createDrawerNavigator();
  */
 const Navigation = () => {
   const token = useSelector(state => state.login?.data?.token)
-  const newUser = useSelector(state => state.persist?.newUser)
+  const {newUser,isOnboarded} = useSelector(state => state.persist)
 
   const renderAuthStack = () => {
     return (
@@ -59,17 +60,14 @@ const Navigation = () => {
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-        <Stack.Screen name="ARChallenge" component={ARChallenge} />
-        <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
-        <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
-        <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+
       </>
     )
   }
   const renderCommonStack = () => {
     return (
       <>
-        <Stack.Screen name="Home" component={Home} />
+        <Stack.Screen name="Home" component={DrawerNavigator} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />

@@ -66,13 +66,15 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Access to the camera is required to take the picture</string>
+	<string>Access to the camera is required to take the picture or record video.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Access to the microphone is required to record a video.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Access to the photo library is required to select a photo.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Access to save videos/photos to camera roll.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
@@ -93,7 +95,6 @@
 		<string>Fontisto.ttf</string>
 		<string>sf-ui-display-black.otf</string>
 		<string>sf-ui-display-bold.otf</string>
-		<string>sf-ui-display-heavy.otf</string>
 		<string>sf-ui-display-light.otf</string>
 		<string>sf-ui-display-medium.otf</string>
 		<string>sf-ui-display-semibold.otf</string>

@@ -100,7 +100,9 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
       </TouchableOpacity>
     )
   }
-
+  const handleARChallenge = () => {
+    navigation.navigate('ARChallenge')
+  }
   return (
   
     <>
@@ -111,15 +113,6 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           title={"Home"}
           leftComponent={handleMenuButton()}
         />
-        {/* <AppButton
-        containerStyle={{
-          paddingHorizontal: 10,
-          paddingVertical: 5,
-          width: '70%', marginTop: 50
-        }}
-        title="Log Out"
-        onPress={handleLogout}
-      /> */}
         <View style={styles.container}>
           <AppButton
             containerStyle={{
