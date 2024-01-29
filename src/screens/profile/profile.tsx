@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { FlatList, Image, TouchableOpacity, View } from "react-native"
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import useStyles from "./styles"
 import {
@@ -29,7 +35,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
   const _styles = useStyles()
   const userProfile = useSelector(state => state.login?.data?.user)
   const [profileDetails, setProfileDetails] = useState(null)
-  const resData = useRef({})
 
   const fetchProfileDetails = async () => {
     try {
@@ -44,9 +49,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
     }
   }
 
-  useFocusEffect(useCallback(()=>{
-    fetchProfileDetails()
-  },[]))
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfileDetails()
+    }, [])
+  )
 
   const handleMenuButton = () => {
     return (
@@ -71,7 +78,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
   for (let i = 0; i < data.length; i += 3) {
     rows.push(data.slice(i, i + 3))
   }
-  const navigateToVerifyMail = (email) => {
+  const navigateToVerifyMail = email => {
     // navigation.navigate('EmailVerification', { email: email.toLowerCase() })
   }
   const renderHeader = () => (
@@ -79,7 +86,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
       keyboardShouldPersistTaps="always"
       nestedScrollEnabled
       style={_styles.header}
-    >
+    >      
       <AppHeader
         containerStyle={_styles.headerContainer}
         titleStyle={_styles.headerStyle}
@@ -87,21 +94,31 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
         leftComponent={handleMenuButton()}
       />
       <View style={_styles.avatarContainer}>
+        {profileDetails?.image && (
+          <Avatar
+            size={405}
+            source={{ uri: profileDetails.image }}
+            avatarStyle={_styles.profileImage}
+          />
+        )}
         <LinearGradient
-          colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.9)"]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
+          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+          start={{ x: 0.5, y: 1 }}
+          end={{ x: 0.5, y: 0.7 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1
+          }}
         />
-        {profileDetails?.image ? (
-        <Avatar
-          size={405}
-          source={{ uri: profileDetails.image }}
-        />
-      ) : (
-        <View style={{ width: 405, height: 405, backgroundColor: 'gray' }}>
-          <AppText style={{ color: 'white' }}>Image not available</AppText>
-        </View>
-      )}
+        {!profileDetails?.image && (
+          <View style={{ width: 405, height: 405, backgroundColor: "gray" }}>
+            <AppText style={{ color: "white" }}>Image not available</AppText>
+          </View>
+        )}
         {/* Edit Profile button */}
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
@@ -120,6 +137,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
+        
         <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
