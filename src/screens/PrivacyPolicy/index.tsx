@@ -1,18 +1,26 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { Dimensions, StyleSheet, Text, ScrollView } from 'react-native'
 import RenderHtml from 'react-native-render-html';
 import BackgroundWithImage from '../../components/background';
 import { AppHeader } from '../../components';
-import terms from '../../constants/terms';
+import ScreenLoader from '../../components/screenLoader';
+import { getPrivacyPolicy } from '../../network';
 
 
 const { width } = Dimensions.get('window');
 
 const PrivacyPolicy = () => {
+  const [loading, setLoading] = useState(true)
+  const [html, setHtml] = useState('')
+  useEffect(() => {
+    getPrivacyPolicy().then((res) => {
+      setHtml(res.data[0].body)
+    }).finally(() => setLoading(false))
+  }, [])
   return (
     <BackgroundWithImage>
       <AppHeader title={"Privacy Policy"} backgroundColor="transparent" />
-      <ScrollView
+      {loading ? <ScreenLoader /> : <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
         style={{ marginHorizontal: 20 }
@@ -21,11 +29,10 @@ const PrivacyPolicy = () => {
         <RenderHtml
           contentWidth={width}
           source={{
-            html: terms
-
+            html: html
           }}
         />
-      </ScrollView>
+      </ScrollView>}
     </BackgroundWithImage>
   )
 }
