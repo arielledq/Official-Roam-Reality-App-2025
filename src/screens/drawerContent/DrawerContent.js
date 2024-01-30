@@ -25,7 +25,7 @@ const DrawerList = [
     label: 'Terms and Conditions',
     navigateTo: 'TermsAndConditions'
   },
-  { icon: 'settings', label: 'Settings', navigateTo: 'Home' },
+  { icon: 'settings', label: 'Settings', navigateTo: 'Settings' },
   { icon: 'trash-2', label: 'Delete Account', navigateTo: 'delete' },
   { icon: 'log-out', label: 'Logout', navigateTo: 'logout' }
 ]

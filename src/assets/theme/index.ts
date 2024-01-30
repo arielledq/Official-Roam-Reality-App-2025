@@ -18,6 +18,7 @@ const theme = createTheme({
     lightGrey: '#FFFFFF0D',
     statBG: '#323250',
     boxStatBG: '#27273F',
+    toggleOff: '#6F6F76'
   },
   darkColors: {
     white: '#FFFFFF',
@@ -33,6 +34,7 @@ const theme = createTheme({
     lightGrey: '#FFFFFF0D',
     statBG: '#323250',
     boxStatBG: '#27273F',
+    toggleOff: '#6F6F76'
   },
   mode: 'light',
 });

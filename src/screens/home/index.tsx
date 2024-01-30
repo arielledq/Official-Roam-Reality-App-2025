@@ -102,16 +102,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
         leftComponent={handleMenuButton()}
       />
       <View style={styles.container}>
-        <AppButton
-          containerStyle={{
-            paddingHorizontal: 10,
-            paddingVertical: 5,
-            width: "90%",
-            marginTop: 100
-          }}
-          title="Log Out"
-          onPress={handleLogOutButton}
-        />
+
       </View>
     </ScrollView>
   )
