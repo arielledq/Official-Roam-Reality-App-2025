@@ -142,7 +142,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
         <View style={_styles.scoreboardContainer}>
-          <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
+          <AppText 
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
