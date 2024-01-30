@@ -21,7 +21,6 @@ import {
   ScreenStackComponent
 } from "../../navigation/types"
 import BottomSheet from "@gorhom/bottom-sheet"
-import ConfirmationPopUp from "../../components/confirmationPopUp"
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const name = useSelector(state => state.login?.data?.user?.name)
