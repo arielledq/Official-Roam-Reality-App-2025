@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react"
-import { Alert, Keyboard, Pressable, Text, View } from "react-native"
+import React, { useEffect, useRef, useState } from "react"
+import { ActivityIndicator, Alert, Keyboard, Pressable, Text, View } from "react-native"
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import theme from "../../assets/theme"
@@ -26,9 +26,11 @@ import {
   CameraOptions,
   launchImageLibrary
 } from "react-native-image-picker"
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { getProfieDetails, updateProfile } from "../../network"
 import { handleError } from "../../util/helpers"
+import { useNavigation, useRoute } from "@react-navigation/native"
+import { updateName } from "../../redux/Login"
 
 interface ImageData {
   uri: string | undefined;
@@ -36,9 +38,13 @@ interface ImageData {
   name: string;
 }
 
-const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
-  navigation
-}) => {
+const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
+
+) => {
+  const navigation = useNavigation()
+  const dispatch = useDispatch()
+  const route = useRoute()
+  const edit = route?.params?.edit
   const _styles = useStyles()
   const [profileDetails, setProfileDetails] = useState(null)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
@@ -47,10 +53,12 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isAddressInputFocused, setAddressInputFocused] = useState(false)
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false)
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false)
-  const [pImage, setPImage] = useState <string | undefined>(undefined)
-  const [photoDetails, setPhotoDetails] = useState <ImageData | null>(null)
-
+  const [pImage, setPImage] = useState<string | undefined>(undefined)
+  const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null)
+  const [pageLoading, setPageLoading] = useState(true);
+  const [imageLoading, setImageLoading] = useState(true);
   const [countryData, setCountryData] = useState([])
+  const nameRef = useRef()
   // Function to fetch 
   const fetchProfileDetails = async () => {
     try {
@@ -64,10 +72,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       console.error("Error fetching profile details: ", error)
     }
   }
-  console.log(JSON.stringify(profileDetails))
-
+  console.log(profileDetails)
   useEffect(() => {
     fetchProfileDetails()
+      .then(() => setPageLoading(false))
+      .catch(error => {
+        console.error("Error fetching profile details: ", error);
+        setPageLoading(false);
+      });
     var config = {
       method: "get",
       url: "https://api.countrystatecity.in/v1/countries",
@@ -135,9 +147,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     const options = {
       mediaType: 'photo',
       includeBase64: false,
-      //   quality: 0.5,
-      maxHeight: 300,
-      maxWidth: 300,
+      // maxHeight: 300,
+      // maxWidth: 300,
+      quality: 1,
     } as CameraOptions;
 
     await launchImageLibrary(options, (response) => {
@@ -149,6 +161,15 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       }
     });
 
+  }
+
+  const handleNavigaion = () => {
+    if (edit) {
+      navigation.goBack()
+    } else {
+      dispatch(updateName(nameRef.current))
+      navigation.replace('Home')
+    }
   }
 
   const handleEditProfile = values => {
@@ -167,30 +188,27 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     const updatedDateOfBirth = formattedDate
       ? formattedDate
       : profileDetails?.date_of_birth
-
+    console.log("dob: " + updatedDateOfBirth)
+    nameRef.current = values.name
     const updatedProfileData = new FormData()
     updatedProfileData.append("name", values.name)
     updatedProfileData.append("phone_number", values.phoneNumber)
     updatedProfileData.append("home_address", values.address)
-    updatedProfileData.append("gender", updatedGender)
+    gender.value ? updatedProfileData.append("gender", updatedGender) : {}
     updatedProfileData.append("home_country", updatedCountry)
-    updatedProfileData.append("date_of_birth", updatedDateOfBirth)
+    formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {}
     if (photoDetails?.name) {
       updatedProfileData.append("image", photoDetails)
     }
-
-    console.log("Image details " + JSON.stringify(photoDetails))
     setIsLoading(true)
-    console.log("Profile Data details " + JSON.stringify(updatedProfileData))
-
     updateProfile({
       id: userProfile.user_profile.id,
       data: updatedProfileData
     })
       .then(res => {
         if (res.status == 1) {
-          Alert.alert("Success", res.message, [
-            { text: "OK", onPress: () => navigation.goBack() }
+          Alert.alert("Success", 'Details saved successfully!', [
+            { text: "OK", onPress: handleNavigaion }
           ])
         } else {
           handleError(res)
@@ -203,294 +221,344 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
   return (
     <>
-      <BackgroundWithImage style={_styles.mainContainer}>
-        <AppHeader title={"Edit Profile"} backgroundColor="transparent" />
-        <KeyboardAwareScrollView
-          keyboardShouldPersistTaps="always"
-          nestedScrollEnabled
-        >
-          <Formik
-            initialValues={{
-              name: profileDetails?.user.name ?? "",
-              phoneNumber: profileDetails?.phone_number ?? "",
-              address: profileDetails?.home_address ?? "",
-              gender: profileDetails?.gender ?? "",
-              pImage: (pImage || profileDetails?.image) ?? undefined
-            }}
-            onSubmit={values => handleEditProfile(values)}
-            enableReinitialize
-            validationSchema={EditProfileSchema}
-          >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
-              <View style={_styles.container}>
-                <View style={_styles.chidlView}>
-                  {/* profile avatar */}
-                  <ProfileAvatar
-                    onChangeProfilePic={pickImage}
-                    avatarUrl={values.pImage}
-                  />
 
-                  {/* input fields */}
-                  <AppInput
-                    inputContainerStyle={[
-                      _styles.input,
-                      isNameInputFocused ? _styles.focusedInput : {},
-                      touched.name && errors?.name ? _styles.inputError : {}
-                    ]}
-                    selectionColor={"white"}
-                    onFocus={() => setNameInputFocused(true)}
-                    onBlur={() => setNameInputFocused(false)}
-                    placeholder="Full name"
-                    onSubmitEditing={Keyboard.dismiss}
-                    placeholderTextColor={
-                      (touched.name && errors?.name) || isNameInputFocused
-                        ? theme.darkColors?.white
-                        : theme.darkColors?.grey
-                    }
-                    value={values.name}
-                    onChangeText={handleChange("name")}
-                    errorMessage={
-                      touched.name && errors?.name ? errors.name : undefined
-                    }
-                    autoCapitalize="none"
-                    leftIcon={
-                      <Icon
-                        name={"user"}
-                        family="feather"
-                        color={
-                          (touched.name && errors?.name) || isNameInputFocused
-                            ? theme.darkColors?.white
-                            : theme.darkColors?.TandCgrey
-                        }
-                        size={24}
-                      />
-                    }
-                  />
-                  <View style={_styles.dropdownParentView}>
-                    <Dropdown
-                      style={[
-                        _styles.dropdown,
-                        isGenderDropDownFocused ? _styles.focusedInput : {}
-                        // touched.gender && errors?.gender && !gender
-                        //   ? _styles.inputError
-                        //   : {}
+      <BackgroundWithImage style={_styles.mainContainer}>
+        <AppHeader
+          hideBackButton={!edit}
+          title={edit ? "Edit Profile" : 'Setup Profile'} backgroundColor="transparent" />
+        {pageLoading ? (
+          <View style={_styles.loaderContainer}>
+            <ActivityIndicator size="large" color={theme.lightColors?.pink} />
+          </View>
+        ) : (
+          <KeyboardAwareScrollView
+            keyboardShouldPersistTaps="always"
+            nestedScrollEnabled
+          >
+            <Formik
+              initialValues={{
+                name: profileDetails?.user.name ?? "",
+                phoneNumber: profileDetails?.phone_number ?? "",
+                address: profileDetails?.home_address ?? "",
+                gender: profileDetails?.gender ?? "",
+                pImage: (pImage || profileDetails?.image) ?? undefined
+              }}
+              onSubmit={values => handleEditProfile(values)}
+              enableReinitialize
+              validationSchema={EditProfileSchema}
+            >
+              {({ handleChange, handleSubmit, values, errors, touched }) => (
+                <View style={_styles.container}>
+                  <View style={_styles.chidlView}>
+                    {/* profile avatar */}
+                    <ProfileAvatar
+                      onChangeProfilePic={pickImage}
+                      avatarUrl={values.pImage}
+                    />
+
+                    {/* input fields */}
+                    <AppInput
+                      inputContainerStyle={[
+                        _styles.input,
+                        isNameInputFocused ? _styles.focusedInput : {},
+                        touched.name && errors?.name ? _styles.inputError : {}
                       ]}
-                      placeholderStyle={{
-                        color:
-                          // (touched.gender && errors?.gender && !gender) ||
-                          isGenderDropDownFocused
-                            ? theme.darkColors?.white
-                            : theme.darkColors?.grey,
-                        marginStart: 13,
-                        fontSize: FontSizes.S14,
-                        opacity: 1
-                      }}
-                      containerStyle={{
-                        borderWidth: 0,
-                        backgroundColor: "transparent"
-                      }}
-                      onFocus={() => {
-                        setGenderDropDownFocused(true)
-                      }}
-                      onBlur={() => {
-                        setGenderDropDownFocused(false)
-                      }}
-                      activeColor={theme.darkColors?.inputBG}
-                      itemContainerStyle={_styles.itemContainerStyle}
-                      itemTextStyle={_styles.placeholderStyle}
-                      selectedTextStyle={_styles.selectedTextStyle}
-                      iconStyle={_styles.iconStyle}
-                      data={genders}
-                      maxHeight={300}
-                      labelField="label"
-                      placeholder="Select Gender"
-                      valueField="value"
-                      value={profileDetails?.gender ?? ""}
-                      // onFocus={() => setIsFocus(true)}
-                      // onBlur={() => setIsFocus(false)}
-                      onChange={value => {
-                        handleChange("gender")
-                        setGender(value)
-                        setIsFocus(false)
-                      }}
-                      renderLeftIcon={() => (
+                      selectionColor={"white"}
+                      onFocus={() => setNameInputFocused(true)}
+                      onBlur={() => setNameInputFocused(false)}
+                      placeholder="Full name"
+                      onSubmitEditing={Keyboard.dismiss}
+                      placeholderTextColor={
+                        (touched.name && errors?.name) || isNameInputFocused
+                          ? theme.darkColors?.white
+                          : theme.darkColors?.grey
+                      }
+                      value={values.name}
+                      onChangeText={handleChange("name")}
+                      errorMessage={
+                        touched.name && errors?.name ? errors.name : undefined
+                      }
+                      autoCapitalize="none"
+                      leftIcon={
                         <Icon
-                          name={"meh"}
+                          name={"user"}
                           family="feather"
                           color={
-                            // (touched.gender && errors?.gender && !gender) ||
-                            isGenderDropDownFocused
+                            (touched.name && errors?.name) || isNameInputFocused
                               ? theme.darkColors?.white
                               : theme.darkColors?.TandCgrey
                           }
                           size={24}
                         />
-                      )}
+                      }
                     />
-                    {touched.gender && errors?.gender && !gender ? (
-                      <Text style={_styles.errorText}>{errors.gender}</Text>
-                    ) : undefined}
-                  </View>
-                  <AppInput
-                    inputContainerStyle={[
-                      _styles.input,
-                      isMobileInputFocused ? _styles.focusedInput : {},
-                      touched.phoneNumber && errors?.phoneNumber
-                        ? _styles.inputError
-                        : {}
-                    ]}
-                    onFocus={() => setMobileInputFocused(true)}
-                    onBlur={() => setMobileInputFocused(false)}
-                    onSubmitEditing={Keyboard.dismiss}
-                    placeholder="Mobile Number"
-                    placeholderTextColor={
-                      (touched.phoneNumber && errors?.phoneNumber) ||
-                      isMobileInputFocused
-                        ? theme.darkColors?.white
-                        : theme.darkColors?.grey
-                    }
-                    selectionColor={"white"}
-                    value={values.phoneNumber}
-                    onChangeText={handleChange("phoneNumber")}
-                    errorMessage={
-                      touched.phoneNumber && errors?.phoneNumber
-                        ? errors.phoneNumber
-                        : undefined
-                    }
-                    autoCapitalize="none"
-                    keyboardType="phone-pad"
-                    leftIcon={
-                      <Icon
-                        name={"phone"}
-                        family="feather"
-                        color={
-                          (touched.phoneNumber && errors?.phoneNumber) ||
-                          isMobileInputFocused
-                            ? theme.darkColors?.white
-                            : theme.darkColors?.TandCgrey
-                        }
-                        size={24}
+                    <View style={_styles.dropdownParentView}>
+                      <Dropdown
+                        style={[
+                          _styles.dropdown,
+                          isGenderDropDownFocused ? _styles.focusedInput : {}
+                          // touched.gender && errors?.gender && !gender
+                          //   ? _styles.inputError
+                          //   : {}
+                        ]}
+                        placeholderStyle={{
+                          color:
+                            // (touched.gender && errors?.gender && !gender) ||
+                            isGenderDropDownFocused
+                              ? theme.darkColors?.white
+                              : theme.darkColors?.grey,
+                          marginStart: 13,
+                          fontSize: FontSizes.S14,
+                          opacity: 1
+                        }}
+                        containerStyle={{
+                          borderWidth: 0,
+                          backgroundColor: "transparent"
+                        }}
+                        onFocus={() => {
+                          setGenderDropDownFocused(true)
+                        }}
+                        onBlur={() => {
+                          setGenderDropDownFocused(false)
+                        }}
+                        activeColor={theme.darkColors?.inputBG}
+                        itemContainerStyle={_styles.itemContainerStyle}
+                        itemTextStyle={_styles.placeholderStyle}
+                        selectedTextStyle={_styles.selectedTextStyle}
+                        iconStyle={_styles.iconStyle}
+                        data={genders}
+                        maxHeight={300}
+                        labelField="label"
+                        placeholder="Select Gender"
+                        valueField="value"
+                        value={profileDetails?.gender ?? null}
+                        // onFocus={() => setIsFocus(true)}
+                        // onBlur={() => setIsFocus(false)}
+                        onChange={value => {
+                          handleChange("gender")
+                          setGender(value)
+                          setIsFocus(false)
+                        }}
+                        renderLeftIcon={() => (
+                          <Icon
+                            name={"meh"}
+                            family="feather"
+                            color={
+                              // (touched.gender && errors?.gender && !gender) ||
+                              isGenderDropDownFocused
+                                ? theme.darkColors?.white
+                                : theme.darkColors?.TandCgrey
+                            }
+                            size={24}
+                          />
+                        )}
                       />
-                    }
-                  />
-                  <AppInput
-                    inputContainerStyle={[
-                      _styles.input,
-                      isAddressInputFocused ? _styles.focusedInput : {},
-                      touched.address && errors?.address
-                        ? _styles.inputError
-                        : {}
-                    ]}
-                    onFocus={() => setAddressInputFocused(true)}
-                    onBlur={() => setAddressInputFocused(false)}
-                    onSubmitEditing={Keyboard.dismiss}
-                    placeholderTextColor={
-                      (touched.address && errors?.address) ||
-                      isAddressInputFocused
-                        ? theme.darkColors?.white
-                        : theme.darkColors?.grey
-                    }
-                    selectionColor={"white"}
-                    placeholder="Home Address"
-                    value={values.address}
-                    onChangeText={handleChange("address")}
-                    errorMessage={
-                      touched.address && errors?.address
-                        ? errors.address
-                        : undefined
-                    }
-                    autoCapitalize="none"
-                    leftIcon={
-                      <Icon
-                        name={"map-pin"}
-                        family="feather"
-                        color={
-                          (touched.address && errors?.address) ||
-                          isAddressInputFocused
-                            ? theme.darkColors?.white
-                            : theme.darkColors?.TandCgrey
-                        }
-                        size={24}
-                      />
-                    }
-                  />
-                  <View style={_styles.dropdownParentView}>
-                    <Dropdown
-                      style={[
-                        _styles.dropdown,
-                        isCountryDropDownFocused ? _styles.focusedInput : {},
-                        touched.country && errors?.country && !country
+                      {touched.gender && errors?.gender && !gender ? (
+                        <Text style={_styles.errorText}>{errors.gender}</Text>
+                      ) : undefined}
+                    </View>
+                    <AppInput
+                      inputContainerStyle={[
+                        _styles.input,
+                        isMobileInputFocused ? _styles.focusedInput : {},
+                        touched.phoneNumber && errors?.phoneNumber
                           ? _styles.inputError
                           : {}
                       ]}
-                      placeholderStyle={{
-                        color:
-                          (touched.country && errors?.country && !country) ||
-                          isCountryDropDownFocused
-                            ? theme.darkColors?.white
-                            : theme.darkColors?.grey,
-                        marginStart: 13,
-                        fontSize: FontSizes.S14,
-                        opacity: 1
-                      }}
-                      containerStyle={{
-                        borderWidth: 0,
-                        backgroundColor: "transparent"
-                      }}
-                      onFocus={() => {
-                        setCountryDropDownFocused(true)
-                      }}
-                      onBlur={() => {
-                        setCountryDropDownFocused(false)
-                      }}
-                      activeColor={theme.darkColors?.inputBG}
-                      itemContainerStyle={_styles.itemContainerStyle}
-                      itemTextStyle={_styles.placeholderStyle}
-                      selectedTextStyle={_styles.selectedTextStyle}
-                      iconStyle={_styles.iconStyle}
-                      data={countryData}
-                      maxHeight={300}
-                      labelField="label"
-                      placeholder="Home Country"
-                      valueField="value"
-                      value={profileDetails?.home_country ?? ""}
-                      onChange={item => {
-                        handleChange("country")
-                        setCountry(item)
-                        setIsFocus(false)
-                      }}
-                      renderLeftIcon={() => (
+                      onFocus={() => setMobileInputFocused(true)}
+                      onBlur={() => setMobileInputFocused(false)}
+                      onSubmitEditing={Keyboard.dismiss}
+                      placeholder="Mobile Number"
+                      placeholderTextColor={
+                        (touched.phoneNumber && errors?.phoneNumber) ||
+                          isMobileInputFocused
+                          ? theme.darkColors?.white
+                          : theme.darkColors?.grey
+                      }
+                      selectionColor={"white"}
+                      value={values.phoneNumber}
+                      onChangeText={handleChange("phoneNumber")}
+                      errorMessage={
+                        touched.phoneNumber && errors?.phoneNumber
+                          ? errors.phoneNumber
+                          : undefined
+                      }
+                      autoCapitalize="none"
+                      keyboardType="phone-pad"
+                      leftIcon={
+                        <Icon
+                          name={"phone"}
+                          family="feather"
+                          color={
+                            (touched.phoneNumber && errors?.phoneNumber) ||
+                              isMobileInputFocused
+                              ? theme.darkColors?.white
+                              : theme.darkColors?.TandCgrey
+                          }
+                          size={24}
+                        />
+                      }
+                    />
+                    <AppInput
+                      inputContainerStyle={[
+                        _styles.input,
+                        isAddressInputFocused ? _styles.focusedInput : {},
+                        touched.address && errors?.address
+                          ? _styles.inputError
+                          : {}
+                      ]}
+                      onFocus={() => setAddressInputFocused(true)}
+                      onBlur={() => setAddressInputFocused(false)}
+                      onSubmitEditing={Keyboard.dismiss}
+                      placeholderTextColor={
+                        (touched.address && errors?.address) ||
+                          isAddressInputFocused
+                          ? theme.darkColors?.white
+                          : theme.darkColors?.grey
+                      }
+                      selectionColor={"white"}
+                      placeholder="Home Address"
+                      value={values.address}
+                      onChangeText={handleChange("address")}
+                      errorMessage={
+                        touched.address && errors?.address
+                          ? errors.address
+                          : undefined
+                      }
+                      autoCapitalize="none"
+                      leftIcon={
                         <Icon
                           name={"map-pin"}
                           family="feather"
                           color={
-                            (touched.country && errors?.country && !country) ||
-                            isCountryDropDownFocused
+                            (touched.address && errors?.address) ||
+                              isAddressInputFocused
                               ? theme.darkColors?.white
                               : theme.darkColors?.TandCgrey
                           }
                           size={24}
                         />
-                      )}
+                      }
                     />
-                    {touched.country && errors?.country && !country ? (
-                      <Text style={_styles.errorText}>{errors.country}</Text>
-                    ) : undefined}
-                  </View>
-                  <View>
-                    <Pressable
-                      style={[
-                        _styles.timeInput
-                        // touched.dob && errors?.dob && !bDate
-                        //   ? _styles.inputError
-                        //   : {}
-                      ]}
-                      onPress={showDatePicker}
-                    >
-                      <View style={_styles.iconContainer}>
+                    <View style={_styles.dropdownParentView}>
+                      <Dropdown
+                        style={[
+                          _styles.dropdown,
+                          isCountryDropDownFocused ? _styles.focusedInput : {},
+                          touched.country && errors?.country && !country
+                            ? _styles.inputError
+                            : {}
+                        ]}
+                        placeholderStyle={{
+                          color:
+                            (touched.country && errors?.country && !country) ||
+                              isCountryDropDownFocused
+                              ? theme.darkColors?.white
+                              : theme.darkColors?.grey,
+                          marginStart: 13,
+                          fontSize: FontSizes.S14,
+                          opacity: 1
+                        }}
+                        containerStyle={{
+                          borderWidth: 0,
+                          backgroundColor: "transparent"
+                        }}
+                        onFocus={() => {
+                          setCountryDropDownFocused(true)
+                        }}
+                        onBlur={() => {
+                          setCountryDropDownFocused(false)
+                        }}
+                        activeColor={theme.darkColors?.inputBG}
+                        itemContainerStyle={_styles.itemContainerStyle}
+                        itemTextStyle={_styles.placeholderStyle}
+                        selectedTextStyle={_styles.selectedTextStyle}
+                        iconStyle={_styles.iconStyle}
+                        data={countryData}
+                        maxHeight={300}
+                        labelField="label"
+                        placeholder="Home Country"
+                        valueField="value"
+                        value={profileDetails?.home_country ?? ""}
+                        onChange={item => {
+                          handleChange("country")
+                          setCountry(item)
+                          setIsFocus(false)
+                        }}
+                        renderLeftIcon={() => (
+                          <Icon
+                            name={"map-pin"}
+                            family="feather"
+                            color={
+                              (touched.country && errors?.country && !country) ||
+                                isCountryDropDownFocused
+                                ? theme.darkColors?.white
+                                : theme.darkColors?.TandCgrey
+                            }
+                            size={24}
+                          />
+                        )}
+                      />
+                      {touched.country && errors?.country && !country ? (
+                        <Text style={_styles.errorText}>{errors.country}</Text>
+                      ) : undefined}
+                    </View>
+                    <View>
+                      <Pressable
+                        style={[
+                          _styles.timeInput
+                          // touched.dob && errors?.dob && !bDate
+                          //   ? _styles.inputError
+                          //   : {}
+                        ]}
+                        onPress={showDatePicker}
+                      >
+                        <View style={_styles.iconContainer}>
+                          <Icon
+                            onPress={() => { }}
+                            name={"aperture"}
+                            family="feather"
+                            color={
+                              // touched.dob && errors?.dob && !bDate
+                              //   ? theme.darkColors?.white
+                              //   :
+                              theme.darkColors?.TandCgrey
+                            }
+                            size={24}
+                          />
+                        </View>
+                        {bDate !== null ? (
+                          <View style={_styles.textContainer}>
+                            <AppText style={_styles.timeteststyle}>
+                              {formatDate(bDate, DateFormat.MMDDYY)}
+                            </AppText>
+                          </View>
+                        ) : profileDetails?.date_of_birth ? (
+                          <View style={_styles.textContainer}>
+                            <AppText style={_styles.timeteststyle}>
+                              {formatDate(
+                                profileDetails.date_of_birth,
+                                DateFormat.MMDDYY
+                              )}
+                            </AppText>
+                          </View>
+                        ) : (
+                          <View style={_styles.textContainer}>
+                            <AppText
+                              style={
+                                // touched.dob && errors?.dob && !bDate
+                                //   ? _styles.placeholderDOBStyle
+                                //   :
+                                _styles.placeholderStyle
+                              }
+                            >
+                              Date of Birth
+                            </AppText>
+                          </View>
+                        )}
                         <Icon
-                          onPress={() => {}}
-                          name={"aperture"}
+                          onPress={() => { }}
+                          name={"calendar"}
                           family="feather"
                           color={
                             // touched.dob && errors?.dob && !bDate
@@ -500,88 +568,48 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           }
                           size={24}
                         />
-                      </View>
-                      {bDate !== null ? (
-                        <View style={_styles.textContainer}>
-                          <AppText style={_styles.timeteststyle}>
-                            {formatDate(bDate, DateFormat.MMDDYY)}
-                          </AppText>
-                        </View>
-                      ) : profileDetails?.date_of_birth ? (
-                        <View style={_styles.textContainer}>
-                          <AppText style={_styles.timeteststyle}>
-                            {formatDate(
-                              profileDetails.date_of_birth,
-                              DateFormat.MMDDYY
-                            )}
-                          </AppText>
-                        </View>
-                      ) : (
-                        <View style={_styles.textContainer}>
-                          <AppText
-                            style={
-                              // touched.dob && errors?.dob && !bDate
-                              //   ? _styles.placeholderDOBStyle
-                              //   :
-                              _styles.placeholderStyle
-                            }
-                          >
-                            Date of Birth
-                          </AppText>
-                        </View>
-                      )}
-                      <Icon
-                        onPress={() => {}}
-                        name={"calendar"}
-                        family="feather"
-                        color={
-                          // touched.dob && errors?.dob && !bDate
-                          //   ? theme.darkColors?.white
-                          //   :
-                          theme.darkColors?.TandCgrey
-                        }
-                        size={24}
-                      />
-                    </Pressable>
-                    {/* {touched.dob && errors?.dob && !bDate ? (
+                      </Pressable>
+                      {/* {touched.dob && errors?.dob && !bDate ? (
                       <Text style={[_styles.errorText, { marginTop: 5 }]}>
                         Date of birth is required
                       </Text>
                     ) : undefined} */}
-                  </View>
-                  <DateTimePickerModal
-                    isVisible={isDatePickerVisible}
-                    mode="date"
-                    themeVariant="light"
-                    onConfirm={handleConfirm}
-                    onCancel={hideDatePicker}
-                    maximumDate={new Date()}
-                    date={bDate || new Date()} // Provide a default value if bDate is null
-                    // locale="en_GB"
-                  />
-                  <View style={_styles.privacyContainer}>
-                    <View style={{ marginRight: 10 }}>
-                      <Icons.Shield />
                     </View>
-                    <AppText style={_styles.privacyText}>
-                      Privacy First! Only your name and avatar will be visible
-                      on your profile. All other information is kept
-                      confidential.
-                    </AppText>
+                    <DateTimePickerModal
+                      isVisible={isDatePickerVisible}
+                      mode="date"
+                      themeVariant="light"
+                      onConfirm={handleConfirm}
+                      onCancel={hideDatePicker}
+                      maximumDate={new Date()}
+                      date={bDate || new Date()} // Provide a default value if bDate is null
+                    // locale="en_GB"
+                    />
+                    <View style={_styles.privacyContainer}>
+                      <View style={{ marginRight: 10 }}>
+                        <Icons.Shield />
+                      </View>
+                      <AppText style={_styles.privacyText}>
+                        Privacy First! Only your name and avatar will be visible
+                        on your profile. All other information is kept
+                        confidential.
+                      </AppText>
+                    </View>
+                    <AppButton
+                      buttonStyle={_styles.buttonStyle}
+                      containerStyle={_styles.buttonContainer}
+                      title={"Save & Continue"}
+                      onPress={handleSubmit}
+                      loading={isLoading}
+                    />
                   </View>
-                  <AppButton
-                    buttonStyle={_styles.buttonStyle}
-                    containerStyle={_styles.buttonContainer}
-                    title={"Save & Continue"}
-                    onPress={handleSubmit}
-                    loading={isLoading}
-                  />
                 </View>
-              </View>
-            )}
-          </Formik>
-        </KeyboardAwareScrollView>
+              )}
+            </Formik>
+          </KeyboardAwareScrollView>
+        )}
       </BackgroundWithImage>
+
     </>
   )
 }

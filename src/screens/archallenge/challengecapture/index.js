@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react"
 
-import { TouchableOpacity, View, Image, Text, Platform } from "react-native";
+import {
+  TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView,
+  PermissionsAndroid
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import {
@@ -12,20 +15,31 @@ import {
   ViroImage,
   ViroAmbientLight,
   ViroDirectionalLight,
-  ViroSpotLight
+  ViroSpotLight,
+  ViroText, ViroARCamera, ViroBox, ViroNode
 } from '@viro-community/react-viro';
+import Video from 'react-native-video';
+import uuid from 'react-native-uuid';
+import { FontSizes } from "../../../util/FontUtils"
 import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
 import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
+import RecordSound from '../../../assets/ar/record.mp3';
+import LineIcon from '../../../assets/ar/line.png';
 import { unzip } from 'react-native-zip-archive'
+import { AppButton } from "../../../components";
+import RenderHTML from "react-native-render-html";
 const RNFS = require('react-native-fs');
 const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
+import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
+const { width } = Dimensions.get('window');
 
 ViroMaterials.createMaterials({
   pbr: {
-    lightingModel: "PBR",
+    lightingModel: "Blinn",
+    chromaKeyFilteringColor: "#00FF00",
   },
 });
 
@@ -38,7 +52,6 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
-  const [loading, setLoading] = useState(false);
   console.log("ArChallengeCapture", modelFile)
   console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
@@ -48,6 +61,10 @@ const ArChallengeCapture = ({
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [scale, setScale] = useState([0.08, 0.08, 0.08]);
+    const [rotate, setRotate] = useState([0, 0, 0]);
+
 
     function onInitialized(state, reason) {
       console.log('guncelleme', state, reason);
@@ -91,10 +108,13 @@ const ArChallengeCapture = ({
                   }
                 }
               }
+              setLoading(false)
             })
         })
         .catch((error) => {
           console.error(error)
+          setLoading(true)
+          downloadModelFile(sourcePath, targetPath)
         })
     }
 
@@ -122,13 +142,36 @@ const ArChallengeCapture = ({
     }
     useEffect(() => {
       if (challengeObj.challenge_choice == "DANCE") {
+        setLoading(true)
         checkIfModelExist()
       }
     }, []);
 
+    const _onRotate = (rotateState, rotationFactor, source) => {
+      if (rotateState == 3) {
+        const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
+        setRotate(rotation)
+        return;
+      }
+      const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
+      setRotate(rotation)
+    }
+
+    const _onDrag = (draggedToPosition, source) => {
+      console.log(
+        "Dragged to: x" +
+        draggedToPosition[0] +
+        " y:" +
+        draggedToPosition[1] +
+        " z: " +
+        draggedToPosition[2]
+      );
+    }
+
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
-        <ViroAmbientLight color="#ffffff" intensity={20} />
+
+        <ViroAmbientLight color="#ffffff" intensity={200} />
         <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
         <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
 
@@ -140,25 +183,24 @@ const ArChallengeCapture = ({
           color="#ffffff"
           intensity={250} />
 
-        <ViroSpotLight
-          position={[1, 3, 1]}
-          direction={[-1, -1, -1]}
-          color="grey"
-          intensity={750}
-          attenuationStartDistance={1}
-          attenuationEndDistance={10}
-          innerAngle={45}
-          outerAngle={90}
-          castsShadow
-          shadowMapSize={2048}
-          shadowNearZ={1}
-          shadowFarZ={4}
-          shadowOpacity={1.0}
-        />
+
+        {loading &&
+          <ViroARCamera>
+            <ViroText
+              text="Loading Model"
+              color="#ff0000"
+              width={2}
+              height={2}
+              style={styles.loadingText}
+              position={[0, 0, -5]}
+            />
+          </ViroARCamera>
+        }
 
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
+          onDrag={_onDrag}
           source={{ uri: challengeObj.image }}
           position={[0, 0, -5]} />}
 
@@ -166,10 +208,20 @@ const ArChallengeCapture = ({
           challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
             key="obj_3d1"
             source={{ uri: Platform.OS === 'android' ? `file://${modelPath}` : modelPath }} /// this works
-            position={[-10, -8, -20]}
+            position={[0, -5, -30]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
+            resources={[
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_D.PNG'),
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_Tan.PNG'),
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_D.PNG'),
+              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_Tan.PNG'),
+            ]}
             materials={"pbr"}
+            rotation={rotate}
+            onRotate={_onRotate}
+            chromaKeyFilteringColor={"transparent"}
+            onDrag={_onDrag}
             animation={{
               name: 'Take 001',
               run: true,
@@ -185,13 +237,24 @@ const ArChallengeCapture = ({
   class ViroARNavigator extends React.Component {
 
     state = {
-      capturedImage: null
+      capturedImage: null,
+      capturedVideo: null,
+      detailsShow: false,
     }
 
     constructor() {
       super();
       this._setARNavigatorRef = this._setARNavigatorRef.bind(this);
       this._takeScreenshot = this._takeScreenshot.bind(this);
+      this.startRecordVideo = this.startRecordVideo.bind(this);
+      this.stopRecordVideo = this.stopRecordVideo.bind(this);
+      this.playRecordSound = this.playRecordSound.bind(this);
+      this.playCameraSound = this.playCameraSound.bind(this);
+      this.checkPermission = this.checkPermission.bind(this);
+    }
+
+    componentDidMount(){
+      this.checkPermission()
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -209,10 +272,49 @@ const ArChallengeCapture = ({
       });
     };
 
+    playRecordSound() {
+      Sound.setCategory('Playback');
+      let cameraSound = new Sound(RecordSound, error => {
+        if (error) {
+          console.log('failed to load the sound', error);
+        } else {
+          cameraSound.play(); // have to put the call to play() in the onload callback
+        }
+      });
+    };
+
+
+    async startRecordVideo() {
+      this.setState({
+        capturedImages: null,
+        recordingStart: true
+      }, () => {
+        const onError = (error) => {
+          console.log("startRecordVideo: error:", error)
+        }
+        this.playRecordSound()
+        this._arNavigator
+          ._startVideoRecording('recording', false, onError)
+      })
+    }
+
+    async stopRecordVideo() {
+      console.log("stopRecordVideo:")
+      const retDict = await this._arNavigator._stopVideoRecording()
+      console.log("stopRecordVideo:", retDict)
+      this.setState({
+        capturedVideo: retDict.url
+      });
+      this.playRecordSound()
+    }
+
     async _takeScreenshot() {
+      this.setState({
+        capturedVideo: null
+      })
       this.playCameraSound()
       this._arNavigator
-        ._takeScreenshot('screenshot', false)
+        ._takeScreenshot(uuid.v4(), false)
         .then((retDict) => {
           console.log("captureImage:", retDict)
           this.setState({
@@ -221,22 +323,81 @@ const ArChallengeCapture = ({
         });
     }
 
-    async _takeScreenshot() {
-      this.playCameraSound()
-      this._arNavigator
-        ._takeScreenshot('screenshot', false)
-        .then((retDict) => {
-          console.log("captureImage:", retDict)
-          this.setState({
-            capturedImage: retDict.url
-          });
-        });
+    InfoView = () => {
+      return (
+        <View style={styles.challengeInfoContainer}>
+          <View style={styles.challengeInfoHeaderContainer}>
+            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+            <Text style={styles.challengeInfoHeader}>Waiver details</Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1, width: '100%', padding: 24 }
+            }
+          >
+            <RenderHTML
+              contentWidth={width}
+              tagsStyles={{
+                p: {
+                  color: '#9CA3AF',
+                  fontSize: FontSizes.S14,
+                },
+                strong: {
+                  color: '#fff',
+                  fontSize: FontSizes.S18,
+                }
+              }}
+              source={{
+                html: `${challengeObj.description}`
+              }}
+            />
+          </ScrollView>
+          <View style={{ width: '100%', paddingHorizontal: 24 }}>
+            <AppButton
+              onPress={() => this.setState({ detailsShow: false })}
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
+              title={"Accept and Continue"}
+            />
+            <TouchableOpacity
+              activeOpacity={.6}
+              onPress={() => this.setState({ detailsShow: false })}>
+              <Text style={styles.bottomText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
     }
+
+    checkPermission() {
+      if(Platform.OS == 'android'){
+        requestMultiple([PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        ]).then(response => {
+          console.log("PERMISSIONS.ANDROID:: ",response);
+        });
+      }
+      if(Platform.OS =='ios'){
+        requestMultiple([PERMISSIONS.IOS.CAMERA,
+          PERMISSIONS.IOS.MICROPHONE,
+          PERMISSIONS.IOS.MEDIA_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+        ]).then(response => {
+          console.log("PERMISSIONS.OS",response);
+        });
+      }
+    };
 
     render() {
       return (
         <View style={styles.mainContainer}>
           <ViroARSceneNavigator
+            videoQuality={"High"}
             autofocus={true}
             pbrEnabled={true}
             hdrEnabled={true}
@@ -249,47 +410,70 @@ const ArChallengeCapture = ({
           >
           </ViroARSceneNavigator>
 
-          {this.state.capturedImage && <Image style={styles.f1} source={{ uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage }} />}
+          {this.state.capturedImage && <Image style={styles.f1} source={{
+            uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
+          }} />}
 
-          <View style={{ position: 'absolute' }}>
+          {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
+            uri: Platform.OS === 'android' ? `file://${this.state.capturedVideo}` : this.state.capturedVideo
+          }} />}
+
+          <View style={styles.mainHeaderContainer}>
             <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
-            <View style={{ backgroundColor: "#1158F4", height: 53, borderRadius: 8, marginHorizontal: 20, marginTop: 20, justifyContent: 'center' }}>
-              <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20 }}>
+            <View style={styles.viewDetailsIconContainer}>
+              <View style={styles.viewDetailsIconContainerWrapper}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                  <Image style={{ width: 37, height: 37, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
+                  <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
-                <TouchableOpacity style={{ backgroundColor: '#fff', height: 30, width: 118, alignItems: 'center', justifyContent: 'center' }}>
+                <TouchableOpacity onPress={() => this.setState({ detailsShow: true })}
+                  style={styles.viewDetailBtn}>
                   <Text style={styles.btnText}>View Details</Text>
                 </TouchableOpacity>
               </View>
             </View>
           </View>
-          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage ? 'space-between' : 'center' }]}>
-            {this.state.capturedImage && <TouchableOpacity activeOpacity={.6} onPress={() => {
-              this.setState({ capturedImage: null })
+          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
+            <View style={styles.holdTextContainer}>
+              <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
+            </View>
+            {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
+              this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Retake</Text>
             </TouchableOpacity>
             }
-            <TouchableOpacity onPress={() => {
-              this._takeScreenshot();
-            }} activeOpacity={.6}>
+            <TouchableOpacity
+              onLongPress={() => {
+                this.startRecordVideo()
+              }}
+              onPressIn={() => {
+                console.log('onPressIn Press')
+              }}
+              onPressOut={() => {
+                console.log('onPressOut Press')
+              }}
+              delayLongPress={1500} onPress={() => {
+                if (this.state.recordingStart) {
+                  this.stopRecordVideo();
+                  this.setState({
+                    capturedImages: null,
+                    recordingStart: false
+                  })
+                  return;
+                }
+                this._takeScreenshot();
+              }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
-            {this.state.capturedImage && <TouchableOpacity onPress={() => {
+            {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
               navigateToShare(this.state.capturedImage)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
             </TouchableOpacity>
             }
           </View>
-          {loading &&
-            <View pointerEvents="none" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, alignItems: 'center', justifyContent: 'center' }}>
-              <View style={{ padding: 8, backgroundColor: "#ffffff40", alignItems: 'center', justifyContent: 'center', borderRadius: 10 }}>
-                <Text style={styles.loadingText}>LOADING CHALLENGE</Text>
-              </View>
-            </View>}
+          {this.state.detailsShow && this.InfoView()}
         </View >
       )
     }

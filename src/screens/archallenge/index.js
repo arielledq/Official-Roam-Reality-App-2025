@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react"
 
-import { FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
-import { getARChallenges, getARSposored } from '../../network'
+import { getARChallenges, getARProfile } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import AppText from "../../components/text"
@@ -22,6 +22,7 @@ const ArChallenge = ({
   const [challengeChoice, setChallengeChoice] = useState("SPONSORED")
   const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
+  const [arProfile, setARProfile] = useState({})
   const navigation = useNavigation()
 
   const ARSposored = () => {
@@ -31,12 +32,29 @@ const ArChallenge = ({
         setSponsoredDataAll(res.data)
         setSponsoredData(res.data.filter(x => x.challenge_choice == challengeChoice))
       } else {
+        res.message.message = "Error in loading Challenges."
         handleError(res)
       }
     }).finally(() => {
       setIsLoading(false)
     })
   }
+
+  const ARUserProfile = () => {
+    setIsLoading(true)
+    getARProfile().then((res) => {
+      console.log("getARProfile::", res)
+      if (res.status == 1) {
+        setARProfile(res)
+      } else {
+        res.message.message = "Error in loading Challenges."
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
 
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
@@ -46,6 +64,7 @@ const ArChallenge = ({
 
   useEffect(() => {
     ARSposored()
+    ARUserProfile()
   }, []);
 
   const navigateToChallengeDetails = (obj) => {
@@ -71,18 +90,20 @@ const ArChallenge = ({
         <BackgroundWithImage
           style={{ backgroundColor: "transparent", flex: .5, height: 94, justifyContent: "center", alignItems: 'center' }}
           imageSource={PointBoardBG}>
-          <AppText style={[_styles.headerText]}>0</AppText>
+          <AppText style={[_styles.headerText]}>{arProfile?.points}</AppText>
           <AppText style={[_styles.subHeaderText]}>Your Total Points</AppText>
         </BackgroundWithImage>
       </View>
       <View style={_styles.rowView}>
-        <TouchableOpacity onPress={() => setDataWithChoice("SPONSORED")} activeOpacity={.5} style={ challengeChoice == "SPONSORED" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("SPONSORED")} activeOpacity={.5} style={challengeChoice == "SPONSORED" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Photo Challenges</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={ challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Dance Challenges </Text>
         </TouchableOpacity>
       </View>
+
+      {isLoading && <ActivityIndicator size="large" /> }
       <FlatList
         style={{ flex: 1, marginVertical: 15 }}
         data={sponsoredData}
