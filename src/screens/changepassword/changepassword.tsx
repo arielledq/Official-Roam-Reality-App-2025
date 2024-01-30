@@ -116,7 +116,7 @@ const ChangePassword: ScreenStackComponent<
                         name={"lock"}
                         family="feather"
                         color={"grey"}
-                        size={20}
+                        size={24}
                       />
                     }
                   />
@@ -152,7 +152,7 @@ const ChangePassword: ScreenStackComponent<
                         name={"lock"}
                         family="feather"
                         color={"grey"}
-                        size={20}
+                        size={24}
                       />
                     }
                   />
@@ -187,7 +187,7 @@ const ChangePassword: ScreenStackComponent<
                         name={"lock"}
                         family="feather"
                         color={"grey"}
-                        size={20}
+                        size={24}
                       />
                     }
                   />
