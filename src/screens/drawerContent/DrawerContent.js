@@ -106,13 +106,13 @@ function DrawerContent(props) {
         title: 'Delete Account',
         description: 'Are you sure you want to delete your account?'
       })
-      bottomSheetRef.current?.expand()
+      bottomSheetRef.current?.show()
     } else if (navigateTo === 'logout') {
       setPopupDetails({
         title: 'Log Out',
         description: 'Are you sure you want to logout?'
       })
-      bottomSheetRef.current?.expand()
+      bottomSheetRef.current?.show()
     } else {
       navigation.navigate(navigateTo)
     }
@@ -157,6 +157,7 @@ function DrawerContent(props) {
             ? handleLogOutButton
             : handleDeleteAccount
         }
+        isVisible={!!popupDetails?.title}        
         cancelText={'Cancel'}
       />
     </>

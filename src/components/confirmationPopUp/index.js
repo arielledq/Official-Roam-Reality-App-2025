@@ -1,11 +1,10 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native'
-import React, { useMemo } from 'react'
-import AppBottomSheet from '../bottomSheet'
-import AppText from '../text'
-import AppButton from '../button'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import theme from '../../assets/theme'
-import { screenHorizontalPadding } from '../../util/AppDimensions'
+import { StyleSheet, TouchableOpacity, View, Modal } from "react-native"
+import React, { useState } from "react"
+import AppText from "../text"
+import AppButton from "../button"
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import theme from "../../assets/theme"
+import { screenHorizontalPadding } from "../../util/AppDimensions"
 
 const ConfirmationPopUp = React.forwardRef(
   (
@@ -15,47 +14,65 @@ const ConfirmationPopUp = React.forwardRef(
       confirmText,
       cancelText,
       confirmHandler = () => {},
-      cancelHandler
+      cancelHandler,
+      isVisible
     },
     ref
   ) => {
-    const snapPoints = useMemo(() => ['33%'], [])
+    const [modalVisible, setModalVisible] = useState(isVisible)
+    const show = () => setModalVisible(true)
+    const hide = () => setModalVisible(false)
+    
+    React.useImperativeHandle(ref, () => ({
+      show,
+      hide
+    }))
+    const closeModal = () => {
+      setModalVisible(false)
+      cancelHandler && cancelHandler()
+    }
+
+    const handleConfirm = () => {
+      setModalVisible(false)
+      confirmHandler()
+    }
 
     return (
-      <AppBottomSheet bottomSheetRef={ref} snaps={snapPoints}>
-        {/* Header */}
-        <View style={styles.header}>
-          <AppText style={styles.headerText}>{title}</AppText>
-          <View style={styles.horizontalLine} />
-        </View>
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          {/* Header */}
+          <View style={styles.header}>
+            <AppText style={styles.headerText}>{title}</AppText>
+            <View style={styles.horizontalLine} />
+          </View>
 
-        {/* Button Header */}
-        <View style={styles.buttonheaderContainer}>
-          <AppText style={styles.logoutText}>{description}</AppText>
-        </View>
+          {/* Button Header */}
+          <View style={styles.buttonheaderContainer}>
+            <AppText style={styles.logoutText}>{description}</AppText>
+          </View>
 
-        <View style={styles.buttonContainer}>
-          {/* Logout Button */}
-          <AppButton
-            buttonStyle={styles.buttonStyle}
-            containerStyle={styles.buttonContainerStyle}
-            titleStyle={styles.buttonTitle}
-            title={confirmText}
-            onPress={confirmHandler}
-          />
+          <View style={styles.buttonContainer}>
+            {/* Confirm Button */}
+            <AppButton
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
+              titleStyle={styles.buttonTitle}
+              title={confirmText}
+              onPress={handleConfirm}
+            />
 
-          {/* Cancel Button */}
-          <TouchableOpacity
-            style={styles.cancelButton}
-            onPress={() => {
-              ref.current?.close()
-              cancelHandler && cancelHandler()
-            }}
-          >
-            <AppText style={styles.cancelButtonText}>{cancelText}</AppText>
-          </TouchableOpacity>
+            {/* Cancel Button */}
+            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
+              <AppText style={styles.cancelButtonText}>{cancelText}</AppText>
+            </TouchableOpacity>
+          </View>
         </View>
-      </AppBottomSheet>
+      </Modal>
     )
   }
 )
@@ -63,15 +80,25 @@ const ConfirmationPopUp = React.forwardRef(
 export default ConfirmationPopUp
 
 const styles = StyleSheet.create({
+  modalContainer: { 
+    backgroundColor: theme.lightColors.inputBG, 
+    justifyContent: "flex-end",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
+    // height: "32.7%",
+  },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 12
   },
   headerText: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
-    marginVertical: 8
+    marginBottom: 8,
+    marginTop: 13
   },
   logoutText: {
     ...fontGroup.ns400,
@@ -80,15 +107,15 @@ const styles = StyleSheet.create({
   },
   horizontalLine: {
     height: 1,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     backgroundColor: theme.darkColors?.dividerGrey,
     opacity: 0.4,
     marginVertical: 8
   },
   cancelButton: {
     marginTop: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 50
   },
   cancelButtonText: {
@@ -99,7 +126,7 @@ const styles = StyleSheet.create({
   },
   buttonheaderContainer: {
     paddingHorizontal: screenHorizontalPadding + 5,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 15,
     marginTop: 7
   },
@@ -108,8 +135,8 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: "center",
+    justifyContent: "center"
   },
   buttonContainerStyle: {
     marginTop: 10
