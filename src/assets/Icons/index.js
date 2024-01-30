@@ -1,5 +1,13 @@
 import password from './password.svg'
 import lock from './lock.svg'
+import privacy from './privacy.svg'
+import mic from './mic.svg'
+import camera from './camera.svg'
+import file from './file.svg'
+import star from './star.svg'
+import user from './user.svg'
+import flag from './flag.svg'
+import scores from './scores.svg'
 import UserIcon from './UserIcon.svg'
 import Phone from './Phone.svg'
 import LocationIcon from './LocationIcon.svg'
@@ -24,6 +32,14 @@ import SelectedCamera from './SelectedCamera.svg'
 export const Icons = {
   password,
   lock,
+  privacy,
+  mic,
+  camera,
+  file,
+  star,
+  user,
+  flag,
+  scores,
   UserIcon,
   Phone,
   LocationIcon,

@@ -27,6 +27,8 @@ import DrawerContent from '../screens/drawerContent/DrawerContent';
 import Onboarding from '../screens/onboarding/onboarding';
 import DrawerNavigator from './DrawerNavigator'
 import BottomTabNavigator from './BottomTabNavigator';
+import Settings from '../screens/settings';
+import Privacy from '../screens/privacy';
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
@@ -78,6 +80,8 @@ const Navigation = () => {
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+        <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Privacy" component={Privacy} />
       </>
     )
   }
