@@ -14,5 +14,6 @@ declare module '@rneui/themed' {
     lightGrey: string;
     statBG: string;
     boxStatBG: string;
+    toggleOff:  string;
   }
 }

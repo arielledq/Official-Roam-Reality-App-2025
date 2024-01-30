@@ -1,1 +1,1 @@
-export { resetState, updateUserData } from './reducer'
+export { resetState, updateUserData, updateName } from './reducer'
