@@ -99,20 +99,22 @@ function DrawerContent(props) {
   const navigation = useNavigation()
   const dispatch = useDispatch()
   const [popupDetails, setPopupDetails] = useState({})
-  const bottomSheetRef = React.useRef()
+  const [isConfirmationVisible, setConfirmationVisible] = useState(false);
   const onPressHandler = navigateTo => {
     if (navigateTo === 'delete') {
       setPopupDetails({
         title: 'Delete Account',
-        description: 'Are you sure you want to delete your account?'
+        description: 'Are you sure you want to delete your account?',
+        cancelText: 'Cancel'
       })
-      bottomSheetRef.current?.show()
+      setConfirmationVisible(true);
     } else if (navigateTo === 'logout') {
       setPopupDetails({
         title: 'Log Out',
-        description: 'Are you sure you want to logout?'
+        description: 'Are you sure you want to logout?',
+        cancelText: 'Cancel'
       })
-      bottomSheetRef.current?.show()
+      setConfirmationVisible(true);
     } else {
       navigation.navigate(navigateTo)
     }
@@ -121,7 +123,9 @@ function DrawerContent(props) {
     logout()
     dispatch(resetState())
   }
-
+  const closeModalHandler = () => {
+    setConfirmationVisible(false);
+  };
   const handleDeleteAccount = () => {
     deleteAccount().then(res => {
       console.log({ res })
@@ -148,7 +152,6 @@ function DrawerContent(props) {
         </DrawerContentScrollView>
       </View>
       <ConfirmationPopUp
-        ref={bottomSheetRef}
         title={popupDetails?.title}
         description={popupDetails?.description}
         confirmText={popupDetails?.title}
@@ -157,8 +160,9 @@ function DrawerContent(props) {
             ? handleLogOutButton
             : handleDeleteAccount
         }
-        isVisible={!!popupDetails?.title}        
+        isVisible={isConfirmationVisible}        
         cancelText={'Cancel'}
+        cancelHandler={closeModalHandler}
       />
     </>
   )
