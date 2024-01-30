@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
   FlatList,
   Image,
@@ -65,6 +65,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     }, [])
   )
 
+  // useEffect(() => { 
+  //     fetchProfileDetails();
+  // }, [navigation]);
+
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
@@ -96,17 +100,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const renderHeader = () => (
     <KeyboardAwareScrollView
       style={_styles.header}
-    >
-      <AppHeader
-        containerStyle={_styles.headerContainer}
-        title={"Profile"}
-        leftComponent={handleMenuButton()}
-      />
+    >  
       <View style={_styles.avatarContainer}>
         <FastImage
           style={{
             width: '100%',
-            height: height * 0.4,
+            height: height * 0.5,
           }}
           source={{ uri: profileDetails?.image || `https://picsum.photos/500` }}
           resizeMode={FastImage.resizeMode.cover}
@@ -190,6 +189,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
+       <AppHeader
+        containerStyle={_styles.headerContainer}
+        title={"Profile"}
+        leftComponent={handleMenuButton()}
+      />
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
         // contentContainerStyle={_styles.scroll}
