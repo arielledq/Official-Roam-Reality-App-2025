@@ -100,9 +100,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const renderHeader = () => (
     <KeyboardAwareScrollView
       style={_styles.header}
-    >  
-      <View style={_styles.avatarContainer}>
-        {!profileDetails?.image && <>
+    >
+      {profileDetails?.image ?
+        <View style={_styles.avatarContainer}>
           <FastImage
             style={{
               width: '100%',
@@ -124,8 +124,17 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
               zIndex: 1
             }}
           />
-        </>}
-        {/* Edit Profile button */}
+          <AppButton
+            customColors={["#7B16FF", "#1158F4"]}
+            buttonStyle={_styles.editButton}
+            containerStyle={_styles.editButtonContainer}
+            onPress={() => navigation.navigate("EditProfile", { edit: true })}
+          >
+            <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+            <AppText style={_styles.buttonText}>Edit Profile</AppText>
+          </AppButton>
+        </View>
+        :
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
@@ -135,7 +144,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
         </AppButton>
-      </View>
+      }
       <View style={_styles.scroll}>
         <UserInfoCard
           name={profileDetails?.user.name}
@@ -144,10 +153,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
         <View style={_styles.scoreboardContainer}>
-          <AppText 
-          adjustsFontSizeToFit={true}
-          numberOfLines={1}
-          style={_styles.scoreboard}>SCOREBOARD</AppText>
+          <AppText
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
@@ -195,7 +204,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-       <AppHeader
+      <AppHeader
         containerStyle={_styles.headerContainer}
         title={"Profile"}
         leftComponent={handleMenuButton()}

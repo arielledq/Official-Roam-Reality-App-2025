@@ -95,14 +95,12 @@ const useStyles = makeStyles(theme => ({
     position: "absolute",
     top: 10,
     right: 20,
-    zIndex: 1
+    zIndex: 10
   },
   editButton: {
-    borderRadius: 20,
-    height: 47,
-    width: 120,
-    flexDirection: "row",
-    alignItems: "center"
+    marginVertical:5,
+    // flexDirection: "row",
+    // alignItems: "center"
   },
 }))
 
