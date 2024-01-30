@@ -12,7 +12,7 @@ import AppText from "../../components/text"
 import Images from "../../assets/images"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { useDispatch } from "react-redux"
-import { updateUserData } from "../../redux/Login"
+import { updateUserData, updateVerified } from "../../redux/Login"
 
 const VerificationSuccess: ScreenStackComponent<
   RootStackParamList,
@@ -23,13 +23,22 @@ const VerificationSuccess: ScreenStackComponent<
   const dispatch = useDispatch()
   const route = useRoute()
   const data = route?.params?.data
+  const profile = route?.params?.profile
   const ChangePassword = route?.params?.ChangePassword
   const successText = ChangePassword ? "password has been successfully changed" : "email address has been successfully verified"
-  const buttonText = ChangePassword? "Continue to Login" : "Continue"
+  const buttonText = ChangePassword ? "Continue to Login" : "Continue"
+  console.log({ data })
+  console.log({ ChangePassword })
+
   const handleContinue = () => {
     if (ChangePassword) {
       navigation.navigate('Login')
-    } else {
+    }
+    else if (profile) {
+      navigation.goBack()
+      dispatch(updateVerified(true))
+    }
+    else {
       data.user.user_profile.is_verified = true
       dispatch(updateUserData(data))
     }
@@ -40,10 +49,10 @@ const VerificationSuccess: ScreenStackComponent<
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
       <View style={_styles.container}>
         <Image style={_styles.checkIcon} source={Images.CircleCheck} />
-        <AppText 
-        adjustsFontSizeToFit={true}
-        numberOfLines={1}
-        style={_styles.headerText}>Congratulations!</AppText>
+        <AppText
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          style={_styles.headerText}>Congratulations!</AppText>
         <AppText style={_styles.subHeaderText}>
           🎉 Hooray! Your {successText}.
         </AppText>
