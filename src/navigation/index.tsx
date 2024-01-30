@@ -95,6 +95,7 @@ const Navigation = () => {
         drawerContent={props => <DrawerContent {...props} />}
         screenOptions={{
           headerShown: false,
+          drawerType: "slide"
         }}>
         <Drawer.Screen name="Tab" component={BottomTabNavigator} />
       </Drawer.Navigator>
