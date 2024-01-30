@@ -33,11 +33,16 @@ const EmailVerification: ScreenStackComponent<
   const route = useRoute()
   const email = route?.params?.email
   const data = route?.params?.data
+  const profile = route?.params?.profile
   const [isLoading, setIsLoading] = useState(false)
   const [timerVisible, setTimerVisible] = useState(false)
 
   const navigatetoSuccess = () => {
-    navigation.replace('VerificationSuccess', { ChangePassword: false, data })
+    if (profile) {
+      navigation.replace('VerificationSuccessC', { ChangePassword: false, data, profile })
+    } else {
+      navigation.replace('VerificationSuccess', { ChangePassword: false, data, profile })
+    }
   }
 
   const handleResend = () => {
@@ -68,7 +73,12 @@ const EmailVerification: ScreenStackComponent<
 
   const handleSkip = () => {
     // login user
-    dispatch(updateUserData(data))
+    if (profile) {
+      navigation.goBack()
+    }
+    else {
+      dispatch(updateUserData(data))
+    }
   }
 
   return (

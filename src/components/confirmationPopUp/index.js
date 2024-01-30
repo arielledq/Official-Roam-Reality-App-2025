@@ -1,10 +1,10 @@
-import { StyleSheet, TouchableOpacity, View, Modal } from "react-native"
-import React, { useState } from "react"
-import AppText from "../text"
-import AppButton from "../button"
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
-import theme from "../../assets/theme"
-import { screenHorizontalPadding } from "../../util/AppDimensions"
+import { StyleSheet, TouchableOpacity, View, Modal } from 'react-native'
+import React, { useState } from 'react'
+import AppText from '../text'
+import AppButton from '../button'
+import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
+import theme from '../../assets/theme'
+import { screenHorizontalPadding } from '../../util/AppDimensions'
 
 const ConfirmationPopUp = ({
   title,
@@ -59,14 +59,14 @@ export default ConfirmationPopUp
 const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: theme.lightColors.inputBG,
-    justifyContent: "flex-end",
-    position: "absolute",
+    justifyContent: 'flex-end',
+    position: 'absolute',
     bottom: 0,
     left: 0,
     right: 0
   },
   header: {
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 12
   },
   headerText: {
@@ -79,19 +79,20 @@ const styles = StyleSheet.create({
   logoutText: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S18,
-    lineHeight: FontLineHeights.LH20
+    lineHeight: FontLineHeights.LH25,
+    textAlign: 'center'
   },
   horizontalLine: {
     height: 1,
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
     backgroundColor: theme.darkColors?.dividerGrey,
     opacity: 0.4,
     marginVertical: 8
   },
   cancelButton: {
     marginTop: 8,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     height: 50
   },
   cancelButtonText: {
@@ -102,7 +103,7 @@ const styles = StyleSheet.create({
   },
   buttonheaderContainer: {
     paddingHorizontal: screenHorizontalPadding + 5,
-    alignItems: "center",
+    alignItems: 'center',
     marginBottom: 15,
     marginTop: 7
   },
@@ -111,8 +112,8 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     height: 50,
-    alignItems: "center",
-    justifyContent: "center"
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   buttonContainerStyle: {
     marginTop: 10
