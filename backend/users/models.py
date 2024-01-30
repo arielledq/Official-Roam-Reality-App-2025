@@ -50,6 +50,7 @@ class UserProfile(CommonModel):
     date_of_birth = models.DateField(blank=True, null=True)
     country_code = models.CharField(max_length=5, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
+    account_setup = models.BooleanField(default=False)
 
     def __str__(self):
         return self.user.email
