@@ -40,7 +40,10 @@ const VerificationSuccess: ScreenStackComponent<
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
       <View style={_styles.container}>
         <Image style={_styles.checkIcon} source={Images.CircleCheck} />
-        <AppText style={_styles.headerText}>Congratulations!</AppText>
+        <AppText 
+        adjustsFontSizeToFit={true}
+        numberOfLines={1}
+        style={_styles.headerText}>Congratulations!</AppText>
         <AppText style={_styles.subHeaderText}>
           🎉 Hooray! Your {successText}.
         </AppText>

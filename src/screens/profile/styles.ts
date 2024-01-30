@@ -56,7 +56,6 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S48,
     lineHeight: FontLineHeights.LH66,
     marginTop: "10%",
-    marginHorizontal: -6,
   },
   statContainerStyle: {
     flexDirection: "row",
