@@ -102,27 +102,29 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       style={_styles.header}
     >  
       <View style={_styles.avatarContainer}>
-        <FastImage
-          style={{
-            width: '100%',
-            height: height * 0.5,
-          }}
-          source={{ uri: profileDetails?.image || `https://picsum.photos/500` }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <LinearGradient
-          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-          start={{ x: 0.5, y: 1 }}
-          end={{ x: 0.5, y: 0.7 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1
-          }}
-        />
+        {!profileDetails?.image && <>
+          <FastImage
+            style={{
+              width: '100%',
+              height: height * 0.4,
+            }}
+            source={{ uri: profileDetails?.image }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+          <LinearGradient
+            colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+            start={{ x: 0.5, y: 1 }}
+            end={{ x: 0.5, y: 0.7 }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1
+            }}
+          />
+        </>}
         {/* Edit Profile button */}
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}

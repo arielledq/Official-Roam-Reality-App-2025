@@ -29,6 +29,7 @@ const SocialSignin = ({ setLoading }) => {
   const newUser = useSelector(state => state.persist.newUser)
 
   const handleGoogleLogin = async () => {
+    console.log('login called')
     setLoading(true)
     try {
       await GoogleSignin.hasPlayServices()
@@ -71,6 +72,7 @@ const SocialSignin = ({ setLoading }) => {
         // some other error happened
         console.log({ errorHere: error })
       }
+      setLoading(false)
     }
   }
 
