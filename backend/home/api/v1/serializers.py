@@ -74,7 +74,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserProfile
-        fields = ('id', 'is_verified', 'image')
+        fields = ('id', 'is_verified', 'image', 'account_setup')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -133,6 +133,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
         instance.country_code = validated_data.get('country_code', instance.country_code)
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.account_setup = validated_data.get('account_setup', instance.account_setup)
         instance.image = validated_data.get('image', instance.image)
         instance.user.name = validated_data.get('name', instance.user.name)
         instance.user.save()
