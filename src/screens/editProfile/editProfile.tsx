@@ -30,7 +30,7 @@ import { useDispatch, useSelector } from "react-redux"
 import { getProfieDetails, updateProfile } from "../../network"
 import { handleError } from "../../util/helpers"
 import { useNavigation, useRoute } from "@react-navigation/native"
-import { updateName } from "../../redux/Login"
+import { updateAccountFlag, updateName } from "../../redux/Login"
 
 interface ImageData {
   uri: string | undefined;
@@ -168,6 +168,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
       navigation.goBack()
     } else {
       dispatch(updateName(nameRef.current))
+      dispatch(updateAccountFlag(true))
       navigation.replace('Home')
     }
   }
@@ -194,6 +195,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
     updatedProfileData.append("name", values.name)
     updatedProfileData.append("phone_number", values.phoneNumber)
     updatedProfileData.append("home_address", values.address)
+    updatedProfileData.append("account_setup", true)
     gender.value ? updatedProfileData.append("gender", updatedGender) : {}
     updatedProfileData.append("home_country", updatedCountry)
     formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {}

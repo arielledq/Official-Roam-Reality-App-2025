@@ -23,7 +23,7 @@ import {
 import BottomSheet from "@gorhom/bottom-sheet"
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
-  const name = useSelector(state => state.login?.data?.user?.name)
+  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
 
   const bottomSheetRef = useRef<BottomSheet>(null)
@@ -43,7 +43,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   }
 
   useEffect(() => {
-    if (name == null) {
+    if (!account_setup) {
       navigation.replace('EditProfile')
     }
   }, [])
