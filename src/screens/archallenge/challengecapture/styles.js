@@ -13,8 +13,16 @@ const useStyles = makeStyles(theme => ({
   mainContainer: {
     height: ScreenHeight,
     width: '100%',
+    position: 'relative',
   },
-  container: { marginTop: "10%" },
+  mainHeaderContainer: {
+    padding: screenHorizontalPadding,
+    position: 'absolute',
+    top: -20
+  },
+  container: {
+    marginTop: "10%"
+  },
   f1: {
     height: ScreenHeight,
     width: '100%'
@@ -29,7 +37,7 @@ const useStyles = makeStyles(theme => ({
     position: 'absolute',
     bottom: 0,
     flexDirection: 'row',
-    paddingHorizontal: 10
+    paddingHorizontal: 10,
   },
   bottomButtonContainer:
   {
@@ -57,11 +65,86 @@ const useStyles = makeStyles(theme => ({
     color: "#2B0143",
   },
   loadingText: {
-    ...fontGroup.ns900,
     fontSize: FontSizes.S24,
     color: theme.colors.black,
     marginTop: 10,
   },
+  //information view
+  challengeInfoContainer: { width: '100%', backgroundColor: "#131422", height: 420, borderRadius: 30, position: 'absolute', bottom: 0, alignItems: 'center' },
+  challengeInfoHeaderContainer: { paddingVertical: 20, alignItems: 'center', borderBottomColor: "#2C2D41", borderBottomWidth: 1, width: '100%' },
+  challengeInfoHeader: {
+    ...fontGroup.ns700,
+    fontSize: FontSizes.S18,
+    color: theme.colors.white,
+    marginTop: 10,
+  },
+  buttonStyle: {
+    height: 50
+  },
+  buttonContainerStyle: {
+    marginTop: 20
+  },
+  bottomText: {
+    ...fontGroup.p700,
+    fontSize: FontSizes.S19,
+    textAlign: 'center',
+    color: "#1158F4",
+    marginVertical: 15,
+    fontWeight: "700"
+  },
+  holdTextContainer: {
+    top: -50,
+    position: 'absolute',
+    padding: 5,
+    backgroundColor: "#090A1620",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    width: '100%'
+  },
+  holdText: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S10,
+    textAlign: 'center',
+    color: theme.colors.white,
+  },
+  descriptionText: {
+    ...fontGroup.p400,
+    fontSize: FontSizes.S14,
+    textAlign: 'center',
+    color: "#9CA3AF",
+    marginVertical: 15,
+    fontWeight: "700"
+  },
+
+  //view details styles
+  viewDetailBtn: {
+    backgroundColor: '#fff',
+    height: 30,
+    width: 118,
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  viewDetailsIconContainer: {
+    backgroundColor: "#1158F4",
+    height: 53,
+    borderRadius: 8,
+    marginHorizontal: 20,
+    marginTop: 20,
+    justifyContent: 'center'
+  },
+  viewDetailsIconContainerWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20
+  },
+  viewDetailsIcon: {
+    width: 37,
+    height: 37,
+    marginEnd: 10
+  }
+
 }))
 
 export default useStyles

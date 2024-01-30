@@ -12,23 +12,24 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     backgroundColor: theme?.colors?.inputBG
   },
-  headerStyle: {
-    ...fontGroup.ns700,
-    fontSize: FontSizes.S24,
-    lineHeight: FontLineHeights.LH33,
-    marginTop: 0
-  },
+
   headerContainer: {
     paddingVertical: 15,
     borderBottomWidth: 0,
+    // backgroundColor: "transparent",
     backgroundColor: 'rgba(0, 0, 0, 0.5)'
+    // position: "absolute",
+    // top: 0,
+    // left: 0,
+    // right: 0,
+    // zIndex: 2
   },
   header: {
     marginBottom: "12%"
   },
   headingView: {
     flexDirection: "row",
-    marginTop: '15%',
+    marginTop: "15%",
     marginHorizontal: 5
   },
   heading: {
@@ -63,11 +64,11 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
     justifyContent: "space-between"
   },
-  arrow_3: { 
-    flex: 1, 
-    alignItems: "flex-end", 
+  arrow_3: {
+    flex: 1,
+    alignItems: "flex-end",
     marginRight: -29,
-    marginTop: -23,
+    marginTop: -23
   },
   buttonStyle: {
     height: 44
@@ -83,23 +84,21 @@ const useStyles = makeStyles(theme => ({
     marginLeft: 10
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
+    marginBottom: 10
   },
   editButtonContainer: {
-    position: 'absolute',
-    top: '50%', 
-    left: '50%', 
-    transform: [{ translateX: 55 }, { translateY: -185 }],
-    zIndex: 1, 
+    position: "absolute",
+    top: 20,
+    right: 20,
+    zIndex: 1
   },
   editButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 20,
     borderRadius: 20,
-    height: 50,
+    height: 47,
     width: 120,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center"
   },
 }))
 

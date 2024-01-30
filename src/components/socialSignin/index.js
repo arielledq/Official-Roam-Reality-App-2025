@@ -20,8 +20,14 @@ import appleAuth, {
 } from '@invertase/react-native-apple-authentication'
 import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from '../../network/config'
 import { googleLogin } from '../../network'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateUserData } from '../../redux/Login'
+import { updateAsOldUser } from '../../redux/Persist'
 
 const SocialSignin = ({ setLoading }) => {
+  const dispatch = useDispatch()
+  const newUser = useSelector(state => state.persist.newUser)
+
   const handleGoogleLogin = async () => {
     setLoading(true)
     try {
@@ -36,6 +42,14 @@ const SocialSignin = ({ setLoading }) => {
       })
         .then(res => {
           console.log({ res })
+          if (res.status == 1) {
+            dispatch(updateUserData(res))
+            if (newUser) {
+              dispatch(updateAsOldUser())
+            }
+          } else {
+            handleError(res)
+          }
         })
         .catch(err => {
           console.log({ err })
@@ -43,12 +57,6 @@ const SocialSignin = ({ setLoading }) => {
         .finally(() => {
           setLoading(false)
         })
-      //   dispatch(
-      //     LoginActions.google_login({
-      //       access_token: tokens.accessToken
-      //       // code: userinfo.serverAuthCode
-      //     })
-      //   )
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) {
         // user cancelled the login flow
