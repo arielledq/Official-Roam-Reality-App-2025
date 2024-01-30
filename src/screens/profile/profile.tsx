@@ -1,8 +1,7 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useState } from "react"
 import {
   FlatList,
   Image,
-  StyleSheet,
   TouchableOpacity,
   View
 } from "react-native"
@@ -27,25 +26,36 @@ import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
 import { getProfieDetails } from "../../network"
 import { useSelector } from "react-redux"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import FastImage from 'react-native-fast-image'
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen"
+import { height, width } from "../../util/AppDimensions"
+import ScreenLoader from "../../components/screenLoader"
 
-const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
-  navigation
-}) => {
+const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
+  const navigation = useNavigation()
   const _styles = useStyles()
   const userProfile = useSelector(state => state.login?.data?.user)
   const [profileDetails, setProfileDetails] = useState(null)
+  const [loading, setloading] = useState(true)
 
   const fetchProfileDetails = async () => {
     try {
-      const details = await getProfieDetails({
+      getProfieDetails({
         id: userProfile.user_profile.id
-      })
+      }).then(res => {
+        if (res.status == 1) {
+          setProfileDetails(res)
+        } else {
+          console.error('Error', "Error fetching profile details: ")
+        }
+      }).catch(err => {
+        console.error('Error', "Error fetching profile details: ")
+      }
+      ).finally(() => setloading(false))
 
-      // Store the details in the state variable
-      setProfileDetails(details)
     } catch (error) {
-      console.error("Error fetching profile details: ", error)
+      console.error('Error', "Error fetching profile details: ")
     }
   }
 
@@ -57,7 +67,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
 
   const handleMenuButton = () => {
     return (
-      <TouchableOpacity style={_styles.menuIcon}>
+      <TouchableOpacity
+        onPress={() => navigation.openDrawer()}
+        style={_styles.menuIcon}>
         <MenuIcon />
       </TouchableOpacity>
     )
@@ -83,24 +95,22 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
   }
   const renderHeader = () => (
     <KeyboardAwareScrollView
-      keyboardShouldPersistTaps="always"
-      nestedScrollEnabled
       style={_styles.header}
-    >      
+    >
       <AppHeader
         containerStyle={_styles.headerContainer}
-        titleStyle={_styles.headerStyle}
         title={"Profile"}
         leftComponent={handleMenuButton()}
       />
       <View style={_styles.avatarContainer}>
-        {profileDetails?.image && (
-          <Avatar
-            size={405}
-            source={{ uri: profileDetails.image }}
-            avatarStyle={_styles.profileImage}
-          />
-        )}
+        <FastImage
+          style={{
+            width: '100%',
+            height: height * 0.4,
+          }}
+          source={{ uri: profileDetails?.image || `https://picsum.photos/500` }}
+          resizeMode={FastImage.resizeMode.cover}
+        />
         <LinearGradient
           colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
           start={{ x: 0.5, y: 1 }}
@@ -114,17 +124,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
             zIndex: 1
           }}
         />
-        {!profileDetails?.image && (
-          <View style={{ width: 405, height: 405, backgroundColor: "gray" }}>
-            <AppText style={{ color: "white" }}>Image not available</AppText>
-          </View>
-        )}
         {/* Edit Profile button */}
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
           containerStyle={_styles.editButtonContainer}
-          onPress={() => navigation.navigate("EditProfile")}
+          onPress={() => navigation.navigate("EditProfile", { edit: true })}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
@@ -137,7 +142,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
-        
+
         <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
@@ -158,18 +163,21 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
       </TouchableOpacity>
       <View style={{ marginHorizontal: -22 }}>
         <FlatList
+          contentContainerStyle={{ marginBottom: 50 }}
           data={data}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <MemoryContainer title={"hELLO"} description={"HI"} image={""} />
+            <MemoryContainer title={"Title"} description={"description"} image={""} />
           )}
           keyExtractor={item => item.id.toString()}
         />
       </View>
     </View>
   )
+
+  console.log({ profileDetails })
 
   const renderItem = ({ item }) => (
     <BoxStatContainer
@@ -182,7 +190,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <FlatList
+      {loading ? <ScreenLoader /> : <FlatList
         data={data}
         // contentContainerStyle={_styles.scroll}
         keyExtractor={item => item.id.toString()}
@@ -191,7 +199,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
         numColumns={3}
         ListFooterComponent={renderFooter}
         nestedScrollEnabled={false}
-      />
+      />}
     </BackgroundWithImage>
   )
 }

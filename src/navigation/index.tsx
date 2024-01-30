@@ -1,4 +1,4 @@
-import {  NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { ThemeProvider } from '@rneui/themed';
 import React from 'react';
@@ -26,6 +26,11 @@ import { createDrawerNavigator } from '@react-navigation/drawer';
 import DrawerContent from '../screens/drawerContent/DrawerContent';
 import Onboarding from '../screens/onboarding/onboarding';
 import DrawerNavigator from './DrawerNavigator'
+import BottomTabNavigator from './BottomTabNavigator';
+import Settings from '../screens/settings';
+import Privacy from '../screens/privacy';
+import AnimatedSplash from '../screens/animatedSplash';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
@@ -35,8 +40,9 @@ const Drawer = createDrawerNavigator();
  * @returns JSX.Element
  */
 const Navigation = () => {
+  const splashShown = useSelector(state => state.splash?.splashShown)
   const token = useSelector(state => state.login?.data?.token)
-  const {newUser,isOnboarded} = useSelector(state => state.persist)
+  const { newUser, isOnboarded } = useSelector(state => state.persist)
 
   const renderAuthStack = () => {
     return (
@@ -67,7 +73,7 @@ const Navigation = () => {
   const renderCommonStack = () => {
     return (
       <>
-        <Stack.Screen name="Home" component={DrawerNavigator} />
+        <Stack.Screen name="Home" component={DrawerNav} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
@@ -77,40 +83,44 @@ const Navigation = () => {
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+        <Stack.Screen name="Settings" component={Settings} />
+        <Stack.Screen name="Privacy" component={Privacy} />
       </>
     )
   }
 
-  const StackNav = () => {
-    return(
-    <Stack.Navigator
-      screenOptions={{
-        headerShown: false,
-        animation: "slide_from_right",   
-      }}>
-      {token ?
-        renderCommonStack() : renderAuthStack()
-      }
-    </Stack.Navigator>
+  const DrawerNav = () => {
+    return (
+      <Drawer.Navigator
+        drawerContent={props => <DrawerContent {...props} />}
+        screenOptions={{
+          headerShown: false,
+          drawerType: "slide"
+        }}>
+        <Drawer.Screen name="Tab" component={BottomTabNavigator} />
+      </Drawer.Navigator>
     )
   }
 
-  const DrawerNav = () => {
-    return(
-      <Drawer.Navigator 
-      drawerContent={props => <DrawerContent {...props}/>}
-      screenOptions={{ 
-        headerShown: false
-      }}>
-      <Drawer.Screen name="HomeScreen" component={StackNav} />
-    </Drawer.Navigator>
+  const StackNav = () => {
+    return (
+      <Stack.Navigator
+        screenOptions={{
+          headerShown: false,
+          animation: "slide_from_right",
+        }}>
+        {token ?
+          renderCommonStack() : renderAuthStack()
+        }
+      </Stack.Navigator>
     )
   }
+
   return (
     <NavigationContainer ref={navigationRef}>
       {
         <ThemeProvider theme={theme}>
-          <DrawerNav/>
+          <StackNav />
         </ThemeProvider>
       }
     </NavigationContainer>
