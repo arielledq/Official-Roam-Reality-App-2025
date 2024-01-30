@@ -14,9 +14,9 @@ class UserAdmin(auth_admin.UserAdmin):
     form = UserChangeForm
     add_form = UserCreationForm
     fieldsets = (("User", {"fields": ("name",)}),) + auth_admin.UserAdmin.fieldsets
-    list_display = ["system_generated_user_name", "name", "is_superuser"]
+    list_display = ["id", "system_generated_user_name", "name", "is_superuser"]
     search_fields = ["name", "email"]
-    list_display_links = ("system_generated_user_name", "name",)
+    list_display_links = ("id", "system_generated_user_name", "name",)
 
     def system_generated_user_name(self, obj):
         return obj.username
