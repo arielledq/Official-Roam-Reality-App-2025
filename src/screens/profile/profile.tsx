@@ -141,8 +141,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
-
-        <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
+        <View style={_styles.scoreboardContainer}>
+          <AppText 
+          adjustsFontSizeToFit={true}
+          numberOfLines={1}
+          style={_styles.scoreboard}>SCOREBOARD</AppText>
+        </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
           <StatContainer value={"23"} property={"Points"} />
