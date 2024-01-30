@@ -99,7 +99,7 @@ function DrawerContent(props) {
   const navigation = useNavigation()
   const dispatch = useDispatch()
   const [popupDetails, setPopupDetails] = useState({})
-  const [isConfirmationVisible, setConfirmationVisible] = useState(false);
+  const [isConfirmationVisible, setConfirmationVisible] = useState(false)
   const onPressHandler = navigateTo => {
     if (navigateTo === 'delete') {
       setPopupDetails({
@@ -107,14 +107,14 @@ function DrawerContent(props) {
         description: 'Are you sure you want to delete your account?',
         cancelText: 'Cancel'
       })
-      setConfirmationVisible(true);
+      setConfirmationVisible(true)
     } else if (navigateTo === 'logout') {
       setPopupDetails({
         title: 'Log Out',
         description: 'Are you sure you want to logout?',
         cancelText: 'Cancel'
       })
-      setConfirmationVisible(true);
+      setConfirmationVisible(true)
     } else {
       navigation.navigate(navigateTo)
     }
@@ -124,8 +124,8 @@ function DrawerContent(props) {
     dispatch(resetState())
   }
   const closeModalHandler = () => {
-    setConfirmationVisible(false);
-  };
+    setConfirmationVisible(false)
+  }
   const handleDeleteAccount = () => {
     deleteAccount().then(res => {
       console.log({ res })
@@ -160,7 +160,7 @@ function DrawerContent(props) {
             ? handleLogOutButton
             : handleDeleteAccount
         }
-        isVisible={isConfirmationVisible}        
+        isVisible={isConfirmationVisible}
         cancelText={'Cancel'}
         cancelHandler={closeModalHandler}
       />

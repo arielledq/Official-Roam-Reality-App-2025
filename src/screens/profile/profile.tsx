@@ -24,7 +24,7 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getProfieDetails } from "../../network"
+import { getProfieDetails, sendCode } from "../../network"
 import { useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
@@ -95,7 +95,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     rows.push(data.slice(i, i + 3))
   }
   const navigateToVerifyMail = email => {
-    // navigation.navigate('EmailVerification', { email: email.toLowerCase() })
+    sendCode({ email: email.toLowerCase() })
+    navigation.navigate('EmailVerificationC', { email: email.toLowerCase(), profile: true })
   }
   const renderHeader = () => (
     <KeyboardAwareScrollView

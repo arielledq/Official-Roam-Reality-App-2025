@@ -41,10 +41,13 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
     setOpenBottomSheet(false)
   } else {
   }
+  console.log({ account_setup })
 
   useEffect(() => {
     if (!account_setup) {
-      navigation.replace('EditProfile')
+      setTimeout(() => {
+        navigation.replace('EditProfile')
+      }, 300);
     }
   }, [])
 

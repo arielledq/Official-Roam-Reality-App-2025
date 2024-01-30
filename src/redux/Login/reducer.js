@@ -17,9 +17,17 @@ export const sliceLogin = createSlice({
     },
     updateAccountFlag: (state, action) => {
       state.data.user.user_profile.account_setup = action.payload
+    },
+    updateVerified: (state, action) => {
+      state.data.user.user_profile.is_verified = action.payload
     }
   }
 })
 
-export const { resetState, updateUserData, updateName, updateAccountFlag } =
-  sliceLogin.actions
+export const {
+  resetState,
+  updateUserData,
+  updateName,
+  updateAccountFlag,
+  updateVerified
+} = sliceLogin.actions
