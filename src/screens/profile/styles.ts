@@ -46,12 +46,16 @@ const useStyles = makeStyles(theme => ({
   scroll: {
     paddingHorizontal: screenHorizontalPadding - 4
   },
+  scoreboardContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   scoreboard: {
     ...fontGroup.ns900,
     color: theme.colors.lightGrey,
     fontSize: FontSizes.S48,
     lineHeight: FontLineHeights.LH66,
-    marginTop: "10%"
+    marginTop: "10%",
   },
   statContainerStyle: {
     flexDirection: "row",
