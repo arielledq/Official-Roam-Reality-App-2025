@@ -29,6 +29,8 @@ import DrawerNavigator from './DrawerNavigator'
 import BottomTabNavigator from './BottomTabNavigator';
 import Settings from '../screens/settings';
 import Privacy from '../screens/privacy';
+import AnimatedSplash from '../screens/animatedSplash';
+
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
 
@@ -38,6 +40,7 @@ const Drawer = createDrawerNavigator();
  * @returns JSX.Element
  */
 const Navigation = () => {
+  const splashShown = useSelector(state => state.splash?.splashShown)
   const token = useSelector(state => state.login?.data?.token)
   const { newUser, isOnboarded } = useSelector(state => state.persist)
 
