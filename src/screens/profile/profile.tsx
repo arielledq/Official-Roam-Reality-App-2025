@@ -59,15 +59,15 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     }
   }
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     fetchProfileDetails()
-  //   }, [])
-  // )
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfileDetails()
+    }, [])
+  )
 
-  useEffect(() => { 
-      fetchProfileDetails();
-  }, [navigation]);
+  // useEffect(() => { 
+  //     fetchProfileDetails();
+  // }, [navigation]);
 
   const handleMenuButton = () => {
     return (
