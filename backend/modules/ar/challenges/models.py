@@ -80,6 +80,9 @@ class ARMemories(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE,related_name='user_ar_memories'
     )
+    challenges = models.ForeignKey(
+        Challenges, on_delete=models.CASCADE,related_name='challenges_ar_memories',null=True,blank=True,
+    )
     
     class Meta:
         verbose_name_plural = "AR Memories"
