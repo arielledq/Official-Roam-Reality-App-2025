@@ -286,7 +286,7 @@ const ArChallengeCapture = ({
 
     async startRecordVideo() {
       this.setState({
-        capturedImages: null,
+        capturedImage: null,
         recordingStart: true
       }, () => {
         const onError = (error) => {
@@ -299,11 +299,12 @@ const ArChallengeCapture = ({
     }
 
     async stopRecordVideo() {
-      console.log("stopRecordVideo:")
       const retDict = await this._arNavigator._stopVideoRecording()
       console.log("stopRecordVideo:", retDict)
       this.setState({
-        capturedVideo: retDict.url
+        capturedVideo: retDict.url,
+        capturedImage: null,
+        recordingStart: false
       });
       this.playRecordSound()
     }
@@ -382,9 +383,13 @@ const ArChallengeCapture = ({
         });
       }
       if(Platform.OS =='ios'){
+        request([
+          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
+        ]).then(response => {
+          console.log("PERMISSIONS.OS",response);
+        });
         requestMultiple([PERMISSIONS.IOS.CAMERA,
           PERMISSIONS.IOS.MICROPHONE,
-          PERMISSIONS.IOS.MEDIA_LIBRARY,
           PERMISSIONS.IOS.PHOTO_LIBRARY,
           PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
         ]).then(response => {
@@ -452,17 +457,17 @@ const ArChallengeCapture = ({
               }}
               onPressOut={() => {
                 console.log('onPressOut Press')
+                if (this.state.recordingStart) {
+                  this.stopRecordVideo();
+                }
               }}
               delayLongPress={1500} onPress={() => {
                 if (this.state.recordingStart) {
                   this.stopRecordVideo();
-                  this.setState({
-                    capturedImages: null,
-                    recordingStart: false
-                  })
                   return;
+                }else{
+                  this._takeScreenshot();
                 }
-                this._takeScreenshot();
               }} activeOpacity={.6}>
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
