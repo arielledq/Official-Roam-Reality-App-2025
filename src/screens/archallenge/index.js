@@ -81,7 +81,12 @@ const ArChallenge = ({
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader titleStyle={{fontSize:16}} title={"Anywhere AR Challenges"} backgroundColor="transparent" />
+      <AppHeader
+        centerComponent={{
+          text: "Anywhere AR Challenges",
+          numberOfLines: 2,
+          style: [_styles.heading],
+        }} backgroundColor="transparent" />
       <View style={_styles.rowView}>
         <View style={{ flex: .5 }}>
           <AppText style={[_styles.headerText]}>Choose You AR Challenge</AppText>
@@ -103,7 +108,7 @@ const ArChallenge = ({
         </TouchableOpacity>
       </View>
 
-      {isLoading && <ActivityIndicator size="large" /> }
+      {isLoading && <ActivityIndicator size="large" />}
       <FlatList
         style={{ flex: 1, marginVertical: 15 }}
         data={sponsoredData}
