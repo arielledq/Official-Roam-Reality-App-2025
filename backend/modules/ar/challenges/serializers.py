@@ -1,4 +1,4 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories
 from rest_framework import serializers
 
 
@@ -59,3 +59,13 @@ class ChallengesUploadSerializer(serializers.ModelSerializer):
     class Meta:
         model = Challenges
         fields = ("image","model_file")
+
+class ARMemoriesSerializer(serializers.ModelSerializer):
+    memory_file = serializers.FileField()
+
+    class Meta:
+        model = ARMemories
+        fields = (
+            "__all__"
+        )
+
