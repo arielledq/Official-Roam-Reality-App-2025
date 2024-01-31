@@ -1,80 +1,99 @@
-import { StyleSheet } from 'react-native';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import LinearGradient from "react-native-linear-gradient"
+import { StyleSheet,Text } from 'react-native';
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { useTheme } from 'react-native-paper'
 
-import { Icons } from '../assets/Icons';
 import Home from '../screens/home';
 import Profile from '../screens/profile/profile';
 import Scores from '../screens/scores';
 import Rally from '../screens/rally';
+import Icon from "../components/Icon"
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+  const theme = useTheme();
+  theme.colors.secondaryContainer = "transparent"
   return (
     <Tab.Navigator
-      screenOptions={{
-        tabBarStyle: styles.tabBarStyle,
-        headerShown: false,
-      }}
+      initialRouteName="HomeScreen"
+      barStyle={styles.tabBarStyle}
+      activeColor='#FFFFFF'
+      inactiveColor='#FFFFFF'
+      theme={theme}
     >
       <Tab.Screen
         name="HomeScreen"
         component={Home}
         options={{
-          tabBarLabel: "Home",
-          tabBarIcon: ({ focused }) => (
-            focused ? <Icons.SelectedHomeIcon /> : <Icons.UnselectedHomeIcon />
+          tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
+          tabBarIcon: ({focused}) => ( 
+              <Icon  
+                name={focused ? 'SelectedHomeIcon' : 'UnselectedHomeIcon'} 
+                family='custom' 
+                size={focused ? 120 : 35} 
+                style={focused && styles.tabBarIconStyle}
+              /> 
           ),
-          tabBarIconStyle: styles.tabBarIconStyle,
-          tabBarLabelStyle: styles.tabBarLabelStyle
         }}
       />
       <Tab.Screen
         name="Scores"
         component={Scores}
         options={{
-          tabBarLabel: "Scores",
+          tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
           tabBarIcon: ({ focused }) => (
-            focused ? <Icons.SelectedBadgeIcon /> : <Icons.UnselectedBadgeIcon />
+            <Icon  
+                name={focused ? 'SelectedBadgeIcon' : 'UnselectedBadgeIcon'} 
+                family='custom' 
+                size={focused ? 120 : 38} 
+                style={focused && styles.tabBarIconStyle}
+              /> 
           ),
-          tabBarIconStyle: styles.tabBarIconStyle,
-          tabBarLabelStyle: styles.tabBarLabelStyle
         }}
       />
       <Tab.Screen
         name="Go Navigate"
         component={Home}
         options={{
-          tabBarLabel: () => null,
+          tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
-            focused ? <Icons.SelectedCamera /> : <Icons.SelectedCamera />
+            <Icon  
+                name={'SelectedCamera'} 
+                family='custom' 
+                size={60} 
+                style={styles.cameraTabStyle}
+            /> 
           ),
-          tabBarIconStyle: [styles.tabBarIconStyle, styles.cameraTabStyle],
         }}
       />
       <Tab.Screen
         name="Rally"
         component={Rally}
         options={{
-          tabBarLabel: "Rally",
+          tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
           tabBarIcon: ({ focused }) => (
-            focused ? <Icons.SelectedFlagIcon /> : <Icons.UnselectedFlagIcon />
+            <Icon  
+              name={focused ? 'SelectedFlagIcon' : 'UnselectedFlagIcon'} 
+              family='custom' 
+              size={focused ? 120 : 35} 
+              style={focused && styles.tabBarIconStyle}
+          />
           ),
-          tabBarIconStyle: styles.tabBarIconStyle,
-          tabBarLabelStyle: styles.tabBarLabelStyle,
         }}
       />
       <Tab.Screen
         name="Profile"
         component={Profile}
         options={{
-          tabBarLabel: "Profile",
+          tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
           tabBarIcon: ({ focused }) => (
-            focused ? <Icons.SelectedProfile /> : <Icons.UnselectedProfile />
+            <Icon  
+              name={focused ? 'SelectedProfile' : 'UnselectedProfile'} 
+              family='custom' 
+              size={focused ? 120 : 35} 
+              style={focused && styles.tabBarIconStyle}
+        />
           ),
-          tabBarIconStyle: styles.tabBarIconStyle,
-          tabBarLabelStyle: styles.tabBarLabelStyle
         }}
       />
     </Tab.Navigator>
@@ -85,7 +104,7 @@ export default BottomTabNavigator
 
 const styles = StyleSheet.create({
   tabBarStyle: {
-    height: 90,
+    height: 100,
     position: 'absolute',
     backgroundColor: '#090A16',
     borderTopStartRadius: 20,
@@ -93,7 +112,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 25
   },
   tabBarIconStyle: {
-    // marginBottom: -10
+    marginTop: -40
   },
   tabBarLabelStyle: {
     fontSize: 12,
@@ -101,9 +120,9 @@ const styles = StyleSheet.create({
     lineHeight: 12,
     color: '#FFFFFF',
     textAlign: 'center',
-    marginTop: -10
+    marginTop: 15
   },
   cameraTabStyle: {
-    marginTop: 5
+    marginTop: -5
   }
 })
