@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: screenHorizontalPadding,
+    paddingHorizontal: 10,
   },
   headerText: {
     ...fontGroup.ns700,

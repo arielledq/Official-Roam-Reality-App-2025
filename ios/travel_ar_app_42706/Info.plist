@@ -28,16 +28,16 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.220585435352-6rs34650r35gm2m5i9a7n1rpl4t6jkog</string>
-				<string>fb6631272443643265</string>
+				<string>fb746185200437639</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
-	<string>6631272443643265</string>
+	<string>746185200437639</string>
 	<key>FacebookClientToken</key>
-	<string>f83a00e23f9723cf8053ac7d68f7cf0e</string>
+	<string>9bb1d62e7fa4072498828e188eb87c02</string>
 	<key>FacebookDisplayName</key>
 	<string>Roam Reality</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
