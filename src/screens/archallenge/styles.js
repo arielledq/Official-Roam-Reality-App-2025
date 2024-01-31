@@ -8,6 +8,14 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/Fo
  */
 
 const useStyles = makeStyles(theme => ({
+  heading: {
+    fontSize: FontSizes.S18,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+    color: theme.colors.white,
+    marginTop: 5,
+    textAlign:'center'
+  },
   mainContainer: {
     flex: 1,
     paddingHorizontal: screenHorizontalPadding

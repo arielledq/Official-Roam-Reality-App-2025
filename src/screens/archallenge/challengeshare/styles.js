@@ -60,7 +60,7 @@ const useStyles = makeStyles(theme => ({
     height: 50
   },
   buttonContainerStyle: {
-    marginTop: 20
+    marginTop: 10
   },
   bottomText: {
     ...fontGroup.p700,
@@ -70,8 +70,42 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 15,
     fontWeight: "700"
   },
-  detailContainer: { borderRadius: 12, height: 422, width: '100%', backgroundColor: "#272741", marginVertical: 20, overflow: 'hidden' },
-  pointsParentContainer: { width: '100%', height: 104, borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 },
+  socialShareContainer: {
+    borderRadius: 4,
+    height: 50,
+    width: '100%',
+    backgroundColor: "#272741",
+    marginVertical: 5,
+    overflow: 'hidden',
+    alignItems:'center',
+    justifyContent:'space-between',
+    flexDirection:'row',
+    paddingHorizontal:10
+  },
+  shareBtn:{
+    marginHorizontal:8
+  },
+  shareText:{
+    ...fontGroup.p400,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
+  },
+  detailContainer: {
+    borderRadius: 12,
+    height: 422,
+    width: '100%',
+    backgroundColor: "#272741",
+    marginVertical: 20,
+    overflow: 'hidden'
+  },
+  pointsParentContainer: {
+    width: '100%',
+    height: 104,
+    borderRadius: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20
+  },
   detailPointContainter:
   {
     flexDirection: 'column',
