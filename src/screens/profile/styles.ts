@@ -46,12 +46,16 @@ const useStyles = makeStyles(theme => ({
   scroll: {
     paddingHorizontal: screenHorizontalPadding - 4
   },
+  scoreboardContainer: {
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
   scoreboard: {
     ...fontGroup.ns900,
     color: theme.colors.lightGrey,
     fontSize: FontSizes.S48,
     lineHeight: FontLineHeights.LH66,
-    marginTop: "10%"
+    marginTop: "10%",
   },
   statContainerStyle: {
     flexDirection: "row",
@@ -89,16 +93,14 @@ const useStyles = makeStyles(theme => ({
   },
   editButtonContainer: {
     position: "absolute",
-    top: 20,
+    top: 10,
     right: 20,
-    zIndex: 1
+    zIndex: 10
   },
   editButton: {
-    borderRadius: 20,
-    height: 47,
-    width: 120,
-    flexDirection: "row",
-    alignItems: "center"
+    marginVertical:5,
+    // flexDirection: "row",
+    // alignItems: "center"
   },
 }))
 

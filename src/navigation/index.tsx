@@ -44,6 +44,8 @@ const Navigation = () => {
   const token = useSelector(state => state.login?.data?.token)
   const { newUser, isOnboarded } = useSelector(state => state.persist)
 
+  console.log({ token })
+
   const renderAuthStack = () => {
     return (
       <>
@@ -85,6 +87,8 @@ const Navigation = () => {
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
+        <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
+        <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
       </>
     )
   }

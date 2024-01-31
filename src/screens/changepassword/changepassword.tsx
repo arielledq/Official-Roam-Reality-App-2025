@@ -40,15 +40,20 @@ const ChangePassword: ScreenStackComponent<
       old_password: values.oldPassword,
       new_password: values.newPassword,
       confirm_password: values.confirmnewPassword
-    }).then(res => {
-      console.log({ res })
-      if (res.status == 1) {
-        Alert.alert('Success', res.message, [{ text: 'OK', onPress: () => navigation.goBack() }])
-      } else {
-        Alert.alert('Error', res.message.error)
-      }
     })
-      .finally(() => { setIsLoading(false) })
+      .then(res => {
+        console.log({ res })
+        if (res.status == 1) {
+          Alert.alert("Success", res.message, [
+            { text: "OK", onPress: () => navigation.goBack() }
+          ])
+        } else {
+          Alert.alert("Error", res.message.error)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   return (
@@ -69,7 +74,14 @@ const ChangePassword: ScreenStackComponent<
             onSubmit={handleChangePassword}
             validationSchema={ChangePasswordSchema}
           >
-            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            {({
+              handleChange,
+              handleBlur,
+              handleSubmit,
+              values,
+              errors,
+              touched
+            }) => (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
                   <AppInput
@@ -81,7 +93,7 @@ const ChangePassword: ScreenStackComponent<
                     placeholderTextColor={theme.darkColors?.grey}
                     value={values.oldPassword}
                     onChangeText={handleChange("oldPassword")}
-                    onBlur={handleBlur('oldPassword')}
+                    onBlur={handleBlur("oldPassword")}
                     errorMessage={
                       touched.oldPassword && errors?.oldPassword
                         ? errors.oldPassword
@@ -89,9 +101,23 @@ const ChangePassword: ScreenStackComponent<
                     }
                     autoCapitalize="none"
                     rightIcon={
-                      <Icon onPress={() => {
-                        setOldPasswordVisibility(p => !p)
-                      }} name={oldpasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                      <Icon
+                        onPress={() => {
+                          setOldPasswordVisibility(p => !p)
+                        }}
+                        name={oldpasswordVisibility ? "eye" : "eye-off"}
+                        family="feather"
+                        color={"#9CA3AF"}
+                        size={23}
+                      />
+                    }
+                    leftIcon={
+                      <Icon
+                        name={"lock"}
+                        family="feather"
+                        color={"grey"}
+                        size={24}
+                      />
                     }
                   />
                   <AppInput
@@ -103,7 +129,7 @@ const ChangePassword: ScreenStackComponent<
                     placeholderTextColor={theme.darkColors?.grey}
                     value={values.newPassword}
                     onChangeText={handleChange("newPassword")}
-                    onBlur={handleBlur('newPassword')}
+                    onBlur={handleBlur("newPassword")}
                     errorMessage={
                       touched.newPassword && errors?.newPassword
                         ? errors.newPassword
@@ -111,9 +137,23 @@ const ChangePassword: ScreenStackComponent<
                     }
                     autoCapitalize="none"
                     rightIcon={
-                      <Icon onPress={() => {
-                        setNewPasswordVisibility(p => !p)
-                      }} name={newpasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                      <Icon
+                        onPress={() => {
+                          setNewPasswordVisibility(p => !p)
+                        }}
+                        name={newpasswordVisibility ? "eye" : "eye-off"}
+                        family="feather"
+                        color={"#9CA3AF"}
+                        size={23}
+                      />
+                    }
+                    leftIcon={
+                      <Icon
+                        name={"lock"}
+                        family="feather"
+                        color={"grey"}
+                        size={24}
+                      />
                     }
                   />
                   <AppInput
@@ -124,7 +164,7 @@ const ChangePassword: ScreenStackComponent<
                     placeholder="Confirm Password"
                     value={values.confirmnewPassword}
                     onChangeText={handleChange("confirmnewPassword")}
-                    onBlur={handleBlur('confirmnewPassword')}
+                    onBlur={handleBlur("confirmnewPassword")}
                     errorMessage={
                       touched.confirmnewPassword && errors?.confirmnewPassword
                         ? errors.confirmnewPassword
@@ -132,9 +172,23 @@ const ChangePassword: ScreenStackComponent<
                     }
                     autoCapitalize="none"
                     rightIcon={
-                      <Icon onPress={() => {
-                        setConfirmNewPasswordVisibility(p => !p)
-                      }} name={confirmnewpasswordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                      <Icon
+                        onPress={() => {
+                          setConfirmNewPasswordVisibility(p => !p)
+                        }}
+                        name={confirmnewpasswordVisibility ? "eye" : "eye-off"}
+                        family="feather"
+                        color={"#9CA3AF"}
+                        size={23}
+                      />
+                    }
+                    leftIcon={
+                      <Icon
+                        name={"lock"}
+                        family="feather"
+                        color={"grey"}
+                        size={24}
+                      />
                     }
                   />
                 </View>

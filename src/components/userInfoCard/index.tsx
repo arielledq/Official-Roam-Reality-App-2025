@@ -19,7 +19,7 @@ const UserInfoCard = ({
   const styles = useStyles()
 
   const truncatedEmail =
-    email?.length > 23 && !isVerified ? `${email?.slice(0, 23)}...` : email
+    email?.length > 22 && !isVerified ? `${email?.slice(0, 22)}...` : email
 
   return (
     <View style={styles.row}>

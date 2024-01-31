@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
   FlatList,
   Image,
@@ -24,7 +24,7 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getProfieDetails } from "../../network"
+import { getProfieDetails, sendCode } from "../../network"
 import { useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
@@ -65,6 +65,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     }, [])
   )
 
+  // useEffect(() => { 
+  //     fetchProfileDetails();
+  // }, [navigation]);
+
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
@@ -91,40 +95,47 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     rows.push(data.slice(i, i + 3))
   }
   const navigateToVerifyMail = email => {
-    // navigation.navigate('EmailVerification', { email: email.toLowerCase() })
+    sendCode({ email: email.toLowerCase() })
+    navigation.navigate('EmailVerificationC', { email: email.toLowerCase(), profile: true })
   }
   const renderHeader = () => (
     <KeyboardAwareScrollView
       style={_styles.header}
     >
-      <AppHeader
-        containerStyle={_styles.headerContainer}
-        title={"Profile"}
-        leftComponent={handleMenuButton()}
-      />
-      <View style={_styles.avatarContainer}>
-        <FastImage
-          style={{
-            width: '100%',
-            height: height * 0.4,
-          }}
-          source={{ uri: profileDetails?.image || `https://picsum.photos/500` }}
-          resizeMode={FastImage.resizeMode.cover}
-        />
-        <LinearGradient
-          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-          start={{ x: 0.5, y: 1 }}
-          end={{ x: 0.5, y: 0.7 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1
-          }}
-        />
-        {/* Edit Profile button */}
+      {profileDetails?.image ?
+        <View style={_styles.avatarContainer}>
+          <FastImage
+            style={{
+              width: '100%',
+              height: height * 0.4,
+            }}
+            source={{ uri: profileDetails?.image }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+          <LinearGradient
+            colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+            start={{ x: 0.5, y: 1 }}
+            end={{ x: 0.5, y: 0.7 }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1
+            }}
+          />
+          <AppButton
+            customColors={["#7B16FF", "#1158F4"]}
+            buttonStyle={_styles.editButton}
+            containerStyle={_styles.editButtonContainer}
+            onPress={() => navigation.navigate("EditProfile", { edit: true })}
+          >
+            <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+            <AppText style={_styles.buttonText}>Edit Profile</AppText>
+          </AppButton>
+        </View>
+        :
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
@@ -134,7 +145,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
         </AppButton>
-      </View>
+      }
       <View style={_styles.scroll}>
         <UserInfoCard
           name={profileDetails?.user.name}
@@ -142,8 +153,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
-
-        <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
+        <View style={_styles.scoreboardContainer}>
+          <AppText
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={_styles.scoreboard}>SCOREBOARD</AppText>
+        </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
           <StatContainer value={"23"} property={"Points"} />
@@ -190,6 +205,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
+      <AppHeader
+        containerStyle={_styles.headerContainer}
+        title={"Profile"}
+        leftComponent={handleMenuButton()}
+      />
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
         // contentContainerStyle={_styles.scroll}
