@@ -10,6 +10,7 @@ from rest_framework import authentication,permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from django.db.models import F
 
 class Resource3dModelViewSet(viewsets.ModelViewSet):
     """
@@ -49,6 +50,11 @@ class ARMemoriesViewSet(ViewSet):
       serializer = ARMemoriesSerializer(data=request.data, partial=True)
       if serializer.is_valid(raise_exception=True):
         serializer.save()
+        if serializer.data.get("challenges"):
+           #update user point
+           cBbj = Challenges.objects.get(pk=serializer.data.get("challenges"))
+           ARUserProfile.objects.filter(user=serializer.data.get("user")).update(points=F('points')+cBbj.points)
+        
         return Response(serializer.data, status=status.HTTP_201_CREATED)
       else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
