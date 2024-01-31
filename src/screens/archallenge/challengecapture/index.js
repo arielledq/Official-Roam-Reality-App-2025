@@ -64,6 +64,7 @@ const ArChallengeCapture = ({
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState([0.08, 0.08, 0.08]);
     const [rotate, setRotate] = useState([0, 0, 0]);
+    const [progress, setProgress] = useState([0, 0, 0]);
 
 
     function onInitialized(state, reason) {
@@ -82,6 +83,7 @@ const ArChallengeCapture = ({
         .fetch('GET', modelFile)
         .progress((received, total) => {
           console.log('progress', received / total)
+          setProgress(Math.trunc( Number((received / total) * 100) ))
         })
         .then((res) => {// the temp file path
           console.log('The file saved to ', res.path());
@@ -187,7 +189,7 @@ const ArChallengeCapture = ({
         {loading &&
           <ViroARCamera>
             <ViroText
-              text="Loading Model"
+              text={`${progress}% Loading Challenge Completed`}
               color="#ff0000"
               width={2}
               height={2}
