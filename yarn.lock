@@ -2653,10 +2653,10 @@
     "@typescript-eslint/types" "5.59.5"
     eslint-visitor-keys "^3.3.0"
 
-"@viro-community/react-viro@2.23.1-rc3":
-  version "2.23.1-rc3"
-  resolved "https://registry.yarnpkg.com/@viro-community/react-viro/-/react-viro-2.23.1-rc3.tgz#7b1e3394bfdd753e0e918a025ac67950654ed190"
-  integrity sha512-12vpT62FawPLZVoH0DAMX/FZVhSKu6FsiX7+Wpo8DRYpjzgI0gIcK7SL0xfo7m0ZqlN2N+XfqETV9gYxnc+pVA==
+"@viro-community/react-viro@2.23.1":
+  version "2.23.1"
+  resolved "https://registry.yarnpkg.com/@viro-community/react-viro/-/react-viro-2.23.1.tgz#dc5904730847bb6a6ab32a4dbe00c62a35eaec6e"
+  integrity sha512-RUWW3yH58RnCJGm/3IKA+m4SY1YCfZGHJH1J/xJ9m+nmUdsTZ4y3jyKFP0XmnglUgHy2r//20qBJ5qxa88Kdlg==
   dependencies:
     "@expo/config-plugins" "^7.2.5"
     react "^18.2.0"
