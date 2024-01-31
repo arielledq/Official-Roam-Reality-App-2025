@@ -12,10 +12,10 @@ class ReadOnly(BasePermission):
 class TermAndConditionViewSet(viewsets.ModelViewSet):
     serializer_class = TermAndConditionSerializer
     permission_classes = [IsAdminUser|ReadOnly] #Makes it Read-only unless admin
-    authentication_classes = (
-        authentication.SessionAuthentication,
-        authentication.TokenAuthentication,
-    )
+    # authentication_classes = (
+    #     authentication.SessionAuthentication,
+    #     authentication.TokenAuthentication,
+    # )
 
     # This query will only return a single (if it exists) T&C string, and that will be 
     # the most recently updated one that *also* has an active flag. You must set at least
