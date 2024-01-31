@@ -196,7 +196,9 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
               </AppText>
 
               {/* social sign in options */}
-              <SocialSignin />
+              <SocialSignin
+                setLoading={setIsLoading}
+              />
             </View>
           )}
         </Formik>
