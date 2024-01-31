@@ -23,7 +23,7 @@ class Sponsor(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
-        verbose_name_plural = "Sponsor"
+        verbose_name_plural = "AR Sponsor"
 
     def __str__(self):
       return self.name
@@ -69,7 +69,20 @@ class ARUserProfile(models.Model):
     )
     
     class Meta:
-        verbose_name_plural = "User AR Profile"
+        verbose_name_plural = "AR User Profile"
+
+    def __str__(self):
+      return str(self.user.name) 
+    
+class ARMemories(models.Model):
+    memory_file = models.FileField(upload_to='ar/memories/')
+    description = models.TextField(_("Description"), blank=True, null=True)
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE,related_name='user_ar_memories'
+    )
+    
+    class Meta:
+        verbose_name_plural = "AR Memories"
 
     def __str__(self):
       return str(self.user.name) 
