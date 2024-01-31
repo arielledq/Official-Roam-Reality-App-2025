@@ -16,7 +16,8 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
   },
   mainHeaderContainer: {
-    padding: screenHorizontalPadding,
+    paddingHorizontal: screenHorizontalPadding,
+    marginTop:20,
     position: 'absolute',
     top: -20
   },
@@ -121,15 +122,15 @@ const useStyles = makeStyles(theme => ({
   viewDetailBtn: {
     backgroundColor: '#fff',
     height: 30,
-    width: 118,
+    paddingHorizontal:8,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    borderRadius:4
   },
   viewDetailsIconContainer: {
     backgroundColor: "#1158F4",
     height: 53,
     borderRadius: 8,
-    marginHorizontal: 20,
     marginTop: 20,
     justifyContent: 'center'
   },
