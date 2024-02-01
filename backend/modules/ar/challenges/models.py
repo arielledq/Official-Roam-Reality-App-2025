@@ -3,12 +3,19 @@ from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
 CHALLENGE_CHOICES = (
     ("SPONSORED", "PHOTO"),
     ("DANCE", "DANCE"),
+)
+
+CHALLENGE_APPROVAL_CHOICES = (
+    ("UNAPPROVED", "UNAPPROVED"),
+    ("APPROVED", "APPROVED"),
+    ("DECLINED", "DECLINED")
 )
 
 CHALLENGE_REQUIREMENT = (
@@ -83,9 +90,18 @@ class ARMemories(models.Model):
     challenges = models.ForeignKey(
         Challenges, on_delete=models.CASCADE,related_name='challenges_ar_memories',null=True,blank=True,
     )
+    declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
+    challenge_approval = models.CharField(max_length=50,
+                  choices=CHALLENGE_APPROVAL_CHOICES,
+                  default="UNAPPROVED", blank=True, null=True)
     
     class Meta:
         verbose_name_plural = "AR Memories"
 
+    def clean(self):
+      if self.challenge_approval == "DECLINED":
+        if self.declined_reason is "":
+          raise ValidationError("Declined Reason is mandotory, When challenge is declined!")
+    
     def __str__(self):
-      return str(self.user.name) 
+      return str(self.memory_file) 
