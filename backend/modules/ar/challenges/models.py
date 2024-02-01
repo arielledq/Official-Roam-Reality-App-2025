@@ -100,7 +100,7 @@ class ARMemories(models.Model):
 
     def clean(self):
       if self.challenge_approval == "DECLINED":
-        if self.declined_reason is "":
+        if self.declined_reason == "":
           raise ValidationError("Declined Reason is mandotory, When challenge is declined!")
     
     def __str__(self):

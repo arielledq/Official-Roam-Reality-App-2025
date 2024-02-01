@@ -1,7 +1,7 @@
 
 from django.urls import path, include
 from rest_framework import routers
-
+from . import signals  # noqa
 from .viewsets import ChallengesViewSet, ChallengesUploadView, SponsorViewSet, Resource3dModelViewSet, ARProfileViewSet, ARMemoriesViewSet
 
 
