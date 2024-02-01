@@ -1,1 +1,1 @@
-default_app_config = 'ar.challenges.apps.ARConfig'
+#default_app_config = 'challenges.apps.ARConfig'
