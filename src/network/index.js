@@ -143,3 +143,9 @@ export const getTermsAndConditions = payload =>
     method: 'GET',
     payload
   })
+  export const postArMemory = (payload) =>
+  Request.multiPartCall({
+    url: `modules/challenges/memories/`,
+    method: 'POST',
+    data: payload.data
+  })
