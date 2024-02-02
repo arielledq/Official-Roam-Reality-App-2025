@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  data: {}
+  arProfile: {}
 }
 
 export const sliceAR = createSlice({
@@ -10,9 +10,9 @@ export const sliceAR = createSlice({
   reducers: {
     resetState: () => initialState,
     updateARUserData: (state, action) => {
-      state.data = action.payload
+      state.arProfile = action.payload
     }
   }
 })
 
-export const { resetState, updateUserData } = sliceAR.actions
+export const { resetState, updateARUserData } = sliceAR.actions
