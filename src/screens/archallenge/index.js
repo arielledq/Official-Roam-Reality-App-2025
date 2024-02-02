@@ -8,6 +8,7 @@ import AppHeader from "../../components/header"
 import AppText from "../../components/text"
 import { useNavigation } from "@react-navigation/native"
 import PointBoardBG from "../../assets/ar/point_board_bg.png"
+import { updateARUserData } from "../../redux/AR"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
@@ -22,7 +23,7 @@ const ArChallenge = ({
   const [challengeChoice, setChallengeChoice] = useState("SPONSORED")
   const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
-  const [arProfile, setARProfile] = useState({})
+  const arProfile = useSelector(state => state.ar?.arProfile)
   const navigation = useNavigation()
 
   const ARSposored = () => {
@@ -45,7 +46,7 @@ const ArChallenge = ({
     getARProfile().then((res) => {
       console.log("getARProfile::", res)
       if (res.status == 1) {
-        setARProfile(res)
+        dispatch(updateARUserData(res))
       } else {
         res.message.message = "Error in loading Challenges."
         handleError(res)
