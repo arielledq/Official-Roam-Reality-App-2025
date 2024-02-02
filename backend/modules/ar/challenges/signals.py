@@ -5,9 +5,11 @@ from django.db.models import F
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
 def update_points(sender, instance, **kwargs):
-    
-    cBbj = Challenges.objects.get(pk=instance.challenges)
-    if instance.challenge_approval == "DECLINED":
-      ARUserProfile.objects.filter(user=instance.user).update(points=F('points')-cBbj.points)
-    else:
-      ARUserProfile.objects.filter(user=instance.user).update(points=F('points')+cBbj.points)
+    if instance.challenges:
+      cBbj = Challenges.objects.get(pk=instance.challenges.id)
+      profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
+      if instance.challenge_approval == "DECLINED":
+        profileObj.points =F('points')-cBbj.points
+      elif instance.challenge_approval == "UNAPPROVED":
+        profileObj.points =F('points')+cBbj.points
+      profileObj.save()
