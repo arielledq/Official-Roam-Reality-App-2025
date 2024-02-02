@@ -131,20 +131,12 @@ export const getARProfile = () =>
     method: 'GET'
   })
 
-export const postArMemory = (payload) =>
-  Request.multiPartCall({
-    url: `modules/challenges/memories/`,
-    method: 'POST',
-    data: payload
-  })
-
 export const getPrivacyPolicy = payload =>
   Request.callWithToken({
     url: `/modules/privacy-policy/`,
     method: 'GET',
     payload
   })
-
 export const getTermsAndConditions = payload =>
   Request.callWithToken({
     url: `/modules/terms-and-conditions/`,
@@ -152,3 +144,9 @@ export const getTermsAndConditions = payload =>
     payload
   })
 
+  export const postArMemory = (payload) =>
+  Request.multiPartCall({
+    url: `modules/challenges/memories/`,
+    method: 'POST',
+    data: payload.data
+  })
