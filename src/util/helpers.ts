@@ -12,3 +12,7 @@ export const handleError = (res) => {
     console.log({ message })
     Alert.alert('Error', message)
 }
+
+export const getImage = (image) => {
+    return image.split('?X-Amz-Algorithm=')[0]
+}

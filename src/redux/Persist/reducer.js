@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  newUser: true
+  newUser: true,
+  isOnboarded: false,
 }
 
 export const slicePersist = createSlice({
@@ -11,8 +12,11 @@ export const slicePersist = createSlice({
     resetPersist: () => initialState,
     updateAsOldUser: (state, action) => {
       state.newUser = false
-    }
+    },
+    toggleOnboard : (state, action) => {
+      state.isOnboarded = !state.isOnboarded
+    },
   }
 })
 
-export const { resetPersist, updateAsOldUser } = slicePersist.actions
+export const { resetPersist, updateAsOldUser, toggleOnboard } = slicePersist.actions
