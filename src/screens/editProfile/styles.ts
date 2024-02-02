@@ -122,6 +122,11 @@ const useStyles = makeStyles((theme) => ({
     fontSize: FontSizes.S13, 
     marginLeft: 5, 
   },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 }));
 
 export default useStyles;

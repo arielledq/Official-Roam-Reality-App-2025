@@ -1,1 +1,7 @@
-export { resetState, updateUserData } from './reducer'
+export {
+  resetState,
+  updateUserData,
+  updateName,
+  updateAccountFlag,
+  updateVerified
+} from './reducer'

@@ -1,5 +1,10 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
-import { FlatList, Image, TouchableOpacity, View } from "react-native"
+import React, { useCallback, useEffect, useState } from "react"
+import {
+  FlatList,
+  Image,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import useStyles from "./styles"
 import {
@@ -19,38 +24,56 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getProfieDetails } from "../../network"
+import { getProfieDetails, sendCode } from "../../network"
 import { useSelector } from "react-redux"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import FastImage from 'react-native-fast-image'
+import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen"
+import { height, width } from "../../util/AppDimensions"
+import ScreenLoader from "../../components/screenLoader"
 
-const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
-  navigation
-}) => {
+const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
+  const navigation = useNavigation()
   const _styles = useStyles()
   const userProfile = useSelector(state => state.login?.data?.user)
   const [profileDetails, setProfileDetails] = useState(null)
-  const resData = useRef({})
+  const [loading, setloading] = useState(true)
 
   const fetchProfileDetails = async () => {
     try {
-      const details = await getProfieDetails({
+      getProfieDetails({
         id: userProfile.user_profile.id
-      })
+      }).then(res => {
+        if (res.status == 1) {
+          setProfileDetails(res)
+        } else {
+          console.error('Error', "Error fetching profile details: ")
+        }
+      }).catch(err => {
+        console.error('Error', "Error fetching profile details: ")
+      }
+      ).finally(() => setloading(false))
 
-      // Store the details in the state variable
-      setProfileDetails(details)
     } catch (error) {
-      console.error("Error fetching profile details: ", error)
+      console.error('Error', "Error fetching profile details: ")
     }
   }
 
-  useFocusEffect(useCallback(()=>{
-    fetchProfileDetails()
-  },[]))
+  useFocusEffect(
+    useCallback(() => {
+      fetchProfileDetails()
+    }, [])
+  )
+
+  // useEffect(() => { 
+  //     fetchProfileDetails();
+  // }, [navigation]);
 
   const handleMenuButton = () => {
     return (
-      <TouchableOpacity style={_styles.menuIcon}>
+      <TouchableOpacity
+        onPress={() => navigation.openDrawer()}
+        style={_styles.menuIcon}>
         <MenuIcon />
       </TouchableOpacity>
     )
@@ -71,48 +94,58 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
   for (let i = 0; i < data.length; i += 3) {
     rows.push(data.slice(i, i + 3))
   }
-  const navigateToVerifyMail = (email) => {
-    // navigation.navigate('EmailVerification', { email: email.toLowerCase() })
+  const navigateToVerifyMail = email => {
+    sendCode({ email: email.toLowerCase() })
+    navigation.navigate('EmailVerificationC', { email: email.toLowerCase(), profile: true })
   }
   const renderHeader = () => (
     <KeyboardAwareScrollView
-      keyboardShouldPersistTaps="always"
-      nestedScrollEnabled
       style={_styles.header}
     >
-      <AppHeader
-        containerStyle={_styles.headerContainer}
-        titleStyle={_styles.headerStyle}
-        title={"Profile"}
-        leftComponent={handleMenuButton()}
-      />
-      <View style={_styles.avatarContainer}>
-        <LinearGradient
-          colors={["rgba(0,0,0,0)", "rgba(0,0,0,0.9)"]}
-          start={{ x: 0.5, y: 0 }}
-          end={{ x: 0.5, y: 1 }}
-        />
-        {profileDetails?.image ? (
-        <Avatar
-          size={405}
-          source={{ uri: profileDetails.image }}
-        />
-      ) : (
-        <View style={{ width: 405, height: 405, backgroundColor: 'gray' }}>
-          <AppText style={{ color: 'white' }}>Image not available</AppText>
+      {profileDetails?.image ?
+        <View style={_styles.avatarContainer}>
+          <FastImage
+            style={{
+              width: '100%',
+              height: height * 0.4,
+            }}
+            source={{ uri: profileDetails?.image }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+          <LinearGradient
+            colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+            start={{ x: 0.5, y: 1 }}
+            end={{ x: 0.5, y: 0.7 }}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 1
+            }}
+          />
+          <AppButton
+            customColors={["#7B16FF", "#1158F4"]}
+            buttonStyle={_styles.editButton}
+            containerStyle={_styles.editButtonContainer}
+            onPress={() => navigation.navigate("EditProfile", { edit: true })}
+          >
+            <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+            <AppText style={_styles.buttonText}>Edit Profile</AppText>
+          </AppButton>
         </View>
-      )}
-        {/* Edit Profile button */}
+        :
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
           containerStyle={_styles.editButtonContainer}
-          onPress={() => navigation.navigate("EditProfile")}
+          onPress={() => navigation.navigate("EditProfile", { edit: true })}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
         </AppButton>
-      </View>
+      }
       <View style={_styles.scroll}>
         <UserInfoCard
           name={profileDetails?.user.name}
@@ -120,7 +153,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
-        <AppText style={_styles.scoreboard}>SCOREBOARD</AppText>
+        <View style={_styles.scoreboardContainer}>
+          <AppText
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={_styles.scoreboard}>SCOREBOARD</AppText>
+        </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
           <StatContainer value={"23"} property={"Points"} />
@@ -140,18 +178,21 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
       </TouchableOpacity>
       <View style={{ marginHorizontal: -22 }}>
         <FlatList
+          contentContainerStyle={{ marginBottom: 50 }}
           data={data}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <MemoryContainer title={"hELLO"} description={"HI"} image={""} />
+            <MemoryContainer title={"Title"} description={"description"} image={""} />
           )}
           keyExtractor={item => item.id.toString()}
         />
       </View>
     </View>
   )
+
+  console.log({ profileDetails })
 
   const renderItem = ({ item }) => (
     <BoxStatContainer
@@ -164,7 +205,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <FlatList
+      <AppHeader
+        containerStyle={_styles.headerContainer}
+        title={"Profile"}
+        leftComponent={handleMenuButton()}
+      />
+      {loading ? <ScreenLoader /> : <FlatList
         data={data}
         // contentContainerStyle={_styles.scroll}
         keyExtractor={item => item.id.toString()}
@@ -173,7 +219,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = ({
         numColumns={3}
         ListFooterComponent={renderFooter}
         nestedScrollEnabled={false}
-      />
+      />}
     </BackgroundWithImage>
   )
 }
