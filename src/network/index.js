@@ -137,3 +137,18 @@ export const postArMemory = (payload) =>
     method: 'POST',
     data: payload
   })
+
+export const getPrivacyPolicy = payload =>
+  Request.callWithToken({
+    url: `/modules/privacy-policy/`,
+    method: 'GET',
+    payload
+  })
+
+export const getTermsAndConditions = payload =>
+  Request.callWithToken({
+    url: `/modules/terms-and-conditions/`,
+    method: 'GET',
+    payload
+  })
+
