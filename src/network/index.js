@@ -104,29 +104,36 @@ export const getProfieDetails = payload =>
     url: `${commonApiRoute}account-setup/${payload.id}/`,
     method: 'GET',
     payload
-})
+  })
 
 export const updateProfile = payload =>
   Request.multiPartCall({
     url: `${commonApiRoute}account-setup/${payload.id}/`,
     method: 'PATCH',
     data: payload.data
-})
+  })
 
 export const getARChallenges = () =>
   Request.callAR({
     url: `modules/challenges/user/`,
     method: 'GET'
-})
+  })
 
 export const getARSposored = () =>
   Request.callAR({
     url: `modules/challenges/sponsor/`,
     method: 'GET'
-})
+  })
 
 export const getARProfile = () =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/`,
     method: 'GET'
+  })
+
+export const postArMemory = (payload) =>
+  Request.multiPartCall({
+    url: `modules/challenges/memories/`,
+    method: 'POST',
+    data: payload
   })

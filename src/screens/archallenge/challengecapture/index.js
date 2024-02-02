@@ -83,7 +83,7 @@ const ArChallengeCapture = ({
         .fetch('GET', modelFile)
         .progress((received, total) => {
           console.log('progress', received / total)
-          setProgress(Math.trunc( Number((received / total) * 100) ))
+          setProgress(Math.trunc(Number((received / total) * 100)))
         })
         .then((res) => {// the temp file path
           console.log('The file saved to ', res.path());
@@ -249,7 +249,7 @@ const ArChallengeCapture = ({
       this.checkPermission = this.checkPermission.bind(this);
     }
 
-    componentDidMount(){
+    componentDidMount() {
       this.checkPermission()
     }
 
@@ -298,7 +298,7 @@ const ArChallengeCapture = ({
       const retDict = await this._arNavigator._stopVideoRecording()
       console.log("stopRecordVideo:", retDict)
       this.setState({
-        capturedVideo: retDict.url,
+        capturedVideo: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url,
         capturedImage: null,
         recordingStart: false
       });
@@ -315,7 +315,7 @@ const ArChallengeCapture = ({
         .then((retDict) => {
           console.log("captureImage:", retDict)
           this.setState({
-            capturedImage: retDict.url
+            capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
           });
         });
     }
@@ -368,28 +368,28 @@ const ArChallengeCapture = ({
     }
 
     checkPermission() {
-      if(Platform.OS == 'android'){
+      if (Platform.OS == 'android') {
         requestMultiple([PERMISSIONS.ANDROID.CAMERA,
-          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-          PERMISSIONS.ANDROID.RECORD_AUDIO,
-          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+        PERMISSIONS.ANDROID.RECORD_AUDIO,
+        PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
         ]).then(response => {
-          console.log("PERMISSIONS.ANDROID:: ",response);
+          console.log("PERMISSIONS.ANDROID:: ", response);
         });
       }
-      if(Platform.OS =='ios'){
+      if (Platform.OS == 'ios') {
         request([
           PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
         ]).then(response => {
-          console.log("PERMISSIONS.OS",response);
+          console.log("PERMISSIONS.OS", response);
         });
         requestMultiple([PERMISSIONS.IOS.CAMERA,
-          PERMISSIONS.IOS.MICROPHONE,
-          PERMISSIONS.IOS.PHOTO_LIBRARY,
-          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+        PERMISSIONS.IOS.MICROPHONE,
+        PERMISSIONS.IOS.PHOTO_LIBRARY,
+        PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
         ]).then(response => {
-          console.log("PERMISSIONS.OS",response);
+          console.log("PERMISSIONS.OS", response);
         });
       }
     };
@@ -412,11 +412,11 @@ const ArChallengeCapture = ({
           </ViroARSceneNavigator>
 
           {this.state.capturedImage && <Image style={styles.f1} source={{
-            uri: Platform.OS === 'android' ? `file://${this.state.capturedImage}` : this.state.capturedImage
+            uri: this.state.capturedImage
           }} />}
 
           {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
-            uri: Platform.OS === 'android' ? `file://${this.state.capturedVideo}` : this.state.capturedVideo
+            uri: this.state.capturedVideo
           }} />}
 
           <View style={styles.mainHeaderContainer}>
@@ -461,7 +461,7 @@ const ArChallengeCapture = ({
                 if (this.state.recordingStart) {
                   this.stopRecordVideo();
                   return;
-                }else{
+                } else {
                   this._takeScreenshot();
                 }
               }} activeOpacity={.6}>
