@@ -61,6 +61,7 @@ const ArChallengeCapture = ({
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
+    const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState([0.08, 0.08, 0.08]);
     const [rotate, setRotate] = useState([0, 0, 0]);
@@ -102,14 +103,20 @@ const ArChallengeCapture = ({
           RNFS.readDir(path)
             .then((result) => {
               console.log('GOT RESULT', result);
+              const sourcesArray = []
               for (let i = 0; i < result.length; i++) {
                 if (result[i].isFile) {
                   console.log("unzipModelFile", result[i].name)
                   if (result[i].name.includes(".vrx")) {
-                    setModelPath(result[i].path)
+                    const vrxFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(vrxFile)
+                  } else {
+                    const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    sourcesArray.push(sourceFile)
                   }
                 }
               }
+              setSourcesFiles(sourcesArray)
               setLoading(false)
             })
         })
@@ -209,16 +216,11 @@ const ArChallengeCapture = ({
         {
           challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
             key="obj_3d1"
-            source={{ uri: Platform.OS === 'android' ? `file://${modelPath}` : modelPath }} /// this works
+            source={{ uri: modelPath }} /// this works
             position={[0, -5, -30]}
             scale={[0.08, 0.08, 0.08]}
             type="VRX"
-            resources={[
-              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_D.PNG'),
-              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_01ID_Tan.PNG'),
-              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_D.PNG'),
-              // require('../../../assets/ar/Quin_texture_anim2/T_Quinn_02ID_Tan.PNG'),
-            ]}
+            resources={sourcesFiles}
             materials={"pbr"}
             rotation={rotate}
             onRotate={_onRotate}
