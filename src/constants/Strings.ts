@@ -7,6 +7,8 @@
     to : "to",
     WithTheCarribean : "WITH THE CARIBBEAN’S",
     FirstTravelARGame : "1ST TRAVEL AR GAME",
-    LetsBegin : "Let's Begin"
+    LetsBegin : "Let's Begin",
+    HasOnboarded : "HasOnboarded",
+    Onboarded : "Onboarded",
 }
 export default Strings;
