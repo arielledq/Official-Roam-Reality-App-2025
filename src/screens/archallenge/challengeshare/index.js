@@ -11,9 +11,11 @@ import moment from "moment";
 import FacebookShare from "../../../assets/ar/facebook.svg"
 import InstagramShare from "../../../assets/ar/insta.svg"
 import TiktokShare from "../../../assets/ar/tiktok.svg"
-import { postArMemory } from "../../../network";
+import { getARProfile, postArMemory } from "../../../network";
 import { handleError } from "../../../util/helpers";
 import Video from 'react-native-video';
+import { useDispatch, useSelector } from "react-redux"
+import { updateARUserData } from "../../../redux/AR";
 
 const ArChallengeShare = ({
 
@@ -25,6 +27,7 @@ const ArChallengeShare = ({
   const fileExt = captureData.split('.').pop();
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
+  const dispatch = useDispatch()
 
   const shareBtnOnPress = () => {
     setIsLoading(true)
@@ -39,11 +42,22 @@ const ArChallengeShare = ({
     formData.append("memory_file", shareFile)
     postArMemory(formData).then((res) => {
       console.log("shareBtnOnPress::", res)
+      ARUserProfile()
       if (res.status == 1) {
         Alert.alert("AR Challenge Share!", "Successfully, completed you challenge.")
       } else {
         res.message.message = "Error in Sharing Challenges."
         handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
+  const ARUserProfile = () => {
+    getARProfile().then((res) => {
+      if (res.status == 1) {
+        dispatch(updateARUserData(res))
       }
     }).finally(() => {
       setIsLoading(false)
