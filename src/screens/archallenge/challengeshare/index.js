@@ -1,21 +1,22 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 
 import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import AppText from "../../../components/text"
 import useStyles from "./styles"
 import AppButton from "../../../components/button"
 import moment from "moment";
-import FacebookShare from "../../../assets/ar/facebook.svg"
-import InstagramShare from "../../../assets/ar/insta.svg"
-import TiktokShare from "../../../assets/ar/tiktok.svg"
+import FacebookShareImg from "../../../assets/ar/facebook.svg"
+import InstagramShareImg from "../../../assets/ar/insta.svg"
+import TiktokShareImg from "../../../assets/ar/tiktok.svg"
 import { getARProfile, postArMemory } from "../../../network";
 import { handleError } from "../../../util/helpers";
 import Video from 'react-native-video';
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
+import { ShareDialog } from "react-native-fbsdk-next";
 
 const ArChallengeShare = ({
 
@@ -27,6 +28,7 @@ const ArChallengeShare = ({
   const fileExt = captureData.split('.').pop();
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
+  const [capturedUrl, setCapturedUrl] = useState(false)
   const dispatch = useDispatch()
 
   const shareBtnOnPress = () => {
@@ -34,14 +36,13 @@ const ArChallengeShare = ({
     let filename = captureData.split('/').pop()
     let shareFile = {
       uri: captureData,
-      type: fileExt == '.mp4' ? 'video/mp4' : 'image/png',
+      type: fileExt == 'mp4' ? 'video/mp4' : 'image/png',
       name: filename
     }
     const formData = new FormData()
     formData.append("challenges", challengeObj.id)
     formData.append("memory_file", shareFile)
     postArMemory(formData).then((res) => {
-      console.log("shareBtnOnPress::", res)
       ARUserProfile()
       if (res.status == 1) {
         Alert.alert("AR Challenge Share!", "Successfully, completed you challenge.")
@@ -64,6 +65,41 @@ const ArChallengeShare = ({
     })
   }
 
+  const FacebookShareImgOnPress = () => {
+    console.log("Facebook Share", fileExt)
+    console.log("Facebook Share", captureData)
+    ShareDialog.setMode("native")
+    if (fileExt == 'png') {
+      const sharePhotoContent = {
+        contentType: 'photo',
+        photos: [{
+          imageUrl: captureData
+        }],
+      }
+      console.log("Facebook sharePhotoContent", sharePhotoContent)
+      ShareDialog.canShow(sharePhotoContent)
+        .then((canShow) => {
+          console.log("Facebook canShow", canShow)
+          if (canShow) {
+            return ShareDialog.show(sharePhotoContent);
+          }
+        })
+        .then((result) => {
+          console.log('Share : '
+            + result);
+          if (result.isCancelled) {
+            console.log('Share cancelled');
+          } else {
+            console.log('Share success with postId: '
+              + result.postId);
+          }
+        })
+        .catch(e => {
+          console.log("catch", e.toString())
+        });
+    }
+  }
+
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={challengeObj?.sponsored?.name} backgroundColor="transparent" />
@@ -75,7 +111,7 @@ const ArChallengeShare = ({
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
         <View style={styles.detailContainer}>
 
-          {fileExt == '.mp4' ? <Video repeat={true} style={{ width: '100%', height: 318 }} source={{
+          {fileExt == 'mp4' ? <Video repeat={true} style={{ width: '100%', height: 318 }} source={{
             uri: captureData
           }} />
             :
@@ -99,14 +135,14 @@ const ArChallengeShare = ({
         </View>
         <View style={styles.socialShareContainer}>
           <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity style={styles.shareBtn}>
-              <FacebookShare />
+            <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
+              <FacebookShareImg />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
+              <InstagramShareImg />
             </TouchableOpacity>
             <TouchableOpacity style={styles.shareBtn}>
-              <InstagramShare />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.shareBtn}>
-              <TiktokShare />
+              <TiktokShareImg />
             </TouchableOpacity>
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
