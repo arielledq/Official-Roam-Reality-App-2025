@@ -17,6 +17,8 @@ import Video from 'react-native-video';
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
+import Share from 'react-native-share';
+import RNFS from 'react-native-fs';
 
 const ArChallengeShare = ({
 
@@ -109,6 +111,34 @@ const ArChallengeShare = ({
       });
   }
 
+  const InstagramShareImgOnPress = async () => {
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    console.log('InstagramShareImgOnPress filebase64er =>', filebase64);
+    
+    let shareContent = {}
+    if (fileExt == 'mp4') {
+      shareContent = {
+        title: 'Share video to instagram',
+        type: 'video/mp4',
+        url: filebase64,
+        social: Share.Social.INSTAGRAM,
+      }
+    }
+    if (fileExt == 'png') {
+      shareContent = {
+        title: 'Share image to instagram',
+        type: 'image/png',
+        url: filebase64,
+        social: Share.Social.INSTAGRAM,
+      }
+    } try {
+      const ShareResponse = await Share.shareSingle(shareContent);
+      console.log('InstagramShareImgOnPress ShareResponse =>', ShareResponse);
+    } catch (error) {
+      console.log('Error =>', error);
+    }
+  }
+
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={challengeObj?.sponsored?.name} backgroundColor="transparent" />
@@ -147,7 +177,7 @@ const ArChallengeShare = ({
             <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
               <FacebookShareImg />
             </TouchableOpacity>
-            <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
+            <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
             <TouchableOpacity style={styles.shareBtn}>
