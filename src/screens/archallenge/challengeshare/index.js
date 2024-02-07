@@ -69,35 +69,44 @@ const ArChallengeShare = ({
     console.log("Facebook Share", fileExt)
     console.log("Facebook Share", captureData)
     ShareDialog.setMode("native")
+    let shareContent = {}
     if (fileExt == 'png') {
-      const sharePhotoContent = {
+      shareContent = {
         contentType: 'photo',
         photos: [{
           imageUrl: captureData
         }],
       }
-      console.log("Facebook sharePhotoContent", sharePhotoContent)
-      ShareDialog.canShow(sharePhotoContent)
-        .then((canShow) => {
-          console.log("Facebook canShow", canShow)
-          if (canShow) {
-            return ShareDialog.show(sharePhotoContent);
-          }
-        })
-        .then((result) => {
-          console.log('Share : '
-            + result);
-          if (result.isCancelled) {
-            console.log('Share cancelled');
-          } else {
-            console.log('Share success with postId: '
-              + result.postId);
-          }
-        })
-        .catch(e => {
-          console.log("catch", e.toString())
-        });
     }
+    if (fileExt == 'mp4') {
+      shareContent = {
+        contentType: 'video',
+        video: {
+          localUrl: captureData
+        },
+      }
+    }
+    console.log("Facebook sharePhotoContent", shareContent)
+    ShareDialog.canShow(shareContent)
+      .then((canShow) => {
+        console.log("Facebook canShow", canShow)
+        if (canShow) {
+          return ShareDialog.show(shareContent);
+        }
+      })
+      .then((result) => {
+        console.log('Share : '
+          + result);
+        if (result.isCancelled) {
+          console.log('Share cancelled');
+        } else {
+          console.log('Share success with postId: '
+            + result.postId);
+        }
+      })
+      .catch(e => {
+        console.log("catch", e.toString())
+      });
   }
 
   return (
