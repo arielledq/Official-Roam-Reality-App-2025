@@ -88,7 +88,7 @@ const ArChallengeShare = ({
         },
       }
     }
-    console.log("Facebook sharePhotoContent", shareContent)
+    console.log("Facebook shareContent", shareContent)
     ShareDialog.canShow(shareContent)
       .then((canShow) => {
         console.log("Facebook canShow", canShow)

@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 
 import {
   TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView,
-  PermissionsAndroid
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
@@ -16,7 +15,7 @@ import {
   ViroAmbientLight,
   ViroDirectionalLight,
   ViroSpotLight,
-  ViroText, ViroARCamera, ViroBox, ViroNode
+  ViroText, ViroARCamera, ViroOrbitCamera, ViroARPlaneSelector, ViroQuad, ViroNode
 } from '@viro-community/react-viro';
 import Video from 'react-native-video';
 import uuid from 'react-native-uuid';
@@ -40,6 +39,7 @@ ViroMaterials.createMaterials({
   pbr: {
     lightingModel: "Blinn",
     chromaKeyFilteringColor: "#00FF00",
+    shininess: .6
   },
 });
 
@@ -52,8 +52,6 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
-  console.log("ArChallengeCapture", modelFile)
-  console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
   const navigateToShare = (captureData) => {
     navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -181,8 +179,14 @@ const ArChallengeCapture = ({
       <ViroARScene onTrackingUpdated={onInitialized}>
 
         <ViroAmbientLight color="#ffffff" intensity={200} />
-        <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
-        <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
+        <ViroDirectionalLight
+          color="#FFFFFF"
+          direction={[.05, 0.05, .05]}
+          shadowOrthographicPosition={[0, 3, -5]}
+          shadowOrthographicSize={10}
+          shadowNearZ={2}
+          shadowFarZ={9}
+          castsShadow={true} />
 
         <ViroSpotLight
           innerAngle={5}
@@ -191,6 +195,19 @@ const ArChallengeCapture = ({
           position={[0, -7, 0]}
           color="#ffffff"
           intensity={250} />
+
+        <ViroSpotLight
+          innerAngle={5}
+          outerAngle={25}
+          direction={[0, 1, 0]}
+          position={[0, -7, 0]}
+          color="#ffffff"
+          castsShadow={true}
+          shadowMapSize={2048}
+          shadowNearZ={2}
+          shadowFarZ={5}
+          intensity={250}
+          shadowOpacity={.7} />
 
 
         {loading &&
@@ -214,11 +231,12 @@ const ArChallengeCapture = ({
           position={[0, 0, -5]} />}
 
         {
-          challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
+          challengeObj.challenge_choice == "DANCE" && modelPath &&
+          <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
             position={[0, -5, -30]}
-            scale={[0.08, 0.08, 0.08]}
+            scale={[0.004, 0.004, 0.004]}
             type="VRX"
             resources={sourcesFiles}
             materials={"pbr"}
@@ -234,6 +252,11 @@ const ArChallengeCapture = ({
             }}
           />
         }
+        <ViroQuad
+          position={[0, -5, -30]}
+          rotation={[-90, 0, 0]}
+          width={4} height={4}
+          arShadowReceiver={true} />
       </ViroARScene>
     );
   };
@@ -387,11 +410,6 @@ const ArChallengeCapture = ({
         });
       }
       if (Platform.OS == 'ios') {
-        request([
-          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
-        ]).then(response => {
-          console.log("PERMISSIONS.OS", response);
-        });
         requestMultiple([PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
         PERMISSIONS.IOS.PHOTO_LIBRARY,
@@ -476,7 +494,7 @@ const ArChallengeCapture = ({
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
-              navigateToShare(this.state.capturedImage)
+              navigateToShare(this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo )
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
             </TouchableOpacity>
