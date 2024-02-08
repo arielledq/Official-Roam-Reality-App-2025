@@ -26,7 +26,9 @@ const useStyles = makeStyles(theme => ({
   },
   f1: {
     height: ScreenHeight,
-    width: '100%'
+    width: '100%',
+    position:'absolute',
+    top:0
   },
   bottomContainer: {
     width: '100%',
@@ -101,7 +103,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    width: '100%'
+    left:0,
+    marginHorizontal:20,
+    right:0
   },
   holdText: {
     ...fontGroup.p600,
