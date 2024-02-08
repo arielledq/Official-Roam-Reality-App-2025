@@ -95,6 +95,24 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 15,
     fontWeight: "700"
   },
+  timerTextContainer: {
+    top: -50,
+    position: 'absolute',
+    padding: 5,
+    backgroundColor: "#090A1620",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    left:0,
+    marginHorizontal:20,
+    right:0
+  },
+  timerText: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S10,
+    textAlign: 'center',
+    color: theme.colors.white,
+  },
   holdTextContainer: {
     top: -50,
     position: 'absolute',
