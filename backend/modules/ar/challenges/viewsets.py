@@ -1,5 +1,5 @@
 from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories
-from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer
+from .serializers import ARMemoriesSerializerGet,ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
@@ -40,22 +40,23 @@ class ARMemoriesViewSet(ViewSet):
         
     parser_class = (FileUploadParser,)
 
+    def get(self, request, *args, **kwargs):
+        objs = self.queryset.filter(user = request.user.id)
+        serializer = ARMemoriesSerializerGet(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['post'],url_path='check-challenge-done', name='Check Challenge')
     def check_challenge_done(self, request):
       user_id = self.request.user.id
-      print(user_id)
       challenges_id = request.data.get("challenges")
-      print(challenges_id)
       criterion1 = Q(user=user_id)
       criterion2 = Q(challenges=challenges_id)
       results = ARMemories.objects.filter(criterion1 & criterion2)
       if len(results) == 0:
-        return Response({'message': "Challenge not exists."}, status=200)
+        return Response({'message': "Challenge not exists."}, status=status.HTTP_200_OK)
       else:
-        return Response({'message': "Challenge experience already submitted."}, status=403)
+        return Response({'message': "Challenge experience already submitted."}, status=status.HTTP_403_FORBIDDEN)
          
-       
-
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
