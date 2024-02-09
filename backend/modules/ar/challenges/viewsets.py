@@ -10,7 +10,9 @@ from rest_framework import authentication,permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.db.models import F
+from django.db.models import Q
 
 class Resource3dModelViewSet(viewsets.ModelViewSet):
     """
@@ -38,6 +40,22 @@ class ARMemoriesViewSet(ViewSet):
         
     parser_class = (FileUploadParser,)
 
+    @action(detail=False, methods=['post'],url_path='check-challenge-done', name='Check Challenge')
+    def check_challenge_done(self, request):
+      user_id = self.request.user.id
+      print(user_id)
+      challenges_id = request.data.get("challenges")
+      print(challenges_id)
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(challenges=challenges_id)
+      results = ARMemories.objects.filter(criterion1 & criterion2)
+      if len(results) == 0:
+        return Response({'message': "Challenge not exists."}, status=200)
+      else:
+        return Response({'message': "Challenge experience already submitted."}, status=403)
+         
+       
+
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
@@ -46,13 +64,21 @@ class ARMemoriesViewSet(ViewSet):
       return Response(serializer.data)
         
     def create(self, request, *args, **kwargs):
-      request.data['user'] = self.request.user.id
-      serializer = ARMemoriesSerializer(data=request.data, partial=True)
-      if serializer.is_valid(raise_exception=True):
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      challenges_id = request.data.get("challenges")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(challenges=challenges_id)
+      results = ARMemories.objects.filter(criterion1 & criterion2)
+      if len(results) == 0:
+        serializer = ARMemoriesSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+          serializer.save()
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': "Challenge experience already submitted."}, status=403)
       
 
 class ARProfileViewSet(ViewSet):
