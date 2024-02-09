@@ -40,7 +40,9 @@ const useStyles = makeStyles((theme) => ({
     color: theme.colors.TandCgrey,
   },
   iconStyle: {
-    marginBottom: 2
+    marginBottom: 2,
+    width:100,
+    height:100
   }
 }));
 
