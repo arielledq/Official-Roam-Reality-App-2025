@@ -15,14 +15,14 @@ const MemoryContainer = ({
   description: string,
   image: string,
   onPressAction?: () => void,
-  item:any
+  item: any
 }) => {
   const styles = useStyles()
 
   return (
     <Pressable style={styles.cardContainer} onPress={onPressAction}>
       <View style={styles.cardInner}>
-        <Image style={styles.iconStyle} source={Images.ProfileImage} />
+        <Image style={styles.iconStyle} source={{ uri: item?.challenge_details?.image }} />
         <View style={styles.cardBottomContent}>
           <AppText style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
           <AppText style={styles.Text}>{description}</AppText>
