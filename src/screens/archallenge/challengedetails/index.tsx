@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import { fontGroup, FontSizes } from "../../../util/FontUtils"
-import { Dimensions, Image, Keyboard, ScrollView, Text, View } from "react-native";
+import { Alert, Dimensions, Image, Keyboard, ScrollView, Text, View } from "react-native";
 import {
   RootStackParamList,
   ScreenStackComponent
@@ -14,6 +14,7 @@ import RenderHtml from 'react-native-render-html';
 import moment from 'moment'
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
+import { checkARChallengeDoneAPI } from "../../../network";
 
 const { width } = Dimensions.get('window');
 
@@ -24,8 +25,39 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const route = useRoute()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj;
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
+
+  const checkIfChallengeIsDone = () => {
+    setIsLoading(true)
+    checkARChallengeDoneAPI({
+      challenges: challengeObj.id
+    }).then((res) => {
+      if (res.errorStatus == 403) {
+        console.log("checkIfChallengeIsDone", "false")
+        setIsChallengeDone(false)
+      } else {
+        console.log("checkIfChallengeIsDone", "true")
+        setIsChallengeDone(true)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
+  const navigateToChallengeCapture = () => {
+    if (!isChallengeDone) {
+      navigation.navigate("ArChallengeCapture", { challengeObj });
+    }else{
+      Alert.alert("Anywhere AR Challenges","You have already completed the challenge.")
+    }
+  }
+
+  useEffect(() => {
+    checkIfChallengeIsDone()
+  }, []);
 
   return (
 
@@ -72,7 +104,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
       <View style={{ height: 152 }}>
         <Text style={styles.bottomText}>Let's see an example</Text>
         <AppButton
-          onPress={() => navigation.navigate("ArChallengeCapture", { challengeObj })}
+          onPress={() => navigateToChallengeCapture()}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainerStyle}
           title={"Start Challenge"}
