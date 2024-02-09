@@ -145,6 +145,12 @@ export const checkARChallengeDoneAPI = (payload) =>
     data: payload
   })
 
+export const getProfieARMemoriesAPI = () =>
+  Request.callWithToken({
+    url: `modules/challenges/memories/`,
+    method: 'GET'
+  })
+
 export const getPrivacyPolicy = payload =>
   Request.callWithToken({
     url: `/modules/privacy-policy/`,
