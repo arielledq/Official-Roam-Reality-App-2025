@@ -49,6 +49,8 @@ const Navigation = () => {
   const renderAuthStack = () => {
     return (
       <>
+        <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
+        <Stack.Screen name="Onboarding" component={Onboarding} />
         {
           newUser ?
             <>
