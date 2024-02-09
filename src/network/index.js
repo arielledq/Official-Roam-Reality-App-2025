@@ -138,6 +138,13 @@ export const postArMemory = (payload) =>
     data: payload
   })
 
+export const checkARChallengeDoneAPI = (payload) =>
+  Request.callWithToken({
+    url: `modules/challenges/memories/check-challenge-done/`,
+    method: 'POST',
+    data: payload
+  })
+
 export const getPrivacyPolicy = payload =>
   Request.callWithToken({
     url: `/modules/privacy-policy/`,
