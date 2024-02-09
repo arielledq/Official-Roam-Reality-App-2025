@@ -1,4 +1,5 @@
 import { Alert } from "react-native"
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const handleError = (res) => {
     let message = ''
@@ -16,3 +17,22 @@ export const handleError = (res) => {
 export const getImage = (image) => {
     return image.split('?X-Amz-Algorithm=')[0]
 }
+
+export const setItem = async (key : string, value : string) => {
+    try {
+      await AsyncStorage.setItem(key, value);
+    } catch (e) {
+      console.log('error', e)
+    }
+};
+
+export const getItem = async (key : string) => {
+    try {
+        const value = await AsyncStorage.getItem(key);
+        if (value !== null) {
+          return value
+        }
+      } catch (e) {
+        console.log('error', e)
+      }
+};

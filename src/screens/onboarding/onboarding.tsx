@@ -1,10 +1,8 @@
-import { useDispatch } from 'react-redux'
 import React,{useState} from 'react'
 import {Image} from 'react-native'
 
 import BackgroundWithImage from '../../components/background'
 import { AppButton, AppText } from '../../components'
-import { toggleOnboard } from '../../redux/Persist'
 import Strings from '../../constants/Strings'
 import { Icons } from '../../assets/Icons'
 import Images from '../../assets/images'
@@ -29,7 +27,6 @@ const onboardingScreens = [
 ];
 
 const Onboarding = ({navigation}) => {
-  const dispatch = useDispatch()
   const styles = useStyles();
   const [activeIndex, setActiveIndex] = useState(1);
 
@@ -38,8 +35,7 @@ const Onboarding = ({navigation}) => {
 
   const continueHandler = async() => {
     if(activeIndex === onboardingScreens.length){
-      dispatch(toggleOnboard())
-      navigation.navigate('Home')
+      navigation.navigate('SignUp')
     }
     else{
       setActiveIndex((prevIndex) => prevIndex + 1)
