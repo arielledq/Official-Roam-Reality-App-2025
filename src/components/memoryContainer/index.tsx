@@ -25,7 +25,7 @@ const MemoryContainer = ({
         <Image style={styles.iconStyle} source={{ uri: item?.challenge_details?.image }} />
         <View style={styles.cardBottomContent}>
           <AppText style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
-          <AppText style={styles.Text}>{description}</AppText>
+          <AppText numberOfLines={2} style={styles.Text}>{item?.challenge_details?.description.replace(/<[^>]+>/g, '')}</AppText>
         </View>
       </View>
     </Pressable>
