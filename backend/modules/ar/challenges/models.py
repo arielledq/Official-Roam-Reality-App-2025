@@ -161,5 +161,5 @@ class ARMemories(models.Model):
 
     def __str__(self):
         return str(
-            self.user.name + " " + self.challenges.name if self.challenges else ""
+            self.user.name + " " + str(self.memory_file)
         )

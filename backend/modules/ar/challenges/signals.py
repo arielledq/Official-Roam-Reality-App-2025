@@ -29,8 +29,7 @@ def update_thumbnails(sender, instance, **kwargs):
         video_file = instance.memory_file.url
       else:
         video_file = instance.memory_file.path
-         
-      thumbnail_tmp_out = tempfile.NamedTemporaryFile(suffix="_thumbnails.%s"%OUTPUT_IMAGE_EXT,dir='mediafiles',delete=True)
+      thumbnail_tmp_out = tempfile.NamedTemporaryFile(suffix=".%s"%OUTPUT_IMAGE_EXT)
       video_file_thumbnail_tmp = thumbnail_tmp_out.name
       ffmpeg_cmd = ["ffmpeg", '-i', video_file, '-ss', '00:00:01.000', '-vframes', '1','-y',video_file_thumbnail_tmp]
       subprocess.call(ffmpeg_cmd)
