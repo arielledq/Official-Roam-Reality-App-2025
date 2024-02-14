@@ -42,18 +42,17 @@ const Drawer = createDrawerNavigator();
 const Navigation = () => {
   const splashShown = useSelector(state => state.splash?.splashShown)
   const token = useSelector(state => state.login?.data?.token)
-  const { newUser, isOnboarded } = useSelector(state => state.persist)
+  const { newUser } = useSelector(state => state.persist)
 
   console.log({ token })
 
   const renderAuthStack = () => {
     return (
       <>
-        <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
-        <Stack.Screen name="Onboarding" component={Onboarding} />
         {
           newUser ?
             <>
+              <Stack.Screen name="Onboarding" component={Onboarding} />
               <Stack.Screen name="SignUp" component={SignUp} />
               <Stack.Screen name="Login" component={Login} />
             </> :
@@ -115,8 +114,9 @@ const Navigation = () => {
           headerShown: false,
           animation: "slide_from_right",
         }}>
-        {token ?
-          renderCommonStack() : renderAuthStack()
+        {splashShown ?  
+          token ? renderCommonStack() : renderAuthStack()  : 
+          <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} /> 
         }
       </Stack.Navigator>
     )
@@ -124,11 +124,9 @@ const Navigation = () => {
 
   return (
     <NavigationContainer ref={navigationRef}>
-      {
         <ThemeProvider theme={theme}>
           <StackNav />
         </ThemeProvider>
-      }
     </NavigationContainer>
   );
 };
