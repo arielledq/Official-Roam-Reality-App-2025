@@ -9,6 +9,8 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
 FROM crowdbotics/cb-django:3.8-slim-buster AS release
 ARG SECRET_KEY
 
+RUN apt-get update && apt-get install -y ffmpeg
+
 # Set Working directory
 WORKDIR /opt/webapp
 
