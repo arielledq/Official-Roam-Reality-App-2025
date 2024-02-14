@@ -18,11 +18,11 @@ const MemoryContainer = ({
   item: any
 }) => {
   const styles = useStyles()
-
+  console.log("item:",item)
   return (
     <Pressable style={styles.cardContainer} onPress={onPressAction}>
       <View style={styles.cardInner}>
-        <Image style={styles.iconStyle} source={{ uri: item?.challenge_details?.image }} />
+        <Image style={styles.iconStyle} source={{ uri: item.memory_type == 'VIDEO' ? item?.thumbnail_memory_video_file : item?.image }} />
         <View style={styles.cardBottomContent}>
           <AppText style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
           <AppText numberOfLines={2} style={styles.Text}>{item?.challenge_details?.description.replace(/<[^>]+>/g, '')}</AppText>

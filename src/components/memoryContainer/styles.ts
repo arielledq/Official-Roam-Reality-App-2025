@@ -4,9 +4,9 @@ import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 const useStyles = makeStyles((theme) => ({
   cardInner: {
-    // justifyContent: 'center',
-    // alignContent: 'center',
-    // alignItems: 'center',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
   },
   cardContainer: {
     height: 172,
@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // marginTop: -20
+    paddingHorizontal:12
   },
   titleStyle: {
     ...fontGroup.ns800,
