@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 from django.conf import settings
 import ffmpeg_downloader as ffdl
+import os
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
 def update_points(sender, instance, **kwargs):
@@ -22,6 +23,9 @@ def update_points(sender, instance, **kwargs):
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_thumbnails_updated")
 def update_thumbnails(sender, instance, **kwargs):
+    if os.path.exists(ffdl.ffmpeg_path) is False:
+      subprocess.call(['ffdl','install','-y'])
+
     if kwargs['created'] and instance.memory_type == 'VIDEO':
       OUTPUT_IMAGE_EXT = 'png'
       OUTPUT_IMAGE_CONTENT_TYPE = 'image/png'
