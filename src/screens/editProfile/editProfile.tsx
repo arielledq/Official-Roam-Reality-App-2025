@@ -419,7 +419,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                           : theme.darkColors?.grey
                       }
                       selectionColor={"white"}
-                      placeholder="Home Address"
+                      placeholder="Hometown"
                       value={values.address}
                       onChangeText={handleChange("address")}
                       errorMessage={
