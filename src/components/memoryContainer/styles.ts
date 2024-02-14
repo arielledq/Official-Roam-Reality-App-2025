@@ -10,7 +10,7 @@ const useStyles = makeStyles((theme) => ({
   },
   cardContainer: {
     height: 172,
-    width: wp('34%'),
+    width: 127,
     alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
@@ -42,8 +42,9 @@ const useStyles = makeStyles((theme) => ({
   },
   iconStyle: {
     marginBottom: 2,
-    width:100,
-    height:100
+    width:107,
+    height:100,
+    borderRadius:10
   }
 }));
 
