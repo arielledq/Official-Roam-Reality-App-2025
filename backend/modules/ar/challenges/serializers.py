@@ -73,7 +73,9 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "description",
             "declined_reason",
             "challenge_approval",
-            "challenges"
+            "challenges",
+            "thumbnail_memory_video_file",
+            "memory_type"
         )
 
 class ARMemoriesSerializer(serializers.ModelSerializer):
