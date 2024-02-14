@@ -121,6 +121,7 @@ class ARUserProfile(models.Model):
 
 class ARMemories(models.Model):
     memory_file = models.FileField(upload_to="ar/memories/")
+    thumbnail_memory_video_file = models.ImageField(upload_to="ar/memories/thumbnails/", blank=True, null=True)
     description = models.TextField(_("Description"), blank=True, null=True)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_ar_memories"
