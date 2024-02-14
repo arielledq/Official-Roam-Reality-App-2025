@@ -7,6 +7,7 @@ from django.core.files.base import File
 import subprocess
 import tempfile
 from django.conf import settings
+import ffmpeg_downloader as ffdl
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
 def update_points(sender, instance, **kwargs):
@@ -31,7 +32,7 @@ def update_thumbnails(sender, instance, **kwargs):
         video_file = instance.memory_file.path
       thumbnail_tmp_out = tempfile.NamedTemporaryFile(suffix=".%s"%OUTPUT_IMAGE_EXT)
       video_file_thumbnail_tmp = thumbnail_tmp_out.name
-      ffmpeg_cmd = ["ffmpeg", '-i', video_file, '-ss', '00:00:01.000', '-vframes', '1','-y',video_file_thumbnail_tmp]
+      ffmpeg_cmd = [ffdl.ffmpeg_path, '-i', video_file, '-ss', '00:00:00.000', '-vframes', '1','-y',video_file_thumbnail_tmp]
       subprocess.call(ffmpeg_cmd)
       suf = SimpleUploadedFile(video_file_thumbnail_tmp,thumbnail_tmp_out.read(),content_type=OUTPUT_IMAGE_CONTENT_TYPE)
       instance.thumbnail_memory_video_file = suf
