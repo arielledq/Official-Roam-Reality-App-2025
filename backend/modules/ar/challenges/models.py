@@ -24,6 +24,10 @@ CHALLENGE_REQUIREMENT = (
     ("PHOTOVIDEO", "PHOTOVIDEO"),
 )
 
+AR_MEMORY_CHOICES = (
+    ("PHOTO", "PHOTO"),
+    ("VIDEO", "VIDEO"),
+)
 
 class Sponsor(models.Model):
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
@@ -125,6 +129,9 @@ class ARMemories(models.Model):
     description = models.TextField(_("Description"), blank=True, null=True)
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_ar_memories"
+    )
+    memory_type = models.CharField(
+        max_length=50, choices=AR_MEMORY_CHOICES, default="PHOTO", blank=True, null=True
     )
     challenges = models.ForeignKey(
         Challenges,
