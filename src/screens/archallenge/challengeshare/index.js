@@ -44,6 +44,7 @@ const ArChallengeShare = ({
     const formData = new FormData()
     formData.append("challenges", challengeObj.id)
     formData.append("memory_file", shareFile)
+    formData.append("memory_type", fileExt == 'mp4' ? "VIDEO" : "PHOTO")
     postArMemory(formData).then((res) => {
       ARUserProfile()
       if (res.status == 1) {
