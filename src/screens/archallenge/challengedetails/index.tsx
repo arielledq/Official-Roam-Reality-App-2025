@@ -35,12 +35,13 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
     checkARChallengeDoneAPI({
       challenges: challengeObj.id
     }).then((res) => {
+      console.log("checkIfChallengeIsDone:",res)
       if (res.errorStatus == 403) {
-        console.log("checkIfChallengeIsDone", "false")
-        setIsChallengeDone(false)
-      } else {
         console.log("checkIfChallengeIsDone", "true")
         setIsChallengeDone(true)
+      } else {
+        console.log("checkIfChallengeIsDone", "false")
+        setIsChallengeDone(false)
       }
     }).finally(() => {
       setIsLoading(false)
