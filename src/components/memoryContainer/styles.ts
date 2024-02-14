@@ -4,13 +4,13 @@ import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils';
 
 const useStyles = makeStyles((theme) => ({
   cardInner: {
-    // justifyContent: 'center',
-    // alignContent: 'center',
-    // alignItems: 'center',
+    justifyContent: 'center',
+    alignContent: 'center',
+    alignItems: 'center',
   },
   cardContainer: {
     height: 172,
-    width: wp('34%'),
+    width: 127,
     alignContent: 'center',
     alignItems: 'center',
     justifyContent: 'center',
@@ -25,6 +25,7 @@ const useStyles = makeStyles((theme) => ({
     // alignItems: 'center',
     // justifyContent: 'center',
     // marginTop: -20
+    paddingHorizontal:12
   },
   titleStyle: {
     ...fontGroup.ns800,
@@ -41,8 +42,9 @@ const useStyles = makeStyles((theme) => ({
   },
   iconStyle: {
     marginBottom: 2,
-    width:100,
-    height:100
+    width:107,
+    height:100,
+    borderRadius:10
   }
 }));
 
