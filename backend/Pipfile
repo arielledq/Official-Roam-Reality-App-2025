@@ -38,3 +38,4 @@ cb-ar = {editable = true, path = "./modules/ar"}
 sendgrid = "*"
 django-allauth = "==0.45.0"
 django-ckeditor = "*"
+ffmpeg_downloader = "*"
