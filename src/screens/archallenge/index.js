@@ -44,7 +44,6 @@ const ArChallenge = ({
   const ARUserProfile = () => {
     setIsLoading(true)
     getARProfile().then((res) => {
-      console.log("getARProfile::", res)
       if (res.status == 1) {
         dispatch(updateARUserData(res))
       } else {

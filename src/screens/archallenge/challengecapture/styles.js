@@ -26,7 +26,9 @@ const useStyles = makeStyles(theme => ({
   },
   f1: {
     height: ScreenHeight,
-    width: '100%'
+    width: '100%',
+    position:'absolute',
+    top:0
   },
   bottomContainer: {
     width: '100%',
@@ -93,6 +95,24 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 15,
     fontWeight: "700"
   },
+  timerTextContainer: {
+    top: -50,
+    position: 'absolute',
+    padding: 5,
+    backgroundColor: "#090A1620",
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 4,
+    left:0,
+    marginHorizontal:20,
+    right:0
+  },
+  timerText: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S10,
+    textAlign: 'center',
+    color: theme.colors.white,
+  },
   holdTextContainer: {
     top: -50,
     position: 'absolute',
@@ -101,7 +121,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    width: '100%'
+    left:0,
+    marginHorizontal:20,
+    right:0
   },
   holdText: {
     ...fontGroup.p600,

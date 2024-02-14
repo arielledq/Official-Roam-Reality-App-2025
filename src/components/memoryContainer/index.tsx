@@ -8,22 +8,24 @@ const MemoryContainer = ({
   title,
   description,
   image,
+  item,
   onPressAction
 }: {
   title: string,
   description: string,
   image: string,
-  onPressAction?: () => void
+  onPressAction?: () => void,
+  item: any
 }) => {
   const styles = useStyles()
 
   return (
     <Pressable style={styles.cardContainer} onPress={onPressAction}>
       <View style={styles.cardInner}>
-        <Image style={styles.iconStyle} source={Images.ProfileImage} />
+        <Image style={styles.iconStyle} source={{ uri: item?.challenge_details?.image }} />
         <View style={styles.cardBottomContent}>
-          <AppText style={styles.titleStyle}>{title}</AppText>
-          <AppText style={styles.Text}>{description}</AppText>
+          <AppText style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
+          <AppText numberOfLines={2} style={styles.Text}>{item?.challenge_details?.description.replace(/<[^>]+>/g, '')}</AppText>
         </View>
       </View>
     </Pressable>
