@@ -24,7 +24,7 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getProfieDetails, sendCode } from "../../network"
+import { getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
 import { useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
@@ -37,6 +37,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const _styles = useStyles()
   const userProfile = useSelector(state => state.login?.data?.user)
   const [profileDetails, setProfileDetails] = useState(null)
+  const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
 
   const fetchProfileDetails = async () => {
@@ -59,9 +60,28 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     }
   }
 
+  const getProfieARMemories = async () => {
+    try {
+      getProfieARMemoriesAPI().then(res => {
+        if (res.status == 1) {
+          setARMemories(res.data)
+        } else {
+          console.error('Error', "Error fetching ar memories: ")
+        }
+      }).catch(err => {
+        console.error('Error', "Error fetching ar memories: ")
+      }
+      ).finally(() => setloading(false))
+
+    } catch (error) {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+  }
+
   useFocusEffect(
     useCallback(() => {
       fetchProfileDetails()
+      getProfieARMemories()
     }, [])
   )
 
@@ -179,12 +199,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       <View style={{ marginHorizontal: -22 }}>
         <FlatList
           contentContainerStyle={{ marginBottom: 50 }}
-          data={data}
+          data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <MemoryContainer title={"Title"} description={"description"} image={""} />
+            <MemoryContainer title={"Title"} item={item} description={"description"} image={""} />
           )}
           keyExtractor={item => item.id.toString()}
         />
