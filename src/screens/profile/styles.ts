@@ -102,6 +102,9 @@ const useStyles = makeStyles(theme => ({
     // flexDirection: "row",
     // alignItems: "center"
   },
+  container_style:{
+    paddingBottom : '50%'
+  }
 }))
 
 export default useStyles
