@@ -99,21 +99,15 @@ const SocialSignin = ({ setLoading }) => {
                 return
               } else {
                 console.log('res of login fb', result)
-                if (Platform.OS === 'ios') {
-                  AuthenticationToken.getAuthenticationTokenIOS().then(data => {
-                    console.log(data?.authenticationToken)
-                  })
-                } else {
-                  AccessToken.getCurrentAccessToken().then(data => {
-                    console.log({ data })
-                    console.log(data?.accessToken.toString())
-                    // dispatch(
-                    //   LoginActions.fb_login({
-                    //     access_token: data?.accessToken.toString()
-                    //   })
-                    // )
-                  })
-                }
+                AccessToken.getCurrentAccessToken().then(data => {
+                  console.log({ data })
+                  console.log(data?.accessToken.toString())
+                  // dispatch(
+                  //   LoginActions.fb_login({
+                  //     access_token: data?.accessToken.toString()
+                  //   })
+                  // )
+                })
               }
             }
           )
