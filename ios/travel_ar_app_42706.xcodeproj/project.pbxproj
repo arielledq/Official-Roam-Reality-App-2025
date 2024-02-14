@@ -683,9 +683,14 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -697,9 +702,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "onPress--handleGoogleLogin-";
-				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.roam.reality;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
 				PRODUCT_NAME = "Roam Reality";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -713,8 +718,13 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = AB35BNBR3J;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -726,9 +736,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "onPress--handleGoogleLogin-";
-				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = com.roam.reality;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
 				PRODUCT_NAME = "Roam Reality";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
