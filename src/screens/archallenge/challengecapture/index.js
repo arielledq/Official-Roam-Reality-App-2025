@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 
 import {
   TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView,
-  PermissionsAndroid
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
@@ -16,7 +15,7 @@ import {
   ViroAmbientLight,
   ViroDirectionalLight,
   ViroSpotLight,
-  ViroText, ViroARCamera, ViroBox, ViroNode
+  ViroText, ViroARCamera, ViroOrbitCamera, ViroARPlaneSelector, ViroQuad, ViroNode
 } from '@viro-community/react-viro';
 import Video from 'react-native-video';
 import uuid from 'react-native-uuid';
@@ -36,10 +35,13 @@ const { config, fs } = RNFetchBlob;
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 const { width } = Dimensions.get('window');
 
+const VIDEO_RECORD_TIME = 10
+
 ViroMaterials.createMaterials({
   pbr: {
     lightingModel: "Blinn",
     chromaKeyFilteringColor: "#00FF00",
+    shininess: .6
   },
 });
 
@@ -52,8 +54,6 @@ const ArChallengeCapture = ({
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const modelFile = challengeObj.model_file;
-  console.log("ArChallengeCapture", modelFile)
-  console.log("ArChallengeCapture", challengeObj.challenge_choice)
 
   const navigateToShare = (captureData) => {
     navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -133,8 +133,6 @@ const ArChallengeCapture = ({
       withoutExtFilename = filename.split('.')[0];
       const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-      console.log("sourcePath:", sourcePath)
-      console.log("targetPath:", targetPath)
       RNFS.exists(sourcePath)
         .then((exists) => {
           console.log("exists:", exists)
@@ -181,8 +179,14 @@ const ArChallengeCapture = ({
       <ViroARScene onTrackingUpdated={onInitialized}>
 
         <ViroAmbientLight color="#ffffff" intensity={200} />
-        <ViroDirectionalLight color="#ffffff" direction={[0, -1, -.2]} />
-        <ViroDirectionalLight castsShadow={true} color="#ffffff" direction={[.05, 0.05, .05]} />
+        <ViroDirectionalLight
+          color="#FFFFFF"
+          direction={[.05, 0.05, .05]}
+          shadowOrthographicPosition={[0, 3, -5]}
+          shadowOrthographicSize={10}
+          shadowNearZ={2}
+          shadowFarZ={9}
+          castsShadow={true} />
 
         <ViroSpotLight
           innerAngle={5}
@@ -191,6 +195,19 @@ const ArChallengeCapture = ({
           position={[0, -7, 0]}
           color="#ffffff"
           intensity={250} />
+
+        <ViroSpotLight
+          innerAngle={5}
+          outerAngle={25}
+          direction={[0, 1, 0]}
+          position={[0, -7, 0]}
+          color="#ffffff"
+          castsShadow={true}
+          shadowMapSize={2048}
+          shadowNearZ={2}
+          shadowFarZ={5}
+          intensity={250}
+          shadowOpacity={.7} />
 
 
         {loading &&
@@ -214,11 +231,12 @@ const ArChallengeCapture = ({
           position={[0, 0, -5]} />}
 
         {
-          challengeObj.challenge_choice == "DANCE" && modelPath && <Viro3DObject
+          challengeObj.challenge_choice == "DANCE" && modelPath &&
+          <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
             position={[0, -5, -30]}
-            scale={[0.08, 0.08, 0.08]}
+            scale={[0.004, 0.004, 0.004]}
             type="VRX"
             resources={sourcesFiles}
             materials={"pbr"}
@@ -234,6 +252,11 @@ const ArChallengeCapture = ({
             }}
           />
         }
+        <ViroQuad
+          position={[0, -5, -30]}
+          rotation={[-90, 0, 0]}
+          width={4} height={4}
+          arShadowReceiver={true} />
       </ViroARScene>
     );
   };
@@ -244,6 +267,9 @@ const ArChallengeCapture = ({
       capturedImage: null,
       capturedVideo: null,
       detailsShow: false,
+      recordingStart: false,
+      timer: "00:00",
+      recordTimeInMillis: 0
     }
 
     constructor() {
@@ -255,6 +281,44 @@ const ArChallengeCapture = ({
       this.playRecordSound = this.playRecordSound.bind(this);
       this.playCameraSound = this.playCameraSound.bind(this);
       this.checkPermission = this.checkPermission.bind(this);
+      this.startTimer = this.startTimer.bind(this);
+      this.clearTimer = this.clearTimer.bind(this);
+    }
+
+    pad(val) {
+      var valString = val + "";
+      if (valString.length < 2) {
+        return "0" + valString;
+      } else {
+        return valString;
+      }
+    }
+
+    startTimer = () => {
+      _this = this
+      _this.setState({
+        recordTimeInMillis: 0,
+        timer: `00:00`
+      })
+      const timeInterval = setInterval(function () {
+        ++_this.state.recordTimeInMillis
+        const seconds = _this.pad(_this.state.recordTimeInMillis % 60);
+        const minutes = _this.pad(parseInt(_this.state.recordTimeInMillis / 60));
+        _this.setState({
+          recordTimeInMillis: _this.state.recordTimeInMillis,
+          timer: `${minutes}:${seconds}`
+        })
+        if (seconds >= VIDEO_RECORD_TIME) {
+          _this.stopRecordVideo()
+        }
+      }, 1000);
+      this.setState({
+        timeInterval: timeInterval
+      })
+    }
+
+    clearTimer = () => {
+      clearInterval(this.state.timeInterval);
     }
 
     componentDidMount() {
@@ -297,12 +361,14 @@ const ArChallengeCapture = ({
           console.log("startRecordVideo: error:", error)
         }
         this.playRecordSound()
+        this.startTimer()
         this._arNavigator
           ._startVideoRecording('recording', false, onError)
       })
     }
 
     async stopRecordVideo() {
+      this.clearTimer()
       const retDict = await this._arNavigator._stopVideoRecording()
       console.log("stopRecordVideo:", retDict)
       this.setState({
@@ -387,11 +453,6 @@ const ArChallengeCapture = ({
         });
       }
       if (Platform.OS == 'ios') {
-        request([
-          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY
-        ]).then(response => {
-          console.log("PERMISSIONS.OS", response);
-        });
         requestMultiple([PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
         PERMISSIONS.IOS.PHOTO_LIBRARY,
@@ -443,9 +504,16 @@ const ArChallengeCapture = ({
             </View>
           </View>
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
-            <View style={styles.holdTextContainer}>
-              <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
-            </View>
+            {
+              (this.state.recordingStart) && <View style={styles.timerTextContainer}>
+                <Text style={styles.timerText}>{this.state.timer}</Text>
+              </View>
+            }
+            {
+              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) && <View style={styles.holdTextContainer}>
+                <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
+              </View>
+            }
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
@@ -454,6 +522,9 @@ const ArChallengeCapture = ({
             }
             <TouchableOpacity
               onLongPress={() => {
+                if ((this.state.capturedImage || this.state.capturedVideo)) {
+                  return;
+                }
                 this.startRecordVideo()
               }}
               onPressIn={() => {
@@ -465,10 +536,12 @@ const ArChallengeCapture = ({
                   this.stopRecordVideo();
                 }
               }}
-              delayLongPress={1500} onPress={() => {
+              delayLongPress={800} onPress={() => {
+                if ((this.state.capturedImage || this.state.capturedVideo)) {
+                  return;
+                }
                 if (this.state.recordingStart) {
                   this.stopRecordVideo();
-                  return;
                 } else {
                   this._takeScreenshot();
                 }
@@ -476,7 +549,7 @@ const ArChallengeCapture = ({
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
-              navigateToShare(this.state.capturedImage)
+              navigateToShare(this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
             </TouchableOpacity>
