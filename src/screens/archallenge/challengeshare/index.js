@@ -69,6 +69,8 @@ const ArChallengeShare = ({
   }
 
   const FacebookShareImgOnPress = () => {
+    Alert.alert("In Progress")
+    return;
     console.log("Facebook Share", fileExt)
     console.log("Facebook Share", captureData)
     ShareDialog.setMode("native")
@@ -113,6 +115,8 @@ const ArChallengeShare = ({
   }
 
   const InstagramShareImgOnPress = async () => {
+    Alert.alert("In Progress")
+    return;
     const filebase64 = await RNFS.readFile(captureData, 'base64')
     console.log('InstagramShareImgOnPress filebase64er =>', filebase64);
     
@@ -139,6 +143,12 @@ const ArChallengeShare = ({
       console.log('Error =>', error);
     }
   }
+
+  const TiktokShareImgOnPress = async () => {
+    Alert.alert("In Progress")
+    return;
+  }
+
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -181,7 +191,7 @@ const ArChallengeShare = ({
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
-            <TouchableOpacity style={styles.shareBtn}>
+            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
               <TiktokShareImg />
             </TouchableOpacity>
           </View>
