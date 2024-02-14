@@ -6,10 +6,10 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.base import File
 import subprocess
 import tempfile
+from django.conf import settings
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
 def update_points(sender, instance, **kwargs):
-    print("update_points",kwargs)
     if instance.challenges:
       cBbj = Challenges.objects.get(pk=instance.challenges.id)
       profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
@@ -21,15 +21,15 @@ def update_points(sender, instance, **kwargs):
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_thumbnails_updated")
 def update_thumbnails(sender, instance, **kwargs):
-    print("update_thumbnails",kwargs)
-    if kwargs['created']:
-      # stream = ffmpeg.input(instance.memory_file.path) 
-      # stream = ffmpeg.output(video_file_thumbnail, vframes=1)
-      # stream.run()
-
+    if kwargs['created'] and instance.memory_type == 'VIDEO':
       OUTPUT_IMAGE_EXT = 'png'
       OUTPUT_IMAGE_CONTENT_TYPE = 'image/png'
-      video_file = instance.memory_file.path
+      video_file = ''
+      if settings.USE_S3:
+        video_file = instance.memory_file.url
+      else:
+        video_file = instance.memory_file.path
+         
       thumbnail_tmp_out = tempfile.NamedTemporaryFile(suffix="_thumbnails.%s"%OUTPUT_IMAGE_EXT,dir='mediafiles',delete=True)
       video_file_thumbnail_tmp = thumbnail_tmp_out.name
       ffmpeg_cmd = ["ffmpeg", '-i', video_file, '-ss', '00:00:01.000', '-vframes', '1','-y',video_file_thumbnail_tmp]
