@@ -56,7 +56,7 @@ const ArChallengeCapture = ({
   const modelFile = challengeObj.model_file;
 
   const navigateToShare = (captureData) => {
-    navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData });
+    navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
   }
 
   const ARScreen = () => {
