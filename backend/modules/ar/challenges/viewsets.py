@@ -92,7 +92,7 @@ class ARProfileViewSet(ViewSet):
     queryset = ARUserProfile.objects.all()
     serializer_class = ARUserProfileSerializer
 
-    @action(detail=False, methods=['post'],url_path='update-ar-social-points', name='Check Challenge')
+    @action(detail=False, methods=['post'],url_path='update-ar-social-points', name='AR SOCIAL POINT UPDATE')
     def update_points_for_social(self, request):
         social_network = request.data.get("social_network","")
         profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
