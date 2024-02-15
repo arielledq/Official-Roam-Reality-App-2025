@@ -112,9 +112,11 @@ class Resource3dModel(models.Model):
 
 class ARUserProfile(models.Model):
     points = models.BigIntegerField(verbose_name="Challenge Points", default=0)
+    challenge_completed = models.IntegerField(verbose_name="Challenge Completed", default=0)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="user_ar_profile"
     )
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "AR User Profile"
@@ -148,6 +150,7 @@ class ARMemories(models.Model):
         blank=True,
         null=True,
     )
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "AR Memories"
