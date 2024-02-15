@@ -151,6 +151,13 @@ export const getProfieARMemoriesAPI = () =>
     method: 'GET'
   })
 
+export const socialPointsARUpdateAPI = (payload) =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/update-ar-social-points/`,
+    method: 'POST',
+    data: payload
+  })
+
 export const getPrivacyPolicy = payload =>
   Request.callWithToken({
     url: `/modules/privacy-policy/`,

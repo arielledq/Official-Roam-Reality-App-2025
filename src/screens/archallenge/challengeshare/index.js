@@ -11,7 +11,7 @@ import moment from "moment";
 import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
 import TiktokShareImg from "../../../assets/ar/tiktok.svg"
-import { getARProfile, postArMemory } from "../../../network";
+import { getARProfile, postArMemory, socialPointsARUpdateAPI } from "../../../network";
 import { handleError } from "../../../util/helpers";
 import Video from 'react-native-video';
 import { useDispatch, useSelector } from "react-redux"
@@ -58,6 +58,16 @@ const ArChallengeShare = ({
     })
   }
 
+  const updateARSocialPoints = (social_network) => {
+    socialPointsARUpdateAPI({
+      social_network
+    }).then((res) => {
+      if (res.status == 1) {
+        console.log(res.message)
+      }
+    })
+  }
+
   const ARUserProfile = () => {
     getARProfile().then((res) => {
       if (res.status == 1) {
@@ -69,6 +79,7 @@ const ArChallengeShare = ({
   }
 
   const FacebookShareImgOnPress = () => {
+    updateARSocialPoints("FACEBOOK")
     Alert.alert("In Progress")
     return;
     console.log("Facebook Share", fileExt)
@@ -115,11 +126,12 @@ const ArChallengeShare = ({
   }
 
   const InstagramShareImgOnPress = async () => {
+    updateARSocialPoints("INSTAGRAM")
     Alert.alert("In Progress")
     return;
     const filebase64 = await RNFS.readFile(captureData, 'base64')
     console.log('InstagramShareImgOnPress filebase64er =>', filebase64);
-    
+
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
@@ -145,6 +157,7 @@ const ArChallengeShare = ({
   }
 
   const TiktokShareImgOnPress = async () => {
+    updateARSocialPoints("TIKTOK")
     Alert.alert("In Progress")
     return;
   }
