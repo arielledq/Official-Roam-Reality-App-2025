@@ -24,21 +24,24 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
-import { useSelector } from "react-redux"
+import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
+import { useDispatch, useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen"
 import { height, width } from "../../util/AppDimensions"
 import ScreenLoader from "../../components/screenLoader"
+import { updateARUserData } from "../../redux/AR"
 
 const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const navigation = useNavigation()
   const _styles = useStyles()
+  const dispatch = useDispatch()
   const userProfile = useSelector(state => state.login?.data?.user)
   const [profileDetails, setProfileDetails] = useState(null)
   const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
+  const arProfile = useSelector(state => state.ar?.arProfile)
 
   const fetchProfileDetails = async () => {
     try {
@@ -59,6 +62,16 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       console.error('Error', "Error fetching profile details: ")
     }
   }
+
+  const fetchARUserProfile = () => {
+    getARProfile().then((res) => {
+      if (res.status == 1) {
+        dispatch(updateARUserData(res))
+      }
+    }).finally(() => {
+    })
+  }
+
 
   const getProfieARMemories = async () => {
     try {
@@ -82,6 +95,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     useCallback(() => {
       fetchProfileDetails()
       getProfieARMemories()
+      fetchARUserProfile()
     }, [])
   )
 
@@ -107,7 +121,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     { id: 5, value: 55, property: "Friends Added" },
     { id: 6, value: 30, property: "Articles Read" },
     { id: 7, value: 80, property: "Messages Sent" },
-    { id: 8, value: 65, property: "Logins This Month" }
+    { id: 8, value: 65, property: "Logins This Month" },
+    { id: 9, value: arProfile?.challenge_completed, property: "AR Challenges" }
+    
   ]
   // Split the data into chunks of 3 for each row
   const rows = []
@@ -181,7 +197,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"178/1000"} property={"Global Rank"} />
-          <StatContainer value={"23"} property={"Points"} />
+          <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"23"} property={"TT Rank"} />
         </View>
       </View>
