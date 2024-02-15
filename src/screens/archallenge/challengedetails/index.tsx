@@ -8,7 +8,7 @@ import {
 } from "../../../navigation/types"
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
-import { useNavigation, useRoute } from "@react-navigation/native"
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native"
 import AppButton from "../../../components/button"
 import RenderHtml from 'react-native-render-html';
 import moment from 'moment'
@@ -29,13 +29,14 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj;
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
+  const isFocused = useIsFocused();
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true)
     checkARChallengeDoneAPI({
       challenges: challengeObj.id
     }).then((res) => {
-      console.log("checkIfChallengeIsDone:",res)
+      console.log("checkIfChallengeIsDone:", res)
       if (res.errorStatus == 403) {
         console.log("checkIfChallengeIsDone", "true")
         setIsChallengeDone(true)
@@ -51,14 +52,16 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const navigateToChallengeCapture = () => {
     if (!isChallengeDone) {
       navigation.navigate("ArChallengeCapture", { challengeObj });
-    }else{
-      Alert.alert("Anywhere AR Challenges","You have already completed the challenge.")
+    } else {
+      Alert.alert("Anywhere AR Challenges", "You have already completed the challenge.")
     }
   }
 
   useEffect(() => {
-    checkIfChallengeIsDone()
-  }, []);
+    if (isFocused) {
+      checkIfChallengeIsDone()
+    }
+  }, [isFocused]);
 
   return (
 
