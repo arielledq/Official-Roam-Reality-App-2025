@@ -14,6 +14,8 @@ from rest_framework.decorators import action
 from django.db.models import F
 from django.db.models import Q
 
+SOCIAL_POINTS = 1
+
 class Resource3dModelViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing accounts.
@@ -89,6 +91,14 @@ class ARProfileViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
     queryset = ARUserProfile.objects.all()
     serializer_class = ARUserProfileSerializer
+
+    @action(detail=False, methods=['post'],url_path='update-ar-social-points', name='Check Challenge')
+    def update_points_for_social(self, request):
+        social_network = request.data.get("social_network","")
+        profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
+        profileObj.points =F('points')+SOCIAL_POINTS
+        profileObj.save()
+        return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
 
     def list(self, request):
         obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
