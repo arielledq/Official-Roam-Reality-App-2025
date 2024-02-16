@@ -248,7 +248,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       />
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
-        // contentContainerStyle={_styles.scroll}
+        contentContainerStyle={_styles.container_style}
         keyExtractor={item => item.id.toString()}
         renderItem={renderItem}
         ListHeaderComponent={renderHeader}
