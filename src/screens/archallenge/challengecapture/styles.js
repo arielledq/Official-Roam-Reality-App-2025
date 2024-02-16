@@ -11,9 +11,10 @@ let ScreenHeight = Dimensions.get("window").height;
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
-    height: ScreenHeight,
+    flex:1,
     width: '100%',
     position: 'relative',
+    backgroundColor:'#000'
   },
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
