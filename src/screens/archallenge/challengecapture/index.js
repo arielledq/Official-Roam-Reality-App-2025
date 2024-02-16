@@ -23,8 +23,6 @@ import { FontSizes } from "../../../util/FontUtils"
 import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from "./styles"
 import CaptureImage from "../../../assets/ar/camera.png"
-import CameraSoundFile from '../../../assets/ar/camera-sound.mp3';
-import RecordSound from '../../../assets/ar/record.mp3';
 import LineIcon from '../../../assets/ar/line.png';
 import { unzip } from 'react-native-zip-archive'
 import { AppButton } from "../../../components";
@@ -331,7 +329,7 @@ const ArChallengeCapture = ({
 
     playCameraSound() {
       Sound.setCategory('Playback');
-      let cameraSound = new Sound(CameraSoundFile, error => {
+      let cameraSound = new Sound(Platform.OS == "android" ? "camerasound.mp3" : "camera-sound.mp3", Sound.MAIN_BUNDLE,error => {
         if (error) {
           console.log('failed to load the sound', error);
         } else {
@@ -342,7 +340,7 @@ const ArChallengeCapture = ({
 
     playRecordSound() {
       Sound.setCategory('Playback');
-      let cameraSound = new Sound(RecordSound, error => {
+      let cameraSound = new Sound("record.mp3",Sound.MAIN_BUNDLE, error => {
         if (error) {
           console.log('failed to load the sound', error);
         } else {
