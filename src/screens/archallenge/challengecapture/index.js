@@ -15,7 +15,7 @@ import {
   ViroAmbientLight,
   ViroDirectionalLight,
   ViroSpotLight,
-  ViroText, ViroARCamera, ViroOrbitCamera, ViroARPlaneSelector, ViroQuad, ViroNode
+  ViroText
 } from '@viro-community/react-viro';
 import Video from 'react-native-video';
 import uuid from 'react-native-uuid';
@@ -114,7 +114,9 @@ const ArChallengeCapture = ({
                   }
                 }
               }
-              setSourcesFiles(sourcesArray)
+              if(sourcesArray.length > 0){
+                setSourcesFiles(sourcesArray)
+              }
               setLoading(false)
             })
         })
@@ -194,39 +196,16 @@ const ArChallengeCapture = ({
           color="#ffffff"
           intensity={250} />
 
-        <ViroSpotLight
-          innerAngle={5}
-          outerAngle={25}
-          direction={[0, 1, 0]}
-          position={[0, -7, 0]}
-          color="#ffffff"
-          castsShadow={true}
-          shadowMapSize={2048}
-          shadowNearZ={2}
-          shadowFarZ={5}
-          intensity={250}
-          shadowOpacity={.7} />
-
-
         {loading &&
-          <ViroARCamera>
-            <ViroText
-              text={`${progress}% Loading Challenge Completed`}
-              color="#ff0000"
-              width={2}
-              height={2}
-              style={styles.loadingText}
-              position={[0, 0, -5]}
-            />
-          </ViroARCamera>
+          <ViroText
+            text={`${progress}% Loading Challenge Completed`}
+            color="#ff0000"
+            width={2}
+            height={2}
+            style={styles.loadingText}
+            position={[0, 0, -5]}
+          />
         }
-
-        {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
-          height={1}
-          width={1}
-          onDrag={_onDrag}
-          source={{ uri: challengeObj.image }}
-          position={[0, 0, -5]} />}
 
         {
           challengeObj.challenge_choice == "DANCE" && modelPath &&
@@ -250,11 +229,13 @@ const ArChallengeCapture = ({
             }}
           />
         }
-        <ViroQuad
-          position={[0, -5, -30]}
-          rotation={[-90, 0, 0]}
-          width={4} height={4}
-          arShadowReceiver={true} />
+
+        {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
+          height={1}
+          width={1}
+          onDrag={_onDrag}
+          source={{ uri: challengeObj.image }}
+          position={[0, 0, -5]} />}
       </ViroARScene>
     );
   };
@@ -267,7 +248,8 @@ const ArChallengeCapture = ({
       detailsShow: false,
       recordingStart: false,
       timer: "00:00",
-      recordTimeInMillis: 0
+      recordTimeInMillis: 0,
+      isLoadVR: false
     }
 
     constructor() {
@@ -321,15 +303,25 @@ const ArChallengeCapture = ({
 
     componentDidMount() {
       this.checkPermission()
+      this.setState({ isLoadVR: true })
     }
 
     _setARNavigatorRef(ARNavigator) {
       this._arNavigator = ARNavigator;
     }
 
+    componentWillUnmount() {
+      this._arNavigator = null
+      this.clearTimer()
+      if (this.state.recordingStart) {
+        this.stopRecordVideo()
+      }
+      this.setState({ isLoadVR: false })
+    }
+
     playCameraSound() {
       Sound.setCategory('Playback');
-      let cameraSound = new Sound(Platform.OS == "android" ? "camerasound.mp3" : "camera-sound.mp3", Sound.MAIN_BUNDLE,error => {
+      let cameraSound = new Sound(Platform.OS == "android" ? "camerasound.mp3" : "camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
         if (error) {
           console.log('failed to load the sound', error);
         } else {
@@ -340,7 +332,7 @@ const ArChallengeCapture = ({
 
     playRecordSound() {
       Sound.setCategory('Playback');
-      let cameraSound = new Sound("record.mp3",Sound.MAIN_BUNDLE, error => {
+      let cameraSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
         if (error) {
           console.log('failed to load the sound', error);
         } else {
@@ -464,19 +456,21 @@ const ArChallengeCapture = ({
     render() {
       return (
         <View style={styles.mainContainer}>
-          <ViroARSceneNavigator
-            videoQuality={"High"}
-            autofocus={true}
-            pbrEnabled={true}
-            hdrEnabled={true}
-            bloomEnabled={true}
-            ref={this._setARNavigatorRef}
-            initialScene={{
-              scene: ARScreen,
-            }}
-            style={styles.f1}
-          >
-          </ViroARSceneNavigator>
+          {
+            this.state.isLoadVR && <ViroARSceneNavigator
+              videoQuality={"High"}
+              autofocus={true}
+              pbrEnabled={true}
+              hdrEnabled={true}
+              bloomEnabled={true}
+              ref={this._setARNavigatorRef}
+              initialScene={{
+                scene: ARScreen,
+              }}
+              style={styles.f1}
+            >
+            </ViroARSceneNavigator>
+          }
 
           {this.state.capturedImage && <Image style={styles.f1} source={{
             uri: this.state.capturedImage
