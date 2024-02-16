@@ -25,7 +25,8 @@ module.exports = (async () => {
       babelTransformerPath: require.resolve('react-native-svg-transformer')
     },
     resolver: {
-      assetExts: assetExts.filter(ext => ext !== 'svg'),
+      assetExts: ["db", "ttf", "obj", "png", "jpg", "otf", "mtl", "vrx", "fbx", "obj",
+        "mtl", "mp3", "JPG", "vrx", "hdr", "gltf", "glb", "bin", "arobject", "gif", "PNG"],
       sourceExts: [...sourceExts, 'js', 'jsx', 'ts', 'tsx', 'json', 'svg']
     },
     resetCache: true

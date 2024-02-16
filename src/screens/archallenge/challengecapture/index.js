@@ -331,7 +331,7 @@ const ArChallengeCapture = ({
 
     playCameraSound() {
       Sound.setCategory('Playback');
-      let cameraSound = new Sound(CameraSoundFile, error => {
+      let cameraSound = new Sound("camera-sound.mp3", Sound.MAIN_BUNDLE,error => {
         if (error) {
           console.log('failed to load the sound', error);
         } else {
@@ -342,7 +342,7 @@ const ArChallengeCapture = ({
 
     playRecordSound() {
       Sound.setCategory('Playback');
-      let cameraSound = new Sound(RecordSound, error => {
+      let cameraSound = new Sound("record.mp3",Sound.MAIN_BUNDLE, error => {
         if (error) {
           console.log('failed to load the sound', error);
         } else {
