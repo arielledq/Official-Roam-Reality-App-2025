@@ -215,7 +215,6 @@ const ArChallengeCapture = ({
             position={[0, -5, -30]}
             scale={[0.05, 0.05, 0.05]}
             type="VRX"
-            resources={sourcesFiles}
             materials={"pbr"}
             rotation={rotate}
             onRotate={_onRotate}
