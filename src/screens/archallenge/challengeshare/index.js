@@ -19,6 +19,7 @@ import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
 import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
+import { auth, share, init, events } from 'react-native-tiktok';
 
 const ArChallengeShare = ({
 
@@ -84,7 +85,7 @@ const ArChallengeShare = ({
       shareContent = {
         url: `data:video/mp4;base64,${filebase64}`,
         social: Share.Social.FACEBOOK,
-        appId:746185200437639
+        appId: 746185200437639
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
@@ -93,10 +94,9 @@ const ArChallengeShare = ({
         backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
         type: `image/*`,
         url: `data:image/${fileExt};base64,${filebase64}`,
-        appId:746185200437639
+        appId: 746185200437639
       }
     }
-    console.log("shareContent:",shareContent)
     try {
       const ShareResponse = await Share.shareSingle(shareContent);
       if (ShareResponse.success == true) {
@@ -131,7 +131,6 @@ const ArChallengeShare = ({
         },
       }
     }
-    console.log("Facebook shareContent", shareContent)
     ShareDialog.canShow(shareContent)
       .then((canShow) => {
         console.log("Facebook canShow", canShow)
@@ -194,16 +193,30 @@ const ArChallengeShare = ({
   }
 
   const TiktokShareImgOnPress = async () => {
-    Share.open(options)
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        err && console.log(err);
-      });
-    updateARSocialPoints("TIKTOK")
-    Alert.alert("In Progress")
-    return;
+    // const filebase64 = await RNFS.readFile(captureData, 'base64')
+    // console.log("base64")
+    // init('aw5g4n448236v4uh');
+    // share(captureData, (code) => {
+    //   console.log(code);
+    // });
+
+    // return;
+    if (fileExt == 'mp4') {
+      const shareOptions = {
+        // hard coded path
+        url: `data:image/${fileExt};base64,${filebase64}`,
+        type: 'video/mp4',
+        filename: "VideoShare"
+      };
+      console.log(JSON.stringify(shareOptions, null, 2))
+      try {
+        await Share.open(shareOptions);
+      } catch (error) {
+        console.log('Error =>', error);
+      }
+    } else {
+      Alert.alert("Share Support Issue:", "Only Video Supported to share.")
+    }
   }
 
 
