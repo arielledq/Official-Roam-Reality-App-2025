@@ -32,13 +32,14 @@ const ArChallengeShare = ({
   const [isLoading, setIsLoading] = useState(false)
   const [capturedUrl, setCapturedUrl] = useState(false)
   const dispatch = useDispatch()
+  console.log("fileExt:",fileExt)
 
   const shareBtnOnPress = () => {
     setIsLoading(true)
     let filename = captureData.split('/').pop()
     let shareFile = {
       uri: captureData,
-      type: fileExt == 'mp4' ? 'video/mp4' : 'image/png',
+      type: fileExt == 'mp4' ? 'video/mp4' : `image/{${fileExt}}`,
       name: filename
     }
     const formData = new FormData()
@@ -79,14 +80,14 @@ const ArChallengeShare = ({
   }
 
   const FacebookShareImgOnPress = () => {
-    updateARSocialPoints("FACEBOOK")
-    Alert.alert("In Progress")
-    return;
+    // updateARSocialPoints("FACEBOOK")
+    // Alert.alert("In Progress")
+    // return;
     console.log("Facebook Share", fileExt)
     console.log("Facebook Share", captureData)
     ShareDialog.setMode("native")
     let shareContent = {}
-    if (fileExt == 'png') {
+    if (fileExt == 'png'|| fileExt == 'jpg') {
       shareContent = {
         contentType: 'photo',
         photos: [{
@@ -126,31 +127,35 @@ const ArChallengeShare = ({
   }
 
   const InstagramShareImgOnPress = async () => {
-    updateARSocialPoints("INSTAGRAM")
-    Alert.alert("In Progress")
-    return;
+    // 
+    // Alert.alert("In Progress")
+    // return;
     const filebase64 = await RNFS.readFile(captureData, 'base64')
-    console.log('InstagramShareImgOnPress filebase64er =>', filebase64);
 
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
         title: 'Share video to instagram',
         type: 'video/mp4',
-        url: filebase64,
+        url: `data:video/mp4;base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
     }
-    if (fileExt == 'png') {
+    if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
         title: 'Share image to instagram',
-        type: 'image/png',
-        url: filebase64,
+        type: `image/${fileExt}`,
+        url: `data:video/${fileExt};base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
     } try {
       const ShareResponse = await Share.shareSingle(shareContent);
-      console.log('InstagramShareImgOnPress ShareResponse =>', ShareResponse);
+      if(ShareResponse.success == true){
+        console.log('ShareResponse true =>', ShareResponse);
+        updateARSocialPoints("INSTAGRAM")
+      }else{
+        console.log('ShareResponse false =>', ShareResponse);
+      }
     } catch (error) {
       console.log('Error =>', error);
     }
