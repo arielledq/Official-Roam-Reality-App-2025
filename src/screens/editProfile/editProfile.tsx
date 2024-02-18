@@ -221,15 +221,38 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
       })
   }
 
-  const formattedPhoneNumber = (phoneNumber : string) => {
-    var cleaned = ('' + phoneNumber).replace(/\D/g, '')
-    var match = cleaned.match(/^(91|)?(\d{3})(\d{3})(\d{4})$/)
-    if (match) {
-        var intlCode = (match[1] ? '+91 ' : '+91 '),
-        number = [intlCode, '(', match[2], ') ', match[3], '-', match[4]].join('');
-        return number;
+  const formatPhoneNumber = (input : string) => {
+    // Remove non-digit characters
+    const cleaned = input.replace(/\D/g, '');
+    
+    // Apply desired format
+    let formatted = '';
+    for (let i = 0; i < cleaned.length; i++) {
+      if(i == 0){
+        formatted += '1-';
+      }
+      else if (i === 4 || i === 7) {
+        formatted += `-${cleaned[i]}`;
+      } else {
+        formatted += cleaned[i];
+      }
     }
-    return phoneNumber
+    return formatted;
+  };
+
+  const handleInputChange = (input : string) => {
+    const formattedNumber = formatPhoneNumber(input);
+    setProfileDetails({...profileDetails, phone_number: formattedNumber});
+  };
+
+  const handleInputName = (input : string) => {
+    console.log('name',input)
+    setProfileDetails({...profileDetails, user: {name: input}});
+  }
+
+  const handleInputAddress = (input : string) => {
+    console.log('name',input)
+    setProfileDetails({...profileDetails, home_address: input});
   }
   return (
     <>
@@ -286,7 +309,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                           : theme.darkColors?.grey
                       }
                       value={values.name}
-                      onChangeText={handleChange("name")}
+                      onChangeText={(e) => handleInputName(e)}
                       errorMessage={
                         touched.name && errors?.name ? errors.name : undefined
                       }
@@ -388,9 +411,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                           : theme.darkColors?.grey
                       }
                       selectionColor={"white"}
-                      value={values.phoneNumber && formattedPhoneNumber(values.phoneNumber)}
-                      onChangeText={(text) => setProfileDetails({...profileDetails, phone_number: text.replace(/\D/g, '').replace('/^91/', '')})}
-                      maxLength={18}
+                      value={values.phoneNumber}
+                      onChangeText={(e) => handleInputChange(e)}
+                      maxLength={14}
                       errorMessage={
                         touched.phoneNumber && errors?.phoneNumber
                           ? errors.phoneNumber
@@ -432,7 +455,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                       selectionColor={"white"}
                       placeholder="Hometown"
                       value={values.address}
-                      onChangeText={handleChange("address")}
+                      onChangeText={(e)=>handleInputAddress(e)}
                       errorMessage={
                         touched.address && errors?.address
                           ? errors.address
