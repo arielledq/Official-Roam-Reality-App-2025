@@ -84,12 +84,16 @@ const ArChallengeShare = ({
       shareContent = {
         url: `data:video/mp4;base64,${filebase64}`,
         social: Share.Social.FACEBOOK,
+        appId:746185200437639
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
         social: Share.Social.FACEBOOK,
+        backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
+        type: `image/*`,
         url: `data:image/${fileExt};base64,${filebase64}`,
+        appId:746185200437639
       }
     }
     console.log("shareContent:",shareContent)
@@ -165,7 +169,6 @@ const ArChallengeShare = ({
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
-        title: 'Share video to instagram',
         type: 'video/mp4',
         url: `data:video/mp4;base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
@@ -173,8 +176,7 @@ const ArChallengeShare = ({
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
-        title: 'Share image to instagram',
-        type: `image/${fileExt}`,
+        type: `image/*`,
         url: `data:image/${fileExt};base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
