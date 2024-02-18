@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import { useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
@@ -30,9 +30,7 @@ const ArChallengeShare = ({
   const fileExt = captureData.split('.').pop();
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
-  const [capturedUrl, setCapturedUrl] = useState(false)
   const dispatch = useDispatch()
-  console.log("fileExt:",fileExt)
 
   const shareBtnOnPress = () => {
     setIsLoading(true)
@@ -79,19 +77,45 @@ const ArChallengeShare = ({
     })
   }
 
-  const FacebookShareImgOnPress = () => {
-    // updateARSocialPoints("FACEBOOK")
-    // Alert.alert("In Progress")
-    // return;
+  const facebookShareAndroid = async () => {
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    let shareContent = {}
+    if (fileExt == 'mp4') {
+      shareContent = {
+        url: `data:video/mp4;base64,${filebase64}`,
+        social: Share.Social.FACEBOOK,
+      }
+    }
+    if (fileExt == 'png' || fileExt == 'jpg') {
+      shareContent = {
+        social: Share.Social.FACEBOOK,
+        url: `data:image/${fileExt};base64,${filebase64}`,
+      }
+    }
+    console.log("shareContent:",shareContent)
+    try {
+      const ShareResponse = await Share.shareSingle(shareContent);
+      if (ShareResponse.success == true) {
+        console.log('ShareResponse true =>', ShareResponse);
+        updateARSocialPoints("FACEBOOK")
+      } else {
+        console.log('ShareResponse false =>', ShareResponse);
+      }
+    } catch (error) {
+      console.log('Error =>', error);
+    }
+  }
+
+  const facebookShareIOS = async () => {
     console.log("Facebook Share", fileExt)
     console.log("Facebook Share", captureData)
     ShareDialog.setMode("native")
-    let shareContent = {}
-    if (fileExt == 'png'|| fileExt == 'jpg') {
+
+    if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
         contentType: 'photo',
         photos: [{
-          imageUrl: captureData
+          imageUrl: captureData,
         }],
       }
     }
@@ -99,7 +123,7 @@ const ArChallengeShare = ({
       shareContent = {
         contentType: 'video',
         video: {
-          localUrl: captureData
+          localUrl: captureData,
         },
       }
     }
@@ -119,6 +143,7 @@ const ArChallengeShare = ({
         } else {
           console.log('Share success with postId: '
             + result.postId);
+          updateARSocialPoints("FACEBOOK")
         }
       })
       .catch(e => {
@@ -126,10 +151,15 @@ const ArChallengeShare = ({
       });
   }
 
+  const FacebookShareImgOnPress = async () => {
+    if (Platform.OS == 'android') {
+      facebookShareAndroid()
+    } else {
+      facebookShareAndroid()
+    }
+  }
+
   const InstagramShareImgOnPress = async () => {
-    // 
-    // Alert.alert("In Progress")
-    // return;
     const filebase64 = await RNFS.readFile(captureData, 'base64')
 
     let shareContent = {}
@@ -145,15 +175,15 @@ const ArChallengeShare = ({
       shareContent = {
         title: 'Share image to instagram',
         type: `image/${fileExt}`,
-        url: `data:video/${fileExt};base64,${filebase64}`,
+        url: `data:image/${fileExt};base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
     } try {
       const ShareResponse = await Share.shareSingle(shareContent);
-      if(ShareResponse.success == true){
+      if (ShareResponse.success == true) {
         console.log('ShareResponse true =>', ShareResponse);
         updateARSocialPoints("INSTAGRAM")
-      }else{
+      } else {
         console.log('ShareResponse false =>', ShareResponse);
       }
     } catch (error) {
@@ -162,6 +192,13 @@ const ArChallengeShare = ({
   }
 
   const TiktokShareImgOnPress = async () => {
+    Share.open(options)
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        err && console.log(err);
+      });
     updateARSocialPoints("TIKTOK")
     Alert.alert("In Progress")
     return;
@@ -183,7 +220,7 @@ const ArChallengeShare = ({
             uri: captureData
           }} />
             :
-            <Image resizeMode={"cover"}  source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />}
+            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <Text style={styles.pointCount}>{challengeObj.points}</Text>
