@@ -41,3 +41,9 @@ export const EditProfileSchema = Yup.object().shape({
   // country: Yup.string().required('Home country is required'),
   // dob: Yup.date().required('Date of birth is required'),
 });
+
+export const ContactUsSchema = Yup.object().shape({
+  name: Yup.string().required('Full name is required'),
+  email: Yup.string().matches(emailRegex, Strings.EmailError).required('Please enter your email address'),
+  message: Yup.string().required('Please write your message'),
+});

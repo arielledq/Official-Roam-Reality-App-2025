@@ -25,6 +25,8 @@ const DrawerList = [
     label: 'Terms and Conditions',
     navigateTo: 'TermsAndConditions'
   },
+  { icon: 'Contact', label: 'Contact Us', navigateTo: 'ContactUs' },
+  { icon: 'Question', label: 'FAQ', navigateTo: 'FAQ' },
   { icon: 'settings', label: 'Settings', navigateTo: 'Settings' },
   { icon: 'trash-2', label: 'Delete Account', navigateTo: 'delete' },
   { icon: 'log-out', label: 'Logout', navigateTo: 'logout' }
@@ -44,7 +46,7 @@ const DrawerLayout = ({
         icon={() => (
           <Icon
             name={icon}
-            family="feather"
+            family={(icon === "Contact" || icon === "Question") ? 'custom' : "feather"}
             color={'white'}
             size={20}
             style={{ marginLeft: 10 }}
