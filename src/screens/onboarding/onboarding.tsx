@@ -1,4 +1,4 @@
-import React,{useState} from 'react'
+import React,{useState,useEffect} from 'react'
 import {Image} from 'react-native'
 
 import BackgroundWithImage from '../../components/background'
@@ -30,16 +30,28 @@ const Onboarding = ({navigation}) => {
   const styles = useStyles();
   const [activeIndex, setActiveIndex] = useState(1);
 
+  useEffect(()=>{
+    setTimeout(()=>{
+      if(activeIndex === onboardingScreens.length){
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'SignUp' }],
+          });
+      }
+      else{
+        setActiveIndex((prevIndex) => prevIndex + 1)
+      }
+    }, 2000)
+  },[activeIndex])
+
   const getImageSource = () => onboardingScreens[activeIndex - 1] || onboardingScreens[0];
   const { backgroundImage, device, icon } = getImageSource();
 
-  const continueHandler = async() => {
-    if(activeIndex === onboardingScreens.length){
-      navigation.navigate('SignUp')
-    }
-    else{
-      setActiveIndex((prevIndex) => prevIndex + 1)
-    }
+  const continueHandler = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{ name: 'SignUp' }],
+    });
   };
 
   return (

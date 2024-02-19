@@ -34,8 +34,7 @@ export const FPChangePasswordSchema = Yup.object().shape({
 
 export const EditProfileSchema = Yup.object().shape({
   name: Yup.string().required('Full name is required'),
-  phoneNumber: Yup.string()
-    .matches(/^[0-9]+$/, 'Invalid phone number'),
+  phoneNumber: Yup.string().length(14, 'Invalid phone number').required('Phone number is required'),
     // .required('Phone number is required'),
   // address: Yup.string().required('Home address is required'),
   // gender: Yup.string().required('Gender is required'),
