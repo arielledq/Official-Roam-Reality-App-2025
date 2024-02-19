@@ -118,7 +118,7 @@ const Privacy = () => {
       />
       <PrivacyToggle
         icon="user"
-        label="Friend request"
+        label="Friend Request"
         value={notificationToggles.friendRequest}
         setter={value => handleNotificationToggle('friendRequest', value)}
       />
