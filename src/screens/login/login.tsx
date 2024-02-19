@@ -73,8 +73,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
       <AppText style={[_styles.headerText]}>Welcome back!</AppText>
       <AppText style={_styles.subHeaderText}>
-        Create an account to ROAM a new dimension with captivating AR
-        experiences.
+        Login to ROAM a new dimension with captivating AR experiences.
       </AppText>
       <KeyboardAwareScrollView style={{ flex: 1 }} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
         <Formik
