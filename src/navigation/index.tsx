@@ -30,6 +30,8 @@ import BottomTabNavigator from './BottomTabNavigator';
 import Settings from '../screens/settings';
 import Privacy from '../screens/privacy';
 import AnimatedSplash from '../screens/animatedSplash';
+import ContactUs from '../screens/ContactUs/ContactUs'
+import FAQ from '../screens/FAQ/FAQ';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -90,6 +92,8 @@ const Navigation = () => {
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
         <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
+        <Stack.Screen name="ContactUs" component={ContactUs} />
+        <Stack.Screen name="FAQ" component={FAQ} />
       </>
     )
   }
