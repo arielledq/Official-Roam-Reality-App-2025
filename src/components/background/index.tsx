@@ -19,9 +19,10 @@ const BackgroundWithImage: React.FC<BackgroundWithImageProps> = ({
   children,
   imageSource = Images.Background,
   style,
+  ...props
 }) => {
   return (
-    <ImageBackground source={imageSource} style={[styles.background, style]}>
+    <ImageBackground source={imageSource} style={[styles.background, style]} {...props}>
       {children}
     </ImageBackground>
   );

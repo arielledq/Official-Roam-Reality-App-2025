@@ -89,7 +89,7 @@ const ArChallenge = ({
         }} backgroundColor="transparent" />
       <View style={_styles.rowView}>
         <View style={{ flex: .5 }}>
-          <AppText style={[_styles.headerText]}>Choose You AR Challenge</AppText>
+          <AppText style={[_styles.headerText]}>Choose Your AR Challenge</AppText>
           <AppText style={[_styles.subHeaderText]}>Sponsored</AppText>
         </View>
         <BackgroundWithImage

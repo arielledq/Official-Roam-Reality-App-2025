@@ -4,11 +4,12 @@ import {
   ScrollView,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
+  ActivityIndicator
 } from "react-native"
 import { AppButton, AppHeader, AppText } from "../../components"
 import { resetState } from "../../redux/Login"
-import { deleteAccount, logout } from "../../network"
+import { deleteAccount, getARChallenges, logout } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
 import { MenuIcon } from "../../assets/svg"
@@ -16,20 +17,28 @@ import { screenHorizontalPadding } from "../../util/AppDimensions"
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
 import theme from "../../assets/theme"
 import AppBottomSheet from "../../components/bottomSheet"
+import BackgroundWithImage from '../../components/background'
 import {
   RootStackParamList,
   ScreenStackComponent
 } from "../../navigation/types"
 import BottomSheet from "@gorhom/bottom-sheet"
+import Images from "../../assets/images"
+import useStyles from "./styles"
+import RightArrowIcon from "../../assets/svg/RightArrowIcon"
+import { handleError } from "../../util/helpers"
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
 
   const bottomSheetRef = useRef<BottomSheet>(null)
   const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
+  const styles = useStyles();
 
 
   const handleLogOut = () => {
@@ -58,6 +67,20 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
       handleDeleteAccount()
     }
   }, [route.params])
+
+  useEffect(()=>{
+    setIsLoading(true)
+    getARChallenges().then((res) => {
+      if (res.status == 1) {
+        setNumberOfChallenges(res?.data?.length)
+      } else {
+        res.message.message = "Error in loading Challenges."
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  },[])
 
   const handleDeleteAccount = () => {
     Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
@@ -95,16 +118,33 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
       </TouchableOpacity>
     )
   }
+
+  const navigateToARChanllenge = () => {
+    navigation.navigate('ARChallenge')
+  }
   return (
     <ScrollView style={styles.mainContainer}>
-      <AppHeader
-        // containerStyle={styles.headerContainer}
-        // titleStyle={styles.headerStyle}
-        title={"Home"}
-        leftComponent={handleMenuButton()}
-      />
+      <AppHeader title={"Home"} leftComponent={handleMenuButton()}/>
       <View style={styles.container}>
-
+        {isLoading ? <ActivityIndicator size="large" /> : 
+        <BackgroundWithImage 
+          imageSource={Images.Home} 
+          style={styles.imageBg}
+          imageStyle={styles.imageStyle}
+        >
+          <View style={styles.firstView}/>
+          <View style={styles.row}>
+            <View style={styles.innerView}>
+              <AppText style={styles.headerText}>Anywhere</AppText>
+              <AppText style={styles.headerText}>AR Challenges</AppText>
+              <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
+            </View>
+            <TouchableOpacity onPress={navigateToARChanllenge}>
+              <RightArrowIcon/>
+            </TouchableOpacity>
+          </View>
+        </BackgroundWithImage>
+      }
       </View>
     </ScrollView>
   )
