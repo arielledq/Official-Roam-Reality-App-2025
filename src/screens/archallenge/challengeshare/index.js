@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
 import { Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
@@ -19,7 +19,8 @@ import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
 import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
-import { auth, share, init, events } from 'react-native-tiktok';
+import {  share, init, events } from 'react-native-tiktok';
+import Picker from 'react-native-image-crop-picker';
 
 const ArChallengeShare = ({
 
@@ -32,6 +33,13 @@ const ArChallengeShare = ({
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    const shareListener = events.addListener('onShareCompleted', (resp) => {
+      console.log("Tiktok: onShareCompleted", resp)
+      // response contains returned errorCode
+    });
+  }, []);
 
   const shareBtnOnPress = () => {
     setIsLoading(true)
@@ -158,7 +166,7 @@ const ArChallengeShare = ({
     if (Platform.OS == 'android') {
       facebookShareAndroid()
     } else {
-      facebookShareAndroid()
+      facebookShareIOS()
     }
   }
 
@@ -193,30 +201,39 @@ const ArChallengeShare = ({
   }
 
   const TiktokShareImgOnPress = async () => {
-    // const filebase64 = await RNFS.readFile(captureData, 'base64')
-    // console.log("base64")
-    // init('aw5g4n448236v4uh');
-    // share(captureData, (code) => {
-    //   console.log(code);
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    console.log("captureData",captureData);
+    init('aw5g4n448236v4uh');
+    share(filebase64, (code) => {
+      console.log(code);
+    });
+
+    // Picker.openPicker({
+    //   mediaType: 'video',
+    // }).then((media) => {
+    //   init('aw5g4n448236v4uh');
+    //   share(media.path, (code) => {
+    //     console.log(code);
+    //   });
     // });
 
     // return;
-    if (fileExt == 'mp4') {
-      const shareOptions = {
-        // hard coded path
-        url: `data:image/${fileExt};base64,${filebase64}`,
-        type: 'video/mp4',
-        filename: "VideoShare"
-      };
-      console.log(JSON.stringify(shareOptions, null, 2))
-      try {
-        await Share.open(shareOptions);
-      } catch (error) {
-        console.log('Error =>', error);
-      }
-    } else {
-      Alert.alert("Share Support Issue:", "Only Video Supported to share.")
-    }
+
+    // if (fileExt == 'mp4') {
+    //   const shareOptions = {
+    //     url: `data:image/${fileExt};base64,${filebase64}`,
+    //     type: 'video/mp4',
+    //     filename: "VideoShare"
+    //   };
+    //   console.log(JSON.stringify(shareOptions, null, 2))
+    //   try {
+    //     await Share.open(shareOptions);
+    //   } catch (error) {
+    //     console.log('Error =>', error);
+    //   }
+    // } else {
+    //   Alert.alert("Share Support Issue:", "Only Video Supported to share.")
+    // }
   }
 
 

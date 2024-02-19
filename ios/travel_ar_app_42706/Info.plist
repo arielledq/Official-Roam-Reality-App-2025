@@ -22,6 +22,12 @@
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
 	<array>
+    <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>aw5g4n448236v4uh</string>
+        </array>
+      </dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
