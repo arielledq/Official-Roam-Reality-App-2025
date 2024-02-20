@@ -64,5 +64,16 @@
       android:authorities="com.facebook.app.FacebookContentProvider746185200437639"
       android:exported="true" />
 
+    <provider
+      android:name="androidx.core.content.FileProvider"
+      android:authorities="${applicationId}.fileprovider"
+      android:exported="false"
+      tools:replace="android:authorities"
+      android:grantUriPermissions="true">
+      <meta-data
+        tools:replace="android:resource"
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_provider_paths" />
+    </provider>
   </application>
 </manifest>
