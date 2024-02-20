@@ -28,6 +28,11 @@ import SelectedFlagIcon from './SelectedFlagIcon.svg'
 import UnselectedProfile from './UnselectedProfile.svg'
 import SelectedProfile from './SelectedProfile.svg'
 import SelectedCamera from './SelectedCamera.svg'
+import Contact from './Contact.svg'
+import Question from './Question.svg'
+import FacebookIcon  from './facebookIcon.svg'
+import Instagram  from './Instagram.svg'
+import TikTok from './TikTok.svg'
 
 export const Icons = {
   password,
@@ -59,5 +64,10 @@ export const Icons = {
   SelectedFlagIcon,
   UnselectedProfile,
   SelectedProfile,
-  SelectedCamera
+  SelectedCamera,
+  Contact,
+  Question,
+  FacebookIcon,
+  Instagram,
+  TikTok
 }
