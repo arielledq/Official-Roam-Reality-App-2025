@@ -1,6 +1,6 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 
-import { Alert, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import { useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
@@ -19,6 +19,8 @@ import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
 import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
+import { share, init, events } from 'react-native-tiktok';
+import Picker from 'react-native-image-crop-picker';
 
 const ArChallengeShare = ({
 
@@ -30,15 +32,21 @@ const ArChallengeShare = ({
   const fileExt = captureData.split('.').pop();
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
-  const [capturedUrl, setCapturedUrl] = useState(false)
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    const shareListener = events.addListener('onShareCompleted', (resp) => {
+      console.log("Tiktok: onShareCompleted", resp)
+      // response contains returned errorCode
+    });
+  }, []);
 
   const shareBtnOnPress = () => {
     setIsLoading(true)
     let filename = captureData.split('/').pop()
     let shareFile = {
       uri: captureData,
-      type: fileExt == 'mp4' ? 'video/mp4' : 'image/png',
+      type: fileExt == 'mp4' ? 'video/mp4' : `image/{${fileExt}}`,
       name: filename
     }
     const formData = new FormData()
@@ -78,31 +86,59 @@ const ArChallengeShare = ({
     })
   }
 
-  const FacebookShareImgOnPress = () => {
-    updateARSocialPoints("FACEBOOK")
-    Alert.alert("In Progress")
-    return;
+  const facebookShareAndroid = async () => {
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    let shareContent = {}
+    if (fileExt == 'mp4') {
+      shareContent = {
+        url: `data:video/mp4;base64,${filebase64}`,
+        social: Share.Social.FACEBOOK,
+        appId: '746185200437639'
+      }
+    }
+    if (fileExt == 'png' || fileExt == 'jpg') {
+      shareContent = {
+        social: Share.Social.FACEBOOK,
+        backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
+        type: `image/*`,
+        url: `data:image/${fileExt};base64,${filebase64}`,
+        appId: '746185200437639'
+      }
+    }
+    try {
+      const ShareResponse = await Share.shareSingle(shareContent);
+      if (ShareResponse.success == true) {
+        console.log('ShareResponse true =>', ShareResponse);
+        updateARSocialPoints("FACEBOOK")
+      } else {
+        console.log('ShareResponse false =>', ShareResponse);
+      }
+    } catch (error) {
+      console.log('Error =>', error);
+    }
+  }
+
+  const facebookShareIOS = async () => {
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
     console.log("Facebook Share", fileExt)
     console.log("Facebook Share", captureData)
     ShareDialog.setMode("native")
-    let shareContent = {}
-    if (fileExt == 'png') {
+
+    if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
         contentType: 'photo',
         photos: [{
-          imageUrl: captureData
+          imageUrl: captureData,
         }],
       }
     }
     if (fileExt == 'mp4') {
       shareContent = {
-        contentType: 'video',
-        video: {
-          localUrl: captureData
-        },
+        contentType: 'link',
+        contentUrl: `data:video/mp4;base64,${filebase64}`,
+        contentDescription: 'Wow, check out this great site!',
       }
     }
-    console.log("Facebook shareContent", shareContent)
     ShareDialog.canShow(shareContent)
       .then((canShow) => {
         console.log("Facebook canShow", canShow)
@@ -118,6 +154,7 @@ const ArChallengeShare = ({
         } else {
           console.log('Share success with postId: '
             + result.postId);
+          updateARSocialPoints("FACEBOOK")
         }
       })
       .catch(e => {
@@ -125,41 +162,79 @@ const ArChallengeShare = ({
       });
   }
 
+  const FacebookShareImgOnPress = async () => {
+    if (Platform.OS == 'android') {
+      facebookShareAndroid()
+    } else {
+      facebookShareAndroid()
+    }
+  }
+
   const InstagramShareImgOnPress = async () => {
-    updateARSocialPoints("INSTAGRAM")
-    Alert.alert("In Progress")
-    return;
     const filebase64 = await RNFS.readFile(captureData, 'base64')
-    console.log('InstagramShareImgOnPress filebase64er =>', filebase64);
 
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
-        title: 'Share video to instagram',
         type: 'video/mp4',
-        url: filebase64,
+        url: `data:video/mp4;base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
     }
-    if (fileExt == 'png') {
+    if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
-        title: 'Share image to instagram',
-        type: 'image/png',
-        url: filebase64,
+        type: `image/*`,
+        url: `data:image/${fileExt};base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
-    } try {
+    }
+    try {
       const ShareResponse = await Share.shareSingle(shareContent);
-      console.log('InstagramShareImgOnPress ShareResponse =>', ShareResponse);
+      if (ShareResponse.success == true) {
+        console.log('ShareResponse true =>', ShareResponse);
+        updateARSocialPoints("INSTAGRAM")
+      } else {
+        console.log('ShareResponse false =>', ShareResponse);
+      }
     } catch (error) {
       console.log('Error =>', error);
     }
   }
 
   const TiktokShareImgOnPress = async () => {
-    updateARSocialPoints("TIKTOK")
-    Alert.alert("In Progress")
-    return;
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    console.log("captureData", captureData);
+    init('aw5g4n448236v4uh');
+    share(filebase64, (code) => {
+      console.log(code);
+    });
+
+    // Picker.openPicker({
+    //   mediaType: 'video',
+    // }).then((media) => {
+    //   init('aw5g4n448236v4uh');
+    //   share(media.path, (code) => {
+    //     console.log(code);
+    //   });
+    // });
+
+    // return;
+
+    // if (fileExt == 'mp4') {
+    //   const shareOptions = {
+    //     url: `data:image/${fileExt};base64,${filebase64}`,
+    //     type: 'video/mp4',
+    //     filename: "VideoShare"
+    //   };
+    //   console.log(JSON.stringify(shareOptions, null, 2))
+    //   try {
+    //     await Share.open(shareOptions);
+    //   } catch (error) {
+    //     console.log('Error =>', error);
+    //   }
+    // } else {
+    //   Alert.alert("Share Support Issue:", "Only Video Supported to share.")
+    // }
   }
 
 
@@ -174,11 +249,11 @@ const ArChallengeShare = ({
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
         <View style={styles.detailContainer}>
 
-          {fileExt == 'mp4' ? <Video repeat={true} style={{ width: '100%', height: 318 }} source={{
+          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', height: 318 }} source={{
             uri: captureData
           }} />
             :
-            <Image source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />}
+            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <Text style={styles.pointCount}>{challengeObj.points}</Text>
