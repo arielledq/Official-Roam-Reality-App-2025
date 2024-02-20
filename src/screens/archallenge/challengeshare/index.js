@@ -19,7 +19,7 @@ import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
 import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
-import {  share, init, events } from 'react-native-tiktok';
+import { share, init, events } from 'react-native-tiktok';
 import Picker from 'react-native-image-crop-picker';
 
 const ArChallengeShare = ({
@@ -93,7 +93,7 @@ const ArChallengeShare = ({
       shareContent = {
         url: `data:video/mp4;base64,${filebase64}`,
         social: Share.Social.FACEBOOK,
-        appId: 746185200437639
+        appId: '746185200437639'
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
@@ -102,7 +102,7 @@ const ArChallengeShare = ({
         backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
         type: `image/*`,
         url: `data:image/${fileExt};base64,${filebase64}`,
-        appId: 746185200437639
+        appId: '746185200437639'
       }
     }
     try {
@@ -119,6 +119,7 @@ const ArChallengeShare = ({
   }
 
   const facebookShareIOS = async () => {
+    const filebase64 = await RNFS.readFile(captureData, 'base64')
     console.log("Facebook Share", fileExt)
     console.log("Facebook Share", captureData)
     ShareDialog.setMode("native")
@@ -133,10 +134,9 @@ const ArChallengeShare = ({
     }
     if (fileExt == 'mp4') {
       shareContent = {
-        contentType: 'video',
-        video: {
-          localUrl: captureData,
-        },
+        contentType: 'link',
+        contentUrl: `data:video/mp4;base64,${filebase64}`,
+        contentDescription: 'Wow, check out this great site!',
       }
     }
     ShareDialog.canShow(shareContent)
@@ -166,7 +166,7 @@ const ArChallengeShare = ({
     if (Platform.OS == 'android') {
       facebookShareAndroid()
     } else {
-      facebookShareIOS()
+      facebookShareAndroid()
     }
   }
 
@@ -187,7 +187,8 @@ const ArChallengeShare = ({
         url: `data:image/${fileExt};base64,${filebase64}`,
         social: Share.Social.INSTAGRAM,
       }
-    } try {
+    }
+    try {
       const ShareResponse = await Share.shareSingle(shareContent);
       if (ShareResponse.success == true) {
         console.log('ShareResponse true =>', ShareResponse);
@@ -202,7 +203,7 @@ const ArChallengeShare = ({
 
   const TiktokShareImgOnPress = async () => {
     const filebase64 = await RNFS.readFile(captureData, 'base64')
-    console.log("captureData",captureData);
+    console.log("captureData", captureData);
     init('aw5g4n448236v4uh');
     share(filebase64, (code) => {
       console.log(code);
