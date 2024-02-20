@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
     // zIndex: 2
   },
   header: {
-    marginBottom: "12%"
+    marginBottom: "5%"
   },
   headingView: {
     flexDirection: "row",
