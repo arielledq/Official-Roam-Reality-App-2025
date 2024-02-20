@@ -50,6 +50,9 @@
 	<false/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
+    <string>fb</string>
+    <string>tiktok</string>
+    <string>facebook-stories</string>
 		<string>fbapi</string>
 		<string>fb-messenger-share-api</string>
 		<string>tel</string>
