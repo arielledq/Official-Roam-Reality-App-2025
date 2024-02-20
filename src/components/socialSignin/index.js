@@ -19,7 +19,7 @@ import appleAuth, {
   appleAuthAndroid
 } from '@invertase/react-native-apple-authentication'
 import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from '../../network/config'
-import { googleLogin } from '../../network'
+import { googleLogin, appleLogin } from '../../network'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUserData } from '../../redux/Login'
 import { updateAsOldUser } from '../../redux/Persist'
@@ -150,7 +150,24 @@ const SocialSignin = ({ setLoading }) => {
           access_token: response.code ?? ''
         }
         console.log({ payload })
-        // dispatch(LoginActions.apple_login(payload))
+        appleLogin(payload)
+          .then(res => {
+            console.log('apple response',{ res })
+            if (res.status == 1) {
+              dispatch(updateUserData(res))
+              if (newUser) {
+                dispatch(updateAsOldUser())
+              }
+            } else {
+              handleError(res)
+            }
+          })
+          .catch(err => {
+            console.log({ err })
+          })
+          .finally(() => {
+            setLoading(false)
+          })
       }
     } catch (error) {
       if (error && error?.code === appleAuth.Error.CANCELED) {
@@ -177,7 +194,24 @@ const SocialSignin = ({ setLoading }) => {
         access_token: appleAuthRequestResponse.authorizationCode
       }
       console.log({ payload })
-      // dispatch(LoginActions.apple_login(payload))
+      appleLogin(payload)
+      .then(res => {
+        console.log('apple response',{ res })
+        if (res.status == 1) {
+          dispatch(updateUserData(res))
+          if (newUser) {
+            dispatch(updateAsOldUser())
+          }
+        } else {
+          handleError(res)
+        }
+      })
+      .catch(err => {
+        console.log({ err })
+      })
+      .finally(() => {
+        setLoading(false)
+      })
     } catch (err) {
       console.log({ err })
     }
