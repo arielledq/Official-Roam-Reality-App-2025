@@ -18,6 +18,7 @@ const Images = {
     Device3 : require('./Device3.png'),
     Splash : require('./Splash.gif'),
     Home : require('./Home.png'),
+    Home1 : require('./Home1.png'),
 }
 
 export default Images;

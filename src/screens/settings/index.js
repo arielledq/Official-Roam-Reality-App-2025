@@ -2,7 +2,7 @@ import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import BackgroundWithImage from '../../components/background'
 import theme from '../../assets/theme'
-import { AppHeader } from '../../components'
+import { AppHeader, AppText } from '../../components'
 import Icon from '../../components/Icon'
 import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
 import { useNavigation } from '@react-navigation/native'
@@ -43,6 +43,43 @@ function SettingsItem({ label, onPress, icon }) {
   )
 }
 
+function SocialAccountItem({ label, onPress, icon }) {
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: theme.darkColors?.statBG,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        marginHorizontal: 25,
+        marginVertical: 10,
+        borderRadius: 8
+      }}
+    >
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center'
+        }}
+      >
+        <Icon name={icon} family="custom" size={24} />
+        <Text style={styles.text}>{label}</Text>
+      </View>
+      <TouchableOpacity
+        onPress={onPress}
+        name="chevron-right"
+        family="entypo"
+        color={theme.darkColors?.white}
+        size={24}
+      >
+        <AppText style={styles.linkNow}>Link now</AppText>
+      </TouchableOpacity>
+    </View>
+  )
+}
+
 const Settings = () => {
   const navigation = useNavigation()
 
@@ -61,6 +98,10 @@ const Settings = () => {
         onPress={handleChangePassword}
       />
       <SettingsItem icon="privacy" label={'Privacy'} onPress={handlePrivacy} />
+      <AppText style={styles.socialAccount}>Social Accounts</AppText>
+      <SocialAccountItem icon="FacebookIcon" label={'Facebook'} onPress={handlePrivacy} />
+      <SocialAccountItem icon="Instagram" label={'Instagram'} onPress={handlePrivacy} />
+      <SocialAccountItem icon="TikTok" label={'TikTok'} onPress={handlePrivacy} />
     </BackgroundWithImage>
   )
 }
@@ -78,5 +119,18 @@ const styles = StyleSheet.create({
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,
     marginLeft: 15
+  },
+  socialAccount: {
+    paddingHorizontal: 25,
+    paddingVertical: 10,
+    ...fontGroup.ns600,
+    fontSize: FontSizes.S18,
+    lineHeight: FontLineHeights.LH24,
+  },
+  linkNow : {
+    ...fontGroup.ns700,
+    fontSize: FontSizes.S16,
+    lineHeight: FontLineHeights.LH21,
+    color: theme.darkColors?.inputBlue,
   }
 })

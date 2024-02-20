@@ -48,7 +48,7 @@ const ArChallengeShare = ({
     postArMemory(formData).then((res) => {
       ARUserProfile()
       if (res.status == 1) {
-        Alert.alert("AR Challenge Share!", "Successfully, completed you challenge.")
+        Alert.alert("AR Challenge Share!", "Successfully, completed your challenge.")
       } else {
         res.message.message = "Error in Sharing Challenges."
         handleError(res)

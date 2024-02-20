@@ -114,14 +114,14 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }
 
   const data = [
-    { id: 1, value: 50, property: "Sites Viewed" },
-    { id: 2, value: 60, property: "Likes Received" },
-    { id: 3, value: 40, property: "Comments Posted" },
-    { id: 4, value: 75, property: "Photos Uploaded" },
-    { id: 5, value: 55, property: "Friends Added" },
-    { id: 6, value: 30, property: "Articles Read" },
-    { id: 7, value: 80, property: "Messages Sent" },
-    { id: 8, value: 65, property: "Logins This Month" },
+    { id: 1, value: 0, property: "Sites Viewed" },
+    { id: 2, value: 0, property: "Likes Received" },
+    { id: 3, value: 0, property: "Comments Posted" },
+    { id: 4, value: 0, property: "Photos Uploaded" },
+    { id: 5, value: 0, property: "Friends Added" },
+    { id: 6, value: 0, property: "Articles Read" },
+    { id: 7, value: 0, property: "Messages Sent" },
+    { id: 8, value: 0, property: "Logins This Month" },
     { id: 9, value: arProfile?.challenge_completed, property: "AR Challenges" }
     
   ]
@@ -196,9 +196,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"178/1000"} property={"Global Rank"} />
+          <StatContainer value={"0/1000"} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
-          <StatContainer value={"23"} property={"TT Rank"} />
+          <StatContainer value={"0"} property={"TT Rank"} />
         </View>
       </View>
     </KeyboardAwareScrollView>
