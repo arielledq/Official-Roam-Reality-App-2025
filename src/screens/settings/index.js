@@ -1,11 +1,18 @@
-import React from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import BackgroundWithImage from '../../components/background'
-import theme from '../../assets/theme'
-import { AppHeader, AppText } from '../../components'
-import Icon from '../../components/Icon'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import { useNavigation } from '@react-navigation/native'
+import React from "react"
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import BackgroundWithImage from "../../components/background"
+import theme from "../../assets/theme"
+import { AppHeader, AppText } from "../../components"
+import Icon from "../../components/Icon"
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import { useNavigation } from "@react-navigation/native"
+import {
+  AccessToken,
+  GraphRequest,
+  GraphRequestManager,
+  LoginManager
+} from "react-native-fbsdk-next"
+import { setItem } from "../../util/helpers"
 
 function SettingsItem({ label, onPress, icon }) {
   return (
@@ -13,9 +20,9 @@ function SettingsItem({ label, onPress, icon }) {
       activeOpacity={0.8}
       onPress={onPress}
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         backgroundColor: theme.darkColors?.inputBlue,
         paddingHorizontal: 15,
         paddingVertical: 12,
@@ -26,8 +33,8 @@ function SettingsItem({ label, onPress, icon }) {
     >
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center'
+          flexDirection: "row",
+          alignItems: "center"
         }}
       >
         <Icon name={icon} family="custom" size={24} />
@@ -47,9 +54,9 @@ function SocialAccountItem({ label, onPress, icon }) {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         backgroundColor: theme.darkColors?.statBG,
         paddingHorizontal: 15,
         paddingVertical: 12,
@@ -60,8 +67,8 @@ function SocialAccountItem({ label, onPress, icon }) {
     >
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center'
+          flexDirection: "row",
+          alignItems: "center"
         }}
       >
         <Icon name={icon} family="custom" size={24} />
@@ -84,24 +91,86 @@ const Settings = () => {
   const navigation = useNavigation()
 
   const handleChangePassword = () => {
-    navigation.navigate('ChangePassword')
+    navigation.navigate("ChangePassword")
   }
   const handlePrivacy = () => {
-    navigation.navigate('Privacy')
+    navigation.navigate("Privacy")
+  }
+
+  const fbLink = (resCallBack) => {
+    LoginManager.logOut()
+    return LoginManager.logInWithPermissions(["public_profile", "email"]).then(
+      result => {
+        console.log("result:", result)
+        if (
+          result.declinedPermissions &&
+          result.declinedPermissions.includes("email")
+        ) {
+          resCallBack({ message: "Email is required" })
+        } else if (result.isCancelled) {
+          console.log("error")
+        } else {
+          const infoRequest = new GraphRequest(
+            "/me?fields=id,name,email,picture",
+            null,
+            resCallBack
+          )
+          new GraphRequestManager().addRequest(infoRequest).start()
+          AccessToken.getCurrentAccessToken().then(async(data) => {
+            const accessToken = data.accessToken.toString();
+            await setItem("fbToken", accessToken)
+          })
+        }
+      },
+      function (error) {
+        console.log("Login fail with error: " + error)
+      }
+    )
+  }
+
+  const onFbLink = async () => {
+    try {
+      await fbLink(_resInfoCallback)
+    } catch (e) {
+      console.log("error raised", e)
+    }
+  }
+
+  const _resInfoCallback = (error, result) => {
+      if (error) {
+        console.log("login has error: " + error)
+        return
+      }  
+      else {
+        const userdata = result;
+        console.log("userData result:", userdata)
+    }
   }
   return (
     <BackgroundWithImage style={styles.mainContainer}>
-      <AppHeader title={'Settings'} backgroundColor="transparent" />
+      <AppHeader title={"Settings"} backgroundColor="transparent" />
       <SettingsItem
         icon="lock"
-        label={'Change password'}
+        label={"Change password"}
         onPress={handleChangePassword}
       />
-      <SettingsItem icon="privacy" label={'Privacy'} onPress={handlePrivacy} />
+      <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
       <AppText style={styles.socialAccount}>Social Accounts</AppText>
-      <SocialAccountItem icon="FacebookIcon" label={'Facebook'} onPress={handlePrivacy} />
-      <SocialAccountItem icon="Instagram" label={'Instagram'} onPress={handlePrivacy} />
-      <SocialAccountItem icon="TikTok" label={'TikTok'} onPress={handlePrivacy} />
+      <SocialAccountItem
+        icon="FacebookIcon"
+        label={"Facebook"}
+        onPress={onFbLink}
+      />
+      <SocialAccountItem
+        icon="Instagram"
+        label={"Instagram"}
+        onPress={handlePrivacy}
+      />
+      <SocialAccountItem
+        icon="TikTok"
+        label={"TikTok"}
+        onPress={handlePrivacy}
+      />
     </BackgroundWithImage>
   )
 }
@@ -125,12 +194,12 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     ...fontGroup.ns600,
     fontSize: FontSizes.S18,
-    lineHeight: FontLineHeights.LH24,
+    lineHeight: FontLineHeights.LH24
   },
-  linkNow : {
+  linkNow: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH21,
-    color: theme.darkColors?.inputBlue,
+    color: theme.darkColors?.inputBlue
   }
 })
