@@ -15,7 +15,8 @@ const useStyles = makeStyles((theme) => ({
     imageBg : {
         width : '100%',
         height : 335,
-        borderRadius : 20
+        borderRadius : 20,
+        marginBottom :20
       },
       firstView : {
         flex:1
@@ -37,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
        borderRadius: 20
     },
     innerView : {
-      width : '60%',
+      width : '70%'
     },
     challengesText : {
       ...fontGroup.ns800,
@@ -45,6 +46,9 @@ const useStyles = makeStyles((theme) => ({
       lineHeight: FontLineHeights.LH15,
       marginTop: 10,
       marginStart: 3
+    },
+    containerStyle: {
+      paddingBottom : 100
     }
     })
 )

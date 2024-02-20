@@ -5,7 +5,8 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  ActivityIndicator
+  ActivityIndicator,
+  FlatList
 } from "react-native"
 import { AppButton, AppHeader, AppText } from "../../components"
 import { resetState } from "../../redux/Login"
@@ -27,6 +28,7 @@ import Images from "../../assets/images"
 import useStyles from "./styles"
 import RightArrowIcon from "../../assets/svg/RightArrowIcon"
 import { handleError } from "../../util/helpers"
+import { HomeScreenData } from "../../util/HomeScreenUtils"
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
@@ -122,31 +124,43 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const navigateToARChanllenge = () => {
     navigation.navigate('ARChallenge')
   }
+
+  const HomeScreenARItem = (item) => {
+    return (
+      <BackgroundWithImage 
+      imageSource={item?.image} 
+      style={styles.imageBg}
+      imageStyle={styles.imageStyle}
+    >
+      <View style={styles.firstView}/>
+      <View style={styles.row}>
+        <View style={styles.innerView}>
+          <AppText style={styles.headerText}>{item?.title}</AppText>
+          <AppText style={styles.headerText}>{item?.subtitle}</AppText>
+          <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
+        </View>
+        <TouchableOpacity onPress={navigateToARChanllenge}>
+          <RightArrowIcon/>
+        </TouchableOpacity>
+      </View>
+    </BackgroundWithImage>
+    )
+  }
+
   return (
-    <ScrollView style={styles.mainContainer}>
+    <View style={styles.mainContainer}>
       <AppHeader title={"Home"} leftComponent={handleMenuButton()}/>
       <View style={styles.container}>
         {isLoading ? <ActivityIndicator size="large" /> : 
-        <BackgroundWithImage 
-          imageSource={Images.Home} 
-          style={styles.imageBg}
-          imageStyle={styles.imageStyle}
-        >
-          <View style={styles.firstView}/>
-          <View style={styles.row}>
-            <View style={styles.innerView}>
-              <AppText style={styles.headerText}>Anywhere</AppText>
-              <AppText style={styles.headerText}>AR Challenges</AppText>
-              <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
-            </View>
-            <TouchableOpacity onPress={navigateToARChanllenge}>
-              <RightArrowIcon/>
-            </TouchableOpacity>
-          </View>
-        </BackgroundWithImage>
+        <FlatList
+          contentContainerStyle={styles.containerStyle}
+          data={HomeScreenData}
+          renderItem={({item}) => <HomeScreenARItem {...item}/>}
+          keyExtractor={(item) => item.id}
+        />
       }
       </View>
-    </ScrollView>
+    </View>
   )
 }
 
