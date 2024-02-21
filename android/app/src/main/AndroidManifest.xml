@@ -76,4 +76,13 @@
         android:resource="@xml/file_provider_paths" />
     </provider>
   </application>
+
+  <queries>
+    <package android:name="com.ecom.zhiliaoapp.musically" />
+    <package android:name="android.permission.QUERY_ALL_PACKAGES" />
+    <intent>
+      <action android:name="android.intent.action.MAIN" />
+    </intent>
+  </queries>
+
 </manifest>
