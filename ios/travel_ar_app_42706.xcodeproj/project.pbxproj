@@ -24,6 +24,8 @@
 		733259CF4D604031AF68F7DF /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */; };
 		76EE719B016D4CCDAF7A5327 /* NunitoSans_10pt-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */; };
 		78A5E58FE1EA4917A8853C38 /* NunitoSans_10pt-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */; };
+		7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */; };
+		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
 		7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8203743F5590401D93CFBA74 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */; };
@@ -102,6 +104,8 @@
 		6E1BB610A5784CC698E44AA8 /* NunitoSans_10pt-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-SemiBold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-SemiBold.ttf"; sourceTree = "<group>"; };
 		70B7CB0E017E451EAB220EA0 /* NunitoSans_10pt-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-ExtraBold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-ExtraBold.ttf"; sourceTree = "<group>"; };
 		74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-black.otf"; path = "../src/assets/fonts/sf-ui-display-black.otf"; sourceTree = "<group>"; };
+		7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
+		7A0A2F212B7FA27000E778AF /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../../src/assets/ar/record.mp3; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -176,6 +180,7 @@
 		13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */ = {
 			isa = PBXGroup;
 			children = (
+				7A0A2F1F2B7FA24600E778AF /* Sounds */,
 				8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */,
 				90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */,
 				90EF26442B5039E300872709 /* Fonts */,
@@ -197,6 +202,15 @@
 				455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7A0A2F1F2B7FA24600E778AF /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */,
+				7A0A2F212B7FA27000E778AF /* record.mp3 */,
+			);
+			path = Sounds;
 			sourceTree = "<group>";
 		};
 		7C8964729316417391B79D39 /* Resources */ = {
@@ -403,6 +417,7 @@
 				90AF16972B55A6A6007514E1 /* FontAwesome5_Brands.ttf in Resources */,
 				90AF16982B55A6A6007514E1 /* MaterialCommunityIcons.ttf in Resources */,
 				90AF16992B55A6A6007514E1 /* AntDesign.ttf in Resources */,
+				7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */,
 				90AF169A2B55A6A6007514E1 /* Foundation.ttf in Resources */,
 				90AF169B2B55A6A6007514E1 /* Ionicons.ttf in Resources */,
 				90AF169C2B55A6A6007514E1 /* FontAwesome5_Solid.ttf in Resources */,
@@ -427,6 +442,7 @@
 				AA6AFD4BD2404146A54A90D6 /* NunitoSans_10pt-ExtraBold.ttf in Resources */,
 				D861E940FA984C13850C042A /* NunitoSans_10pt-ExtraLight.ttf in Resources */,
 				78A5E58FE1EA4917A8853C38 /* NunitoSans_10pt-Light.ttf in Resources */,
+				7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */,
 				76EE719B016D4CCDAF7A5327 /* NunitoSans_10pt-Medium.ttf in Resources */,
 				7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */,
 				475566C6FDC443F49225D0C0 /* NunitoSans_10pt-SemiBold.ttf in Resources */,
@@ -685,7 +701,7 @@
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
@@ -720,7 +736,7 @@
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
+				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";

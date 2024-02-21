@@ -16,6 +16,7 @@
   <uses-feature android:name="android.hardware.camera.ar" android:required="false" />
   <uses-feature android:name="android.hardware.screen.portrait" />
 
+
   <application android:name=".MainApplication"
     tools:replace="android:label"
     android:label="@string/original_app_name"
@@ -51,9 +52,28 @@
       </intent-filter>
     </activity>
 
+    <meta-data
+      android:name="com.facebook.sdk.ApplicationName"
+      android:value="@string/app_name" />
     <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id" />
     <meta-data android:name="com.facebook.sdk.ClientToken"
       android:value="@string/facebook_client_token" />
 
+    <provider
+      android:name="com.facebook.FacebookContentProvider"
+      android:authorities="com.facebook.app.FacebookContentProvider746185200437639"
+      android:exported="true" />
+
+    <provider
+      android:name="androidx.core.content.FileProvider"
+      android:authorities="${applicationId}.fileprovider"
+      android:exported="false"
+      tools:replace="android:authorities"
+      android:grantUriPermissions="true">
+      <meta-data
+        tools:replace="android:resource"
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/file_provider_paths" />
+    </provider>
   </application>
 </manifest>
