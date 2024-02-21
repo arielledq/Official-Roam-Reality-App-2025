@@ -8,7 +8,7 @@ class ContactUs(CommonModel):
     message = models.TextField()
 
     def __str__(self):
-        return self.sender.name
+        return self.sender.email
     
     class Meta:
         verbose_name = "Contact Us"
