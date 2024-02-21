@@ -3,7 +3,7 @@ from rest_framework.routers import DefaultRouter
 
 from feedback.api.v1.viewsets import ContactUsViewSet
 
-app_name = "agendas"
+app_name = "feedback"
 
 router = DefaultRouter()
 router.register("contact-us", ContactUsViewSet, basename="contact_us"),
