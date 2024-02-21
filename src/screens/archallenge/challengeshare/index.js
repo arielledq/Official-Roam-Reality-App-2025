@@ -207,6 +207,7 @@ const ArChallengeShare = ({
       init('aw5g4n448236v4uh');
       share(captureData, (code) => {
         console.log(code);
+        updateARSocialPoints("TIKTOK")
       });
     } else {
       Alert.alert("Share Support Issue:", "Only Video Supported to share.")
