@@ -7,6 +7,7 @@
 #import <SafariServices/SafariServices.h>
 #import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
 #import "RNSplashScreen.h" 
+#import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
 
 @implementation AppDelegate
 
@@ -26,6 +27,11 @@
   if ([RCTLinkingManager application:app openURL:url options:options]) {
     return YES;
   }
+  
+  if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:app openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]]
+         ) {
+         return YES;
+     }
 
   return NO;
 }
@@ -40,8 +46,25 @@
   self.initialProps = @{};
 
   [RNSplashScreen show]; // Add RNSplashScreen show method call here
+  [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
+}
+
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+{
+    if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:sourceApplication annotation:annotation]) {
+        return YES;
+    }
+    return NO;
+}
+
+- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+{
+    if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:nil annotation:nil]) {
+        return YES;
+    }
+    return NO;
 }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
