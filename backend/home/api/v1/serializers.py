@@ -117,11 +117,11 @@ class ChangePasswordSerializer(serializers.Serializer):
 class AccountSetupSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     name = serializers.CharField(required=False)
-    ar_memories = serializers.SerializerMethodField()
+    # ar_memories = serializers.SerializerMethodField()
 
-    def get_ar_memories(self, obj):
-        user_ar_memories = ARMemories.objects.filter(user=self.context['request'].user)
-        return ARMemoriesSerializer(user_ar_memories, many=True).data if user_ar_memories.exists() else []
+    # def get_ar_memories(self, obj):
+    #     user_ar_memories = ARMemories.objects.filter(user=self.context['request'].user)
+    #     return ARMemoriesSerializer(user_ar_memories, many=True).data if user_ar_memories.exists() else []
 
     class Meta:
         model = UserProfile
