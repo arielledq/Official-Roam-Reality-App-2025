@@ -1,5 +1,5 @@
 from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories
-from .serializers import ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer
+from .serializers import ARMemoriesSerializerGet,ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
@@ -10,7 +10,11 @@ from rest_framework import authentication,permissions
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import action
 from django.db.models import F
+from django.db.models import Q
+
+SOCIAL_POINTS = 1
 
 class Resource3dModelViewSet(viewsets.ModelViewSet):
     """
@@ -38,6 +42,23 @@ class ARMemoriesViewSet(ViewSet):
         
     parser_class = (FileUploadParser,)
 
+    def get(self, request, *args, **kwargs):
+        objs = self.queryset.filter(user = request.user.id)
+        serializer = ARMemoriesSerializerGet(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'],url_path='check-challenge-done', name='Check Challenge')
+    def check_challenge_done(self, request):
+      user_id = self.request.user.id
+      challenges_id = request.data.get("challenges")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(challenges=challenges_id)
+      results = ARMemories.objects.filter(criterion1 & criterion2)
+      if len(results) == 0:
+        return Response({'message': "Challenge not exists."}, status=status.HTTP_200_OK)
+      else:
+        return Response({'message': "Challenge experience already submitted."}, status=status.HTTP_403_FORBIDDEN)
+         
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
@@ -46,13 +67,21 @@ class ARMemoriesViewSet(ViewSet):
       return Response(serializer.data)
         
     def create(self, request, *args, **kwargs):
-      request.data['user'] = self.request.user.id
-      serializer = ARMemoriesSerializer(data=request.data, partial=True)
-      if serializer.is_valid(raise_exception=True):
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      challenges_id = request.data.get("challenges")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(challenges=challenges_id)
+      results = ARMemories.objects.filter(criterion1 & criterion2)
+      if len(results) == 0:
+        serializer = ARMemoriesSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+          serializer.save()
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       else:
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response({'message': "Challenge experience already submitted."}, status=403)
       
 
 class ARProfileViewSet(ViewSet):
@@ -62,6 +91,14 @@ class ARProfileViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
     queryset = ARUserProfile.objects.all()
     serializer_class = ARUserProfileSerializer
+
+    @action(detail=False, methods=['post'],url_path='update-ar-social-points', name='Check Challenge')
+    def update_points_for_social(self, request):
+        social_network = request.data.get("social_network","")
+        profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
+        profileObj.points =F('points')+SOCIAL_POINTS
+        profileObj.save()
+        return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
 
     def list(self, request):
         obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)

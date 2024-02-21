@@ -60,6 +60,24 @@ class ChallengesUploadSerializer(serializers.ModelSerializer):
         model = Challenges
         fields = ("image","model_file")
 
+class ARMemoriesSerializerGet(serializers.ModelSerializer):
+    memory_file = serializers.FileField()
+    challenge_details = ChallengesSerializer(source='challenges', read_only=True)
+
+    class Meta:
+        model = ARMemories
+        fields = (
+            "id",
+            "challenge_details",
+            "memory_file",
+            "description",
+            "declined_reason",
+            "challenge_approval",
+            "challenges",
+            "thumbnail_memory_video_file",
+            "memory_type"
+        )
+
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
 

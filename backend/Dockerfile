@@ -9,6 +9,8 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
 FROM crowdbotics/cb-django:3.8-slim-buster AS release
 ARG SECRET_KEY
 
+# RUN apt-get update && apt-get install -y ffmpeg
+
 # Set Working directory
 WORKDIR /opt/webapp
 
@@ -25,6 +27,8 @@ ENV PATH="/.venv/bin:$PATH"
 # Copy app source
 COPY --chown=django:django . .
 
+RUN pip install ffmpeg-downloader
+RUN ffdl install -y
 # Collect static files and serve app
 RUN python3 manage.py collectstatic --no-input
 CMD waitress-serve --port=$PORT travel_ar_app_42706.wsgi:application
