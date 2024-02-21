@@ -204,7 +204,6 @@ const ArChallengeShare = ({
   const TiktokShareImgOnPress = async () => {
     if (fileExt == 'mp4') {
       const filebase64 = await RNFS.readFile(captureData, 'base64')
-      console.log("captureData aa", captureData);
       init('aw5g4n448236v4uh');
       share(captureData, (code) => {
         console.log(code);
