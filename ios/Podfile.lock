@@ -369,6 +369,9 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-splash-screen (3.3.0):
     - React-Core
+  - react-native-tiktok (1.0.1):
+    - React-Core
+    - TikTokOpenSDK (= 5.0.15)
   - react-native-video (5.2.1):
     - React-Core
     - react-native-video/Video (= 5.2.1)
@@ -604,6 +607,7 @@ DEPENDENCIES:
   - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
+  - react-native-tiktok (from `../node_modules/react-native-tiktok`)
   - react-native-video (from `../node_modules/react-native-video`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-perflogger (from `../node_modules/react-native/ReactCommon/reactperflogger`)
@@ -728,6 +732,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
+  react-native-tiktok:
+    :path: "../node_modules/react-native-tiktok"
   react-native-video:
     :path: "../node_modules/react-native-video"
   react-native-webview:
@@ -850,6 +856,7 @@ SPEC CHECKSUMS:
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: b8979f5eda6ed5903d4dbc885be3846ea3daa753
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
+  react-native-tiktok: 7daefc5ab8c024fdd077e12e3429bee7e75dc385
   react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
   react-native-webview: e771bc375f789ebfa02a26939a57dbc6fa897336
   React-perflogger: 2d505bbe298e3b7bacdd9e542b15535be07220f6
