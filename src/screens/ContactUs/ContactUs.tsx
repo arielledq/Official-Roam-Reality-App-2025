@@ -1,20 +1,66 @@
-import React, { useState } from 'react'
-import { View, Keyboard ,TextInput,Text} from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { View, Keyboard , Alert} from 'react-native'
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { AppButton, AppHeader, AppInput } from '../../components';
 import { ContactUsSchema } from '../../util/ValidationSchemas';
 import BackgroundWithImage from '../../components/background';
+import { contactUs, getProfieDetails } from '../../network';
+import { useSelector } from 'react-redux';
 import theme from "../../assets/theme"
 import useStyles from "./styles"
 import { Formik } from "formik"
 
-const ContactUs = () => {
+const ContactUs = ({navigation}) => {
+  const userProfile = useSelector(state => state.login?.data?.user)
+  const [profileDetails, setProfileDetails] = useState(null)
   const [isNameInputFocused, setNameInputFocused] = useState(false)
   const [isEmailInputFocused, setEmailInputFocused] = useState(false)
   const [isMessageInputFocused, setMessageInputFocused] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [showError , setShowError] = useState(false)
   const _styles = useStyles()
+
+  useEffect(()=>{
+    fetchProfileDetails()
+  },[])
+
+  const fetchProfileDetails = async () => {
+    try {
+      getProfieDetails({
+        id: userProfile.user_profile.id
+      }).then(res => {
+        if (res.status == 1) {
+          setProfileDetails(res)
+        } else {
+          console.error('Error', "Error fetching profile details: ")
+        }
+      }).catch(err => {
+        console.error('Error', "Error fetching profile details: ")
+      }
+      ).finally(() => setIsLoading(false))
+
+    } catch (error) {
+      console.error('Error', "Error fetching profile details: ")
+    }
+  }
+
+  const submitHandler = (values) => {
+    setIsLoading(true)
+    contactUs({
+      message : values?.message
+    })
+      .then(res => {
+        if (res.status == 1) {
+          Alert.alert("Success", 'Message submitted successfully!', [
+            { text: "OK", onPress: () => navigation.navigate('Home') }
+          ])
+        } else {
+          Alert.alert("Error", res.message.error)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
   
   return (
     <BackgroundWithImage>
@@ -26,11 +72,11 @@ const ContactUs = () => {
       >
       <Formik
         initialValues={{
-            name :  "",
-            email : "",
+            name :  profileDetails?.user?.name ?? "",
+            email : profileDetails?.user?.email ?? "",
             message : ""
         }}
-        onSubmit={values => setShowError(true)}
+        onSubmit={values => submitHandler(values)}
         enableReinitialize
         validationSchema={ContactUsSchema}      
         >
@@ -58,7 +104,8 @@ const ContactUs = () => {
                     errorMessage={
                         touched.name && errors?.name ? errors.name : undefined
                     }
-                    autoCapitalize="none"                      
+                    autoCapitalize="none"   
+                    editable={false}                   
                 />
                 <AppInput
                     inputContainerStyle={[
@@ -81,7 +128,8 @@ const ContactUs = () => {
                     errorMessage={
                         touched.email && errors?.email ? errors.email : undefined
                     }
-                    autoCapitalize="none"                      
+                    autoCapitalize="none"  
+                    editable={false}                     
                 /> 
                   <AppInput
                     style={[
