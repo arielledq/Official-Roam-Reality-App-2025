@@ -9,6 +9,8 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
+from modules.ar.challenges.serializers import ARMemoriesSerializer
+from modules.ar.challenges.models import ARMemories
 from users.models import UserProfile
 from rest_framework.authtoken.models import Token
 
@@ -115,6 +117,11 @@ class ChangePasswordSerializer(serializers.Serializer):
 class AccountSetupSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     name = serializers.CharField(required=False)
+    # ar_memories = serializers.SerializerMethodField()
+
+    # def get_ar_memories(self, obj):
+    #     user_ar_memories = ARMemories.objects.filter(user=self.context['request'].user)
+    #     return ARMemoriesSerializer(user_ar_memories, many=True).data if user_ar_memories.exists() else []
 
     class Meta:
         model = UserProfile
