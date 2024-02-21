@@ -1,12 +1,14 @@
 from django.db import models
+from home.common import CommonModel
 
-class ContactUs(models.Model):
-    full_name = models.CharField(max_length=255)
-    email_address = models.EmailField()
+from users.models import User
+
+class ContactUs(CommonModel):
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
     message = models.TextField()
 
     def __str__(self):
-        return self.full_name
+        return self.sender.name
     
     class Meta:
         verbose_name = "Contact Us"
