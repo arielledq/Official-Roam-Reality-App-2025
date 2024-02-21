@@ -75,6 +75,13 @@ export const resetPassword = data =>
     data
   })
 
+  export const contactUs = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}contact-us/`,
+    method: 'POST',
+    data
+  })
+
 export const googleLogin = data => {
   return Request.call({
     url: `modules/social-auth/google/login/`,
