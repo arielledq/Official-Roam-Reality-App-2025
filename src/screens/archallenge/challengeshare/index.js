@@ -91,17 +91,17 @@ const ArChallengeShare = ({
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
+        appId: '746185200437639',
+        backgroundVideo: `data:video/mp4;base64,${filebase64}`,
         url: `data:video/mp4;base64,${filebase64}`,
-        social: Share.Social.FACEBOOK,
-        appId: '746185200437639'
+        social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
-        social: Share.Social.FACEBOOK,
+        social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
         backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
         type: `image/*`,
-        url: `data:image/${fileExt};base64,${filebase64}`,
         appId: '746185200437639'
       }
     }
@@ -166,7 +166,7 @@ const ArChallengeShare = ({
     if (Platform.OS == 'android') {
       facebookShareAndroid()
     } else {
-      facebookShareIOS()
+      facebookShareAndroid()
     }
   }
 
@@ -177,15 +177,20 @@ const ArChallengeShare = ({
     if (fileExt == 'mp4') {
       shareContent = {
         type: 'video/mp4',
-        url: `data:video/mp4;base64,${filebase64}`,
-        social: Share.Social.INSTAGRAM,
+        backgroundVideo: `data:video/mp4;base64,${filebase64}`,
+        url: `data:video/${fileExt};base64,${filebase64}`,
+        social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
+        appId: '746185200437639'
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
         type: `image/*`,
         url: `data:image/${fileExt};base64,${filebase64}`,
-        social: Share.Social.INSTAGRAM,
+        backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
+        social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
+        appId: '746185200437639',
+        BackgroundAndStickerImage: `data:image/${fileExt};base64,${filebase64}`,
       }
     }
     try {
