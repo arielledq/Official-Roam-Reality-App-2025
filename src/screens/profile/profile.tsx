@@ -114,15 +114,14 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }
 
   const data = [
-    { id: 1, value: 0, property: "Sites Viewed" },
-    { id: 2, value: 0, property: "Likes Received" },
-    { id: 3, value: 0, property: "Comments Posted" },
-    { id: 4, value: 0, property: "Photos Uploaded" },
-    { id: 5, value: 0, property: "Friends Added" },
-    { id: 6, value: 0, property: "Articles Read" },
-    { id: 7, value: 0, property: "Messages Sent" },
-    { id: 8, value: 0, property: "Logins This Month" },
-    { id: 9, value: arProfile?.challenge_completed, property: "AR Challenges" }
+    { id: 1, value: 0, property: "Sites Visited" },
+    { id: 2, value: 0, property: "Stars" },
+    { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
+    { id: 4, value: 0, property: "Friends" },
+    { id: 5, value: 0, property: "Credits" },
+    { id: 6, value: 0, property: "Tokens" },
+    { id: 7, value: 0, property: "Rallies" },
+    { id: 8, value: 0, property: "Countries" },
     
   ]
   // Split the data into chunks of 3 for each row
@@ -143,7 +142,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <FastImage
             style={{
               width: '100%',
-              height: height * 0.4,
+              height: height * 0.45,
             }}
             source={{ uri: profileDetails?.image }}
             resizeMode={FastImage.resizeMode.cover}
@@ -245,6 +244,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         containerStyle={_styles.headerContainer}
         title={"Profile"}
         leftComponent={handleMenuButton()}
+        titleStyle={{blurRadius: 90}}
       />
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
