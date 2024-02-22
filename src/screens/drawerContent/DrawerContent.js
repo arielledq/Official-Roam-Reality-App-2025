@@ -16,12 +16,12 @@ const DrawerList = [
   { icon: 'target', label: 'AR Challenges', navigateTo: 'ARChallenge' },
   { icon: 'message-square', label: 'Chats', navigateTo: 'Home' },
   { icon: 'users', label: 'Friends', navigateTo: 'Home' },
-  { icon: 'target', label: 'Wallet', navigateTo: 'Home' },
+  { icon: 'Wallet', label: 'Wallet', navigateTo: 'Home' },
   { icon: 'info', label: 'About Us', navigateTo: 'Home' },
-  { icon: 'target', label: 'Invite Friends', navigateTo: 'Home' },
-  { icon: 'target', label: 'Privacy Policy', navigateTo: 'PrivacyPolicy' },
+  { icon: 'Invite', label: 'Invite Friends', navigateTo: 'Home' },
+  { icon: 'Folder', label: 'Privacy Policy', navigateTo: 'PrivacyPolicy' },
   {
-    icon: 'target',
+    icon: 'Folder',
     label: 'Terms and Conditions',
     navigateTo: 'TermsAndConditions'
   },
@@ -40,13 +40,17 @@ const DrawerLayout = ({
   index,
   onPress
 }) => {
+  function getIconFamily(icon) {
+    const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet"];
+    return customIcons.includes(icon) ? 'custom' : 'feather';
+  }
   return (
     <>
       <DrawerItem
         icon={() => (
           <Icon
             name={icon}
-            family={(icon === "Contact" || icon === "Question") ? 'custom' : "feather"}
+            family={getIconFamily(icon)}
             color={'white'}
             size={20}
             style={{ marginLeft: 10 }}

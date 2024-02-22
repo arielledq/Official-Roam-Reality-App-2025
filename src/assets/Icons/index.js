@@ -33,7 +33,9 @@ import Question from './Question.svg'
 import FacebookIcon  from './facebookIcon.svg'
 import Instagram  from './Instagram.svg'
 import TikTok from './TikTok.svg'
-
+import Invite from './invite.svg'
+import Folder from './folder.svg'
+import Wallet from './wallet.svg'
 export const Icons = {
   password,
   lock,
@@ -69,5 +71,8 @@ export const Icons = {
   Question,
   FacebookIcon,
   Instagram,
-  TikTok
+  TikTok,
+  Invite,
+  Folder,
+  Wallet
 }
