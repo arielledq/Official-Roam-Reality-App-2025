@@ -47,6 +47,13 @@ const useStyles = makeStyles((theme) => ({
       marginTop: 10,
       marginStart: 3
     },
+    subtitleText : {
+      ...fontGroup.ns400,
+      fontSize: FontSizes.S12,
+      lineHeight: FontLineHeights.LH15,
+      marginTop: 10,
+      marginStart: 3
+    },
     containerStyle: {
       paddingBottom : 100
     }

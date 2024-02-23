@@ -25,11 +25,11 @@ const useStyles = makeStyles(theme => ({
     // zIndex: 2
   },
   header: {
-    marginBottom: "5%"
+    marginBottom: 20
   },
   headingView: {
     flexDirection: "row",
-    marginTop: "15%",
+    marginTop: 20,
     marginHorizontal: 5
   },
   heading: {
@@ -61,7 +61,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 6
   },
   boxstatContainerStyle: {
     flexDirection: "row",
