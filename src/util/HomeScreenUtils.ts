@@ -7,11 +7,5 @@ export const HomeScreenData = [
       subtitle: "AR Challenges",
       image : Images.Home
     },
-    {
-      id : 2,
-      title : "Outdoor GEO-AR",
-      subtitle : "Adventures",
-      image : Images.Home1
-    },
   ]
   
