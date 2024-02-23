@@ -140,7 +140,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           <AppText style={styles.subtitleText}>Praesent et leo cursus, malesuada magna eu</AppText>
           <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
         </View>
-        <TouchableOpacity onPress={navigateToARChanllenge}>
+        <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => Alert.alert('InProgress')}>
           <RightArrowIcon/>
         </TouchableOpacity>
       </View>
