@@ -16,6 +16,14 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     backgroundColor:'#000'
   },
+  heading: {
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+    color: theme.colors.white,
+    marginTop: 5,
+    textAlign:'center'
+  },
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
     marginTop:20,

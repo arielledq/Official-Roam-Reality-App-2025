@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.white,
-    marginTop: 7
+    flex:1,
   },
   Text: {
     ...fontGroup.sf500,
