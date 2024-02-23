@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
 
   challengeSponsorStartDateText: {
     ...fontGroup.p300,
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S10,
     color: theme.colors.white,
   },
   pointCount: {
@@ -74,7 +74,24 @@ const useStyles = makeStyles(theme => ({
   buttonContainerStyle: {
     marginTop: 20
   },
-  pointContainer: { backgroundColor: "#9003E050", width: '100%', height: 87, marginVertical: 20, borderRadius: 20, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20 }
+  pointContainer: { 
+    backgroundColor: "#9003E050", 
+    width: '100%', 
+    height: 87, 
+    marginVertical: 20, 
+    borderRadius: 20, 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    paddingHorizontal: 20 
+  },
+  heading: {
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+    color: theme.colors.white,
+    marginTop: 5,
+    textAlign:'center'
+  },
 }))
 
 export default useStyles

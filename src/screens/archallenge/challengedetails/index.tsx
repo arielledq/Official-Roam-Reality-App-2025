@@ -15,6 +15,7 @@ import moment from 'moment'
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { checkARChallengeDoneAPI } from "../../../network";
+import BGArShare from "../../../assets/ar/bg-ar-share.png"
 
 const { width } = Dimensions.get('window');
 
@@ -29,6 +30,8 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj;
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
+  console.log("expiry_date:",challengeObj.expiry_date)
+  const expiryDate = moment(challengeObj.expiry_date).format('DD-MM-YYYY');
   const isFocused = useIsFocused();
 
   const checkIfChallengeIsDone = () => {
@@ -66,19 +69,27 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   return (
 
     <BackgroundWithImage style={styles.mainContainer}>
-      <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
+      <AppHeader centerComponent={{
+        text: "Anywhere AR Challenges",
+        numberOfLines: 2,
+        style: [styles.heading],
+      }} backgroundColor="transparent" />
       <View style={styles.pointContainer}>
-        <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: "#B816E0", width: 73, height: 63, borderRadius: 8 }}>
+        <View style={{ flexDirection: 'column', alignItems: 'center', justifyContent: 'center', width: 73, height: 63, borderRadius: 8 }}>
+          <BackgroundWithImage imageSource={BGArShare}
+            style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+          </BackgroundWithImage>
           <Text style={styles.pointCount}>{challengeObj.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
         </View>
-        <View style={{ paddingHorizontal: 10 }}>
+        <View style={{ paddingHorizontal: 10,flex:1}}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
             <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
           </View>
-          <View style={{ marginTop: 2 }}>
+          <View style={{ marginTop: 2, flexDirection: 'row', justifyContent: "space-between",width:'100%' }}>
             <Text style={styles.challengeSponsorStartDateText}>Started on: {startDate}</Text>
+            <Text style={styles.challengeSponsorStartDateText}>Ends on: {challengeObj.expiry_date ? expiryDate : "None"}</Text>
           </View>
         </View>
       </View>
