@@ -58,6 +58,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
   const [pageLoading, setPageLoading] = useState(true);
   const [imageLoading, setImageLoading] = useState(true);
   const [countryData, setCountryData] = useState([])
+  const [height, setHeight] = useState(0);
   const nameRef = useRef()
   // Function to fetch 
   const fetchProfileDetails = async () => {
@@ -437,7 +438,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                     />
                     <AppInput
                       inputContainerStyle={[
-                        _styles.input,
+                        _styles.input,{ height: Math.min(75, height) },
                         isAddressInputFocused ? _styles.focusedInput : {},
                         touched.address && errors?.address
                           ? _styles.inputError
@@ -474,6 +475,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                           }
                           size={24}
                         />
+                      }
+                      multiline = {true}
+                      onContentSizeChange={(event) =>
+                        setHeight(event.nativeEvent.contentSize.height)
                       }
                     />
                     <View style={_styles.dropdownParentView}>
