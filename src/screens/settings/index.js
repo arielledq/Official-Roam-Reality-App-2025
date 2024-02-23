@@ -1,4 +1,4 @@
-import React from "react"
+import React,{useState,useEffect} from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
 import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
@@ -12,7 +12,7 @@ import {
   GraphRequestManager,
   LoginManager
 } from "react-native-fbsdk-next"
-import { setItem } from "../../util/helpers"
+import { setItem,getItem } from "../../util/helpers"
 
 function SettingsItem({ label, onPress, icon }) {
   return (
@@ -50,7 +50,7 @@ function SettingsItem({ label, onPress, icon }) {
   )
 }
 
-function SocialAccountItem({ label, onPress, icon }) {
+function SocialAccountItem({ label, onPress, icon, isLinked = false}) {
   return (
     <View
       style={{
@@ -81,7 +81,7 @@ function SocialAccountItem({ label, onPress, icon }) {
         color={theme.darkColors?.white}
         size={24}
       >
-        <AppText style={styles.linkNow}>Link now</AppText>
+        <AppText style={styles.linkNow}>{isLinked ? 'Linked' : 'Link now'}</AppText>
       </TouchableOpacity>
     </View>
   )
@@ -89,6 +89,7 @@ function SocialAccountItem({ label, onPress, icon }) {
 
 const Settings = () => {
   const navigation = useNavigation()
+  const [isFbLinked, setIsFbLinked] = useState(false)
 
   const handleChangePassword = () => {
     navigation.navigate("ChangePassword")
@@ -96,6 +97,18 @@ const Settings = () => {
   const handlePrivacy = () => {
     navigation.navigate("Privacy")
   }
+
+  useEffect(()=>{
+    const getfbToken = async()=>{
+      const token = await getItem("fbToken")
+      console.log("token:", token)
+      if(token){
+        setIsFbLinked(true)
+      }
+    }
+
+    getfbToken()
+  },[])
 
   const fbLink = (resCallBack) => {
     LoginManager.logOut()
@@ -160,6 +173,7 @@ const Settings = () => {
         icon="FacebookIcon"
         label={"Facebook"}
         onPress={onFbLink}
+        isLinked={isFbLinked}
       />
       <SocialAccountItem
         icon="Instagram"

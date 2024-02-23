@@ -28,14 +28,14 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.220585435352-6rs34650r35gm2m5i9a7n1rpl4t6jkog</string>
-				<string>fb746185200437639</string>
+				<string>fb1425164828425408</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>FacebookAppID</key>
-	<string>746185200437639</string>
+	<string>1425164828425408</string>
 	<key>FacebookClientToken</key>
 	<string>9bb1d62e7fa4072498828e188eb87c02</string>
 	<key>FacebookDisplayName</key>
@@ -46,6 +46,8 @@
 	<array>
 		<string>fbapi</string>
 		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
 		<string>tel</string>
 		<string>telprompt</string>
 		<string>https</string>
