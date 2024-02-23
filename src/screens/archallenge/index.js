@@ -84,7 +84,6 @@ const ArChallenge = ({
       <AppHeader
         centerComponent={{
           text: "Anywhere AR Challenges",
-          numberOfLines: 2,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
       <View style={_styles.rowView}>
