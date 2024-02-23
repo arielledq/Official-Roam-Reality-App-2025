@@ -33,6 +33,17 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     marginTop: 10,
   },
+  pointsText: {
+    ...fontGroup.ns900,
+    fontSize: FontSizes.S24,
+    color: theme.colors.white,
+  },
+  yourPointsText: {
+    ...fontGroup.p400,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
+    marginTop: 5,
+  },
   rowView: { 
     width: '100%',
     flexDirection: 'row', 
