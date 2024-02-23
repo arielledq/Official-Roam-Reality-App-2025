@@ -114,7 +114,7 @@ const ArChallengeCapture = ({
                   }
                 }
               }
-              if(sourcesArray.length > 0){
+              if (sourcesArray.length > 0) {
                 setSourcesFiles(sourcesArray)
               }
               setLoading(false)
@@ -388,7 +388,7 @@ const ArChallengeCapture = ({
         <View style={styles.challengeInfoContainer}>
           <View style={styles.challengeInfoHeaderContainer}>
             <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-            <Text style={styles.challengeInfoHeader}>Waiver details</Text>
+            <Text style={styles.challengeInfoHeader}>Waiver Details</Text>
           </View>
           <ScrollView
             contentContainerStyle={{ paddingBottom: 100 }}
@@ -480,7 +480,11 @@ const ArChallengeCapture = ({
           }} />}
 
           <View style={styles.mainHeaderContainer}>
-            <AppHeader title={challengeObj.sponsored.name} backgroundColor="transparent" />
+            <AppHeader centerComponent={{
+              text: "Anywhere AR Challenges",
+              numberOfLines: 2,
+              style: [styles.heading],
+            }}  backgroundColor="transparent" />
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
