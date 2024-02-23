@@ -166,7 +166,7 @@ const ArChallengeShare = ({
     if (Platform.OS == 'android') {
       facebookShareAndroid()
     } else {
-      facebookShareAndroid()
+      facebookShareIOS()
     }
   }
 
@@ -202,12 +202,16 @@ const ArChallengeShare = ({
   }
 
   const TiktokShareImgOnPress = async () => {
-    const filebase64 = await RNFS.readFile(captureData, 'base64')
-    console.log("captureData", captureData);
-    init('aw5g4n448236v4uh');
-    share(filebase64, (code) => {
-      console.log(code);
-    });
+    if (fileExt == 'mp4') {
+      const filebase64 = await RNFS.readFile(captureData, 'base64')
+      init('aw5g4n448236v4uh');
+      share(captureData, (code) => {
+        console.log(code);
+        updateARSocialPoints("TIKTOK")
+      });
+    } else {
+      Alert.alert("Share Support Issue:", "Only Video Supported to share.")
+    }
 
     // Picker.openPicker({
     //   mediaType: 'video',
