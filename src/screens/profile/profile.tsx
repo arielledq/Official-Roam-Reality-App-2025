@@ -142,7 +142,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <FastImage
             style={{
               width: '100%',
-              height: height * 0.45,
+              height: height * 0.4,
             }}
             source={{ uri: profileDetails?.image }}
             resizeMode={FastImage.resizeMode.cover}
@@ -195,7 +195,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"0/1000"} property={"Global Rank"} />
+          <StatContainer value={"0"} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
