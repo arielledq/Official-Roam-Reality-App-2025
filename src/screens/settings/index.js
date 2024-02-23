@@ -1,5 +1,7 @@
-import React,{useState,useEffect} from "react"
+import React,{useState,useEffect,useRef} from "react"
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import InstagramLogin from 'react-native-instagram-login';
+import { init, auth, share, events } from "react-native-tiktok";
 import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import { AppHeader, AppText } from "../../components"
@@ -90,6 +92,9 @@ function SocialAccountItem({ label, onPress, icon, isLinked = false}) {
 const Settings = () => {
   const navigation = useNavigation()
   const [isFbLinked, setIsFbLinked] = useState(false)
+  const [isInstaLinked, setIsInstaLinked] = useState(false)
+  const [isTiktokLinked, setIsTiktokLinked] = useState(false)
+  const insRef = useRef();
 
   const handleChangePassword = () => {
     navigation.navigate("ChangePassword")
@@ -99,15 +104,27 @@ const Settings = () => {
   }
 
   useEffect(()=>{
-    const getfbToken = async()=>{
-      const token = await getItem("fbToken")
-      console.log("token:", token)
-      if(token){
+    init("awx8jb1brvngfo5m")
+  },[])
+
+  useEffect(()=>{
+    const getToken = async()=>{
+      const fbtoken = await getItem("fbToken")
+      const instatoken = await getItem("instaToken")
+      const tiktokToken = await getItem("tiktokToken")
+      console.log("token:", instatoken,fbtoken,tiktokToken)
+      if(fbtoken){
         setIsFbLinked(true)
+      }
+      if(instatoken){
+        setIsInstaLinked(true)
+      }
+      if(tiktokToken){
+        setIsTiktokLinked(true)
       }
     }
 
-    getfbToken()
+    getToken()
   },[])
 
   const fbLink = (resCallBack) => {
@@ -159,6 +176,22 @@ const Settings = () => {
         console.log("userData result:", userdata)
     }
   }
+
+  const onSuccess = async(token) => {
+    if(token){
+      setIsInstaLinked(true)
+      await setItem("instaToken", token.toString())
+    }
+  }
+
+  const onTiktokLink = ()=>{
+      auth((code)=>{
+        if(code){
+          setIsTiktokLinked(true)
+          setItem("tiktokToken", code)
+        }
+      })
+  }
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={"Settings"} backgroundColor="transparent" />
@@ -178,12 +211,23 @@ const Settings = () => {
       <SocialAccountItem
         icon="Instagram"
         label={"Instagram"}
-        onPress={handlePrivacy}
+        onPress={() => insRef.current.show()}
+        isLinked={isInstaLinked}
       />
       <SocialAccountItem
         icon="TikTok"
         label={"TikTok"}
-        onPress={handlePrivacy}
+        onPress={() => onTiktokLink()}
+        isLinked={isTiktokLinked}
+      />
+      <InstagramLogin
+        ref={insRef}
+        appId='1484661052113126'
+        appSecret='96fc71a7ca5736144da344e5b7d1b158'
+        redirectUrl='https://github.com/'
+        scopes={['user_profile', 'user_media']}
+        onLoginSuccess={(token)=>onSuccess(token)}
+        onLoginFailure={(data) => console.log(data)}
       />
     </BackgroundWithImage>
   )

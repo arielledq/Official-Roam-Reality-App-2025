@@ -52,6 +52,7 @@ target 'travel_ar_app_42706' do
   
   pod 'ViroReact', :path => '../node_modules/@viro-community/react-viro/ios/'
   pod 'ViroKit', :path => '../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/'
+  pod 'TikTokOpenSDK', '~> 5.0.15'
   #FOR LOCALLY VIRO REACT
   # pod 'ViroReact', :path => '../../viro/ios/'
   # pod 'ViroKit', :path => '../../viro/ios/dist/ViroRenderer/'
