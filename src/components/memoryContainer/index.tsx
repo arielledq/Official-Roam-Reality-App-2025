@@ -1,5 +1,5 @@
 import React from "react"
-import { Image, Platform, Pressable, TouchableOpacity, View } from "react-native"
+import { Alert, Image, Platform, Pressable, TouchableOpacity, View } from "react-native"
 import useStyles from "./styles"
 import AppText from "../text"
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
@@ -34,30 +34,37 @@ const MemoryContainer = ({
   let memoryName = memoryPath.substring(newMemoryUri);
 
   let dirs = RNFetchBlob.fs.dirs;
-  let path = Platform.OS === 'ios' ? dirs['MainBundleDir'] + memoryName : dirs.PictureDir + memoryName;
+  const path = Platform.OS === 'ios' ? dirs.LibraryDir + memoryName : dirs.PictureDir + memoryName;
+  //let path = Platform.OS === 'ios' ? dirs['MainBundleDir'] + memoryName : dirs.PictureDir + memoryName;
 
   const saveToGallery = () => {
-    if (Platform.OS == 'android') {
-      console.log("path:", path)
-      console.log("fileExt:", fileExt)
-      RNFetchBlob.config({
-        fileCache: true,
-        appendExt: fileExt,
-        indicator: true,
-        IOSBackgroundTask: true,
+    console.log("path:", path)
+    console.log("fileExt:", fileExt)
+    console.log("memoryURL:", memoryURL)
+    console.log("Platform.OS:", Platform.OS)
+    RNFetchBlob.config({
+      fileCache: true,
+      appendExt: fileExt,
+      indicator: true,
+      IOSBackgroundTask: true,
+      path: path,
+      addAndroidDownloads: {
+        useDownloadManager: true,
+        notification: true,
         path: path,
-        addAndroidDownloads: {
-          useDownloadManager: true,
-          notification: true,
-          path: path,
-          description: fileExt == 'mp4' ? 'Video' : "Image"
-        },
-      }).fetch("GET", memoryURL).then(res => {
-        console.log(res, 'end downloaded')
-      });
-    } else {
-      CameraRoll.saveToCameraRoll(memoryURL);
-    }
+        description: fileExt == 'mp4' ? 'Video' : "Image"
+      },
+    }).fetch("GET", memoryURL).then(res => {
+      if (Platform.OS == 'ios') {
+        console.log("res.path::", res)
+        CameraRoll.saveAsset(res.data, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
+          Alert.alert('Saved to Camera Roll');
+        })
+          .catch((err) => {
+            console.log('err:', err);
+          });;
+      }
+    });
   }
 
   return (
