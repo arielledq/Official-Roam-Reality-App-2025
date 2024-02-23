@@ -85,6 +85,14 @@ const useStyles = makeStyles(theme => ({
   shareBtn:{
     marginHorizontal:8
   },
+  heading: {
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+    color: theme.colors.white,
+    marginTop: 5,
+    textAlign:'center'
+  },
   shareText:{
     ...fontGroup.p400,
     fontSize: FontSizes.S12,
@@ -111,10 +119,10 @@ const useStyles = makeStyles(theme => ({
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: "#B816E0",
     width: 73,
     height: 63,
-    borderRadius: 8
+    borderRadius: 8,
+    backgroundColor:'transparent'
   }
 }))
 
