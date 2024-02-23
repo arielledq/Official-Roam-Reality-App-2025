@@ -9,7 +9,7 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/Fo
 
 const useStyles = makeStyles(theme => ({
   heading: {
-    fontSize: FontSizes.S18,
+    fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.ns700,
     color: theme.colors.white,
@@ -41,9 +41,9 @@ const useStyles = makeStyles(theme => ({
     marginVertical:10
   },
   buttonSelectText: {
-    ...fontGroup.p400,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
+    fontWeight:'bold'
   },
   selectButtonStyle:
   {
