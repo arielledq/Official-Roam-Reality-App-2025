@@ -151,11 +151,11 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
 
   return (
     <View style={styles.mainContainer}>
-      <BlurView style={styles.blurView}>
+      <BlurView style={styles.blurView} blurType="light" blurAmount={10}>
         <AppHeader 
           title={"Home"} 
-          containerStyle={styles.headerContainer}
           leftComponent={handleMenuButton()}
+          containerStyle={styles.headerContainer}
         />
       </BlurView>
       <View style={styles.container}>
