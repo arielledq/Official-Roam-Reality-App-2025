@@ -30,7 +30,7 @@ const BottomTabNavigator = () => {
               <Icon  
                 name={focused ? 'SelectedHomeIcon' : 'UnselectedHomeIcon'} 
                 family='custom' 
-                size={focused ? 120 : 35} 
+                size={focused ? 110 : 30} 
                 style={focused && styles.tabBarIconStyle}
               /> 
           ),
@@ -45,7 +45,7 @@ const BottomTabNavigator = () => {
             <Icon  
                 name={focused ? 'SelectedBadgeIcon' : 'UnselectedBadgeIcon'} 
                 family='custom' 
-                size={focused ? 120 : 38} 
+                size={focused ? 110 : 33} 
                 style={focused && styles.tabBarIconStyle}
               /> 
           ),
@@ -60,7 +60,7 @@ const BottomTabNavigator = () => {
             <Icon  
                 name={'SelectedCamera'} 
                 family='custom' 
-                size={60} 
+                size={55} 
                 style={styles.cameraTabStyle}
             /> 
           ),
@@ -75,7 +75,7 @@ const BottomTabNavigator = () => {
             <Icon  
               name={focused ? 'SelectedFlagIcon' : 'UnselectedFlagIcon'} 
               family='custom' 
-              size={focused ? 120 : 35} 
+              size={focused ? 110 : 30} 
               style={focused && styles.tabBarIconStyle}
           />
           ),
@@ -90,7 +90,7 @@ const BottomTabNavigator = () => {
             <Icon  
               name={focused ? 'SelectedProfile' : 'UnselectedProfile'} 
               family='custom' 
-              size={focused ? 120 : 35} 
+              size={focused ? 110 : 30} 
               style={focused && styles.tabBarIconStyle}
         />
           ),
@@ -104,7 +104,7 @@ export default BottomTabNavigator
 
 const styles = StyleSheet.create({
   tabBarStyle: {
-    height: 100,
+    height: 80,
     position: 'absolute',
     backgroundColor: '#090A16',
     borderTopStartRadius: 20,
@@ -120,7 +120,7 @@ const styles = StyleSheet.create({
     lineHeight: 12,
     color: '#FFFFFF',
     textAlign: 'center',
-    marginTop: 15
+    marginTop: 10
   },
   cameraTabStyle: {
     marginTop: -5
