@@ -9,7 +9,7 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/Fo
 
 const useStyles = makeStyles(theme => ({
   heading: {
-    fontSize: FontSizes.S18,
+    fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.ns700,
     color: theme.colors.white,
@@ -25,13 +25,23 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns900,
     fontSize: FontSizes.S24,
     color: theme.colors.white,
-    marginTop: 10,
   },
   subHeaderText: {
     ...fontGroup.p400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    marginTop: 10,
+    marginTop: 5,
+  },
+  pointsText: {
+    ...fontGroup.ns900,
+    fontSize: FontSizes.S24,
+    color: theme.colors.white,
+  },
+  yourPointsText: {
+    ...fontGroup.p400,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
+    marginTop: 5,
   },
   rowView: { 
     width: '100%',
@@ -41,9 +51,9 @@ const useStyles = makeStyles(theme => ({
     marginVertical:10
   },
   buttonSelectText: {
-    ...fontGroup.p400,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
+    fontWeight:'bold'
   },
   selectButtonStyle:
   {

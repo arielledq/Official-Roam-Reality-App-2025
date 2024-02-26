@@ -20,7 +20,7 @@ import { ShareDialog } from "react-native-fbsdk-next";
 import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
 import { share, init, events } from 'react-native-tiktok';
-import Picker from 'react-native-image-crop-picker';
+import BGArShare from "../../../assets/ar/bg-ar-share.png"
 
 const ArChallengeShare = ({
 
@@ -30,7 +30,7 @@ const ArChallengeShare = ({
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const fileExt = captureData.split('.').pop();
-  const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
+  const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch()
 
@@ -91,17 +91,17 @@ const ArChallengeShare = ({
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
+        appId: '746185200437639',
+        backgroundVideo: `data:video/mp4;base64,${filebase64}`,
         url: `data:video/mp4;base64,${filebase64}`,
-        social: Share.Social.FACEBOOK,
-        appId: '746185200437639'
+        social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
-        social: Share.Social.FACEBOOK,
+        social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
         backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
         type: `image/*`,
-        url: `data:image/${fileExt};base64,${filebase64}`,
         appId: '746185200437639'
       }
     }
@@ -166,7 +166,7 @@ const ArChallengeShare = ({
     if (Platform.OS == 'android') {
       facebookShareAndroid()
     } else {
-      facebookShareIOS()
+      facebookShareAndroid()
     }
   }
 
@@ -177,15 +177,20 @@ const ArChallengeShare = ({
     if (fileExt == 'mp4') {
       shareContent = {
         type: 'video/mp4',
-        url: `data:video/mp4;base64,${filebase64}`,
-        social: Share.Social.INSTAGRAM,
+        backgroundVideo: `data:video/mp4;base64,${filebase64}`,
+        url: `data:video/${fileExt};base64,${filebase64}`,
+        social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
+        appId: '746185200437639'
       }
     }
     if (fileExt == 'png' || fileExt == 'jpg') {
       shareContent = {
         type: `image/*`,
         url: `data:image/${fileExt};base64,${filebase64}`,
-        social: Share.Social.INSTAGRAM,
+        backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
+        social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
+        appId: '746185200437639',
+        BackgroundAndStickerImage: `data:image/${fileExt};base64,${filebase64}`,
       }
     }
     try {
@@ -244,7 +249,11 @@ const ArChallengeShare = ({
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
-      <AppHeader title={challengeObj?.sponsored?.name} backgroundColor="transparent" />
+      <AppHeader centerComponent={{
+        text: "Anywhere AR Challenges",
+        numberOfLines: 2,
+        style: [styles.heading],
+      }} backgroundColor="transparent" />
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, overflow: 'hidden' }
@@ -260,8 +269,10 @@ const ArChallengeShare = ({
             <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
-              <Text style={styles.pointCount}>{challengeObj.points}</Text>
-              <Text style={styles.pointCountText}>Points</Text>
+              <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+              </BackgroundWithImage>
+              <AppText style={styles.pointCount}>{challengeObj.points}</AppText>
+              <AppText style={styles.pointCountText}>Points</AppText>
             </View>
             <View style={{ paddingHorizontal: 10 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -270,7 +281,7 @@ const ArChallengeShare = ({
               </View>
               <View >
                 <Text style={styles.challengeSponsorTipText}>Share your recorded experience for extra credits!</Text>
-                <Text style={styles.challengeSponsorStartDateText}>Started on : {startDate}</Text>
+                <Text style={styles.challengeSponsorStartDateText}>Completed on : {startDate}</Text>
               </View>
             </View>
           </View>
