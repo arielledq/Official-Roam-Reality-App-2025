@@ -84,7 +84,6 @@ const ArChallenge = ({
       <AppHeader
         centerComponent={{
           text: "Anywhere AR Challenges",
-          numberOfLines: 2,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
       <View style={_styles.rowView}>
@@ -95,8 +94,8 @@ const ArChallenge = ({
         <BackgroundWithImage
           style={{ backgroundColor: "transparent", flex: .5, height: 94, justifyContent: "center", alignItems: 'center' }}
           imageSource={PointBoardBG}>
-          <AppText style={[_styles.headerText]}>{arProfile?.points}</AppText>
-          <AppText style={[_styles.subHeaderText]}>Your Total Points</AppText>
+          <AppText style={[_styles.pointsText]}>{arProfile?.points}</AppText>
+          <AppText style={[_styles.yourPointsText]}>Your Total Points</AppText>
         </BackgroundWithImage>
       </View>
       <View style={_styles.rowView}>
