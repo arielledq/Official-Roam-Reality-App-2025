@@ -241,12 +241,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <BlurView style={_styles.blurView}>
+      <BlurView style={_styles.blurView} blurType="light" blurAmount={10}>
         <AppHeader
           containerStyle={_styles.headerContainer}
           title={"Profile"}
           leftComponent={handleMenuButton()}
-        />
+          titleStyle={{blurRadius: 90}}
+          />
       </BlurView>
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
