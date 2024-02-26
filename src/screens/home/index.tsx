@@ -29,6 +29,7 @@ import useStyles from "./styles"
 import RightArrowIcon from "../../assets/svg/RightArrowIcon"
 import { handleError } from "../../util/helpers"
 import { HomeScreenData } from "../../util/HomeScreenUtils"
+import { BlurView } from "@react-native-community/blur";
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
@@ -150,7 +151,13 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
 
   return (
     <View style={styles.mainContainer}>
-      <AppHeader title={"Home"} leftComponent={handleMenuButton()}/>
+      <BlurView style={styles.blurView}>
+        <AppHeader 
+          title={"Home"} 
+          containerStyle={styles.headerContainer}
+          leftComponent={handleMenuButton()}
+        />
+      </BlurView>
       <View style={styles.container}>
         {isLoading ? <ActivityIndicator size="large" /> : 
         <FlatList
