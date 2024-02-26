@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, Image, Alert } from 'react-native'
+import { View, StyleSheet, Image, Alert,TouchableOpacity } from 'react-native'
 import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
 import theme from '../../assets/theme'
 import { useNavigation } from '@react-navigation/native'
@@ -11,6 +11,7 @@ import ConfirmationPopUp from '../../components/confirmationPopUp'
 import { deleteAccount, logout } from '../../network'
 import { useDispatch } from 'react-redux'
 import { resetState } from '../../redux/Login'
+import LinearGradient from 'react-native-linear-gradient'
 
 const DrawerList = [
   { icon: 'target', label: 'AR Challenges', navigateTo: 'ARChallenge' },
@@ -44,45 +45,54 @@ const DrawerLayout = ({
     const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet"];
     return customIcons.includes(icon) ? 'custom' : 'feather';
   }
+  const renderDrawerItem = () => {
+    return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}
+    >
+      <Icon
+          name={icon}
+          family={getIconFamily(icon)}
+          color={'white'}
+          size={20}
+        />
+      <AppText style={styles.Text}>{label}</AppText>
+      {!isLastTwoItems && (
+        <Icon
+        name="chevron-right"
+        family="entypo"
+        color={theme.darkColors?.white}
+        size={20}
+      />   
+      )}
+    </View>
+    )
+  }
   return (
     <>
-      <DrawerItem
-        icon={() => (
-          <Icon
-            name={icon}
-            family={getIconFamily(icon)}
-            color={'white'}
-            size={20}
-            style={{ marginLeft: 10 }}
-          />
-        )}
-        label={() => (
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between'
-            }}
-          >
-            <AppText style={styles.Text}>{label}</AppText>
-            {!isLastTwoItems && (
-              <Icon
-                name="chevron-right"
-                family="entypo"
-                color={theme.darkColors?.white}
-                size={20}
-                style={{ marginRight: -20 }}
-              />
-            )}
-          </View>
-        )}
-        labelStyle={{ color: theme.darkColors?.white, marginLeft: -20 }}
-        onPress={() => onPress(navigateTo)}
-        style={{
-          backgroundColor: index === 0 ? theme.lightColors.pink : 'transparent'
-        }}
-      />
-    </>
+  {index === 0 ? 
+    <TouchableOpacity onPress={() => onPress(navigateTo)}>
+      <LinearGradient  
+        colors={['#9003E0','#1158F4','#9003E0']}  
+        style={styles.linearGradient}
+        start={{x: 0, y: 0}} 
+        end={{x: 1, y: 0}}
+      >
+        {renderDrawerItem()}
+      </LinearGradient>
+    </TouchableOpacity> : 
+    <TouchableOpacity 
+      onPress={() => onPress(navigateTo)}
+      style={styles.linearGradient}
+    >
+      {renderDrawerItem()}
+    </TouchableOpacity>
+    }
+  </>
   )
 }
 
@@ -178,7 +188,8 @@ export default DrawerContent
 
 const styles = StyleSheet.create({
   drawerContent: {
-    flex: 1
+    flex: 1,
+    paddingBottom: 20
   },
   drawerSection: {
     marginTop: 15,
@@ -186,13 +197,23 @@ const styles = StyleSheet.create({
   },
   Text: {
     ...fontGroup.p600,
-    marginLeft: -20,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH21,
-    color: theme.darkColors?.white
+    color: theme.darkColors?.white,
+    marginLeft: 10,
+    flex: 1
   },
   checkIcon: {
     alignItems: 'center',
     justifyContent: 'center'
-  }
+  },
+  linearGradient: {
+    marginLeft: 20,
+    marginRight: 10,
+    marginTop : 13,
+    padding: 10,
+    borderRadius: 8,
+    justifyContent : 'center',
+    alignItems : 'flex-start'
+  },
 })
