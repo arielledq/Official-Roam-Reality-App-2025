@@ -92,7 +92,7 @@ const useStyles = makeStyles(theme => ({
   },
   editButtonContainer: {
     position: "absolute",
-    top: 10,
+    top: 100,
     right: 20,
     zIndex: 10
   },
@@ -103,6 +103,13 @@ const useStyles = makeStyles(theme => ({
   },
   container_style:{
     paddingBottom : '50%'
+  },
+  blurView : {
+    position:'absolute', 
+    top : 0,
+    backgroundColor : '#00000050', 
+    height : 85,
+    zIndex : 10
   }
 }))
 
