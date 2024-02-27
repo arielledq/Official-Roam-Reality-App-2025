@@ -32,6 +32,7 @@ import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsi
 import { height, width } from "../../util/AppDimensions"
 import ScreenLoader from "../../components/screenLoader"
 import { updateARUserData } from "../../redux/AR"
+import { BlurView } from "@react-native-community/blur";
 
 const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const navigation = useNavigation()
@@ -240,12 +241,14 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        containerStyle={_styles.headerContainer}
-        title={"Profile"}
-        leftComponent={handleMenuButton()}
-        titleStyle={{blurRadius: 90}}
-      />
+      <BlurView style={_styles.blurView} blurType="light" blurAmount={10}>
+        <AppHeader
+          containerStyle={_styles.headerContainer}
+          title={"Profile"}
+          leftComponent={handleMenuButton()}
+          titleStyle={{blurRadius: 90}}
+          />
+      </BlurView>
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
         contentContainerStyle={_styles.container_style}
