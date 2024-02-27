@@ -103,10 +103,12 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
           contentWidth={width}
           tagsStyles={{
             p: {
+              lineHeight:19.1,
               color: '#9CA3AF',
               fontSize: FontSizes.S14
             },
             strong: {
+              lineHeight:19.1,
               color: '#fff',
               fontSize: FontSizes.S18
             }
