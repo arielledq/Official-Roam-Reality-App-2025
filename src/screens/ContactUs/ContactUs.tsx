@@ -9,6 +9,7 @@ import { useSelector } from 'react-redux';
 import theme from "../../assets/theme"
 import useStyles from "./styles"
 import { Formik } from "formik"
+import { DrawerActions } from '@react-navigation/native';
 
 const ContactUs = ({navigation}) => {
   const userProfile = useSelector(state => state.login?.data?.user)
@@ -51,7 +52,11 @@ const ContactUs = ({navigation}) => {
       .then(res => {
         if (res.status == 1) {
           Alert.alert("Success", 'Message submitted successfully!', [
-            { text: "OK", onPress: () => navigation.navigate('Home') }
+            { text: "OK", onPress: () => {
+              navigation.dispatch(DrawerActions.closeDrawer)
+              navigation.navigate('Home')
+            }
+             }
           ])
         } else {
           Alert.alert("Error", res.message.error)
