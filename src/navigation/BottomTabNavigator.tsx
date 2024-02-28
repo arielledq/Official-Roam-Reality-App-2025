@@ -1,4 +1,4 @@
-import { StyleSheet,Text } from 'react-native';
+import { StyleSheet, Text, View, Image } from 'react-native';
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import { useTheme } from 'react-native-paper'
 
@@ -7,6 +7,7 @@ import Profile from '../screens/profile/profile';
 import Scores from '../screens/scores';
 import Rally from '../screens/rally';
 import Icon from "../components/Icon"
+import { Icons } from '../assets/Icons';
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -26,13 +27,16 @@ const BottomTabNavigator = () => {
         component={Home}
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
-          tabBarIcon: ({focused}) => ( 
-              <Icon  
-                name={focused ? 'SelectedHomeIcon' : 'UnselectedHomeIcon'} 
-                family='custom' 
-                size={focused ? 110 : 30} 
-                style={focused && styles.tabBarIconStyle}
-              /> 
+          tabBarIcon: ({ focused }) => (
+            <View style={{ position: 'relative', width: 30, height: 30 }}>
+              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              <Icon
+                name={'UnselectedHomeIcon'}
+                family='custom'
+                size={30}
+              />
+            </View>
+
           ),
         }}
       />
@@ -42,12 +46,14 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
           tabBarIcon: ({ focused }) => (
-            <Icon  
-                name={focused ? 'SelectedBadgeIcon' : 'UnselectedBadgeIcon'} 
-                family='custom' 
-                size={focused ? 110 : 33} 
-                style={focused && styles.tabBarIconStyle}
-              /> 
+            <View style={{ position: 'relative', width: 30, height: 30 }}>
+              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              <Icon
+                name={'UnselectedBadgeIcon'}
+                family='custom'
+                size={33}
+              />
+            </View>
           ),
         }}
       />
@@ -57,12 +63,12 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: '',
           tabBarIcon: ({ focused }) => (
-            <Icon  
-                name={'SelectedCamera'} 
-                family='custom' 
-                size={55} 
-                style={styles.cameraTabStyle}
-            /> 
+            <Icon
+              name={'SelectedCamera'}
+              family='custom'
+              size={55}
+              style={styles.cameraTabStyle}
+            />
           ),
         }}
       />
@@ -72,12 +78,14 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
           tabBarIcon: ({ focused }) => (
-            <Icon  
-              name={focused ? 'SelectedFlagIcon' : 'UnselectedFlagIcon'} 
-              family='custom' 
-              size={focused ? 110 : 30} 
-              style={focused && styles.tabBarIconStyle}
-          />
+            <View style={{ position: 'relative', width: 30, height: 30 }}>
+              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              <Icon
+                name={'UnselectedFlagIcon'}
+                family='custom'
+                size={30}
+              />
+            </View>
           ),
         }}
       />
@@ -87,12 +95,14 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
           tabBarIcon: ({ focused }) => (
-            <Icon  
-              name={focused ? 'SelectedProfile' : 'UnselectedProfile'} 
-              family='custom' 
-              size={focused ? 110 : 30} 
-              style={focused && styles.tabBarIconStyle}
-        />
+            <View style={{ position: 'relative', width: 30, height: 30 }}>
+              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              <Icon
+                name={'UnselectedProfile'}
+                family='custom'
+                size={30}
+              />
+            </View>
           ),
         }}
       />
