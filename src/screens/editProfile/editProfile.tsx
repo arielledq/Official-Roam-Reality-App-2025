@@ -45,8 +45,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
   const dispatch = useDispatch()
   const route = useRoute()
   const edit = route?.params?.edit
+  const userData = route?.params?.profileDetails
+  const onProfileUpdate = route?.params?.onProfileUpdate
   const _styles = useStyles()
-  const [profileDetails, setProfileDetails] = useState(null)
+  const [profileDetails, setProfileDetails] = useState(userData)
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false)
   const [isNameInputFocused, setNameInputFocused] = useState(false)
   const [isMobileInputFocused, setMobileInputFocused] = useState(false)
@@ -55,7 +57,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false)
   const [pImage, setPImage] = useState<string | undefined>(undefined)
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null)
-  const [pageLoading, setPageLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
   const [imageLoading, setImageLoading] = useState(true);
   const [countryData, setCountryData] = useState([])
   const [height, setHeight] = useState(0);
@@ -63,24 +65,24 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
   // Function to fetch 
   const fetchProfileDetails = async () => {
     try {
-      const details = await getProfieDetails({
-        id: userProfile.user_profile.id
-      })
+      // const details = await getProfieDetails({
+      //   id: userProfile.user_profile.id
+      // })
 
       // Store the details in the state variable
-      setProfileDetails(details)
+      setProfileDetails(userData)
     } catch (error) {
       console.error("Error fetching profile details: ", error)
     }
   }
   console.log(profileDetails)
   useEffect(() => {
-    fetchProfileDetails()
-      .then(() => setPageLoading(false))
-      .catch(error => {
-        console.error("Error fetching profile details: ", error);
-        setPageLoading(false);
-      });
+    // fetchProfileDetails()
+    //   .then(() => setPageLoading(false))
+    //   .catch(error => {
+    //     console.error("Error fetching profile details: ", error);
+    //     setPageLoading(false);
+    //   });
     var config = {
       method: "get",
       url: "https://api.countrystatecity.in/v1/countries",
@@ -116,8 +118,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
     { label: "Prefer not to say", value: 3 }
   ])
   const handleConfirm = (date: Date) => {
-    setBDate(date)
     hideDatePicker()
+    setBDate(date)
   }
   const hideDatePicker = () => {
     setDatePickerVisibility(false)
@@ -166,6 +168,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
 
   const handleNavigaion = () => {
     if (edit) {
+      onProfileUpdate()
       navigation.goBack()
     } else {
       dispatch(updateName(nameRef.current))
@@ -261,7 +264,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
       <BackgroundWithImage style={_styles.mainContainer}>
         <AppHeader
           hideBackButton={!edit}
-          title={edit ? "Edit Profile" : 'Setup Profile'} backgroundColor="transparent" />
+          title={edit ? "Edit Profile" : 'Account Setup'} backgroundColor="transparent" />
         {pageLoading ? (
           <View style={_styles.loaderContainer}>
             <ActivityIndicator size="large" color={theme.lightColors?.pink} />
