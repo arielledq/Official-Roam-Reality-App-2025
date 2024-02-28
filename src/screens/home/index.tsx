@@ -165,6 +165,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           data={HomeScreenData}
           renderItem={({item}) => <HomeScreenARItem {...item}/>}
           keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
         />
       }
       </View>

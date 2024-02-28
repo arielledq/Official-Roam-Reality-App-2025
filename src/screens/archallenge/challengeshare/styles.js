@@ -54,7 +54,7 @@ const useStyles = makeStyles(theme => ({
   challengeSponsorStartDateText: {
     ...fontGroup.p300,
     fontSize: FontSizes.S10,
-    color: "#9CA3AF",
+    color: "#F2F2F2",
   },
   buttonStyle: {
     height: 50

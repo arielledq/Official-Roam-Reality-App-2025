@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux'
 import { resetState } from '../../redux/Login'
 import LinearGradient from 'react-native-linear-gradient'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import { removeItem } from '../../util/helpers'
 
 const DrawerList = [
   { icon: 'target', label: 'AR Challenges', navigateTo: 'ARChallenge' },
@@ -139,6 +140,9 @@ function DrawerContent(props) {
   const handleLogOutButton = async() => {
     await GoogleSignin.revokeAccess().catch(err => console.log(err));
     await GoogleSignin.signOut().catch(err => console.log(err));
+    await removeItem('fbToken')
+    await removeItem('instaToken')
+    await removeItem('tiktokToken')
     logout()
     dispatch(resetState())
   }
