@@ -43,6 +43,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
   const arProfile = useSelector(state => state.ar?.arProfile)
+  const [isProfileUpdated, setIsProfileUpdated] = useState(false)
 
   const fetchProfileDetails = async () => {
     try {
@@ -94,15 +95,18 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   useFocusEffect(
     useCallback(() => {
-      fetchProfileDetails()
       getProfieARMemories()
       fetchARUserProfile()
     }, [])
   )
 
-  // useEffect(() => { 
-  //     fetchProfileDetails();
-  // }, [navigation]);
+  useEffect(() => { 
+      fetchProfileDetails();
+  }, [isProfileUpdated]);
+
+  const onProfileUpdate = () => {
+    setIsProfileUpdated(true)
+  }
 
   const handleMenuButton = () => {
     return (
@@ -143,7 +147,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <FastImage
             style={{
               width: '100%',
-              height: height * 0.4,
+              height: height * 0.5,
             }}
             source={{ uri: profileDetails?.image }}
             resizeMode={FastImage.resizeMode.cover}
@@ -165,7 +169,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             customColors={["#7B16FF", "#1158F4"]}
             buttonStyle={_styles.editButton}
             containerStyle={_styles.editButtonContainer}
-            onPress={() => navigation.navigate("EditProfile", { edit: true })}
+            onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
           >
             <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
             <AppText style={_styles.buttonText}>Edit Profile</AppText>
@@ -176,7 +180,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
           containerStyle={_styles.editButtonContainer}
-          onPress={() => navigation.navigate("EditProfile", { edit: true })}
+          onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
@@ -184,6 +188,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       }
       <View style={_styles.scroll}>
         <UserInfoCard
+          image={profileDetails?.image ? true : false}
           name={profileDetails?.user.name}
           email={profileDetails?.user.email}
           verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}

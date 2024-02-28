@@ -55,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
       marginStart: 3
     },
     containerStyle: {
-      paddingBottom : 100,
+      paddingBottom : 150,
       marginTop : 80
     },
     blurView : {
@@ -68,7 +68,7 @@ const useStyles = makeStyles((theme) => ({
     headerContainer: {
       paddingVertical: 15,
       borderBottomWidth: 0,
-      backgroundColor: 'rgba(0, 0, 0, 0.5)'
+      backgroundColor: 'rgba(0, 0, 0, 0.0)'
     },
     })
 )
