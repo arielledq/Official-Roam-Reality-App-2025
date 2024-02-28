@@ -32,7 +32,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative', width: 30, height: 30 }}>
+            <View style={{ position: 'relative'}}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedHomeIcon'}
@@ -50,7 +50,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative', width: 30, height: 30 }}>
+            <View style={{ position: 'relative'}}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedBadgeIcon'}
@@ -82,7 +82,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative', width: 30, height: 30 }}>
+            <View style={{ position: 'relative'}}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedFlagIcon'}
@@ -99,7 +99,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative', width: 30, height: 30 }}>
+            <View style={{ position: 'relative'}}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedProfile'}
