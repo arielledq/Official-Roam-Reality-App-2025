@@ -4,6 +4,7 @@ import { AVATAR_SIZE, useStyles } from "./styles"
 import { ImageBackground, TouchableOpacity, View } from "react-native"
 import Images from "../../assets/images"
 import { Icons } from "../../assets/Icons"
+import FastImage from "react-native-fast-image"
 
 export interface ProfileAvatarProps {
   avatarUrl?: string | undefined;
@@ -19,15 +20,14 @@ const ProfileAvatar: FC<ProfileAvatarProps> = props => {
         <ImageBackground source={Images.ProfileImgGradient} style={styles.imagePresentBackground}>
           <TouchableOpacity onPress={onChangeProfilePic}>
           <View style={[styles.avatarContainer, styles.avatarViewStyles]}>
-            <Avatar
-              size={AVATAR_SIZE}
-              containerStyle={styles.avatarContainer}
-              avatarStyle={styles.avatarStyles}
+            <FastImage
+              style={[styles.avatarContainer,styles.avatarStyles]}
               source={{ uri: avatarUrl }}
+              resizeMode="cover"
             />
             </View>
-          </TouchableOpacity>
           <Icons.ProfilePicPlusIcon style={styles.plusIconWithImage}/>
+          </TouchableOpacity>
         </ImageBackground>
       ) : (
       <TouchableOpacity style={styles.parent} onPress={onChangeProfilePic}>

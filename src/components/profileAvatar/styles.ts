@@ -21,6 +21,8 @@ const useStyles = makeStyles((theme) => ({
     borderRadius: 8,
   },
   avatarStyles: {
+    width : 105, 
+    height: 105,
     borderRadius: 8
   },
   
@@ -47,7 +49,8 @@ const useStyles = makeStyles((theme) => ({
     marginTop: '-9%'
   },
   plusIconWithImage: {
-    marginTop: '-7%'
+    marginTop: '-7%',
+    alignSelf: 'center'
   }
 }));
 
