@@ -14,15 +14,9 @@ const useStyles = makeStyles(theme => ({
   },
 
   headerContainer: {
-    paddingVertical: 15,
+    paddingVertical: 10,
     borderBottomWidth: 0,
-    // backgroundColor: "transparent",
-    backgroundColor: 'rgba(0, 0, 0, 0.5)'
-    // position: "absolute",
-    // top: 0,
-    // left: 0,
-    // right: 0,
-    // zIndex: 2
+    backgroundColor: 'rgba(0, 0, 0, 0.0)'
   },
   header: {
     marginBottom: 20
@@ -55,7 +49,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.lightGrey,
     fontSize: FontSizes.S48,
     lineHeight: FontLineHeights.LH66,
-    marginTop: "10%",
+    marginTop: "5%",
   },
   statContainerStyle: {
     flexDirection: "row",
@@ -92,7 +86,7 @@ const useStyles = makeStyles(theme => ({
   },
   editButtonContainer: {
     position: "absolute",
-    top: 10,
+    top: 100,
     right: 20,
     zIndex: 10
   },
@@ -103,6 +97,13 @@ const useStyles = makeStyles(theme => ({
   },
   container_style:{
     paddingBottom : '50%'
+  },
+  blurView : {
+    position:'absolute', 
+    top : 0,
+    backgroundColor : '#00000050', 
+    height : 90,
+    zIndex : 10
   }
 }))
 

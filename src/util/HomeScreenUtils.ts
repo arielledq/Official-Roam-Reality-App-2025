@@ -4,13 +4,15 @@ export const HomeScreenData = [
   {
     id: 1,
     title: "Anywhere",
-    subtitle: "AR Challenges",
+    title1: "AR Challenges",
+    subtitle: "These are AR challenges that you can do anytime & anywhere",
     image: Images.Home
   },
   {
     id: 2,
     title: "Outdoor GEO-AR",
-    subtitle: "Adventures",
+    title1: "Adventures",
+    subtitle: "Follow our digital AR stars to find the best sites & attractions nationwide.",
     image: Images.Home1
   }
 ]
