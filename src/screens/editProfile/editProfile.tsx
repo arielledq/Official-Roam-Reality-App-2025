@@ -261,7 +261,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
       <BackgroundWithImage style={_styles.mainContainer}>
         <AppHeader
           hideBackButton={!edit}
-          title={edit ? "Edit Profile" : 'Setup Profile'} backgroundColor="transparent" />
+          title={edit ? "Edit Profile" : 'Account Setup'} backgroundColor="transparent" />
         {pageLoading ? (
           <View style={_styles.loaderContainer}>
             <ActivityIndicator size="large" color={theme.lightColors?.pink} />
