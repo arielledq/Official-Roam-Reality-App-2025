@@ -375,15 +375,16 @@ PODS:
     - ReactCommon/turbomodule/core
   - react-native-splash-screen (3.3.0):
     - React-Core
-  - react-native-tiktok (1.0.1):
+  - react-native-tiktok (1.1.1):
     - React-Core
-    - TikTokOpenSDK (= 5.0.15)
+    - TikTokOpenSDK (~> 5.0.0)
   - react-native-video (5.2.1):
     - React-Core
     - react-native-video/Video (= 5.2.1)
   - react-native-video/Video (5.2.1):
     - React-Core
-  - react-native-webview (11.23.0):
+  - react-native-webview (13.8.1):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-perflogger (0.71.7)
   - React-RCTActionSheet (0.71.7):
@@ -870,9 +871,9 @@ SPEC CHECKSUMS:
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: b8979f5eda6ed5903d4dbc885be3846ea3daa753
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
-  react-native-tiktok: 7daefc5ab8c024fdd077e12e3429bee7e75dc385
+  react-native-tiktok: e99aff60df828daf638307adc76865abbfe82c8b
   react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
-  react-native-webview: e771bc375f789ebfa02a26939a57dbc6fa897336
+  react-native-webview: bdc091de8cf7f8397653e30182efcd9f772e03b3
   React-perflogger: 2d505bbe298e3b7bacdd9e542b15535be07220f6
   React-RCTActionSheet: 0e96e4560bd733c9b37efbf68f5b1a47615892fb
   React-RCTAnimation: fd138e26f120371c87e406745a27535e2c8a04ef
@@ -914,6 +915,6 @@ SPEC CHECKSUMS:
   Yoga: d56980c8914db0b51692f55533409e844b66133c
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 31067ddb48056ecab4d9880981e8fe3226c765bf
+PODFILE CHECKSUM: 156af646ccfc67c791b50750a004e2d672bd8ffa
 
 COCOAPODS: 1.11.3

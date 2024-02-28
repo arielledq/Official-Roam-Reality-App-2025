@@ -6,6 +6,8 @@
 #import <AuthenticationServices/AuthenticationServices.h>
 #import <SafariServices/SafariServices.h>
 #import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
+#import <FBSDKCoreKit/FBSDKCoreKit.h>
+#import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
 #import "RNSplashScreen.h" 
 #import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
 
@@ -19,6 +21,10 @@
   if ([[FBSDKApplicationDelegate sharedInstance] application:app openURL:url options:options]) {
     return YES;
   }
+  
+  if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:app openURL:url sourceApplication:nil annotation:nil]) {
+         return YES;
+    }
 
   if ([GIDSignIn.sharedInstance handleURL:url]) {
     return YES;
@@ -40,6 +46,8 @@
 {
   [[FBSDKApplicationDelegate sharedInstance] application:application
                        didFinishLaunchingWithOptions:launchOptions];
+  
+  [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
   self.moduleName = @"travel_ar_app_42706";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
