@@ -14,6 +14,10 @@ const Tab = createMaterialBottomTabNavigator();
 const BottomTabNavigator = () => {
   const theme = useTheme();
   theme.colors.secondaryContainer = "transparent"
+
+  const glowEffect = () => {
+    return (<Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />)
+  }
   return (
     <Tab.Navigator
       initialRouteName="HomeScreen"
@@ -29,7 +33,7 @@ const BottomTabNavigator = () => {
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
           tabBarIcon: ({ focused }) => (
             <View style={{ position: 'relative', width: 30, height: 30 }}>
-              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              {focused && glowEffect()}
               <Icon
                 name={'UnselectedHomeIcon'}
                 family='custom'
@@ -47,7 +51,7 @@ const BottomTabNavigator = () => {
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
           tabBarIcon: ({ focused }) => (
             <View style={{ position: 'relative', width: 30, height: 30 }}>
-              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              {focused && glowEffect()}
               <Icon
                 name={'UnselectedBadgeIcon'}
                 family='custom'
@@ -79,7 +83,7 @@ const BottomTabNavigator = () => {
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
           tabBarIcon: ({ focused }) => (
             <View style={{ position: 'relative', width: 30, height: 30 }}>
-              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              {focused && glowEffect()}
               <Icon
                 name={'UnselectedFlagIcon'}
                 family='custom'
@@ -96,7 +100,7 @@ const BottomTabNavigator = () => {
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
           tabBarIcon: ({ focused }) => (
             <View style={{ position: 'relative', width: 30, height: 30 }}>
-              {focused && <Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />}
+              {focused && glowEffect()}
               <Icon
                 name={'UnselectedProfile'}
                 family='custom'
