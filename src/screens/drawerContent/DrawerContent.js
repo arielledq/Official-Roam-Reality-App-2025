@@ -12,6 +12,7 @@ import { deleteAccount, logout } from '../../network'
 import { useDispatch } from 'react-redux'
 import { resetState } from '../../redux/Login'
 import LinearGradient from 'react-native-linear-gradient'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
 const DrawerList = [
   { icon: 'target', label: 'AR Challenges', navigateTo: 'ARChallenge' },
@@ -135,7 +136,9 @@ function DrawerContent(props) {
       navigation.navigate(navigateTo)
     }
   }
-  const handleLogOutButton = () => {
+  const handleLogOutButton = async() => {
+    await GoogleSignin.revokeAccess().catch(err => console.log(err));
+    await GoogleSignin.signOut().catch(err => console.log(err));
     logout()
     dispatch(resetState())
   }

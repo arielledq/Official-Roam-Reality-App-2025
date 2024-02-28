@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">Roam Reality</string>
     <string name="original_app_name">Roam Reality</string>
-    <string name="facebook_app_id">746185200437639</string>
-    <string name="fb_login_protocol_scheme">fb1234</string>
-    <string name="facebook_client_token">9bb1d62e7fa4072498828e188eb87c02</string>
+    <string name="facebook_app_id">1425164828425408</string>
+    <string name="fb_login_protocol_scheme">fb1425164828425408</string>
+    <string name="facebook_client_token">bcfb01b5ffe4e7a523e0620b51d1ffd1</string>
 </resources>

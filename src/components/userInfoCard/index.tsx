@@ -9,7 +9,8 @@ const UserInfoCard = ({
   name,
   email,
   isVerified,
-  verifyAction
+  verifyAction,
+  image = false,
 }: {
   name: string | null,
   email: string | null,
@@ -17,6 +18,7 @@ const UserInfoCard = ({
   verifyAction: () => void
 }) => {
   const styles = useStyles()
+  console.log('props',{ name, email, isVerified, verifyAction })
 
   const truncatedEmail =
     email?.length > 22 && !isVerified ? `${email?.slice(0, 22)}...` : email
@@ -25,7 +27,7 @@ const UserInfoCard = ({
     <View style={styles.row}>
       {/* user details */}
       <View style={styles.nameContainer}>
-        <AppText style={styles.name}>{name}</AppText>
+        <AppText style={image ? styles.name : styles.name1}>{name}</AppText>
         <View style={styles.containerBottom}>
           <AppText style={styles.userName}>{truncatedEmail}</AppText>
           {!isVerified && (

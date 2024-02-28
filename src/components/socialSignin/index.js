@@ -23,6 +23,7 @@ import { googleLogin, appleLogin } from '../../network'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateUserData } from '../../redux/Login'
 import { updateAsOldUser } from '../../redux/Persist'
+import { handleError } from '../../util/helpers'
 
 const SocialSignin = ({ setLoading }) => {
   const dispatch = useDispatch()
@@ -42,7 +43,6 @@ const SocialSignin = ({ setLoading }) => {
         // code: userinfo.serverAuthCode
       })
         .then(res => {
-          console.log({ res })
           if (res.status == 1) {
             dispatch(updateUserData(res))
             if (newUser) {
