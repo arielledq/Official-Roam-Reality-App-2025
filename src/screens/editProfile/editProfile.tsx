@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { ActivityIndicator, Alert, Keyboard, Pressable, Text, View } from "react-native"
+import { ActivityIndicator, Alert, Keyboard, Platform, Pressable, Text, View } from "react-native"
 import { Formik } from "formik"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import theme from "../../assets/theme"
@@ -438,7 +438,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                     />
                     <AppInput
                       inputContainerStyle={[
-                        _styles.input,{ height: Math.min(75, height) },
+                        _styles.input,
                         isAddressInputFocused ? _styles.focusedInput : {},
                         touched.address && errors?.address
                           ? _styles.inputError
@@ -455,6 +455,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                       }
                       selectionColor={"white"}
                       placeholder="Hometown"
+                      inputStyle={{marginTop:Platform.OS == 'ios' ? 5 : 0}}
                       value={values.address}
                       onChangeText={(e)=>handleInputAddress(e)}
                       errorMessage={
