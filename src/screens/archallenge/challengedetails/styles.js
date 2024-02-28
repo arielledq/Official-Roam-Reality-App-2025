@@ -37,6 +37,11 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S10,
     color: theme.colors.white,
   },
+  challengeSponsorStartDateTextValue: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S10,
+    color: theme.colors.white,
+  },
   pointCount: {
     ...fontGroup.p900,
     fontSize: FontSizes.S24,
