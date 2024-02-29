@@ -36,6 +36,7 @@ import TikTok from './TikTok.svg'
 import Invite from './invite.svg'
 import Folder from './folder.svg'
 import Wallet from './wallet.svg'
+import IconBGHome from './icon_bg.png'
 export const Icons = {
   password,
   lock,
@@ -74,5 +75,6 @@ export const Icons = {
   TikTok,
   Invite,
   Folder,
-  Wallet
+  Wallet,
+  IconBGHome
 }
