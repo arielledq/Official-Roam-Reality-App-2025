@@ -44,6 +44,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const [loading, setloading] = useState(true)
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [isProfileUpdated, setIsProfileUpdated] = useState(false)
+  const [isTransitioning, setIsTransitioning] = useState(true)
 
   const fetchProfileDetails = async () => {
     try {
@@ -245,15 +246,16 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   )
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      <BlurView style={_styles.blurView} blurType="light" blurAmount={10}>
+    <BackgroundWithImage style={_styles.mainContainer}>  
+      <View style={_styles.blurView}>
+        <BlurView  blurType="light" overlayColor='#00000050'>
         <AppHeader
           containerStyle={_styles.headerContainer}
           title={"Profile"}
           leftComponent={handleMenuButton()}
-          titleStyle={{blurRadius: 90}}
           />
-      </BlurView>
+        </BlurView>
+        </View>
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
         contentContainerStyle={_styles.container_style}
