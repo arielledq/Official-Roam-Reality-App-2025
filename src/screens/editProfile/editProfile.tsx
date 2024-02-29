@@ -458,7 +458,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                       }
                       selectionColor={"white"}
                       placeholder="Hometown"
-                      inputStyle={{marginTop:Platform.OS == 'ios' ? 5 : 0}}
                       value={values.address}
                       onChangeText={(e)=>handleInputAddress(e)}
                       errorMessage={
@@ -480,7 +479,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
                           size={24}
                         />
                       }
-                      multiline = {true}
                       onContentSizeChange={(event) =>
                         setHeight(event.nativeEvent.contentSize.height)
                       }
