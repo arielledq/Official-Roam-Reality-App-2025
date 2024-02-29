@@ -151,13 +151,15 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
 
   return (
     <View style={styles.mainContainer}>
-      <BlurView style={styles.blurView} blurType="light" blurAmount={10}>
-        <AppHeader 
-          title={"Home"} 
-          leftComponent={handleMenuButton()}
-          containerStyle={styles.headerContainer}
-        />
-      </BlurView>
+      <View style={styles.blurView}>
+        <BlurView blurType="light" overlayColor='transparent'>
+          <AppHeader 
+            title={"Home"} 
+            leftComponent={handleMenuButton()}
+            containerStyle={styles.headerContainer}
+          />
+        </BlurView>
+      </View>
       <View style={styles.container}>
         {isLoading ? <ActivityIndicator size="large" /> : 
         <FlatList
@@ -165,6 +167,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           data={HomeScreenData}
           renderItem={({item}) => <HomeScreenARItem {...item}/>}
           keyExtractor={(item) => item.id}
+          showsVerticalScrollIndicator={false}
         />
       }
       </View>
