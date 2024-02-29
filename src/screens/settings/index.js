@@ -148,6 +148,7 @@ const Settings = () => {
           new GraphRequestManager().addRequest(infoRequest).start()
           AccessToken.getCurrentAccessToken().then(async(data) => {
             const accessToken = data.accessToken.toString();
+            setIsFbLinked(true)
             await setItem("fbToken", accessToken)
           })
         }

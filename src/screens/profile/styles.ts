@@ -99,10 +99,10 @@ const useStyles = makeStyles(theme => ({
     paddingBottom : '50%'
   },
   blurView : {
+    overflow: "hidden",
     position:'absolute', 
     top : 0,
-    backgroundColor : '#00000050', 
-    height : 90,
+    height : 85,
     zIndex : 10
   }
 }))
