@@ -4,12 +4,14 @@ import { Provider } from 'react-redux'
 import { PersistGate } from 'redux-persist/integration/react'
 import { persistor, store } from './store'
 import 'react-native-devsettings/withAsyncStorage'
-import { StyleSheet } from 'react-native'
+import { LogBox, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import SplashScreen from 'react-native-splash-screen'
 
 const App = () => {
   useEffect(() => {
+    LogBox.ignoreLogs(['Warning: ...'])
+    LogBox.ignoreAllLogs();
     setTimeout(() => {
       SplashScreen.hide()
     }, 100)
