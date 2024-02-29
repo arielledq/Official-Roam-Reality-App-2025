@@ -106,7 +106,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   useEffect(() => { 
       fetchProfileDetails();
-  }, [isProfileUpdated]);
+  }, [isProfileUpdated,userProfile]);
 
   const onProfileUpdate = () => {
     setIsProfileUpdated(true)
