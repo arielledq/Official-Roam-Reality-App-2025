@@ -6,7 +6,7 @@ import { Platform } from "react-native"
 const useStyles = makeStyles((theme) => ({
   mainContainer : {
     flex:1,
-    backgroundColor: '#131422',
+    backgroundColor: '#202136',
     },
     container: {
         flex: 1,
@@ -62,8 +62,6 @@ const useStyles = makeStyles((theme) => ({
     blurView : {
       position:'absolute', 
       top : 0,
-      backgroundColor : '#00000050', 
-      height : Platform.OS ? 100 : 85,
       zIndex : 10
     },
     headerContainer: {
