@@ -1,6 +1,7 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
+import { Platform } from "react-native"
 
 const useStyles = makeStyles((theme) => ({
   mainContainer : {
@@ -62,7 +63,7 @@ const useStyles = makeStyles((theme) => ({
       position:'absolute', 
       top : 0,
       backgroundColor : '#00000050', 
-      height : 85,
+      height : Platform.OS ? 100 : 85,
       zIndex : 10
     },
     headerContainer: {
