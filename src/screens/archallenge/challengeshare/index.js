@@ -58,7 +58,7 @@ const ArChallengeShare = ({
       if (res.status == 1) {
         Alert.alert("AR Challenge Share!", "Successfully, completed your challenge.")
       } else {
-        res.message.message = "Error in Sharing Challenges."
+        res.message.message = "You already completed the challenge or there is some issue with completing the challenge."
         handleError(res)
       }
     }).finally(() => {

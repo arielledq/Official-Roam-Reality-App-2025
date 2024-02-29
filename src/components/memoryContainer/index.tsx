@@ -6,6 +6,7 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import FastImage from "react-native-fast-image"
 import DownloadImg from "../../assets/ar/download.svg"
 import RNFetchBlob from "rn-fetch-blob";
+import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
 
 const MemoryContainer = ({
   title,
@@ -36,7 +37,6 @@ const MemoryContainer = ({
   let dirs = RNFetchBlob.fs.dirs;
   const path = Platform.OS === 'ios' ? dirs.LibraryDir + memoryName : dirs.PictureDir + memoryName;
   //let path = Platform.OS === 'ios' ? dirs['MainBundleDir'] + memoryName : dirs.PictureDir + memoryName;
-
   const saveToGallery = () => {
     console.log("path:", path)
     console.log("fileExt:", fileExt)
@@ -58,14 +58,28 @@ const MemoryContainer = ({
       if (Platform.OS == 'ios') {
         console.log("res.path::", res)
         CameraRoll.saveAsset(res.data, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
-          Alert.alert('Saved to Camera Roll');
+          Alert.alert("AR Memories!", 'Saved to Camera Roll'); 
         })
           .catch((err) => {
             console.log('err:', err);
           });;
-      }
+      } else { Alert.alert("AR Memories!", 'Saved to Camera Roll'); }
     });
   }
+
+  const checkPermission = () => {
+    if (Platform.OS == 'android') {
+      requestMultiple([
+        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+      ]).then(response => {
+        console.log("PERMISSIONS.ANDROID:: ", response);
+        saveToGallery()
+      });
+    } else {
+      saveToGallery()
+    }
+  };
 
   return (
     <Pressable style={styles.cardContainer} onPress={onPressAction}>
@@ -76,7 +90,7 @@ const MemoryContainer = ({
         <View style={styles.cardBottomContent}>
           <View style={{ flexDirection: 'row', marginVertical: 7, alignItems: 'center', justifyContent: 'space-between' }}>
             <AppText numberOfLines={1} style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
-            <TouchableOpacity onPress={saveToGallery} style={{ marginStart: 10 }}>
+            <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10 }}>
               <DownloadImg style={{ width: 16, height: 16 }} />
             </TouchableOpacity>
           </View>
