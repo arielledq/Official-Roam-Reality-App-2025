@@ -1,11 +1,12 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
+import { Platform } from "react-native"
 
 const useStyles = makeStyles((theme) => ({
   mainContainer : {
     flex:1,
-    backgroundColor: '#131422',
+    backgroundColor: '#202136',
     },
     container: {
         flex: 1,
@@ -62,7 +63,6 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
       position:'absolute', 
       top : 0,
-      height : 85,
       zIndex : 10
     },
     headerContainer: {
