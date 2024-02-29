@@ -96,6 +96,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   useFocusEffect(
     useCallback(() => {
+      setTimeout(()=>{
+        setIsTransitioning(false)
+      },500)
       getProfieARMemories()
       fetchARUserProfile()
     }, [])
@@ -112,7 +115,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
-        onPress={() => navigation.openDrawer()}
+        onPress={() =>{
+          setIsTransitioning(true)
+          navigation.openDrawer()
+        }}
         style={_styles.menuIcon}>
         <MenuIcon />
       </TouchableOpacity>
@@ -137,6 +143,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }
   const navigateToVerifyMail = email => {
     sendCode({ email: email.toLowerCase() })
+    setIsTransitioning(true)
     navigation.navigate('EmailVerificationC', { email: email.toLowerCase(), profile: true })
   }
   const renderHeader = () => (
@@ -170,7 +177,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             customColors={["#7B16FF", "#1158F4"]}
             buttonStyle={_styles.editButton}
             containerStyle={_styles.editButtonContainer}
-            onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
+            onPress={() => {
+              setIsTransitioning(true)
+              navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})
+            }}
           >
             <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
             <AppText style={_styles.buttonText}>Edit Profile</AppText>
@@ -181,7 +191,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
           containerStyle={_styles.editButtonContainer}
-          onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
+          onPress={() => {
+            setIsTransitioning(true)
+            navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})
+          }}
+          // onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
@@ -248,7 +262,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   return (
     <BackgroundWithImage style={_styles.mainContainer}>  
       <View style={_styles.blurView}>
-        <BlurView  blurType="light" overlayColor='#00000050'>
+        <BlurView  blurType="light" overlayColor='#00000050' enabled={!isTransitioning}>
         <AppHeader
           containerStyle={_styles.headerContainer}
           title={"Profile"}
