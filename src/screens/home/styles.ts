@@ -60,6 +60,7 @@ const useStyles = makeStyles((theme) => ({
       marginTop : 80
     },
     blurView : {
+      overflow: "hidden",
       position:'absolute', 
       top : 0,
       zIndex : 10
