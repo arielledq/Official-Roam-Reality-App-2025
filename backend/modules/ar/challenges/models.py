@@ -8,8 +8,8 @@ from django.core.exceptions import ValidationError
 User = get_user_model()
 
 CHALLENGE_CHOICES = (
-    ("SPONSORED", "PHOTO"),
-    ("DANCE", "DANCING"),
+    ("SPONSORED", "IMAGE"),
+    ("DANCE", "3D MODEL"),
 )
 
 CHALLENGE_APPROVAL_CHOICES = (
@@ -62,11 +62,11 @@ class Challenges(models.Model):
     )
     challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=0)
     points = models.IntegerField(verbose_name="Challenge Points", default=0)
-    challenge_choice = models.CharField(
-        max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
-    )
     challenge_requirement = models.CharField(
         max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
+    )
+    challenge_choice = models.CharField(verbose_name="Challenge Load From",
+        max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
