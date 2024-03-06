@@ -60,6 +60,7 @@ class Challenges(models.Model):
         blank=False,
         related_name="sponsored",
     )
+    challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=0)
     points = models.IntegerField(verbose_name="Challenge Points", default=0)
     challenge_choice = models.CharField(
         max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
