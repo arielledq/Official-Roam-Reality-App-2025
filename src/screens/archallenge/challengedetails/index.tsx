@@ -14,7 +14,7 @@ import RenderHtml from 'react-native-render-html';
 import moment from 'moment'
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { checkARChallengeDoneAPI, getARStettings } from "../../../network";
+import { checkARChallengeDoneAPI } from "../../../network";
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
 
 const { width } = Dimensions.get('window');
@@ -27,23 +27,12 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const navigation = useNavigation()
   const route = useRoute()
   const [isLoading, setIsLoading] = useState(false)
-  const [settings, setSettings] = useState(null)
   const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj;
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
-  console.log("expiry_date:", challengeObj.expiry_date)
+  console.log("expiry_date:",challengeObj.expiry_date)
   const expiryDate = moment(challengeObj.expiry_date).format('DD-MM-YYYY');
   const isFocused = useIsFocused();
-
-  const getSettings = () => {
-    setIsLoading(true)
-    getARStettings().then((res) => {
-      console.log("getSettings:",res.data)
-      setSettings(res.data.length > 0 ? res.data[0] : null)
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true)
@@ -65,7 +54,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
 
   const navigateToChallengeCapture = () => {
     if (!isChallengeDone) {
-      navigation.navigate("ArChallengeCapture", { challengeObj, settings });
+      navigation.navigate("ArChallengeCapture", { challengeObj });
     } else {
       Alert.alert("Anywhere AR Challenges", "You have already completed the challenge.")
     }
@@ -75,7 +64,6 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
     if (isFocused) {
       checkIfChallengeIsDone()
     }
-    getSettings()
   }, [isFocused]);
 
   return (
@@ -94,12 +82,12 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
           <Text style={styles.pointCount}>{challengeObj.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
         </View>
-        <View style={{ paddingHorizontal: 10, flex: 1 }}>
+        <View style={{ paddingHorizontal: 10,flex:1}}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
             <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
           </View>
-          <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: "space-between", width: '100%' }}>
+          <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: "space-between",width:'100%' }}>
             <Text style={styles.challengeSponsorStartDateText}>Started on: <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text></Text>
             <Text style={styles.challengeSponsorStartDateText}>Ends on: <Text style={styles.challengeSponsorStartDateTextValue}>{challengeObj.expiry_date ? expiryDate : "None"}</Text></Text>
           </View>
@@ -115,12 +103,12 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
           contentWidth={width}
           tagsStyles={{
             p: {
-              lineHeight: 19.1,
+              lineHeight:19.1,
               color: '#9CA3AF',
               fontSize: FontSizes.S14
             },
             strong: {
-              lineHeight: 19.1,
+              lineHeight:19.1,
               color: '#fff',
               fontSize: FontSizes.S18
             }

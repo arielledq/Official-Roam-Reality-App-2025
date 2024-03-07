@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react"
 
 import { ActivityIndicator, FlatList, Image, Keyboard, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
-import { getARChallenges, getARProfile } from '../../network'
+import { getARChallenges, getARProfile, getARStettings } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import AppText from "../../components/text"
 import { useNavigation } from "@react-navigation/native"
 import PointBoardBG from "../../assets/ar/point_board_bg.png"
-import { updateARUserData } from "../../redux/AR"
+import { updateARUserData, updateARSettings } from "../../redux/AR"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
@@ -55,6 +55,17 @@ const ArChallenge = ({
     })
   }
 
+  const getSettings = () => {
+    setIsLoading(true)
+    getARStettings().then((res) => {
+      if (res.data.length > 0) {
+        dispatch(updateARSettings(res.data[0]))
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }
+
 
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
@@ -65,6 +76,7 @@ const ArChallenge = ({
   useEffect(() => {
     ARSposored()
     ARUserProfile()
+    getSettings()
   }, []);
 
   const navigateToChallengeDetails = (obj) => {
