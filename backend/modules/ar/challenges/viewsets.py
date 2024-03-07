@@ -1,5 +1,7 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories
-from .serializers import ARMemoriesSerializerGet,ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings
+from .serializers import ARMemoriesSerializerGet, \
+ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
+Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
@@ -27,11 +29,20 @@ class Resource3dModelViewSet(viewsets.ModelViewSet):
 
 class SponsorViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for viewing and editing accounts.
+    A simple ViewSet for viewing and editing sponsors.
     """
     queryset = Sponsor.objects.all()
     serializer_class = SponsorSerializer
     http_method_names = ["get"]
+
+class ARSettingsViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing settings.
+    """
+    queryset = ARSettings.objects.all()
+    serializer_class = SettingsSerializer
+    http_method_names = ["get"]
+
 
 class ARMemoriesViewSet(ViewSet):
 
@@ -114,7 +125,7 @@ class ARProfileViewSet(ViewSet):
 		
 class ChallengesViewSet(viewsets.ModelViewSet):
     """
-    A simple ViewSet for viewing and editing accounts.
+    A simple ViewSet for viewing and editing challenges.
     """
     queryset = Challenges.objects.all()
     serializer_class = ChallengesSerializer
