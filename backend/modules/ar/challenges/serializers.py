@@ -1,4 +1,4 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings
 from rest_framework import serializers
 
 
@@ -22,6 +22,14 @@ class SponsorSerializer(serializers.ModelSerializer):
   
     class Meta:
         model = Sponsor
+        fields = (
+            "__all__"
+        )
+
+class SettingsSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = ARSettings
         fields = (
             "__all__"
         )
