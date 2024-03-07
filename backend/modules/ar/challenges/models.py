@@ -167,3 +167,9 @@ class ARMemories(models.Model):
         return str(
             self.user.name + " " + str(self.memory_file)
         )
+
+class ARSettings(models.Model):
+    class Meta:
+        verbose_name_plural = "AR Settings"
+
+    waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
