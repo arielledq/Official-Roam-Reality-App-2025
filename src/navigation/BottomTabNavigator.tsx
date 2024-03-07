@@ -16,7 +16,7 @@ const BottomTabNavigator = () => {
   theme.colors.secondaryContainer = "transparent"
 
   const glowEffect = () => {
-    return (<Image style={{ position: 'absolute', top: -10, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />)
+    return (<Image style={{ position: 'absolute', top: -15, left: -30, height: 60, width: 90 }} source={Icons.IconBGHome} />)
   }
   return (
     <Tab.Navigator
@@ -37,7 +37,7 @@ const BottomTabNavigator = () => {
               <Icon
                 name={'UnselectedHomeIcon'}
                 family='custom'
-                size={30}
+                size={25}
               />
             </View>
 
@@ -55,7 +55,7 @@ const BottomTabNavigator = () => {
               <Icon
                 name={'UnselectedBadgeIcon'}
                 family='custom'
-                size={33}
+                size={28}
               />
             </View>
           ),
@@ -70,7 +70,7 @@ const BottomTabNavigator = () => {
             <Icon
               name={'SelectedCamera'}
               family='custom'
-              size={55}
+              size={50}
               style={styles.cameraTabStyle}
             />
           ),
@@ -87,7 +87,7 @@ const BottomTabNavigator = () => {
               <Icon
                 name={'UnselectedFlagIcon'}
                 family='custom'
-                size={30}
+                size={25}
               />
             </View>
           ),
@@ -104,7 +104,7 @@ const BottomTabNavigator = () => {
               <Icon
                 name={'UnselectedProfile'}
                 family='custom'
-                size={30}
+                size={25}
               />
             </View>
           ),
@@ -123,18 +123,19 @@ const styles = StyleSheet.create({
     backgroundColor: '#090A16',
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
-    paddingHorizontal: 25
+    paddingHorizontal: 25,
+    paddingVertical : 5
   },
   tabBarIconStyle: {
     marginTop: -40
   },
   tabBarLabelStyle: {
-    fontSize: 12,
+    fontSize: 10,
     fontWeight: '700',
     lineHeight: 12,
     color: '#FFFFFF',
     textAlign: 'center',
-    marginTop: 10
+    marginTop: 5
   },
   cameraTabStyle: {
     marginTop: -5

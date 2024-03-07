@@ -7,6 +7,7 @@ import Strings from '../../constants/Strings'
 import { Icons } from '../../assets/Icons'
 import Images from '../../assets/images'
 import useStyles from './styles'
+import { useSelector } from 'react-redux'
 
 const onboardingScreens = [
   {
@@ -29,13 +30,14 @@ const onboardingScreens = [
 const Onboarding = ({navigation}) => {
   const styles = useStyles();
   const [activeIndex, setActiveIndex] = useState(1);
+  const { newUser } = useSelector(state => state.persist)
 
   useEffect(()=>{
     setTimeout(()=>{
       if(activeIndex === onboardingScreens.length){
         navigation.reset({
           index: 0,
-          routes: [{ name: 'SignUp' }],
+          routes: [{ name: newUser ? 'SignUp' : 'Login' }],
           });
       }
       else{
@@ -50,7 +52,7 @@ const Onboarding = ({navigation}) => {
   const continueHandler = () => {
     navigation.reset({
       index: 0,
-      routes: [{ name: 'SignUp' }],
+      routes: [{ name: newUser ? 'SignUp' : 'Login' }],
     });
   };
 
