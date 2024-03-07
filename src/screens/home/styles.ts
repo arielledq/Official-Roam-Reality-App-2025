@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
     imageBg : {
         width : '100%',
-        height : 335,
+        height : 280,
         borderRadius : 20,
         marginBottom :20
       },

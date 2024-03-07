@@ -20,7 +20,8 @@ const theme = createTheme({
     boxStatBG: '#27273F',
     toggleOff: '#6F6F76',
     grey: "#BCBCBC",
-    grey31 : '#4F4F4F'
+    grey31 : '#4F4F4F',
+    drawerBG : "#202136"
   },
   darkColors: {
     white: '#FFFFFF',
@@ -38,7 +39,8 @@ const theme = createTheme({
     boxStatBG: '#27273F',
     toggleOff: '#6F6F76',
     grey: "#BCBCBC",
-    grey31 : '#4F4F4F'
+    grey31 : '#4F4F4F',
+    drawerBG : "#202136"
   },
   mode: 'light',
 });

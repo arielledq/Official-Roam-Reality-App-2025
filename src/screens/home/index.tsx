@@ -154,7 +154,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
       <View style={styles.blurView}>
         <BlurView blurType="light" overlayColor='transparent'>
           <AppHeader 
-            title={"Home"} 
+            title={"AR Experiences"} 
             leftComponent={handleMenuButton()}
             containerStyle={styles.headerContainer}
           />
