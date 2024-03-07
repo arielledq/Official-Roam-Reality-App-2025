@@ -410,7 +410,7 @@ const ArChallengeCapture = ({
                 }
               }}
               source={{
-                html: `${settings.waiver_details}`
+                html: `${settings?.waiver_details}`
               }}
             />
           </ScrollView>
