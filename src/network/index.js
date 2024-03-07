@@ -75,7 +75,7 @@ export const resetPassword = data =>
     data
   })
 
-  export const contactUs = data =>
+export const contactUs = data =>
   Request.callWithToken({
     url: `${commonApiRoute}contact-us/`,
     method: 'POST',
@@ -179,3 +179,9 @@ export const getTermsAndConditions = payload =>
     payload
   })
 
+
+export const getARStettings = () =>
+  Request.callWithToken({
+    url: `/modules/challenges/settings/`,
+    method: 'GET'
+  })

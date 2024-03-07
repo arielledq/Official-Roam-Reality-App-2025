@@ -51,6 +51,7 @@ const ArChallengeCapture = ({
   const route = useRoute()
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
+  const settings = route?.params?.settings;
   const modelFile = challengeObj.model_file;
 
   const navigateToShare = (captureData) => {
@@ -409,7 +410,7 @@ const ArChallengeCapture = ({
                 }
               }}
               source={{
-                html: `${challengeObj.description}`
+                html: `${settings.waiver_details}`
               }}
             />
           </ScrollView>
