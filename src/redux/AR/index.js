@@ -1,1 +1,1 @@
-export { resetState, updateARUserData } from './reducer'
+export { resetState, updateARUserData, updateARSettings } from './reducer'

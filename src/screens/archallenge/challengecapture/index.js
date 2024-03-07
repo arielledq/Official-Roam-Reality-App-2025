@@ -31,6 +31,7 @@ const RNFS = require('react-native-fs');
 const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
+import { useSelector } from "react-redux";
 const { width } = Dimensions.get('window');
 
 const VIDEO_RECORD_TIME = 10
@@ -51,6 +52,7 @@ const ArChallengeCapture = ({
   const route = useRoute()
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
+  const settings = useSelector(state => state.ar?.arSettings)
   const modelFile = challengeObj.model_file;
 
   const navigateToShare = (captureData) => {
@@ -409,7 +411,7 @@ const ArChallengeCapture = ({
                 }
               }}
               source={{
-                html: `${challengeObj.description}`
+                html: `${settings?.waiver_details}`
               }}
             />
           </ScrollView>
