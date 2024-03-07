@@ -38,7 +38,8 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const getSettings = () => {
     setIsLoading(true)
     getARStettings().then((res) => {
-      setSettings(res.length > 0 ? res[0] : null)
+      console.log("getSettings:",res.data)
+      setSettings(res.data.length > 0 ? res.data[0] : null)
     }).finally(() => {
       setIsLoading(false)
     })
