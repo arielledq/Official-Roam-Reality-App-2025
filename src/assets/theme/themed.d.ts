@@ -17,5 +17,6 @@ declare module '@rneui/themed' {
     toggleOff:  string;
     grey: string;
     grey31: string;
+    drawerBG : string;
   }
 }
