@@ -65,10 +65,11 @@ class ARMemoriesViewSet(ViewSet):
       criterion1 = Q(user=user_id)
       criterion2 = Q(challenges=challenges_id)
       results = ARMemories.objects.filter(criterion1 & criterion2)
-      if len(results) == 0:
-        return Response({'message': "Challenge not exists."}, status=status.HTTP_200_OK)
+      challengeObj = Challenges.objects.get(pk=challenges_id)
+      if len(results) < challengeObj.challenge_attempt:
+        return Response({'message': "Challenge submission can be added more."}, status=status.HTTP_200_OK)
       else:
-        return Response({'message': "Challenge experience already submitted."}, status=status.HTTP_403_FORBIDDEN)
+        return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=status.HTTP_403_FORBIDDEN)
          
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
@@ -84,7 +85,8 @@ class ARMemoriesViewSet(ViewSet):
       criterion1 = Q(user=user_id)
       criterion2 = Q(challenges=challenges_id)
       results = ARMemories.objects.filter(criterion1 & criterion2)
-      if len(results) == 0:
+      challengeObj = Challenges.objects.get(pk=challenges_id)
+      if len(results) < challengeObj.challenge_attempt:
         serializer = ARMemoriesSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
           serializer.save()
@@ -92,7 +94,7 @@ class ARMemoriesViewSet(ViewSet):
         else:
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       else:
-        return Response({'message': "Challenge experience already submitted."}, status=403)
+        return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
       
 
 class ARProfileViewSet(ViewSet):
