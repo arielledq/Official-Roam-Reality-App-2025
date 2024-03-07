@@ -162,7 +162,7 @@ function DrawerContent(props) {
   }
   return (
     <>
-      <View style={{ flex: 1, backgroundColor: theme.darkColors?.inputBG }}>
+      <View style={{ flex: 1, backgroundColor: theme.darkColors?.drawerBG }}>
         <DrawerContentScrollView {...props}>
           <View style={styles.drawerContent}>
             <View style={styles.checkIcon}>

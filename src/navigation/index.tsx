@@ -47,6 +47,7 @@ const Navigation = () => {
   const { newUser } = useSelector(state => state.persist)
 
   console.log({ token })
+  console.log('newUser', newUser)
 
   const renderAuthStack = () => {
     return (
@@ -59,6 +60,7 @@ const Navigation = () => {
               <Stack.Screen name="Login" component={Login} />
             </> :
             <>
+              <Stack.Screen name="Onboarding" component={Onboarding} />
               <Stack.Screen name="Login" component={Login} />
               <Stack.Screen name="SignUp" component={SignUp} />
             </>
