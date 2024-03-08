@@ -115,7 +115,7 @@ const ArChallenge = ({
           <Text style={_styles.buttonSelectText}>Photo Challenges</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
-          <Text style={_styles.buttonSelectText}>Dance Challenges </Text>
+          <Text style={_styles.buttonSelectText}>Video Challenges </Text>
         </TouchableOpacity>
       </View>
 
