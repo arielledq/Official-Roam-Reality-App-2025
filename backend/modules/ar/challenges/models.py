@@ -173,3 +173,16 @@ class ARSettings(models.Model):
         verbose_name_plural = "AR Settings"
 
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
+
+class ARExample(models.Model):
+    class Meta:
+        verbose_name_plural = "AR Example"
+
+    name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
+    image = models.ImageField(
+        upload_to="ar/example/",
+        blank=True,
+        null=True,
+    )
+    video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
+    description = RichTextField(_("Example Details"), blank=True, null=True)
