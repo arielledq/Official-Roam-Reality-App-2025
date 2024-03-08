@@ -246,7 +246,7 @@ const ArChallengeCapture = ({
     state = {
       capturedImage: null,
       capturedVideo: null,
-      detailsShow: false,
+      detailsShow: true,
       recordingStart: false,
       timer: "00:00",
       recordTimeInMillis: 0,
@@ -424,7 +424,7 @@ const ArChallengeCapture = ({
             />
             <TouchableOpacity
               activeOpacity={.6}
-              onPress={() => this.setState({ detailsShow: false })}>
+              onPress={() => navigation.goBack()}>
               <Text style={styles.bottomText}>Cancel</Text>
             </TouchableOpacity>
           </View>
