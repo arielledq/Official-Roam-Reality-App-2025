@@ -25,14 +25,25 @@ import BGArShare from "../../../assets/ar/bg-ar-share.png"
 const ArChallengeShare = ({
 
 }) => {
+
+  const getPathFromUrl = (url) => {
+    return url.split("?")[0];
+  }
+
   const styles = useStyles()
   const route = useRoute()
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
-  const fileExt = captureData.split('.').pop();
+  const hideBottomTab = route?.params?.hideBottomTab;
+  let filePath = getPathFromUrl(captureData)
+  const fileExt = filePath.split('.').pop();
   const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
   const dispatch = useDispatch()
+
+  console.log("challenges", challengeObj.id)
+  console.log("fileExt", fileExt)
+  console.log("captureData", captureData)
 
   useEffect(() => {
     const shareListener = events.addListener('onShareCompleted', (resp) => {
@@ -301,7 +312,7 @@ const ArChallengeShare = ({
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
       </ScrollView>
-      <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
+      {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
         <Text style={styles.bottomText}>Link My Profiles</Text>
         <AppButton
           onPress={() => shareBtnOnPress()}
@@ -311,6 +322,7 @@ const ArChallengeShare = ({
           loading={isLoading}
         />
       </View>
+      }
     </BackgroundWithImage>
   )
 }
