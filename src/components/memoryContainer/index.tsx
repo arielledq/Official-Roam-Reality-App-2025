@@ -82,7 +82,7 @@ const MemoryContainer = ({
   };
 
   return (
-    <Pressable style={styles.cardContainer} onPress={onPressAction}>
+    <Pressable style={styles.cardContainer} onPress={()=>onPressAction(item?.memory_file,item?.challenge_details)}>
       <View style={styles.cardInner}>
         <FastImage style={styles.iconStyle}
           resizeMode={FastImage.resizeMode.cover}
@@ -90,7 +90,7 @@ const MemoryContainer = ({
         <View style={styles.cardBottomContent}>
           <View style={{ flexDirection: 'row', marginVertical: 7, alignItems: 'center', justifyContent: 'space-between' }}>
             <AppText numberOfLines={1} style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
-            <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10 }}>
+            <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10,padding:10 }}>
               <DownloadImg style={{ width: 16, height: 16 }} />
             </TouchableOpacity>
           </View>
