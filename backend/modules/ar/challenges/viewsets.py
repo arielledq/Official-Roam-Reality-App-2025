@@ -1,7 +1,7 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
-Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer
+Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
@@ -41,6 +41,14 @@ class ARSettingsViewSet(viewsets.ModelViewSet):
     """
     queryset = ARSettings.objects.all()
     serializer_class = SettingsSerializer
+    http_method_names = ["get"]
+
+class ARExamplesViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing settings.
+    """
+    queryset = ARExample.objects.all()
+    serializer_class = ExamplesSerializer
     http_method_names = ["get"]
 
 
