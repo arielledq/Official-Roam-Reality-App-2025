@@ -106,6 +106,7 @@
 		74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-black.otf"; path = "../src/assets/fonts/sf-ui-display-black.otf"; sourceTree = "<group>"; };
 		7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
 		7A0A2F212B7FA27000E778AF /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../../src/assets/ar/record.mp3; sourceTree = "<group>"; };
+		7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-medium.otf"; path = "../../../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
@@ -292,6 +293,7 @@
 				90EF264C2B5039E300872709 /* Foundation.ttf */,
 				90EF264D2B5039E300872709 /* Ionicons.ttf */,
 				90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */,
+				7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */,
 				90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */,
 				90EF26502B5039E300872709 /* FontAwesome.ttf */,
 				90EF26512B5039E300872709 /* Zocial.ttf */,
