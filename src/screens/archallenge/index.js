@@ -66,7 +66,6 @@ const ArChallenge = ({
     })
   }
 
-
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
     const filteredArray = sponsoredDataAll.filter(x => x.challenge_choice == choice)
