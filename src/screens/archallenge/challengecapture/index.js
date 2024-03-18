@@ -312,11 +312,11 @@ const ArChallengeCapture = ({
     }
 
     componentWillUnmount() {
-      this._arNavigator = null
-      this.clearTimer()
       if (this.state.recordingStart) {
         this.stopRecordVideo()
       }
+      this._arNavigator = null
+      this.clearTimer()
       this.setState({ isLoadVR: false })
     }
 
