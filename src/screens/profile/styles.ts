@@ -102,7 +102,8 @@ const useStyles = makeStyles(theme => ({
       overflow: "hidden",
       position:'absolute', 
       top : 0,
-      zIndex : 10
+      zIndex : 10,
+      backgroundColor:'transparent'
     },
 }))
 

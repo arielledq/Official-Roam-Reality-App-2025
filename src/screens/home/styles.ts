@@ -11,8 +11,6 @@ const useStyles = makeStyles((theme) => ({
     container: {
         flex: 1,
         paddingHorizontal: 25,
-        paddingVertical: 20,
-        paddingBottom:0
     },
     imageBg : {
         width : '100%',
@@ -60,7 +58,6 @@ const useStyles = makeStyles((theme) => ({
       marginTop : 10,
     },
     list: {
-      marginTop : 105,
       marginBottom:80,
       flex:1
     },
