@@ -163,6 +163,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
       <View style={styles.container}>
         {isLoading ? <ActivityIndicator size="large" /> : 
         <FlatList
+          style={styles.list}
           contentContainerStyle={styles.containerStyle}
           data={HomeScreenData}
           renderItem={({item}) => <HomeScreenARItem {...item}/>}
