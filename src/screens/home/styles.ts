@@ -15,7 +15,7 @@ const useStyles = makeStyles((theme) => ({
     },
     imageBg : {
         width : '100%',
-        height : 280,
+        height : 320,
         borderRadius : 20,
         marginBottom :20
       },
@@ -56,8 +56,11 @@ const useStyles = makeStyles((theme) => ({
       marginStart: 3
     },
     containerStyle: {
-      paddingBottom : 150,
-      marginTop : 80
+      marginTop : 10,
+    },
+    list: {
+      marginVertical : 70,
+      flex:1
     },
     blurView : {
       overflow: "hidden",
