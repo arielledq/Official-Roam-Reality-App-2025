@@ -2696,7 +2696,7 @@
 
 "@viro-community/react-viro@https://github.com/shabeebhasan/viro.git":
   version "2.23.3"
-  resolved "https://github.com/shabeebhasan/viro.git#0f30d4be5ddd7ed25b44d117ec398e98261e05e2"
+  resolved "https://github.com/shabeebhasan/viro.git#f74650b63e97fc8d0c15e6503a6e8443dd56fb8d"
   dependencies:
     "@expo/config-plugins" "^7.2.5"
     react "^18.2.0"
