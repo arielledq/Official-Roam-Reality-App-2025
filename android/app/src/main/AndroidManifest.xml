@@ -1,6 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:tools="http://schemas.android.com/tools">
 
+  <queries>
+    <package android:name="com.google.ar.core" />
+  </queries>
+  
   <uses-sdk tools:overrideLibrary="com.viromedia.virobridge, com.viro.renderer, com.viro.core" />
 
   <uses-permission android:name="android.permission.CAMERA" />
@@ -10,7 +14,7 @@
   <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
   <uses-permission android:name="android.permission.DOWNLOAD_WITHOUT_NOTIFICATION" />
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.GET_ACCOUNTS" /> 
+  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
   <uses-feature android:name="android.hardware.camera" android:required="false" />
   <uses-feature android:name="android.hardware.camera.front" android:required="false" />
@@ -38,7 +42,7 @@
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
         <category android:name="android.intent.category.LAUNCHER" />
-        <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+        <action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
       </intent-filter>
     </activity>
     <activity android:name="com.facebook.FacebookActivity"
