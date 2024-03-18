@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
   },
 
   headerContainer: {
-    paddingVertical: 10,
+    paddingVertical: 15,
     borderBottomWidth: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.0)'
   },
@@ -86,7 +86,7 @@ const useStyles = makeStyles(theme => ({
   },
   editButtonContainer: {
     position: "absolute",
-    top: 100,
+    top: 140,
     right: 20,
     zIndex: 10
   },
@@ -99,12 +99,11 @@ const useStyles = makeStyles(theme => ({
     paddingBottom : '50%'
   },
   blurView : {
-    overflow: "hidden",
-    position:'absolute', 
-    top : 0,
-    height : 85,
-    zIndex : 10
-  }
+      overflow: "hidden",
+      position:'absolute', 
+      top : 0,
+      zIndex : 10
+    },
 }))
 
 export default useStyles

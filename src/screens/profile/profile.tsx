@@ -266,7 +266,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   return (
     <BackgroundWithImage style={_styles.mainContainer}>  
       <View style={_styles.blurView}>
-        <BlurView  blurType="light" overlayColor='#00000050' enabled={!isTransitioning}>
+        <BlurView  blurType="light" overlayColor='transparent' enabled={!isTransitioning}>
         <AppHeader
           containerStyle={_styles.headerContainer}
           title={"Profile"}
