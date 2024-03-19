@@ -1,0 +1,25 @@
+{% extends 'admin/base.html' %} {% block extrahead %}{{ block.super }}
+<style>
+  :root {
+    --primary: #800080;
+    --white: #fff;
+  }
+
+  #header {
+    background:var(--primary);
+  }
+
+  caption {
+    background:var(--primary) !important;
+  }
+
+  .breadcrumbs {
+    background:var(--primary) !important;
+  }
+
+  h2 {
+    background:var(--primary) !important;
+    color: var(--white) !important;
+  }
+</style>
+{% endblock %}
