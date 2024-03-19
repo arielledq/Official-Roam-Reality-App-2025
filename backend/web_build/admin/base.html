@@ -1,27 +1,25 @@
 {% extends 'admin/base.html' %} {% block extrahead %}{{ block.super }}
 <style>
+  :root {
+    --primary: #800080;
+    --white: #fff;
+  }
+
   #header {
-    width: auto;
-    height: auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 40px;
-    background: #800080;
-    color: #ffc;
-    overflow: hidden;
+    background:var(--primary);
   }
 
   caption {
-    background: #800080 !important;
+    background:var(--primary) !important;
   }
 
   .breadcrumbs {
-    background: #800080 !important;
+    background:var(--primary) !important;
   }
 
   h2 {
-    background: #800080 !important;
+    background:var(--primary) !important;
+    color: var(--white) !important;
   }
 </style>
 {% endblock %}
