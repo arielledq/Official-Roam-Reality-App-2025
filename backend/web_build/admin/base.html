@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %} {% block extrahead %}{{ block.super }}
+<style>
+  #header {
+    width: auto;
+    height: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 40px;
+    background: #800080;
+    color: #ffc;
+    overflow: hidden;
+  }
+
+  caption {
+    background: #800080 !important;
+  }
+
+  .breadcrumbs {
+    background: #800080 !important;
+  }
+
+  h2 {
+    background: #800080 !important;
+  }
+</style>
+{% endblock %}
