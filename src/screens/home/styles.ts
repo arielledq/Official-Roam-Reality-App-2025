@@ -11,7 +11,6 @@ const useStyles = makeStyles((theme) => ({
     container: {
         flex: 1,
         paddingHorizontal: 25,
-        paddingVertical: 20
     },
     imageBg : {
         width : '100%',
@@ -59,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
       marginTop : 10,
     },
     list: {
-      marginVertical : 70,
+      marginBottom:80,
       flex:1
     },
     blurView : {

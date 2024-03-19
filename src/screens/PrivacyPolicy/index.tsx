@@ -5,6 +5,7 @@ import BackgroundWithImage from '../../components/background';
 import { AppHeader } from '../../components';
 import ScreenLoader from '../../components/screenLoader';
 import { getPrivacyPolicy } from '../../network';
+import { FontSizes } from '../../util/FontUtils';
 
 
 const { width } = Dimensions.get('window');
@@ -28,6 +29,13 @@ const PrivacyPolicy = () => {
       >
         <RenderHtml
           contentWidth={width}
+          tagsStyles={{
+            body: {
+              lineHeight:19.1,
+              color: '#fff',
+              fontSize: FontSizes.S14
+            },
+          }}
           source={{
             html: html
           }}

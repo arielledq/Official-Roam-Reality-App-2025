@@ -96,17 +96,17 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   useFocusEffect(
     useCallback(() => {
-      setTimeout(()=>{
+      setTimeout(() => {
         setIsTransitioning(false)
-      },500)
+      }, 500)
       getProfieARMemories()
       fetchARUserProfile()
     }, [])
   )
 
-  useEffect(() => { 
-      fetchProfileDetails();
-  }, [isProfileUpdated,userProfile]);
+  useEffect(() => {
+    fetchProfileDetails();
+  }, [isProfileUpdated, userProfile]);
 
   const onProfileUpdate = () => {
     setIsProfileUpdated(true)
@@ -115,7 +115,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
-        onPress={() =>{
+        onPress={() => {
           setIsTransitioning(true)
           navigation.openDrawer()
         }}
@@ -134,7 +134,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     { id: 6, value: 0, property: "Tokens" },
     { id: 7, value: 0, property: "Rallies" },
     { id: 8, value: 0, property: "Countries" },
-    
+
   ]
   // Split the data into chunks of 3 for each row
   const rows = []
@@ -179,7 +179,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             containerStyle={_styles.editButtonContainer}
             onPress={() => {
               setIsTransitioning(true)
-              navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})
+              navigation.navigate("EditProfile", { edit: true, profileDetails, onProfileUpdate })
             }}
           >
             <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
@@ -193,9 +193,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           containerStyle={_styles.editButtonContainer}
           onPress={() => {
             setIsTransitioning(true)
-            navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})
+            navigation.navigate("EditProfile", { edit: true, profileDetails, onProfileUpdate })
           }}
-          // onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
+        // onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
@@ -224,8 +224,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     </KeyboardAwareScrollView>
   )
 
-  const navigateToShare = (captureData,challengeObj) => {
-    navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData,hideBottomTab: true });
+  const navigateToShare = (captureData, challengeObj) => {
+    navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData, hideBottomTab: true });
   }
 
   const renderFooter = () => (
@@ -264,16 +264,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   )
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>  
-      <View style={_styles.blurView}>
-        <BlurView  blurType="light" overlayColor='#00000050' enabled={!isTransitioning}>
-        <AppHeader
-          containerStyle={_styles.headerContainer}
-          title={"Profile"}
-          leftComponent={handleMenuButton()}
-          />
-        </BlurView>
-        </View>
+    <BackgroundWithImage style={_styles.mainContainer}>
       {loading ? <ScreenLoader /> : <FlatList
         data={data}
         contentContainerStyle={_styles.container_style}
@@ -284,6 +275,15 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         ListFooterComponent={renderFooter}
         nestedScrollEnabled={false}
       />}
+      <View style={_styles.blurView}>
+        <BlurView blurType="light" overlayColor='#00000050' enabled={!isTransitioning}>
+          <AppHeader
+            containerStyle={_styles.headerContainer}
+            title={"Profile"}
+            leftComponent={handleMenuButton()}
+          />
+        </BlurView>
+      </View>
     </BackgroundWithImage>
   )
 }
