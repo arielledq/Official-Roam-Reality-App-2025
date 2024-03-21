@@ -109,7 +109,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }, [isProfileUpdated,userProfile]);
 
   const onProfileUpdate = () => {
-    setIsProfileUpdated(true)
+    setIsProfileUpdated(prev => !prev)
   }
 
   const handleMenuButton = () => {
