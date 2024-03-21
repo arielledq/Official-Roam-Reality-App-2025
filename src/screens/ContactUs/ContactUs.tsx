@@ -74,6 +74,8 @@ const ContactUs = ({navigation}) => {
         keyboardShouldPersistTaps="always"
         nestedScrollEnabled
         contentContainerStyle={_styles.scroll}
+        enableOnAndroid={true}
+        enableAutomaticScroll={true}
       >
       <Formik
         initialValues={{
