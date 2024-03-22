@@ -5,6 +5,7 @@ import BackgroundWithImage from '../../components/background';
 import { AppHeader } from '../../components';
 import { getTermsAndConditions } from '../../network';
 import ScreenLoader from '../../components/screenLoader';
+import { FontSizes } from '../../util/FontUtils';
 
 
 const { width } = Dimensions.get('window');
@@ -28,9 +29,15 @@ const TermsAndConditions = () => {
       >
         <RenderHtml
           contentWidth={width}
+          tagsStyles={{
+            body: {
+              lineHeight:19.1,
+              color: '#fff',
+              fontSize: FontSizes.S14
+            },
+          }}
           source={{
             html: html
-
           }}
         />
       </ScrollView>}
