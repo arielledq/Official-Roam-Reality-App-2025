@@ -71,7 +71,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
     }
   }, [route.params])
 
-  useEffect(()=>{
+  useEffect(() => {
     setIsLoading(true)
     getARChallenges().then((res) => {
       if (res.status == 1) {
@@ -83,7 +83,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
     }).finally(() => {
       setIsLoading(false)
     })
-  },[])
+  }, [])
 
   const handleDeleteAccount = () => {
     Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
@@ -128,49 +128,50 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
 
   const HomeScreenARItem = (item) => {
     return (
-      <BackgroundWithImage 
-      imageSource={item?.image} 
-      style={styles.imageBg}
-      imageStyle={styles.imageStyle}
-    >
-      <View style={styles.firstView}/>
-      <View style={styles.row}>
-        <View style={styles.innerView}>
-          <AppText style={styles.headerText}>{item?.title}</AppText>
-          <AppText style={styles.headerText}>{item?.title1}</AppText>
-          <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-          <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
+      <BackgroundWithImage
+        imageSource={item?.image}
+        style={styles.imageBg}
+        imageStyle={styles.imageStyle}
+      >
+        <View style={styles.firstView} />
+        <View style={styles.row}>
+          <View style={styles.innerView}>
+            <AppText style={styles.headerText}>{item?.title}</AppText>
+            <AppText style={styles.headerText}>{item?.title1}</AppText>
+            <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
+            <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
+          </View>
+          <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => Alert.alert('InProgress')}>
+            <RightArrowIcon />
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => Alert.alert('InProgress')}>
-          <RightArrowIcon/>
-        </TouchableOpacity>
-      </View>
-    </BackgroundWithImage>
+      </BackgroundWithImage>
     )
   }
 
   return (
     <View style={styles.mainContainer}>
+      <View style={styles.container}>
+        {isLoading ? <ActivityIndicator size="large" /> :
+          <FlatList
+            style={styles.list}
+            contentContainerStyle={styles.containerStyle}
+            data={HomeScreenData}
+            renderItem={({ item }) => item.blank ? <View style={{ height: 120 }} /> : <HomeScreenARItem {...item} />}
+            keyExtractor={(item) => item.id}
+            showsVerticalScrollIndicator={false}
+          />
+        }
+      </View>
       <View style={styles.blurView}>
-        <BlurView blurType="light" overlayColor='transparent'>
-          <AppHeader 
-            title={"AR Experiences"} 
+        <BlurView blurType="regular" overlayColor='transparent'
+          style={{ backgroundColor: 'transparent' }}>
+          <AppHeader
+            title={"AR Experiences"}
             leftComponent={handleMenuButton()}
             containerStyle={styles.headerContainer}
           />
         </BlurView>
-      </View>
-      <View style={styles.container}>
-        {isLoading ? <ActivityIndicator size="large" /> : 
-        <FlatList
-          style={styles.list}
-          contentContainerStyle={styles.containerStyle}
-          data={HomeScreenData}
-          renderItem={({item}) => <HomeScreenARItem {...item}/>}
-          keyExtractor={(item) => item.id}
-          showsVerticalScrollIndicator={false}
-        />
-      }
       </View>
     </View>
   )
