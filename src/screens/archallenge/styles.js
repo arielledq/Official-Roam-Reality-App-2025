@@ -86,7 +86,7 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: 12,
     paddingVertical: 10,
     flex:1,
-    height: 113,
+    minHeight: 113,
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "#ffffff10",
@@ -96,7 +96,16 @@ const useStyles = makeStyles(theme => ({
   list_title: {
     ...fontGroup.sf700,
     fontSize: FontSizes.S12,
-    color: theme.colors.white
+    color: theme.colors.white,
+    marginTop:5,
+    textAlign:'center'
+  },
+  s_list_title: {
+    ...fontGroup.sf300,
+    fontSize: FontSizes.S10,
+    color: theme.colors.white,
+    marginTop:5,
+    alignItems:'center'
   },
   list_image: {
     width: 60,
