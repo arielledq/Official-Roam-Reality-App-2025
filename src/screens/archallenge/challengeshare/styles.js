@@ -100,7 +100,7 @@ const useStyles = makeStyles(theme => ({
   },
   detailContainer: {
     borderRadius: 12,
-    height: 422,
+    height: 600,
     width: '100%',
     backgroundColor: "#272741",
     marginVertical: 20,
