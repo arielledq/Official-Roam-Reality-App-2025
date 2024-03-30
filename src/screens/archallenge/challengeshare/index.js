@@ -273,11 +273,11 @@ const ArChallengeShare = ({
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
         <View style={styles.detailContainer}>
 
-          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', height: 318 }} source={{
+          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex:1 }} source={{
             uri: captureData
           }} />
             :
-            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', height: 318 }} />}
+            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', flex:1}} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
@@ -295,7 +295,7 @@ const ArChallengeShare = ({
                 <Text style={styles.challengeSponsorStartDateText}>Completed on : {startDate}</Text>
               </View>
             </View>
-          </View>
+          </View>  
         </View>
         <View style={styles.socialShareContainer}>
           <View style={{ flexDirection: 'row' }}>
