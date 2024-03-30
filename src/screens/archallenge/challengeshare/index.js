@@ -21,6 +21,7 @@ import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
 import { share, init, events } from 'react-native-tiktok';
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
+import DownloadImg from "../../../assets/ar/download.svg"
 
 const ArChallengeShare = ({
 
@@ -257,6 +258,10 @@ const ArChallengeShare = ({
     // }
   }
 
+  const checkPermission = () => {
+    
+  };
+
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -307,6 +312,9 @@ const ArChallengeShare = ({
             </TouchableOpacity>
             <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
               <TiktokShareImg />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={checkPermission} style={styles.shareBtn}>
+              <DownloadImg />
             </TouchableOpacity>
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
