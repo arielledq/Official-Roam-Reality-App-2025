@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
-import { useRoute } from "@react-navigation/native"
+import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import AppText from "../../../components/text"
 import useStyles from "./styles"
@@ -34,6 +34,7 @@ const ArChallengeShare = ({
 
   const styles = useStyles()
   const route = useRoute()
+  const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const hideBottomTab = route?.params?.hideBottomTab;
@@ -260,7 +261,7 @@ const ArChallengeShare = ({
   }
 
   const checkPermission = () => {
-    CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(()=>{
+    CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
       Alert.alert("Saved to Camera Roll.")
     });
   };
@@ -293,14 +294,14 @@ const ArChallengeShare = ({
               <AppText style={styles.pointCount}>{challengeObj.points}</AppText>
               <AppText style={styles.pointCountText}>Points</AppText>
             </View>
-            <View style={{ paddingHorizontal: 10,flex:1 }}>
+            <View style={{ paddingHorizontal: 10, flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
                 <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
                 <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
               </View>
-              <View style={{width:'100%'}}>
+              <View style={{ width: '100%' }}>
                 <Text style={styles.challengeSponsorTipText}>Share your recorded experience for extra credits!</Text>
-                <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%',justifyContent:'space-between',marginTop:2}}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginTop: 2 }}>
                   <Text style={styles.challengeSponsorStartDateText}>Completed on : {startDate}</Text>
                   <TouchableOpacity onPress={checkPermission} style={styles.shareBtn}>
                     <DownloadImg />
@@ -326,7 +327,10 @@ const ArChallengeShare = ({
         </View>
       </ScrollView>
       {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
-        <Text style={styles.bottomText}>Link My Profiles</Text>
+        <TouchableOpacity onPress={() => { navigation.navigate("Settings") }}>
+          <Text style={styles.bottomText}>Link My Profiles</Text>
+        </TouchableOpacity>
+
         <AppButton
           onPress={() => shareBtnOnPress()}
           buttonStyle={styles.buttonStyle}
