@@ -84,8 +84,9 @@ const ArChallenge = ({
 
   const Item = ({ obj }) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={_styles.list_item}>
-      <Image style={_styles.list_image} source={{ uri: obj.sponsored.image }} />
-      <Text style={_styles.list_title}>{obj.sponsored.name}</Text>
+      <Image style={_styles.list_image} source={{ uri: obj.image }} />
+      <Text style={_styles.list_title}>{obj.name} By {obj.sponsored.name}</Text>
+      <Text style={_styles.s_list_title}>Sponsored By {obj.sponsored.name}</Text>
     </TouchableOpacity>
   );
 

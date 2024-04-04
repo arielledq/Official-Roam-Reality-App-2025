@@ -49,7 +49,8 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.p700,
     fontSize: FontSizes.S12,
     color: "#F2F2F2",
-    width: '80%'
+    width: '100%',
+    marginTop:2
   },
   challengeSponsorStartDateText: {
     ...fontGroup.p300,
@@ -100,7 +101,7 @@ const useStyles = makeStyles(theme => ({
   },
   detailContainer: {
     borderRadius: 12,
-    height: 422,
+    height: 600,
     width: '100%',
     backgroundColor: "#272741",
     marginVertical: 20,

@@ -250,7 +250,8 @@ const ArChallengeCapture = ({
       recordingStart: false,
       timer: "00:00",
       recordTimeInMillis: 0,
-      isLoadVR: false
+      isLoadVR: false,
+      challengeInformationView: false
     }
 
     constructor() {
@@ -385,6 +386,48 @@ const ArChallengeCapture = ({
         });
     }
 
+    challengeDetailView = () => {
+      return (
+        <View style={styles.challengeInfoContainer}>
+          <View style={styles.challengeInfoHeaderContainer}>
+            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+            <Text style={styles.challengeInfoHeader}>Challenge Details</Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1, width: '100%', padding: 24 }
+            }
+          >
+            <RenderHTML
+              contentWidth={width}
+              tagsStyles={{
+                p: {
+                  color: '#9CA3AF',
+                  fontSize: FontSizes.S14,
+                },
+                strong: {
+                  color: '#fff',
+                  fontSize: FontSizes.S18,
+                }
+              }}
+              source={{
+                html: `${challengeObj.description}`
+              }}
+            />
+          </ScrollView>
+          <View style={{ width: '100%', paddingHorizontal: 24 }}>
+            
+            <TouchableOpacity
+              activeOpacity={.6}
+              onPress={() => this.setState({challengeInformationView:false})}>
+              <Text style={styles.bottomText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+
     InfoView = () => {
       return (
         <View style={styles.challengeInfoContainer}>
@@ -493,7 +536,7 @@ const ArChallengeCapture = ({
                   <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
-                <TouchableOpacity onPress={() => this.setState({ detailsShow: true })}
+                <TouchableOpacity onPress={() => this.setState({ challengeInformationView: true })}
                   style={styles.viewDetailBtn}>
                   <Text style={styles.btnText}>View Details</Text>
                 </TouchableOpacity>
@@ -553,6 +596,7 @@ const ArChallengeCapture = ({
             }
           </View>
           {this.state.detailsShow && this.InfoView()}
+          {this.state.challengeInformationView && this.challengeDetailView()}
         </View >
       )
     }
