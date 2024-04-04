@@ -22,6 +22,7 @@ import RNFS from 'react-native-fs';
 import { share, init, events } from 'react-native-tiktok';
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
 import DownloadImg from "../../../assets/ar/download.svg"
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 const ArChallengeShare = ({
 
@@ -259,7 +260,7 @@ const ArChallengeShare = ({
   }
 
   const checkPermission = () => {
-    
+    CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" })
   };
 
 
@@ -278,11 +279,11 @@ const ArChallengeShare = ({
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
         <View style={styles.detailContainer}>
 
-          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex:1 }} source={{
+          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1 }} source={{
             uri: captureData
           }} />
             :
-            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', flex:1}} />}
+            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', flex: 1 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
@@ -300,7 +301,7 @@ const ArChallengeShare = ({
                 <Text style={styles.challengeSponsorStartDateText}>Completed on : {startDate}</Text>
               </View>
             </View>
-          </View>  
+          </View>
         </View>
         <View style={styles.socialShareContainer}>
           <View style={{ flexDirection: 'row' }}>
