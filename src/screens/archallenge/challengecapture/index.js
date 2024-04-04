@@ -63,7 +63,7 @@ const ArChallengeCapture = ({
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [scale, setScale] = useState([0.08, 0.08, 0.08]);
+    const [scale, setScale] = useState([0.05, 0.05, 0.05]);
     const [rotate, setRotate] = useState([0, 0, 0]);
     const [progress, setProgress] = useState([0, 0, 0]);
 
@@ -177,6 +177,19 @@ const ArChallengeCapture = ({
       );
     }
 
+    const  _onPinch = (pinchState, scaleFactor, source) => {
+      let newScale = [
+        scale[0] * scaleFactor,
+        scale[1] * scaleFactor,
+        scale[2] * scaleFactor
+      ];
+  
+      if (pinchState == 3) {
+        setScale(newScale)
+        return;
+      }
+    };
+
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
 
@@ -215,12 +228,13 @@ const ArChallengeCapture = ({
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
             position={[0, -5, -30]}
-            scale={[0.05, 0.05, 0.05]}
+            scale={scale}
             type="VRX"
             materials={"pbr"}
             rotation={rotate}
             onRotate={_onRotate}
             chromaKeyFilteringColor={"transparent"}
+            onPinch={_onPinch}
             onDrag={_onDrag}
             animation={{
               name: 'Take 001',
