@@ -86,30 +86,35 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: 12,
     paddingVertical: 10,
     flex:1,
-    minHeight: 113,
-    justifyContent: "center",
+    minHeight: 140,
+    justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "#ffffff10",
     borderRadius: 12,
-    margin: 5
+    margin: 5,
+    overflow:'hidden'
   },
   list_title: {
     ...fontGroup.sf700,
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S16,
     color: theme.colors.white,
     marginTop:5,
     textAlign:'center'
   },
   s_list_title: {
-    ...fontGroup.sf300,
-    fontSize: FontSizes.S10,
+    ...fontGroup.sf500,
+    fontSize: FontSizes.S12,
     color: theme.colors.white,
     marginTop:5,
-    alignItems:'center'
+    alignItems:'center',
+    textAlign:'center'
   },
   list_image: {
-    width: 60,
-    height: 60
+    position:'absolute',
+    top:0,
+    bottom:0,
+    left:0,
+    right:0
   }
 }))
 
