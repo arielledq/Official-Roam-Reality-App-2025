@@ -31,6 +31,9 @@ env_file = os.path.join(BASE_DIR, ".env")
 env = environ.Env()
 env.read_env(env_file)
 
+GDAL_LIBRARY_PATH = '/opt/homebrew/Cellar/gdal/3.8.5/lib/libgdal.dylib' 
+GEOS_LIBRARY_PATH = '/opt/homebrew/Cellar/geos/3.12.1/lib/libgeos_c.dylib'
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
 
@@ -68,7 +71,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django.contrib.sites'
+    'django.contrib.sites',
+    'django.contrib.gis'
 ]
 LOCAL_APPS = [
     'home',
@@ -138,8 +142,10 @@ DATABASES = {
 }
 
 if env.str("DATABASE_URL", default=None):
+    db = env.db()
+    db['ENGINE'] = 'django.contrib.gis.db.backends.postgis'
     DATABASES = {
-        'default': env.db()
+        'default': db
     }
 
 
