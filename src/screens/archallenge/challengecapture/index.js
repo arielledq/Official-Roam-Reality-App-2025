@@ -36,15 +36,6 @@ const { width } = Dimensions.get('window');
 
 const VIDEO_RECORD_TIME = 10
 
-ViroMaterials.createMaterials({
-  pbr: {
-    lightingModel: "Blinn",
-    chromaKeyFilteringColor: "#00FF00",
-    shininess: .6
-  },
-});
-
-
 const ArChallengeCapture = ({
 
 }) => {
@@ -157,6 +148,7 @@ const ArChallengeCapture = ({
     }, []);
 
     const _onRotate = (rotateState, rotationFactor, source) => {
+      console.log("_onRotate rotateState", rotateState)
       if (rotateState == 3) {
         const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
         setRotate(rotation)
@@ -167,23 +159,24 @@ const ArChallengeCapture = ({
     }
 
     const _onDrag = (draggedToPosition, source) => {
-      console.log(
-        "Dragged to: x" +
-        draggedToPosition[0] +
-        " y:" +
-        draggedToPosition[1] +
-        " z: " +
-        draggedToPosition[2]
-      );
+      // console.log(
+      //   "Dragged to: x" +
+      //   draggedToPosition[0] +
+      //   " y:" +
+      //   draggedToPosition[1] +
+      //   " z: " +
+      //   draggedToPosition[2]
+      // );
     }
 
-    const  _onPinch = (pinchState, scaleFactor, source) => {
+    const _onPinch = (pinchState, scaleFactor, source) => {
+      console.log("_onPinch rotateState", pinchState)
       let newScale = [
         scale[0] * scaleFactor,
         scale[1] * scaleFactor,
         scale[2] * scaleFactor
       ];
-  
+
       if (pinchState == 3) {
         setScale(newScale)
         return;
@@ -193,15 +186,10 @@ const ArChallengeCapture = ({
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
 
-        <ViroAmbientLight color="#ffffff" intensity={200} />
-        <ViroDirectionalLight
-          color="#FFFFFF"
-          direction={[.05, 0.05, .05]}
-          shadowOrthographicPosition={[0, 3, -5]}
-          shadowOrthographicSize={10}
-          shadowNearZ={2}
-          shadowFarZ={9}
-          castsShadow={true} />
+        <ViroAmbientLight color="#FFFFFF" intensity={250} />
+        <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
+        <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
+        <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
 
         <ViroSpotLight
           innerAngle={5}
@@ -230,7 +218,7 @@ const ArChallengeCapture = ({
             position={[0, -5, -30]}
             scale={scale}
             type="VRX"
-            materials={"pbr"}
+            materials={["mat"]}
             rotation={rotate}
             onRotate={_onRotate}
             chromaKeyFilteringColor={"transparent"}
@@ -431,10 +419,10 @@ const ArChallengeCapture = ({
             />
           </ScrollView>
           <View style={{ width: '100%', paddingHorizontal: 24 }}>
-            
+
             <TouchableOpacity
               activeOpacity={.6}
-              onPress={() => this.setState({challengeInformationView:false})}>
+              onPress={() => this.setState({ challengeInformationView: false })}>
               <Text style={styles.bottomText}>Close</Text>
             </TouchableOpacity>
           </View>
@@ -543,7 +531,7 @@ const ArChallengeCapture = ({
               text: "Anywhere AR Challenges",
               numberOfLines: 2,
               style: [styles.heading],
-            }}  backgroundColor="transparent" />
+            }} backgroundColor="transparent" />
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
                 <View style={{ flexDirection: 'row', alignItems: 'center' }}>
@@ -622,5 +610,18 @@ const ArChallengeCapture = ({
 }
 
 
+ViroMaterials.createMaterials({
+  grid: {
+    lightingModel: "Lambert",
+    bloomThreshold: 0.5,
+  },
+  mat: {
+    shininess: .6,
+    blendMode: "Add",
+    lightingModel: "Lambert",
+    bloomThreshold: 0.5,
+    diffuseColor:"#fffS"
+  },
+});
 
 export default ArChallengeCapture
