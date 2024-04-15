@@ -220,7 +220,7 @@ class GeoArChallenge(models.Model):
 
     def save(self, *args, **kwargs):
         self.clean()
-        return super(Challenges, self).save(*args, **kwargs)
+        return super(GeoArChallenge, self).save(*args, **kwargs)
 
     def clean(self):
         print(self.challenge_choice)
