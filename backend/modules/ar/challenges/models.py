@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.contrib.gis.db import models as gis_models
 
 User = get_user_model()
 
@@ -186,3 +187,54 @@ class ARExample(models.Model):
     )
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
+
+class GeoArChallenge(models.Model):
+    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    model_file = models.FileField(upload_to="geoar/model/", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_sponsored",
+    )
+    challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=1)
+    points = models.IntegerField(verbose_name="Challenge Points", default=0)
+    challenge_requirement = models.CharField(
+        max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
+    )
+    challenge_choice = models.CharField(verbose_name="Challenge Load From",
+        max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
+    )
+    expiry_date = models.DateTimeField(blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+    geo_location = gis_models.MultiPolygonField(_("Geo Location"), blank=True, null=True)
+    radius = models.IntegerField(verbose_name="Redius", default=0)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        return super(Challenges, self).save(*args, **kwargs)
+
+    def clean(self):
+        print(self.challenge_choice)
+        print(self.image)
+        if self.challenge_choice == "SPONSORED" and self.image == None:
+            raise ValidationError("Image is mandotory, When challenge is sponsored!")
+        elif self.challenge_choice == "DANCE" and self.model_file == None:
+            raise ValidationError(
+                "Model file is mandotory, When challenge type is Dancing!"
+            )
+
+    class Meta:
+        verbose_name_plural = "Geo AR Challenge"
+        verbose_name = "Geo AR Challenge"
+
+    def __str__(self):
+        return self.name
