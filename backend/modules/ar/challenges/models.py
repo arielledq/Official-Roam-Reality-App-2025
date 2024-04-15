@@ -188,6 +188,22 @@ class ARExample(models.Model):
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
 
+class GeoArSite(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+    geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Geo AR Site"
+        verbose_name = "Geo AR Site"
+
+    def __str__(self):
+        return self.name
+
 class GeoArChallenge(models.Model):
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="geoar/model/", null=True, blank=True)
