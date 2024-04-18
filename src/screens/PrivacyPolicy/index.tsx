@@ -27,19 +27,13 @@ const PrivacyPolicy = () => {
         style={{ marginHorizontal: 20 }
         }
       >
-        <RenderHtml
-          contentWidth={width}
-          tagsStyles={{
-            body: {
-              lineHeight:19.1,
-              color: '#fff',
-              fontSize: FontSizes.S14
-            },
+        <Text
+          style={{
+            lineHeight: 19.1,
+            color: '#fff',
+            fontSize: FontSizes.S14
           }}
-          source={{
-            html: html
-          }}
-        />
+        >{html}</Text>
       </ScrollView>}
     </BackgroundWithImage>
   )
