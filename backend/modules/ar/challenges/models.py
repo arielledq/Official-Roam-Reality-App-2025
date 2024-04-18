@@ -171,23 +171,14 @@ class ARMemories(models.Model):
 
 class ARSettings(models.Model):
     class Meta:
-        verbose_name_plural = "AR Legals and Settings"
-        verbose_name = "AR Legals and Settings"
+        verbose_name_plural = "AR Settings"
 
-    name = models.CharField(_("Name"), blank=True, null=True, max_length=255,default="Default")
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
-    
-    def __str__(self):
-        return str(
-            self.name
-        )
 
 class ARExample(models.Model):
     class Meta:
         verbose_name_plural = "AR Example"
-    challenge = models.OneToOneField(
-        Challenges, on_delete=models.CASCADE, related_name="ar_example_challenge", blank=True, null=True
-    )
+
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
     image = models.ImageField(
         upload_to="ar/example/",
@@ -197,6 +188,23 @@ class ARExample(models.Model):
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
 
+class GeoLocation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Geo Location"
+        verbose_name = "Geo Location"
+
+    def __str__(self):
+        return self.name
+
 class GeoArSite(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
@@ -204,62 +212,20 @@ class GeoArSite(models.Model):
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     description = RichTextField(_("Description"), blank=True, null=True)
-    geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
-
-    class Meta:
-        verbose_name_plural = "Geo AR Site"
-        verbose_name = "Geo AR Site"
-
-    def __str__(self):
-        return self.name
-
-class GeoArChallenge(models.Model):
-    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
-    model_file = models.FileField(upload_to="geoar/model/", null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    name = models.CharField(
-        _("Name"), default=None, null=False, blank=False, max_length=255
-    )
-    sponsor = models.ForeignKey(
-        Sponsor,
+    updated_at = models.DateTimeField(auto_now=True)
+    geo_location = models.ForeignKey(
+        GeoLocation,
         on_delete=models.CASCADE,
         default=None,
         null=False,
         blank=False,
-        related_name="geo_sponsored",
+        related_name="geo_location_ar_site",
     )
-    challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=1)
-    points = models.IntegerField(verbose_name="Challenge Points", default=0)
-    challenge_requirement = models.CharField(
-        max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
-    )
-    challenge_choice = models.CharField(verbose_name="Challenge Load From",
-        max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
-    )
-    expiry_date = models.DateTimeField(blank=True, null=True)
-    description = RichTextField(_("Description"), blank=True, null=True)
-    geo_location = gis_models.MultiPolygonField(_("Geo Location"), blank=True, null=True)
-    radius = models.IntegerField(verbose_name="Redius", default=0)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
-
-    def save(self, *args, **kwargs):
-        self.clean()
-        return super(GeoArChallenge, self).save(*args, **kwargs)
-
-    def clean(self):
-        print(self.challenge_choice)
-        print(self.image)
-        if self.challenge_choice == "SPONSORED" and self.image == None:
-            raise ValidationError("Image is mandotory, When challenge is sponsored!")
-        elif self.challenge_choice == "DANCE" and self.model_file == None:
-            raise ValidationError(
-                "Model file is mandotory, When challenge type is Dancing!"
-            )
+    geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
 
     class Meta:
-        verbose_name_plural = "Geo AR Challenge"
-        verbose_name = "Geo AR Challenge"
+        verbose_name_plural = "Geo AR Site"
+        verbose_name = "Geo AR Site"
 
     def __str__(self):
         return self.name
