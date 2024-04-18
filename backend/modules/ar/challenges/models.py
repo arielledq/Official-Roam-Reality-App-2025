@@ -171,14 +171,23 @@ class ARMemories(models.Model):
 
 class ARSettings(models.Model):
     class Meta:
-        verbose_name_plural = "AR Settings"
+        verbose_name_plural = "AR Legals and Settings"
+        verbose_name = "AR Legals and Settings"
 
+    name = models.CharField(_("Name"), blank=True, null=True, max_length=255,default="Default")
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
+    
+    def __str__(self):
+        return str(
+            self.name
+        )
 
 class ARExample(models.Model):
     class Meta:
         verbose_name_plural = "AR Example"
-
+    challenge = models.OneToOneField(
+        Challenges, on_delete=models.CASCADE, related_name="ar_example_challenge", blank=True, null=True
+    )
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
     image = models.ImageField(
         upload_to="ar/example/",

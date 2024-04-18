@@ -32,7 +32,7 @@ class SendgridClient(object):
             else:
                 UserOtp.objects.create(email=email, otp=otp)
         else:
-            raise Exception("UserDoesNotExist")
+            raise Exception("User not found")
 
     def confirm(self, request):
         email = request.data.get('email', None)
