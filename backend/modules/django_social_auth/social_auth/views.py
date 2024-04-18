@@ -9,6 +9,8 @@ from allauth.socialaccount.providers.twitter.views import TwitterOAuthAdapter
 from allauth.socialaccount.models import SocialAccount, SocialToken
 
 from rest_auth.registration.views import SocialLoginView, SocialConnectView
+
+from users.models import UserProfile
 from .serializers import CustomAppleSocialLoginSerializer, CustomAppleConnectSerializer
 from django.contrib.sites.shortcuts import get_current_site
 from rest_framework.response import Response
@@ -37,6 +39,9 @@ class FacebookLogin(SocialLoginView):
     def get_response(self):
         token = self.token
         user = self.user
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.is_verified = True
+        user_profile.save()
         serializer = UserSerializer(user)
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
     
@@ -56,6 +61,9 @@ class GoogleLogin(SocialLoginView):
     def get_response(self):
         token = self.token
         user = self.user
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.is_verified = True
+        user_profile.save()
         serializer = UserSerializer(user)
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 
@@ -76,6 +84,9 @@ class AppleLogin(SocialLoginView):
     def get_response(self):
         token = self.token
         user = self.user
+        user_profile = UserProfile.objects.get(user=user)
+        user_profile.is_verified = True
+        user_profile.save()
         serializer = UserSerializer(user)
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 

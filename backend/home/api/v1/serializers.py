@@ -9,6 +9,8 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
+from modules.ar.challenges.serializers import ARMemoriesSerializer
+from modules.ar.challenges.models import ARMemories
 from users.models import UserProfile
 from rest_framework.authtoken.models import Token
 
@@ -74,7 +76,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserProfile
-        fields = ('id', 'is_verified', 'image')
+        fields = ('id', 'is_verified', 'image', 'account_setup')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -113,7 +115,13 @@ class ChangePasswordSerializer(serializers.Serializer):
 
 
 class AccountSetupSerializer(serializers.ModelSerializer):
-    user = serializers.CharField(required=False)
+    user = UserSerializer()
+    name = serializers.CharField(required=False)
+    # ar_memories = serializers.SerializerMethodField()
+
+    # def get_ar_memories(self, obj):
+    #     user_ar_memories = ARMemories.objects.filter(user=self.context['request'].user)
+    #     return ARMemoriesSerializer(user_ar_memories, many=True).data if user_ar_memories.exists() else []
 
     class Meta:
         model = UserProfile
@@ -124,3 +132,17 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         user_profile["user"] = self.context['request'].user
         user_profile.update(validated_data)
         return UserProfile.objects.create(**user_profile)
+
+    def update(self, instance, validated_data):
+        instance.home_address = validated_data.get('home_address', instance.home_address)
+        instance.home_country = validated_data.get('home_country', instance.home_country)
+        instance.gender = validated_data.get('gender', instance.gender)
+        instance.date_of_birth = validated_data.get('date_of_birth', instance.date_of_birth)
+        instance.country_code = validated_data.get('country_code', instance.country_code)
+        instance.phone_number = validated_data.get('phone_number', instance.phone_number)
+        instance.account_setup = validated_data.get('account_setup', instance.account_setup)
+        instance.image = validated_data.get('image', instance.image)
+        instance.user.name = validated_data.get('name', instance.user.name)
+        instance.user.save()
+        instance.save()
+        return instance
