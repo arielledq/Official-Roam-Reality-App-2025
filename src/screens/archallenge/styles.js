@@ -86,7 +86,7 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: 12,
     paddingVertical: 10,
     flex:1,
-    minHeight: 140,
+    minHeight: 200,
     justifyContent: "flex-end",
     alignItems: "center",
     backgroundColor: "#ffffff10",
