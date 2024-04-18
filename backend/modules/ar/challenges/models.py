@@ -191,12 +191,12 @@ class ARExample(models.Model):
 class GeoLocation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    description = RichTextField(_("Description"), blank=True, null=True)
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Geo Location"
