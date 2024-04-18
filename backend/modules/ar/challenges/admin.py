@@ -7,7 +7,11 @@ class ARMemoriesAdmin(admin.ModelAdmin):
         "user__name",
         "challenges__name",
     )
-    list_display = ('user', 'challenges', 'challenge_approval')
+    list_display = ('user_name', 'challenges', 'challenge_approval','memory_file')
+    list_select_related = ['user']  # To avoid extra queries
+
+    def user_name(self, memory):
+        return memory.user.name
 
     pass
 
