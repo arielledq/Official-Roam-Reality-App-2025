@@ -7,7 +7,7 @@ class ARMemoriesAdmin(admin.ModelAdmin):
         "user__name",
         "challenges__name",
     )
-    list_display = ('user', 'challenges', 'challenge_approval')
+    list_display = ('user', 'challenges', 'challenge_approval','memory_file')
 
     pass
 
