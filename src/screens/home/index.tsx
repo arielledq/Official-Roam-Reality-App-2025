@@ -126,6 +126,10 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
     navigation.navigate('ARChallenge')
   }
 
+  const navigateToGeoARChanllenge = () => {
+    navigation.navigate('GeoArChallenge')
+  }
+
   const HomeScreenARItem = (item) => {
     return (
       <BackgroundWithImage
@@ -141,7 +145,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
             <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
             <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
           </View>
-          <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => Alert.alert('InProgress')}>
+          <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}>
             <RightArrowIcon />
           </TouchableOpacity>
         </View>
