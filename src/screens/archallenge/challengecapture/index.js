@@ -448,7 +448,7 @@ const ArChallengeCapture = ({
               contentWidth={width}
               tagsStyles={{
                 p: {
-                  color: '#fff',
+                  color: '#9CA3AF',
                   fontSize: FontSizes.S14,
                 },
                 strong: {
