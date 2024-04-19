@@ -87,7 +87,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
             <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
             <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
           </View>
-          <View style={{ marginTop: 10, flexDirection: 'row', justifyContent: "space-between",width:'100%' }}>
+          <View style={{ marginTop: 10, justifyContent: "space-between",width:'100%' }}>
             <Text style={styles.challengeSponsorStartDateText}>Started on: <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text></Text>
             <Text style={styles.challengeSponsorStartDateText}>Ends on: <Text style={styles.challengeSponsorStartDateTextValue}>{challengeObj.expiry_date ? expiryDate : "None"}</Text></Text>
           </View>
