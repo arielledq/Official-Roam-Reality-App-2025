@@ -5,11 +5,13 @@ import { handleError } from "../../util/helpers"
 import { getARChallenges, getARProfile, getARStettings } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
-import AppText from "../../components/text"
 import { useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../assets/geoar/starsite.svg"
+import GradientDown from "../../assets/geoar/gradient_down.svg"
+import GradientDownPNG from "../../assets/geoar/gradient_down.png"
 import BellIcon from "../../assets/geoar/bell.svg"
+import LocationIcon from "../../assets/geoar/location.png"
 import BackImg from "../../assets/geoar/back_img.png"
 import ArIcon from "../../assets/geoar/aricon.svg"
 import { updateARUserData, updateARSettings } from "../../redux/AR"
@@ -17,6 +19,7 @@ import { updateARUserData, updateARSettings } from "../../redux/AR"
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import LinearGradient from "react-native-linear-gradient";
+import { height, width } from "../../util/AppDimensions";
 
 
 const GeoArChallenge = ({
@@ -88,18 +91,29 @@ const GeoArChallenge = ({
   }
 
   const Item = ({ obj }) => (
-    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)}>
-      <ImageBackground style={_styles.containerView} resizeMode="contain" source={BackImg}>
-        <LinearGradient
-          colors={['#4F0F9350', '#344CAA50']}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 0 }}
-          style={_styles.gradient} 
-        >
-        </LinearGradient>
-        <View style={[_styles.list_image, { backgroundColor: '#00000080' }]} />
-        <Text style={_styles.list_title}>{obj.name}</Text>
-        <Text style={_styles.s_list_title}>Sponsored By {obj.sponsored.name}</Text>
+    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{width:'100%'}}>
+      <ImageBackground style={_styles.containerView} resizeMode="cover" source={BackImg}>
+        <Image source={GradientDownPNG} resizeMode="cover" style={{ position: 'absolute', bottom: 0, left:0, right: 0, top: 0,width:'110%' }} />
+        <View style={{ width: '100%', marginBottom: 10 }}>
+          <Text style={_styles.list_title}>Trinidad</Text>
+          <View style={{ flexDirection: 'row', justifyContent: "flex-start", width: '100%', alignItems: "flex-start", marginTop: 20 }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <SiteIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>18+</Text>
+              <Text style={_styles.s_list_text}>Sites</Text>
+            </View>
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 22, marginEnd: 10 }}>
+              <StarSiteIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>8+</Text>
+              <Text style={_styles.s_list_text}>Star Sites</Text>
+            </View>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <ArIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>64+</Text>
+              <Text style={_styles.s_list_text}>AR Challenges</Text>
+            </View>
+          </View>
+        </View>
       </ImageBackground>
     </TouchableOpacity>
   );
