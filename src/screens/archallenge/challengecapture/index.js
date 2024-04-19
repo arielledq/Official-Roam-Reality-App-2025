@@ -431,6 +431,7 @@ const ArChallengeCapture = ({
     }
 
     InfoView = () => {
+      console.log(settings?.waiver_details.replaceAll("#000000","#fff"))
       return (
         <View style={styles.challengeInfoContainer}>
           <View style={styles.challengeInfoHeaderContainer}>
@@ -452,11 +453,23 @@ const ArChallengeCapture = ({
                 },
                 strong: {
                   color: '#fff',
-                  fontSize: FontSizes.S18,
+                  fontSize: FontSizes.S14,
+                },
+                pre:{
+                  color: '#fff',
+                  fontSize: FontSizes.S14,
+                },
+                span:{
+                  color: '#fff',
+                  fontSize: FontSizes.S14,
+                },
+                ol:{
+                  color: '#fff',
+                  fontSize: FontSizes.S14,
                 }
               }}
               source={{
-                html: `${settings?.waiver_details}`
+                html: `${settings?.waiver_details.replaceAll("#000000","#fff")}`
               }}
             />
           </ScrollView>
@@ -620,7 +633,7 @@ ViroMaterials.createMaterials({
     blendMode: "Add",
     lightingModel: "Lambert",
     bloomThreshold: 0.5,
-    diffuseColor:"#fffS"
+    diffuseColor:"#fff"
   },
 });
 
