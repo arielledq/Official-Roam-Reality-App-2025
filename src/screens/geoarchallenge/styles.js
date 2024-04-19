@@ -89,23 +89,28 @@ const useStyles = makeStyles(theme => ({
     minHeight: 280,
     justifyContent: "flex-end",
     alignItems: "center",
-    backgroundColor: "#ffffff10",
     borderRadius: 12,
     margin: 5,
-    overflow:'hidden'
+    overflow:'hidden',
+    position:'relative'
   },
   list_title: {
-    ...fontGroup.sf700,
-    fontSize: FontSizes.S16,
+    ...fontGroup.ns800,
+    fontSize: FontSizes.S26,
     color: theme.colors.white,
     marginTop:5,
-    textAlign:'center'
   },
-  s_list_title: {
-    ...fontGroup.sf500,
+  s_list_count: {
+    ...fontGroup.ns700,
+    fontSize: FontSizes.S14,
+    color: theme.colors.white,
+    alignItems:'center',
+    textAlign:'center',
+  },
+  s_list_text: {
+    ...fontGroup.ns400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    marginTop:5,
     alignItems:'center',
     textAlign:'center'
   },
