@@ -14,6 +14,9 @@ import BellIcon from "../../../assets/geoar/bell.svg"
 import LocationIcon from "../../../assets/geoar/location.png"
 import BackImg from "../../../assets/geoar/back_img.png"
 import ArIcon from "../../../assets/geoar/aricon.svg"
+import PinIcon from "../../../assets/geoar/pinicon.svg"
+import SitesIcon from "../../../assets/geoar/sites.svg"
+import Map from "../../../assets/geoar/map.png"
 import { updateARUserData, updateARSettings } from "../../../redux/AR"
 
 import { useDispatch, useSelector } from "react-redux"
@@ -40,6 +43,38 @@ const GeoArChallengeDetails = ({
         }} backgroundColor="transparent" />
 
       {isLoading && <ActivityIndicator size="large" />}
+      <View style={_styles.rowView}>
+        <TouchableOpacity activeOpacity={.5} style={_styles.selectButtonStyle}>
+          <Text style={_styles.buttonSelectText}>Full</Text>
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
+          <Text style={_styles.buttonSelectText}>Diego Martin Region</Text>
+        </TouchableOpacity>
+      </View>
+      <View>
+        <Image source={Map} />
+      </View>
+      <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20 }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <SiteIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>18+</Text>
+              <Text style={_styles.s_list_text}>Sites</Text>
+            </View>
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 22, marginEnd: 10 }}>
+              <SitesIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>8+</Text>
+              <Text style={_styles.s_list_text}>Star Sites</Text>
+            </View><View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 22, marginEnd: 10 }}>
+              <StarSiteIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>100+</Text>
+              <Text style={_styles.s_list_text}>Hidden Sites</Text>
+            </View>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <ArIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>64+</Text>
+              <Text style={_styles.s_list_text}>AR Challenges</Text>
+            </View>
+          </View>
     </BackgroundWithImage >
   )
 }
