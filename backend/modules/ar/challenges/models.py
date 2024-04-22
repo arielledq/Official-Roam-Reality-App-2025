@@ -229,3 +229,25 @@ class GeoArSite(models.Model):
 
     def __str__(self):
         return self.name
+
+class GeoARStar(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    star_location = gis_models.PointField(_("Star Location"), blank=True, null=True)
+    fun_facts = RichTextField(_("Description"), blank=True, null=True)
+    visibility_radius = models.IntegerField(verbose_name="Challenge Points", default=0)
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_arstar_ar_site",
+    )
+    class Meta:
+      verbose_name_plural = "Geo AR Star"
+      verbose_name = "Geo AR Star"
+
+    def __str__(self):
+        return self.name
