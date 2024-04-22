@@ -18,7 +18,8 @@ const useStyles = makeStyles(theme => ({
   },
   mainContainer: {
     flex: 1,
-    paddingHorizontal: screenHorizontalPadding
+    paddingHorizontal: screenHorizontalPadding,
+    justifyContent:'flex-start'
   },
   container: { marginTop: "10%" },
   headerText: {
@@ -44,11 +45,7 @@ const useStyles = makeStyles(theme => ({
     marginTop: 5,
   },
   rowView: { 
-    width: '100%',
-    flexDirection: 'row', 
-    justifyContent: 'center', 
-    alignItems: 'center',
-    marginVertical:10
+    flexDirection: 'row',
   },
   buttonSelectText: {
     fontSize: FontSizes.S14,
@@ -62,11 +59,11 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 2,
     borderWidth: 1,
     height: 37,
-    flex: .5,
     justifyContent: 'center',
     alignItems: 'center',
     marginEnd: 2,
-    marginStart: 2
+    marginStart: 2,
+    paddingHorizontal:8
   },
   unSelectButtonStyle:
   {
@@ -75,11 +72,11 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 2,
     borderWidth: 1,
     height: 37,
-    flex: .5,
     justifyContent: 'center',
     alignItems: 'center',
     marginStart: 2,
     marginEnd: 2,
+    paddingHorizontal:8
   },
   //Flat Item
   containerView: {
