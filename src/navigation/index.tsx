@@ -33,6 +33,7 @@ import AnimatedSplash from '../screens/animatedSplash';
 import ContactUs from '../screens/ContactUs/ContactUs'
 import FAQ from '../screens/FAQ/FAQ';
 import GeoArChallenge from '../screens/geoarchallenge';
+import GeoArChallengeDetails from '../screens/geoarchallenge/destinationdetails';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -92,6 +93,7 @@ const Navigation = () => {
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
         <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
+        <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />

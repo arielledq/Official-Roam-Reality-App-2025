@@ -1,6 +1,6 @@
 import { makeStyles } from "@rneui/themed"
-import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import { screenHorizontalPadding } from "../../../util/AppDimensions"
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
 
 /**
  *  Using makeStyles to set colors with theme.
