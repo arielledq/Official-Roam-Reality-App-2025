@@ -4,7 +4,7 @@
   <queries>
     <package android:name="com.google.ar.core" />
   </queries>
-  
+
   <uses-sdk tools:overrideLibrary="com.viromedia.virobridge, com.viro.renderer, com.viro.core" />
 
   <uses-permission android:name="android.permission.CAMERA" />
@@ -82,6 +82,9 @@
         android:name="android.support.FILE_PROVIDER_PATHS"
         android:resource="@xml/file_provider_paths" />
     </provider>
+    <meta-data
+      android:name="com.google.android.geo.API_KEY"
+      android:value="AIzaSyBVhUGaATctpInzIonfKOK74HyA7o0uUdQ" />
   </application>
 
   <queries>
@@ -91,5 +94,4 @@
       <action android:name="android.intent.action.MAIN" />
     </intent>
   </queries>
-
 </manifest>
