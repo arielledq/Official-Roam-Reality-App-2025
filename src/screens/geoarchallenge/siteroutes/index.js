@@ -58,7 +58,7 @@ const GeoArSiteRoutes = ({
           </TouchableOpacity>
         </View>
 
-        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 30 }}>
+        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CarIcon style={{ width: 32, height: 32 }} />
             <View style={{ marginHorizontal: 20, justifyContent: 'flex-start' }}>
@@ -85,7 +85,7 @@ const GeoArSiteRoutes = ({
             />
           </View>
         </View>
-        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 30 }}>
+        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CarIcon style={{ width: 32, height: 32 }} />
             <View style={{ marginHorizontal: 20, justifyContent: 'flex-start' }}>
