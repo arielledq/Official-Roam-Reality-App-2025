@@ -26,6 +26,7 @@ import ProTipIcon from "../../../assets/geoar/pro-tip.svg"
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { height, width } from "../../../util/AppDimensions";
+import { AppButton } from "../../../components";
 
 
 const GeoArSiteDetails = ({
@@ -73,12 +74,12 @@ const GeoArSiteDetails = ({
         </View>
 
         <View style={{ flexDirection: 'row', paddingVertical: 20, justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text style={_styles.site_d_text}>Site Details</Text>
+          <Text style={_styles.site_d_header_text}>Site Details</Text>
           <TouchableOpacity>
             <CloseBIcon style={{ height: 32, width: 32 }} />
           </TouchableOpacity>
         </View>
-        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20,marginBottom:30 }}>
+        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 30 }}>
           <Image source={PlaceholderImg} />
           <Text style={_styles.site_d_header}>Arima</Text>
           <Text style={_styles.site_d_text}>De Best Laundromat, 59 Tunapuna Rd, Tunapuna, Trinidad & Tobago</Text>
@@ -104,12 +105,19 @@ const GeoArSiteDetails = ({
             </View>
           </View>
           <Text style={_styles.site_d_text}>Tunapuna, a town in northern Trinidad, is known for its rich cultural heritage, bustling markets, and mix of traditional and modern amenities. The Tunapuna Market offers fresh produce, local crafts, and street food. It's also home to historical landmarks and cultural sites such as the Tunapuna Hindu Temple and Cemetery. For nature lovers, Tunapuna is a gateway to nearby attractions such as the Caroni Swamp and Asa Wright Nature Centre.</Text>
-          <View style={{justifyContent:'space-between',flexDirection:'row',alignItems:'center'}}>
-            <View style={{justifyContent:'center',flexDirection:'row',alignItems:'center'}}>
+          <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
+            <View style={{ justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}>
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
               <Text style={_styles.protip_text}>Pro Tips</Text>
             </View>
-            <View></View>
+            <View>
+              <AppButton
+                buttonStyle={_styles.buttonStyle}
+                containerStyle={_styles.buttonContainerStyle}
+                title={"Lets Roam"}
+                loading={isLoading}
+              />
+            </View>
           </View>
         </View>
       </ScrollView>
