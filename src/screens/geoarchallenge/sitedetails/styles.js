@@ -116,7 +116,7 @@ const useStyles = makeStyles(theme => ({
     position:'absolute',
     top:0,bottom:0,left:0,right:0
   },
-  site_d_text: {
+  site_d_header_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
