@@ -35,6 +35,7 @@ import FAQ from '../screens/FAQ/FAQ';
 import GeoArChallenge from '../screens/geoarchallenge';
 import GeoArChallengeDetails from '../screens/geoarchallenge/destinationdetails';
 import GeoArSiteDetails from '../screens/geoarchallenge/sitedetails';
+import GeoArSiteRoutes from '../screens/geoarchallenge/siteroutes';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -96,6 +97,7 @@ const Navigation = () => {
         <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
         <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
         <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
+        <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />

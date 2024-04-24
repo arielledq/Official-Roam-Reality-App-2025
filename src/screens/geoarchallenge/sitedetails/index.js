@@ -35,6 +35,7 @@ const GeoArSiteDetails = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
 
 
   return (
@@ -48,20 +49,7 @@ const GeoArSiteDetails = ({
 
       {isLoading && <ActivityIndicator size="large" />}
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View style={{ marginVertical: 20 }}>
-          <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} style={{ width: '100%', height: 50 }} contentContainerStyle={_styles.rowView}>
-            <TouchableOpacity activeOpacity={.5} style={_styles.selectButtonStyle}>
-              <Text style={_styles.buttonSelectText}>Full</Text>
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
-              <Text style={_styles.buttonSelectText}>Diego Martin Region</Text>
-            </TouchableOpacity>
-            <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
-              <Text style={_styles.buttonSelectText}>San Juan-Laventille Region</Text>
-            </TouchableOpacity>
-          </ScrollView>
-        </View>
-        <View style={{ width: '100%', position: 'relative', height: 160, borderRadius: 16, overflow: 'hidden' }}>
+        <View style={{ width: '100%', position: 'relative', height: 160, borderRadius: 16,marginVertical: 15, overflow: 'hidden' }}>
           <MapView
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             initialRegion={{
@@ -112,6 +100,7 @@ const GeoArSiteDetails = ({
             </View>
             <View>
               <AppButton
+                onPress={()=>navigation.navigate("GeoArSiteRoutes")}
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
                 title={"Lets Roam"}
