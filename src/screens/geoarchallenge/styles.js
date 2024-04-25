@@ -9,7 +9,7 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/Fo
 
 const useStyles = makeStyles(theme => ({
   heading: {
-    fontSize: FontSizes.S14,
+    fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.ns700,
     color: theme.colors.white,

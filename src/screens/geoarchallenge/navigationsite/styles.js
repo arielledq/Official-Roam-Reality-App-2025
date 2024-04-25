@@ -20,6 +20,7 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,
     justifyContent:'flex-start',
+    alignItems:'center'
 
   },
   container: { marginTop: "10%" },
@@ -166,7 +167,7 @@ const useStyles = makeStyles(theme => ({
   },
   site_distance_time_value_text: {
     ...fontGroup.ns400,
-    fontSize: FontSizes.S14,
+    fontSize: FontSizes.S20,
     color: '#C881F0',
     marginHorizontal:8
   },
