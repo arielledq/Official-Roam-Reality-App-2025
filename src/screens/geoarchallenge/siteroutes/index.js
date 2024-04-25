@@ -26,6 +26,7 @@ const GeoArSiteRoutes = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
 
 
   return (
@@ -33,7 +34,7 @@ const GeoArSiteRoutes = ({
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Trinidad",
+          text: "Arima",
           style: [_styles.heading],
         }} backgroundColor="transparent" />
 
@@ -78,6 +79,7 @@ const GeoArSiteRoutes = ({
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
+              onPress={()=>navigation.navigate("GeoArSiteNavigation")}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
               title={"Navigate"}
@@ -105,6 +107,7 @@ const GeoArSiteRoutes = ({
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
+              onPress={()=>navigation.navigate("GeoArSiteNavigation")}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
               title={"Navigate"}
