@@ -236,7 +236,8 @@ class GeoARStar(models.Model):
     )
     star_location = gis_models.PointField(_("Star Location"), blank=True, null=True)
     fun_facts = RichTextField(_("Description"), blank=True, null=True)
-    visibility_radius = models.IntegerField(verbose_name="Challenge Points", default=0)
+    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=0)
+    points = models.IntegerField(verbose_name="Challenge Points", default=0)
     geo_site = models.ForeignKey(
         GeoArSite,
         on_delete=models.CASCADE,

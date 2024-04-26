@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField
 
@@ -38,3 +38,5 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
 
 admin.site.register(GeoLocation, GeoArChallengeAdmin)
 admin.site.register(GeoArSite, GeoArChallengeAdmin)
+admin.site.register(GeoARStar, GeoArChallengeAdmin)
+
