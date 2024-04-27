@@ -20,8 +20,6 @@ RUN apt update
 RUN apt-get install -y software-properties-common 
 RUN add-apt-repository ppa:ubuntugis/ppa
 RUN apt install -y libpq-dev gdal-bin libgdal-dev
-RUN apt install -y postgis 
-RUN apt install -y postgresql-postgis
 
 USER django
 
