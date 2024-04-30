@@ -5,9 +5,11 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>travel-ar-app-42706</string>
+	<string>Roam Reality</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleGetInfoString</key>
+	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -20,8 +22,60 @@
 	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
+    <dict>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>aw5g4n448236v4uh</string>
+        </array>
+      </dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.220585435352-6rs34650r35gm2m5i9a7n1rpl4t6jkog</string>
+				<string>fb1425164828425408</string>
+				<string>awx8jb1brvngfo5m</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAppID</key>
+	<string>1425164828425408</string>
+	<key>FacebookClientToken</key>
+	<string>9bb1d62e7fa4072498828e188eb87c02</string>
+	<key>FacebookDisplayName</key>
+	<string>Roam Reality</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+    <string>fb</string>
+    <string>tiktok</string>
+    <string>facebook-stories</string>
+		<string>fbapi</string>
+		<string>fb-messenger-share-api</string>
+		<string>fbauth2</string>
+		<string>fbshareextension</string>
+		<string>tel</string>
+		<string>telprompt</string>
+		<string>https</string>
+		<string>http</string>
+		<string>mailto</string>
+    <string>tiktokopensdk</string>
+    <string>tiktoksharesdk</string>
+    <string>snssdk1180</string>
+    <string>snssdk1233</string>
+    <string>instagram</string>
+    <string>instagram-stories</string>
+	</array>
+  <key>TikTokAppID</key>
+  <string>aw5g4n448236v4uh</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -35,10 +89,69 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Access to the camera is required to take the picture or record video.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string></string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Access to the microphone is required to record a video.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Access to save videos/photos to camera roll.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Access to the photo library is required to select a photo.</string>
+	<key>TikTokAppID</key>
+	<string>awx8jb1brvngfo5m</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>AntDesign.ttf</string>
+		<string>Entypo.ttf</string>
+		<string>EvilIcons.ttf</string>
+		<string>Feather.ttf</string>
+		<string>FontAwesome.ttf</string>
+		<string>FontAwesome5_Brands.ttf</string>
+		<string>FontAwesome5_Regular.ttf</string>
+		<string>FontAwesome5_Solid.ttf</string>
+		<string>Foundation.ttf</string>
+		<string>Ionicons.ttf</string>
+		<string>MaterialIcons.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+		<string>SimpleLineIcons.ttf</string>
+		<string>Octicons.ttf</string>
+		<string>Zocial.ttf</string>
+		<string>Fontisto.ttf</string>
+		<string>sf-ui-display-black.otf</string>
+		<string>sf-ui-display-bold.otf</string>
+		<string>sf-ui-display-light.otf</string>
+		<string>sf-ui-display-medium.otf</string>
+		<string>sf-ui-display-semibold.otf</string>
+		<string>sf-ui-display-thin.otf</string>
+		<string>sf-ui-display-ultralight.otf</string>
+		<string>NunitoSans_10pt-Black.ttf</string>
+		<string>NunitoSans_10pt-Bold.ttf</string>
+		<string>NunitoSans_10pt-ExtraBold.ttf</string>
+		<string>NunitoSans_10pt-ExtraLight.ttf</string>
+		<string>NunitoSans_10pt-Light.ttf</string>
+		<string>NunitoSans_10pt-Medium.ttf</string>
+		<string>NunitoSans_10pt-Regular.ttf</string>
+		<string>NunitoSans_10pt-SemiBold.ttf</string>
+		<string>Poppins-Black.ttf</string>
+		<string>Poppins-Bold.ttf</string>
+		<string>Poppins-ExtraBold.ttf</string>
+		<string>Poppins-ExtraLight.ttf</string>
+		<string>Poppins-Light.ttf</string>
+		<string>Poppins-Medium.ttf</string>
+		<string>Poppins-Regular.ttf</string>
+		<string>Poppins-SemiBold.ttf</string>
+		<string>Poppins-Thin.ttf</string>
+		<string>sf-ui-display-regular.ttf</string>
+	</array>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>UILaunchStoryboardName</key>
-	<string>LaunchScreen</string>
+	<string></string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -46,9 +159,9 @@
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>UIUserInterfaceStyle</key>
+	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 </dict>
