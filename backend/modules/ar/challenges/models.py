@@ -30,6 +30,23 @@ AR_MEMORY_CHOICES = (
     ("VIDEO", "VIDEO"),
 )
 
+class GeoLocation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Geo Destination"
+        verbose_name = "Geo Destination"
+
+    def __str__(self):
+        return self.name
+
 class Sponsor(models.Model):
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
     image = models.ImageField(
@@ -71,6 +88,14 @@ class Challenges(models.Model):
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_location_ar_challenge",
+    )
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -188,22 +213,6 @@ class ARExample(models.Model):
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
 
-class GeoLocation(models.Model):
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-    name = models.CharField(
-        _("Name"), default=None, null=False, blank=False, max_length=255
-    )
-    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
-    geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
-    description = RichTextField(_("Description"), blank=True, null=True)
-
-    class Meta:
-        verbose_name_plural = "Geo Location"
-        verbose_name = "Geo Location"
-
-    def __str__(self):
-        return self.name
 
 class GeoArSite(models.Model):
     name = models.CharField(
@@ -211,7 +220,6 @@ class GeoArSite(models.Model):
     )
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    description = RichTextField(_("Description"), blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
     geo_location = models.ForeignKey(
         GeoLocation,
@@ -221,7 +229,12 @@ class GeoArSite(models.Model):
         blank=False,
         related_name="geo_location_ar_site",
     )
+    lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
     geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+    pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
+    specific_tips = RichTextField(_("Specific Tips"), blank=True, null=True)
+    list_of_tips = RichTextField(_("List of Tips"), blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
@@ -249,6 +262,26 @@ class GeoARStar(models.Model):
     class Meta:
       verbose_name_plural = "Geo AR Star"
       verbose_name = "Geo AR Star"
+
+    def __str__(self):
+        return self.name
+
+class GeoARSpecificSiteRoute(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_route_ar_site",
+    )
+    route = gis_models.MultiPolygonField(_("Geo Site Route"), blank=True, null=True)
+    class Meta:
+      verbose_name_plural = "Geo AR Specific Routes"
+      verbose_name = "Geo AR Specific Routes"
 
     def __str__(self):
         return self.name
