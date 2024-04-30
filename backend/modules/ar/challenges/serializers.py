@@ -1,4 +1,4 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample, GeoLocation, GeoArSite
 from rest_framework import serializers
 
 
@@ -103,3 +103,20 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
+class GeoLocationSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+
+    class Meta:
+        model = GeoLocation
+        fields = (
+            "__all__"
+        )
+
+class GeoArSiteSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+
+    class Meta:
+        model = GeoArSite
+        fields = (
+            "__all__"
+        )

@@ -1,5 +1,7 @@
 from django.contrib import admin
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,GeoARSpecificSiteRoute
+from .widgets import GoogleMapsOpenLayersWidget
+from django.contrib.gis.db.models import MultiPolygonField, PointField
 
 class ARMemoriesAdmin(admin.ModelAdmin):
     
@@ -34,3 +36,17 @@ admin.site.register(ARUserProfile, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
 admin.site.register(ARExample, ARChallengeAdmin)
+
+class GeoArChallengeAdmin(admin.ModelAdmin):
+    formfield_overrides = {
+        MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
+        PointField: {"widget": GoogleMapsOpenLayersWidget},
+    }
+    pass
+
+
+admin.site.register(GeoLocation, GeoArChallengeAdmin)
+admin.site.register(GeoArSite, GeoArChallengeAdmin)
+admin.site.register(GeoARStar, GeoArChallengeAdmin)
+admin.site.register(GeoARSpecificSiteRoute, GeoArChallengeAdmin)
+

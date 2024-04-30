@@ -5,11 +5,8 @@ COPY ./Pipfile ./Pipfile.lock /
 COPY ./modules/ /modules/
 RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
 
-
 FROM crowdbotics/cb-django:3.8-slim-buster AS release
 ARG SECRET_KEY
-
-# RUN apt-get update && apt-get install -y ffmpeg
 
 # Set Working directory
 WORKDIR /opt/webapp
@@ -18,6 +15,12 @@ WORKDIR /opt/webapp
 RUN groupadd -r django \
   && useradd -d /opt/webapp -r -g django django \
   && chown django:django -R /opt/webapp
+
+RUN apt update
+RUN apt-get install -y software-properties-common 
+RUN add-apt-repository ppa:ubuntugis/ppa
+RUN apt install -y libpq-dev gdal-bin libgdal-dev
+
 USER django
 
 # Copy virtual env from build stage
@@ -26,7 +29,6 @@ ENV PATH="/.venv/bin:$PATH"
 
 # Copy app source
 COPY --chown=django:django . .
-
 RUN pip install ffmpeg-downloader
 RUN ffdl install -y
 # Collect static files and serve app
