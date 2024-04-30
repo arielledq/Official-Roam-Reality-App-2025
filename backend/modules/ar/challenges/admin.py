@@ -20,7 +20,7 @@ class ARChallengeAdmin(admin.ModelAdmin):
 
 @admin.register(Challenges)
 class ARChallengeUpdatedAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sponsor_name', 'expiry_date')
+    list_display = ('name', 'sponsor', 'expiry_date')
     list_select_related = ['sponsor']
     ordering = ("sponsor__name",)
     search_fields = ["name", "sponsor__name"]
