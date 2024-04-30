@@ -2,6 +2,10 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
+from home.constants import Gender
+from core.utils import get_file_path
+
+from home.common import CommonModel
 
 
 class User(AbstractUser):
@@ -24,3 +28,48 @@ class User(AbstractUser):
 
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
+    
+    def __str__(self):
+        return self.email
+    
+    
+class UserProfile(CommonModel):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE,related_name='user_profile'
+    )
+    is_verified = models.BooleanField(
+        default=False
+    )
+    image = models.ImageField(
+        upload_to=get_file_path,
+        null=True, blank=True
+    )
+    gender = models.PositiveSmallIntegerField(choices=Gender.GENDER_CHOICES, blank=True, null=True)
+    home_address = models.CharField(max_length=255, blank=True, null=True)
+    home_country = models.CharField(max_length=255, blank=True, null=True)
+    date_of_birth = models.DateField(blank=True, null=True)
+    country_code = models.CharField(max_length=5, blank=True, null=True)
+    phone_number = models.CharField(max_length=15, blank=True, null=True)
+    account_setup = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.email
+
+
+class UserOtp(CommonModel):
+    email = models.EmailField(_('email address'))
+    otp = models.CharField(max_length=4)
+
+    def __str__(self) -> str:
+        return str(self.email)
+
+
+class EmailTokenVerification(CommonModel):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    token = models.CharField(max_length=50)
+
+    def __str__(self) -> str:
+        return self.user.email
+
+class PasswordReset(EmailTokenVerification):
+    pass
