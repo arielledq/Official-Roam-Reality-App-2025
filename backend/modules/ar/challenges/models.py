@@ -13,7 +13,7 @@ CHALLENGE_CHOICES = (
 )
 
 CHALLENGE_APPROVAL_CHOICES = (
-    ("UNAPPROVED", "UNAPPROVED"),
+    ("UNAPPROVED", "APPROVED BUT NOT REVIEWED"),
     ("APPROVED", "APPROVED"),
     ("DECLINED", "DECLINED"),
 )
@@ -50,7 +50,7 @@ class Challenges(models.Model):
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     name = models.CharField(
-        _("Name"), default=None, null=False, blank=False, max_length=255
+        _("Challenge Name"), default=None, null=False, blank=False, max_length=255
     )
     sponsor = models.ForeignKey(
         Sponsor,
