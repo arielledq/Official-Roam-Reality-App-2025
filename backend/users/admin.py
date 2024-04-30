@@ -21,18 +21,22 @@ class UserAdmin(auth_admin.UserAdmin):
     def system_generated_user_name(self, obj):
         return obj.username
 
-admin.site.register(UserOtp)
-
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = ["user_id", "user_name", "user_email", "is_verified"]
     search_fields = ["user__id", "user__name", "user__email"]
     list_display_links = ("user_id", "user_name",)
     list_filter = ("is_verified",)
-
+    ordering = ("user__name",)
 
     def user_name(self, obj):
         return obj.user.name
 
     def user_email(self, obj):
         return obj.user.email
+
+@admin.register(UserOtp)
+class UserOTP(admin.ModelAdmin):
+    list_display = ["email", "otp"]
+    search_fields = ["email", "otp"]
+    list_display_links = ["email", "otp"]
