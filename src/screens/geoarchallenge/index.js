@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
-import { getARChallenges, getARProfile, getARStettings } from '../../network'
+import { getGeoARDestinations, getARProfile, getARStettings } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -28,18 +28,15 @@ const GeoArChallenge = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
-  const [challengeChoice, setChallengeChoice] = useState("SPONSORED")
-  const [sponsoredDataAll, setSponsoredDataAll] = useState([])
-  const [sponsoredData, setSponsoredData] = useState([])
-  const arProfile = useSelector(state => state.ar?.arProfile)
+  const [destinationData, setDestinationData] = useState([])
   const navigation = useNavigation()
 
   const ARSposored = () => {
     setIsLoading(true)
-    getARChallenges().then((res) => {
+    getGeoARDestinations().then((res) => {
+      console.log(res.data)
       if (res.status == 1) {
-        setSponsoredDataAll(res.data)
-        setSponsoredData(res.data.filter(x => x.challenge_choice == challengeChoice))
+        setDestinationData(res.data)
       } else {
         res.message.message = "Error in loading Challenges."
         handleError(res)
@@ -74,11 +71,6 @@ const GeoArChallenge = ({
     })
   }
 
-  const setDataWithChoice = (choice) => {
-    setChallengeChoice(choice);
-    const filteredArray = sponsoredDataAll.filter(x => x.challenge_choice == choice)
-    setSponsoredData(filteredArray.slice())
-  }
 
   useEffect(() => {
     ARSposored()
@@ -91,9 +83,9 @@ const GeoArChallenge = ({
   }
 
   const Item = ({ obj }) => (
-    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{width:'100%'}}>
+    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{ width: '100%' }}>
       <ImageBackground style={_styles.containerView} resizeMode="cover" source={BackImg}>
-        <Image source={GradientDownPNG} resizeMode="cover" style={{ position: 'absolute', bottom: 0, left:0, right: 0, top: 0,width:'110%' }} />
+        <Image source={GradientDownPNG} resizeMode="cover" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, width: '110%' }} />
         <View style={{ width: '100%', marginBottom: 10 }}>
           <Text style={_styles.list_title}>Trinidad</Text>
           <View style={{ flexDirection: 'row', justifyContent: "flex-start", width: '100%', alignItems: "flex-start", marginTop: 20 }}>
@@ -122,6 +114,7 @@ const GeoArChallenge = ({
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
+        rightComponent={<BellIcon />}
         centerComponent={{
           text: "AR Experiences",
           style: [_styles.heading],
@@ -130,7 +123,7 @@ const GeoArChallenge = ({
       {isLoading && <ActivityIndicator size="large" />}
       <FlatList
         style={{ flex: 1, marginVertical: 15 }}
-        data={sponsoredData}
+        data={destinationData}
         numColumns={1}
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}

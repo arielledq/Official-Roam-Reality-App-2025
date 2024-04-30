@@ -185,3 +185,9 @@ export const getARStettings = () =>
     url: `/modules/challenges/settings/`,
     method: 'GET'
   })
+
+export const getGeoARDestinations = () =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-location/`,
+    method: 'GET'
+  })
