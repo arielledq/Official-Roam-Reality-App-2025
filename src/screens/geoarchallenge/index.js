@@ -20,6 +20,7 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import LinearGradient from "react-native-linear-gradient";
 import { height, width } from "../../util/AppDimensions";
+import { MenuIcon } from "../../assets/svg"
 
 
 const GeoArChallenge = ({
@@ -79,12 +80,12 @@ const GeoArChallenge = ({
   }, []);
 
   const navigateToChallengeDetails = (obj) => {
-    navigation.navigate("GeoArChallengeDetails", { challengeObj: obj });
+    navigation.navigate("GeoArOutdoor", { challengeObj: obj });
   }
 
   const Item = ({ obj }) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{ width: '100%' }}>
-      <ImageBackground style={_styles.containerView} resizeMode="cover" source={{uri:obj.image}}>
+      <ImageBackground style={_styles.containerView} resizeMode="cover" source={{ uri: obj.image }}>
         <Image source={GradientDownPNG} resizeMode="cover" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, width: '110%' }} />
         <View style={{ width: '100%', marginBottom: 10 }}>
           <Text style={_styles.list_title}>{obj.name}</Text>
@@ -109,12 +110,23 @@ const GeoArChallenge = ({
       </ImageBackground>
     </TouchableOpacity>
   );
+  const handleMenuButton = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
+        style={{ paddingLeft: 5 }}
+      >
+        <MenuIcon />
+      </TouchableOpacity>
+    )
+  }
 
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         rightComponent={<BellIcon />}
+        leftComponent={handleMenuButton()}
         centerComponent={{
           text: "AR Experiences",
           style: [_styles.heading],
