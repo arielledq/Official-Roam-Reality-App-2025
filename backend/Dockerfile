@@ -16,13 +16,11 @@ RUN groupadd -r django \
   && useradd -d /opt/webapp -r -g django django \
   && chown django:django -R /opt/webapp
 
+USER django
 RUN apt update
 RUN apt-get install -y software-properties-common 
 RUN add-apt-repository ppa:ubuntugis/ppa
 RUN apt install -y libpq-dev gdal-bin libgdal-dev
-
-USER django
-
 # Copy virtual env from build stage
 COPY --chown=django:django --from=build /.venv /.venv
 ENV PATH="/.venv/bin:$PATH"
