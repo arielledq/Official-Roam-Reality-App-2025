@@ -84,10 +84,10 @@ const GeoArChallenge = ({
 
   const Item = ({ obj }) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{ width: '100%' }}>
-      <ImageBackground style={_styles.containerView} resizeMode="cover" source={BackImg}>
+      <ImageBackground style={_styles.containerView} resizeMode="cover" source={{uri:obj.image}}>
         <Image source={GradientDownPNG} resizeMode="cover" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, width: '110%' }} />
         <View style={{ width: '100%', marginBottom: 10 }}>
-          <Text style={_styles.list_title}>Trinidad</Text>
+          <Text style={_styles.list_title}>{obj.name}</Text>
           <View style={{ flexDirection: 'row', justifyContent: "flex-start", width: '100%', alignItems: "flex-start", marginTop: 20 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
