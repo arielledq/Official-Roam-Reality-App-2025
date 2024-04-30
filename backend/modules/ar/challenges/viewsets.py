@@ -1,7 +1,9 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample, \
+GeoArSite, GeoLocation
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
-Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer
+Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, \
+GeoLocationSerializer, GeoArSiteSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
@@ -154,3 +156,19 @@ class ChallengesUploadView(APIView):
           return Response(challenges_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       except Exception as e:
         return Response(e.args[0], status=status.HTTP_400_BAD_REQUEST)
+
+class GeoLocationViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing GeoLocation.
+    """
+    queryset = GeoLocation.objects.all()
+    serializer_class = GeoLocationSerializer
+    http_method_names = ["get"]
+
+class GeoArSiteViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing GeoArSite.
+    """
+    queryset = GeoArSite.objects.all()
+    serializer_class = GeoArSiteSerializer
+    http_method_names = ["get"]

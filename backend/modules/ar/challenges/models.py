@@ -4,6 +4,7 @@ from django.utils.translation import gettext_lazy as _
 from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
+from django.contrib.gis.db import models as gis_models
 
 User = get_user_model()
 
@@ -28,6 +29,23 @@ AR_MEMORY_CHOICES = (
     ("PHOTO", "PHOTO"),
     ("VIDEO", "VIDEO"),
 )
+
+class GeoLocation(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Geo Destination"
+        verbose_name = "Geo Destination"
+
+    def __str__(self):
+        return self.name
 
 class Sponsor(models.Model):
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
@@ -70,6 +88,14 @@ class Challenges(models.Model):
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_location_ar_challenge",
+    )
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -170,23 +196,14 @@ class ARMemories(models.Model):
 
 class ARSettings(models.Model):
     class Meta:
-        verbose_name_plural = "AR Legals and Settings"
-        verbose_name = "AR Legals and Settings"
+        verbose_name_plural = "AR Settings"
 
-    name = models.CharField(_("Name"), blank=True, null=True, max_length=255,default="Default")
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
-    
-    def __str__(self):
-        return str(
-            self.name
-        )
 
 class ARExample(models.Model):
     class Meta:
         verbose_name_plural = "AR Example"
-    challenge = models.OneToOneField(
-        Challenges, on_delete=models.CASCADE, related_name="ar_example_challenge", blank=True, null=True
-    )
+
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
     image = models.ImageField(
         upload_to="ar/example/",
@@ -195,3 +212,76 @@ class ARExample(models.Model):
     )
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
+
+
+class GeoArSite(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_location_ar_site",
+    )
+    lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
+    geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
+    description = RichTextField(_("Description"), blank=True, null=True)
+    pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
+    specific_tips = RichTextField(_("Specific Tips"), blank=True, null=True)
+    list_of_tips = RichTextField(_("List of Tips"), blank=True, null=True)
+
+    class Meta:
+        verbose_name_plural = "Geo AR Site"
+        verbose_name = "Geo AR Site"
+
+    def __str__(self):
+        return self.name
+
+class GeoARStar(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    star_location = gis_models.PointField(_("Star Location"), blank=True, null=True)
+    fun_facts = RichTextField(_("Description"), blank=True, null=True)
+    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=0)
+    points = models.IntegerField(verbose_name="Challenge Points", default=0)
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_arstar_ar_site",
+    )
+    class Meta:
+      verbose_name_plural = "Geo AR Star"
+      verbose_name = "Geo AR Star"
+
+    def __str__(self):
+        return self.name
+
+class GeoARSpecificSiteRoute(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_route_ar_site",
+    )
+    route = gis_models.MultiPolygonField(_("Geo Site Route"), blank=True, null=True)
+    class Meta:
+      verbose_name_plural = "Geo AR Specific Routes"
+      verbose_name = "Geo AR Specific Routes"
+
+    def __str__(self):
+        return self.name
