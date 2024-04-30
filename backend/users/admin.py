@@ -29,7 +29,7 @@ class UserProfileAdmin(admin.ModelAdmin):
     search_fields = ["user__id", "user__name", "user__email"]
     list_display_links = ("user_id", "user_name",)
     list_filter = ("is_verified",)
-
+    ordering = ("user__name",)
 
     def user_name(self, obj):
         return obj.user.name
