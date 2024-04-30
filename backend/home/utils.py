@@ -88,6 +88,17 @@ class SendgridClient(object):
             email_obj.send()
 
 
+    def send_email(self, email, message, subject):
+        if email:
+            subject = subject
+            email_obj = EmailMessage(
+                subject=subject, body=message, to=[email]
+            )
+            email_obj.send()
+        else:
+            raise Exception("Email not provided")
+
+
 class EmailOTP:
     
     @classmethod
@@ -105,6 +116,10 @@ class EmailOTP:
     @classmethod
     def send_reset_link(cls, *args):
         SendgridClient().send_reset_link(*args)
+
+    @classmethod
+    def send_email(cls, *args):
+        SendgridClient().send_email(*args)
 
 
 def handle_validation_error(e):
