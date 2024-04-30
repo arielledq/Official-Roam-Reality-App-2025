@@ -20,9 +20,18 @@ class ARMemoriesAdmin(admin.ModelAdmin):
 class ARChallengeAdmin(admin.ModelAdmin):
     pass
 
+@admin.register(Challenges)
+class ARChallengeUpdatedAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sponsor', 'expiry_date')
+    list_select_related = ['sponsor']
+    ordering = ("sponsor__name",)
+    search_fields = ["name", "sponsor__name"]
+
+    def sponsor_name(self, obj):
+        return obj.sponsor.name
+    
 
 admin.site.register(Sponsor, ARChallengeAdmin)
-admin.site.register(Challenges, ARChallengeAdmin)
 admin.site.register(ARUserProfile, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
