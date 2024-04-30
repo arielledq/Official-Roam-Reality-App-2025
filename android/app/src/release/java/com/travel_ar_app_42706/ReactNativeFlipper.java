@@ -4,7 +4,7 @@
  * <p>This source code is licensed under the MIT license found in the LICENSE file in the root
  * directory of this source tree.
  */
-package com.travel_ar_app_42706;
+package com.roam_reality;
 
 import android.content.Context;
 import com.facebook.react.ReactInstanceManager;

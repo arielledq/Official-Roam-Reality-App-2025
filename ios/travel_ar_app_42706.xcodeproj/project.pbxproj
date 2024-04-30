@@ -8,12 +8,57 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* travel_ar_app_42706Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */; };
-		0C80B921A6F3F58F76C31292 /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-travel_ar_app_42706.a */; };
+		02AFF9238C5F465996CE62FB /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */; };
+		0FD2C6B450084C2ABA964DAB /* sf-ui-display-light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		7699B88040F8A987B510C191 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
+		18ECC00FF4674AD1A5278128 /* sf-ui-display-semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = C819029DAEAC4167BAC89AB3 /* sf-ui-display-semibold.otf */; };
+		3235135242414B33812B78CA /* sf-ui-display-black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */; };
+		3900D0AA5E0345C8B41EFBEC /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2FE0364303ED43E4A1DBF5A9 /* Poppins-Medium.ttf */; };
+		3B7B221EF1F84DE3A93B6D08 /* sf-ui-display-medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */; };
+		3D603FCECA2143A7AF9DB4E2 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A53F223FE2914D979DB076EB /* Poppins-SemiBold.ttf */; };
+		475566C6FDC443F49225D0C0 /* NunitoSans_10pt-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E1BB610A5784CC698E44AA8 /* NunitoSans_10pt-SemiBold.ttf */; };
+		7241EFA2F08C408BA847C61D /* sf-ui-display-bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */; };
+		732EB55F52334EFD9593556C /* sf-ui-display-regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */; };
+		733259CF4D604031AF68F7DF /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */; };
+		76EE719B016D4CCDAF7A5327 /* NunitoSans_10pt-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */; };
+		78A5E58FE1EA4917A8853C38 /* NunitoSans_10pt-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */; };
+		7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */; };
+		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
+		7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		8203743F5590401D93CFBA74 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */; };
+		8BD0DA913D325AFF04175913 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
+		8BF9013D26454852A8AAC264 /* sf-ui-display-ultralight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */; };
+		8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */; };
+		8EB858A8C16C48D09686094D /* NunitoSans_10pt-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B399D590B2C9401AA9C9817E /* NunitoSans_10pt-Bold.ttf */; };
+		90AF16932B55A6A6007514E1 /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26452B5039E300872709 /* Fontisto.ttf */; };
+		90AF16942B55A6A6007514E1 /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26462B5039E300872709 /* Octicons.ttf */; };
+		90AF16952B55A6A6007514E1 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26472B5039E300872709 /* Feather.ttf */; };
+		90AF16962B55A6A6007514E1 /* Entypo.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26482B5039E300872709 /* Entypo.ttf */; };
+		90AF16972B55A6A6007514E1 /* FontAwesome5_Brands.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26492B5039E300872709 /* FontAwesome5_Brands.ttf */; };
+		90AF16982B55A6A6007514E1 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF264A2B5039E300872709 /* MaterialCommunityIcons.ttf */; };
+		90AF16992B55A6A6007514E1 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF264B2B5039E300872709 /* AntDesign.ttf */; };
+		90AF169A2B55A6A6007514E1 /* Foundation.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF264C2B5039E300872709 /* Foundation.ttf */; };
+		90AF169B2B55A6A6007514E1 /* Ionicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF264D2B5039E300872709 /* Ionicons.ttf */; };
+		90AF169C2B55A6A6007514E1 /* FontAwesome5_Solid.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */; };
+		90AF169D2B55A6A6007514E1 /* FontAwesome5_Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */; };
+		90AF169E2B55A6A6007514E1 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26502B5039E300872709 /* FontAwesome.ttf */; };
+		90AF169F2B55A6A6007514E1 /* Zocial.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26512B5039E300872709 /* Zocial.ttf */; };
+		90AF16A02B55A6A6007514E1 /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26522B5039E300872709 /* EvilIcons.ttf */; };
+		90AF16A12B55A6A6007514E1 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26532B5039E300872709 /* SimpleLineIcons.ttf */; };
+		90AF16A22B55A6A6007514E1 /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26542B5039E300872709 /* MaterialIcons.ttf */; };
+		99947BFACF2E4C4F9C9C6B9D /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 69828AF7D549444A9FB96C62 /* index.js */; };
+		9CA9F538379E4FD29F9EC5EC /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */; };
+		AA6AFD4BD2404146A54A90D6 /* NunitoSans_10pt-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 70B7CB0E017E451EAB220EA0 /* NunitoSans_10pt-ExtraBold.ttf */; };
+		B45D634D2BC0480EBFA69C7D /* sf-ui-display-thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3020C3A053944525B096A961 /* sf-ui-display-thin.otf */; };
+		B87483F64C2A25E47A261435 /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E15B440137DBEE8140A37FC5 /* libPods-travel_ar_app_42706.a */; };
+		C62A697E5B374603A68AAC5A /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */; };
+		CA66786B9F934F798246E280 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */; };
+		D0BE067D5A634F1EAB11156D /* NunitoSans_10pt-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */; };
+		D861E940FA984C13850C042A /* NunitoSans_10pt-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 162B40CDEEE145B3BC91B877 /* NunitoSans_10pt-ExtraLight.ttf */; };
+		FF3279F34BD54D6B88C7827D /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5217457F90794339A2E07132 /* Poppins-Black.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -30,19 +75,69 @@
 		00E356EE1AD99517003FC87E /* travel_ar_app_42706Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = travel_ar_app_42706Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = travel_ar_app_42706Tests.m; sourceTree = "<group>"; };
-		13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = travel_ar_app_42706.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		035E791890C347CAA200494B /* sf-ui-display-heavy.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-heavy.otf"; path = "../src/assets/fonts/sf-ui-display-heavy.otf"; sourceTree = "<group>"; };
+		05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-medium.otf"; path = "../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* Roam Reality.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Roam Reality.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = travel_ar_app_42706/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = travel_ar_app_42706/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = travel_ar_app_42706/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = travel_ar_app_42706/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = travel_ar_app_42706/main.m; sourceTree = "<group>"; };
-		19F6CBCC0A4E27FBF8BF4A61 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		3B4392A12AC88292D35C810B /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
-		5709B34CF0A7D63546082F79 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
+		162B40CDEEE145B3BC91B877 /* NunitoSans_10pt-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-ExtraLight.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-ExtraLight.ttf"; sourceTree = "<group>"; };
+		25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../src/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
+		263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-light.otf"; path = "../src/assets/fonts/sf-ui-display-light.otf"; sourceTree = "<group>"; };
+		27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-regular.ttf"; path = "../src/assets/fonts/sf-ui-display-regular.ttf"; sourceTree = "<group>"; };
+		2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../src/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
+		2FE0364303ED43E4A1DBF5A9 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../src/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
+		3020C3A053944525B096A961 /* sf-ui-display-thin.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-thin.otf"; path = "../src/assets/fonts/sf-ui-display-thin.otf"; sourceTree = "<group>"; };
+		3718B6537A6B4657B0B19CB0 /* Pods-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706Tests/Pods-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
+		455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-ultralight.otf"; path = "../src/assets/fonts/sf-ui-display-ultralight.otf"; sourceTree = "<group>"; };
+		4B285C4AB2C689259B681A55 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
+		4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Black.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Black.ttf"; sourceTree = "<group>"; };
+		5217457F90794339A2E07132 /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../src/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
+		5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-bold.otf"; path = "../src/assets/fonts/sf-ui-display-bold.otf"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
-		5DCACB8F33CDC322A6C60F78 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Light.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Light.ttf"; sourceTree = "<group>"; };
+		67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Thin.ttf"; path = "../src/assets/fonts/Poppins-Thin.ttf"; sourceTree = "<group>"; };
+		69828AF7D549444A9FB96C62 /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
+		6E1BB610A5784CC698E44AA8 /* NunitoSans_10pt-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-SemiBold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-SemiBold.ttf"; sourceTree = "<group>"; };
+		70B7CB0E017E451EAB220EA0 /* NunitoSans_10pt-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-ExtraBold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-ExtraBold.ttf"; sourceTree = "<group>"; };
+		74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-black.otf"; path = "../src/assets/fonts/sf-ui-display-black.otf"; sourceTree = "<group>"; };
+		7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
+		7A0A2F212B7FA27000E778AF /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../../src/assets/ar/record.mp3; sourceTree = "<group>"; };
+		7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-medium.otf"; path = "../../../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
+		8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
+		90EF26452B5039E300872709 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
+		90EF26462B5039E300872709 /* Octicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Octicons.ttf; sourceTree = "<group>"; };
+		90EF26472B5039E300872709 /* Feather.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Feather.ttf; sourceTree = "<group>"; };
+		90EF26482B5039E300872709 /* Entypo.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Entypo.ttf; sourceTree = "<group>"; };
+		90EF26492B5039E300872709 /* FontAwesome5_Brands.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Brands.ttf; sourceTree = "<group>"; };
+		90EF264A2B5039E300872709 /* MaterialCommunityIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialCommunityIcons.ttf; sourceTree = "<group>"; };
+		90EF264B2B5039E300872709 /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = AntDesign.ttf; sourceTree = "<group>"; };
+		90EF264C2B5039E300872709 /* Foundation.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Foundation.ttf; sourceTree = "<group>"; };
+		90EF264D2B5039E300872709 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Ionicons.ttf; sourceTree = "<group>"; };
+		90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Solid.ttf; sourceTree = "<group>"; };
+		90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome5_Regular.ttf; sourceTree = "<group>"; };
+		90EF26502B5039E300872709 /* FontAwesome.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = FontAwesome.ttf; sourceTree = "<group>"; };
+		90EF26512B5039E300872709 /* Zocial.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Zocial.ttf; sourceTree = "<group>"; };
+		90EF26522B5039E300872709 /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
+		90EF26532B5039E300872709 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
+		90EF26542B5039E300872709 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
+		A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../src/assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
+		A53F223FE2914D979DB076EB /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
+		A7086CB91B0E463608DBCCAC /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
+		ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../src/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
+		B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Medium.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Medium.ttf"; sourceTree = "<group>"; };
+		B399D590B2C9401AA9C9817E /* NunitoSans_10pt-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Bold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Bold.ttf"; sourceTree = "<group>"; };
+		BFCB5B4D3BDD6363B6AAAF80 /* Pods-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706Tests/Pods-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		C819029DAEAC4167BAC89AB3 /* sf-ui-display-semibold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-semibold.otf"; path = "../src/assets/fonts/sf-ui-display-semibold.otf"; sourceTree = "<group>"; };
+		D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Regular.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Regular.ttf"; sourceTree = "<group>"; };
+		E15B440137DBEE8140A37FC5 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -51,7 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				7699B88040F8A987B510C191 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
+				8BD0DA913D325AFF04175913 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -59,7 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0C80B921A6F3F58F76C31292 /* libPods-travel_ar_app_42706.a in Frameworks */,
+				B87483F64C2A25E47A261435 /* libPods-travel_ar_app_42706.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -86,6 +181,10 @@
 		13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */ = {
 			isa = PBXGroup;
 			children = (
+				7A0A2F1F2B7FA24600E778AF /* Sounds */,
+				8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */,
+				90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */,
+				90EF26442B5039E300872709 /* Fonts */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -100,10 +199,53 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				5DCACB8F33CDC322A6C60F78 /* libPods-travel_ar_app_42706.a */,
-				19F6CBCC0A4E27FBF8BF4A61 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
+				E15B440137DBEE8140A37FC5 /* libPods-travel_ar_app_42706.a */,
+				455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		7A0A2F1F2B7FA24600E778AF /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */,
+				7A0A2F212B7FA27000E778AF /* record.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
+		7C8964729316417391B79D39 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */,
+				5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */,
+				035E791890C347CAA200494B /* sf-ui-display-heavy.otf */,
+				263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */,
+				05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */,
+				C819029DAEAC4167BAC89AB3 /* sf-ui-display-semibold.otf */,
+				3020C3A053944525B096A961 /* sf-ui-display-thin.otf */,
+				464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */,
+				4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */,
+				B399D590B2C9401AA9C9817E /* NunitoSans_10pt-Bold.ttf */,
+				70B7CB0E017E451EAB220EA0 /* NunitoSans_10pt-ExtraBold.ttf */,
+				162B40CDEEE145B3BC91B877 /* NunitoSans_10pt-ExtraLight.ttf */,
+				651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */,
+				B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */,
+				D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */,
+				6E1BB610A5784CC698E44AA8 /* NunitoSans_10pt-SemiBold.ttf */,
+				5217457F90794339A2E07132 /* Poppins-Black.ttf */,
+				ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */,
+				A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */,
+				8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */,
+				2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */,
+				2FE0364303ED43E4A1DBF5A9 /* Poppins-Medium.ttf */,
+				25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */,
+				A53F223FE2914D979DB076EB /* Poppins-SemiBold.ttf */,
+				67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */,
+				27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */,
+				69828AF7D549444A9FB96C62 /* index.js */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -122,6 +264,7 @@
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7C8964729316417391B79D39 /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -131,19 +274,46 @@
 		83CBBA001A601CBA00E9B192 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */,
+				13B07F961A680F5B00A75B9A /* Roam Reality.app */,
 				00E356EE1AD99517003FC87E /* travel_ar_app_42706Tests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
+		90EF26442B5039E300872709 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				90EF26452B5039E300872709 /* Fontisto.ttf */,
+				90EF26462B5039E300872709 /* Octicons.ttf */,
+				90EF26472B5039E300872709 /* Feather.ttf */,
+				90EF26482B5039E300872709 /* Entypo.ttf */,
+				90EF26492B5039E300872709 /* FontAwesome5_Brands.ttf */,
+				90EF264A2B5039E300872709 /* MaterialCommunityIcons.ttf */,
+				90EF264B2B5039E300872709 /* AntDesign.ttf */,
+				90EF264C2B5039E300872709 /* Foundation.ttf */,
+				90EF264D2B5039E300872709 /* Ionicons.ttf */,
+				90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */,
+				7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */,
+				90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */,
+				90EF26502B5039E300872709 /* FontAwesome.ttf */,
+				90EF26512B5039E300872709 /* Zocial.ttf */,
+				90EF26522B5039E300872709 /* EvilIcons.ttf */,
+				90EF26532B5039E300872709 /* SimpleLineIcons.ttf */,
+				90EF26542B5039E300872709 /* MaterialIcons.ttf */,
+			);
+			name = Fonts;
+			path = "../node_modules/react-native-vector-icons/Fonts";
+			sourceTree = "<group>";
+		};
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				3B4392A12AC88292D35C810B /* Pods-travel_ar_app_42706.debug.xcconfig */,
-				5709B34CF0A7D63546082F79 /* Pods-travel_ar_app_42706.release.xcconfig */,
 				5B7EB9410499542E8C5724F5 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
 				89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
+				A7086CB91B0E463608DBCCAC /* Pods-travel_ar_app_42706.debug.xcconfig */,
+				4B285C4AB2C689259B681A55 /* Pods-travel_ar_app_42706.release.xcconfig */,
+				BFCB5B4D3BDD6363B6AAAF80 /* Pods-travel_ar_app_42706Tests.debug.xcconfig */,
+				3718B6537A6B4657B0B19CB0 /* Pods-travel_ar_app_42706Tests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -159,8 +329,8 @@
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
-				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
+				11C253D45E9C48196A1E069D /* [CP] Embed Pods Frameworks */,
+				7F645AFE203E3514B5B8EFD5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -182,8 +352,8 @@
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
-				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				2A1E3B0C213B6832A6E62503 /* [CP] Embed Pods Frameworks */,
+				DAF4F6F4FE392B7B5E7FFED3 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -191,7 +361,7 @@
 			);
 			name = travel_ar_app_42706;
 			productName = travel_ar_app_42706;
-			productReference = 13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Roam Reality.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -242,8 +412,53 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				90AF16932B55A6A6007514E1 /* Fontisto.ttf in Resources */,
+				90AF16942B55A6A6007514E1 /* Octicons.ttf in Resources */,
+				90AF16952B55A6A6007514E1 /* Feather.ttf in Resources */,
+				90AF16962B55A6A6007514E1 /* Entypo.ttf in Resources */,
+				90AF16972B55A6A6007514E1 /* FontAwesome5_Brands.ttf in Resources */,
+				90AF16982B55A6A6007514E1 /* MaterialCommunityIcons.ttf in Resources */,
+				90AF16992B55A6A6007514E1 /* AntDesign.ttf in Resources */,
+				7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */,
+				90AF169A2B55A6A6007514E1 /* Foundation.ttf in Resources */,
+				90AF169B2B55A6A6007514E1 /* Ionicons.ttf in Resources */,
+				90AF169C2B55A6A6007514E1 /* FontAwesome5_Solid.ttf in Resources */,
+				90AF169D2B55A6A6007514E1 /* FontAwesome5_Regular.ttf in Resources */,
+				90AF169E2B55A6A6007514E1 /* FontAwesome.ttf in Resources */,
+				90AF169F2B55A6A6007514E1 /* Zocial.ttf in Resources */,
+				90AF16A02B55A6A6007514E1 /* EvilIcons.ttf in Resources */,
+				90AF16A12B55A6A6007514E1 /* SimpleLineIcons.ttf in Resources */,
+				90AF16A22B55A6A6007514E1 /* MaterialIcons.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				3235135242414B33812B78CA /* sf-ui-display-black.otf in Resources */,
+				8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */,
+				7241EFA2F08C408BA847C61D /* sf-ui-display-bold.otf in Resources */,
+				0FD2C6B450084C2ABA964DAB /* sf-ui-display-light.otf in Resources */,
+				3B7B221EF1F84DE3A93B6D08 /* sf-ui-display-medium.otf in Resources */,
+				18ECC00FF4674AD1A5278128 /* sf-ui-display-semibold.otf in Resources */,
+				B45D634D2BC0480EBFA69C7D /* sf-ui-display-thin.otf in Resources */,
+				8BF9013D26454852A8AAC264 /* sf-ui-display-ultralight.otf in Resources */,
+				D0BE067D5A634F1EAB11156D /* NunitoSans_10pt-Black.ttf in Resources */,
+				8EB858A8C16C48D09686094D /* NunitoSans_10pt-Bold.ttf in Resources */,
+				AA6AFD4BD2404146A54A90D6 /* NunitoSans_10pt-ExtraBold.ttf in Resources */,
+				D861E940FA984C13850C042A /* NunitoSans_10pt-ExtraLight.ttf in Resources */,
+				78A5E58FE1EA4917A8853C38 /* NunitoSans_10pt-Light.ttf in Resources */,
+				7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */,
+				76EE719B016D4CCDAF7A5327 /* NunitoSans_10pt-Medium.ttf in Resources */,
+				7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */,
+				475566C6FDC443F49225D0C0 /* NunitoSans_10pt-SemiBold.ttf in Resources */,
+				FF3279F34BD54D6B88C7827D /* Poppins-Black.ttf in Resources */,
+				CA66786B9F934F798246E280 /* Poppins-Bold.ttf in Resources */,
+				02AFF9238C5F465996CE62FB /* Poppins-ExtraBold.ttf in Resources */,
+				8203743F5590401D93CFBA74 /* Poppins-ExtraLight.ttf in Resources */,
+				9CA9F538379E4FD29F9EC5EC /* Poppins-Light.ttf in Resources */,
+				3900D0AA5E0345C8B41EFBEC /* Poppins-Medium.ttf in Resources */,
+				C62A697E5B374603A68AAC5A /* Poppins-Regular.ttf in Resources */,
+				3D603FCECA2143A7AF9DB4E2 /* Poppins-SemiBold.ttf in Resources */,
+				733259CF4D604031AF68F7DF /* Poppins-Thin.ttf in Resources */,
+				732EB55F52334EFD9593556C /* sf-ui-display-regular.ttf in Resources */,
+				99947BFACF2E4C4F9C9C6B9D /* index.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -266,7 +481,24 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
+		11C253D45E9C48196A1E069D /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		2A1E3B0C213B6832A6E62503 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -281,6 +513,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7F645AFE203E3514B5B8EFD5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
@@ -327,24 +576,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+		DAF4F6F4FE392B7B5E7FFED3 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -359,23 +591,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -481,13 +696,20 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-travel_ar_app_42706.debug.xcconfig */;
+			baseConfigurationReference = A7086CB91B0E463608DBCCAC /* Pods-travel_ar_app_42706.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -498,8 +720,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = travel_ar_app_42706;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
+				PRODUCT_NAME = "Roam Reality";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -508,12 +731,19 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-travel_ar_app_42706.release.xcconfig */;
+			baseConfigurationReference = 4B285C4AB2C689259B681A55 /* Pods-travel_ar_app_42706.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CURRENT_PROJECT_VERSION = 1;
+				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 2;
+				DEVELOPMENT_TEAM = AB35BNBR3J;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -524,8 +754,9 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
-				PRODUCT_NAME = travel_ar_app_42706;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
+				PRODUCT_NAME = "Roam Reality";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
 			};
@@ -564,7 +795,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -580,7 +811,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -636,7 +867,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = i386;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -645,7 +876,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
