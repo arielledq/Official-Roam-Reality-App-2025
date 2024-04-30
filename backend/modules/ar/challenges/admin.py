@@ -29,23 +29,25 @@ class ARChallengeUpdatedAdmin(admin.ModelAdmin):
 
     def sponsor_name(self, obj):
         return obj.sponsor.name
-    
-
-admin.site.register(Sponsor, ARChallengeAdmin)
-admin.site.register(ARUserProfile, ARChallengeAdmin)
-admin.site.register(ARMemories, ARMemoriesAdmin)
-admin.site.register(ARSettings, ARChallengeAdmin)
-admin.site.register(ARExample, ARChallengeAdmin)
 
 class GeoArChallengeAdmin(admin.ModelAdmin):
     formfield_overrides = {
         MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
         PointField: {"widget": GoogleMapsOpenLayersWidget},
     }
-    pass
+   
+@admin.register(GeoLocation)
+class GeoLocationAdmin(GeoArChallengeAdmin):
+    list_display = ('name',)
+    ordering = ("name",)
+    search_fields = ["name"]
 
 
-admin.site.register(GeoLocation, GeoArChallengeAdmin)
+admin.site.register(Sponsor, ARChallengeAdmin)
+admin.site.register(ARUserProfile, ARChallengeAdmin)
+admin.site.register(ARMemories, ARMemoriesAdmin)
+admin.site.register(ARSettings, ARChallengeAdmin)
+admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(GeoArSite, GeoArChallengeAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARSpecificSiteRoute, GeoArChallengeAdmin)
