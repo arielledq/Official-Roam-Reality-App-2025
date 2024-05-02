@@ -71,6 +71,13 @@ class ARChallengeParameterSettings(models.Model):
     rotation = models.BooleanField(_("Rotation"), default=False)
     bloom = models.BooleanField(_("Bloom"), default=False)
 
+    class Meta:
+      verbose_name_plural = "AR Challenge Parameter Settings"
+      verbose_name = "AR Challenge Parameter Settings"
+
+    def __str__(self):
+        return self.name
+
 class Challenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
