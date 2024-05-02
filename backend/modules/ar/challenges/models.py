@@ -62,6 +62,21 @@ class Sponsor(models.Model):
     def __str__(self):
         return self.name
 
+class ARChallengeParameterSettings(models.Model):
+    name = models.CharField(
+        _("Settings Name"), default=None, null=False, blank=False, max_length=255
+    )
+    loop_animations = models.BooleanField(_("Loop Animation"), default=False)
+    pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
+    rotation = models.BooleanField(_("Rotation"), default=False)
+    bloom = models.BooleanField(_("Bloom"), default=False)
+
+    class Meta:
+      verbose_name_plural = "AR Challenge Parameter Settings"
+      verbose_name = "AR Challenge Parameter Settings"
+
+    def __str__(self):
+        return self.name
 
 class Challenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
@@ -87,15 +102,16 @@ class Challenges(models.Model):
         max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
-    description = RichTextField(_("Description"), blank=True, null=True)
-    geo_location = models.ForeignKey(
-        GeoLocation,
+    parameter_settings = models.ForeignKey(
+        ARChallengeParameterSettings,
         on_delete=models.CASCADE,
         default=None,
         null=True,
         blank=True,
-        related_name="geo_location_ar_challenge",
+        related_name="geo_parameters_ar_challenge",
     )
+    description = RichTextField(_("Description"), blank=True, null=True)
+   
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -118,6 +134,10 @@ class Challenges(models.Model):
     def __str__(self):
         return self.name
 
+class ARChallengeFilters(models.Model):
+    name = models.CharField(
+        _("Filter Name"), default=None, null=False, blank=False, max_length=255
+    )
 
 class Resource3dModel(models.Model):
     challenge = models.ForeignKey(
