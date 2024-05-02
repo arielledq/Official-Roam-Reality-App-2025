@@ -62,6 +62,14 @@ class Sponsor(models.Model):
     def __str__(self):
         return self.name
 
+class ARChallengeParameterSettings(models.Model):
+    name = models.CharField(
+        _("Settings Name"), default=None, null=False, blank=False, max_length=255
+    )
+    loop_animations = models.BooleanField(_("Loop Animation"), default=False)
+    pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
+    rotation = models.BooleanField(_("Rotation"), default=False)
+    bloom = models.BooleanField(_("Bloom"), default=False)
 
 class Challenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
