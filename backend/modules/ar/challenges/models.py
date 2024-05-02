@@ -95,15 +95,16 @@ class Challenges(models.Model):
         max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
-    description = RichTextField(_("Description"), blank=True, null=True)
-    geo_location = models.ForeignKey(
-        GeoLocation,
+    parameter_settings = models.ForeignKey(
+        ARChallengeParameterSettings,
         on_delete=models.CASCADE,
         default=None,
         null=True,
         blank=True,
-        related_name="geo_location_ar_challenge",
+        related_name="geo_parameters_ar_challenge",
     )
+    description = RichTextField(_("Description"), blank=True, null=True)
+   
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -126,6 +127,10 @@ class Challenges(models.Model):
     def __str__(self):
         return self.name
 
+class ARChallengeFilters(models.Model):
+    name = models.CharField(
+        _("Filter Name"), default=None, null=False, blank=False, max_length=255
+    )
 
 class Resource3dModel(models.Model):
     challenge = models.ForeignKey(
