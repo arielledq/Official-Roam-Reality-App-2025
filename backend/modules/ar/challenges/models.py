@@ -70,6 +70,11 @@ class ARChallengeParameterSettings(models.Model):
     pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
     rotation = models.BooleanField(_("Rotation"), default=False)
     bloom = models.BooleanField(_("Bloom"), default=False)
+    sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
+    image_opacity = models.BooleanField(_("Image Opacity"), default=False)
+    tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
+    ar_portals = models.BooleanField(_("AR Portals"), default=False)
+    image_recognition = models.BooleanField(_("Image Recognition"), default=False)
 
     class Meta:
       verbose_name_plural = "AR Challenge Parameter Settings"
