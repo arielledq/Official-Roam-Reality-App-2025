@@ -5,7 +5,7 @@ import { handleError } from "../../util/helpers"
 import { getGeoARDestinations, getARProfile, getARStettings } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
-import { useNavigation } from "@react-navigation/native"
+import { DrawerActions, useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../assets/geoar/starsite.svg"
 import GradientDown from "../../assets/geoar/gradient_down.svg"
