@@ -221,7 +221,8 @@ class ARMemories(models.Model):
 
 class ARSettings(models.Model):
     class Meta:
-        verbose_name_plural = "AR Settings"
+        verbose_name_plural = "AR Settings and Legal"
+        verbose_name = "AR Settings and Legal"
 
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
 
