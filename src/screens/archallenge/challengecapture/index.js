@@ -47,9 +47,8 @@ const ArChallengeCapture = ({
   const settings = useSelector(state => state.ar?.arSettings)
   const modelFile = challengeObj.model_file;
 
-  console.log("challengeObjParameters:",challengeObjParameters)
-  console.log("settings?.waiver_details:",settings?.waiver_details)
-  
+  console.log("challengeObjParameters:", challengeObjParameters)
+
 
   const navigateToShare = (captureData) => {
     navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -176,7 +175,7 @@ const ArChallengeCapture = ({
 
     const _onPinch = (pinchState, scaleFactor, source) => {
       console.log("_onPinch scaleFactor", scaleFactor)
-      if((scale[0] * scaleFactor) < 0.05){
+      if ((scale[0] * scaleFactor) < 0.05) {
         return;
       }
       let newScale = [
@@ -197,7 +196,10 @@ const ArChallengeCapture = ({
         <ViroAmbientLight color="#FFFFFF" intensity={250} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
-        <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
+        {
+          challengeObjParameters.bloom &&
+          <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
+        }
 
         <ViroSpotLight
           innerAngle={5}
@@ -226,18 +228,18 @@ const ArChallengeCapture = ({
             position={[0, -5, -30]}
             scale={scale}
             type="VRX"
-            materials={["mat"]}
+            materials={challengeObjParameters.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
-            onRotate={_onRotate}
+            onRotate={challengeObjParameters.rotation ? _onRotate : null}
             chromaKeyFilteringColor={"transparent"}
-            onPinch={_onPinch}
-            onDrag={_onDrag}
-            animation={{
+            onPinch={challengeObjParameters.pinch_to_zoom ? _onPinch : null}
+            onDrag={challengeObjParameters.tracking_and_anchors ? _onDrag : null}
+            animation={challengeObjParameters.loop_animations ? {
               name: 'Take 001',
               run: true,
               loop: true,
               delay: 1000
-            }}
+            } : {}}
           />
         }
 
@@ -428,7 +430,7 @@ const ArChallengeCapture = ({
                 }
               }}
               source={{
-                html: `${challengeObj.description.toString().replaceAll("#000000","#fff")}`
+                html: `${challengeObj.description.toString().replaceAll("#000000", "#fff")}`
               }}
             />
           </ScrollView>
@@ -476,7 +478,7 @@ const ArChallengeCapture = ({
                 }
               }}
               source={{
-                html: `${settings?.waiver_details.toString().replaceAll("#000000","#fff")}}`
+                html: `${settings?.waiver_details.toString().replaceAll("#000000", "#fff")}}`
               }}
             />
           </ScrollView>
@@ -633,14 +635,14 @@ const ArChallengeCapture = ({
 ViroMaterials.createMaterials({
   grid: {
     lightingModel: "Lambert",
-    bloomThreshold: 0.5,
+    shininess: .6,
   },
   mat: {
     shininess: .6,
     blendMode: "Add",
     lightingModel: "Lambert",
     bloomThreshold: 0.5,
-    diffuseColor:"#fffS"
+    diffuseColor: "#fffS"
   },
 });
 
