@@ -1,4 +1,6 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings
+from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories,\
+    ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
+    ARChallengeFilters
 from rest_framework import serializers
 
 
@@ -50,10 +52,19 @@ class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
+class ARChallengeFiltersSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = ARChallengeFilters
+        fields = (
+            "__all__"
+        )
+
 class ChallengesSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
+    ar_filters = ARChallengeFiltersSerializer(read_only=True, many=True)
 
     def get_image(self, obj):
         return obj.image.url
@@ -72,7 +83,8 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "created_at",
             "expiry_date",
             "sponsored",
-            "parameters"
+            "parameters",
+            "ar_filters"
         )
 
 
