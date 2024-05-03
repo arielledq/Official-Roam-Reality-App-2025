@@ -83,6 +83,21 @@ class ARChallengeParameterSettings(models.Model):
     def __str__(self):
         return self.name
 
+class ARChallengeFilters(models.Model):
+    name = models.CharField(
+        _("Filter Name"), default=None, null=False, blank=False, max_length=255
+    )
+    gradient_colors = models.CharField(_("Gradient Colors"), max_length=200, blank=False, null=False,default='')
+    image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
+    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
+
+    class Meta:
+        verbose_name_plural = "AR Filters"
+        verbose_name = "AR Filter"
+
+    def __str__(self):
+        return self.name
+
 class Challenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
@@ -106,7 +121,7 @@ class Challenges(models.Model):
     challenge_choice = models.CharField(verbose_name="Challenge Load From",
         max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
     )
-    expiry_date = models.DateTimeField(blank=True, null=True)
+    ar_filters = models.ManyToManyField(ARChallengeFilters,verbose_name="AR Filters",related_name="filter_ar_challenge", blank=False, null=False, default=None)
     parameter_settings = models.ForeignKey(
         ARChallengeParameterSettings,
         on_delete=models.CASCADE,
@@ -115,8 +130,8 @@ class Challenges(models.Model):
         blank=True,
         related_name="geo_parameters_ar_challenge",
     )
+    expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
-   
 
     def save(self, *args, **kwargs):
         self.clean()
@@ -138,14 +153,6 @@ class Challenges(models.Model):
 
     def __str__(self):
         return self.name
-
-class ARChallengeFilters(models.Model):
-    name = models.CharField(
-        _("Filter Name"), default=None, null=False, blank=False, max_length=255
-    )
-    gradient_colors = models.CharField(_("Gradient Colors"), max_length=200, blank=False, null=False,default='')
-    image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
-    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
 
 class Resource3dModel(models.Model):
     challenge = models.ForeignKey(
