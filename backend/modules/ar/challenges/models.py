@@ -143,6 +143,9 @@ class ARChallengeFilters(models.Model):
     name = models.CharField(
         _("Filter Name"), default=None, null=False, blank=False, max_length=255
     )
+    gradient_colors = models.CharField(_("Gradient Colors"), max_length=200, blank=False, null=False,default='')
+    image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
+    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
 
 class Resource3dModel(models.Model):
     challenge = models.ForeignKey(
