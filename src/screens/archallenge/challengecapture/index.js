@@ -43,8 +43,13 @@ const ArChallengeCapture = ({
   const route = useRoute()
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
+  const challengeObjParameters = route?.params?.challengeObj?.parameters;
   const settings = useSelector(state => state.ar?.arSettings)
   const modelFile = challengeObj.model_file;
+
+  console.log("challengeObjParameters:",challengeObjParameters)
+  console.log("settings?.waiver_details:",settings?.waiver_details)
+  
 
   const navigateToShare = (captureData) => {
     navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -414,10 +419,16 @@ const ArChallengeCapture = ({
                 strong: {
                   color: '#fff',
                   fontSize: FontSizes.S18,
+                },
+                ol: {
+                  color: '#fff',
+                },
+                li: {
+                  color: '#fff',
                 }
               }}
               source={{
-                html: `${challengeObj.description}`
+                html: `${challengeObj.description.toString().replaceAll("#000000","#fff")}`
               }}
             />
           </ScrollView>
@@ -456,10 +467,16 @@ const ArChallengeCapture = ({
                 strong: {
                   color: '#fff',
                   fontSize: FontSizes.S18,
+                },
+                ol: {
+                  color: '#fff',
+                },
+                li: {
+                  color: '#fff',
                 }
               }}
               source={{
-                html: `${settings?.waiver_details}`
+                html: `${settings?.waiver_details.toString().replaceAll("#000000","#fff")}}`
               }}
             />
           </ScrollView>
