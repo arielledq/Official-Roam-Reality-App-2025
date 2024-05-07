@@ -95,7 +95,8 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'storages',
     'import_export',
-    'ckeditor'
+    'ckeditor',
+    'taggit'
 ]
 MODULES_APPS = get_modules()
 
