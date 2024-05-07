@@ -5,6 +5,7 @@ from ckeditor.fields import RichTextField
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.contrib.gis.db import models as gis_models
+from taggit.managers import TaggableManager
 
 User = get_user_model()
 
@@ -87,8 +88,8 @@ class ARChallengeFilters(models.Model):
     name = models.CharField(
         _("Filter Name"), default=None, null=False, blank=False, max_length=255
     )
-    gradient_colors = models.CharField(_("Gradient Colors"), max_length=200, blank=False, null=False,default='')
     image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
+    gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False)
     filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
 
     class Meta:
