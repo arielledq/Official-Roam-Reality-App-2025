@@ -36,6 +36,7 @@ class ReportedContentConstant:
 class ContactUs(CommonModel):
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sender')
     message = models.TextField()
+    title = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.sender.email
@@ -52,6 +53,7 @@ def send_feedback_email_to_admin(sender, instance, created, **kwargs):
         message = (
             f"Dear Admin,\n\n"
             f"A new feedback has been submitted by {sender_email}:\n\n"
+            f"{instance.title}\n\n"
             f"{instance.message}\n\n"
             f"Best regards,\n"
             f"Travel AR\n"
