@@ -2,6 +2,8 @@ from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemor
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
     ARChallengeFilters
 from rest_framework import serializers
+from taggit.serializers import (TagListSerializerField,
+                                TaggitSerializer)
 
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
@@ -52,8 +54,9 @@ class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
-class ARChallengeFiltersSerializer(serializers.ModelSerializer):
-  
+class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer):
+    gradient_colors = TagListSerializerField()
+
     class Meta:
         model = ARChallengeFilters
         fields = (
