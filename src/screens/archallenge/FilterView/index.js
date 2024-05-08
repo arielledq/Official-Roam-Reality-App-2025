@@ -30,17 +30,17 @@ const ARFilter = ({
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   console.log("challengeObj:", challengeObj)
-  const viewShot = useRef();
+  const viewShotRef = useRef();
 
   const navigateToShare = () => {
-    viewShot.current.capture().then(uri => {
+    viewShotRef.current.capture().then(uri => {
       console.log("do something with ", uri);
-      navigation.replace("ArChallengeShare", { challengeObj: challengeObj, uri });
+      navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData: uri });
     });
   }
 
   return (
-    <ViewShot ref={ref} options={{ fileName: "filtered_share", format: "jpg", quality: 0.9 }}>
+    <ViewShot ref={viewShotRef} style={styles.mainContainer} options={{ fileName: "filtered_share", format: "jpg", quality: 0.9 }}>
       <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
         <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
           colors={['black', 'transparent']} />

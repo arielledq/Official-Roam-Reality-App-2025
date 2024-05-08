@@ -10,7 +10,6 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
     position: 'relative'
   },
   buttonStyle: {
