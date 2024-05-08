@@ -51,7 +51,7 @@ const ArChallengeCapture = ({
 
 
   const navigateToShare = (captureData) => {
-    navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
+    navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
   }
 
   const ARScreen = () => {
@@ -197,7 +197,7 @@ const ArChallengeCapture = ({
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
         {
-          challengeObjParameters.bloom &&
+          challengeObjParameters?.bloom &&
           <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
         }
 
@@ -228,13 +228,13 @@ const ArChallengeCapture = ({
             position={[0, -5, -30]}
             scale={scale}
             type="VRX"
-            materials={challengeObjParameters.bloom ? ["mat"] : ["grid"]}
+            materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
-            onRotate={challengeObjParameters.rotation ? _onRotate : null}
+            onRotate={challengeObjParameters?.rotation ? _onRotate : null}
             chromaKeyFilteringColor={"transparent"}
-            onPinch={challengeObjParameters.pinch_to_zoom ? _onPinch : null}
-            onDrag={challengeObjParameters.tracking_and_anchors ? _onDrag : null}
-            animation={challengeObjParameters.loop_animations ? {
+            onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
+            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
+            animation={challengeObjParameters?.loop_animations ? {
               name: 'Take 001',
               run: true,
               loop: true,
@@ -522,6 +522,23 @@ const ArChallengeCapture = ({
     };
 
     render() {
+
+      const viewComponent = () => <View style={styles.cornerStyles} />;
+
+      const _cornerComponent = [
+        {
+          side: 'TR',
+          customCornerComponent: () => viewComponent()
+        },
+      ];
+  
+      const _rotateComponent = {
+        side: 'bottom',
+        customRotationComponent: () => viewComponent()
+      };
+  
+      const _resizerSnapPoints = ['right', 'left'];
+
       return (
         <View style={styles.mainContainer}>
           {
