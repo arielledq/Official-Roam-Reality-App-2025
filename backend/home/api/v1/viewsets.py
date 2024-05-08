@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.authtoken.models import Token
@@ -8,13 +9,15 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
-from users.models import UserProfile
+from rest_framework.views import APIView
+from users.models import FriendshipRequest, UserProfile
 from home.utils import EmailOTP
 from django.utils.translation import ugettext_lazy as _
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator as token_generator
 from home.api.v1.serializers import (
     AccountSetupSerializer,
+    FriendshipRequestSerializer,
     SignupSerializer,
     UserProfileSerializer,
     UserSerializer,
@@ -149,5 +152,84 @@ class AccountSetupViewset(ModelViewSet):
     http_method_names = ["get", "patch"]
 
     def get_queryset(self):
-        return UserProfile.objects.filter(user=self.request.user)
+        user_id = self.kwargs.get('pk')
+        if user_id:
+            return UserProfile.objects.filter(user_id=user_id)
+        else:
+            return UserProfile.objects.filter(user=self.request.user)
     
+
+class FriendshipViewSet(ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = FriendshipRequestSerializer
+    queryset = FriendshipRequest.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        try:
+            from_user = request.user
+            to_user_id = request.data.get('to_user')
+            to_user = User.objects.get(id=to_user_id)
+
+            existing_request = FriendshipRequest.objects.filter(from_user=from_user, to_user=to_user).exists()
+            if existing_request:
+                return Response({"message": "Friendship request already sent."}, status=status.HTTP_400_BAD_REQUEST)
+
+            FriendshipRequest.objects.create(from_user=from_user, to_user=to_user)
+            return Response({"message": "Friendship request sent."}, status=status.HTTP_200_OK)
+        except User.DoesNotExist:
+            return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    def list(self, request, *args, **kwargs):
+        queryset = FriendshipRequest.objects.filter(to_user=request.user)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
+
+    def destroy(self, request, *args, **kwargs):
+        try:
+            from_user_id = request.data.get('from_user')
+            FriendshipRequest.objects.filter(from_user_id=from_user_id, to_user=request.user).delete()
+            return Response({"message": "Friendship request rejected."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['post'])
+    def accept_friend_request(self, request, pk=None):
+        try:
+            friendship_request = self.get_object()
+            from_user = friendship_request.from_user
+            to_user = request.user
+            friendship_request.delete()
+            to_user.user_profile.friends.add(from_user)
+            from_user.user_profile.friends.add(to_user)
+            return Response({"message": "Friendship request accepted."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(detail=True, methods=['post'])
+    def remove_friend(self, request, pk=None):
+        try:
+            to_user = request.user
+            from_user = User.objects.get(id=pk)
+            to_user.user_profile.friends.remove(from_user)
+            from_user.user_profile.friends.remove(to_user)
+            return Response({"message": "Friend removed."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class InviteFriendAPIview(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            email = request.data.get('email')
+            message = request.data.get('message')
+            user = request.user
+            EmailOTP.send_email(email, message, subject="Invitation from " + user.email)
+            return Response({"message": "Invitation sent."}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
