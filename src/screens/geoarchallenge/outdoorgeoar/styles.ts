@@ -14,7 +14,7 @@ const useStyles = makeStyles((theme) => ({
   },
   imageBg: {
     width: '100%',
-    height: 180,
+    minHeight: 180,
     borderRadius: 20,
     marginBottom: 20,
     paddingVertical:20,
