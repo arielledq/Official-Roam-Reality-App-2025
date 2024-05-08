@@ -56,7 +56,7 @@ def send_feedback_email_to_admin(sender, instance, created, **kwargs):
             f"{instance.title}\n\n"
             f"{instance.message}\n\n"
             f"Best regards,\n"
-            f"Travel AR\n"
+            f"Roam Reality\n"
         )
         EmailOTP.send_email(settings.DEFAULT_FROM_EMAIL, message, subject)
 

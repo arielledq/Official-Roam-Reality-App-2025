@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from home.constants import Gender
 from core.utils import get_file_path
-
+from django.utils import timezone
 from home.common import CommonModel
 
 
@@ -51,6 +51,7 @@ class UserProfile(CommonModel):
     country_code = models.CharField(max_length=5, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     account_setup = models.BooleanField(default=False)
+    friends = models.ManyToManyField(User, related_name='friends')
 
     def __str__(self):
         return self.user.email
@@ -73,3 +74,24 @@ class EmailTokenVerification(CommonModel):
 
 class PasswordReset(EmailTokenVerification):
     pass
+
+
+class FriendshipRequest(models.Model):
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="friendship_requests_sent",
+    )
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="friendship_requests_received",
+    )
+    created = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Friendship Request")
+        verbose_name_plural = _("Friendship Requests")
+
+    def __str__(self):
+        return "%s" % self.from_user_id
