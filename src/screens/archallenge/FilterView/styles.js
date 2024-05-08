@@ -19,6 +19,9 @@ const useStyles = makeStyles(theme => ({
     marginTop: 20,
     width:'100%'
   },
+  pagerView: {
+    flex: 1,
+  },
 }))
 
 export default useStyles
