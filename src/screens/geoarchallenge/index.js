@@ -134,6 +134,7 @@ const GeoArChallenge = ({
 
       {isLoading && <ActivityIndicator size="large" />}
       <FlatList
+        showsVerticalScrollIndicator={false}
         style={{ flex: 1, marginVertical: 15 }}
         data={destinationData}
         numColumns={1}

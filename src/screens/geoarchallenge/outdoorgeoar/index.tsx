@@ -158,7 +158,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
-            renderItem={({ item }) => item.blank ? <View style={{ height: 120 }} /> : <HomeScreenARItem {...item} />}
+            renderItem={({ item }) => item.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
           />
