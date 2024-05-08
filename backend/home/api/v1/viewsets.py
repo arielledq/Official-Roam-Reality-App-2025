@@ -229,7 +229,7 @@ class InviteFriendAPIview(APIView):
             email = request.data.get('email')
             message = request.data.get('message')
             user = request.user
-            EmailOTP.send_email(email, message, subject="Invitation from " + user.email)
+            EmailOTP.send_email(email, message, "Invitation from " + user.email)
             return Response({"message": "Invitation sent."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
