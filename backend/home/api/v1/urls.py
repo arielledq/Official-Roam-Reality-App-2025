@@ -5,8 +5,10 @@ from home.views import AppLogoutView, ChangePasswordView, DeleteAccountView, Res
 from home.api.v1.viewsets import (
     AccountSetupViewset,
     ConfirmEmailOtpViewset,
+    FindFriendsAPIView,
     FriendshipViewSet,
     InviteFriendAPIview,
+    NotificationViewset,
     SendEmailOtpViewset,
     SignupViewSet,
     LoginViewSet,
@@ -19,6 +21,7 @@ router.register("send-email-otp", SendEmailOtpViewset, basename="send_email_otp"
 router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_email_otp")
 router.register("account-setup", AccountSetupViewset, basename="account-setup")
 router.register("friends", FriendshipViewSet, basename="friends")
+router.register("notifications", NotificationViewset, basename="friends")
 
 
 urlpatterns = [
@@ -30,5 +33,6 @@ urlpatterns = [
     # path('reset-password/verify/', VerifyPasswordToken.as_view(), name="verify_reset_password"),
     path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
     path("invite-friend/", InviteFriendAPIview.as_view(), name="invite_friend"),
+    path("find-friends/", FindFriendsAPIView.as_view(), name="find-friends"),
 
 ]
