@@ -10,7 +10,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
-from users.models import FriendshipRequest, UserProfile
+from rest_framework import viewsets
+from users.models import FriendshipRequest, Notification, UserProfile
 from home.utils import EmailOTP
 from django.utils.translation import ugettext_lazy as _
 from django.utils.http import urlsafe_base64_encode
@@ -18,10 +19,13 @@ from django.contrib.auth.tokens import default_token_generator as token_generato
 from home.api.v1.serializers import (
     AccountSetupSerializer,
     FriendshipRequestSerializer,
+    NotificationSerializer,
     SignupSerializer,
     UserProfileSerializer,
     UserSerializer,
 )
+from django.db.models import Q
+
 
 User = get_user_model()
 
@@ -204,6 +208,14 @@ class FriendshipViewSet(ModelViewSet):
             friendship_request.delete()
             to_user.user_profile.friends.add(from_user)
             from_user.user_profile.friends.add(to_user)
+
+            Notification.objects.create(
+            sender=from_user,
+            receiver=to_user,
+            title="Friend Request",
+            message=f"{to_user.name} accpeted your friend request",
+            notification_type=Notification.FRIEND_REQUEST,
+             )
             return Response({"message": "Friendship request accepted."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -233,3 +245,33 @@ class InviteFriendAPIview(APIView):
             return Response({"message": "Invitation sent."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FindFriendsAPIView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            search = request.query_params.get('search',"")
+            friends = request.user.user_profile.friends.all()
+
+            users = User.objects.filter(
+                Q(email__icontains=search) |
+                Q(name__icontains=search) 
+            ).exclude(id__in=friends)
+
+            serializer = UserSerializer(users, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NotificationViewset(viewsets.ModelViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = NotificationSerializer
+    http_method_names = ["get", "patch"]
+
+    def get_queryset(self):
+        return Notification.objects.filter(receiver=self.request.user).order_by('-created_at')

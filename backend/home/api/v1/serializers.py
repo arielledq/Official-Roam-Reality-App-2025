@@ -11,7 +11,7 @@ from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
 from modules.ar.challenges.serializers import ARMemoriesSerializer
 from modules.ar.challenges.models import ARMemories
-from users.models import FriendshipRequest, UserProfile
+from users.models import FriendshipRequest, Notification, UserProfile
 from rest_framework.authtoken.models import Token
 
 from home.utils import EmailOTP
@@ -165,3 +165,10 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendshipRequest
         fields = "__all__"
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    friend_request = FriendshipRequestSerializer()
+    class Meta:
+        model = Notification
+        fields = '__all__'
