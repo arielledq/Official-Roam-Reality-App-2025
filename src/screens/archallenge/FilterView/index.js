@@ -9,6 +9,8 @@ import LinearGradient from "react-native-linear-gradient";
 import ViewShot from "react-native-view-shot";
 import GetLocation from 'react-native-get-location';
 import PagerView from 'react-native-pager-view';
+import {DragTextEditor} from 'react-native-drag-text-editor';
+
 
 const { width } = Dimensions.get('window');
 
@@ -24,6 +26,22 @@ const ARFilter = ({
   const viewShotRef = useRef();
   console.log("ar_filters:", ar_filters)
 
+  const viewComponent = () => <View style={styles.cornerStyles}/>;
+
+  const _cornerComponent = [
+    {
+      side: 'TR',
+      customCornerComponent: () => viewComponent()
+    },
+  ];
+
+  const _rotateComponent = {
+    side: 'bottom',
+    customRotationComponent: () => viewComponent()
+  };
+
+  const _resizerSnapPoints = ['right', 'left'];
+  
   const navigateToShare = () => {
     viewShotRef.current.capture().then(uri => {
       navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData: uri });
@@ -58,7 +76,16 @@ const ARFilter = ({
                 return (
                   <View key={filter.id} style={{ position: 'relative', flex: 1 }}>
                     <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                      colors={['transparent', ...filter.gradient_colors]} />
+                      colors={['transparent', 'transparent', ...filter.gradient_colors]} />
+                    <DragTextEditor
+                      visible={true}
+                      value={filter.filter_text}
+                      resizerSnapPoints={_resizerSnapPoints}
+                      cornerComponents={_cornerComponent}
+                      rotationComponent={_rotateComponent}
+                      externalTextStyles={styles.textStyles}
+                      externalBorderStyles={styles.borderStyles}
+                    />
                   </View>
                 )
               })
