@@ -22,6 +22,32 @@ const useStyles = makeStyles(theme => ({
   pagerView: {
     flex: 1,
   },
+  borderStyles: {
+    borderStyle: 'dashed',
+    borderColor: 'gray',
+  },
+  textStyles: {
+    color: '#fff',
+    fontSize: FontSizes.S22,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+  },
+  cornerStyles: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    borderColor: '#aaa',
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: 'white',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
 }))
 
 export default useStyles
