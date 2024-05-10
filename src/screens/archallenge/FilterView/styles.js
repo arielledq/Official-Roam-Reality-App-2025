@@ -17,7 +17,7 @@ const useStyles = makeStyles(theme => ({
   },
   buttonContainerStyle: {
     marginTop: 20,
-    width:'100%'
+    width: '100%'
   },
   pagerView: {
     flex: 1,
@@ -47,6 +47,20 @@ const useStyles = makeStyles(theme => ({
   contentContainer: {
     flex: 1,
     alignItems: 'center',
+  },
+  locationText: {
+    color: '#fff',
+    fontSize: FontSizes.S22,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+    marginHorizontal: 5
+  },
+  bottomText: {
+    color: '#fff',
+    fontSize: FontSizes.S30,
+    lineHeight: FontLineHeights.LH33,
+    ...fontGroup.p900,
+    marginHorizontal: 5
   },
 }))
 
