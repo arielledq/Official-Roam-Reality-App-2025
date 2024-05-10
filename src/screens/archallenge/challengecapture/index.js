@@ -47,11 +47,13 @@ const ArChallengeCapture = ({
   const settings = useSelector(state => state.ar?.arSettings)
   const modelFile = challengeObj.model_file;
 
-  console.log("challengeObjParameters:", challengeObjParameters)
 
-
-  const navigateToShare = (captureData) => {
-    navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
+  const navigateToShare = (captureData,ifImage) => {
+    if (ifImage) {
+      navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
+    } else {
+      navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
+    }
   }
 
   const ARScreen = () => {
@@ -531,12 +533,12 @@ const ArChallengeCapture = ({
           customCornerComponent: () => viewComponent()
         },
       ];
-  
+
       const _rotateComponent = {
         side: 'bottom',
         customRotationComponent: () => viewComponent()
       };
-  
+
       const _resizerSnapPoints = ['right', 'left'];
 
       return (
@@ -630,7 +632,7 @@ const ArChallengeCapture = ({
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
-              navigateToShare(this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo)
+              navigateToShare(this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo, this.state.capturedImage ? true : false)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
             </TouchableOpacity>
