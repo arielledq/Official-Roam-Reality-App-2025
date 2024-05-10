@@ -31,6 +31,11 @@ AR_MEMORY_CHOICES = (
     ("VIDEO", "VIDEO"),
 )
 
+GRADIENT_DIRECTION = (
+    ("TOP_TO_BOTTOM", "TOP TO BOTTOM"),
+    ("BOTTOM_TO_TOP", "BOTTOM TO TOP")
+)
+
 class GeoLocation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -91,6 +96,9 @@ class ARChallengeFilters(models.Model):
     image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
     gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False)
     filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
+    gradient_direction = models.CharField(
+        max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=True, null=True
+    )
 
     class Meta:
         verbose_name_plural = "AR Filters"
