@@ -25,6 +25,11 @@ from home.api.v1.serializers import (
     UserSerializer,
 )
 from django.db.models import Q
+import re
+from functools import reduce
+from django.db.models import F, Value
+from django.db.models.functions import Replace
+
 
 
 User = get_user_model()
@@ -265,6 +270,38 @@ class FindFriendsAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+    def post(self, request):
+        try:
+            contacts = request.data
+
+            phone_numbers = []
+            for contact in contacts:
+                if contact.get('phoneNumbers'):
+                    phone_number = re.sub(r'\D', '', contact['phoneNumbers'][0]['number'])
+                    phone_numbers.append(phone_number)
+
+
+            if phone_numbers:
+                user_profiles = UserProfile.objects.annotate(phone_number_cleaned=Replace(F('phone_number'), Value('-'), Value(''))).filter(
+                    reduce(
+                        lambda x, y: x | y,
+                        [
+                            Q(phone_number_cleaned__regex=rf'{phone_number}')
+                            for phone_number in phone_numbers
+                        ]
+                    )
+                ).exclude(user__in=request.user.user_profile.friends.all())
+
+                users = [up.user for up in user_profiles]
+                serializer = UserSerializer(users, many=True)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'No valid phone numbers found in the contacts'}, status=status.HTTP_400_BAD_REQUEST)
+
+        except Exception as e:
+            return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class NotificationViewset(viewsets.ModelViewSet):
