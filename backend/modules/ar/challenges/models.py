@@ -330,3 +330,31 @@ class GeoARSpecificSiteRoute(models.Model):
 
     def __str__(self):
         return self.name
+
+class UniqueChallengeSite(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_location_ar_unique_site",
+    )
+    challenges = models.ForeignKey(
+        Challenges,
+        on_delete=models.CASCADE,
+        related_name="challenges_ar_unique_site",
+        null=False,
+        blank=False,
+    )
+    lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
+
+    class Meta:
+      verbose_name_plural = "Geo AR Unique Sites"
+      verbose_name = "Geo AR Unique Site"
+
+    def __str__(self):
+        return self.name
