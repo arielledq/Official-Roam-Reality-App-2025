@@ -1,6 +1,6 @@
 from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
-    ARChallengeFilters
+    ARChallengeFilters, UniqueChallengeSite
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
@@ -117,6 +117,14 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "memory_type"
         )
 
+class UniqueChallengeSiteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UniqueChallengeSite
+        fields = (
+            "__all__"
+        )
+
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
 
@@ -128,6 +136,8 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
 
 class GeoLocationSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
+    unique_ar_sites = ARChallengeParameterSettingsSerializer(source='geo_location_ar_unique_site',read_only=True, many=True)
+    star_ar_sites = ARChallengeParameterSettingsSerializer(source='geo_location_ar_site',read_only=True, many=True)
 
     class Meta:
         model = GeoLocation
