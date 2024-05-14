@@ -90,7 +90,6 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "ar_filters"
         )
 
-
 class ChallengesUploadSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
     model_file = serializers.FileField()
