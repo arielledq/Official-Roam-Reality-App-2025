@@ -343,12 +343,10 @@ class UniqueChallengeSite(models.Model):
         blank=False,
         related_name="geo_location_ar_unique_site",
     )
-    challenges = models.ForeignKey(
+    challenges = models.ManyToManyField(
         Challenges,
-        on_delete=models.CASCADE,
         related_name="challenges_ar_unique_site",
-        null=False,
-        blank=False,
+        blank=False, null=False, default=None
     )
     lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
 
