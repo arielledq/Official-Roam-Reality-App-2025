@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -6,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.contrib.gis.db import models as gis_models
 from taggit.managers import TaggableManager
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
@@ -78,6 +80,7 @@ class ARChallengeParameterSettings(models.Model):
     bloom = models.BooleanField(_("Bloom"), default=False)
     sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
     image_opacity = models.BooleanField(_("Image Opacity"), default=False)
+    image_opacity_value = models.DecimalField(_("Image Opacity Value"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=1.00)
     tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
     ar_portals = models.BooleanField(_("AR Portals"), default=False)
     image_recognition = models.BooleanField(_("Image Recognition"), default=False)
