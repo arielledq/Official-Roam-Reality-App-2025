@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -6,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.contrib.gis.db import models as gis_models
 from taggit.managers import TaggableManager
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 User = get_user_model()
 
@@ -34,6 +36,11 @@ AR_MEMORY_CHOICES = (
 GRADIENT_DIRECTION = (
     ("TOP_TO_BOTTOM", "TOP TO BOTTOM"),
     ("BOTTOM_TO_TOP", "BOTTOM TO TOP")
+)
+
+LOCATION_OPTION = (
+    ("COUNTRY_ONLY", "COUNTRY ONLY"),
+    ("SITE_COUNTRY", "SITE + COUNTRY")
 )
 
 class GeoLocation(models.Model):
@@ -73,12 +80,18 @@ class ARChallengeParameterSettings(models.Model):
         _("Settings Name"), default=None, null=False, blank=False, max_length=255
     )
     loop_animations = models.BooleanField(_("Loop Animation"), default=False)
+    loop_delay = models.IntegerField(_("Loop Delay"),validators=[MinValueValidator(0)], default=1000, null=False, blank=False)
     pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
     rotation = models.BooleanField(_("Rotation"), default=False)
     bloom = models.BooleanField(_("Bloom"), default=False)
     sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
     image_opacity = models.BooleanField(_("Image Opacity"), default=False)
+    image_opacity_value = models.DecimalField(_("Image Opacity Value"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=1.00)
     tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
+    scale_object = models.DecimalField(_("Object Scale"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=0.05)
+    positionX = models.IntegerField(_("Position X"), default=0, null=False, blank=False)
+    positionY = models.IntegerField(_("Position Y"), default=0, null=False, blank=False)
+    positionZ = models.IntegerField(_("Position Z"), default=-25, null=False, blank=False)
     ar_portals = models.BooleanField(_("AR Portals"), default=False)
     image_recognition = models.BooleanField(_("Image Recognition"), default=False)
 
@@ -95,9 +108,12 @@ class ARChallengeFilters(models.Model):
     )
     image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
     gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False)
-    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
     gradient_direction = models.CharField(
-        max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=True, null=True
+        max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=False, null=False
+    )
+    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
+    location_option = models.CharField(_("Location Text"),
+        max_length=50, choices=LOCATION_OPTION, default="COUNTRY_ONLY", blank=False, null=False
     )
 
     class Meta:
