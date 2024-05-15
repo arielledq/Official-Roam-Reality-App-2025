@@ -92,12 +92,12 @@ const GeoArChallenge = ({
           <View style={{ flexDirection: 'row', justifyContent: "flex-start", width: '100%', alignItems: "flex-start", marginTop: 20 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>18+</Text>
+              <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center', marginStart: 22, marginEnd: 10 }}>
               <StarSiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>8+</Text>
+              <Text style={_styles.s_list_count}>{obj.star_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
