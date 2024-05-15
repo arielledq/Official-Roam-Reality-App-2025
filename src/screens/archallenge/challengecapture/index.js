@@ -60,9 +60,9 @@ const ArChallengeCapture = ({
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [scale, setScale] = useState([challengeObjParameters?.scale_object ? challengeObjParameters?.scale_object : 0.05,
-    challengeObjParameters?.scale_object ? challengeObjParameters?.scale_object : 0.05,
-    challengeObjParameters?.scale_object ? challengeObjParameters?.scale_object : 0.05]);
+    const [scale, setScale] = useState([challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+    challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+    challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05]);
     const [rotate, setRotate] = useState([0, 0, 0]);
     const [progress, setProgress] = useState([0, 0, 0]);
 
@@ -229,12 +229,12 @@ const ArChallengeCapture = ({
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
-            position={[challengeObjParameters?.positionX ? challengeObjParameters?.positionX : 0,
-            challengeObjParameters?.positionY ? challengeObjParameters?.positionY : -5,
-            challengeObjParameters?.positionZ ? challengeObjParameters?.positionZ : -25]}
+            position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+            challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
+            challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
             type="VRX"
-            opacity={challengeObjParameters?.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
+            opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
             onRotate={challengeObjParameters?.rotation ? _onRotate : null}
@@ -253,12 +253,12 @@ const ArChallengeCapture = ({
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
-          opacity={challengeObjParameters?.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
+          opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
           onDrag={_onDrag}
           source={{ uri: challengeObj.image }}
-          position={[challengeObjParameters?.positionX ? challengeObjParameters?.positionX : 0,
-          challengeObjParameters?.positionY ? challengeObjParameters?.positionY : 0,
-          challengeObjParameters?.positionZ ? challengeObjParameters?.positionZ : -5]} />}
+          position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+          challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
+          challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5]} />}
       </ViroARScene>
     );
   };
