@@ -88,3 +88,6 @@ celerybeat-schedule
 venv/
 ENV/
 myvenv/
+mediafiles/
+.local
+.python_history

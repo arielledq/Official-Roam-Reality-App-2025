@@ -1,38 +1,39 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, Image, Alert,TouchableOpacity } from 'react-native'
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
-import theme from '../../assets/theme'
-import { useNavigation } from '@react-navigation/native'
-import Images from '../../assets/images'
-import Icon from '../../components/Icon'
-import AppText from '../../components/text'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import ConfirmationPopUp from '../../components/confirmationPopUp'
-import { deleteAccount, logout } from '../../network'
-import { useDispatch } from 'react-redux'
-import { resetState } from '../../redux/Login'
-import LinearGradient from 'react-native-linear-gradient'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import { removeItem } from '../../util/helpers'
+import React, { useState } from "react"
+import { View, StyleSheet, Image, Alert, TouchableOpacity } from "react-native"
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer"
+import theme from "../../assets/theme"
+import { useNavigation } from "@react-navigation/native"
+import Images from "../../assets/images"
+import Icon from "../../components/Icon"
+import AppText from "../../components/text"
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import ConfirmationPopUp from "../../components/confirmationPopUp"
+import { deleteAccount, logout } from "../../network"
+import { useDispatch } from "react-redux"
+import { resetState } from "../../redux/Login"
+import LinearGradient from "react-native-linear-gradient"
+import { GoogleSignin } from "@react-native-google-signin/google-signin"
+import { removeItem } from "../../util/helpers"
 
 const DrawerList = [
   { icon: 'target', label: 'AR Challenges', navigateTo: 'GeoArChallenge' },
-  { icon: 'message-square', label: 'Chats', navigateTo: 'Home' },
-  { icon: 'users', label: 'Friends', navigateTo: 'Home' },
-  { icon: 'Wallet', label: 'Wallet', navigateTo: 'Home' },
-  { icon: 'info', label: 'About Us', navigateTo: 'Home' },
-  { icon: 'Invite', label: 'Invite Friends', navigateTo: 'Home' },
-  { icon: 'Folder', label: 'Privacy Policy', navigateTo: 'PrivacyPolicy' },
+  { icon: "message-square", label: "Chats", navigateTo: "Home" },
+  { icon: "users", label: "Friends", navigateTo: "Home" },
+  { icon: "Wallet", label: "Wallet", navigateTo: "Home" },
+  { icon: "info", label: "About Us", navigateTo: "Home" },
+  { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },
+  { icon: "Folder", label: "Privacy Policy", navigateTo: "PrivacyPolicy" },
+  { icon: "info", label: "Send Feedback", navigateTo: "SendFeedback" },
   {
-    icon: 'Folder',
-    label: 'Terms and Conditions',
-    navigateTo: 'TermsAndConditions'
+    icon: "Folder",
+    label: "Terms and Conditions",
+    navigateTo: "TermsAndConditions"
   },
-  { icon: 'Contact', label: 'Contact Us', navigateTo: 'ContactUs' },
-  { icon: 'Question', label: 'FAQ', navigateTo: 'FAQ' },
-  { icon: 'settings', label: 'Settings', navigateTo: 'Settings' },
-  { icon: 'trash-2', label: 'Delete Account', navigateTo: 'delete' },
-  { icon: 'log-out', label: 'Logout', navigateTo: 'logout' }
+  { icon: "Contact", label: "Contact Us", navigateTo: "ContactUs" },
+  { icon: "Question", label: "FAQ", navigateTo: "FAQ" },
+  { icon: "settings", label: "Settings", navigateTo: "Settings" },
+  { icon: "trash-2", label: "Delete Account", navigateTo: "delete" },
+  { icon: "log-out", label: "Logout", navigateTo: "logout" }
 ]
 
 const DrawerLayout = ({
@@ -44,57 +45,58 @@ const DrawerLayout = ({
   onPress
 }) => {
   function getIconFamily(icon) {
-    const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet"];
-    return customIcons.includes(icon) ? 'custom' : 'feather';
+    const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet"]
+    return customIcons.includes(icon) ? "custom" : "feather"
   }
   const renderDrawerItem = () => {
     return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}
-    >
-      <Icon
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between"
+        }}
+      >
+        <Icon
           name={icon}
           family={getIconFamily(icon)}
-          color={'white'}
+          color={"white"}
           size={20}
         />
-      <AppText style={styles.Text}>{label}</AppText>
-      {!isLastTwoItems && (
-        <Icon
-        name="chevron-right"
-        family="entypo"
-        color={theme.darkColors?.white}
-        size={20}
-      />   
-      )}
-    </View>
+        <AppText style={styles.Text}>{label}</AppText>
+        {!isLastTwoItems && (
+          <Icon
+            name="chevron-right"
+            family="entypo"
+            color={theme.darkColors?.white}
+            size={20}
+          />
+        )}
+      </View>
     )
   }
   return (
     <>
-  {index === 0 ? 
-    <TouchableOpacity onPress={() => onPress(navigateTo)}>
-      <LinearGradient  
-        colors={['#9003E0','#1158F4','#9003E0']}  
-        style={styles.linearGradient}
-        start={{x: 0, y: 0}} 
-        end={{x: 1, y: 0}}
-      >
-        {renderDrawerItem()}
-      </LinearGradient>
-    </TouchableOpacity> : 
-    <TouchableOpacity 
-      onPress={() => onPress(navigateTo)}
-      style={styles.linearGradient}
-    >
-      {renderDrawerItem()}
-    </TouchableOpacity>
-    }
-  </>
+      {index === 0 ? (
+        <TouchableOpacity onPress={() => onPress(navigateTo)}>
+          <LinearGradient
+            colors={["#9003E0", "#1158F4", "#9003E0"]}
+            style={styles.linearGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            {renderDrawerItem()}
+          </LinearGradient>
+        </TouchableOpacity>
+      ) : (
+        <TouchableOpacity
+          onPress={() => onPress(navigateTo)}
+          style={styles.linearGradient}
+        >
+          {renderDrawerItem()}
+        </TouchableOpacity>
+      )}
+    </>
   )
 }
 
@@ -119,30 +121,30 @@ function DrawerContent(props) {
   const [popupDetails, setPopupDetails] = useState({})
   const [isConfirmationVisible, setConfirmationVisible] = useState(false)
   const onPressHandler = navigateTo => {
-    if (navigateTo === 'delete') {
+    if (navigateTo === "delete") {
       setPopupDetails({
-        title: 'Delete Account',
-        description: 'Are you sure you want to delete your account?',
-        cancelText: 'Cancel'
+        title: "Delete Account",
+        description: "Are you sure you want to delete your account?",
+        cancelText: "Cancel"
       })
       setConfirmationVisible(true)
-    } else if (navigateTo === 'logout') {
+    } else if (navigateTo === "logout") {
       setPopupDetails({
-        title: 'Log Out',
-        description: 'Are you sure you want to logout?',
-        cancelText: 'Cancel'
+        title: "Log Out",
+        description: "Are you sure you want to logout?",
+        cancelText: "Cancel"
       })
       setConfirmationVisible(true)
     } else {
       navigation.navigate(navigateTo)
     }
   }
-  const handleLogOutButton = async() => {
-    await GoogleSignin.revokeAccess().catch(err => console.log(err));
-    await GoogleSignin.signOut().catch(err => console.log(err));
-    await removeItem('fbToken')
-    await removeItem('instaToken')
-    await removeItem('tiktokToken')
+  const handleLogOutButton = async () => {
+    await GoogleSignin.revokeAccess().catch(err => console.log(err))
+    await GoogleSignin.signOut().catch(err => console.log(err))
+    await removeItem("fbToken")
+    await removeItem("instaToken")
+    await removeItem("tiktokToken")
     logout()
     dispatch(resetState())
   }
@@ -154,9 +156,9 @@ function DrawerContent(props) {
       console.log({ res })
       if (res.status == 1) {
         handleLogOutButton()
-        Alert.alert('Success', 'Your account has been deleted successfully')
+        Alert.alert("Success", "Your account has been deleted successfully")
       } else {
-        Alert.alert('Error', res.message.error)
+        Alert.alert("Error", res.message.error)
       }
     })
   }
@@ -179,12 +181,12 @@ function DrawerContent(props) {
         description={popupDetails?.description}
         confirmText={popupDetails?.title}
         confirmHandler={
-          popupDetails?.title == 'Log Out'
+          popupDetails?.title == "Log Out"
             ? handleLogOutButton
             : handleDeleteAccount
         }
         isVisible={isConfirmationVisible}
-        cancelText={'Cancel'}
+        cancelText={"Cancel"}
         cancelHandler={closeModalHandler}
       />
     </>
@@ -211,16 +213,16 @@ const styles = StyleSheet.create({
     flex: 1
   },
   checkIcon: {
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: "center",
+    justifyContent: "center"
   },
   linearGradient: {
     marginLeft: 20,
     marginRight: 10,
-    marginTop : 13,
+    marginTop: 13,
     padding: 10,
     borderRadius: 8,
-    justifyContent : 'center',
-    alignItems : 'flex-start'
-  },
+    justifyContent: "center",
+    alignItems: "flex-start"
+  }
 })

@@ -19,7 +19,6 @@ waitress = "~=2.1.2"
 whitenoise = "~=6.0.0"
 djangorestframework = "~=3.13.1"
 django-bootstrap4 = "~=22.1"
-django-allauth = "~=0.54.0"
 django-rest-auth = "~=0.9.5"
 django-extensions = "~=3.1.5"
 packaging = "*"
@@ -35,3 +34,8 @@ django-import-export = "*"
 drf-spectacular = "~=0.26.3"
 cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditions"}
 cb-privacy-policy = {editable = true, path = "./modules/privacy_policy"}
+cb-ar = {editable = true, path = "./modules/ar"}
+sendgrid = "*"
+django-allauth = "==0.45.0"
+django-ckeditor = "*"
+ffmpeg_downloader = "*"
