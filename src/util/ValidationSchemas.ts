@@ -72,5 +72,7 @@ export const feedbackSchema = Yup.object().shape({
 })
 
 export const inviteFriendSchema = Yup.object().shape({
-  email: Yup.string().required("Email is required")
+  email: Yup.string()
+    .matches(emailRegex, Strings.EmailError)
+    .required("Email is required")
 })
