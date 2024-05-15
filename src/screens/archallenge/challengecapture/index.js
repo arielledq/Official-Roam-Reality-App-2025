@@ -60,7 +60,9 @@ const ArChallengeCapture = ({
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [scale, setScale] = useState([0.05, 0.05, 0.05]);
+    const [scale, setScale] = useState([challengeObjParameters?.scale_object ? challengeObjParameters?.scale_object : 0.05,
+    challengeObjParameters?.scale_object ? challengeObjParameters?.scale_object : 0.05,
+    challengeObjParameters?.scale_object ? challengeObjParameters?.scale_object : 0.05]);
     const [rotate, setRotate] = useState([0, 0, 0]);
     const [progress, setProgress] = useState([0, 0, 0]);
 
