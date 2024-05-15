@@ -48,7 +48,7 @@ const ArChallengeCapture = ({
   const modelFile = challengeObj.model_file;
 
 
-  const navigateToShare = (captureData,ifImage) => {
+  const navigateToShare = (captureData, ifImage) => {
     if (ifImage) {
       navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
     } else {
@@ -227,30 +227,36 @@ const ArChallengeCapture = ({
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
-            position={[0, -5, -30]}
+            position={[challengeObjParameters?.positionX ? challengeObjParameters?.positionX : 0,
+            challengeObjParameters?.positionY ? challengeObjParameters?.positionY : -5,
+            challengeObjParameters?.positionZ ? challengeObjParameters?.positionZ : -25]}
             scale={scale}
             type="VRX"
+            opacity={challengeObjParameters.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
             onRotate={challengeObjParameters?.rotation ? _onRotate : null}
             chromaKeyFilteringColor={"transparent"}
             onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
             onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            animation={challengeObjParameters?.loop_animations ? {
+            animation={{
               name: 'Take 001',
               run: true,
-              loop: true,
-              delay: 1000
-            } : {}}
+              loop: challengeObjParameters?.loop_animations ? true : false,
+              delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000
+            }}
           />
         }
 
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
+          opacity={challengeObjParameters.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
           onDrag={_onDrag}
           source={{ uri: challengeObj.image }}
-          position={[0, 0, -5]} />}
+          position={[challengeObjParameters?.positionX ? challengeObjParameters?.positionX : 0,
+          challengeObjParameters?.positionY ? challengeObjParameters?.positionY : 0,
+          challengeObjParameters?.positionZ ? challengeObjParameters?.positionZ : -5]} />}
       </ViroARScene>
     );
   };
