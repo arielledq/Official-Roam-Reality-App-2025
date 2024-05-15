@@ -53,7 +53,7 @@
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
-  [RNSplashScreen show]; // Add RNSplashScreen show method call here
+  //[RNSplashScreen show]; // Add RNSplashScreen show method call here
   [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
 
   return [super application:application didFinishLaunchingWithOptions:launchOptions];

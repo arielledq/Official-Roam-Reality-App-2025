@@ -39,6 +39,9 @@ import GeoArSiteRoutes from '../screens/geoarchallenge/siteroutes';
 import GeoArSiteNavigation from '../screens/geoarchallenge/navigationsite';
 import GeoArOutdoor from '../screens/geoarchallenge/outdoorgeoar';
 import ARFilter from '../screens/archallenge/FilterView';
+import Feedback from '../../screens/support-send-feedback/Feedback';
+import InviteFriends from '../screens/inviteFriends/InviteFriends';
+
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -92,6 +95,8 @@ const Navigation = () => {
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="SendFeedback" component={Feedback} />
+        <Stack.Screen name="InviteFriends" component={InviteFriends} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
