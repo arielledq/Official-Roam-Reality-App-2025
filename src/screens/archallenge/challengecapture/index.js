@@ -234,7 +234,7 @@ const ArChallengeCapture = ({
             challengeObjParameters?.positionZ ? challengeObjParameters?.positionZ : -25]}
             scale={scale}
             type="VRX"
-            opacity={challengeObjParameters.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
+            opacity={challengeObjParameters?.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
             onRotate={challengeObjParameters?.rotation ? _onRotate : null}
@@ -253,7 +253,7 @@ const ArChallengeCapture = ({
         {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
           height={1}
           width={1}
-          opacity={challengeObjParameters.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
+          opacity={challengeObjParameters?.image_opacity ? challengeObjParameters?.image_opacity_value : 1}
           onDrag={_onDrag}
           source={{ uri: challengeObj.image }}
           position={[challengeObjParameters?.positionX ? challengeObjParameters?.positionX : 0,
