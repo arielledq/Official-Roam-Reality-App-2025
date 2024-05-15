@@ -198,3 +198,9 @@ export const inviteFriendByEmail = data =>
     method: "POST",
     data
   })
+
+export const getGeoARDestinations = () =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-location/`,
+    method: 'GET'
+  })

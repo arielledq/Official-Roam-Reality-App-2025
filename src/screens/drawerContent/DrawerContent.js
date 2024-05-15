@@ -16,7 +16,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin"
 import { removeItem } from "../../util/helpers"
 
 const DrawerList = [
-  { icon: "target", label: "AR Challenges", navigateTo: "ARChallenge" },
+  { icon: 'target', label: 'AR Challenges', navigateTo: 'GeoArChallenge' },
   { icon: "message-square", label: "Chats", navigateTo: "Home" },
   { icon: "users", label: "Friends", navigateTo: "Home" },
   { icon: "Wallet", label: "Wallet", navigateTo: "Home" },

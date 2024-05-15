@@ -8,30 +8,30 @@ import {
   ActivityIndicator,
   FlatList
 } from "react-native"
-import { AppButton, AppHeader, AppText } from "../../components"
-import { resetState } from "../../redux/Login"
-import { deleteAccount, getARChallenges, logout } from "../../network"
+import { AppButton, AppHeader, AppText } from "../../../components"
+import { resetState } from "../../../redux/Login"
+import { deleteAccount, getARChallenges, logout } from "../../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
-import { MenuIcon } from "../../assets/svg"
-import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
-import theme from "../../assets/theme"
-import AppBottomSheet from "../../components/bottomSheet"
-import BackgroundWithImage from '../../components/background'
+import { MenuIcon } from "../../../assets/svg"
+import { screenHorizontalPadding } from "../../../util/AppDimensions"
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
+import theme from "../../../assets/theme"
+import AppBottomSheet from "../../../components/bottomSheet"
+import BackgroundWithImage from '../../../components/background'
 import {
   RootStackParamList,
   ScreenStackComponent
-} from "../../navigation/types"
+} from "../../../navigation/types"
 import BottomSheet from "@gorhom/bottom-sheet"
-import Images from "../../assets/images"
+import Images from "../../../assets/images"
 import useStyles from "./styles"
-import RightArrowIcon from "../../assets/svg/RightArrowIcon"
-import { handleError } from "../../util/helpers"
-import { HomeScreenData } from "../../util/HomeScreenUtils"
+import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
+import { handleError } from "../../../util/helpers"
+import { HomeScreenData } from "../../../util/HomeScreenUtils"
 import { BlurView } from "@react-native-community/blur";
 
-const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
+const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -127,17 +127,14 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   }
 
   const navigateToGeoARChanllenge = () => {
-    navigation.navigate('GeoArChallenge')
+    navigation.navigate('GeoArChallengeDetails')
   }
 
   const HomeScreenARItem = (item) => {
     return (
-      <BackgroundWithImage
-        imageSource={item?.image}
+      <View
         style={styles.imageBg}
-        imageStyle={styles.imageStyle}
       >
-        <View style={styles.firstView} />
         <View style={styles.row}>
           <View style={styles.innerView}>
             <AppText style={styles.headerText}>{item?.title}</AppText>
@@ -149,7 +146,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
             <RightArrowIcon />
           </TouchableOpacity>
         </View>
-      </BackgroundWithImage>
+      </View>
     )
   }
 
@@ -161,7 +158,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
-            renderItem={({ item }) => item.blank ? <View style={{ height: 120 }} /> : <HomeScreenARItem {...item} />}
+            renderItem={({ item }) => item.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />}
             keyExtractor={(item) => item.id}
             showsVerticalScrollIndicator={false}
           />
@@ -172,7 +169,6 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           style={{ backgroundColor: 'transparent' }}>
           <AppHeader
             title={"AR Experiences"}
-            leftComponent={handleMenuButton()}
             containerStyle={styles.headerContainer}
           />
         </BlurView>
@@ -181,7 +177,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   )
 }
 
-export default Home
+export default GeoArOutdoor
 
 const styles = StyleSheet.create({
   mainContainer: {
