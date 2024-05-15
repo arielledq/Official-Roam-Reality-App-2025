@@ -191,3 +191,10 @@ export const sendFeedback = data =>
     method: "POST",
     data
   })
+
+export const inviteFriendByEmail = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}invite-friend/`,
+    method: "POST",
+    data
+  })

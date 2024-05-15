@@ -5,7 +5,9 @@ import {
   StyleSheet,
   Keyboard,
   Pressable,
-  Image
+  Image,
+  Share,
+  Alert
 } from "react-native"
 import BackgroundWithImage from "../../components/background"
 import { AppButton, AppHeader, AppInput } from "../../components"
@@ -17,6 +19,7 @@ import { SvgXml } from "react-native-svg"
 import { Icons } from "../../assets/Icons"
 import useStyles from "./styles"
 import Images from "../../assets/images"
+import { inviteFriendByEmail } from "../../network"
 
 interface InviteFriendsProps {}
 
@@ -25,6 +28,48 @@ const InviteFriends = (props: InviteFriendsProps) => {
   const [isMessageFocused, setMessageFocused] = React.useState(false)
   const [isEmailInputFocused, setEmailInputFocused] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
+
+  /**
+   * Method to share the app link through email, message, etc.
+   */
+  const onShareLinkClick = async () => {
+    const result = Share.share({
+      message: "https://www.google.com",
+      title: "Invite Friends"
+    })
+    if (result.action === Share.sharedAction) {
+      // Link has been successfully shared
+      Alert.alert("App link shared successfully")
+    }
+  }
+
+  /**
+   * Method to invite friends using their email id and message
+   */
+  const inviteFriends = async (values: any, resetForm: any) => {
+    // API call to invite friends
+    setLoading(true)
+    const data = {
+      email: values.email?.trim(),
+      message: values.description?.trim()
+    }
+    inviteFriendByEmail(data)
+      .then(response => {
+        setLoading(false)
+        if (response.status === 1) {
+          resetForm() // Reset form after successful submission
+          Alert.alert("Invite", "An invite has been sent to your friend")
+        } else {
+          Alert.alert("Error", "Something went wrong")
+        }
+      })
+      .catch(error => {
+        setLoading(false)
+        console.error("error", JSON.stringify(error))
+        Alert.alert("Error", "Something went wrong")
+      })
+  }
+
   return (
     <BackgroundWithImage>
       <AppHeader title={"Invite Friends"} backgroundColor="transparent" />
@@ -37,11 +82,10 @@ const InviteFriends = (props: InviteFriendsProps) => {
       >
         <Formik
           initialValues={{
-            name: "",
             email: "",
             message: ""
           }}
-          onSubmit={values => submitHandler(values)}
+          onSubmit={(values, { resetForm }) => inviteFriends(values, resetForm)}
           enableReinitialize
           validationSchema={inviteFriendSchema}
         >
@@ -70,7 +114,6 @@ const InviteFriends = (props: InviteFriendsProps) => {
                     touched.email && errors?.email ? errors.email : undefined
                   }
                   autoCapitalize="none"
-                  editable={false}
                 />
                 <AppInput
                   style={[
@@ -108,7 +151,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
                 onPress={handleSubmit}
                 loading={loading}
               />
-              <Pressable>
+              <Pressable onPress={onShareLinkClick}>
                 <Image
                   source={Images.ShareInvite}
                   style={_styles.shareInvite}
