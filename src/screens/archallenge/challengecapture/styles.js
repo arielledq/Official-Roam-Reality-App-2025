@@ -175,8 +175,31 @@ const useStyles = makeStyles(theme => ({
     width: 37,
     height: 37,
     marginEnd: 10
-  }
+  },
 
+  borderStyles: {
+    borderStyle: 'dashed',
+    borderColor: 'gray',
+  },
+  textStyles: {
+    color: '#fff',
+  },
+  cornerStyles: {
+    padding: 8,
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: 'white',
+    borderColor: '#aaa',
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: 'white',
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+  },
 }))
 
 export default useStyles

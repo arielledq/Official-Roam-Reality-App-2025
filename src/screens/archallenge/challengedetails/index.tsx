@@ -33,6 +33,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   console.log("expiry_date:",challengeObj.expiry_date)
   const expiryDate = moment(challengeObj.expiry_date).format('DD-MM-YYYY');
   const isFocused = useIsFocused();
+  console.log("challengeObj:",challengeObj)
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true)
