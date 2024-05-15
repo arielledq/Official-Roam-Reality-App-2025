@@ -52,8 +52,10 @@ const useStyles = makeStyles(theme => ({
     color: '#fff',
     fontSize: FontSizes.S22,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
-    marginHorizontal: 5
+    ...fontGroup.p700,
+    marginHorizontal: 8,
+    maxWidth:'75%',
+    textAlign:'center'
   },
   bottomText: {
     color: '#fff',
@@ -62,6 +64,12 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.p900,
     marginHorizontal: 5
   },
+  filterTextView: { position: 'absolute', zIndex: 20, right: 0, left: 0, alignItems: 'center' },
+  locationTextView: { position: 'absolute', right: 0, left: 0, flexDirection: 'row', alignItems: 'center' },
+  filterTextBottom: {bottom: 80},
+  locationTextBottom: {bottom: 150},
+  filterTextTop: {top: 150},
+  locationTextTop: {top: 80},
 }))
 
 export default useStyles
