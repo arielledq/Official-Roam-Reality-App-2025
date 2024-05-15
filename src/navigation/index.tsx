@@ -32,6 +32,8 @@ import Privacy from '../screens/privacy';
 import AnimatedSplash from '../screens/animatedSplash';
 import ContactUs from '../screens/ContactUs/ContactUs'
 import FAQ from '../screens/FAQ/FAQ';
+import Feedback from '../../screens/support-send-feedback/Feedback';
+import InviteFriends from '../screens/inviteFriends/InviteFriends';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -85,6 +87,8 @@ const Navigation = () => {
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="SendFeedback" component={Feedback} />
+        <Stack.Screen name="InviteFriends" component={InviteFriends} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
         <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
