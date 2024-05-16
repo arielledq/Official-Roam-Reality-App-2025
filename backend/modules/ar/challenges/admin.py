@@ -3,6 +3,7 @@ from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, 
   ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField
+from django.contrib.gis.admin import OSMGeoAdmin
 
 class ARMemoriesAdmin(admin.ModelAdmin):
     
@@ -31,11 +32,14 @@ class ARChallengeUpdatedAdmin(admin.ModelAdmin):
     def sponsor_name(self, obj):
         return obj.sponsor.name
 
-class GeoArChallengeAdmin(admin.ModelAdmin):
+class GeoArChallengeAdmin(OSMGeoAdmin):
     formfield_overrides = {
         MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
         PointField: {"widget": GoogleMapsOpenLayersWidget},
     }
+    default_lon = 4600000
+    default_lat = 180000
+    default_zoom = 15
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
