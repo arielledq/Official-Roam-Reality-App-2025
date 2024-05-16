@@ -179,7 +179,7 @@ const ArChallengeCapture = ({
 
     const _onPinch = (pinchState, scaleFactor, source) => {
       console.log("_onPinch scaleFactor", scaleFactor)
-      if ((scale[0] * scaleFactor) < 0.05) {
+      if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
       let newScale = [
