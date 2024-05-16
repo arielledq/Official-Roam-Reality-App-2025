@@ -49,7 +49,7 @@ const ArChallengeCapture = ({
 
 
   const navigateToShare = (captureData, ifImage) => {
-    if (ifImage) {
+    if (ifImage && route?.params?.challengeObj?.ar_filters.length > 0) {
       navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
     } else {
       navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });

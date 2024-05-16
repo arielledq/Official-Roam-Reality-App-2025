@@ -111,9 +111,9 @@ const ARFilter = ({
     if (location_option == "COUNTRY_ONLY") {
       return country;
     } else {
-      if(admin_area_2){
+      if (admin_area_2) {
         return `${city}, ${admin_area_2}, ${country}`;
-      }else{
+      } else {
         return `${city}, ${country}`;
       }
     }
@@ -141,11 +141,12 @@ const ARFilter = ({
                     {fullLocation &&
                       <View style={[styles.locationTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.locationTextTop : styles.locationTextBottom]}>
                         <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
-                        <Text style={styles.locationText}>{getLocationText(filter.location_option)}</Text>
+                        <Text style={[styles.locationText,
+                        { color: filter.location_text_color, fontSize: filter.location_text_size }]}>{getLocationText(filter.location_option)}</Text>
                         <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
                       </View>}
                     <View style={[styles.filterTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.filterTextTop : styles.filterTextBottom]}>
-                      <Text style={styles.bottomText}>{filter.filter_text}</Text>
+                      <Text style={[styles.bottomText, { color: filter.filter_text_color, fontSize: filter.filter_text_size }]}>{filter.filter_text}</Text>
                     </View>
                   </View>
                 )
