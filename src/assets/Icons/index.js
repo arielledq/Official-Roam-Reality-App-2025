@@ -31,6 +31,8 @@ import SelectedCamera from "./SelectedCamera.svg"
 import Contact from "./Contact.svg"
 import Question from "./Question.svg"
 import FacebookIcon from "./facebookIcon.svg"
+import TikTok from "./tiktok.svg"
+import Instagram from "./instagram.svg"
 import Invite from "./invite.svg"
 import Folder from "./folder.svg"
 import Wallet from "./wallet.svg"
@@ -70,6 +72,8 @@ export const Icons = {
   Contact,
   Question,
   FacebookIcon,
+  TikTok,
+  Instagram,
   Invite,
   Folder,
   Wallet,
