@@ -82,7 +82,7 @@ class ARChallengeParameterSettings(models.Model):
     loop_animations = models.BooleanField(_("Loop Animation"), default=False)
     loop_delay = models.IntegerField(_("Loop Delay"),validators=[MinValueValidator(0)], default=1000, null=False, blank=False)
     pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
-    min_pinch_scale = models.DecimalField(_("Minimum Zoom Sceling"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=0.02)
+    min_pinch_scale = models.DecimalField(_("Minimum Zoom Scaling"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=0.02)
     rotation = models.BooleanField(_("Rotation"), default=False)
     bloom = models.BooleanField(_("Bloom"), default=False)
     sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
