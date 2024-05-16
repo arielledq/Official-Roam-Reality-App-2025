@@ -3,7 +3,7 @@ from django.urls import path, include
 from rest_framework import routers
 from . import signals  # noqa
 from .viewsets import ChallengesViewSet, ChallengesUploadView,\
-    SponsorViewSet, Resource3dModelViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
+    SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
     ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet
 
 router = routers.DefaultRouter()
@@ -13,7 +13,6 @@ router.register(r'sponsor', SponsorViewSet)
 router.register(r'memories', ARMemoriesViewSet, basename="ar-memories")
 router.register(r'settings', ARSettingsViewSet)
 router.register(r'examples', ARExamplesViewSet)
-router.register(r'resource', Resource3dModelViewSet)
 router.register(r'geo-ar-location', GeoLocationViewSet)
 router.register(r'geo-ar-site', GeoArSiteViewSet)
 
