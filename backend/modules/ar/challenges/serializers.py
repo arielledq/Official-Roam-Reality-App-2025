@@ -1,10 +1,9 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories,\
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
     ARChallengeFilters, UniqueChallengeSite
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
-
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
   
@@ -13,15 +12,7 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
         fields = (
             "__all__"
         )
-        
-class Resource3dModelSerializer(serializers.ModelSerializer):
-  
-    class Meta:
-        model = Resource3dModel
-        fields = (
-            "__all__"
-        )
-        
+
 class SponsorSerializer(serializers.ModelSerializer):
   
     class Meta:
