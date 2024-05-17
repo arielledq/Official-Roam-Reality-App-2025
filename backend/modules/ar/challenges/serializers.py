@@ -1,10 +1,11 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories,\
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
     ARChallengeFilters, UniqueChallengeSite
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
-
+from django.contrib.gis.db.models import GeometryField
+from rest_framework_gis.serializers import GeoModelSerializer
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
   
@@ -13,15 +14,7 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
         fields = (
             "__all__"
         )
-        
-class Resource3dModelSerializer(serializers.ModelSerializer):
-  
-    class Meta:
-        model = Resource3dModel
-        fields = (
-            "__all__"
-        )
-        
+
 class SponsorSerializer(serializers.ModelSerializer):
   
     class Meta:
@@ -116,14 +109,6 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "memory_type"
         )
 
-class UniqueChallengeSiteSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = UniqueChallengeSite
-        fields = (
-            "__all__"
-        )
-
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
 
@@ -133,22 +118,33 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
-class GeoLocationSerializer(serializers.ModelSerializer):
-    image = serializers.ImageField()
-    unique_ar_sites = ARChallengeParameterSettingsSerializer(source='geo_location_ar_unique_site',read_only=True, many=True)
-    star_ar_sites = ARChallengeParameterSettingsSerializer(source='geo_location_ar_site',read_only=True, many=True)
+class UniqueChallengeSiteSerializer(GeoModelSerializer):
 
     class Meta:
-        model = GeoLocation
+        model = UniqueChallengeSite
+        geo_field = 'lat_long'
         fields = (
             "__all__"
         )
 
-class GeoArSiteSerializer(serializers.ModelSerializer):
+class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
 
     class Meta:
         model = GeoArSite
+        geo_field = ('lat_long','geo_site_area',)
+        fields = (
+            "__all__"
+        )
+
+class GeoLocationSerializer(GeoModelSerializer):
+    image = serializers.ImageField()
+    unique_ar_sites = UniqueChallengeSiteSerializer(source='geo_location_ar_unique_site',read_only=True, many=True)
+    star_ar_sites = GeoArSiteSerializer(source='geo_location_ar_site',read_only=True, many=True)
+
+    class Meta:
+        model = GeoLocation
+        geo_field = 'geo_location'
         fields = (
             "__all__"
         )
