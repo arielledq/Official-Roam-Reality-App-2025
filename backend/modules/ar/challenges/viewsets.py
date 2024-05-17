@@ -1,8 +1,8 @@
-from .models import Challenges, Sponsor, Resource3dModel, ARUserProfile, ARMemories, ARSettings, ARExample, \
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
 GeoArSite, GeoLocation
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
-Resource3dModelSerializer, ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, \
+ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, \
 GeoLocationSerializer, GeoArSiteSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
@@ -19,15 +19,6 @@ from django.db.models import F
 from django.db.models import Q
 
 SOCIAL_POINTS = 1
-
-class Resource3dModelViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing accounts.
-    """
-    queryset = Resource3dModel.objects.all()
-    serializer_class = Resource3dModelSerializer
-    http_method_names = ["get"]
-
 
 class SponsorViewSet(viewsets.ModelViewSet):
     """

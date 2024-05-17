@@ -1,8 +1,9 @@
 from django.contrib import admin
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,GeoARSpecificSiteRoute, \
-  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite
+  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField
+from django.contrib.gis.admin import OSMGeoAdmin
 
 class ARMemoriesAdmin(admin.ModelAdmin):
     
@@ -31,11 +32,24 @@ class ARChallengeUpdatedAdmin(admin.ModelAdmin):
     def sponsor_name(self, obj):
         return obj.sponsor.name
 
-class GeoArChallengeAdmin(admin.ModelAdmin):
+@admin.register(GeoARChallenges)
+class GeoARChallengesUpdatedAdmin(admin.ModelAdmin):
+    list_display = ('name', 'sponsor', 'expiry_date')
+    list_select_related = ['sponsor']
+    ordering = ("sponsor__name",)
+    search_fields = ["name", "sponsor__name"]
+
+    def sponsor_name(self, obj):
+        return obj.sponsor.name
+
+class GeoArChallengeAdmin(OSMGeoAdmin):
     formfield_overrides = {
         MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
         PointField: {"widget": GoogleMapsOpenLayersWidget},
     }
+    default_lon = -80.41984442094248
+    default_lat =  21.758821200665473
+    default_zoom = 3
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
@@ -43,6 +57,11 @@ class GeoLocationAdmin(GeoArChallengeAdmin):
     ordering = ("name",)
     search_fields = ["name"]
 
+@admin.register(UniqueChallengeSite)
+class GeoLocationAdmin(GeoArChallengeAdmin):
+    list_display = ('name',)
+    ordering = ("name",)
+    search_fields = ["name"]
 
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARUserProfile, ARChallengeAdmin)
@@ -54,7 +73,6 @@ admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARSpecificSiteRoute, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 admin.site.register(ARChallengeFilters, ARChallengeAdmin)
-admin.site.register(UniqueChallengeSite, ARChallengeAdmin)
 
 
 
