@@ -53,9 +53,9 @@ class GeoArChallengeAdmin(OSMGeoAdmin):
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
-    list_display = ('name',)
-    ordering = ("name",)
-    search_fields = ["name"]
+    list_display = ('name','sequence_number',)
+    ordering = ('sequence_number',)
+    search_fields = ["name",'sequence_number']
 
 @admin.register(UniqueChallengeSite)
 class GeoLocationAdmin(GeoArChallengeAdmin):
