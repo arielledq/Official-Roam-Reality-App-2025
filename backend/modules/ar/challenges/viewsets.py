@@ -152,7 +152,7 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing GeoLocation.
     """
-    queryset = GeoLocation.objects.all()
+    queryset = GeoLocation.objects.all().order_by('sequence_number')
     serializer_class = GeoLocationSerializer
     http_method_names = ["get"]
 

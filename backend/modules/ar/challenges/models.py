@@ -51,6 +51,7 @@ class GeoLocation(models.Model):
     )
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)
 
     class Meta:
         verbose_name_plural = "Geo Destination"
