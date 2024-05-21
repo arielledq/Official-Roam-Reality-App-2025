@@ -31,14 +31,10 @@ env_file = os.path.join(BASE_DIR, ".env")
 env = environ.Env()
 env.read_env(env_file)
 
-OS = os.environ.get("OS", "")
-if OS == 'MAC':
+if os.name == 'posix':
     GDAL_LIBRARY_PATH = '/opt/homebrew/Cellar/gdal/3.8.5/lib/libgdal.dylib' 
     GEOS_LIBRARY_PATH = '/opt/homebrew/Cellar/geos/3.12.1/lib/libgeos_c.dylib'
-else:
-    pass
-
-if os.name == 'nt':
+elif os.name == 'nt':
     import platform
     OSGEO4W = r"C:\OSGeo4W"
     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
@@ -110,7 +106,8 @@ THIRD_PARTY_APPS = [
     'storages',
     'import_export',
     'ckeditor',
-    'taggit'
+    'taggit',
+    'rest_framework_gis',
 ]
 MODULES_APPS = get_modules()
 
