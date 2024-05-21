@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../../util/helpers"
@@ -18,6 +18,8 @@ import PinIcon from "../../../assets/geoar/pinicon.svg"
 import SitesIcon from "../../../assets/geoar/sites.svg"
 import Map from "../../../assets/geoar/map.png"
 import MapView from 'react-native-maps';
+import Geocoder from 'react-native-geocoding';
+Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
@@ -30,7 +32,36 @@ const GeoArChallengeDetails = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+  const mapView = useRef();
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
+  console.log("selectedDestination", selectedDestination)
 
+  const setMapBounds = () => {
+    console.log("mapView")
+    var address = selectedDestination.name;
+    Geocoder.from(address)
+      .then(json => {
+        var location = json.results[0].geometry.location;
+        var bounds = json.results[0].geometry.bounds
+        console.log(location);
+        console.log(bounds);
+        mapView.current.setMapBoundaries({ latitude: bounds.northeast.lat, longitude: bounds.northeast.lng },
+          { latitude: bounds.southwest.lat, longitude: bounds.southwest.lng }
+        );
+        mapView.current.animateToRegion({
+          latitude: location.lat,
+          longitude: location.lng,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 1,
+        })
+      })
+      .catch(error => console.warn(error));
+  }
+
+  useEffect(() => {
+    setTimeout(setMapBounds, 500)
+
+  }, []);
 
   return (
 
@@ -47,7 +78,7 @@ const GeoArChallengeDetails = ({
           <TouchableOpacity activeOpacity={.5} style={_styles.selectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Full</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
+          <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Diego Martin Region</Text>
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
@@ -55,8 +86,9 @@ const GeoArChallengeDetails = ({
           </TouchableOpacity>
         </ScrollView>
       </View>
-      <View style={{ width: '100%',position:'relative',flex:1, borderRadius:16, overflow:'hidden'}}>
+      <View style={{ width: '100%', position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden' }}>
         <MapView
+          ref={mapView}
           style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={{
             latitude: 37.78825,
@@ -66,13 +98,13 @@ const GeoArChallengeDetails = ({
           }}
         />
       </View>
-      <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20,marginBottom:30 }}>
+      <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <SiteIcon style={{ width: 48, height: 48 }} />
           <Text style={_styles.s_list_count}>18+</Text>
           <Text style={_styles.s_list_text}>Sites</Text>
         </View>
-        <View style={{ alignItems: 'center', justifyContent: 'center'}}>
+        <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <SitesIcon style={{ width: 48, height: 48 }} />
           <Text style={_styles.s_list_count}>8+</Text>
           <Text style={_styles.s_list_text}>Star Sites</Text>
