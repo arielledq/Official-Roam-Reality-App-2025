@@ -1,24 +1,16 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { handleError } from "../../../util/helpers"
-import { getARChallenges, getARProfile, getARStettings } from '../../../network'
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
-import GradientDown from "../../../assets/geoar/gradient_down.svg"
-import GradientDownPNG from "../../../assets/geoar/gradient_down.png"
-import BellIcon from "../../../assets/geoar/bell.svg"
-import LocationIcon from "../../../assets/geoar/location.png"
-import BackImg from "../../../assets/geoar/back_img.png"
 import ArIcon from "../../../assets/geoar/aricon.svg"
-import PinIcon from "../../../assets/geoar/pinicon.svg"
 import SitesIcon from "../../../assets/geoar/sites.svg"
-import Map from "../../../assets/geoar/map.png"
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
+import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 import { useDispatch, useSelector } from "react-redux"
@@ -59,16 +51,31 @@ const GeoArChallengeDetails = ({
   }
 
   useEffect(() => {
-    setTimeout(setMapBounds, 500)
-
+    //setTimeout(setMapBounds, 500)
   }, []);
 
-  return (
+  const _markerView = (o) => {
+    return (
+      <Marker
+        coordinate={{
+          latitude: 37.78825,
+          longitude: -122.4324
+        }}
+        title={o.name}
+        onCalloutPress={() => navigation.navigate("GeoArSiteDetails")}
+      >
+        <View style={{ width: 30, height: 30 }}>
+          <MarkerIcon />
+        </View>
+      </Marker>
+    )
+  }
 
+  return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Trinidad",
+          text: selectedDestination.name,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
 
@@ -96,17 +103,29 @@ const GeoArChallengeDetails = ({
             latitudeDelta: 0.0922,
             longitudeDelta: 0.0421,
           }}
-        />
+        >
+          {
+            selectedDestination.unique_ar_sites.map((o) => {
+              return _markerView(o)
+            })
+          }
+          {
+            selectedDestination.star_ar_sites.map((o) => {
+              return _markerView(o)
+            })
+          }
+
+        </MapView>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <SiteIcon style={{ width: 48, height: 48 }} />
-          <Text style={_styles.s_list_count}>18+</Text>
+          <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>Sites</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <SitesIcon style={{ width: 48, height: 48 }} />
-          <Text style={_styles.s_list_count}>8+</Text>
+          <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>Star Sites</Text>
         </View><View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <StarSiteIcon style={{ width: 48, height: 48 }} />
