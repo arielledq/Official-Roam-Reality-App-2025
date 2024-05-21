@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { ActivityIndicator, FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
-import { getGeoARDestinations, getARProfile, getARStettings } from '../../network'
+import { getGeoARDestinations, getARProfile, getARStettings, getARChallenges } from '../../network'
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
@@ -25,6 +25,7 @@ const GeoArChallenge = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
+  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
   const navigation = useNavigation()
 
   const ARSposored = () => {
@@ -70,6 +71,16 @@ const GeoArChallenge = ({
     ARSposored()
     ARUserProfile()
     getSettings()
+    getARChallenges().then((res) => {
+      if (res.status == 1) {
+        setNumberOfChallenges(res?.data?.length)
+      } else {
+        res.message.message = "Error in loading Challenges."
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
   }, []);
 
   const navigateToChallengeDetails = (obj) => {
@@ -96,7 +107,7 @@ const GeoArChallenge = ({
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>64+</Text>
+              <Text style={_styles.s_list_count}>{numberOfChallenges}</Text>
               <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
           </View>
