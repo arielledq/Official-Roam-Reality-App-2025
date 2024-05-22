@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,GeoARSpecificSiteRoute, \
-  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges
+  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField
 from django.contrib.gis.admin import OSMGeoAdmin
@@ -57,6 +57,12 @@ class GeoLocationAdmin(GeoArChallengeAdmin):
     ordering = ('sequence_number',)
     search_fields = ["name",'sequence_number']
 
+@admin.register(GeoRegion)
+class GeoRegionAdmin(GeoArChallengeAdmin):
+    list_display = ('name',)
+    ordering = ('name',)
+    search_fields = ["name"]
+    
 @admin.register(UniqueChallengeSite)
 class GeoLocationAdmin(GeoArChallengeAdmin):
     list_display = ('name',)

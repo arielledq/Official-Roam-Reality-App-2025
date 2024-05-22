@@ -43,6 +43,23 @@ LOCATION_OPTION = (
     ("SITE_COUNTRY", "SITE + COUNTRY")
 )
 
+class GeoRegion(models.Model):
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    latitude_longitude = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
+    map_latitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
+    
+    class Meta:
+        verbose_name_plural = "Geo Regions"
+        verbose_name = "Geo Region"
+
+    def __str__(self):
+        return self.name
+
 class GeoLocation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -51,6 +68,7 @@ class GeoLocation(models.Model):
     )
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    regions = models.ManyToManyField(GeoRegion,verbose_name="AR Regions",related_name="geo_location_region", blank=True, null=True, default=None)
     sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)
     map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
     map_latitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
