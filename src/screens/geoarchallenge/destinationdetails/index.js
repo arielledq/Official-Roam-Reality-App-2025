@@ -26,7 +26,7 @@ const GeoArChallengeDetails = ({
   const navigation = useNavigation()
   const mapView = useRef();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  console.log("selectedDestination", selectedDestination)
+  const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
 
   const setMapBounds = () => {
     console.log("mapView")
@@ -43,32 +43,35 @@ const GeoArChallengeDetails = ({
         mapView.current.animateToRegion({
           latitude: location.lat,
           longitude: location.lng,
-          latitudeDelta: 0.0922,
-          longitudeDelta: 1,
+          latitudeDelta: Number(selectedDestination.map_latitude_delta),
+          longitudeDelta:Number(selectedDestination.map_longitude_delta),
         })
       })
       .catch(error => console.warn(error));
   }
 
   useEffect(() => {
-    //setTimeout(setMapBounds, 500)
+    setTimeout(setMapBounds, 500)
   }, []);
 
   const _markerView = (o) => {
-    return (
-      <Marker
-        coordinate={{
-          latitude: 37.78825,
-          longitude: -122.4324
-        }}
-        title={o.name}
-        onCalloutPress={() => navigation.navigate("GeoArSiteDetails")}
-      >
-        <View style={{ width: 30, height: 30 }}>
-          <MarkerIcon />
-        </View>
-      </Marker>
-    )
+    console.log("_markerView",o.lat_long)
+    if(o.lat_long){
+      return (
+        <Marker
+          coordinate={{
+            latitude: o.lat_long.coordinates[0],
+            longitude: o.lat_long.coordinates[1]
+          }}
+          title={o.name}
+          onCalloutPress={() => navigation.navigate("GeoArSiteDetails")}
+        >
+          <View style={{ width: 30, height: 30 }}>
+            <MarkerIcon />
+          </View>
+        </Marker>
+      )
+    }
   }
 
   return (
@@ -85,12 +88,12 @@ const GeoArChallengeDetails = ({
           <TouchableOpacity activeOpacity={.5} style={_styles.selectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Full</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
+          {/* <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Diego Martin Region</Text>
           </TouchableOpacity>
           <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
             <Text style={_styles.buttonSelectText}>San Juan-Laventille Region</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </ScrollView>
       </View>
       <View style={{ width: '100%', position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden' }}>
@@ -129,12 +132,12 @@ const GeoArChallengeDetails = ({
           <Text style={_styles.s_list_text}>Star Sites</Text>
         </View><View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <StarSiteIcon style={{ width: 48, height: 48 }} />
-          <Text style={_styles.s_list_count}>100+</Text>
+          <Text style={_styles.s_list_count}>0</Text>
           <Text style={_styles.s_list_text}>Hidden Sites</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ArIcon style={{ width: 48, height: 48 }} />
-          <Text style={_styles.s_list_count}>64+</Text>
+          <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
           <Text style={_styles.s_list_text}>AR Challenges</Text>
         </View>
       </View>

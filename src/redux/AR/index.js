@@ -1,1 +1,4 @@
-export { resetState, updateARUserData, updateARSettings, updateSelectedDestination } from './reducer'
+export {
+  resetState, updateARUserData, updateARSettings, updateSelectedDestination,
+  updateAnyWhereChallenges, updateSelectedSites
+} from './reducer'

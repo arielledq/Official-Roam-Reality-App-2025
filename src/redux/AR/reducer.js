@@ -3,7 +3,9 @@ import { createSlice } from '@reduxjs/toolkit'
 const initialState = {
   arProfile: {},
   arSettings: {},
-  selectedDestination: {}
+  selectedDestination: {},
+  anywhereChallenges: {},
+  selectedGeoSite: {}
 }
 
 export const sliceAR = createSlice({
@@ -20,10 +22,18 @@ export const sliceAR = createSlice({
       state.arSettings = action.payload
     },
     updateSelectedDestination: (state, action) => {
-      console.log(state, action)
       state.selectedDestination = action.payload
+    },
+    updateAnyWhereChallenges: (state, action) => {
+      state.anywhereChallenges = action.payload
+    },
+    updateSelectedSites: (state, action) => {
+      state.selectedGeoSite = action.payload
     }
   }
 })
 
-export const { resetState, updateARUserData, updateARSettings, updateSelectedDestination } = sliceAR.actions
+export const { resetState, updateARUserData,
+  updateARSettings, updateSelectedDestination,
+  updateAnyWhereChallenges, updateSelectedSites
+} = sliceAR.actions

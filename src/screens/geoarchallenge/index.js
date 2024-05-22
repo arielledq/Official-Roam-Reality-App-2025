@@ -11,7 +11,7 @@ import StarSiteIcon from "../../assets/geoar/starsite.svg"
 import GradientDownPNG from "../../assets/geoar/gradient_down.png"
 import BellIcon from "../../assets/geoar/bell.svg"
 import ArIcon from "../../assets/geoar/aricon.svg"
-import { updateARUserData, updateARSettings, updateSelectedDestination } from "../../redux/AR"
+import { updateARUserData, updateARSettings, updateSelectedDestination, updateAnyWhereChallenges } from "../../redux/AR"
 
 import { useDispatch } from "react-redux"
 import useStyles from "./styles"
@@ -74,6 +74,7 @@ const GeoArChallenge = ({
     getARChallenges().then((res) => {
       if (res.status == 1) {
         setNumberOfChallenges(res?.data?.length)
+        dispatch(updateAnyWhereChallenges(res?.data))
       } else {
         res.message.message = "Error in loading Challenges."
         handleError(res)
