@@ -27,6 +27,9 @@ const GeoArChallengeDetails = ({
   const mapView = useRef();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
   const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
+  const regions = selectedDestination?.regions
+  const [fullRegion, setFullRegion] = useState(null)
+  console.log("selectedDestination:", selectedDestination.regions)
 
   const setMapBounds = () => {
     console.log("mapView")
@@ -40,14 +43,20 @@ const GeoArChallengeDetails = ({
         mapView.current.setMapBoundaries({ latitude: bounds.northeast.lat, longitude: bounds.northeast.lng },
           { latitude: bounds.southwest.lat, longitude: bounds.southwest.lng }
         );
-        mapView.current.animateToRegion({
+        const fullRegion = {
           latitude: location.lat,
           longitude: location.lng,
           latitudeDelta: Number(selectedDestination.map_latitude_delta),
-          longitudeDelta:Number(selectedDestination.map_longitude_delta),
-        })
+          longitudeDelta: Number(selectedDestination.map_longitude_delta),
+        }
+        mapView.current.animateToRegion(fullRegion)
+        setFullRegion(fullRegion)
       })
       .catch(error => console.warn(error));
+  }
+
+  moveToFullRegion = ()=>{
+    mapView.current.animateToRegion(fullRegion)
   }
 
   useEffect(() => {
@@ -55,8 +64,7 @@ const GeoArChallengeDetails = ({
   }, []);
 
   const _markerView = (o) => {
-    console.log("_markerView",o.lat_long)
-    if(o.lat_long){
+    if (o.lat_long) {
       return (
         <Marker
           coordinate={{
@@ -74,6 +82,15 @@ const GeoArChallengeDetails = ({
     }
   }
 
+  const moveToRegion = (r) => {
+    mapView.current.animateToRegion({
+      latitude: Number(r.latitude_longitude.coordinates[0]),
+      longitude: Number(r.latitude_longitude.coordinates[1]),
+      latitudeDelta: Number(r.map_latitude_delta),
+      longitudeDelta: Number(r.map_longitude_delta),
+    })
+  }
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -85,9 +102,18 @@ const GeoArChallengeDetails = ({
       {isLoading && <ActivityIndicator size="large" />}
       <View style={{ marginVertical: 20 }}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} style={{ width: '100%', height: 50 }} contentContainerStyle={_styles.rowView}>
-          <TouchableOpacity activeOpacity={.5} style={_styles.selectButtonStyle}>
+          <TouchableOpacity onPress={moveToFullRegion} activeOpacity={.5} style={_styles.selectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Full</Text>
           </TouchableOpacity>
+          {
+            regions.map(e => {
+              return (
+                <TouchableOpacity activeOpacity={.5} onPress={()=>moveToRegion(e)} style={_styles.unSelectButtonStyle}>
+                  <Text style={_styles.buttonSelectText}>{e.name}</Text>
+                </TouchableOpacity>
+              )
+            })
+          }
           {/* <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Diego Martin Region</Text>
           </TouchableOpacity>
