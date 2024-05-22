@@ -15,6 +15,7 @@ Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
+import { updateSelectedSites } from "../../../redux/AR";
 
 
 const GeoArChallengeDetails = ({
@@ -29,17 +30,13 @@ const GeoArChallengeDetails = ({
   const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
   const regions = selectedDestination?.regions
   const [fullRegion, setFullRegion] = useState(null)
-  console.log("selectedDestination:", selectedDestination.regions)
 
   const setMapBounds = () => {
-    console.log("mapView")
     var address = selectedDestination.name;
     Geocoder.from(address)
       .then(json => {
         var location = json.results[0].geometry.location;
         var bounds = json.results[0].geometry.bounds
-        console.log(location);
-        console.log(bounds);
         mapView.current.setMapBoundaries({ latitude: bounds.northeast.lat, longitude: bounds.northeast.lng },
           { latitude: bounds.southwest.lat, longitude: bounds.southwest.lng }
         );
@@ -68,11 +65,11 @@ const GeoArChallengeDetails = ({
       return (
         <Marker
           coordinate={{
-            latitude: o.lat_long.coordinates[0],
-            longitude: o.lat_long.coordinates[1]
+            latitude: o.lat_long.coordinates[1],
+            longitude: o.lat_long.coordinates[0]
           }}
           title={o.name}
-          onCalloutPress={() => navigation.navigate("GeoArSiteDetails")}
+          onCalloutPress={() => {dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails")}}
         >
           <View style={{ width: 30, height: 30 }}>
             <MarkerIcon />
