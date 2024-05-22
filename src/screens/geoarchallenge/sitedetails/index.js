@@ -85,18 +85,19 @@ const GeoArSiteDetails = ({
           <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>Sites</Text>
+              <Text style={_styles.s_list_count}>0</Text>
+              <Text style={_styles.s_list_text}>Check-ins</Text>
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <SitesIcon style={{ width: 48, height: 48 }} />
+              <StarSiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>Star Sites</Text>
-            </View><View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <Text style={_styles.s_list_text}>Star</Text>
+            </View>
+            {/* <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <StarSiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>0</Text>
               <Text style={_styles.s_list_text}>Hidden Sites</Text>
-            </View>
+            </View> */}
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
