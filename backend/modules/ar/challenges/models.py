@@ -52,6 +52,8 @@ class GeoLocation(models.Model):
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
     sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)
+    map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
+    map_latitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
 
     class Meta:
         verbose_name_plural = "Geo Destination"
@@ -95,6 +97,12 @@ class ARChallengeParameterSettings(models.Model):
     positionZ = models.IntegerField(_("Position Z"), default=-25, null=False, blank=False)
     ar_portals = models.BooleanField(_("AR Portals"), default=False)
     image_recognition = models.BooleanField(_("Image Recognition"), default=False)
+    image_recognition_file = models.FileField(
+        _("Image Recognition File"),
+        upload_to="ar_ir/img/",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
       verbose_name_plural = "AR Challenge Parameter Settings"
