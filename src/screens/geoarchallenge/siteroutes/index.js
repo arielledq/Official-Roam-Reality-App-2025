@@ -1,14 +1,9 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, ScrollView, Text, TouchableOpacity, View } from "react-native";
-import { handleError } from "../../../util/helpers"
-import { getARChallenges, getARProfile, getARStettings } from '../../../network'
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
-import PlaceholderImg from "../../../assets/geoar/ph_sites.png"
-import MapView from 'react-native-maps';
-import ProTipIcon from "../../../assets/geoar/pro-tip.svg"
 import CarIcon from "../../../assets/geoar/car.svg"
 import RoadIcon from "../../../assets/geoar/road.svg"
 import TimeIcon from "../../../assets/geoar/time.svg"
@@ -18,6 +13,11 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { height, width } from "../../../util/AppDimensions";
 import { AppButton } from "../../../components";
+import Geocoder from 'react-native-geocoding';
+import MapView, { Marker } from 'react-native-maps';
+import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import MapViewDirections from 'react-native-maps-directions';
+import GetLocation from "react-native-get-location";
 
 
 const GeoArSiteRoutes = ({
@@ -27,7 +27,33 @@ const GeoArSiteRoutes = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+  const mapView = useRef();
 
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
+  const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
+  const [currentLocation, setCurrentLocation] = useState(null)
+
+  const getCurrentLocation = () => {
+    GetLocation.getCurrentPosition({
+      enableHighAccuracy: true,
+      timeout: 60000,
+    })
+      .then(location => {
+        setCurrentLocation({
+          latitude: location.latitude,
+          longitude: location.longitude
+        })
+      })
+      .catch(error => {
+        const { code, message } = error;
+        console.warn(code, message);
+      })
+  }
+
+  useEffect(() => {
+    getCurrentLocation()
+  }, []);
 
   return (
 
@@ -42,14 +68,76 @@ const GeoArSiteRoutes = ({
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ width: '100%', position: 'relative', height: 292, borderRadius: 16, overflow: 'hidden' }}>
           <MapView
+            ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
+              latitude: selectedGeoSite.lat_long.coordinates[1],
+              longitude: selectedGeoSite.lat_long.coordinates[0],
               latitudeDelta: 0.0922,
               longitudeDelta: 0.0421,
             }}
-          />
+          >
+            <Marker
+              coordinate={{
+                latitude: selectedGeoSite.lat_long.coordinates[1],
+                longitude: selectedGeoSite.lat_long.coordinates[0]
+              }}
+              title={selectedGeoSite.name}
+            >
+              <View style={{ width: 30, height: 30 }}>
+                <MarkerIcon />
+              </View>
+            </Marker>
+
+            {currentLocation && <Marker
+              coordinate={{
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude
+              }}
+              title={'Current Location'}
+            >
+              <View style={{ width: 30, height: 30 }}>
+                <MarkerIcon />
+              </View>
+            </Marker>
+            }
+            {currentLocation &&
+              <MapViewDirections
+                origin={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude
+                }}
+                destination={{
+                  latitude: selectedGeoSite.lat_long.coordinates[1],
+                  longitude: selectedGeoSite.lat_long.coordinates[0]
+                }}
+                apikey={"AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA"}
+                strokeWidth={3}
+                strokeColor="hotpink"
+                optimizeWaypoints={true}
+                onStart={(params) => {
+                  console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
+                }}
+                onReady={result => {
+                  console.log(result)
+                  console.log(`Distance: ${result.distance} km`)
+                  console.log(`Duration: ${result.duration} min.`)
+
+                  // mapView.fitToCoordinates(result.coordinates, {
+                  //   edgePadding: {
+                  //     right: (width / 20),
+                  //     bottom: (height / 20),
+                  //     left: (width / 20),
+                  //     top: (height / 20),
+                  //   }
+                  // });
+                }}
+                onError={(errorMessage) => {
+                  // console.log('GOT AN ERROR');
+                }}
+              />
+            }
+          </MapView>
         </View>
 
         <View style={{ flexDirection: 'row', paddingVertical: 20, justifyContent: 'space-between', alignItems: 'center' }}>
@@ -79,7 +167,7 @@ const GeoArSiteRoutes = ({
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
-              onPress={()=>navigation.navigate("GeoArSiteNavigation")}
+              onPress={() => navigation.navigate("GeoArSiteNavigation")}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
               title={"Navigate"}
@@ -107,7 +195,7 @@ const GeoArSiteRoutes = ({
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
-              onPress={()=>navigation.navigate("GeoArSiteNavigation")}
+              onPress={() => navigation.navigate("GeoArSiteNavigation")}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
               title={"Navigate"}
