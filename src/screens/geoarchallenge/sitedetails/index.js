@@ -13,6 +13,7 @@ import CloseBIcon from "../../../assets/geoar/close-square.svg"
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg"
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png"
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import Geocoder from 'react-native-geocoding';
 
 
 import { useDispatch, useSelector } from "react-redux"
@@ -33,14 +34,33 @@ const GeoArSiteDetails = ({
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
+  const [address, setAddress] = useState(null)
 
-  console.log("selectedGeoSite:", selectedGeoSite)
+  const getAddress = () => {
+    Geocoder.from({
+      latitude: selectedGeoSite.lat_long.coordinates[1],
+      longitude: selectedGeoSite.lat_long.coordinates[0],
+    }).then(json => {
+      try {
+        var addressComponent = json.results[0].formatted_address;
+        setAddress(addressComponent)
+      } catch (ex) {
+        setAddress('Not found.')
+      }
+    })
+      .catch(error => console.warn(error));
+  }
+
+  useEffect(() => {
+    getAddress()
+  }, []);
+
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Trinidad",
+          text: selectedDestination.name,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
 
@@ -81,7 +101,7 @@ const GeoArSiteDetails = ({
             <Image source={GradientDownPNG} resizeMode="cover" style={{ position: 'absolute', bottom: 0, left: 0, right: 0, top: 0, width: '110%' }} />
           </ImageBackground>
           <Text style={_styles.site_d_header}>{selectedGeoSite.name}</Text>
-          <Text style={_styles.site_d_text}>De Best Laundromat, 59 Tunapuna Rd, Tunapuna, Trinidad & Tobago</Text>
+          <Text style={_styles.site_d_text}>{address}</Text>
           <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
