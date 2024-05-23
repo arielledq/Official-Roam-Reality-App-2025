@@ -11,7 +11,6 @@ import SitesIcon from "../../../assets/geoar/sites.svg"
 import MapView, { Marker } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
-Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
