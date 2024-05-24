@@ -60,7 +60,7 @@ const GeoArSiteRoutes = ({
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Arima",
+          text: selectedGeoSite.name,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
 
