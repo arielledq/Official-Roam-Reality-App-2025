@@ -198,8 +198,8 @@ class FriendshipViewSet(ModelViewSet):
 
     def destroy(self, request, *args, **kwargs):
         try:
-            from_user_id = request.data.get('from_user')
-            FriendshipRequest.objects.filter(from_user_id=from_user_id, to_user=request.user).delete()
+            instance = self.get_object()
+            super().destroy(request, *args, **kwargs)
             return Response({"message": "Friendship request rejected."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
