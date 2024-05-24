@@ -260,12 +260,11 @@ class FindFriendsAPIView(APIView):
         try:
             search = request.query_params.get('search',"")
             friends = request.user.user_profile.friends.all()
-
+            users_with_friend_request = FriendshipRequest.objects.filter(from_user=request.user).values_list('to_user', flat=True)
             users = User.objects.filter(
                 Q(email__icontains=search) |
                 Q(name__icontains=search) 
-            ).exclude(id__in=friends)
-
+            ).exclude(id__in=friends).exclude(id__in=users_with_friend_request).exclude(id=request.user.id)
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
