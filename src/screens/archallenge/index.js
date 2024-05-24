@@ -68,8 +68,13 @@ const ArChallenge = ({
 
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
-    const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement == choice)
-    setSponsoredData(filteredArray.slice())
+    if(choice == 'PHOTO'){
+      const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement == 'PHOTO')
+      setSponsoredData(filteredArray.slice())
+    }else{
+      const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement !== 'PHOTO')
+      setSponsoredData(filteredArray.slice())
+    }
   }
 
   useEffect(() => {
