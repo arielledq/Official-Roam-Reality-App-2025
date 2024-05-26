@@ -60,8 +60,10 @@ const GeoArSiteDetails = ({
     return (
       <View style={_styles.challengeInfoContainer}>
         <View style={_styles.challengeInfoHeaderContainer}>
-          <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-          <Text style={_styles.challengeInfoHeader}>Pro Tips</Text>
+          <View onPress={() => setShowProTips(true)} style={{ justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}>
+            <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
+            <Text style={_styles.protip_text}>Pro Tips</Text>
+          </View>
         </View>
         <ScrollView
           contentContainerStyle={{ paddingBottom: 100 }}
