@@ -18,6 +18,7 @@ import MapView, { Marker } from 'react-native-maps';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import MapViewDirections from 'react-native-maps-directions';
 import GetLocation from "react-native-get-location";
+import { convertKilometersToMiles } from "../../../util/helpers";
 
 
 const GeoArSiteRoutes = ({
@@ -33,6 +34,8 @@ const GeoArSiteRoutes = ({
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
   const [currentLocation, setCurrentLocation] = useState(null)
+  const [mileDistance, setMileDistance] = useState(0)
+  const [durationMins, setDurationMins] = useState(0)
 
   const getCurrentLocation = () => {
     GetLocation.getCurrentPosition({
@@ -123,6 +126,8 @@ const GeoArSiteRoutes = ({
                   console.log(result.legs)
                   console.log(`Distance: ${result.distance} km`)
                   console.log(`Duration: ${result.duration} min.`)
+                  setMileDistance(convertKilometersToMiles(result.distance)) 
+                  setDurationMins(result.duration)
 
                   // mapView.fitToCoordinates(result.coordinates, {
                   //   edgePadding: {
@@ -159,12 +164,12 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center', marginTop: 15, marginBottom: 10 }}>
             <RoadIcon style={{ width: 20, height: 20 }} />
             <Text style={_styles.site_distance_time_text}>Distance</Text>
-            <Text style={_styles.site_distance_time_value_text}>18.4 <Text style={{ fontSize: 10 }}>miles</Text></Text>
+            <Text style={_styles.site_distance_time_value_text}>{mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text></Text>
           </View>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TimeIcon style={{ width: 20, height: 20 }} />
             <Text style={_styles.site_distance_time_text}>Est. Time</Text>
-            <Text style={_styles.site_distance_time_value_text}>31 <Text style={{ fontSize: 10 }}>mins</Text></Text>
+            <Text style={_styles.site_distance_time_value_text}>{Math.round(durationMins)} <Text style={{ fontSize: 10 }}>mins</Text></Text>
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
