@@ -7,13 +7,13 @@ import { useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
 import ArIcon from "../../../assets/geoar/aricon.svg"
-import SitesIcon from "../../../assets/geoar/sites.svg"
 import MapView, { Marker } from 'react-native-maps';
 import CloseBIcon from "../../../assets/geoar/close-square.svg"
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg"
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png"
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import Geocoder from 'react-native-geocoding';
+import LineIcon from '../../../assets/ar/line.png';
 
 
 import { useDispatch, useSelector } from "react-redux"
@@ -30,6 +30,7 @@ const GeoArSiteDetails = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const [showProTips, setShowProTips] = useState(false)
   const navigation = useNavigation()
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
@@ -54,6 +55,54 @@ const GeoArSiteDetails = ({
   useEffect(() => {
     getAddress()
   }, []);
+
+  InfoView = () => {
+    return (
+      <View style={_styles.challengeInfoContainer}>
+        <View style={_styles.challengeInfoHeaderContainer}>
+          <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+          <Text style={_styles.challengeInfoHeader}>Pro Tips</Text>
+        </View>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, width: '100%', padding: 24 }
+          }
+        >
+          <RenderHTML
+            contentWidth={width}
+            tagsStyles={{
+              p: {
+                color: '#9CA3AF',
+                fontSize: FontSizes.S14,
+              },
+              strong: {
+                color: '#fff',
+                fontSize: FontSizes.S18,
+              },
+              ol: {
+                color: '#fff',
+              },
+              li: {
+                color: '#fff',
+              }
+            }}
+            source={{
+              html: `${selectedGeoSite?.pro_tips.toString().replaceAll("#000000", "#fff")}}`
+            }}
+          />
+        </ScrollView>
+        <View style={{ width: '100%', paddingHorizontal: 24 }}>
+          <AppButton
+            onPress={() => setShowProTips(false)}
+            buttonStyle={_styles.buttonStyle}
+            containerStyle={_styles.buttonContainerStyle}
+            title={"Close"}
+          />
+        </View>
+      </View>
+    )
+  }
 
   return (
 
@@ -151,10 +200,10 @@ const GeoArSiteDetails = ({
             }}
           />
           <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}>
+            <TouchableOpacity onPress={() => setShowProTips(true)} style={{ justifyContent: 'center', flexDirection: 'row', alignItems: 'center' }}>
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
               <Text style={_styles.protip_text}>Pro Tips</Text>
-            </View>
+            </TouchableOpacity>
             <View>
               <AppButton
                 onPress={() => navigation.navigate("GeoArSiteRoutes")}
@@ -167,6 +216,7 @@ const GeoArSiteDetails = ({
           </View>
         </View>
       </ScrollView>
+      {showProTips && InfoView()}
     </BackgroundWithImage >
   )
 }

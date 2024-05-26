@@ -120,6 +120,7 @@ const GeoArSiteRoutes = ({
                 }}
                 onReady={result => {
                   console.log(result)
+                  console.log(result.legs)
                   console.log(`Distance: ${result.distance} km`)
                   console.log(`Duration: ${result.duration} min.`)
 
