@@ -11,24 +11,22 @@ import SkipIcon from "../../../assets/geoar/skip.svg"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { useNavigation } from "@react-navigation/native";
 
 
-const GeoArSiteNavigation = ({
+const GeoArSiteArrived = ({
 
 }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
 
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
-        rightComponent={()=><TouchableOpacity onPress={()=>navigation.navigate("GeoArSiteArrived")}><SkipIcon style={{width:48,height:36}}/></TouchableOpacity>}
+        rightComponent={() => <TouchableOpacity><SkipIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
         centerComponent={{
-          text: "Navigate to Site",
+          text: "You have Arrived",
           style: [_styles.heading],
         }} backgroundColor="transparent" />
 
@@ -45,19 +43,11 @@ const GeoArSiteNavigation = ({
             }}
           />
         </View>
-        <View style={{ backgroundColor: "#131422", borderRadius: 16, paddingHorizontal: 20, paddingBottom: 20, marginVertical: 20, alignItems: 'center' }}>
-          <HomeIcon style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }} />
-          <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <CloseBIcon style={{ width: 32, height: 32 }} />
-            <View style={{ alignItems: 'center', marginVertical: 8 }}>
-              <Text style={_styles.site_distance_time_value_text}>31 <Text style={{ fontSize: 14 }}>mins</Text></Text>
-              <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
-                <Text style={_styles.site_distance_time_text}>18.4 <Text style={{ fontSize: 10 }}>miles</Text></Text>
-                <Text style={_styles.site_distance_time_text}>.</Text>
-                <Text style={_styles.site_distance_time_text}>10:10 am</Text>
-              </View>
-            </View>
-            <View></View>
+        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, paddingBottom: 20, marginVertical: 20, alignItems: 'center' }}>
+          <View>
+            <Text style={_styles.arrivedText}>Arrived</Text>
+            <Text style={_styles.exploringText}>Begin exploring</Text>
+            <Text style={_styles.infoText}>Explore with your camera to find hidden stars. Collect them to uncover interesting facts and earn credits. Remember to take a picture with our pin for additional points.</Text>
           </View>
         </View>
       </ScrollView>
@@ -67,4 +57,4 @@ const GeoArSiteNavigation = ({
 
 
 
-export default GeoArSiteNavigation
+export default GeoArSiteArrived
