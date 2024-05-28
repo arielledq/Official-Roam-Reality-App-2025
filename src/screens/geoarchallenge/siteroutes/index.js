@@ -110,6 +110,9 @@ const GeoArSiteRoutes = ({
                   latitude: currentLocation.latitude,
                   longitude: currentLocation.longitude
                 }}
+                precision={"high"}
+                timePrecision={"now"}
+                mode={"DRIVING"}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0]
@@ -149,7 +152,7 @@ const GeoArSiteRoutes = ({
         <View style={{ flexDirection: 'row', paddingVertical: 20, justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={_styles.site_d_header_text}>Routes</Text>
           <TouchableOpacity>
-            <Text style={_styles.site_d_header_number_text}>02</Text>
+            <Text style={_styles.site_d_header_number_text}>01</Text>
           </TouchableOpacity>
         </View>
 
@@ -157,7 +160,7 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CarIcon style={{ width: 32, height: 32 }} />
             <View style={{ marginHorizontal: 20, justifyContent: 'flex-start' }}>
-              <Text style={_styles.site_via_text}>via Churchill Roosevelt Hwy</Text>
+              <Text style={_styles.site_via_text}>via Not available</Text>
               <Text style={_styles.site_via_des_text}>Fastest route now due to traffic conditions</Text>
             </View>
           </View>
@@ -181,7 +184,7 @@ const GeoArSiteRoutes = ({
             />
           </View>
         </View>
-        <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 20 }}>
+        {/* <View style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 20 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CarIcon style={{ width: 32, height: 32 }} />
             <View style={{ marginHorizontal: 20, justifyContent: 'flex-start' }}>
@@ -208,7 +211,7 @@ const GeoArSiteRoutes = ({
               loading={isLoading}
             />
           </View>
-        </View>
+        </View> */}
       </ScrollView>
     </BackgroundWithImage >
   )
