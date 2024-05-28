@@ -34,13 +34,8 @@ class ARChallengeUpdatedAdmin(admin.ModelAdmin):
 
 @admin.register(GeoARChallenges)
 class GeoARChallengesUpdatedAdmin(admin.ModelAdmin):
-    list_display = ('name', 'sponsor', 'expiry_date')
-    list_select_related = ['sponsor']
-    ordering = ("sponsor__name",)
-    search_fields = ["name", "sponsor__name"]
-
-    def sponsor_name(self, obj):
-        return obj.sponsor.name
+    list_display = ('name', 'expiry_date')
+    search_fields = ["name"]
 
 class GeoArChallengeAdmin(OSMGeoAdmin):
     formfield_overrides = {
