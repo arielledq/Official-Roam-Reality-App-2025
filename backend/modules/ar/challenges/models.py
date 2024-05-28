@@ -254,9 +254,9 @@ class GeoARChallenges(models.Model):
     def clean(self):
         print(self.challenge_choice)
         print(self.image)
-        if self.challenge_choice == "SPONSORED" and self.image == None:
+        if self.challenge_choice == "IMAGE" and self.image == None:
             raise ValidationError("Image is mandotory, When challenge is sponsored!")
-        elif self.challenge_choice == "DANCE" and self.model_file == None:
+        elif self.challenge_choice == "3DMODEL" and self.model_file == None:
             raise ValidationError(
                 "Model file is mandotory, When challenge type is Dancing!"
             )
