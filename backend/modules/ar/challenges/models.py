@@ -43,6 +43,11 @@ LOCATION_OPTION = (
     ("SITE_COUNTRY", "SITE + COUNTRY")
 )
 
+GEO_CHALLENGE_CHOICES = (
+    ("IMAGE", "IMAGE"),
+    ("3DMODEL", "3D MODEL"),
+)
+
 class GeoRegion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -217,13 +222,10 @@ class GeoARChallenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    sponsor = models.ForeignKey(
-        Sponsor,
-        on_delete=models.CASCADE,
-        default=None,
-        null=False,
-        blank=False,
-        related_name="sponsored_geo_ar",
+    sponsor = models.ManyToManyField(Sponsor,
+        verbose_name="Sponsors",
+        related_name="sponsors_geo_ar",
+        blank=False, null=False, default=None
     )
     challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=1)
     points = models.IntegerField(verbose_name="Challenge Points", default=0)
@@ -231,7 +233,7 @@ class GeoARChallenges(models.Model):
         max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
     )
     challenge_choice = models.CharField(verbose_name="Challenge Load From",
-        max_length=50, choices=CHALLENGE_CHOICES, default="SPONSORED"
+        max_length=50, choices=GEO_CHALLENGE_CHOICES, default="3DMODEL"
     )
     ar_filters = models.ManyToManyField(ARChallengeFilters,verbose_name="AR Filters",related_name="filter_geo_ar_challenge", blank=False, null=False, default=None)
     parameter_settings = models.ForeignKey(
