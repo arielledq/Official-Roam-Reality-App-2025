@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,GeoARSpecificSiteRoute, \
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar, \
   ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField
@@ -71,7 +71,6 @@ admin.site.register(ARSettings, ARChallengeAdmin)
 admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(GeoArSite, GeoArChallengeAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
-admin.site.register(GeoARSpecificSiteRoute, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 admin.site.register(ARChallengeFilters, ARChallengeAdmin)
 
