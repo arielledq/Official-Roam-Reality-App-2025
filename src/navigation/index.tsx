@@ -42,6 +42,7 @@ import ARFilter from '../screens/archallenge/FilterView';
 import Feedback from '../../screens/support-send-feedback/Feedback';
 import InviteFriends from '../screens/inviteFriends/InviteFriends';
 import GeoArSiteArrived from '../screens/geoarchallenge/arrivedsite';
+import ChallengeSelection from '../screens/geoarchallenge/challengeselection';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -111,6 +112,7 @@ const Navigation = () => {
         <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
         <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
         <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
+        <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />

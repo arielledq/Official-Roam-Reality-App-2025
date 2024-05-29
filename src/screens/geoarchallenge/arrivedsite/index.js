@@ -5,13 +5,12 @@ import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import MapView from 'react-native-maps';
 import MoveForwardIcon from "../../../assets/geoar/large-step.svg"
-import CloseBIcon from "../../../assets/geoar/close-square.svg"
-import SkipIcon from "../../../assets/geoar/skip.svg"
-
+import CloseBIcon from "../../../assets/geoar/Close.svg"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { height, width } from "../../../util/AppDimensions";
+import { useNavigation } from "@react-navigation/native";
 
 
 const GeoArSiteArrived = ({
@@ -20,12 +19,13 @@ const GeoArSiteArrived = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const navigation = useNavigation()
 
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
-        rightComponent={() => <TouchableOpacity><SkipIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
+        rightComponent={() => <TouchableOpacity><CloseBIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
         centerComponent={{
           text: "You have Arrived",
           style: [_styles.heading],
@@ -58,7 +58,7 @@ const GeoArSiteArrived = ({
             <Text style={_styles.exploringText}>Begin exploring</Text>
             <Text style={_styles.infoText}>Explore with your camera to find hidden stars. Collect them to uncover interesting facts and earn credits. Remember to take a picture with our pin for additional points.</Text>
           </View>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate("ChallengeSelection")}>
             <MoveForwardIcon style={{ width: 56, height: 56 }} />
           </TouchableOpacity>
         </View>
