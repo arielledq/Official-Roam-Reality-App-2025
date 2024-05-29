@@ -29,7 +29,6 @@ const ARFilter = ({
   const viewShotRef = useRef();
   const [location, setLocation] = useState(null)
   const [fullLocation, setFullLocation] = useState(null)
-  console.log("ar_filters:", ar_filters)
 
   const viewComponent = () => <View style={styles.cornerStyles} />;
 
@@ -155,14 +154,17 @@ const ARFilter = ({
           </PagerView>
         </BackgroundWithImage>
       </ViewShot>
+
       <View style={{
         position: 'absolute', bottom: 20, flex: 1, zIndex: 500, justifyContent: 'center', left: 0, right: 0, alignItems: 'flex-end',
-        padding: 20
+        padding: 20,justifyContent:'space-between',flexDirection:'row'
       }}>
+        <TouchableOpacity  style={{transform: [{ rotate: '180deg' }]}} onPress={()=>navigation.goBack()}>
+          <RightArrowIcon />
+        </TouchableOpacity>
         <TouchableOpacity onPress={navigateToShare}>
           <RightArrowIcon />
         </TouchableOpacity>
-
       </View>
     </View>
   )
