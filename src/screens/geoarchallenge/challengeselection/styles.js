@@ -60,7 +60,7 @@ const useStyles = makeStyles((theme) => ({
     marginTop: 10,
   },
   list: {
-    marginBottom: 80,
+    marginBottom: 20,
     flex: 1
   },
   blurView: {

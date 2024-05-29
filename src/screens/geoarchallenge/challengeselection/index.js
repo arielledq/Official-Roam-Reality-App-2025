@@ -28,8 +28,43 @@ import Images from "../../../assets/images"
 import useStyles from "./styles"
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
 import { handleError } from "../../../util/helpers"
-import { HomeScreenData } from "../../../util/HomeScreenUtils"
 import { BlurView } from "@react-native-community/blur";
+
+const HomeScreenData = [
+  {
+    id:-1,
+    blank:true
+  },
+  {
+    id: 1,
+    title: "Check in with our ",
+    title1: "Roam Pin!",
+    subtitle: "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
+    image: Images.Home
+  },
+  {
+    id: 2,
+    title: "Let's go chase the ",
+    title1: "stars!",
+    subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
+    image: Images.Home1
+  },
+  {
+    id: 3,
+    title: "Engage in unique  ",
+    title1: "AR Experiences!",
+    subtitle: "Participate in some extra fun AR experiences found at this site for extra points.",
+    image: Images.Home1
+  },
+  {
+    id: 4,
+    title: "Anywhere ",
+    title1: "AR Challenges",
+    subtitle: "These are AR challenges that you can do anytime & anywhere",
+    image: Images.Home1
+  }
+]
+
 
 const ChallengeSelection = ({ route }) => {
   const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
@@ -43,35 +78,10 @@ const ChallengeSelection = ({ route }) => {
   const navigation = useNavigation()
   const styles = useStyles();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  console.log("selectedDestination", selectedDestination)
-
-
-  const handleLogOut = () => {
-    bottomSheetRef.current?.expand()
-  }
-
-  if (openBottomSheet) {
-    handleLogOut()
-    setOpenBottomSheet(false)
-  } else {
-  }
-  console.log({ account_setup })
 
   useEffect(() => {
-    if (!account_setup) {
-      setTimeout(() => {
-        navigation.replace('EditProfile')
-      }, 300);
-    }
+    
   }, [])
-
-  useEffect(() => {
-    if (route.params?.openBottomSheet === true) {
-      setOpenBottomSheet(true)
-    } else if (route.params?.deleteAccount === true) {
-      handleDeleteAccount()
-    }
-  }, [route.params])
 
   useEffect(() => {
     setIsLoading(true)
@@ -86,43 +96,6 @@ const ChallengeSelection = ({ route }) => {
       setIsLoading(false)
     })
   }, [])
-
-  const handleDeleteAccount = () => {
-    Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
-      {
-        text: 'yes',
-        onPress: () => {
-          deleteAccount().then(res => {
-            console.log({ res })
-            if (res.status == 1) {
-              handleLogOutButton();
-              Alert.alert(('Success'), ('Your account has been deleted successfully'));
-            } else {
-              Alert.alert('Error', res.message.error)
-            }
-          })
-        },
-      },
-      {
-        text: 'No',
-      },
-    ]);
-  };
-
-  const handleLogOutButton = () => {
-    logout()
-    dispatch(resetState())
-  }
-  const handleMenuButton = () => {
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
-        style={{ paddingLeft: 5 }}
-      >
-        <MenuIcon />
-      </TouchableOpacity>
-    )
-  }
 
   const navigateToARChanllenge = () => {
     navigation.navigate('ARChallenge')
@@ -170,7 +143,7 @@ const ChallengeSelection = ({ route }) => {
         <BlurView blurType="regular" overlayColor='transparent'
           style={{ backgroundColor: 'transparent' }}>
           <AppHeader
-            title={"AR Experiences"}
+            title={"Explore The Site"}
             containerStyle={styles.headerContainer}
           />
         </BlurView>
