@@ -17,8 +17,8 @@ const useStyles = makeStyles((theme) => ({
     minHeight: 180,
     borderRadius: 20,
     marginBottom: 20,
-    paddingVertical:20,
-    backgroundColor: "#131422"
+    paddingVertical:8,
+    backgroundColor: "#131422",
   },
   firstView: {
     flex: 1
@@ -29,18 +29,20 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingBottom: 25,
+    flex:1
   },
   headerText: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S26,
     lineHeight: FontLineHeights.LH35,
     marginVertical: 0,
+    flex:1
   },
   imageStyle: {
     borderRadius: 20
   },
   innerView: {
-    width: '70%'
+    flex:1,
   },
   challengesText: {
     ...fontGroup.ns800,
@@ -54,7 +56,8 @@ const useStyles = makeStyles((theme) => ({
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
-    marginStart: 3
+    marginStart: 3,
+    flex:1
   },
   containerStyle: {
     marginTop: 10,
