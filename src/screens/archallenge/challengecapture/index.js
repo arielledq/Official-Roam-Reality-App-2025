@@ -149,7 +149,7 @@ const ArChallengeCapture = ({
         });
     }
     useEffect(() => {
-      if (challengeObj.challenge_choice == "DANCE") {
+      if (challengeObj.challenge_choice == "DANCE" && route?.params?.challengeObj?.ar_filters.length == 0) {
         setLoading(true)
         checkIfModelExist()
       }
@@ -250,7 +250,7 @@ const ArChallengeCapture = ({
           />
         }
 
-        {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
+        {challengeObj.challenge_choice == "SPONSORED" && route?.params?.challengeObj?.ar_filters.length == 0 && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
