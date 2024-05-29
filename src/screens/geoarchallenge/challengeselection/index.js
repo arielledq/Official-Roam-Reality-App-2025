@@ -14,7 +14,7 @@ import { deleteAccount, getARChallenges, logout } from "../../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
 import { MenuIcon } from "../../../assets/svg"
-import { screenHorizontalPadding } from "../../../util/AppDimensions"
+import { height, screenHorizontalPadding, width } from "../../../util/AppDimensions"
 import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
 import theme from "../../../assets/theme"
 import AppBottomSheet from "../../../components/bottomSheet"
@@ -30,38 +30,49 @@ import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
 import { handleError } from "../../../util/helpers"
 import { BlurView } from "@react-native-community/blur";
 
+import SiteIcon from "../../../assets/geoar/siteicon.svg"
+import StarSiteIcon from "../../../assets/geoar/starsite.svg"
+import ArIcon from "../../../assets/geoar/aricon.svg"
+import SitesIcon from "../../../assets/geoar/sites.svg"
+import MapView, { Marker } from 'react-native-maps';
+import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+
 const HomeScreenData = [
   {
-    id:-1,
-    blank:true
+    id: -1,
+    blank: true
   },
   {
     id: 1,
     title: "Check in with our ",
     title1: "Roam Pin!",
     subtitle: "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
-    image: Images.Home
+    image: Images.Home,
+    Icon: SiteIcon
   },
   {
     id: 2,
     title: "Let's go chase the ",
     title1: "stars!",
     subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
-    image: Images.Home1
+    image: Images.Home1,
+    Icon: StarSiteIcon
   },
   {
     id: 3,
     title: "Engage in unique  ",
     title1: "AR Experiences!",
     subtitle: "Participate in some extra fun AR experiences found at this site for extra points.",
-    image: Images.Home1
+    image: Images.Home1,
+    Icon: ArIcon
   },
   {
     id: 4,
     title: "Anywhere ",
     title1: "AR Challenges",
     subtitle: "These are AR challenges that you can do anytime & anywhere",
-    image: Images.Home1
+    image: Images.Home1,
+    Icon: ArIcon
   }
 ]
 
@@ -72,7 +83,7 @@ const ChallengeSelection = ({ route }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
 
-  const bottomSheetRef = useRef<BottomSheet>(null)
+  const bottomSheetRef = useRef < BottomSheet > (null)
   const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
@@ -80,7 +91,7 @@ const ChallengeSelection = ({ route }) => {
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
 
   useEffect(() => {
-    
+
   }, [])
 
   useEffect(() => {
@@ -112,14 +123,20 @@ const ChallengeSelection = ({ route }) => {
       >
         <View style={styles.row}>
           <View style={styles.innerView}>
-            <AppText style={styles.headerText}>{item?.title}</AppText>
-            <AppText style={styles.headerText}>{item?.title1}</AppText>
-            <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-            <AppText style={styles.challengesText}>{item?.id === 1 ? numberOfChallenges : selectedDestination.star_ar_sites.length + selectedDestination.unique_ar_sites.length} Challenges</AppText>
+            <View style={{ flexDirection: 'row', alignItems: 'center',width:'100%' }}>
+              <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />
+              <AppText style={styles.headerText}>{item?.title}{item?.title1}</AppText>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between",flex:1 }}>
+              <View style={{flex:1}}>
+                <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
+                <AppText style={styles.challengesText}>{item?.id === 1 ? numberOfChallenges : selectedDestination.star_ar_sites.length + selectedDestination.unique_ar_sites.length} Challenges</AppText>
+              </View>
+              <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}>
+                <RightArrowIcon />
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}>
-            <RightArrowIcon />
-          </TouchableOpacity>
         </View>
       </View>
     )
