@@ -64,7 +64,8 @@ const HomeScreenData = [
     title1: "AR Experiences!",
     subtitle: "Participate in some extra fun AR experiences found at this site for extra points.",
     image: Images.Home1,
-    Icon: ArIcon
+    Icon: ArIcon,
+    navigation: "UniqueArChallenge"
   },
   {
     id: 4,
@@ -72,7 +73,8 @@ const HomeScreenData = [
     title1: "AR Challenges",
     subtitle: "These are AR challenges that you can do anytime & anywhere",
     image: Images.Home1,
-    Icon: ArIcon
+    Icon: ArIcon,
+    navigation: "ARChallenge"
   }
 ]
 
@@ -123,16 +125,31 @@ const ChallengeSelection = ({ route }) => {
       >
         <View style={styles.row}>
           <View style={styles.innerView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center',width:'100%' }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
               <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />
               <AppText style={styles.headerText}>{item?.title}{item?.title1}</AppText>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between",flex:1 }}>
-              <View style={{flex:1}}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", flex: 1 }}>
+              <View style={{ flex: 1 }}>
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-                <AppText style={styles.challengesText}>{item?.id === 1 ? numberOfChallenges : selectedDestination.star_ar_sites.length + selectedDestination.unique_ar_sites.length} Challenges</AppText>
+                {
+                  item?.id == 1 &&
+                  <AppText style={styles.challengesText}>Pin located: 1/1  •  My Check-ins: 9</AppText>
+                }
+                {
+                  item?.id == 2 &&
+                  <AppText style={styles.challengesText}> Stars collected: 0/8</AppText>
+                }
+                {
+                  item?.id == 3 &&
+                  <AppText style={styles.challengesText}> Experiences Completed - 0/{selectedDestination.star_ar_sites.length + selectedDestination.unique_ar_sites.length}</AppText>
+                }
+                {
+                  item?.id == 4 &&
+                  <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
+                }
               </View>
-              <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}>
+              <TouchableOpacity onPress={() => item.navigation ? navigation.navigate(item.navigation) : console.log("No Navigation")}>
                 <RightArrowIcon />
               </TouchableOpacity>
             </View>
