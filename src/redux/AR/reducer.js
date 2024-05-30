@@ -14,11 +14,9 @@ export const sliceAR = createSlice({
   reducers: {
     resetState: () => initialState,
     updateARUserData: (state, action) => {
-      console.log(state, action)
       state.arProfile = action.payload
     },
     updateARSettings: (state, action) => {
-      console.log(state, action)
       state.arSettings = action.payload
     },
     updateSelectedDestination: (state, action) => {

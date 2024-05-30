@@ -23,22 +23,23 @@ const UniqueArChallenge = ({
   const [challengeChoice, setChallengeChoice] = useState("PHOTO")
   const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
   const arProfile = useSelector(state => state.ar?.arProfile)
   const navigation = useNavigation()
+  const unique_ar_sites = selectedDestination.unique_ar_sites
+
 
   const ARSposored = () => {
     setIsLoading(true)
-    getARChallenges().then((res) => {
-      if (res.status == 1) {
-        setSponsoredDataAll(res.data)
-        setSponsoredData(res.data.filter(x => x.challenge_requirement == challengeChoice))
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
-    })
+    let challengesArray = []
+    unique_ar_sites.forEach(element => {
+      console.log("unique_ar_sites.forEach")
+      challengesArray = [...challengesArray, ...element.challenge]
+    });
+    setSponsoredDataAll(challengesArray)
+    const filterData = challengesArray.filter(x => x.challenge_requirement == 'PHOTO')
+    setSponsoredData(filterData)
+    setIsLoading(false)
   }
 
   const ARUserProfile = () => {
@@ -68,10 +69,10 @@ const UniqueArChallenge = ({
 
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
-    if(choice == 'PHOTO'){
+    if (choice == 'PHOTO') {
       const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement == 'PHOTO')
       setSponsoredData(filteredArray.slice())
-    }else{
+    } else {
       const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement !== 'PHOTO')
       setSponsoredData(filteredArray.slice())
     }
@@ -90,7 +91,7 @@ const UniqueArChallenge = ({
   const Item = ({ obj }) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={_styles.list_item}>
       <Image style={_styles.list_image} resizeMode="stretch" source={{ uri: obj.image }} />
-      <View style={[_styles.list_image,{backgroundColor:'#00000080'}]} />
+      <View style={[_styles.list_image, { backgroundColor: '#00000080' }]} />
       <Text style={_styles.list_title}>{obj.name}</Text>
       <Text style={_styles.s_list_title}>Sponsored By {obj.sponsored.name}</Text>
     </TouchableOpacity>
@@ -120,7 +121,7 @@ const UniqueArChallenge = ({
         <TouchableOpacity onPress={() => setDataWithChoice("PHOTO")} activeOpacity={.5} style={challengeChoice == "PHOTO" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Photo Challenges</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setDataWithChoice("VIDEO")} activeOpacity={.5} style={challengeChoice == "VIDEO"  ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("VIDEO")} activeOpacity={.5} style={challengeChoice == "VIDEO" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Video Challenges </Text>
         </TouchableOpacity>
       </View>
