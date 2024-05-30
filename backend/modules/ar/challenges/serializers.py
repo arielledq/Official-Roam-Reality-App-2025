@@ -1,6 +1,6 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
-    ARChallengeFilters, UniqueChallengeSite, GeoRegion
+    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
@@ -118,7 +118,36 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
+class GeoARChallengesSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
+    sponsored = SponsorSerializer(source='sponsor', read_only=True, many=True)
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
+    ar_filters = ARChallengeFiltersSerializer(read_only=True, many=True)
+
+    def get_image(self, obj):
+        return obj.image.url
+
+    class Meta:
+        model = GeoARChallenges
+        fields = (
+            "id",
+            "image",
+            "model_file",
+            "name",
+            "description",
+            "points",
+            "challenge_choice",
+            "challenge_requirement",
+            "created_at",
+            "expiry_date",
+            "sponsored",
+            "parameters",
+            "ar_filters"
+        )
+
 class UniqueChallengeSiteSerializer(GeoModelSerializer):
+    
+    challenge = GeoARChallengesSerializer(read_only=True, many=True)
 
     class Meta:
         model = UniqueChallengeSite
