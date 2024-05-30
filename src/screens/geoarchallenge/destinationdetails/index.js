@@ -129,11 +129,11 @@ const GeoArChallengeDetails = ({
             longitudeDelta: 0.0421,
           }}
         >
-          {
+          {/* {
             selectedDestination.unique_ar_sites.map((o) => {
               return _markerView(o)
             })
-          }
+          } */}
           {
             selectedDestination.star_ar_sites.map((o) => {
               return _markerView(o)

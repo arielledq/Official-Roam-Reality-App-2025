@@ -198,7 +198,7 @@ const GeoArSiteDetails = ({
               }
             }}
             source={{
-              html: `${selectedGeoSite.description.toString().replaceAll("#000000", "#C8DFFF")}`
+              html: `${selectedGeoSite?.description?.toString().replaceAll("#000000", "#C8DFFF")}`
             }}
           />
           <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
