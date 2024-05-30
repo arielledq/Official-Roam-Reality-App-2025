@@ -222,10 +222,13 @@ class GeoARChallenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    sponsor = models.ManyToManyField(Sponsor,
-        verbose_name="Sponsors",
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
         related_name="sponsors_geo_ar",
-        blank=False, null=False, default=None
     )
     challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=1)
     points = models.IntegerField(verbose_name="Challenge Points", default=0)
@@ -436,8 +439,6 @@ class UniqueChallengeSite(models.Model):
         related_name="challenges_geo_ar_unique_site",
         blank=False, null=False, default=None
     )
-    lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
-    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=0)
 
     class Meta:
       verbose_name_plural = "Geo AR Unique Sites"
