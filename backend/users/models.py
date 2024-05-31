@@ -126,6 +126,7 @@ class Notification(CommonModel):
     notification_type = models.CharField(choices=NOTIFICATION_TYPE_CHOICES, max_length=20, null=True, blank=True, default=OTHER)
     friend_request = models.ForeignKey(FriendshipRequest, on_delete=models.CASCADE, null=True, blank=True)
     is_read = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(default=False)
 
     def __str__(self):
         return str(self.sender)

@@ -260,12 +260,11 @@ class FindFriendsAPIView(APIView):
         try:
             search = request.query_params.get('search',"")
             friends = request.user.user_profile.friends.all()
-
+            users_with_friend_request = FriendshipRequest.objects.filter(from_user=request.user).values_list('to_user', flat=True)
             users = User.objects.filter(
                 Q(email__icontains=search) |
                 Q(name__icontains=search) 
-            ).exclude(id__in=friends)
-
+            ).exclude(id__in=friends).exclude(id__in=users_with_friend_request).exclude(id=request.user.id)
             serializer = UserSerializer(users, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
@@ -312,3 +311,17 @@ class NotificationViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Notification.objects.filter(receiver=self.request.user).order_by('-created_at')
+    
+    @action(methods=['patch'], detail=False, url_path='read-all', permission_classes=[IsAuthenticated])
+    def read_all(self, request, pk=None):
+        queryset = self.get_queryset()
+        queryset.update(is_read=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(methods=['patch'], detail=False, url_path='clear-all', permission_classes=[IsAuthenticated])
+    def clear_all(self, request, pk=None):
+        queryset = self.get_queryset()
+        queryset.update(is_hidden=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
