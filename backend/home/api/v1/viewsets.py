@@ -311,3 +311,17 @@ class NotificationViewset(viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Notification.objects.filter(receiver=self.request.user).order_by('-created_at')
+    
+    @action(methods=['patch'], detail=False, url_path='read-all', permission_classes=[IsAuthenticated])
+    def read_all(self, request, pk=None):
+        queryset = self.get_queryset()
+        queryset.update(is_read=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(methods=['patch'], detail=False, url_path='clear-all', permission_classes=[IsAuthenticated])
+    def clear_all(self, request, pk=None):
+        queryset = self.get_queryset()
+        queryset.update(is_hidden=True)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
