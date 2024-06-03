@@ -48,7 +48,8 @@ const HomeScreenData = [
     title1: "Roam Pin!",
     subtitle: "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
     image: Images.Home,
-    Icon: SiteIcon
+    Icon: SiteIcon,
+    navigation: "PinChallenge"
   },
   {
     id: 2,
@@ -56,7 +57,8 @@ const HomeScreenData = [
     title1: "stars!",
     subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
     image: Images.Home1,
-    Icon: StarSiteIcon
+    Icon: StarSiteIcon,
+    navigation: "StarChallenge"
   },
   {
     id: 3,
