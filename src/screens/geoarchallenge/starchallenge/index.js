@@ -1,15 +1,18 @@
 import React, { useEffect, useState } from "react"
 
-import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
-import MapView from 'react-native-maps';
-import MoveForwardIcon from "../../../assets/geoar/large-step.svg"
-import CloseBIcon from "../../../assets/geoar/Close.svg"
+import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
+import InfoIcon from "../../../assets/geoar/Info.svg"
+import MenIcon from "../../../assets/geoar/men_icon.svg"
+import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg"
+import StarIcon from "../../../assets/geoar/star_icon.svg"
+import TrophyIcon from "../../../assets/geoar/trophy_icon.svg"
+
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { height, width } from "../../../util/AppDimensions";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -22,19 +25,42 @@ const StarChallenge = ({
   const navigation = useNavigation()
 
   return (
-
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "AR Star Hunt - Arima",
+          text: "AR Star Hunt\nArima",
           numberOfLines: 2,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
 
       {isLoading && <ActivityIndicator size="large" />}
-      <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
-        <View style={{ position: 'relative', height: 546, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
-          
+      <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
+        <View style={{
+          backgroundColor: "#131422",
+          borderRadius: 100,
+          paddingHorizontal: 8,
+          alignItems: 'center',
+          height: 65,
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }}>
+          <View style={{ flexDirection: 'row' }}>
+            <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+            <View>
+              <Text style={_styles.exploringText}>Stars Collected</Text>
+              <Text style={_styles.arrivedText}>4 / 12</Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ marginEnd: 10 }}>
+              <Text style={_styles.exploringText}>Points</Text>
+              <Text style={_styles.arrivedText}>100</Text>
+            </View>
+            <TrophyIcon style={{ width: 48, height: 48 }} />
+          </View>
+        </View>
+        <View style={{ position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
+
         </View>
         <View style={{
           backgroundColor: "#131422",
@@ -42,22 +68,33 @@ const StarChallenge = ({
           padding: 20,
           paddingBottom: 20,
           marginVertical: 20,
-          alignItems: 'center',
-          flexDirection: 'row'
+          alignItems: 'center'
         }}>
-          <View style={{ flex: 1,marginEnd:12 }}>
-            <Text style={_styles.arrivedText}>Arrived</Text>
-            <Text style={_styles.exploringText}>Begin exploring</Text>
-            <Text style={_styles.infoText}>Explore with your camera to find hidden stars. Collect them to uncover interesting facts and earn credits. Remember to take a picture with our pin for additional points.</Text>
+          <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
+            <View style={{ flexDirection: 'row' }}>
+              <MenIcon style={{ width: 40, height: 40 }} />
+              <View>
+                <Text style={_styles.exploringText}>Pin</Text>
+                <Text style={_styles.arrivedText}>4 feet away</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+              <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
+              <TouchableOpacity>
+                <SpeakerIcon style={{ width: 40, height: 40 }} />
+              </TouchableOpacity>
+            </View>
           </View>
-          <TouchableOpacity onPress={()=>navigation.navigate("ChallengeSelection")}>
-            <MoveForwardIcon style={{ width: 56, height: 56 }} />
-          </TouchableOpacity>
+          <View style={{ flexDirection: 'row' }}>
+            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
+            <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker</Text>
+          </View>
         </View>
-      </ScrollView>
+      </View>
     </BackgroundWithImage >
   )
 }
+
 
 
 

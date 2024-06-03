@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from "react"
 
-import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
 import InfoIcon from "../../../assets/geoar/Info.svg"
 import MenIcon from "../../../assets/geoar/men_icon.svg"
 import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg"
+import PinIcon from "../../../assets/geoar/pin_locationicon.svg"
+import TrophyIcon from "../../../assets/geoar/trophy_icon.svg"
 
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { height, width } from "../../../util/AppDimensions";
 import { useNavigation } from "@react-navigation/native";
 
 
@@ -24,7 +25,6 @@ const PinChallenge = ({
   const navigation = useNavigation()
 
   return (
-
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
@@ -34,8 +34,32 @@ const PinChallenge = ({
         }} backgroundColor="transparent" />
 
       {isLoading && <ActivityIndicator size="large" />}
-      <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
-        <View style={{ position: 'relative', height: 546, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
+      <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
+        <View style={{
+          backgroundColor: "#131422",
+          borderRadius: 100,
+          paddingHorizontal: 8,
+          alignItems: 'center',
+          height: 65,
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }}>
+          <View style={{ flexDirection: 'row' }}>
+            <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+            <View>
+              <Text style={_styles.exploringText}>Pin Found</Text>
+              <Text style={_styles.arrivedText}>0 / 1</Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <View style={{ marginEnd: 10 }}>
+              <Text style={_styles.exploringText}>Points</Text>
+              <Text style={_styles.arrivedText}>100</Text>
+            </View>
+            <TrophyIcon style={{ width: 48, height: 48 }} />
+          </View>
+        </View>
+        <View style={{ position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
 
         </View>
         <View style={{
@@ -66,7 +90,7 @@ const PinChallenge = ({
             <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker</Text>
           </View>
         </View>
-      </ScrollView>
+      </View>
     </BackgroundWithImage >
   )
 }
