@@ -254,7 +254,7 @@ const ArChallengeCapture = ({
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
-          onDrag={_onDrag}
+          onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
           source={{ uri: challengeObj.image }}
           position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
           challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
