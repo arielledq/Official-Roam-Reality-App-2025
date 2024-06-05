@@ -21,16 +21,20 @@ import { useNavigation } from "@react-navigation/native";
 const StarChallenge = ({
 
 }) => {
+  
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
+  const challengeObj = selectedGeoSite.pin_challenge;
+  const challengeObjParameters = challengeObj?.parameters;
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "AR Star Hunt\nArima",
+          text: "AR Star Hunt\n" + selectedGeoSite.name,
           numberOfLines: 2,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
@@ -93,7 +97,7 @@ const StarChallenge = ({
           </View>
           <View style={{ flexDirection: 'row' }}>
             <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-            <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker</Text>
+            <Text style={_styles.infoText}>The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You can mute the sound by clicking on the speaker.</Text>
           </View>
         </View>
       </View>

@@ -311,7 +311,7 @@ const PinChallenge = ({
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Location Check In\nArima",
+          text: "Location Check In\n" + selectedGeoSite.name,
           numberOfLines: 2,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
@@ -377,7 +377,7 @@ const PinChallenge = ({
           </View>
           <View style={{ flexDirection: 'row' }}>
             <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-            <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker</Text>
+            <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker.</Text>
           </View>
         </View>
       </View>
