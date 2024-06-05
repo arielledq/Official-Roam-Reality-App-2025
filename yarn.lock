@@ -2706,6 +2706,11 @@
     "@expo/config-plugins" "^7.2.5"
     react "^18.2.0"
 
+"@voximplant/react-native-foreground-service@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@voximplant/react-native-foreground-service/-/react-native-foreground-service-3.0.2.tgz#14fca496808db5255799ce01553626cdb9aea03e"
+  integrity sha512-ZIyccOAXPqznA1PAVAYlKZ+GI7kXYCuYgH+gmAkhPouyJbkgrSXaCJJzQ+uBkPr4FBa/PuC/yjzK8vf6tJREQA==
+
 "@webassemblyjs/ast@1.11.6", "@webassemblyjs/ast@^1.11.5":
   version "1.11.6"
   resolved "https://registry.yarnpkg.com/@webassemblyjs/ast/-/ast-1.11.6.tgz#db046555d3c413f8966ca50a95176a0e2c642e24"
@@ -8293,6 +8298,11 @@ react-native-geocoding@^0.5.0:
   version "0.5.0"
   resolved "https://registry.yarnpkg.com/react-native-geocoding/-/react-native-geocoding-0.5.0.tgz#69748f896047a63d1c3c1d55255f9d67c8e275c2"
   integrity sha512-peTXRpRxPLiZpbTW43AOvoXXAEoS+eLnSo4KRY0hcL9F2hulWE5r7o5KiaLx8AWj35c6EJP3fdGHe754q2Gd2Q==
+
+react-native-geolocation-service@^5.3.1:
+  version "5.3.1"
+  resolved "https://registry.yarnpkg.com/react-native-geolocation-service/-/react-native-geolocation-service-5.3.1.tgz#4ce1017789da6fdfcf7576eb6f59435622af4289"
+  integrity sha512-LTXPtPNmrdhx+yeWG47sAaCgQc3nG1z+HLLHlhK/5YfOgfLcAb9HAkhREPjQKPZOUx8pKZMIpdGFUGfJYtimXQ==
 
 react-native-gesture-handler@^2.10.0:
   version "2.10.1"
