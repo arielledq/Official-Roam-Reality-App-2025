@@ -16,6 +16,7 @@ import { useNavigation } from "@react-navigation/native";
 import Geolocation, { GeoPosition } from 'react-native-geolocation-service';
 import MapViewDirections from "react-native-maps-directions";
 import { convertKilometersToMiles } from "../../../util/helpers";
+import moment from "moment";
 
 
 const GeoArSiteNavigation = ({
@@ -36,6 +37,7 @@ const GeoArSiteNavigation = ({
   const [observing, setObserving] = useState(false);
   const [foregroundService, setForegroundService] = useState(false);
   const [useLocationManager, setUseLocationManager] = useState(false);
+  const [estimatedTime, setEstimatedTime] = useState("");
   const [location, setLocation] = useState(null);
   const mapView = useRef();
   const watchId = useRef(null);
@@ -52,6 +54,13 @@ const GeoArSiteNavigation = ({
       setObserving(false);
     }
   };
+
+  const calculatedEstimatedTime = (duration) => {
+    var now = new Date();
+    const calcTime = moment(now).add(duration,'minutes').format('hh:mm A');
+    console.log("Now: " + calcTime);
+    setEstimatedTime(calcTime)
+  }
 
   useEffect(() => {
     getLocation()
@@ -290,6 +299,7 @@ const GeoArSiteNavigation = ({
                   // console.log(`Duration: ${result.duration} min.`)
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
+                  calculatedEstimatedTime(result.duration)
 
                   // mapView.fitToCoordinates(result.coordinates, {
                   //   edgePadding: {
@@ -316,7 +326,7 @@ const GeoArSiteNavigation = ({
               <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={_styles.site_distance_time_text}>{mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text></Text>
                 <Text style={_styles.site_distance_time_text}>.</Text>
-                <Text style={_styles.site_distance_time_text}>10:10 am</Text>
+                <Text style={_styles.site_distance_time_text}>{estimatedTime}</Text>
               </View>
             </View>
             <View></View>
