@@ -20,6 +20,8 @@ const GeoArSiteArrived = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+  const [location, setLocation] = useState(null);
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
 
   return (
 
@@ -36,11 +38,14 @@ const GeoArSiteArrived = ({
         <View style={{ position: 'relative', height: 546, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+            zoomEnabled={true}
+            scrollEnabled={true}
+            showsUserLocation={true}
             initialRegion={{
-              latitude: 37.78825,
-              longitude: -122.4324,
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
+              latitude: selectedGeoSite.lat_long.coordinates[1],
+              longitude: selectedGeoSite.lat_long.coordinates[0],
+              latitudeDelta: 0.0032,
+              longitudeDelta: 0.0032,
             }}
           />
         </View>
