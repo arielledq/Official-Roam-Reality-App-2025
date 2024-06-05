@@ -69,6 +69,5 @@ export const isPointInPolygon = (latitude: Number, longitude: Number, polygon: [
             (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
     if (intersect) inside = !inside
   }
-
   return inside
 };

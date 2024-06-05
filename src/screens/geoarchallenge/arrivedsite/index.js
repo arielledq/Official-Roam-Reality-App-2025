@@ -26,7 +26,7 @@ const GeoArSiteArrived = ({
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
-        rightComponent={() => <TouchableOpacity><CloseBIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
+        // rightComponent={() => <TouchableOpacity><CloseBIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
         centerComponent={{
           text: "You have Arrived",
           style: [_styles.heading],
@@ -34,7 +34,7 @@ const GeoArSiteArrived = ({
 
       {isLoading && <ActivityIndicator size="large" />}
       <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
-        <View style={{ position: 'relative', height: 546, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
+        <View style={{ position: 'relative',  minHeight: 520, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}

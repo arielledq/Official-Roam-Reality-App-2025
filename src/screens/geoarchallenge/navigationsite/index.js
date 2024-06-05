@@ -233,7 +233,7 @@ const GeoArSiteNavigation = ({
 
       {isLoading && <ActivityIndicator size="large" />}
       <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
-        <View style={{ position: 'relative', height: 546, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
+        <View style={{ position: 'relative', minHeight: 520, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
             ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
