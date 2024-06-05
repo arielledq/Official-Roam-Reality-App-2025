@@ -332,7 +332,9 @@ const PinChallenge = ({
             <TrophyIcon style={{ width: 48, height: 48 }} />
           </View>
         </View>
-        <View style={{ backgroundColor: "#131422", position: 'relative', flex: 1, borderRadius: 16, marginVertical: 20 }}>
+        <View style={{
+          backgroundColor: "#131422", position: 'relative', flex: 1, borderRadius: 16, marginVertical: 20
+        }}>
           <ViroARNavigator />
           <TouchableOpacity style={{
             width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0
