@@ -13,7 +13,6 @@ import VIForegroundService from '@voximplant/react-native-foreground-service';
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
-import GetLocation from "react-native-get-location";
 import Geolocation, { GeoPosition } from 'react-native-geolocation-service';
 import MapViewDirections from "react-native-maps-directions";
 import { convertKilometersToMiles } from "../../../util/helpers";
@@ -30,25 +29,6 @@ const GeoArSiteNavigation = ({
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
-
-  const getCurrentLocation = () => {
-    GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000,
-    })
-      .then(location => {
-        setCurrentLocation({
-          latitude: location.latitude,
-          longitude: location.longitude
-        })
-      })
-      .catch(error => {
-        const { code, message } = error;
-        console.warn(code, message);
-      })
-  }
-
-
   const [forceLocation, setForceLocation] = useState(true);
   const [highAccuracy, setHighAccuracy] = useState(true);
   const [locationDialog, setLocationDialog] = useState(true);
@@ -57,7 +37,7 @@ const GeoArSiteNavigation = ({
   const [foregroundService, setForegroundService] = useState(false);
   const [useLocationManager, setUseLocationManager] = useState(false);
   const [location, setLocation] = useState(null);
-
+  const mapView = useRef();
   const watchId = useRef(null);
 
   const stopLocationUpdates = () => {
@@ -74,7 +54,6 @@ const GeoArSiteNavigation = ({
   };
 
   useEffect(() => {
-    getCurrentLocation()
     getLocation()
     getLocationUpdates()
     return () => {
@@ -163,7 +142,16 @@ const GeoArSiteNavigation = ({
     Geolocation.getCurrentPosition(
       position => {
         setLocation(position);
-        console.log("getLocation", position);
+        setCurrentLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
+        mapView.current.animateToRegion({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.0032,
+          longitudeDelta: 0.0032,
+        })
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
@@ -188,7 +176,6 @@ const GeoArSiteNavigation = ({
 
   const getLocationUpdates = async () => {
     const hasPermission = await hasLocationPermission();
-    console.log("hasPermission", hasPermission)
     if (!hasPermission) {
       return;
     }
@@ -236,6 +223,7 @@ const GeoArSiteNavigation = ({
       <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
         <View style={{ position: 'relative', height: 546, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
+            ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
             scrollEnabled={true}
@@ -260,12 +248,12 @@ const GeoArSiteNavigation = ({
               </View>
             </Marker>
 
-            {location && <Marker
+            {currentLocation && <Marker
               coordinate={{
-                latitude: location.coords.latitude,
-                longitude: location.coords.longitude
+                latitude: currentLocation.latitude,
+                longitude: currentLocation.longitude
               }}
-              title={'Current Location'}
+              title={'Start Location'}
             >
               <View style={{ width: 30, height: 30 }}>
                 <MarkerIcon />
@@ -293,10 +281,10 @@ const GeoArSiteNavigation = ({
                   console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
                 }}
                 onReady={result => {
-                  console.log(result)
-                  console.log(result.legs)
-                  console.log(`Distance: ${result.distance} km`)
-                  console.log(`Duration: ${result.duration} min.`)
+                  // console.log(result)
+                  // console.log(result.legs)
+                  // console.log(`Distance: ${result.distance} km`)
+                  // console.log(`Duration: ${result.duration} min.`)
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
 
