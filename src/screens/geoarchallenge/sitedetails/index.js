@@ -156,7 +156,7 @@ const GeoArSiteDetails = ({
           <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>0</Text>
+              <Text style={_styles.s_list_count}>{selectedGeoSite.check_ins}</Text>
               <Text style={_styles.s_list_text}>Check-ins</Text>
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
