@@ -142,10 +142,7 @@ const GeoArSiteNavigation = ({
     Geolocation.getCurrentPosition(
       position => {
         setLocation(position);
-        setCurrentLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        })
+        setCurrentLocation(position)
         mapView.current.animateToRegion({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -187,6 +184,12 @@ const GeoArSiteNavigation = ({
       position => {
         console.log("getLocationUpdates:", position);
         setLocation(position);
+        mapView.current.animateToRegion({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.0032,
+          longitudeDelta: 0.0032,
+        })
       },
       error => {
         setLocation(null);
@@ -198,7 +201,7 @@ const GeoArSiteNavigation = ({
           ios: 'best',
         },
         enableHighAccuracy: highAccuracy,
-        distanceFilter: 100,
+        distanceFilter: 5,
         interval: 5000,
         fastestInterval: 2000,
         forceRequestLocation: forceLocation,
@@ -250,8 +253,8 @@ const GeoArSiteNavigation = ({
 
             {currentLocation && <Marker
               coordinate={{
-                latitude: currentLocation.latitude,
-                longitude: currentLocation.longitude
+                latitude: currentLocation.coords.latitude,
+                longitude: currentLocation.coords.longitude
               }}
               title={'Start Location'}
             >
@@ -260,11 +263,11 @@ const GeoArSiteNavigation = ({
               </View>
             </Marker>
             }
-            {currentLocation &&
+            {location &&
               <MapViewDirections
                 origin={{
-                  latitude: currentLocation.latitude,
-                  longitude: currentLocation.longitude
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude
                 }}
                 precision={"high"}
                 timePrecision={"now"}
