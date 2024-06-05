@@ -19,6 +19,7 @@ import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import MapViewDirections from 'react-native-maps-directions';
 import GetLocation from "react-native-get-location";
 import { convertKilometersToMiles } from "../../../util/helpers";
+import Strings from "../../../constants/Strings";
 
 
 const GeoArSiteRoutes = ({
@@ -117,7 +118,7 @@ const GeoArSiteRoutes = ({
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0]
                 }}
-                apikey={"AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA"}
+                apikey={Strings.GOOGLE_PLACE_API_KEY}
                 strokeWidth={3}
                 strokeColor="hotpink"
                 optimizeWaypoints={true}

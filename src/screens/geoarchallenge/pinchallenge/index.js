@@ -36,6 +36,8 @@ const PinChallenge = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
+  const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = {};
 
   const ARScreen = () => {
@@ -131,7 +133,7 @@ const PinChallenge = ({
         });
     }
     useEffect(() => {
-      if (challengeObj.challenge_choice == "DANCE" && route?.params?.challengeObj?.ar_filters.length == 0) {
+      if (challengeObj?.challenge_choice == "3DMODEL" && route?.params?.challengeObj?.ar_filters.length == 0) {
         setLoading(true)
         checkIfModelExist()
       }
@@ -199,7 +201,7 @@ const PinChallenge = ({
         }
 
         {
-          challengeObj.challenge_choice == "DANCE" && modelPath &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, ScrollView, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -8,7 +8,7 @@ import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
 import ArIcon from "../../../assets/geoar/aricon.svg"
 import SitesIcon from "../../../assets/geoar/sites.svg"
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 
@@ -64,13 +64,17 @@ const GeoArChallengeDetails = ({
     if (o.lat_long) {
       return (
         <Marker
+          key={o.id}
           coordinate={{
             latitude: o.lat_long.coordinates[1],
             longitude: o.lat_long.coordinates[0]
           }}
           title={o.name}
-          onCalloutPress={() => { dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails") }}
         >
+          <Callout onPress={() => { dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails") }}
+            style={{ backgroundColor: '#fff', minWidth: 100,alignItems:'center' }}>
+            <Text>{o.name}</Text>
+          </Callout>
           <View style={{ width: 30, height: 30 }}>
             <MarkerIcon />
           </View>
@@ -121,6 +125,7 @@ const GeoArChallengeDetails = ({
       </View>
       <View style={{ width: '100%', position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden' }}>
         <MapView
+          provider={PROVIDER_GOOGLE}
           ref={mapView}
           style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={{
