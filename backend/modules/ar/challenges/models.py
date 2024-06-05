@@ -373,6 +373,7 @@ class GeoArSite(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check Ins", default=0)
+    check_ins_radius = models.IntegerField(verbose_name="Check Ins Radius in Meters", default=50)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
