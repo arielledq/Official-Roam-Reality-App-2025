@@ -158,6 +158,7 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 
 class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
+    pin_challenge = GeoARChallengesSerializer(read_only=True)
 
     class Meta:
         model = GeoArSite

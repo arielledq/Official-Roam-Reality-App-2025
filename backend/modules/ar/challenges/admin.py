@@ -64,12 +64,17 @@ class GeoLocationAdmin(GeoArChallengeAdmin):
     ordering = ("name",)
     search_fields = ["name"]
 
+@admin.register(GeoArSite)
+class GeoLocationAdmin(GeoArChallengeAdmin):
+    list_display = ('name',"check_ins",)
+    ordering = ("name","check_ins",)
+    search_fields = ["name"]
+
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARUserProfile, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
 admin.site.register(ARExample, ARChallengeAdmin)
-admin.site.register(GeoArSite, GeoArChallengeAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 admin.site.register(ARChallengeFilters, ARChallengeAdmin)
