@@ -18,5 +18,7 @@ declare module '@rneui/themed' {
     grey: string;
     grey31: string;
     drawerBG : string;
+    magenta: string;
+    green: string;
   }
 }
