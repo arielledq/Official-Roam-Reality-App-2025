@@ -9,6 +9,8 @@ import MenIcon from "../../../assets/geoar/men_icon.svg"
 import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg"
 import StarIcon from "../../../assets/geoar/star_icon.svg"
 import TrophyIcon from "../../../assets/geoar/trophy_icon.svg"
+import CaptureIcon from "../../../assets/geoar/capture_icon.svg"
+
 
 
 import { useDispatch, useSelector } from "react-redux"
@@ -59,8 +61,12 @@ const StarChallenge = ({
             <TrophyIcon style={{ width: 48, height: 48 }} />
           </View>
         </View>
-        <View style={{ position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
-
+        <View style={{ backgroundColor: "#131422", position: 'relative', flex: 1, borderRadius: 16, marginVertical: 20 }}>
+          <TouchableOpacity style={{
+            width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0
+          }}>
+            <CaptureIcon />
+          </TouchableOpacity>
         </View>
         <View style={{
           backgroundColor: "#131422",

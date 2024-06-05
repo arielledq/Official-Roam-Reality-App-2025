@@ -31,6 +31,7 @@ const GeoArChallengeDetails = ({
   const [fullRegion, setFullRegion] = useState(null)
 
   const setMapBounds = () => {
+    console.log(selectedDestination)
     var address = selectedDestination.name;
     Geocoder.from(address)
       .then(json => {
@@ -51,12 +52,12 @@ const GeoArChallengeDetails = ({
       .catch(error => console.warn(error));
   }
 
-  moveToFullRegion = ()=>{
+  moveToFullRegion = () => {
     mapView.current.animateToRegion(fullRegion)
   }
 
   useEffect(() => {
-    setTimeout(setMapBounds, 500)
+    //setTimeout(setMapBounds, 500)
   }, []);
 
   const _markerView = (o) => {
@@ -68,7 +69,7 @@ const GeoArChallengeDetails = ({
             longitude: o.lat_long.coordinates[0]
           }}
           title={o.name}
-          onCalloutPress={() => {dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails")}}
+          onCalloutPress={() => { dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails") }}
         >
           <View style={{ width: 30, height: 30 }}>
             <MarkerIcon />
@@ -104,7 +105,7 @@ const GeoArChallengeDetails = ({
           {
             regions.map(e => {
               return (
-                <TouchableOpacity activeOpacity={.5} onPress={()=>moveToRegion(e)} style={_styles.unSelectButtonStyle}>
+                <TouchableOpacity activeOpacity={.5} onPress={() => moveToRegion(e)} style={_styles.unSelectButtonStyle}>
                   <Text style={_styles.buttonSelectText}>{e.name}</Text>
                 </TouchableOpacity>
               )
@@ -123,10 +124,10 @@ const GeoArChallengeDetails = ({
           ref={mapView}
           style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={{
-            latitude: 37.78825,
-            longitude: -122.4324,
-            latitudeDelta: 0.0922,
-            longitudeDelta: 0.0421,
+            latitude: selectedDestination.geo_location.coordinates[1],
+            longitude: selectedDestination.geo_location.coordinates[0],
+            latitudeDelta: selectedDestination.map_latitude_delta ? Number(selectedDestination.map_latitude_delta) : 0.0922,
+            longitudeDelta: selectedDestination.map_longitude_delta ? Number(selectedDestination.map_longitude_delta) : 0.0421,
           }}
         >
           {/* {
