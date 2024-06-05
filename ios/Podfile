@@ -3,7 +3,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 require_relative '../node_modules/react-native-permissions/scripts/setup'
 
 
-platform :ios, min_ios_version_supported
+platform :ios, '13.4'
 prepare_react_native_project!
 
   setup_permissions([
@@ -56,7 +56,8 @@ target 'travel_ar_app_42706' do
   #FOR LOCALLY VIRO REACT
   pod 'ViroReact', :path => '../../viro/ios/'
   pod 'ViroKit', :path => '../../viro/ios/dist/ViroRenderer/'
-
+  pod 'react-native-google-maps', :path => '../node_modules/react-native-maps'
+  pod 'GoogleMaps' 
   pod 'TikTokOpenSDK', '~> 5.0.15'
 
   target 'travel_ar_app_42706Tests' do
