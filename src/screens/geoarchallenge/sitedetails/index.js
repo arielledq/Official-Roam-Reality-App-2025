@@ -7,7 +7,7 @@ import { useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
 import ArIcon from "../../../assets/geoar/aricon.svg"
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import CloseBIcon from "../../../assets/geoar/close-square.svg"
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg"
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png"
@@ -119,6 +119,7 @@ const GeoArSiteDetails = ({
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ width: '100%', position: 'relative', height: 160, borderRadius: 16, marginVertical: 15, overflow: 'hidden' }}>
           <MapView
+            provider={PROVIDER_GOOGLE}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             initialRegion={{
               latitude: selectedGeoSite.lat_long.coordinates[1],

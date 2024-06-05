@@ -7,7 +7,7 @@ import MoveForwardIcon from "../../../assets/geoar/large-step.svg"
 import CloseBIcon from "../../../assets/geoar/Close.svg"
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useNavigation } from "@react-navigation/native";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 
@@ -34,8 +34,9 @@ const GeoArSiteArrived = ({
 
       {isLoading && <ActivityIndicator size="large" />}
       <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
-        <View style={{ position: 'relative',  minHeight: 520, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
+        <View style={{ position: 'relative', minHeight: 520, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
+            provider={PROVIDER_GOOGLE}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
             scrollEnabled={true}

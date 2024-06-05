@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, ScrollView, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -64,17 +64,17 @@ const GeoArChallengeDetails = ({
     if (o.lat_long) {
       return (
         <Marker
-          key={o.id}
           coordinate={{
             latitude: o.lat_long.coordinates[1],
             longitude: o.lat_long.coordinates[0]
           }}
           title={o.name}
+          onCalloutPress={() => { dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails") }}
         >
-          <Callout onPress={() => { dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails") }}
-            style={{ backgroundColor: '#fff', minWidth: 100,alignItems:'center' }}>
+          {Platform.OS == 'ios' && <Callout onPress={() => { dispatch(updateSelectedSites(o)); navigation.navigate("GeoArSiteDetails") }}
+            style={{ backgroundColor: '#fff', minWidth: 100, alignItems: 'center' }}>
             <Text>{o.name}</Text>
-          </Callout>
+          </Callout>}
           <View style={{ width: 30, height: 30 }}>
             <MarkerIcon />
           </View>

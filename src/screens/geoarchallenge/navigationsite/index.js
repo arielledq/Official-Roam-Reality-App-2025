@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from "react"
 import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, PermissionsAndroid, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import HomeIcon from "../../../assets/geoar/home.svg"
 import CloseBIcon from "../../../assets/geoar/close-square.svg"
 import SkipIcon from "../../../assets/geoar/skip.svg"
@@ -58,7 +58,7 @@ const GeoArSiteNavigation = ({
 
   const calculatedEstimatedTime = (duration) => {
     var now = new Date();
-    const calcTime = moment(now).add(duration,'minutes').format('hh:mm A');
+    const calcTime = moment(now).add(duration, 'minutes').format('hh:mm A');
     console.log("Now: " + calcTime);
     setEstimatedTime(calcTime)
   }
@@ -236,6 +236,7 @@ const GeoArSiteNavigation = ({
       <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
         <View style={{ position: 'relative', minHeight: 520, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
+            provider={PROVIDER_GOOGLE}
             ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}

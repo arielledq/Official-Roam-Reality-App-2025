@@ -14,7 +14,7 @@ import useStyles from "./styles"
 import { height, width } from "../../../util/AppDimensions";
 import { AppButton } from "../../../components";
 import Geocoder from 'react-native-geocoding';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import MapViewDirections from 'react-native-maps-directions';
 import GetLocation from "react-native-get-location";
@@ -72,6 +72,7 @@ const GeoArSiteRoutes = ({
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={{ width: '100%', position: 'relative', height: 292, borderRadius: 16, overflow: 'hidden' }}>
           <MapView
+            provider={PROVIDER_GOOGLE}
             ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             initialRegion={{
@@ -130,7 +131,7 @@ const GeoArSiteRoutes = ({
                   console.log(result.legs)
                   console.log(`Distance: ${result.distance} km`)
                   console.log(`Duration: ${result.duration} min.`)
-                  setMileDistance(convertKilometersToMiles(result.distance)) 
+                  setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
 
                   // mapView.fitToCoordinates(result.coordinates, {
