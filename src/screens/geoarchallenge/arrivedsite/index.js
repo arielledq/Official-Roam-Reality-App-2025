@@ -3,14 +3,13 @@ import React, { useEffect, useState } from "react"
 import { ActivityIndicator, FlatList, Image, ImageBackground, Keyboard, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
-import MapView from 'react-native-maps';
 import MoveForwardIcon from "../../../assets/geoar/large-step.svg"
 import CloseBIcon from "../../../assets/geoar/Close.svg"
-
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { height, width } from "../../../util/AppDimensions";
+import MapView, { Marker } from 'react-native-maps';
 import { useNavigation } from "@react-navigation/native";
+import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 
 
 const GeoArSiteArrived = ({
@@ -47,7 +46,19 @@ const GeoArSiteArrived = ({
               latitudeDelta: 0.0032,
               longitudeDelta: 0.0032,
             }}
-          />
+          >
+            <Marker
+              coordinate={{
+                latitude: selectedGeoSite.lat_long.coordinates[1],
+                longitude: selectedGeoSite.lat_long.coordinates[0]
+              }}
+              title={selectedGeoSite.name}
+            >
+              <View style={{ width: 30, height: 30 }}>
+                <MarkerIcon />
+              </View>
+            </Marker>
+          </MapView>
         </View>
         <View style={{
           backgroundColor: "#131422",
@@ -58,12 +69,12 @@ const GeoArSiteArrived = ({
           alignItems: 'center',
           flexDirection: 'row'
         }}>
-          <View style={{ flex: 1,marginEnd:12 }}>
+          <View style={{ flex: 1, marginEnd: 12 }}>
             <Text style={_styles.arrivedText}>Arrived</Text>
             <Text style={_styles.exploringText}>Begin exploring</Text>
             <Text style={_styles.infoText}>Explore with your camera to find hidden stars. Collect them to uncover interesting facts and earn credits. Remember to take a picture with our pin for additional points.</Text>
           </View>
-          <TouchableOpacity onPress={()=>navigation.navigate("ChallengeSelection")}>
+          <TouchableOpacity onPress={() => navigation.navigate("ChallengeSelection")}>
             <MoveForwardIcon style={{ width: 56, height: 56 }} />
           </TouchableOpacity>
         </View>
