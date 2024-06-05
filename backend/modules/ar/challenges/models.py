@@ -273,6 +273,7 @@ class GeoARChallenges(models.Model):
 
 class ARUserProfile(models.Model):
     points = models.BigIntegerField(verbose_name="Challenge Points", default=0)
+    check_ins = models.BigIntegerField(verbose_name="Check-ins", default=0)
     challenge_completed = models.IntegerField(verbose_name="Challenge Completed", default=0)
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="user_ar_profile"
@@ -372,8 +373,8 @@ class GeoArSite(models.Model):
     geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
-    check_ins = models.IntegerField(verbose_name="Check Ins", default=0)
-    check_ins_radius = models.IntegerField(verbose_name="Check Ins Radius in Meters", default=50)
+    check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
+    check_ins_radius = models.IntegerField(verbose_name="Check-ins Radius in Meters", default=50)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
