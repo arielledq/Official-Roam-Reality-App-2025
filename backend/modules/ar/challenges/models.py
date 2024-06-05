@@ -362,10 +362,17 @@ class GeoArSite(models.Model):
         blank=False,
         related_name="geo_location_ar_site",
     )
+    pin_challenge = models.ForeignKey(GeoARChallenges,
+       verbose_name="Geo Pin Challenge Name",
+        on_delete=models.SET_DEFAULT,
+        related_name="challenge_geo_ar_pin_site",
+        blank=True, null=True, default=None
+    )
     lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
     geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
+    check_ins = models.IntegerField(verbose_name="Check Ins", default=0)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
