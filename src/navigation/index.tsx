@@ -41,6 +41,9 @@ import GeoArOutdoor from '../screens/geoarchallenge/outdoorgeoar';
 import ARFilter from '../screens/archallenge/FilterView';
 import Feedback from '../../screens/support-send-feedback/Feedback';
 import InviteFriends from '../screens/inviteFriends/InviteFriends';
+import Friends from '../screens/friends';
+import AddFriendScreen from '../screens/friends/addFriend';
+import NotificationList from '../screens/notificationList';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -55,9 +58,6 @@ const Navigation = () => {
   const splashShown = useSelector(state => state.splash?.splashShown)
   const token = useSelector(state => state.login?.data?.token)
   const { newUser } = useSelector(state => state.persist)
-
-  console.log({ token })
-  console.log('newUser', newUser)
 
   const renderAuthStack = () => {
     return (
@@ -94,6 +94,8 @@ const Navigation = () => {
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="Friends" component={Friends} />
+        <Stack.Screen name="AddFriend" component={AddFriendScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
         <Stack.Screen name="SendFeedback" component={Feedback} />
         <Stack.Screen name="InviteFriends" component={InviteFriends} />
@@ -115,6 +117,7 @@ const Navigation = () => {
         <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
         <Stack.Screen name="ContactUs" component={ContactUs} />
         <Stack.Screen name="FAQ" component={FAQ} />
+        <Stack.Screen name="Notifications" component={NotificationList} />
       </>
     )
   }

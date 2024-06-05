@@ -2,7 +2,12 @@ import { Button } from "@rneui/themed"
 import React, { FC } from "react"
 import { StyleSheet } from "react-native"
 import theme from "../../assets/theme"
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import {
+  FontFamily,
+  FontLineHeights,
+  FontSizes,
+  fontGroup
+} from "../../util/FontUtils"
 import { ButtonProps } from "./type"
 import LinearGradient from "react-native-linear-gradient"
 
@@ -15,8 +20,8 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     ...otherProps
   } = props
 
-  const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
-  const colors = customColors || defaultColors;
+  const defaultColors = ["#B816E0", "#1158F4", "#9003E0"]
+  const colors = customColors || defaultColors
   return (
     <LinearGradient
       colors={colors}

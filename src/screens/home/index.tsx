@@ -18,7 +18,7 @@ import { screenHorizontalPadding } from "../../util/AppDimensions"
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
 import theme from "../../assets/theme"
 import AppBottomSheet from "../../components/bottomSheet"
-import BackgroundWithImage from '../../components/background'
+import BackgroundWithImage from "../../components/background"
 import {
   RootStackParamList,
   ScreenStackComponent
@@ -29,20 +29,21 @@ import useStyles from "./styles"
 import RightArrowIcon from "../../assets/svg/RightArrowIcon"
 import { handleError } from "../../util/helpers"
 import { HomeScreenData } from "../../util/HomeScreenUtils"
-import { BlurView } from "@react-native-community/blur";
+import { BlurView } from "@react-native-community/blur"
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
-  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
+  const account_setup = useSelector(
+    state => state.login?.data?.user?.user_profile?.account_setup
+  )
   const [openBottomSheet, setOpenBottomSheet] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
 
-  const bottomSheetRef = useRef<BottomSheet>(null)
+  const bottomSheetRef = useRef < BottomSheet > null
   const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
-  const styles = useStyles();
-
+  const styles = useStyles()
 
   const handleLogOut = () => {
     bottomSheetRef.current?.expand()
@@ -58,8 +59,8 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   useEffect(() => {
     if (!account_setup) {
       setTimeout(() => {
-        navigation.replace('EditProfile')
-      }, 300);
+        navigation.replace("EditProfile")
+      }, 300)
     }
   }, [])
 
@@ -73,39 +74,48 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
 
   useEffect(() => {
     setIsLoading(true)
-    getARChallenges().then((res) => {
-      if (res.status == 1) {
-        setNumberOfChallenges(res?.data?.length)
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
-    })
+    getARChallenges()
+      .then(res => {
+        if (res.status == 1) {
+          setNumberOfChallenges(res?.data?.length)
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
   const handleDeleteAccount = () => {
-    Alert.alert(('Delete Account?'), ("Are you sure you want to delete your account?"), [
-      {
-        text: 'yes',
-        onPress: () => {
-          deleteAccount().then(res => {
-            console.log({ res })
-            if (res.status == 1) {
-              handleLogOutButton();
-              Alert.alert(('Success'), ('Your account has been deleted successfully'));
-            } else {
-              Alert.alert('Error', res.message.error)
-            }
-          })
+    Alert.alert(
+      "Delete Account?",
+      "Are you sure you want to delete your account?",
+      [
+        {
+          text: "yes",
+          onPress: () => {
+            deleteAccount().then(res => {
+              console.log({ res })
+              if (res.status == 1) {
+                handleLogOutButton()
+                Alert.alert(
+                  "Success",
+                  "Your account has been deleted successfully"
+                )
+              } else {
+                Alert.alert("Error", res.message.error)
+              }
+            })
+          }
         },
-      },
-      {
-        text: 'No',
-      },
-    ]);
-  };
+        {
+          text: "No"
+        }
+      ]
+    )
+  }
 
   const handleLogOutButton = () => {
     logout()
@@ -123,14 +133,14 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   }
 
   const navigateToARChanllenge = () => {
-    navigation.navigate('ARChallenge')
+    navigation.navigate("ARChallenge")
   }
 
   const navigateToGeoARChanllenge = () => {
-    navigation.navigate('GeoArChallenge')
+    navigation.navigate("GeoArChallenge")
   }
 
-  const HomeScreenARItem = (item) => {
+  const HomeScreenARItem = item => {
     return (
       <BackgroundWithImage
         imageSource={item?.image}
@@ -143,9 +153,17 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
             <AppText style={styles.headerText}>{item?.title}</AppText>
             <AppText style={styles.headerText}>{item?.title1}</AppText>
             <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-            <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
+            <AppText style={styles.challengesText}>
+              {numberOfChallenges} Challenges
+            </AppText>
           </View>
-          <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}>
+          <TouchableOpacity
+            onPress={
+              item?.id === 1
+                ? navigateToARChanllenge
+                : () => navigateToGeoARChanllenge()
+            }
+          >
             <RightArrowIcon />
           </TouchableOpacity>
         </View>
@@ -156,20 +174,31 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
-        {isLoading ? <ActivityIndicator size="large" /> :
+        {isLoading ? (
+          <ActivityIndicator size="large" />
+        ) : (
           <FlatList
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
-            renderItem={({ item }) => item.blank ? <View style={{ height: 120 }} /> : <HomeScreenARItem {...item} />}
-            keyExtractor={(item) => item.id}
+            renderItem={({ item }) =>
+              item.blank ? (
+                <View style={{ height: 120 }} />
+              ) : (
+                <HomeScreenARItem {...item} />
+              )
+            }
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
           />
-        }
+        )}
       </View>
       <View style={styles.blurView}>
-        <BlurView blurType="regular" overlayColor='transparent'
-          style={{ backgroundColor: 'transparent' }}>
+        <BlurView
+          blurType="regular"
+          overlayColor="transparent"
+          style={{ backgroundColor: "transparent" }}
+        >
           <AppHeader
             title={"AR Experiences"}
             leftComponent={handleMenuButton()}
