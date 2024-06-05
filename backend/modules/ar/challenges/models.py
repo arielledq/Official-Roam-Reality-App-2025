@@ -238,7 +238,6 @@ class GeoARChallenges(models.Model):
     challenge_choice = models.CharField(verbose_name="Challenge Load From",
         max_length=50, choices=GEO_CHALLENGE_CHOICES, default="3DMODEL"
     )
-    ar_filters = models.ManyToManyField(ARChallengeFilters,verbose_name="AR Filters",related_name="filter_geo_ar_challenge", blank=True, null=True, default=None)
     parameter_settings = models.ForeignKey(
         ARChallengeParameterSettings,
         on_delete=models.CASCADE,
