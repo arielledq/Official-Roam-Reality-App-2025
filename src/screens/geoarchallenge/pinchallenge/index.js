@@ -38,7 +38,7 @@ const PinChallenge = ({
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = selectedGeoSite.pin_challenge;
-  const challengeObjParameters = {};
+  const challengeObjParameters = challengeObj?.parameters;
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
@@ -225,6 +225,16 @@ const PinChallenge = ({
             }}
           />
         }
+
+        {challengeObj?.challenge_choice == "IMAGE" && <ViroImage
+          height={1}
+          width={1}
+          opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
+          onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
+          source={{ uri: challengeObj.image }}
+          position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+          challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
+          challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5]} />}
 
       </ViroARScene>
     );
