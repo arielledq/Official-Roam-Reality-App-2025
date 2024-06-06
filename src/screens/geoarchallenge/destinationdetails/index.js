@@ -59,6 +59,14 @@ const GeoArChallengeDetails = ({
     if (!selectedDestination.geo_location || selectedDestination.geo_location.coordinates.length == 0) {
       console.log("setMapBounds")
       setTimeout(setMapBounds, 500)
+    } else {
+      const fullRegion = {
+        latitude: selectedDestination.geo_location?.coordinates[1],
+        longitude: selectedDestination.geo_location?.coordinates[0],
+        latitudeDelta: Number(selectedDestination.map_latitude_delta),
+        longitudeDelta: Number(selectedDestination.map_longitude_delta),
+      }
+      setFullRegion(fullRegion)
     }
   }, []);
 
