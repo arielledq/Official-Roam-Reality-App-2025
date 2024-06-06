@@ -4,7 +4,7 @@ from rest_framework import routers
 from . import signals  # noqa
 from .viewsets import ChallengesViewSet, ChallengesUploadView,\
     SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
-    ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet
+    ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
@@ -15,6 +15,7 @@ router.register(r'settings', ARSettingsViewSet)
 router.register(r'examples', ARExamplesViewSet)
 router.register(r'geo-ar-location', GeoLocationViewSet)
 router.register(r'geo-ar-site', GeoArSiteViewSet)
+router.register(r'geo-ar-star', GeoArStarViewSet, basename="ar-stars")
 
 urlpatterns = [
     path('', include(router.urls)),

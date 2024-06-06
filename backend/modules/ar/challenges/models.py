@@ -386,7 +386,7 @@ class GeoARStar(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
-    star_location = gis_models.PointField(_("Star Location"), blank=True, null=True)
+    star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=0)
     geo_site = models.ForeignKey(
