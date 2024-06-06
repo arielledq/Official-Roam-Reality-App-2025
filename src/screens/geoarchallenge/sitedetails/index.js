@@ -13,7 +13,6 @@ import ProTipIcon from "../../../assets/geoar/pro-tip.svg"
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png"
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import Geocoder from 'react-native-geocoding';
-import LineIcon from '../../../assets/ar/line.png';
 
 
 import { useDispatch, useSelector } from "react-redux"
@@ -22,6 +21,8 @@ import { height, width } from "../../../util/AppDimensions";
 import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
+import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
+import { getAllARSitesStars } from "../../../network";
 
 
 const GeoArSiteDetails = ({
@@ -35,7 +36,9 @@ const GeoArSiteDetails = ({
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
+  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
   const [address, setAddress] = useState(null)
+  const [starsCount, setStarsCount] = useState(0)
 
   const getAddress = () => {
     Geocoder.from({
@@ -52,8 +55,29 @@ const GeoArSiteDetails = ({
       .catch(error => console.warn(error));
   }
 
+  const geoARSitesStars = () => {
+    getAllARSitesStars({ id: selectedGeoSite.id }).then((res) => {
+      if (res.status == 1) {
+        dispatch(updateSelectedGeoARSiteStars(res.data))
+      }
+    }).finally(() => {
+    })
+  }
+
+  const setStarCounts = () => {
+    let count = 0;
+    for(const stars_site of selectedGeoARSiteStars){
+      if(stars_site.star_location && stars_site.star_location.coordinates){
+        count += stars_site.star_location.coordinates.length;
+      }
+    }
+    setStarsCount(count);
+  }
+
   useEffect(() => {
     getAddress()
+    geoARSitesStars()
+    setStarCounts()
   }, []);
 
   InfoView = () => {
@@ -160,16 +184,16 @@ const GeoArSiteDetails = ({
               <Text style={_styles.s_list_count}>{selectedGeoSite.check_ins}</Text>
               <Text style={_styles.s_list_text}>Check-ins</Text>
             </View>
-            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <StarSiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>Star</Text>
-            </View>
             {/* <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <StarSiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>0</Text>
-              <Text style={_styles.s_list_text}>Hidden Sites</Text>
+              <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
+              <Text style={_styles.s_list_text}>Sites</Text>
             </View> */}
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <StarSiteIcon style={{ width: 48, height: 48 }} />
+              <Text style={_styles.s_list_count}>{starsCount}</Text>
+              <Text style={_styles.s_list_text}>Stars</Text>
+            </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
