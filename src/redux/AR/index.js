@@ -1,4 +1,4 @@
 export {
   resetState, updateARUserData, updateARSettings, updateSelectedDestination,
-  updateAnyWhereChallenges, updateSelectedSites
+  updateAnyWhereChallenges, updateSelectedSites,updateSelectedGeoARSiteStars
 } from './reducer'
