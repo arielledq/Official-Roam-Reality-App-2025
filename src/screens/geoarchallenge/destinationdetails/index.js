@@ -31,7 +31,6 @@ const GeoArChallengeDetails = ({
   const [fullRegion, setFullRegion] = useState(null)
 
   const setMapBounds = () => {
-    console.log(selectedDestination)
     var address = selectedDestination.name;
     Geocoder.from(address)
       .then(json => {
@@ -57,13 +56,17 @@ const GeoArChallengeDetails = ({
   }
 
   useEffect(() => {
-    //setTimeout(setMapBounds, 500)
+    if (!selectedDestination.geo_location || selectedDestination.geo_location.coordinates.length == 0) {
+      console.log("setMapBounds")
+      setTimeout(setMapBounds, 500)
+    }
   }, []);
 
   const _markerView = (o) => {
     if (o.lat_long) {
       return (
         <Marker
+          key={o.id}
           coordinate={{
             latitude: o.lat_long.coordinates[1],
             longitude: o.lat_long.coordinates[0]
@@ -129,8 +132,10 @@ const GeoArChallengeDetails = ({
           ref={mapView}
           style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={{
-            latitude: selectedDestination.geo_location.coordinates[1],
-            longitude: selectedDestination.geo_location.coordinates[0],
+            latitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
+              selectedDestination.geo_location?.coordinates[1] : 21.758821200665473,
+            longitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
+              selectedDestination.geo_location?.coordinates[0] : -80.41984442094248,
             latitudeDelta: selectedDestination.map_latitude_delta ? Number(selectedDestination.map_latitude_delta) : 0.0922,
             longitudeDelta: selectedDestination.map_longitude_delta ? Number(selectedDestination.map_longitude_delta) : 0.0421,
           }}
