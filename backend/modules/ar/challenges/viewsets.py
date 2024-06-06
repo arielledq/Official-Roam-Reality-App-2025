@@ -1,8 +1,8 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
-GeoArSite, GeoLocation
+GeoArSite, GeoLocation, GeoARStar
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
-ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, \
+ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer,GeoStarSerializer, \
 GeoLocationSerializer, GeoArSiteSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
@@ -163,3 +163,18 @@ class GeoArSiteViewSet(viewsets.ModelViewSet):
     queryset = GeoArSite.objects.all()
     serializer_class = GeoArSiteSerializer
     http_method_names = ["get"]
+
+class GeoArStarViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing GeoArSite.
+    """
+    queryset = GeoARStar.objects.all()
+    serializer_class = GeoStarSerializer
+    http_method_names = ["get"]
+
+    @action(detail=False, methods=['get'],url_path='get-by-site-id', name='AR Site Stars')
+    def get_by_ar_site(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_site = id)
+        serializer = GeoStarSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

@@ -1,6 +1,6 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
-    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges
+    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
@@ -185,6 +185,17 @@ class GeoLocationSerializer(GeoModelSerializer):
     class Meta:
         model = GeoLocation
         geo_field = 'geo_location'
+        fields = (
+            "__all__"
+        )
+
+class GeoStarSerializer(GeoModelSerializer):
+    geo_site = GeoArSiteSerializer(read_only=True)
+    challenges = GeoARChallengesSerializer(read_only=True)
+
+    class Meta:
+        model = GeoARStar
+        geo_field = 'star_location'
         fields = (
             "__all__"
         )
