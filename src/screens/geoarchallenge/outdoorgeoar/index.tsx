@@ -43,7 +43,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   const navigation = useNavigation()
   const styles = useStyles();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  console.log("selectedDestination", selectedDestination)
 
 
   const handleLogOut = () => {
@@ -55,7 +54,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     setOpenBottomSheet(false)
   } else {
   }
-  console.log({ account_setup })
 
   useEffect(() => {
     if (!account_setup) {
