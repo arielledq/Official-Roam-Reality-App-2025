@@ -77,8 +77,11 @@ const GeoArSiteDetails = ({
   useEffect(() => {
     getAddress()
     geoARSitesStars()
-    setStarCounts()
   }, []);
+
+  useEffect(() => {
+    setStarCounts()
+  }, [selectedGeoARSiteStars]);
 
   InfoView = () => {
     return (

@@ -6,7 +6,7 @@ const initialState = {
   selectedDestination: {},
   anywhereChallenges: {},
   selectedGeoSite: {},
-  selectedGeoARSiteStars: {}
+  selectedGeoARSiteStars: []
 }
 
 export const sliceAR = createSlice({
