@@ -10,6 +10,7 @@ import useStyles from "./styles"
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { useNavigation } from "@react-navigation/native";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import mapCustomStyle from "../../../constants/MapCustomStyles";
 
 
 const GeoArSiteArrived = ({
@@ -36,6 +37,7 @@ const GeoArSiteArrived = ({
       <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
         <View style={{ position: 'relative', minHeight: 520, borderRadius: 16, overflow: 'hidden', marginTop: 20, marginHorizontal: 30 }}>
           <MapView
+            customMapStyle={mapCustomStyle}
             provider={PROVIDER_GOOGLE}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
