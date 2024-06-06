@@ -185,5 +185,6 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
         objs = self.queryset.filter(geo_site__geo_location = id)
         count = 0
         for o in objs:
-           count += len(o.star_location)
+           if o.star_location:
+            count += len(o.star_location)
         return Response({count}, status=status.HTTP_200_OK)
