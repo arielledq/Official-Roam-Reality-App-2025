@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, Platform, ScrollView, Text, TouchableHighlight, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -15,6 +15,7 @@ import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
+import { getARSitesHiddenStars } from "../../../network";
 
 
 const GeoArChallengeDetails = ({
@@ -23,6 +24,7 @@ const GeoArChallengeDetails = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const [hiddenStars, setHiddenStars] = useState(0)
   const navigation = useNavigation()
   const mapView = useRef();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
@@ -51,8 +53,15 @@ const GeoArChallengeDetails = ({
       .catch(error => console.warn(error));
   }
 
-  moveToFullRegion = () => {
+  const moveToFullRegion = () => {
     mapView.current.animateToRegion(fullRegion)
+  }
+
+  const getHiddenStar = () => {
+    getARSitesHiddenStars({ id: selectedDestination.id }).then((res) => {
+      setHiddenStars(res.data[0])
+    }).finally(() => {
+    })
   }
 
   useEffect(() => {
@@ -68,6 +77,7 @@ const GeoArChallengeDetails = ({
       }
       setFullRegion(fullRegion)
     }
+    getHiddenStar()
   }, []);
 
   const _markerView = (o) => {
@@ -173,8 +183,8 @@ const GeoArChallengeDetails = ({
           <Text style={_styles.s_list_text}>Star Sites</Text>
         </View><View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <StarSiteIcon style={{ width: 48, height: 48 }} />
-          <Text style={_styles.s_list_count}>0</Text>
-          <Text style={_styles.s_list_text}>Hidden Sites</Text>
+          <Text style={_styles.s_list_count}>{hiddenStars}</Text>
+          <Text style={_styles.s_list_text}>Hidden Stars</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ArIcon style={{ width: 48, height: 48 }} />

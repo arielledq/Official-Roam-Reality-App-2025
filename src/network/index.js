@@ -132,6 +132,12 @@ export const getARSposored = () =>
     method: "GET"
   })
 
+export const getARSitesHiddenStars = (payload) =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-star/get-hidden-stars/?id=${payload.id}`,
+    method: "GET"
+  })
+
 export const getARProfile = () =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/`,
