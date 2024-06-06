@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
@@ -22,7 +22,8 @@ import {
   ViroSpotLight,
   ViroText
 } from '@viro-community/react-viro';
-import Video from 'react-native-video';
+const Sound = require('react-native-sound');
+import uuid from 'react-native-uuid';
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
@@ -253,6 +254,14 @@ const PinChallenge = ({
       challengeInformationView: false
     }
 
+    constructor() {
+      super();
+      this._setARNavigatorRef = this._setARNavigatorRef.bind(this);
+      this._takeScreenshot = this._takeScreenshot.bind(this);
+      this.playCameraSound = this.playCameraSound.bind(this);
+      this.checkPermission = this.checkPermission.bind(this);
+    }
+
     componentDidMount() {
       this.checkPermission()
       this.setState({ isLoadVR: true })
@@ -284,28 +293,77 @@ const PinChallenge = ({
       }
     };
 
+    playCameraSound() {
+      Sound.setCategory('Playback');
+      let cameraSound = new Sound(Platform.OS == "android" ? "camerasound.mp3" : "camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.log('failed to load the sound', error);
+        } else {
+          cameraSound.play(); // have to put the call to play() in the onload callback
+        }
+      });
+    };
+
+    async _takeScreenshot() {
+      this.setState({
+        capturedVideo: null
+      })
+      this.playCameraSound()
+      this._arNavigator
+        ._takeScreenshot(uuid.v4(), false)
+        .then((retDict) => {
+          console.log("captureImage:", retDict)
+          this.setState({
+            capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
+          });
+        });
+    }
+
     render() {
       return (
-        <View style={_styles.ARMainContainer}>
-          {
-            this.state.isLoadVR && <ViroARSceneNavigator
-              videoQuality={"High"}
-              autofocus={true}
-              pbrEnabled={true}
-              hdrEnabled={true}
-              bloomEnabled={true}
-              ref={this._setARNavigatorRef}
-              initialScene={{
-                scene: ARScreen,
-              }}
-              style={_styles.f1}
-            >
-            </ViroARSceneNavigator>
+        <View style={{ flex: 1 }} >
+          <View style={_styles.ARMainContainer}>
+            {
+              this.state.isLoadVR && <ViroARSceneNavigator
+                videoQuality={"High"}
+                autofocus={true}
+                pbrEnabled={true}
+                hdrEnabled={true}
+                bloomEnabled={true}
+                ref={this._setARNavigatorRef}
+                initialScene={{
+                  scene: ARScreen,
+                }}
+                style={_styles.f1}
+              >
+              </ViroARSceneNavigator>
+            }
+            {this.state.capturedImage && <Image style={_styles.f1} source={{
+              uri: this.state.capturedImage
+            }} />}
+          </View>
+          <TouchableOpacity disabled={this.state.capturedImage} onPress={() => {
+            this._takeScreenshot();
+          }} style={{
+            width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0
+          }}>
+            <CaptureIcon />
+          </TouchableOpacity>
+          {this.state.capturedImage &&
+            <View style={{ paddingHorizontal: 15, position: 'absolute', bottom: 15, justifyContent: 'space-between', flexDirection: "row", width: '100%' }}>
+              <TouchableOpacity onPress={() => this.setState({ capturedImage: null })} activeOpacity={.8} style={_styles.bottomButtonContainer}>
+                <Text style={_styles.bottomButtonText}>Retake</Text>
+              </TouchableOpacity>
+              <TouchableOpacity activeOpacity={.8} style={_styles.bottomButtonContainer}>
+                <Text style={_styles.bottomButtonText}>Done</Text>
+              </TouchableOpacity>
+            </View>
           }
         </View>
       )
     }
   }
+
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -337,20 +395,15 @@ const PinChallenge = ({
           <View style={{ flexDirection: 'row' }}>
             <View style={{ marginEnd: 10 }}>
               <Text style={_styles.exploringText}>Points</Text>
-              <Text style={_styles.arrivedText}>100</Text>
+              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
             </View>
             <TrophyIcon style={{ width: 48, height: 48 }} />
           </View>
         </View>
         <View style={{
-          backgroundColor: "#131422", position: 'relative', flex: 1, borderRadius: 16, marginVertical: 20
+          flex: 1, marginVertical: 20
         }}>
           <ViroARNavigator />
-          <TouchableOpacity style={{
-            width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0
-          }}>
-            <CaptureIcon />
-          </TouchableOpacity>
         </View>
         <View style={{
           backgroundColor: "#131422",
