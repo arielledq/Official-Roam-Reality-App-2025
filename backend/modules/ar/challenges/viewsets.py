@@ -178,3 +178,12 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
         objs = self.queryset.filter(geo_site = id)
         serializer = GeoStarSerializer(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['get'],url_path='get-hidden-stars', name='AR Site Hidden Stars')
+    def get_hidden_ar_star(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_site__geo_location = id)
+        count = 0
+        for o in objs:
+           count += len(o.star_location)
+        return Response({count}, status=status.HTTP_200_OK)
