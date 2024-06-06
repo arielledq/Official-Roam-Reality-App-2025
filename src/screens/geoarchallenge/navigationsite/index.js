@@ -18,6 +18,7 @@ import MapViewDirections from "react-native-maps-directions";
 import { convertKilometersToMiles } from "../../../util/helpers";
 import moment from "moment";
 import Strings from "../../../constants/Strings";
+import mapCustomStyle from "../../../constants/MapCustomStyles";
 
 
 const GeoArSiteNavigation = ({
@@ -221,8 +222,7 @@ const GeoArSiteNavigation = ({
       },
     );
   };
-  const mapCustomStyle = [{ "elementType": "geometry", "stylers": [{ "color": "#242f3e" }] }, { "elementType": "labels.text.fill", "stylers": [{ "color": "#746855" }] }, { "elementType": "labels.text.stroke", "stylers": [{ "color": "#242f3e" }] }, { "featureType": "administrative.locality", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "poi.park", "elementType": "geometry", "stylers": [{ "color": "#263c3f" }] }, { "featureType": "poi.park", "elementType": "labels.text.fill", "stylers": [{ "color": "#6b9a76" }] }, { "featureType": "road", "elementType": "geometry", "stylers": [{ "color": "#38414e" }] }, { "featureType": "road", "elementType": "geometry.stroke", "stylers": [{ "color": "#212a37" }] }, { "featureType": "road", "elementType": "labels.text.fill", "stylers": [{ "color": "#9ca5b3" }] }, { "featureType": "road.highway", "elementType": "geometry", "stylers": [{ "color": "#746855" }] }, { "featureType": "road.highway", "elementType": "geometry.stroke", "stylers": [{ "color": "#1f2835" }] }, { "featureType": "road.highway", "elementType": "labels.text.fill", "stylers": [{ "color": "#f3d19c" }] }, { "featureType": "transit", "elementType": "geometry", "stylers": [{ "color": "#2f3948" }] }, { "featureType": "transit.station", "elementType": "labels.text.fill", "stylers": [{ "color": "#d59563" }] }, { "featureType": "water", "elementType": "geometry", "stylers": [{ "color": "#17263c" }] }, { "featureType": "water", "elementType": "labels.text.fill", "stylers": [{ "color": "#515c6d" }] }, { "featureType": "water", "elementType": "labels.text.stroke", "stylers": [{ "color": "#17263c" }] }]
-
+  
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -297,7 +297,7 @@ const GeoArSiteNavigation = ({
                   console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
                 }}
                 onReady={result => {
-                  // console.log(result)
+                  console.log(result.via_waypoint)
                   // console.log(result.legs)
                   // console.log(`Distance: ${result.distance} km`)
                   // console.log(`Duration: ${result.duration} min.`)
