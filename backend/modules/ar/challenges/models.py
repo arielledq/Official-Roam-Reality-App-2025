@@ -454,3 +454,59 @@ class UniqueChallengeSite(models.Model):
 
     def __str__(self):
         return self.name
+    
+class GeoARSiteActivity(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=True, blank=True, max_length=255
+    )
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_acitivity_ar_site",
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_ar_site_acitivity"
+    )
+    description = models.TextField(_("Description"), blank=True, null=True)
+
+    class Meta:
+      verbose_name_plural = "Geo AR Site Activities"
+      verbose_name = "Geo AR Site Activity"
+
+    def __str__(self):
+        return self.name
+    
+class StarCollection(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=True, blank=True, max_length=255
+    )
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_star_collect_ar_site",
+    )
+    geo_ar_star = models.ForeignKey(
+        GeoARStar,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_star_collect_ar_star",
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_ar_site_star"
+    )
+    collected_stars = models.IntegerField(verbose_name="Collected Stars", default=0)
+
+    class Meta:
+      verbose_name_plural = "Geo AR Star Collections"
+      verbose_name = "Geo AR Star Collections"
+
+    def __str__(self):
+        return self.name
