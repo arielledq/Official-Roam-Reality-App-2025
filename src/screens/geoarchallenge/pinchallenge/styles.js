@@ -189,7 +189,21 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S10,
     color: theme.colors.white,
     lineHeight: 13.64
-  }
+  },
+  bottomButtonContainer:
+  {
+    width: 96,
+    height: 42,
+    borderRadius: 4,
+    backgroundColor: "#00000090",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  bottomButtonText: {
+    ...fontGroup.p700,
+    color: theme.colors.white,
+    fontSize: FontSizes.S16,
+  },
 }))
 
 export default useStyles
