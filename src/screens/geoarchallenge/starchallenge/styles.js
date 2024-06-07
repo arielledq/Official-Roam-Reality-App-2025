@@ -14,14 +14,27 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     color: theme.colors.white,
     marginTop: 5,
-    textAlign:'center'
+    textAlign: 'center'
   },
   mainContainer: {
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,
-    justifyContent:'flex-start',
-    alignItems:'center'
-
+    justifyContent: 'flex-start',
+    alignItems: 'center'
+  },
+  ARMainContainer: {
+    flex: 1,
+    width: '100%',
+    position: 'relative',
+    backgroundColor: '#000',
+    overflow: 'hidden', 
+    borderRadius: 16
+  },
+  f1: {
+    bottom: 0,
+    width: '100%',
+    position: 'absolute',
+    top: 0
   },
   container: { marginTop: "10%" },
   headerText: {
@@ -46,13 +59,13 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     marginTop: 5,
   },
-  rowView: { 
+  rowView: {
     flexDirection: 'row',
   },
   buttonSelectText: {
     fontSize: FontSizes.S14,
     color: theme.colors.white,
-    fontWeight:'bold'
+    fontWeight: 'bold'
   },
   selectButtonStyle:
   {
@@ -65,7 +78,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     marginEnd: 2,
     marginStart: 2,
-    paddingHorizontal:8
+    paddingHorizontal: 8
   },
   unSelectButtonStyle:
   {
@@ -78,64 +91,64 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     marginStart: 2,
     marginEnd: 2,
-    paddingHorizontal:8
+    paddingHorizontal: 8
   },
   //Flat Item
   containerView: {
     paddingHorizontal: 12,
     marginVertical: 15,
-    flex:1,
+    flex: 1,
     minHeight: 280,
     justifyContent: "flex-end",
     alignItems: "center",
     borderRadius: 12,
     margin: 5,
-    overflow:'hidden',
-    position:'relative'
+    overflow: 'hidden',
+    position: 'relative'
   },
   list_title: {
     ...fontGroup.ns800,
     fontSize: FontSizes.S26,
     color: theme.colors.white,
-    marginTop:5,
+    marginTop: 5,
   },
   s_list_count: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
-    alignItems:'center',
-    textAlign:'center',
+    alignItems: 'center',
+    textAlign: 'center',
   },
   s_list_text: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    alignItems:'center',
-    textAlign:'center'
+    alignItems: 'center',
+    textAlign: 'center'
   },
-  gradient:{
-    position:'absolute',
-    top:0,bottom:0,left:0,right:0
+  gradient: {
+    position: 'absolute',
+    top: 0, bottom: 0, left: 0, right: 0
   },
   site_d_header_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
-    alignItems:'center',
-    textAlign:'center'
+    alignItems: 'center',
+    textAlign: 'center'
   },
   site_d_header_number_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     color: '#C881F0',
-    alignItems:'center',
-    textAlign:'center'
+    alignItems: 'center',
+    textAlign: 'center'
   },
   site_d_header: {
     ...fontGroup.ns800,
     fontSize: FontSizes.S20,
     color: theme.colors.white,
-    marginVertical:10
+    marginVertical: 10
   },
   site_via_text: {
     ...fontGroup.ns700,
@@ -151,32 +164,46 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns400,
     fontSize: FontSizes.S10,
     color: '#C8DFFF',
-    marginVertical:10
+    marginVertical: 10
   },
   protip_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S16,
     color: '#1E63EF',
-    marginVertical:10
+    marginVertical: 10
   },
   arrivedText: {
     ...fontGroup.ns600,
     fontSize: FontSizes.S16,
-    color:'#C881F0'
+    color: '#C881F0'
   },
   exploringText: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     lineHeight: 13.64,
-    marginVertical:4
+    marginVertical: 4
   },
   infoText: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S10,
     color: theme.colors.white,
     lineHeight: 13.64
-  }
+  },
+  bottomButtonContainer:
+  {
+    width: 96,
+    height: 42,
+    borderRadius: 4,
+    backgroundColor: "#00000090",
+    alignItems: 'center',
+    justifyContent: 'center'
+  },
+  bottomButtonText: {
+    ...fontGroup.p700,
+    color: theme.colors.white,
+    fontSize: FontSizes.S16,
+  },
 }))
 
 export default useStyles
