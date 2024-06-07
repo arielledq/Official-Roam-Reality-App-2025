@@ -438,6 +438,18 @@ const PinChallenge = ({
   )
 }
 
-
+ViroMaterials.createMaterials({
+  grid: {
+    lightingModel: "Lambert",
+    shininess: .6,
+  },
+  mat: {
+    shininess: .6,
+    blendMode: "Add",
+    lightingModel: "Lambert",
+    bloomThreshold: 0.5,
+    diffuseColor: "#fff"
+  },
+});
 
 export default PinChallenge
