@@ -1,41 +1,27 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
   ActivityIndicator,
   FlatList
 } from "react-native"
-import { AppButton, AppHeader, AppText } from "../../../components"
-import { resetState } from "../../../redux/Login"
-import { deleteAccount, getARChallenges, logout } from "../../../network"
 import { useDispatch, useSelector } from "react-redux"
-import { DrawerActions, useNavigation } from "@react-navigation/native"
-import { MenuIcon } from "../../../assets/svg"
-import { height, screenHorizontalPadding, width } from "../../../util/AppDimensions"
 import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
 import theme from "../../../assets/theme"
-import AppBottomSheet from "../../../components/bottomSheet"
-import BackgroundWithImage from '../../../components/background'
-import {
-  RootStackParamList,
-  ScreenStackComponent
-} from "../../../navigation/types"
-import BottomSheet from "@gorhom/bottom-sheet"
 import Images from "../../../assets/images"
 import useStyles from "./styles"
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
 import { handleError } from "../../../util/helpers"
 import { BlurView } from "@react-native-community/blur";
-
 import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
 import ArIcon from "../../../assets/geoar/aricon.svg"
-import SitesIcon from "../../../assets/geoar/sites.svg"
-import MapView, { Marker } from 'react-native-maps';
-import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import { screenHorizontalPadding } from "../../../util/AppDimensions"
+import { useNavigation } from "@react-navigation/native"
+import { AppHeader, AppText } from "../../../components"
+import { getARChallenges } from "../../../network"
 
 const HomeScreenData = [
   {
@@ -82,17 +68,16 @@ const HomeScreenData = [
 
 
 const ChallengeSelection = ({ route }) => {
-  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
-  const [openBottomSheet, setOpenBottomSheet] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
 
-  const bottomSheetRef = useRef < BottomSheet > (null)
-  const snapPoints = useMemo(() => ["33%"], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const styles = useStyles();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
+  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
+  const [starsCount, setStarsCount] = useState(0)
 
   useEffect(() => {
 
@@ -112,13 +97,29 @@ const ChallengeSelection = ({ route }) => {
     })
   }, [])
 
-  const navigateToARChanllenge = () => {
-    navigation.navigate('ARChallenge')
+  const goToRoute = (route) => {
+    if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
+      Alert.alert("Pin Challenge is unavailable right now");
+    } if (route === "StarChallenge" && selectedGeoARSiteStars.length == 0) {
+      Alert.alert("Stars Challenges are unavailable right now");
+    } else {
+      navigation.navigate(route)
+    }
   }
 
-  const navigateToGeoARChanllenge = () => {
-    navigation.navigate('GeoArChallengeDetails')
+  const setStarCounts = () => {
+    let count = 0;
+    for(const stars_site of selectedGeoARSiteStars){
+      if(stars_site.star_location && stars_site.star_location.coordinates){
+        count += stars_site.star_location.coordinates.length;
+      }
+    }
+    setStarsCount(count);
   }
+
+  useEffect(() => {
+    setStarCounts()
+  }, [selectedGeoARSiteStars]);
 
   const HomeScreenARItem = (item) => {
     return (
@@ -136,11 +137,11 @@ const ChallengeSelection = ({ route }) => {
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
                 {
                   item?.id == 1 &&
-                  <AppText style={styles.challengesText}>Pin located: 1/1  •  My Check-ins: 9</AppText>
+                  <AppText style={styles.challengesText}>Pin located: 0/1  •  My Check-ins: 9</AppText>
                 }
                 {
                   item?.id == 2 &&
-                  <AppText style={styles.challengesText}> Stars collected: 0/8</AppText>
+                  <AppText style={styles.challengesText}> Stars collected: 0/{starsCount}</AppText>
                 }
                 {
                   item?.id == 3 &&
@@ -151,7 +152,7 @@ const ChallengeSelection = ({ route }) => {
                   <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
                 }
               </View>
-              <TouchableOpacity onPress={() => item.navigation ? navigation.navigate(item.navigation) : console.log("No Navigation")}>
+              <TouchableOpacity onPress={() => goToRoute(item.navigation)}>
                 <RightArrowIcon />
               </TouchableOpacity>
             </View>
