@@ -36,6 +36,8 @@ const StarChallenge = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const [starsCount, setStarsCount] = useState(0)
+  const [collectedStarsCount, setCollectedStarsCount] = useState(0)
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
@@ -348,6 +350,20 @@ const StarChallenge = ({
     }
   }
 
+  const setStarCounts = () => {
+    let count = 0;
+    for(const stars_site of selectedGeoARSiteStars){
+      if(stars_site.star_location && stars_site.star_location.coordinates){
+        count += stars_site.star_location.coordinates.length;
+      }
+    }
+    setStarsCount(count);
+  }
+
+  useEffect(() => {
+    setStarCounts()
+  }, [selectedGeoARSiteStars]);
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -372,13 +388,13 @@ const StarChallenge = ({
             <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
             <View>
               <Text style={_styles.exploringText}>Stars Collected</Text>
-              <Text style={_styles.arrivedText}>4 / 12</Text>
+              <Text style={_styles.arrivedText}>{collectedStarsCount} / {starsCount}</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <View style={{ marginEnd: 10 }}>
               <Text style={_styles.exploringText}>Points</Text>
-              <Text style={_styles.arrivedText}>100</Text>
+              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
             </View>
             <TrophyIcon style={{ width: 48, height: 48 }} />
           </View>
