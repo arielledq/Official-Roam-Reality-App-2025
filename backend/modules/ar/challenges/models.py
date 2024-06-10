@@ -350,6 +350,7 @@ class GeoArSite(models.Model):
     address_text = models.CharField(_("Address Text"),default=None, blank=True, null=True, max_length=255)
     lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
     geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
+    geo_site_border = gis_models.MultiLineStringField(_("Geo Site Line"), blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
