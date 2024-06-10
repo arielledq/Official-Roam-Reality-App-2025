@@ -76,7 +76,7 @@ class GeoLocation(models.Model):
     regions = models.ManyToManyField(GeoRegion,verbose_name="AR Regions",related_name="geo_location_region", blank=True, null=True, default=None)
     sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)
     map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
-    map_latitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
+    map_latitude_delta = models.DecimalField(_("Map Initial Latitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
 
     class Meta:
         verbose_name_plural = "Geo Destination"
