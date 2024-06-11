@@ -158,9 +158,23 @@ export const postArMemory = payload =>
     data: payload
   })
 
+export const postGeoArMemory = payload =>
+  Request.multiPartCall({
+    url: `modules/challenges/memories/check-geo-challenge-create/`,
+    method: "POST",
+    data: payload
+  })
+
 export const checkARChallengeDoneAPI = payload =>
   Request.callWithToken({
     url: `modules/challenges/memories/check-challenge-done/`,
+    method: "POST",
+    data: payload
+  })
+
+export const checkUniqueARChallengeDoneAPI = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/memories/check-geo-challenge-done/`,
     method: "POST",
     data: payload
   })
