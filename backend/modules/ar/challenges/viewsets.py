@@ -1,9 +1,9 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
-GeoArSite, GeoLocation, GeoARStar
+GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
 ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer,GeoStarSerializer, \
-GeoLocationSerializer, GeoArSiteSerializer
+GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser
@@ -110,7 +110,7 @@ class ARProfileViewSet(ViewSet):
     def update_points_for_social(self, request):
         social_network = request.data.get("social_network","")
         profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        profileObj.points =F('points')+SOCIAL_POINTS
+        profileObj.points = F('points')+SOCIAL_POINTS
         profileObj.save()
         return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
 
@@ -188,3 +188,56 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
            if o.star_location:
             count += len(o.star_location)
         return Response({count}, status=status.HTTP_200_OK)
+    
+class ARSitePinCheckInViewSet(ViewSet):
+
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = ARSitePinCheckIn.objects.all()
+    serializer_class = ARSitePinCheckInSerializer
+        
+    parser_class = (FileUploadParser,)
+
+    def get(self, request, *args, **kwargs):
+        objs = self.queryset.filter(user = request.user.id)
+        serializer = ARSitePinCheckInSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'],url_path='check-in-done', name='Check Check-ins')
+    def check_in_done(self, request):
+      user_id = self.request.user.id
+      geo_site = request.data.get("geo_site")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(geo_site=geo_site)
+      results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
+      if len(results) < 1:
+        return Response({'message': "Check-ins submission can be added."}, status=status.HTTP_200_OK)
+      else:
+        return Response({'message': "Check-ins already submitted and can't submitted more."}, status=status.HTTP_403_FORBIDDEN)
+         
+    def partial_update(self, request, *args, **kwargs):
+      instance = self.queryset.get(pk=kwargs.get('pk'))
+      serializer = self.serializer_class(instance, data=request.data, partial=True)
+      serializer.is_valid(raise_exception=True)
+      serializer.save()
+      return Response(serializer.data)
+        
+    def create(self, request, *args, **kwargs):
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      geo_site = request.data.get("geo_site")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(geo_site=geo_site)
+      results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
+      geosite = GeoArSite.objects.get(pk=geo_site)
+      if len(results) < 1:
+        serializer = ARSitePinCheckIn(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+          serializer.save()
+          geosite.check_ins = F('check_ins') + 1
+          geosite.save()
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      else:
+        return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
