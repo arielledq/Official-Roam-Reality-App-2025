@@ -384,6 +384,12 @@ class GeoARStar(models.Model):
         related_name="challenges_geo_ar_star_site",
         blank=False, null=False, default=None
     )
+    sponsors = models.ManyToManyField(
+        Sponsor,
+        verbose_name="Sponsors",
+        related_name="ar_stars_sponsored",
+    )
+
     class Meta:
       verbose_name_plural = "Geo AR Stars"
       verbose_name = "Geo AR Star"
