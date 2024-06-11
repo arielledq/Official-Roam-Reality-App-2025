@@ -2,8 +2,8 @@ from django.contrib import admin
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar, \
   ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion,GeoARSiteActivity,StarCollection,ARSitePinCheckIn
 from .widgets import GoogleMapsOpenLayersWidget
-from django.contrib.gis.db.models import MultiPolygonField, PointField
-from django.contrib.gis.admin import OSMGeoAdmin
+from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
+from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
 
 class ARMemoriesAdmin(admin.ModelAdmin):
     
@@ -37,14 +37,14 @@ class GeoARChallengesUpdatedAdmin(admin.ModelAdmin):
     list_display = ('name', 'expiry_date')
     search_fields = ["name"]
 
-class GeoArChallengeAdmin(OSMGeoAdmin):
+class GeoArChallengeAdmin(admin.ModelAdmin):
     formfield_overrides = {
         MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
         PointField: {"widget": GoogleMapsOpenLayersWidget},
+        MultiLineStringField: {"widget": GoogleMapsOpenLayersWidget},
+        MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
+        MultiPointField: {"widget": GoogleMapsOpenLayersWidget},
     }
-    default_lon = -80.41984442094248
-    default_lat =  21.758821200665473
-    default_zoom = 3
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
@@ -59,13 +59,13 @@ class GeoRegionAdmin(GeoArChallengeAdmin):
     search_fields = ["name"]
     
 @admin.register(UniqueChallengeSite)
-class GeoLocationAdmin(GeoArChallengeAdmin):
+class UniqueChallengeSiteAdmin(GeoArChallengeAdmin):
     list_display = ('name',)
     ordering = ("name",)
     search_fields = ["name"]
 
 @admin.register(GeoArSite)
-class GeoLocationAdmin(GeoArChallengeAdmin):
+class GeoArSiteAdmin(GeoArChallengeAdmin):
     list_display = ('name',"check_ins",)
     ordering = ("name","check_ins",)
     search_fields = ["name"]

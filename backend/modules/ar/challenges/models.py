@@ -73,7 +73,7 @@ class GeoLocation(models.Model):
     )
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
-    regions = models.ManyToManyField(GeoRegion,verbose_name="AR Regions",related_name="geo_location_region", blank=True, null=True, default=None)
+    regions = models.ManyToManyField(GeoRegion,verbose_name="AR Regions",related_name="geo_location_region", blank=True, default=None)
     sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)
     map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
     map_latitude_delta = models.DecimalField(_("Map Initial Latitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
@@ -182,7 +182,7 @@ class Challenges(models.Model):
     challenge_choice = models.CharField(verbose_name="Challenge Load From",
         max_length=50, choices=CHALLENGE_CHOICES, default="DANCE"
     )
-    ar_filters = models.ManyToManyField(ARChallengeFilters,verbose_name="AR Filters",related_name="filter_ar_challenge", blank=True, null=True, default=None)
+    ar_filters = models.ManyToManyField(ARChallengeFilters,verbose_name="AR Filters",related_name="filter_ar_challenge", blank=True, default=None)
     parameter_settings = models.ForeignKey(
         ARChallengeParameterSettings,
         on_delete=models.CASCADE,
@@ -357,14 +357,12 @@ class GeoArSite(models.Model):
         related_name="challenge_geo_ar_pin_site",
         blank=True, null=True, default=None
     )
-    address_text = models.CharField(_("Address Text"),default=None, blank=True, null=True, max_length=255)
+    address_text = models.TextField(_("Address Text"),default=None, blank=True, null=True)
     lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
-    geo_site_area = gis_models.MultiPolygonField(_("Geo Site Area"), blank=True, null=True)
     geo_site_border = gis_models.MultiLineStringField(_("Geo Site Line"), blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
-    check_ins_radius = models.IntegerField(verbose_name="Check-ins Radius in Meters", default=50)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
@@ -442,7 +440,7 @@ class UniqueChallengeSite(models.Model):
     challenge = models.ManyToManyField(GeoARChallenges,
         verbose_name="Geo Challenge Name",
         related_name="challenges_geo_ar_unique_site",
-        blank=False, null=False, default=None
+        blank=False, default=None
     )
 
     class Meta:
