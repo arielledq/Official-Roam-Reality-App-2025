@@ -1,5 +1,5 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
-GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn
+GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
 ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer,GeoStarSerializer, \
@@ -72,13 +72,45 @@ class ARMemoriesViewSet(ViewSet):
       else:
         return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=status.HTTP_403_FORBIDDEN)
          
+    @action(detail=False, methods=['post'],url_path='check-geo-challenge-done', name='Check Geo Challenge')
+    def check_geo_challenge_done(self, request):
+      user_id = self.request.user.id
+      challenges_id = request.data.get("challenges")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(challenges=challenges_id)
+      results = ARMemories.objects.filter(criterion1 & criterion2)
+      challengeObj = GeoARChallenges.objects.get(pk=challenges_id)
+      if len(results) < challengeObj.challenge_attempt:
+        return Response({'message': "Geo Challenge submission can be added more."}, status=status.HTTP_200_OK)
+      else:
+        return Response({'message': "Geo Challenge experience already submitted and can't submitted more."}, status=status.HTTP_403_FORBIDDEN)
+
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
       serializer.is_valid(raise_exception=True)
       serializer.save()
       return Response(serializer.data)
-        
+
+    @action(detail=False, methods=['post'],url_path='check-geo-challenge-create', name='Create Geo Challenge')
+    def create_geo(self, request, *args, **kwargs):
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      geo_challenge_id = request.data.get("geo_challenge")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(geo_challenge=geo_challenge_id)
+      results = ARMemories.objects.filter(criterion1 & criterion2)
+      challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
+      if len(results) < challengeObj.challenge_attempt:
+        serializer = ARMemoriesSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+          serializer.save()
+          return Response(serializer.data, status=status.HTTP_201_CREATED)
+        else:
+          return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+      else:
+        return Response({'message': "Geo Challenge experience already submitted and can't submitted more."}, status=403)
+
     def create(self, request, *args, **kwargs):
       user_id = self.request.user.id
       request.data['user'] = user_id
