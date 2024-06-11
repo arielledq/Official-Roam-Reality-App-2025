@@ -245,7 +245,6 @@ const PinChallenge = ({
 
     state = {
       capturedImage: null,
-      capturedVideo: null,
       detailsShow: true,
       recordingStart: false,
       timer: "00:00",
@@ -305,9 +304,6 @@ const PinChallenge = ({
     };
 
     async _takeScreenshot() {
-      this.setState({
-        capturedVideo: null
-      })
       this.playCameraSound()
       this._arNavigator
         ._takeScreenshot(uuid.v4(), false)
@@ -354,7 +350,9 @@ const PinChallenge = ({
               <TouchableOpacity onPress={() => this.setState({ capturedImage: null })} activeOpacity={.8} style={_styles.bottomButtonContainer}>
                 <Text style={_styles.bottomButtonText}>Retake</Text>
               </TouchableOpacity>
-              <TouchableOpacity activeOpacity={.8} style={_styles.bottomButtonContainer}>
+              <TouchableOpacity onPress={()=>{
+                navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData:this.state.capturedImage });
+              }} activeOpacity={.8} style={_styles.bottomButtonContainer}>
                 <Text style={_styles.bottomButtonText}>Done</Text>
               </TouchableOpacity>
             </View>
