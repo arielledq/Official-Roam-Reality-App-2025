@@ -231,7 +231,7 @@ class ARSitePinCheckInViewSet(ViewSet):
       results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
       geosite = GeoArSite.objects.get(pk=geo_site)
       if len(results) < 1:
-        serializer = ARSitePinCheckIn(data=request.data, partial=True)
+        serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
           serializer.save()
           geosite.check_ins = F('check_ins') + 1
