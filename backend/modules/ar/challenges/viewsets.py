@@ -75,11 +75,11 @@ class ARMemoriesViewSet(ViewSet):
     @action(detail=False, methods=['post'],url_path='check-geo-challenge-done', name='Check Geo Challenge')
     def check_geo_challenge_done(self, request):
       user_id = self.request.user.id
-      challenges_id = request.data.get("challenges")
+      geo_challenge_id = request.data.get("geo_challenge")
       criterion1 = Q(user=user_id)
-      criterion2 = Q(challenges=challenges_id)
+      criterion2 = Q(geo_challenge=geo_challenge_id)
       results = ARMemories.objects.filter(criterion1 & criterion2)
-      challengeObj = GeoARChallenges.objects.get(pk=challenges_id)
+      challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
       if len(results) < challengeObj.challenge_attempt:
         return Response({'message': "Geo Challenge submission can be added more."}, status=status.HTTP_200_OK)
       else:
