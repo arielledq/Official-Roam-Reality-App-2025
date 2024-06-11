@@ -4,13 +4,14 @@ from rest_framework import routers
 from . import signals  # noqa
 from .viewsets import ChallengesViewSet, ChallengesUploadView,\
     SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
-    ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet
+    ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet, ARSitePinCheckInViewSet
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
 router.register(r'ar-profile', ARProfileViewSet, basename="ar-profile")
 router.register(r'sponsor', SponsorViewSet)
 router.register(r'memories', ARMemoriesViewSet, basename="ar-memories")
+router.register(r'check-in', ARSitePinCheckInViewSet, basename="ar-check-ins")
 router.register(r'settings', ARSettingsViewSet)
 router.register(r'examples', ARExamplesViewSet)
 router.register(r'geo-ar-location', GeoLocationViewSet)
