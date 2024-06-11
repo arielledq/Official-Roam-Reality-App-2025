@@ -384,6 +384,12 @@ class GeoARStar(models.Model):
         related_name="challenges_geo_ar_star_site",
         blank=False, null=False, default=None
     )
+    sponsors = models.ManyToManyField(
+        Sponsor,
+        verbose_name="Sponsors",
+        related_name="ar_stars_sponsored",
+    )
+
     class Meta:
       verbose_name_plural = "Geo AR Stars"
       verbose_name = "Geo AR Star"
@@ -460,6 +466,40 @@ class GeoARSiteActivity(models.Model):
     def __str__(self):
         return self.name
     
+class ARSitePinCheckIn(models.Model):
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_star_checkin_ar_site",
+    )
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="user_ar_site_checkin"
+    )
+    check_in_image = models.ImageField(upload_to="geoar/checkinimg/", null=True, blank=True)
+    approval = models.CharField(
+        max_length=50,
+        choices=CHALLENGE_APPROVAL_CHOICES,
+        default="UNAPPROVED",
+        blank=True,
+        null=True,
+    )
+    declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name_plural = "AR Site Pin Check-ins"
+
+    def clean(self):
+        if self.approval == "DECLINED":
+            if self.declined_reason == "":
+                raise ValidationError(
+                    "Declined Reason is mandotory, When challenge is declined!"
+                )
+
 class StarCollection(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=True, blank=True, max_length=255
