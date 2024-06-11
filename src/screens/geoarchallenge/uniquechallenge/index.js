@@ -85,7 +85,7 @@ const UniqueArChallenge = ({
   }, []);
 
   const navigateToChallengeDetails = (obj) => {
-    navigation.navigate("ArChallengeDetails", { challengeObj: obj });
+    navigation.navigate("GeoUniqueArChallengeDetails", { challengeObj: obj });
   }
 
   const Item = ({ obj }) => (

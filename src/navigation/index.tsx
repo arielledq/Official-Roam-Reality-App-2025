@@ -47,6 +47,9 @@ import UniqueArChallenge from '../screens/geoarchallenge/uniquechallenge';
 import PinChallenge from '../screens/geoarchallenge/pinchallenge';
 import StarChallenge from '../screens/geoarchallenge/starchallenge';
 import ArPinChallengeShare from '../screens/geoarchallenge/locationpinshare';
+import GeoUniqueArChallengeDetails from '../screens/geoarchallenge/geouniquechallengedetails';
+import UniqueArChallengeCapture from '../screens/geoarchallenge/uniquechallengecapture';
+import UniqueArChallengeShare from '../screens/geoarchallenge/uniquechallengeshare';
 
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -121,6 +124,9 @@ const Navigation = () => {
         <Stack.Screen name="PinChallenge" component={PinChallenge} />
         <Stack.Screen name="StarChallenge" component={StarChallenge} />
         <Stack.Screen name="ArPinChallengeShare" component={ArPinChallengeShare} />
+        <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
+        <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
+        <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
