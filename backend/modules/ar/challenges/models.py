@@ -276,8 +276,18 @@ class ARMemories(models.Model):
     )
     challenges = models.ForeignKey(
         Challenges,
+        verbose_name="Challenge",
         on_delete=models.CASCADE,
         related_name="challenges_ar_memories",
+        null=True,
+        blank=True,
+    )
+    geo_challenge = models.ForeignKey(
+        GeoARChallenges,
+        verbose_name="Geo Challenge",
+        on_delete=models.CASCADE,
+        related_name="geo_challenges_ar_memories",
+        default=None,
         null=True,
         blank=True,
     )
