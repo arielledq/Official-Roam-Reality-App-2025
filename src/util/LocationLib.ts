@@ -5,14 +5,22 @@ interface LocationPoint {
   longitude: number;
 }
 
-export const isLocationPointInPolygon = (point: LocationPoint, points: LocationPoint[]) => {
-  geolib.isPointInPolygon(point, points);
+export const isLocationPointInPolygon = (point: LocationPoint, coords: LocationPoint[]) => {
+  return geolib.isPointInPolygon(point, coords);
 }
 
 export const getLocationDistance = (start: LocationPoint, end: LocationPoint) => {
-  geolib.getPreciseDistance(start, end, 1);
+  return geolib.getPreciseDistance(start, end, 1);
 }
 
 export const isLocationPointWithinRadius = (start: LocationPoint, centerPoint: LocationPoint, radius: number) => {
-  geolib.isPointWithinRadius(start, centerPoint, radius);
+  return geolib.isPointWithinRadius(start, centerPoint, radius);
+}
+
+export const findNearestLocationPoint = (point: LocationPoint, coords: LocationPoint[]) => {
+  return geolib.findNearest(point, coords);
+}
+
+export const orderByDistanceLocationPoint = (point: LocationPoint, coords: LocationPoint[]) => {
+  return geolib.orderByDistance(point, coords);
 }
