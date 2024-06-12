@@ -29,6 +29,7 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
+import { postGeoPinCheckIn } from "../../../network";
 
 const PinChallenge = ({
 
@@ -315,6 +316,28 @@ const PinChallenge = ({
         });
     }
 
+    onDonePress() {
+      let filename = this.state.capturedImage.split('/').pop()
+      let shareFile = {
+        uri: this.state.capturedImage,
+        type: 'png',
+        name: filename
+      }
+      const formData = new FormData()
+      formData.append("geo_site", selectedGeoSite.id)
+      formData.append("check_in_image", shareFile)
+      postGeoPinCheckIn(formData).then((res) => {
+        if (res.status == 1) {
+          console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
+        } else {
+          const message = "You already completed the check-ins or there is some issue with completing the check-ins."
+          console.log(message)
+        }
+      }).finally(() => {
+      })
+      navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData: this.state.capturedImage });
+    }
+
     render() {
       return (
         <View style={{ flex: 1 }} >
@@ -350,8 +373,8 @@ const PinChallenge = ({
               <TouchableOpacity onPress={() => this.setState({ capturedImage: null })} activeOpacity={.8} style={_styles.bottomButtonContainer}>
                 <Text style={_styles.bottomButtonText}>Retake</Text>
               </TouchableOpacity>
-              <TouchableOpacity onPress={()=>{
-                navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData:this.state.capturedImage });
+              <TouchableOpacity onPress={() => {
+                this.onDonePress()
               }} activeOpacity={.8} style={_styles.bottomButtonContainer}>
                 <Text style={_styles.bottomButtonText}>Done</Text>
               </TouchableOpacity>
