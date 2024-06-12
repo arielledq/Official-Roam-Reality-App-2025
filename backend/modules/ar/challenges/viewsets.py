@@ -247,6 +247,15 @@ class ARSitePinCheckInViewSet(ViewSet):
       else:
         return Response({'message': "Check-ins already submitted and can't submitted more."}, status=status.HTTP_403_FORBIDDEN)
          
+    @action(detail=False, methods=['post'], url_path='check-in-count', name='Check Check-ins')
+    def check_in_count(self, request):
+      user_id = self.request.user.id
+      geo_site = request.data.get("geo_site")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(geo_site=geo_site)
+      count = ARSitePinCheckIn.objects.filter(criterion1 & criterion2).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+      
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
