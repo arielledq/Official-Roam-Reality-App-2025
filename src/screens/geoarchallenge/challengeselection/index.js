@@ -19,9 +19,9 @@ import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
 import ArIcon from "../../../assets/geoar/aricon.svg"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
-import { useNavigation } from "@react-navigation/native"
+import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { AppHeader, AppText } from "../../../components"
-import { getARChallenges } from "../../../network"
+import { checkGeoPinCheckInDoneAPI, getARChallenges } from "../../../network"
 
 const HomeScreenData = [
   {
@@ -78,10 +78,30 @@ const ChallengeSelection = ({ route }) => {
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const [starsCount, setStarsCount] = useState(0)
+  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false)
+  const isFocused = useIsFocused();
+
+  const checkIfPinCheckIsDone = () => {
+    checkGeoPinCheckInDoneAPI({
+      geo_site: selectedGeoSite.id
+    }).then((res) => {
+      console.log("checkIfPinCheckIsDone:", res)
+      if (res.errorStatus == 403) {
+        console.log("checkIfPinCheckIsDone", "true")
+        setIsPinCheckIsDone(true)
+      } else {
+        console.log("checkIfPinCheckIsDone", "false")
+        setIsPinCheckIsDone(false)
+      }
+    }).finally(() => {
+    })
+  }
 
   useEffect(() => {
-
-  }, [])
+    if (isFocused) {
+      checkIfPinCheckIsDone()
+    }
+  }, [isFocused]);
 
   useEffect(() => {
     setIsLoading(true)
@@ -109,8 +129,8 @@ const ChallengeSelection = ({ route }) => {
 
   const setStarCounts = () => {
     let count = 0;
-    for(const stars_site of selectedGeoARSiteStars){
-      if(stars_site.star_location && stars_site.star_location.coordinates){
+    for (const stars_site of selectedGeoARSiteStars) {
+      if (stars_site.star_location && stars_site.star_location.coordinates) {
         count += stars_site.star_location.coordinates.length;
       }
     }
@@ -137,7 +157,7 @@ const ChallengeSelection = ({ route }) => {
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
                 {
                   item?.id == 1 &&
-                  <AppText style={styles.challengesText}>Pin located: 0/1  •  My Check-ins: 9</AppText>
+                  <AppText style={styles.challengesText}>Pin located: {isPinCheckIsDone ? 1 : 0}/1  •  My Check-ins: 9</AppText>
                 }
                 {
                   item?.id == 2 &&
