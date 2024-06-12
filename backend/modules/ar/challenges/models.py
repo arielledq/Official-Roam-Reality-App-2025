@@ -143,9 +143,9 @@ class ARChallengeFilters(models.Model):
     gradient_direction = models.CharField(
         max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=False, null=False
     )
-    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=False, null=False,default='')
-    filter_text_color = models.CharField(_("Filter Text Color"), max_length=10, blank=False, null=False,default='#ffffff')
-    filter_text_size = models.CharField(_("Filter Text Size"), max_length=10, blank=False, null=False,default='22')
+    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=True, null=True,default='')
+    filter_text_color = models.CharField(_("Filter Text Color"), max_length=10, blank=True, null=True,default='#ffffff')
+    filter_text_size = models.CharField(_("Filter Text Size"), max_length=10, blank=True, null=True,default='22')
     location_option = models.CharField(_("Location Text"),
         max_length=50, choices=LOCATION_OPTION, default="COUNTRY_ONLY", blank=False, null=False
     )
