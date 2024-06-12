@@ -335,6 +335,13 @@ class ARExample(models.Model):
     )
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
+    any_where_challenges = models.ManyToManyField(Challenges,verbose_name="Any Where AR Challenges",related_name="ar_example_challenge", blank=True, default=None)
+    geo_challenges = models.ManyToManyField(GeoARChallenges,verbose_name="Geo AR Challenges",related_name="geo_ar_example_challenge", blank=True, default=None)
+
+    def __str__(self):
+        return str(
+            self.name
+        )
 
 class GeoArSite(models.Model):
     name = models.CharField(
