@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { ActivityIndicator, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Image, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
