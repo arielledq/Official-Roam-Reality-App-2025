@@ -99,6 +99,14 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S12,
     color: theme.colors.white,
   },
+  imageContainer: {
+    borderRadius: 12,
+    width: '100%',
+    backgroundColor: "#272741",
+    marginTop: 10,
+    marginBottom:20,
+    overflow: 'hidden'
+  },
   detailContainer: {
     borderRadius: 12,
     width: '100%',
