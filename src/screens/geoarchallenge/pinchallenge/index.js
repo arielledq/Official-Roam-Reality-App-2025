@@ -31,7 +31,7 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { postGeoPinCheckIn } from "../../../network";
-import { isLocationPointInPolygon } from "../../../util/LocationLib";
+import { findNearestLocationPoint, getLocationDistance, isLocationPointInPolygon } from "../../../util/LocationLib";
 
 const PinChallenge = ({
 
@@ -40,11 +40,29 @@ const PinChallenge = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false)
+  const [distanceInFeet, setDistanceInFeet] = useState(0)
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
   const watchId = useRef(null);
+
+  const findNearPoint = (position) => {
+    let arrayPoints = []
+    for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      const points = selectedGeoSite.geo_site_border.coordinates[i];
+      for (j = 0; j < points.length; j++) {
+        const point = points[j]
+        arrayPoints.push({ latitude: point[1], longitude: point[0] })
+      }
+    }
+    const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
+    const distance = getLocationDistance(position.coords,neareastPoint)
+    console.log("neareastPoint",neareastPoint)
+    console.log("distance",distance)
+    const inFeet = distance * 0.3048;
+    setDistanceInFeet(Math.round(inFeet))
+  }
 
   const isCurrentLocationIsInArea = (position) => {
     let isInsideSiteArea = false;
@@ -71,6 +89,9 @@ const PinChallenge = ({
     Geolocation.getCurrentPosition(
       position => {
         isCurrentLocationIsInArea(position)
+        if(!isMeInsideInSite){
+          findNearPoint(position)
+        }
       },
       error => {
         console.log(error);
@@ -103,6 +124,9 @@ const PinChallenge = ({
     watchId.current = Geolocation.watchPosition(
       position => {
         isCurrentLocationIsInArea(position)
+        if(!isMeInsideInSite){
+          findNearPoint(position)
+        }
       },
       error => {
         console.log(error);
@@ -525,7 +549,7 @@ const PinChallenge = ({
               <MenIcon style={{ width: 40, height: 40 }} />
               <View>
                 <Text style={_styles.exploringText}>Pin</Text>
-                <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found": "4 feet away"}</Text>
+                <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found": distanceInFeet + " feet away"}</Text>
               </View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
