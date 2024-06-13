@@ -33,7 +33,7 @@
     "@rneui/themed": "^4.0.0-rc.8",
     "@viro-community/react-viro": "https://github.com/shabeebhasan/viro.git",
     "@voximplant/react-native-foreground-service": "^3.0.2",
-    "axios": "^1.4.0",
+    "axios": "^1.7.2",
     "babel-plugin-inline-import": "^3.0.0",
     "formik": "^2.4.5",
     "geolib": "^3.3.4",

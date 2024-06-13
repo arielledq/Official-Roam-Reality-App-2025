@@ -158,28 +158,6 @@ const PinChallenge = ({
     );
   };
 
-  const postCheckIn = (image) => {
-    let filename = image.split('/').pop()
-    const fileExt = filename.split('.').pop();
-    let shareFile = {
-      uri: image,
-      type: fileExt,
-      name: filename
-    }
-    const formData = new FormData()
-    formData.append("geo_site", selectedGeoSite.id)
-    formData.append("check_in_image", shareFile)
-    postGeoPinCheckIn(formData).then((res) => {
-      if (res.status == 1) {
-        console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
-      } else {
-        console.log("postCheckIn:", res)
-      }
-    }).finally(() => {
-    })
-    navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData: image });
-  }
-
   useEffect(() => {
     getLocation()
     getLocationUpdates()
@@ -465,7 +443,7 @@ const PinChallenge = ({
     }
 
     onDonePress() {
-      postCheckIn(this.state.capturedImage)
+      navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData: this.state.capturedImage });
     }
 
     render() {
