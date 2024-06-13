@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
@@ -28,6 +28,8 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
+import Geolocation from 'react-native-geolocation-service';
+import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, isLocationPointInPolygon } from "../../../util/LocationLib";
 
 const StarChallenge = ({
 
@@ -43,6 +45,80 @@ const StarChallenge = ({
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
   const [challengeObj, setChallengeObj] = useState(selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {})
   const challengeObjParameters = challengeObj?.parameters;
+  const [distanceInFeet, setDistanceInFeet] = useState(0)
+  const watchId = useRef(null);
+
+  const stopLocationUpdates = () => {
+    if (watchId.current !== null) {
+      Geolocation.clearWatch(watchId.current);
+      watchId.current = null;
+      Geolocation.stopObserving()
+    }
+  };
+
+  const getLocation = async () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        findNearPoint(position)
+      },
+      error => {
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      },
+    );
+  };
+
+  const findNearPoint = (position) => {
+    let arrayPoints = []
+    for (i = 0; i < selectedGeoARSiteStars.length; i++) {
+      const starObj = selectedGeoARSiteStars[i];
+      for (j = 0; j < starObj.star_location.coordinates.length; j++) {
+        const point = starObj.star_location.coordinates[j]
+        arrayPoints.push({ latitude: point[1], longitude: point[0], starObj })
+      }
+    }
+    const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
+    const distance = getCloseLocationDistance(position.coords,neareastPoint)
+    console.log("neareastPoint",neareastPoint)
+    console.log("distance",distance)
+    setDistanceInFeet(convertMetersToFeets(distance))
+  }
+
+  const getLocationUpdates = async () => {
+    watchId.current = Geolocation.watchPosition(
+      position => {
+        findNearPoint(position)
+      },
+      error => {
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 5,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      },
+    );
+  };
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
@@ -137,10 +213,15 @@ const StarChallenge = ({
         });
     }
     useEffect(() => {
-      if (challengeObj?.challenge_choice == "3DMODEL" && route?.params?.challengeObj?.ar_filters.length == 0) {
+      if (challengeObj?.challenge_choice == "3DMODEL") {
         setLoading(true)
         checkIfModelExist()
       }
+      getLocation()
+      getLocationUpdates()
+      return () => {
+        stopLocationUpdates();
+      };
     }, []);
 
     const _onRotate = (rotateState, rotationFactor, source) => {
@@ -344,7 +425,7 @@ const StarChallenge = ({
               uri: this.state.capturedImage
             }} />}
           </View>
-          
+
         </View>
       )
     }
@@ -352,8 +433,8 @@ const StarChallenge = ({
 
   const setStarCounts = () => {
     let count = 0;
-    for(const stars_site of selectedGeoARSiteStars){
-      if(stars_site.star_location && stars_site.star_location.coordinates){
+    for (const stars_site of selectedGeoARSiteStars) {
+      if (stars_site.star_location && stars_site.star_location.coordinates) {
         count += stars_site.star_location.coordinates.length;
       }
     }
@@ -417,7 +498,7 @@ const StarChallenge = ({
               <MenIcon style={{ width: 40, height: 40 }} />
               <View>
                 <Text style={_styles.exploringText}>Nearest Star</Text>
-                <Text style={_styles.arrivedText}>10 feet away</Text>
+                <Text style={_styles.arrivedText}>{distanceInFeet} feet away</Text>
               </View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>

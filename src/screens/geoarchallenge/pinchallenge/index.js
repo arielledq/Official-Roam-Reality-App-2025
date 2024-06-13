@@ -31,7 +31,7 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { postGeoPinCheckIn } from "../../../network";
-import { findNearestLocationPoint, getLocationDistance, isLocationPointInPolygon } from "../../../util/LocationLib";
+import { convertMetersToFeets, findNearestLocationPoint, getLocationDistance, isLocationPointInPolygon } from "../../../util/LocationLib";
 
 const PinChallenge = ({
 
@@ -59,9 +59,7 @@ const PinChallenge = ({
     const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
     const distance = getLocationDistance(position.coords,neareastPoint)
     console.log("neareastPoint",neareastPoint)
-    console.log("distance",distance)
-    const inFeet = distance * 0.3048;
-    setDistanceInFeet(Math.round(inFeet))
+    setDistanceInFeet(convertMetersToFeets(distance))
   }
 
   const isCurrentLocationIsInArea = (position) => {
