@@ -385,7 +385,9 @@ const StarChallenge = ({
 
     componentDidMount() {
       this.checkPermission()
-      this.setState({ isLoadVR: true })
+      setTimeout(()=>{
+        this.setState({ isLoadVR: true })
+      },1000)
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -414,31 +416,6 @@ const StarChallenge = ({
       }
     };
 
-    playCameraSound() {
-      Sound.setCategory('Playback');
-      let cameraSound = new Sound(Platform.OS == "android" ? "camerasound.mp3" : "camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
-        if (error) {
-          console.log('failed to load the sound', error);
-        } else {
-          cameraSound.play(); // have to put the call to play() in the onload callback
-        }
-      });
-    };
-
-    async _takeScreenshot() {
-      this.setState({
-        capturedVideo: null
-      })
-      this.playCameraSound()
-      this._arNavigator
-        ._takeScreenshot(uuid.v4(), false)
-        .then((retDict) => {
-          console.log("captureImage:", retDict)
-          this.setState({
-            capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
-          });
-        });
-    }
 
     render() {
       return (

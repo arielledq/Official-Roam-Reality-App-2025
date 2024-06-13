@@ -317,7 +317,7 @@ const PinChallenge = ({
           color="#ffffff"
           intensity={250} />
 
-        {loading  &&
+        {loading && isMeInsideInSite &&
           <ViroText
             text={`${progress}% Loading Challenge Completed`}
             color="#ff0000"
@@ -329,7 +329,7 @@ const PinChallenge = ({
         }
 
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath && isMeInsideInSite &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -354,7 +354,7 @@ const PinChallenge = ({
           />
         }
 
-        {challengeObj?.challenge_choice == "IMAGE" && <ViroImage
+        {challengeObj?.challenge_choice == "IMAGE" && isMeInsideInSite && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
