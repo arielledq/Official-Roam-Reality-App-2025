@@ -29,7 +29,7 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, isLocationPointInPolygon, orderByDistanceLocationPoint } from "../../../util/LocationLib";
+import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, isLocationPointInPolygon, isLocationPointWithinRadius, orderByDistanceLocationPoint } from "../../../util/LocationLib";
 
 const StarChallenge = ({
 
@@ -46,6 +46,7 @@ const StarChallenge = ({
   const [challengeObj, setChallengeObj] = useState(selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {})
   const challengeObjParameters = challengeObj?.parameters;
   const [distanceInFeet, setDistanceInFeet] = useState(0)
+  const [starShouldVisible, setStarShouldVisible] = useState(false)
   const watchId = useRef(null);
 
   const stopLocationUpdates = () => {
@@ -86,15 +87,18 @@ const StarChallenge = ({
       const starObj = selectedGeoARSiteStars[i];
       for (j = 0; j < starObj.star_location.coordinates.length; j++) {
         const point = starObj.star_location.coordinates[j]
-        arrayPoints.push({ latitude: point[1], longitude: point[0], starObj })
+        arrayPoints.push({ latitude: point[1], longitude: point[0],starObj })
       }
     }
     const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
     const nearestPoints = orderByDistanceLocationPoint(position.coords,arrayPoints);
+    const distance = getCloseLocationDistance(position.coords,neareastPoint)
+    const starShouldVisible = isLocationPointWithinRadius(position.coords,neareastPoint,Number(neareastPoint.starObj.visibility_radius))
+    setDistanceInFeet(convertMetersToFeets(distance))
+    setStarShouldVisible(starShouldVisible)
     console.log("nearestPoints",nearestPoints)
     console.log("distance",distance)
-    const distance = getCloseLocationDistance(position.coords,neareastPoint)
-    setDistanceInFeet(convertMetersToFeets(distance))
+    console.log("starShouldVisible",starShouldVisible)
   }
 
   const getLocationUpdates = async () => {
@@ -274,7 +278,7 @@ const StarChallenge = ({
           color="#ffffff"
           intensity={250} />
 
-        {loading &&
+        {loading && starShouldVisible &&
           <ViroText
             text={`${progress}% Loading Challenge Completed`}
             color="#ff0000"
@@ -286,7 +290,7 @@ const StarChallenge = ({
         }
 
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath && starShouldVisible &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -311,7 +315,7 @@ const StarChallenge = ({
           />
         }
 
-        {challengeObj?.challenge_choice == "IMAGE" && <ViroImage
+        {challengeObj?.challenge_choice == "IMAGE" && starShouldVisible && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -450,7 +454,7 @@ const StarChallenge = ({
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "AR Star Hunt\n" + selectedGeoSite.name,
+          text: starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
           numberOfLines: 2,
           style: [_styles.heading],
         }} backgroundColor="transparent" />
