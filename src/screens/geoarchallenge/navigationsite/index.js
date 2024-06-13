@@ -19,7 +19,9 @@ import { convertKilometersToMiles } from "../../../util/helpers";
 import moment from "moment";
 import Strings from "../../../constants/Strings";
 import mapCustomStyle from "../../../constants/MapCustomStyles";
+import { getLocationDistance } from "../../../util/LocationLib";
 
+const MARGIN_ARRIVAL_METERS = 10
 
 const GeoArSiteNavigation = ({
 
@@ -195,6 +197,15 @@ const GeoArSiteNavigation = ({
       position => {
         console.log("getLocationUpdates:", position);
         setLocation(position);
+        const dis = getLocationDistance(position.coords, {
+          latitude: selectedGeoSite.lat_long.coordinates[1],
+          longitude: selectedGeoSite.lat_long.coordinates[0],
+        })
+        console.log("getLocationUpdates: dis", dis)
+        if(dis < MARGIN_ARRIVAL_METERS){
+          navigation.navigate("GeoArSiteArrived");
+          stopLocationUpdates()
+        }
         mapView.current.animateToRegion({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
@@ -222,12 +233,12 @@ const GeoArSiteNavigation = ({
       },
     );
   };
-  
+
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
-        rightComponent={() => <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteArrived")}><SkipIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
+        rightComponent={() => <TouchableOpacity onPress={() => navigation.navigate("ChallengeSelection")}><SkipIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
         centerComponent={{
           text: "Navigate to Site",
           style: [_styles.heading],
