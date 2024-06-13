@@ -29,7 +29,7 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, isLocationPointInPolygon, isLocationPointWithinRadius, orderByDistanceLocationPoint } from "../../../util/LocationLib";
+import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, hasLocationPermission, isLocationPointInPolygon, isLocationPointWithinRadius, orderByDistanceLocationPoint } from "../../../util/LocationLib";
 
 const StarChallenge = ({
 
@@ -58,6 +58,10 @@ const StarChallenge = ({
   };
 
   const getLocation = async () => {
+    const hasPermission = await hasLocationPermission();
+    if (!hasPermission) {
+      return;
+    }
     Geolocation.getCurrentPosition(
       position => {
         findNearPoint(position)
@@ -103,6 +107,10 @@ const StarChallenge = ({
   }
 
   const getLocationUpdates = async () => {
+    const hasPermission = await hasLocationPermission();
+    if (!hasPermission) {
+      return;
+    }
     watchId.current = Geolocation.watchPosition(
       position => {
         findNearPoint(position)

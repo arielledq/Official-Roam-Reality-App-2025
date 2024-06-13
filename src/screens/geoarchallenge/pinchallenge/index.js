@@ -31,7 +31,7 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { postGeoPinCheckIn } from "../../../network";
-import { convertMetersToFeets, findNearestLocationPoint, getLocationDistance, isLocationPointInPolygon } from "../../../util/LocationLib";
+import { convertMetersToFeets, findNearestLocationPoint, getLocationDistance, hasLocationPermission, isLocationPointInPolygon } from "../../../util/LocationLib";
 
 const PinChallenge = ({
 
@@ -84,6 +84,10 @@ const PinChallenge = ({
   }
 
   const getLocation = async () => {
+    const hasPermission = await hasLocationPermission();
+    if (!hasPermission) {
+      return;
+    }
     Geolocation.getCurrentPosition(
       position => {
         isCurrentLocationIsInArea(position)
@@ -119,6 +123,10 @@ const PinChallenge = ({
   };
 
   const getLocationUpdates = async () => {
+    const hasPermission = await hasLocationPermission();
+    if (!hasPermission) {
+      return;
+    }
     watchId.current = Geolocation.watchPosition(
       position => {
         isCurrentLocationIsInArea(position)
