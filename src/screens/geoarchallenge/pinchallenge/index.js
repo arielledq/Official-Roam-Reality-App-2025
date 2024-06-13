@@ -34,7 +34,7 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
-import { postGeoPinCheckIn } from "../../../network";
+import { getARProfile, postGeoPinCheckIn } from "../../../network";
 import { convertMetersToFeets, findNearestLocationPoint, getLocationDistance, hasLocationPermission, isLocationPointInPolygon } from "../../../util/LocationLib";
 
 const PinChallenge = ({
@@ -61,9 +61,9 @@ const PinChallenge = ({
         arrayPoints.push({ latitude: point[1], longitude: point[0] })
       }
     }
-    const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
-    const distance = getLocationDistance(position.coords,neareastPoint)
-    console.log("neareastPoint",neareastPoint)
+    const neareastPoint = findNearestLocationPoint(position.coords, arrayPoints);
+    const distance = getLocationDistance(position.coords, neareastPoint)
+    console.log("neareastPoint", neareastPoint)
     setDistanceInFeet(convertMetersToFeets(distance))
   }
 
@@ -96,7 +96,7 @@ const PinChallenge = ({
     Geolocation.getCurrentPosition(
       position => {
         isCurrentLocationIsInArea(position)
-        if(!isMeInsideInSite){
+        if (!isMeInsideInSite) {
           findNearPoint(position)
         }
       },
@@ -135,7 +135,7 @@ const PinChallenge = ({
     watchId.current = Geolocation.watchPosition(
       position => {
         isCurrentLocationIsInArea(position)
-        if(!isMeInsideInSite){
+        if (!isMeInsideInSite) {
           findNearPoint(position)
         }
       },
@@ -157,6 +157,28 @@ const PinChallenge = ({
       },
     );
   };
+
+  const postCheckIn = (image) => {
+    let filename = image.split('/').pop()
+    const fileExt = filename.split('.').pop();
+    let shareFile = {
+      uri: image,
+      type: fileExt,
+      name: filename
+    }
+    const formData = new FormData()
+    formData.append("geo_site", selectedGeoSite.id)
+    formData.append("check_in_image", shareFile)
+    postGeoPinCheckIn(formData).then((res) => {
+      if (res.status == 1) {
+        console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
+      } else {
+        console.log("postCheckIn:", res)
+      }
+    }).finally(() => {
+    })
+    navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData: image });
+  }
 
   useEffect(() => {
     getLocation()
@@ -258,7 +280,7 @@ const PinChallenge = ({
           console.log(error);
         });
     }
-    
+
 
     const _onRotate = (rotateState, rotationFactor, source) => {
       console.log("_onRotate rotateState", rotateState)
@@ -290,7 +312,7 @@ const PinChallenge = ({
         return;
       }
     };
-    
+
     useEffect(() => {
       if (challengeObj?.challenge_choice == "3DMODEL") {
         setLoading(true)
@@ -388,9 +410,9 @@ const PinChallenge = ({
 
     componentDidMount() {
       this.checkPermission()
-      setTimeout(()=>{
+      setTimeout(() => {
         this.setState({ isLoadVR: true })
-      },1000)
+      }, 1000)
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -443,25 +465,7 @@ const PinChallenge = ({
     }
 
     onDonePress() {
-      let filename = this.state.capturedImage.split('/').pop()
-      let shareFile = {
-        uri: this.state.capturedImage,
-        type: 'png',
-        name: filename
-      }
-      const formData = new FormData()
-      formData.append("geo_site", selectedGeoSite.id)
-      formData.append("check_in_image", shareFile)
-      postGeoPinCheckIn(formData).then((res) => {
-        if (res.status == 1) {
-          console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
-        } else {
-          const message = "You already completed the check-ins or there is some issue with completing the check-ins."
-          console.log(message)
-        }
-      }).finally(() => {
-      })
-      navigation.replace("ArPinChallengeShare", { challengeObj: challengeObj, captureData: this.state.capturedImage });
+      postCheckIn(this.state.capturedImage)
     }
 
     render() {
@@ -564,7 +568,7 @@ const PinChallenge = ({
               <MenIcon style={{ width: 40, height: 40 }} />
               <View>
                 <Text style={_styles.exploringText}>Pin</Text>
-                <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found": distanceInFeet + " feet away"}</Text>
+                <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found" : distanceInFeet + " feet away"}</Text>
               </View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
