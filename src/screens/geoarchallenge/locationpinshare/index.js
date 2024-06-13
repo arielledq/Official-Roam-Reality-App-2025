@@ -11,7 +11,7 @@ import moment from "moment";
 import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
 import TiktokShareImg from "../../../assets/ar/tiktok.svg"
-import { getARProfile, postArMemory, socialPointsARUpdateAPI } from "../../../network";
+import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI } from "../../../network";
 import { handleError } from "../../../util/helpers";
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
@@ -43,6 +43,7 @@ const ArPinChallengeShare = ({
   const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
   const [imageHeight, setImageHeight] = useState(0)
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const dispatch = useDispatch()
 
   console.log("challenges", challengeObj.id)
@@ -63,6 +64,7 @@ const ArPinChallengeShare = ({
         setImageHeight(imageHeight)
       })
     }
+    shareBtnOnPress()
 
   }, []);
 
@@ -75,16 +77,14 @@ const ArPinChallengeShare = ({
       name: filename
     }
     const formData = new FormData()
-    formData.append("challenges", challengeObj.id)
-    formData.append("memory_file", shareFile)
-    formData.append("memory_type", fileExt == 'mp4' ? "VIDEO" : "PHOTO")
-    postArMemory(formData).then((res) => {
+    formData.append("geo_site", selectedGeoSite.id)
+    formData.append("check_in_image", shareFile)
+    postGeoPinCheckIn(formData).then((res) => {
       ARUserProfile()
       if (res.status == 1) {
-        Alert.alert("AR Challenge Share!", "Successfully, completed your challenge.")
+        console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
       } else {
-        res.message.message = "You already completed the challenge or there is some issue with completing the challenge."
-        handleError(res)
+        console.log("postCheckIn:", res)
       }
     }).finally(() => {
       setIsLoading(false)
