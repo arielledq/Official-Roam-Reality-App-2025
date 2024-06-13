@@ -216,7 +216,7 @@ class FriendshipViewSet(ModelViewSet):
 
             Notification.objects.create(
             sender=from_user,
-            receiver=to_user,
+            receiver=from_user,
             title="Friend Request",
             message=f"{to_user.name} accpeted your friend request",
             notification_type=Notification.FRIEND_REQUEST,
