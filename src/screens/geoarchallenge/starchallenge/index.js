@@ -90,12 +90,13 @@ const StarChallenge = ({
         arrayPoints.push({ latitude: point[1], longitude: point[0],starObj })
       }
     }
-    const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
     const nearestPoints = orderByDistanceLocationPoint(position.coords,arrayPoints);
+    const neareastPoint = findNearestLocationPoint(position.coords,nearestPoints);
     const distance = getCloseLocationDistance(position.coords,neareastPoint)
     const starShouldVisible = isLocationPointWithinRadius(position.coords,neareastPoint,Number(neareastPoint.starObj.visibility_radius))
     setDistanceInFeet(convertMetersToFeets(distance))
     setStarShouldVisible(starShouldVisible)
+    setChallengeObj(neareastPoint.starObj?.challenges )
     console.log("nearestPoints",nearestPoints)
     console.log("distance",distance)
     console.log("starShouldVisible",starShouldVisible)
