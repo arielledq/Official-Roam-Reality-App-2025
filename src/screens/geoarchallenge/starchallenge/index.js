@@ -39,7 +39,6 @@ const StarChallenge = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [starsCount, setStarsCount] = useState(0)
-  const [collectedStarsCount, setCollectedStarsCount] = useState(0)
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
@@ -47,6 +46,7 @@ const StarChallenge = ({
   const challengeObjParameters = challengeObj?.parameters;
   const [distanceInFeet, setDistanceInFeet] = useState(0)
   const [starShouldVisible, setStarShouldVisible] = useState(false)
+  const [collectedStars, SetCollectedStars] = useState([])
   const watchId = useRef(null);
 
   const stopLocationUpdates = () => {
@@ -85,25 +85,41 @@ const StarChallenge = ({
     );
   };
 
+  const isStarIsCollected = (point) => {
+    for (i = 0; i < collectedStars.length; i++) {
+      const cPoint = collectedStars[i]
+      if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   const findNearPoint = (position) => {
     let arrayPoints = []
     for (i = 0; i < selectedGeoARSiteStars.length; i++) {
       const starObj = selectedGeoARSiteStars[i];
       for (j = 0; j < starObj.star_location.coordinates.length; j++) {
         const point = starObj.star_location.coordinates[j]
-        arrayPoints.push({ latitude: point[1], longitude: point[0],starObj })
+        const pushPoint = { latitude: point[1], longitude: point[0], starObj }
+        if (!isStarIsCollected(pushPoint)) {
+          arrayPoints.push(pushPoint)
+        }
       }
     }
-    const nearestPoints = orderByDistanceLocationPoint(position.coords,arrayPoints);
-    const neareastPoint = findNearestLocationPoint(position.coords,nearestPoints);
-    const distance = getCloseLocationDistance(position.coords,neareastPoint)
-    const starShouldVisible = isLocationPointWithinRadius(position.coords,neareastPoint,Number(neareastPoint.starObj.visibility_radius))
+    const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
+    const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
+    const distance = getCloseLocationDistance(position.coords, neareastPoint)
+    const starShouldVisible = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
     setDistanceInFeet(convertMetersToFeets(distance))
     setStarShouldVisible(starShouldVisible)
-    setChallengeObj(neareastPoint.starObj?.challenges )
-    console.log("nearestPoints",nearestPoints)
-    console.log("distance",distance)
-    console.log("starShouldVisible",starShouldVisible)
+    setChallengeObj(neareastPoint.starObj?.challenges)
+    console.log("distance", distance)
+    console.log("starShouldVisible", starShouldVisible)
+    if (starShouldVisible && !isStarIsCollected(pushPoint)) {
+      collectedStars.push(neareastPoint)
+      SetCollectedStars([...collectedStars])
+    }
   }
 
   const getLocationUpdates = async () => {
@@ -126,7 +142,7 @@ const StarChallenge = ({
         enableHighAccuracy: true,
         timeout: 15000,
         maximumAge: 10000,
-        distanceFilter: 5,
+        distanceFilter: 2,
         forceRequestLocation: true,
         forceLocationManager: true,
         showLocationDialog: true,
@@ -483,7 +499,7 @@ const StarChallenge = ({
             <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
             <View>
               <Text style={_styles.exploringText}>Stars Collected</Text>
-              <Text style={_styles.arrivedText}>{collectedStarsCount} / {starsCount}</Text>
+              <Text style={_styles.arrivedText}>{collectedStars.length} / {starsCount}</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row' }}>
@@ -512,7 +528,7 @@ const StarChallenge = ({
               <MenIcon style={{ width: 40, height: 40 }} />
               <View>
                 <Text style={_styles.exploringText}>Nearest Star</Text>
-                <Text style={_styles.arrivedText}>{distanceInFeet} feet away</Text>
+                <Text style={_styles.arrivedText}>{starShouldVisible ? "You found a star!" : `${distanceInFeet} feet away`}</Text>
               </View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
