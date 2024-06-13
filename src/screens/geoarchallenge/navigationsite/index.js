@@ -8,7 +8,6 @@ import HomeIcon from "../../../assets/geoar/home.svg"
 import CloseBIcon from "../../../assets/geoar/close-square.svg"
 import SkipIcon from "../../../assets/geoar/skip.svg"
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
-import VIForegroundService from '@voximplant/react-native-foreground-service';
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
@@ -38,7 +37,6 @@ const GeoArSiteNavigation = ({
   const [highAccuracy, setHighAccuracy] = useState(true);
   const [locationDialog, setLocationDialog] = useState(true);
   const [significantChanges, setSignificantChanges] = useState(false);
-  const [observing, setObserving] = useState(false);
   const [foregroundService, setForegroundService] = useState(false);
   const [useLocationManager, setUseLocationManager] = useState(false);
   const [estimatedTime, setEstimatedTime] = useState("");
@@ -47,15 +45,10 @@ const GeoArSiteNavigation = ({
   const watchId = useRef(null);
 
   const stopLocationUpdates = () => {
-    if (Platform.OS === 'android') {
-      VIForegroundService.getInstance()
-        .stopService()
-        .catch((err) => err);
-    }
     if (watchId.current !== null) {
       Geolocation.clearWatch(watchId.current);
       watchId.current = null;
-      setObserving(false);
+      Geolocation.stopObserving()
     }
   };
 
@@ -189,10 +182,6 @@ const GeoArSiteNavigation = ({
     if (!hasPermission) {
       return;
     }
-    if (Platform.OS === 'android' && foregroundService) {
-      await startForegroundService();
-    }
-    setObserving(true);
     watchId.current = Geolocation.watchPosition(
       position => {
         console.log("getLocationUpdates:", position);
@@ -202,16 +191,19 @@ const GeoArSiteNavigation = ({
           longitude: selectedGeoSite.lat_long.coordinates[0],
         })
         console.log("getLocationUpdates: dis", dis)
-        if(dis < MARGIN_ARRIVAL_METERS){
-          navigation.navigate("GeoArSiteArrived");
+        if (dis < MARGIN_ARRIVAL_METERS) {
+          navigation.replace("GeoArSiteArrived");
           stopLocationUpdates()
+          return;
         }
-        mapView.current.animateToRegion({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitudeDelta: 0.0032,
-          longitudeDelta: 0.0032,
-        })
+        if (mapView) {
+          mapView.current.animateToRegion({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.0032,
+            longitudeDelta: 0.0032,
+          })
+        }
       },
       error => {
         setLocation(null);
