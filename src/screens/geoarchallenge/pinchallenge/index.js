@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import { ActivityIndicator, Image, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
@@ -24,12 +24,14 @@ import {
 } from '@viro-community/react-viro';
 const Sound = require('react-native-sound');
 import uuid from 'react-native-uuid';
+import Geolocation from 'react-native-geolocation-service';
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { postGeoPinCheckIn } from "../../../network";
+import { isLocationPointInPolygon } from "../../../util/LocationLib";
 
 const PinChallenge = ({
 
@@ -37,10 +39,89 @@ const PinChallenge = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
+  const [isMeInsideInSite, setIsMeInsideInSite] = useState(false)
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
+  const watchId = useRef(null);
+
+  const isCurrentLocationIsInArea = (position) => {
+    let isInsideSiteArea = false;
+    for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      const points = selectedGeoSite.geo_site_border.coordinates[i];
+      let arrayPoints = []
+      for (j = 0; j < points.length; j++) {
+        const point = points[j]
+        arrayPoints.push({ latitude: point[1], longitude: point[0] })
+      }
+      isInsideSiteArea = isLocationPointInPolygon(position.coords, arrayPoints)
+      console.log("isCurrentLocationIsInArea position.coords:", position.coords)
+      console.log("isCurrentLocationIsInArea arrayPoints:", arrayPoints)
+      console.log("isCurrentLocationIsInArea isInside:", isInsideSiteArea)
+      if (isInsideSiteArea) {
+        break;
+      }
+    }
+    console.log("isCurrentLocationIsInArea isInside Final:", isInsideSiteArea)
+    setIsMeInsideInSite(isInsideSiteArea)
+  }
+
+  const getLocation = async () => {
+    Geolocation.getCurrentPosition(
+      position => {
+        isCurrentLocationIsInArea(position)
+      },
+      error => {
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      },
+    );
+  };
+
+  const stopLocationUpdates = () => {
+    if (watchId.current !== null) {
+      Geolocation.clearWatch(watchId.current);
+      watchId.current = null;
+      Geolocation.stopObserving()
+    }
+  };
+
+  const getLocationUpdates = async () => {
+    watchId.current = Geolocation.watchPosition(
+      position => {
+        isCurrentLocationIsInArea(position)
+      },
+      error => {
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 5,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      },
+    );
+  };
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
@@ -135,10 +216,15 @@ const PinChallenge = ({
         });
     }
     useEffect(() => {
-      if (challengeObj?.challenge_choice == "3DMODEL" && route?.params?.challengeObj?.ar_filters.length == 0) {
+      if (challengeObj?.challenge_choice == "3DMODEL") {
         setLoading(true)
         checkIfModelExist()
       }
+      getLocation()
+      getLocationUpdates()
+      return () => {
+        stopLocationUpdates();
+      };
     }, []);
 
     const _onRotate = (rotateState, rotationFactor, source) => {
@@ -203,7 +289,7 @@ const PinChallenge = ({
         }
 
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath && isMeInsideInSite &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -228,7 +314,7 @@ const PinChallenge = ({
           />
         }
 
-        {challengeObj?.challenge_choice == "IMAGE" && <ViroImage
+        {challengeObj?.challenge_choice == "IMAGE" && isMeInsideInSite && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -410,7 +496,7 @@ const PinChallenge = ({
             <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
             <View>
               <Text style={_styles.exploringText}>Pin Found</Text>
-              <Text style={_styles.arrivedText}>0 / 1</Text>
+              <Text style={_styles.arrivedText}>{isMeInsideInSite ? 1 : 0} / 1</Text>
             </View>
           </View>
           <View style={{ flexDirection: 'row' }}>
@@ -439,7 +525,7 @@ const PinChallenge = ({
               <MenIcon style={{ width: 40, height: 40 }} />
               <View>
                 <Text style={_styles.exploringText}>Pin</Text>
-                <Text style={_styles.arrivedText}>4 feet away</Text>
+                <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found": "4 feet away"}</Text>
               </View>
             </View>
             <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
