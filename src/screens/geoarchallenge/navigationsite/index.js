@@ -85,7 +85,7 @@ const GeoArSiteNavigation = ({
 
     if (status === 'disabled') {
       Alert.alert(
-        `Turn on Location Services to allow "${appConfig.displayName}" to determine your location.`,
+        `Turn on Location Services to allow to determine your location.`,
         '',
         [
           { text: 'Go to Settings', onPress: openSetting },
@@ -134,7 +134,6 @@ const GeoArSiteNavigation = ({
         ToastAndroid.LONG,
       );
     }
-
     return false;
   };
 
