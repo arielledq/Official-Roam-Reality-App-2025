@@ -151,7 +151,7 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 
     class Meta:
         model = UniqueChallengeSite
-        geo_field = 'lat_long'
+        geo_field = 'latitude_longitude'
         fields = (
             "__all__"
         )
