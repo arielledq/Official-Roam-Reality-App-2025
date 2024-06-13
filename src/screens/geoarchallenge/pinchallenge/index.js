@@ -299,7 +299,7 @@ const PinChallenge = ({
           color="#ffffff"
           intensity={250} />
 
-        {loading &&
+        {loading && shouldStarVisible &&
           <ViroText
             text={`${progress}% Loading Challenge Completed`}
             color="#ff0000"
