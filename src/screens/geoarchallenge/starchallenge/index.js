@@ -29,7 +29,7 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, isLocationPointInPolygon } from "../../../util/LocationLib";
+import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, isLocationPointInPolygon, orderByDistanceLocationPoint } from "../../../util/LocationLib";
 
 const StarChallenge = ({
 
@@ -90,9 +90,10 @@ const StarChallenge = ({
       }
     }
     const neareastPoint = findNearestLocationPoint(position.coords,arrayPoints);
-    const distance = getCloseLocationDistance(position.coords,neareastPoint)
-    console.log("neareastPoint",neareastPoint)
+    const nearestPoints = orderByDistanceLocationPoint(position.coords,arrayPoints);
+    console.log("nearestPoints",nearestPoints)
     console.log("distance",distance)
+    const distance = getCloseLocationDistance(position.coords,neareastPoint)
     setDistanceInFeet(convertMetersToFeets(distance))
   }
 
