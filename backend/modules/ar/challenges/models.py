@@ -384,7 +384,7 @@ class GeoARStar(models.Model):
     )
     star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
-    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=0)
+    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
     geo_site = models.ForeignKey(
         GeoArSite,
         on_delete=models.CASCADE,
@@ -449,6 +449,8 @@ class UniqueChallengeSite(models.Model):
         related_name="challenges_geo_ar_unique_site",
         blank=False, default=None
     )
+    latitude_longitude = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
 
     class Meta:
       verbose_name_plural = "Geo AR Unique Sites"
