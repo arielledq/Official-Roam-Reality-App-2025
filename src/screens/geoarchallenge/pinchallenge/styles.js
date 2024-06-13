@@ -204,6 +204,11 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     fontSize: FontSizes.S16,
   },
+  loadingText: {
+    fontSize: FontSizes.S24,
+    color: theme.colors.black,
+    marginTop: 10,
+  },
 }))
 
 export default useStyles

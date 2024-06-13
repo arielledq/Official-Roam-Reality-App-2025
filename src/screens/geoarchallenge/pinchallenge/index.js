@@ -22,10 +22,14 @@ import {
   ViroSpotLight,
   ViroText
 } from '@viro-community/react-viro';
+const RNFS = require('react-native-fs');
+import RNFetchBlob from 'rn-fetch-blob';
 const Sound = require('react-native-sound');
 import uuid from 'react-native-uuid';
 import Geolocation from 'react-native-geolocation-service';
+import { unzip } from 'react-native-zip-archive'
 
+const { config, fs } = RNFetchBlob;
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
@@ -45,6 +49,7 @@ const PinChallenge = ({
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
+  const modelFile = challengeObj.model_file;
   const watchId = useRef(null);
 
   const findNearPoint = (position) => {
@@ -153,6 +158,14 @@ const PinChallenge = ({
     );
   };
 
+  useEffect(() => {
+    getLocation()
+    getLocationUpdates()
+    return () => {
+      stopLocationUpdates();
+    };
+  }, []);
+
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
@@ -245,17 +258,7 @@ const PinChallenge = ({
           console.log(error);
         });
     }
-    useEffect(() => {
-      if (challengeObj?.challenge_choice == "3DMODEL") {
-        setLoading(true)
-        checkIfModelExist()
-      }
-      getLocation()
-      getLocationUpdates()
-      return () => {
-        stopLocationUpdates();
-      };
-    }, []);
+    
 
     const _onRotate = (rotateState, rotationFactor, source) => {
       console.log("_onRotate rotateState", rotateState)
@@ -287,6 +290,13 @@ const PinChallenge = ({
         return;
       }
     };
+    
+    useEffect(() => {
+      if (challengeObj?.challenge_choice == "3DMODEL") {
+        setLoading(true)
+        checkIfModelExist()
+      }
+    }, []);
 
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
@@ -307,7 +317,7 @@ const PinChallenge = ({
           color="#ffffff"
           intensity={250} />
 
-        {loading && shouldStarVisible &&
+        {loading  &&
           <ViroText
             text={`${progress}% Loading Challenge Completed`}
             color="#ff0000"
@@ -319,7 +329,7 @@ const PinChallenge = ({
         }
 
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath && isMeInsideInSite &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -344,7 +354,7 @@ const PinChallenge = ({
           />
         }
 
-        {challengeObj?.challenge_choice == "IMAGE" && isMeInsideInSite && <ViroImage
+        {challengeObj?.challenge_choice == "IMAGE" && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -363,8 +373,6 @@ const PinChallenge = ({
     state = {
       capturedImage: null,
       detailsShow: true,
-      recordingStart: false,
-      timer: "00:00",
       recordTimeInMillis: 0,
       isLoadVR: false,
       challengeInformationView: false
@@ -380,7 +388,9 @@ const PinChallenge = ({
 
     componentDidMount() {
       this.checkPermission()
-      this.setState({ isLoadVR: true })
+      setTimeout(()=>{
+        this.setState({ isLoadVR: true })
+      },1000)
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -460,7 +470,6 @@ const PinChallenge = ({
           <View style={_styles.ARMainContainer}>
             {
               this.state.isLoadVR && <ViroARSceneNavigator
-                videoQuality={"High"}
                 autofocus={true}
                 pbrEnabled={true}
                 hdrEnabled={true}
@@ -477,7 +486,7 @@ const PinChallenge = ({
               uri: this.state.capturedImage
             }} />}
           </View>
-          <TouchableOpacity disabled={this.state.capturedImage} onPress={() => {
+          <TouchableOpacity disabled={this.state.capturedImage ? true : false} onPress={() => {
             this._takeScreenshot();
           }} style={{
             width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0

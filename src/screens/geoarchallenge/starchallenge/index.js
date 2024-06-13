@@ -22,8 +22,12 @@ import {
   ViroSpotLight,
   ViroText
 } from '@viro-community/react-viro';
+import RNFetchBlob from 'rn-fetch-blob';
 const Sound = require('react-native-sound');
 import uuid from 'react-native-uuid';
+import { unzip } from 'react-native-zip-archive'
+
+const { config, fs } = RNFetchBlob;
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
@@ -47,6 +51,7 @@ const StarChallenge = ({
   const [distanceInFeet, setDistanceInFeet] = useState(0)
   const [starShouldVisible, setStarShouldVisible] = useState(false)
   const [collectedStars, SetCollectedStars] = useState([])
+  const modelFile = challengeObj.model_file;
   const watchId = useRef(null);
 
   const stopLocationUpdates = () => {
@@ -116,7 +121,7 @@ const StarChallenge = ({
     setChallengeObj(neareastPoint.starObj?.challenges)
     console.log("distance", distance)
     console.log("starShouldVisible", starShouldVisible)
-    if (starShouldVisible && !isStarIsCollected(pushPoint)) {
+    if (starShouldVisible && !isStarIsCollected(neareastPoint)) {
       collectedStars.push(neareastPoint)
       SetCollectedStars([...collectedStars])
     }
@@ -149,6 +154,14 @@ const StarChallenge = ({
       },
     );
   };
+
+  useEffect(() => {
+    getLocation()
+    getLocationUpdates()
+    return () => {
+      stopLocationUpdates();
+    };
+  }, []);
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
@@ -247,11 +260,6 @@ const StarChallenge = ({
         setLoading(true)
         checkIfModelExist()
       }
-      getLocation()
-      getLocationUpdates()
-      return () => {
-        stopLocationUpdates();
-      };
     }, []);
 
     const _onRotate = (rotateState, rotationFactor, source) => {
