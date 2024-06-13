@@ -262,9 +262,8 @@ const ArPinChallengeShare = ({
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, overflow: 'hidden' }
         }>
-        <View style={styles.detailContainer}>
-          <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', flex: 1, height: imageHeight }} />
-
+        <View style={styles.imageContainer}>
+          <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />
         </View>
         <View style={styles.detailContainer}>
           <View style={styles.pointsParentContainer}>
