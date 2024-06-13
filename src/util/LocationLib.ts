@@ -13,6 +13,10 @@ export const getLocationDistance = (start: LocationPoint, end: LocationPoint) =>
   return geolib.getPreciseDistance(start, end, 1);
 }
 
+export const getCloseLocationDistance = (start: LocationPoint, end: LocationPoint) => {
+  return geolib.getDistance(start, end, 1);
+}
+
 export const isLocationPointWithinRadius = (start: LocationPoint, centerPoint: LocationPoint, radius: number) => {
   return geolib.isPointWithinRadius(start, centerPoint, radius);
 }
@@ -23,4 +27,8 @@ export const findNearestLocationPoint = (point: LocationPoint, coords: LocationP
 
 export const orderByDistanceLocationPoint = (point: LocationPoint, coords: LocationPoint[]) => {
   return geolib.orderByDistance(point, coords);
+}
+
+export const convertMetersToFeets = (meters: number) => {
+  return Math.round(meters * 3.28084);
 }
