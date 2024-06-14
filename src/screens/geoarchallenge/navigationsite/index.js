@@ -159,7 +159,10 @@ const GeoArSiteNavigation = ({
 
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
-        rightComponent={() => <TouchableOpacity onPress={() => navigation.navigate("ChallengeSelection")}><SkipIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
+        rightComponent={() => <TouchableOpacity onPress={() => {
+          stopLocationUpdates();
+          navigation.replace("ChallengeSelection")
+        }}><SkipIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
         centerComponent={{
           text: "Navigate to Site",
           style: [_styles.heading],
