@@ -49,7 +49,6 @@ const StarChallenge = ({
   const [challengeObj, setChallengeObj] = useState(selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {})
   const challengeObjParameters = challengeObj?.parameters;
   const [distanceInFeet, setDistanceInFeet] = useState(0)
-  const [isLoadVR, setLoadVR] = useState(false)
   const [starShouldVisible, setStarShouldVisible] = useState(false)
   const [collectedStars, SetCollectedStars] = useState([])
   const modelFile = challengeObj.model_file;
@@ -118,7 +117,7 @@ const StarChallenge = ({
     const distance = getCloseLocationDistance(position.coords, neareastPoint)
     const starShouldVisible = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
     setDistanceInFeet(convertMetersToFeets(distance))
-    setStarShouldVisible(starShouldVisible)
+    setStarShouldVisible(!starShouldVisible)
     setChallengeObj(neareastPoint.starObj?.challenges)
     console.log("distance", distance)
     console.log("starShouldVisible", starShouldVisible)
@@ -148,7 +147,7 @@ const StarChallenge = ({
         enableHighAccuracy: true,
         timeout: 15000,
         maximumAge: 10000,
-        distanceFilter: 2,
+        distanceFilter: 0,
         forceRequestLocation: true,
         forceLocationManager: true,
         showLocationDialog: true,
@@ -159,9 +158,6 @@ const StarChallenge = ({
   useEffect(() => {
     getLocation()
     getLocationUpdates()
-    setTimeout(() => {
-      setLoadVR(true)
-    }, 1000)
     return () => {
       stopLocationUpdates();
     };
@@ -372,6 +368,7 @@ const StarChallenge = ({
       capturedImage: null,
       capturedVideo: null,
       detailsShow: true,
+      isLoadVR: false,
       challengeInformationView: false
     }
 
@@ -383,6 +380,11 @@ const StarChallenge = ({
 
     componentDidMount() {
       this.checkPermission()
+      console.log("componentDidMount")
+      console.log("isLoadVR",this.state.isLoadVR)
+      setTimeout(() => {
+        this.setState({ isLoadVR: true })
+      }, 1000)
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -411,13 +413,12 @@ const StarChallenge = ({
       }
     };
 
-
     render() {
       return (
         <View style={{ flex: 1 }} >
           <View style={_styles.ARMainContainer}>
             {
-              isLoadVR && <ViroARSceneNavigator
+              this.state.isLoadVR && <ViroARSceneNavigator
                 videoQuality={"High"}
                 autofocus={true}
                 pbrEnabled={true}
