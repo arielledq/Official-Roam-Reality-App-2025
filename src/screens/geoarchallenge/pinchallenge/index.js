@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, Image, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
@@ -34,8 +34,12 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
-import { getARProfile, postGeoPinCheckIn } from "../../../network";
 import { convertMetersToFeets, findNearestLocationPoint, getLocationDistance, hasLocationPermission, isLocationPointInPolygon } from "../../../util/LocationLib";
+import RenderHTML from "react-native-render-html";
+import { AppButton } from "../../../components";
+const { width } = Dimensions.get('window');
+import { FontSizes } from "../../../util/FontUtils"
+import LineIcon from '../../../assets/ar/line.png';
 
 const PinChallenge = ({
 
@@ -45,12 +49,14 @@ const PinChallenge = ({
   const [isLoading, setIsLoading] = useState(false)
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false)
   const [distanceInFeet, setDistanceInFeet] = useState(0)
+  const [detailsShow, setDetailsShow] = useState(true)
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
   const modelFile = challengeObj.model_file;
   const watchId = useRef(null);
+  const settings = useSelector(state => state.ar?.arSettings)
 
   const findNearPoint = (position) => {
     let arrayPoints = []
@@ -372,7 +378,6 @@ const PinChallenge = ({
 
     state = {
       capturedImage: null,
-      detailsShow: true,
       recordTimeInMillis: 0,
       isLoadVR: false,
       challengeInformationView: false
@@ -492,77 +497,132 @@ const PinChallenge = ({
     }
   }
 
-
-  return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        centerComponent={{
-          text: "Location Check In\n" + selectedGeoSite.name,
-          numberOfLines: 2,
-          style: [_styles.heading],
-        }} backgroundColor="transparent" />
-
-      {isLoading && <ActivityIndicator size="large" />}
-      <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={{
-          backgroundColor: "#131422",
-          borderRadius: 100,
-          paddingHorizontal: 8,
-          alignItems: 'center',
-          height: 65,
-          flexDirection: 'row',
-          justifyContent: 'space-between'
-        }}>
-          <View style={{ flexDirection: 'row' }}>
-            <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
-            <View>
-              <Text style={_styles.exploringText}>Pin Found</Text>
-              <Text style={_styles.arrivedText}>{isMeInsideInSite ? 1 : 0} / 1</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ marginEnd: 10 }}>
-              <Text style={_styles.exploringText}>Points</Text>
-              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
-            </View>
-            <TrophyIcon style={{ width: 48, height: 48 }} />
-          </View>
+  const InfoView = () => {
+    return (
+      <View style={_styles.challengeInfoContainer}>
+        <View style={_styles.challengeInfoHeaderContainer}>
+          <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+          <Text style={_styles.challengeInfoHeader}>Waiver Details</Text>
         </View>
-        <View style={{
-          flex: 1, marginVertical: 20
-        }}>
-          <ViroARNavigator />
-        </View>
-        <View style={{
-          backgroundColor: "#131422",
-          borderRadius: 16,
-          padding: 20,
-          paddingBottom: 20,
-          marginVertical: 20,
-          alignItems: 'center'
-        }}>
-          <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-            <View style={{ flexDirection: 'row' }}>
-              <MenIcon style={{ width: 40, height: 40 }} />
-              <View>
-                <Text style={_styles.exploringText}>Pin</Text>
-                <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found" : distanceInFeet + " feet away"}</Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-              <TouchableOpacity>
-                <SpeakerIcon style={{ width: 40, height: 40 }} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-            <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker.</Text>
-          </View>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, width: '100%', padding: 24 }
+          }
+        >
+          <RenderHTML
+            contentWidth={width}
+            tagsStyles={{
+              p: {
+                color: '#9CA3AF',
+                fontSize: FontSizes.S14,
+              },
+              strong: {
+                color: '#fff',
+                fontSize: FontSizes.S18,
+              },
+              ol: {
+                color: '#fff',
+              },
+              li: {
+                color: '#fff',
+              }
+            }}
+            source={{
+              html: `${settings?.waiver_details.toString().replaceAll("#000000", "#fff")}}`
+            }}
+          />
+        </ScrollView>
+        <View style={{ width: '100%', paddingHorizontal: 24 }}>
+          <AppButton
+            onPress={() => setDetailsShow(false)}
+            buttonStyle={_styles.buttonStyle}
+            containerStyle={_styles.buttonContainerStyle}
+            title={"Accept and Continue"}
+          />
+          <TouchableOpacity
+            activeOpacity={.6}
+            onPress={() => navigation.goBack()}>
+            <Text style={_styles.bottomText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
       </View>
-    </BackgroundWithImage >
+    )
+  }
+
+  return (
+    <View style={{flex:1}}>
+      <BackgroundWithImage style={_styles.mainContainer}>
+        <AppHeader
+          centerComponent={{
+            text: "Location Check In\n" + selectedGeoSite.name,
+            numberOfLines: 2,
+            style: [_styles.heading],
+          }} backgroundColor="transparent" />
+
+        {isLoading && <ActivityIndicator size="large" />}
+        <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
+          <View style={{
+            backgroundColor: "#131422",
+            borderRadius: 100,
+            paddingHorizontal: 8,
+            alignItems: 'center',
+            height: 65,
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}>
+            <View style={{ flexDirection: 'row' }}>
+              <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+              <View>
+                <Text style={_styles.exploringText}>Pin Found</Text>
+                <Text style={_styles.arrivedText}>{isMeInsideInSite ? 1 : 0} / 1</Text>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <View style={{ marginEnd: 10 }}>
+                <Text style={_styles.exploringText}>Points</Text>
+                <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
+              </View>
+              <TrophyIcon style={{ width: 48, height: 48 }} />
+            </View>
+          </View>
+          <View style={{
+            flex: 1, marginVertical: 20
+          }}>
+            <ViroARNavigator />
+          </View>
+          <View style={{
+            backgroundColor: "#131422",
+            borderRadius: 16,
+            padding: 20,
+            paddingBottom: 20,
+            marginVertical: 20,
+            alignItems: 'center'
+          }}>
+            <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
+              <View style={{ flexDirection: 'row' }}>
+                <MenIcon style={{ width: 40, height: 40 }} />
+                <View>
+                  <Text style={_styles.exploringText}>Pin</Text>
+                  <Text style={_styles.arrivedText}>{isMeInsideInSite ? "Pin Found" : distanceInFeet + " feet away"}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
+                <TouchableOpacity>
+                  <SpeakerIcon style={{ width: 40, height: 40 }} />
+                </TouchableOpacity>
+              </View>
+            </View>
+            <View style={{ flexDirection: 'row' }}>
+              <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
+              <Text style={_styles.infoText}>The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You can switch off the Sound by clicking on the speaker.</Text>
+            </View>
+          </View>
+        </View>
+      </BackgroundWithImage >
+      {detailsShow && InfoView()}
+    </View>
   )
 }
 
