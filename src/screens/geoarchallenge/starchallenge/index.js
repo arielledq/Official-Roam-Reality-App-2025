@@ -38,132 +38,16 @@ import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistanc
 const StarChallenge = ({
 
 }) => {
-
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const [isLoading, setIsLoading] = useState(false)
-  const [starsCount, setStarsCount] = useState(0)
-  const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
-  const [challengeObj, setChallengeObj] = useState(selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {})
+  const challengeObj = selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {}
   const challengeObjParameters = challengeObj?.parameters;
-  const [distanceInFeet, setDistanceInFeet] = useState(0)
-  const [starShouldVisible, setStarShouldVisible] = useState(false)
-  const [collectedStars, SetCollectedStars] = useState([])
   const modelFile = challengeObj.model_file;
-  const watchId = useRef(null);
 
-  const stopLocationUpdates = () => {
-    if (watchId.current !== null) {
-      Geolocation.clearWatch(watchId.current);
-      watchId.current = null;
-      Geolocation.stopObserving()
-    }
-  };
-
-  const getLocation = async () => {
-    const hasPermission = await hasLocationPermission();
-    if (!hasPermission) {
-      return;
-    }
-    Geolocation.getCurrentPosition(
-      position => {
-        findNearPoint(position)
-      },
-      error => {
-        console.log(error);
-      },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      },
-    );
-  };
-
-  const isStarIsCollected = (point) => {
-    for (i = 0; i < collectedStars.length; i++) {
-      const cPoint = collectedStars[i]
-      if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  const findNearPoint = (position) => {
-    let arrayPoints = []
-    for (i = 0; i < selectedGeoARSiteStars.length; i++) {
-      const starObj = selectedGeoARSiteStars[i];
-      for (j = 0; j < starObj.star_location.coordinates.length; j++) {
-        const point = starObj.star_location.coordinates[j]
-        const pushPoint = { latitude: point[1], longitude: point[0], starObj }
-        if (!isStarIsCollected(pushPoint)) {
-          arrayPoints.push(pushPoint)
-        }
-      }
-    }
-    const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
-    const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
-    const distance = getCloseLocationDistance(position.coords, neareastPoint)
-    const starShouldVisible = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
-    setDistanceInFeet(convertMetersToFeets(distance))
-    setStarShouldVisible(!starShouldVisible)
-    setChallengeObj(neareastPoint.starObj?.challenges)
-    console.log("distance", distance)
-    console.log("starShouldVisible", starShouldVisible)
-    if (starShouldVisible && !isStarIsCollected(neareastPoint)) {
-      collectedStars.push(neareastPoint)
-      SetCollectedStars([...collectedStars])
-    }
-  }
-
-  const getLocationUpdates = async () => {
-    const hasPermission = await hasLocationPermission();
-    if (!hasPermission) {
-      return;
-    }
-    watchId.current = Geolocation.watchPosition(
-      position => {
-        findNearPoint(position)
-      },
-      error => {
-        console.log(error);
-      },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      },
-    );
-  };
-
-  useEffect(() => {
-    getLocation()
-    getLocationUpdates()
-    return () => {
-      stopLocationUpdates();
-    };
-  }, []);
-
-  const ARScreen = () => {
+  const ARScreen = (props) => {
+    console.log("ARScreen",props)
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -172,7 +56,6 @@ const StarChallenge = ({
     challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05]);
     const [rotate, setRotate] = useState([0, 0, 0]);
     const [progress, setProgress] = useState([0, 0, 0]);
-
 
     function onInitialized(state, reason) {
       console.log('guncelleme', state, reason);
@@ -311,7 +194,7 @@ const StarChallenge = ({
           color="#ffffff"
           intensity={250} />
 
-        {loading && starShouldVisible &&
+        {loading && props.viroAppProps.starShouldVisible &&
           <ViroText
             text={`${progress}% Loading Challenge Completed`}
             color="#ff0000"
@@ -323,7 +206,7 @@ const StarChallenge = ({
         }
 
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath && starShouldVisible &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath && props.viroAppProps.starShouldVisible &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -348,7 +231,7 @@ const StarChallenge = ({
           />
         }
 
-        {challengeObj?.challenge_choice == "IMAGE" && starShouldVisible && <ViroImage
+        {challengeObj?.challenge_choice == "IMAGE" && props.viroAppProps.starShouldVisible && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -368,8 +251,12 @@ const StarChallenge = ({
       capturedImage: null,
       capturedVideo: null,
       detailsShow: true,
-      isLoadVR: false,
-      challengeInformationView: false
+      challengeInformationView: false,
+      distanceInFeet: 0,
+      starShouldVisible: false,
+      challengeObj: challengeObj,
+      collectedStars: [],
+      starsCount: 0
     }
 
     constructor() {
@@ -378,13 +265,128 @@ const StarChallenge = ({
       this.checkPermission = this.checkPermission.bind(this);
     }
 
+    setStarCounts = () => {
+      let count = 0;
+      for (const stars_site of selectedGeoARSiteStars) {
+        if (stars_site.star_location && stars_site.star_location.coordinates) {
+          count += stars_site.star_location.coordinates.length;
+        }
+      }
+      this.setState({ starsCount: count });
+    }
+
+    stopLocationUpdates = () => {
+      if (this.watchId !== null) {
+        Geolocation.clearWatch(this.watchId);
+        this.watchId = null;
+        Geolocation.stopObserving()
+      }
+    };
+
+    getLocation = async () => {
+      const hasPermission = await hasLocationPermission();
+      if (!hasPermission) {
+        return;
+      }
+      Geolocation.getCurrentPosition(
+        position => {
+          this.findNearPoint(position)
+        },
+        error => {
+          console.log(error);
+        },
+        {
+          accuracy: {
+            android: 'high',
+            ios: 'best',
+          },
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 10000,
+          distanceFilter: 0,
+          forceRequestLocation: true,
+          forceLocationManager: true,
+          showLocationDialog: true,
+        },
+      );
+    };
+
+    isStarIsCollected = (point) => {
+      for (i = 0; i < this.state.collectedStars.length; i++) {
+        const cPoint = this.state.collectedStars[i]
+        if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    findNearPoint = (position) => {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoARSiteStars.length; i++) {
+        const starObj = selectedGeoARSiteStars[i];
+        for (j = 0; j < starObj.star_location.coordinates.length; j++) {
+          const point = starObj.star_location.coordinates[j]
+          const pushPoint = { latitude: point[1], longitude: point[0], starObj }
+          if (!this.isStarIsCollected(pushPoint)) {
+            arrayPoints.push(pushPoint)
+          }
+        }
+      }
+      const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
+      const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
+      const distance = getCloseLocationDistance(position.coords, neareastPoint)
+      const starShouldVisible = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
+      console.log("distance", distance)
+      console.log("starShouldVisible", starShouldVisible)
+      if (starShouldVisible && !this.isStarIsCollected(neareastPoint)) {
+        this.state.collectedStars.push(neareastPoint)
+      }
+      this.setState({
+        distanceInFeet: convertMetersToFeets(distance),
+        starShouldVisible: starShouldVisible,
+        challengeObj: neareastPoint.starObj?.challenges,
+        collectedStars: this.state.collectedStars
+      })
+    }
+
+    getLocationUpdates = async () => {
+      const hasPermission = await hasLocationPermission();
+      if (!hasPermission) {
+        return;
+      }
+      this.watchId = Geolocation.watchPosition(
+        position => {
+          this.findNearPoint(position)
+        },
+        error => {
+          console.log(error);
+        },
+        {
+          accuracy: {
+            android: 'high',
+            ios: 'best',
+          },
+          enableHighAccuracy: true,
+          timeout: 15000,
+          maximumAge: 10000,
+          distanceFilter: 0,
+          forceRequestLocation: true,
+          forceLocationManager: true,
+          showLocationDialog: true,
+        },
+      );
+    };
+
     componentDidMount() {
       this.checkPermission()
-      console.log("componentDidMount")
-      console.log("isLoadVR",this.state.isLoadVR)
-      setTimeout(() => {
-        this.setState({ isLoadVR: true })
-      }, 1000)
+      this.getLocation()
+      this.getLocationUpdates()
+      this.setStarCounts()
+    }
+
+    componentWillUnmount() {
+      this.stopLocationUpdates();
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -415,117 +417,99 @@ const StarChallenge = ({
 
     render() {
       return (
-        <View style={{ flex: 1 }} >
-          <View style={_styles.ARMainContainer}>
-            {
-              this.state.isLoadVR && <ViroARSceneNavigator
-                videoQuality={"High"}
-                autofocus={true}
-                pbrEnabled={true}
-                hdrEnabled={true}
-                bloomEnabled={true}
-                ref={this._setARNavigatorRef}
-                initialScene={{
-                  scene: ARScreen,
-                }}
-                style={_styles.f1}
-              >
-              </ViroARSceneNavigator>
-            }
-            {this.state.capturedImage && <Image style={_styles.f1} source={{
-              uri: this.state.capturedImage
-            }} />}
-          </View>
+        <BackgroundWithImage style={_styles.mainContainer}>
+          <AppHeader
+            centerComponent={{
+              text: this.state.starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
+              numberOfLines: 2,
+              style: [_styles.heading],
+            }} backgroundColor="transparent" />
 
-        </View>
+          <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
+            <View style={{
+              backgroundColor: "#131422",
+              borderRadius: 100,
+              paddingHorizontal: 8,
+              alignItems: 'center',
+              height: 65,
+              flexDirection: 'row',
+              justifyContent: 'space-between'
+            }}>
+              <View style={{ flexDirection: 'row' }}>
+                <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+                <View>
+                  <Text style={_styles.exploringText}>Stars Collected</Text>
+                  <Text style={_styles.arrivedText}>{this.state.collectedStars.length} / {this.state.starsCount}</Text>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row' }}>
+                <View style={{ marginEnd: 10 }}>
+                  <Text style={_styles.exploringText}>Points</Text>
+                  <Text style={_styles.arrivedText}>{this.state.challengeObj?.points}</Text>
+                </View>
+                <TrophyIcon style={{ width: 48, height: 48 }} />
+              </View>
+            </View>
+            <View style={{
+              flex: 1, marginVertical: 20
+            }}>
+              <View style={_styles.ARMainContainer}>
+                <ViroARSceneNavigator
+                  videoQuality={"High"}
+                  autofocus={true}
+                  pbrEnabled={true}
+                  hdrEnabled={true}
+                  bloomEnabled={true}
+                  ref={this._setARNavigatorRef}
+                  viroAppProps={
+                    {
+                      starShouldVisible: this.state.starShouldVisible,
+                    }
+                  }
+                  initialScene={{
+                    scene: ARScreen,
+                  }}
+                  style={_styles.f1}
+                >
+                </ViroARSceneNavigator>
+              </View>
+            </View>
+            <View style={{
+              backgroundColor: "#131422",
+              borderRadius: 16,
+              padding: 20,
+              paddingBottom: 20,
+              marginVertical: 20,
+              alignItems: 'center'
+            }}>
+              <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
+                <View style={{ flexDirection: 'row' }}>
+                  <MenIcon style={{ width: 40, height: 40 }} />
+                  <View>
+                    <Text style={_styles.exploringText}>Nearest Star</Text>
+                    <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                  <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
+                  <TouchableOpacity>
+                    <SpeakerIcon style={{ width: 40, height: 40 }} />
+                  </TouchableOpacity>
+                </View>
+              </View>
+              <View style={{ flexDirection: 'row' }}>
+                <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
+                <Text style={_styles.infoText}>The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You can mute the sound by clicking on the speaker.</Text>
+              </View>
+            </View>
+          </View>
+        </BackgroundWithImage >
       )
     }
   }
 
-  const setStarCounts = () => {
-    let count = 0;
-    for (const stars_site of selectedGeoARSiteStars) {
-      if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length;
-      }
-    }
-    setStarsCount(count);
-  }
-
-  useEffect(() => {
-    setStarCounts()
-  }, [selectedGeoARSiteStars]);
-
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        centerComponent={{
-          text: starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
-          numberOfLines: 2,
-          style: [_styles.heading],
-        }} backgroundColor="transparent" />
-
-      {isLoading && <ActivityIndicator size="large" />}
-      <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
-        <View style={{
-          backgroundColor: "#131422",
-          borderRadius: 100,
-          paddingHorizontal: 8,
-          alignItems: 'center',
-          height: 65,
-          flexDirection: 'row',
-          justifyContent: 'space-between'
-        }}>
-          <View style={{ flexDirection: 'row' }}>
-            <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
-            <View>
-              <Text style={_styles.exploringText}>Stars Collected</Text>
-              <Text style={_styles.arrivedText}>{collectedStars.length} / {starsCount}</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <View style={{ marginEnd: 10 }}>
-              <Text style={_styles.exploringText}>Points</Text>
-              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
-            </View>
-            <TrophyIcon style={{ width: 48, height: 48 }} />
-          </View>
-        </View>
-        <View style={{
-          flex: 1, marginVertical: 20
-        }}>
-          <ViroARNavigator />
-        </View>
-        <View style={{
-          backgroundColor: "#131422",
-          borderRadius: 16,
-          padding: 20,
-          paddingBottom: 20,
-          marginVertical: 20,
-          alignItems: 'center'
-        }}>
-          <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-            <View style={{ flexDirection: 'row' }}>
-              <MenIcon style={{ width: 40, height: 40 }} />
-              <View>
-                <Text style={_styles.exploringText}>Nearest Star</Text>
-                <Text style={_styles.arrivedText}>{starShouldVisible ? "You found a star!" : `${distanceInFeet} feet away`}</Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-              <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-              <TouchableOpacity>
-                <SpeakerIcon style={{ width: 40, height: 40 }} />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-            <Text style={_styles.infoText}>The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You can mute the sound by clicking on the speaker.</Text>
-          </View>
-        </View>
-      </View>
-    </BackgroundWithImage >
+    <ViroARNavigator />
   )
 }
 
