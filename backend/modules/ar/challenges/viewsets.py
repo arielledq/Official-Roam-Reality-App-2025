@@ -1,12 +1,12 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
-GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges
+GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
 ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer,GeoStarSerializer, \
-GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer
+GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
-from rest_framework.parsers import FileUploadParser
+from rest_framework.parsers import FileUploadParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import permissions, status
 from rest_framework.response import Response
@@ -255,7 +255,14 @@ class ARSitePinCheckInViewSet(ViewSet):
       criterion2 = Q(geo_site=geo_site)
       count = ARSitePinCheckIn.objects.filter(criterion1 & criterion2).count()
       return Response({'count': count}, status=status.HTTP_200_OK)
-      
+    
+    @action(detail=False, methods=['post'], url_path='check-in-all-count', name='Check Check-ins')
+    def check_in_all_count(self, request):
+      user_id = self.request.user.id
+      criterion1 = Q(user=user_id)
+      count = ARSitePinCheckIn.objects.filter(criterion1).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
@@ -282,3 +289,58 @@ class ARSitePinCheckInViewSet(ViewSet):
           return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
       else:
         return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
+
+class StarCollectionViewSet(ViewSet):
+    
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = StarCollection.objects.all()
+    serializer_class = StarCollectionSerializer
+
+    @action(detail=False, methods=['post'], url_path='site-stars', name='Check site-stars')
+    def site_stars(self, request):
+      user_id = self.request.user.id
+      geo_site = request.data.get("geo_site")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(geo_site=geo_site)
+      objs = self.queryset.filter(criterion1 & criterion2)
+      serializer = StarCollectionSerializer(objs, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='star-count', name='Check star-count')
+    def star_count(self, request):
+      user_id = self.request.user.id
+      geo_site = request.data.get("geo_site")
+      criterion1 = Q(user=user_id)
+      criterion2 = Q(geo_site=geo_site)
+      count = StarCollection.objects.filter(criterion1 & criterion2).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['post'], url_path='all-count', name='Check all-count')
+    def call_count(self, request):
+      user_id = self.request.user.id
+      criterion1 = Q(user=user_id)
+      count = StarCollection.objects.filter(criterion1).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+
+    def get(self, request, *args, **kwargs):
+        objs = self.queryset.filter(user = request.user.id)
+        serializer = StarCollectionSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def create(self, request, *args, **kwargs):
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      geo_site = request.data.get("geo_site")
+      geo_ar_star = request.data.get("geo_ar_star")
+      latitude = request.data.get("latitude")
+      longitude = request.data.get("longitude")
+      from django.contrib.gis.geos import Point
+      pnt = Point(latitude,longitude)
+      request.data['point'] = pnt
+      serializer = StarCollectionSerializer(data=request.data, partial=True)
+      if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+      else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
