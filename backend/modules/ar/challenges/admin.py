@@ -66,7 +66,7 @@ class UniqueChallengeSiteAdmin(GeoArChallengeAdmin):
 
 @admin.register(GeoArSite)
 class GeoArSiteAdmin(GeoArChallengeAdmin):
-    list_display = ('name',"check_ins",)
+    list_display = ("id",'name',"check_ins",)
     ordering = ("name","check_ins",)
     search_fields = ["name"]
 
@@ -91,7 +91,7 @@ admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 admin.site.register(ARChallengeFilters, ARChallengeAdmin)
-admin.site.register(StarCollection, ARChallengeAdmin)
+admin.site.register(StarCollection, GeoArChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 
 
