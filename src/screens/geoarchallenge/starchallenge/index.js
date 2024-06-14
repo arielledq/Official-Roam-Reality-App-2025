@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Dimensions, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
@@ -9,7 +9,7 @@ import MenIcon from "../../../assets/geoar/men_icon.svg"
 import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg"
 import StarIcon from "../../../assets/geoar/star_icon.svg"
 import TrophyIcon from "../../../assets/geoar/trophy_icon.svg"
-import CaptureIcon from "../../../assets/geoar/capture_icon.svg"
+import LineIcon from '../../../assets/ar/line.png';
 import {
   ViroARScene,
   ViroMaterials,
@@ -34,6 +34,11 @@ import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
 import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, hasLocationPermission, isLocationPointInPolygon, isLocationPointWithinRadius, orderByDistanceLocationPoint } from "../../../util/LocationLib";
+import { Image } from "react-native";
+import RenderHTML from "react-native-render-html";
+import { AppButton } from "../../../components";
+const { width } = Dimensions.get('window');
+import { FontSizes } from "../../../util/FontUtils"
 
 const StarChallenge = ({
 
@@ -42,11 +47,13 @@ const StarChallenge = ({
   const dispatch = useDispatch()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
+  const settings = useSelector(state => state.ar?.arSettings)
+  const navigation = useNavigation()
 
   const ARScreen = (props) => {
     console.log("props.arSceneNavigator.viroAppProps.starShouldVisible", props.arSceneNavigator.viroAppProps.starShouldVisible)
     console.log("props?.arSceneNavigator.viroAppProps.challengeObj", props?.arSceneNavigator.viroAppProps.challengeObj)
-    
+
     const [challengeObj, setChallengeObj] = useState(props?.arSceneNavigator.viroAppProps.challengeObj)
     const [challengeObjParameters, setChallengeObjParameters] = useState(challengeObj?.parameters)
     const [modelFile, setModelFile] = useState(challengeObj?.model_file)
@@ -143,7 +150,7 @@ const StarChallenge = ({
     }
 
     useEffect(() => {
-      console.log("AR Scene useEffect:",starShouldVisible)
+      console.log("AR Scene useEffect:", starShouldVisible)
       setStarShouldVisible(props.arSceneNavigator.viroAppProps.starShouldVisible)
     }, [props.arSceneNavigator.viroAppProps.starShouldVisible]);
 
@@ -399,7 +406,7 @@ const StarChallenge = ({
       this.getLocationUpdates()
       this.setStarCounts()
     }
-    
+
     componentWillUnmount() {
       this.stopLocationUpdates();
     }
@@ -430,96 +437,152 @@ const StarChallenge = ({
       }
     };
 
+    InfoView = () => {
+      return (
+        <View style={_styles.challengeInfoContainer}>
+          <View style={_styles.challengeInfoHeaderContainer}>
+            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+            <Text style={_styles.challengeInfoHeader}>Waiver Details</Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1, width: '100%', padding: 24 }
+            }
+          >
+            <RenderHTML
+              contentWidth={width}
+              tagsStyles={{
+                p: {
+                  color: '#9CA3AF',
+                  fontSize: FontSizes.S14,
+                },
+                strong: {
+                  color: '#fff',
+                  fontSize: FontSizes.S18,
+                },
+                ol: {
+                  color: '#fff',
+                },
+                li: {
+                  color: '#fff',
+                }
+              }}
+              source={{
+                html: `${settings?.waiver_details.toString().replaceAll("#000000", "#fff")}}`
+              }}
+            />
+          </ScrollView>
+          <View style={{ width: '100%', paddingHorizontal: 24 }}>
+            <AppButton
+              onPress={() => this.setState({ detailsShow: false })}
+              buttonStyle={_styles.buttonStyle}
+              containerStyle={_styles.buttonContainerStyle}
+              title={"Accept and Continue"}
+            />
+            <TouchableOpacity
+              activeOpacity={.6}
+              onPress={() => navigation.goBack()}>
+              <Text style={_styles.bottomText}>Cancel</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+
     render() {
       return (
-        <BackgroundWithImage style={_styles.mainContainer}>
-          <AppHeader
-            centerComponent={{
-              text: this.state.starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
-              numberOfLines: 2,
-              style: [_styles.heading],
-            }} backgroundColor="transparent" />
+        <View style={{ flex: 1 }}>
+          <BackgroundWithImage style={_styles.mainContainer}>
+            <AppHeader
+              centerComponent={{
+                text: this.state.starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
+                numberOfLines: 2,
+                style: [_styles.heading],
+              }} backgroundColor="transparent" />
 
-          <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
-            <View style={{
-              backgroundColor: "#131422",
-              borderRadius: 100,
-              paddingHorizontal: 8,
-              alignItems: 'center',
-              height: 65,
-              flexDirection: 'row',
-              justifyContent: 'space-between'
-            }}>
-              <View style={{ flexDirection: 'row' }}>
-                <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
-                <View>
-                  <Text style={_styles.exploringText}>Stars Collected</Text>
-                  <Text style={_styles.arrivedText}>{this.state.collectedStars.length} / {this.state.starsCount}</Text>
-                </View>
-              </View>
-              <View style={{ flexDirection: 'row' }}>
-                <View style={{ marginEnd: 10 }}>
-                  <Text style={_styles.exploringText}>Points</Text>
-                  <Text style={_styles.arrivedText}>{this.state.challengeObj?.points}</Text>
-                </View>
-                <TrophyIcon style={{ width: 48, height: 48 }} />
-              </View>
-            </View>
-            <View style={{
-              flex: 1, marginVertical: 20
-            }}>
-              <View style={_styles.ARMainContainer}>
-                <ViroARSceneNavigator
-                  videoQuality={"High"}
-                  autofocus={true}
-                  pbrEnabled={true}
-                  hdrEnabled={true}
-                  bloomEnabled={true}
-                  ref={this._setARNavigatorRef}
-                  viroAppProps={
-                    {
-                      starShouldVisible: this.state.starShouldVisible,
-                      challengeObj: this.state.challengeObj
-                    }
-                  }
-                  initialScene={{
-                    scene: ARScreen,
-                  }}
-                  style={_styles.f1}
-                >
-                </ViroARSceneNavigator>
-              </View>
-            </View>
-            <View style={{
-              backgroundColor: "#131422",
-              borderRadius: 16,
-              padding: 20,
-              paddingBottom: 20,
-              marginVertical: 20,
-              alignItems: 'center'
-            }}>
-              <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
+            <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
+              <View style={{
+                backgroundColor: "#131422",
+                borderRadius: 100,
+                paddingHorizontal: 8,
+                alignItems: 'center',
+                height: 65,
+                flexDirection: 'row',
+                justifyContent: 'space-between'
+              }}>
                 <View style={{ flexDirection: 'row' }}>
-                  <MenIcon style={{ width: 40, height: 40 }} />
+                  <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
                   <View>
-                    <Text style={_styles.exploringText}>Nearest Star</Text>
-                    <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                    <Text style={_styles.exploringText}>Stars Collected</Text>
+                    <Text style={_styles.arrivedText}>{this.state.collectedStars.length} / {this.state.starsCount}</Text>
                   </View>
                 </View>
-                <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
-                  <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-                  <TouchableOpacity>
-                    <SpeakerIcon style={{ width: 40, height: 40 }} />
-                  </TouchableOpacity>
+                <View style={{ flexDirection: 'row' }}>
+                  <View style={{ marginEnd: 10 }}>
+                    <Text style={_styles.exploringText}>Points</Text>
+                    <Text style={_styles.arrivedText}>{this.state.challengeObj?.points}</Text>
+                  </View>
+                  <TrophyIcon style={{ width: 48, height: 48 }} />
                 </View>
               </View>
-              <View style={{ flexDirection: 'row' }}>
-                <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-                <Text style={_styles.infoText}>The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You can mute the sound by clicking on the speaker.</Text>
+              <View style={{
+                flex: 1, marginVertical: 20
+              }}>
+                <View style={_styles.ARMainContainer}>
+                  <ViroARSceneNavigator
+                    videoQuality={"High"}
+                    autofocus={true}
+                    pbrEnabled={true}
+                    hdrEnabled={true}
+                    bloomEnabled={true}
+                    ref={this._setARNavigatorRef}
+                    viroAppProps={
+                      {
+                        starShouldVisible: this.state.starShouldVisible,
+                        challengeObj: this.state.challengeObj
+                      }
+                    }
+                    initialScene={{
+                      scene: ARScreen,
+                    }}
+                    style={_styles.f1}
+                  >
+                  </ViroARSceneNavigator>
+                </View>
+              </View>
+              <View style={{
+                backgroundColor: "#131422",
+                borderRadius: 16,
+                padding: 20,
+                paddingBottom: 20,
+                marginVertical: 20,
+                alignItems: 'center'
+              }}>
+                <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
+                  <View style={{ flexDirection: 'row' }}>
+                    <MenIcon style={{ width: 40, height: 40 }} />
+                    <View>
+                      <Text style={_styles.exploringText}>Nearest Star</Text>
+                      <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                    </View>
+                  </View>
+                  <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
+                    <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
+                    <TouchableOpacity>
+                      <SpeakerIcon style={{ width: 40, height: 40 }} />
+                    </TouchableOpacity>
+                  </View>
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                  <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
+                  <Text style={_styles.infoText}>The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You can mute the sound by clicking on the speaker.</Text>
+                </View>
               </View>
             </View>
-          </View>
-        </BackgroundWithImage >
+          </BackgroundWithImage >
+          {this.state.detailsShow && this.InfoView()}
+        </View >
       )
     }
   }
