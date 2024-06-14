@@ -255,7 +255,14 @@ class ARSitePinCheckInViewSet(ViewSet):
       criterion2 = Q(geo_site=geo_site)
       count = ARSitePinCheckIn.objects.filter(criterion1 & criterion2).count()
       return Response({'count': count}, status=status.HTTP_200_OK)
-      
+    
+    @action(detail=False, methods=['post'], url_path='check-in-all-count', name='Check Check-ins')
+    def check_in_all_count(self, request):
+      user_id = self.request.user.id
+      criterion1 = Q(user=user_id)
+      count = ARSitePinCheckIn.objects.filter(criterion1).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+
     def partial_update(self, request, *args, **kwargs):
       instance = self.queryset.get(pk=kwargs.get('pk'))
       serializer = self.serializer_class(instance, data=request.data, partial=True)
