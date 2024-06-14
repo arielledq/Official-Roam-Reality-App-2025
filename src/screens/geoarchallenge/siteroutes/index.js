@@ -30,13 +30,11 @@ const GeoArSiteRoutes = ({
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
   const mapView = useRef();
-
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
+  const [routes, setRoutes] = useState(0)
 
   const getCurrentLocation = () => {
     GetLocation.getCurrentPosition({
@@ -133,6 +131,7 @@ const GeoArSiteRoutes = ({
                   console.log(`Duration: ${result.duration} min.`)
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
+                  setRoutes(1)
 
                   // mapView.fitToCoordinates(result.coordinates, {
                   //   edgePadding: {
@@ -144,7 +143,8 @@ const GeoArSiteRoutes = ({
                   // });
                 }}
                 onError={(errorMessage) => {
-                  // console.log('GOT AN ERROR');
+                  console.log('GOT AN ERROR',errorMessage);
+                  setRoutes(0)
                 }}
               />
             }
@@ -154,7 +154,7 @@ const GeoArSiteRoutes = ({
         <View style={{ flexDirection: 'row', paddingVertical: 20, justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={_styles.site_d_header_text}>Routes</Text>
           <TouchableOpacity>
-            <Text style={_styles.site_d_header_number_text}>01</Text>
+            <Text style={_styles.site_d_header_number_text}>{routes}</Text>
           </TouchableOpacity>
         </View>
 
