@@ -39,6 +39,7 @@ import RenderHTML from "react-native-render-html";
 import { AppButton } from "../../../components";
 const { width } = Dimensions.get('window');
 import { FontSizes } from "../../../util/FontUtils"
+import { getAllCollectedStars, starFoundAndSaveApi } from "../../../network";
 
 const StarChallenge = ({
 
@@ -51,9 +52,6 @@ const StarChallenge = ({
   const navigation = useNavigation()
 
   const ARScreen = (props) => {
-    console.log("props.arSceneNavigator.viroAppProps.starShouldVisible", props.arSceneNavigator.viroAppProps.starShouldVisible)
-    console.log("props?.arSceneNavigator.viroAppProps.challengeObj", props?.arSceneNavigator.viroAppProps.challengeObj)
-
     const [challengeObj, setChallengeObj] = useState(props?.arSceneNavigator.viroAppProps.challengeObj)
     const [challengeObjParameters, setChallengeObjParameters] = useState(challengeObj?.parameters)
     const [modelFile, setModelFile] = useState(challengeObj?.model_file)
@@ -363,12 +361,48 @@ const StarChallenge = ({
       console.log("starShouldVisibleNow", starShouldVisibleNow)
       if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
         this.state.collectedStars.push(neareastPoint)
+        this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
       }
       this.setState({
         distanceInFeet: convertMetersToFeets(distance),
         starShouldVisible: starShouldVisibleNow,
         challengeObj: neareastPoint.starObj?.challenges,
         collectedStars: this.state.collectedStars
+      })
+    }
+
+    getCollectedStar = () => {
+      getAllCollectedStars({
+        geo_site: selectedGeoSite.id,
+      }).then((res) => {
+        console.log("getCollectedStar::", res)
+        if (res.status == 1) {
+          const stars = res.data;
+          const collectedStarsFromAPI = [];
+          for (var i = 0; i < stars.length; i++) {
+            const s = stars[i]
+            collectedStars.push({
+              latitude: s.point.coordinates[1],
+              longitude: s.point.coordinates[0],
+            })
+          }
+          const finalCollectedStars = [...collectedStarsFromAPI, ...this.state.collectedStars]
+          console.log("getAllCollectedStars",finalCollectedStars)
+          this.setState({ collectedStars: finalCollectedStars })
+        }
+      }).finally(() => {
+      })
+    }
+
+    saveCollectedStar = (point, starObj) => {
+      starFoundAndSaveApi({
+        geo_site: selectedGeoSite.id,
+        geo_ar_star: starObj.id,
+        latitude: point.latitude,
+        longitude: point.longitude
+      }).then((res) => {
+        console.log("saveCollectedStar::", res)
+      }).finally(() => {
       })
     }
 
@@ -405,6 +439,7 @@ const StarChallenge = ({
       this.getLocation()
       this.getLocationUpdates()
       this.setStarCounts()
+      this.getCollectedStar()
     }
 
     componentWillUnmount() {
