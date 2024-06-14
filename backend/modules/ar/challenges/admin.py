@@ -66,7 +66,7 @@ class UniqueChallengeSiteAdmin(GeoArChallengeAdmin):
 
 @admin.register(GeoArSite)
 class GeoArSiteAdmin(GeoArChallengeAdmin):
-    list_display = ('name',"check_ins",)
+    list_display = ("id",'name',"check_ins",)
     ordering = ("name","check_ins",)
     search_fields = ["name"]
 
