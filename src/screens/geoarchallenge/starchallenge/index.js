@@ -42,12 +42,15 @@ const StarChallenge = ({
   const dispatch = useDispatch()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
-  const challengeObj = selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {}
-  const challengeObjParameters = challengeObj?.parameters;
-  const modelFile = challengeObj.model_file;
 
   const ARScreen = (props) => {
-    console.log("ARScreen",props)
+    console.log("props.arSceneNavigator.viroAppProps.starShouldVisible", props.arSceneNavigator.viroAppProps.starShouldVisible)
+    console.log("props?.arSceneNavigator.viroAppProps.challengeObj", props?.arSceneNavigator.viroAppProps.challengeObj)
+    
+    const [challengeObj, setChallengeObj] = useState(props?.arSceneNavigator.viroAppProps.challengeObj)
+    const [challengeObjParameters, setChallengeObjParameters] = useState(challengeObj?.parameters)
+    const [modelFile, setModelFile] = useState(challengeObj?.model_file)
+    const [starShouldVisible, setStarShouldVisible] = useState(props.arSceneNavigator.viroAppProps.starShouldVisible)
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -138,6 +141,18 @@ const StarChallenge = ({
           console.log(error);
         });
     }
+
+    useEffect(() => {
+      console.log("AR Scene useEffect:",starShouldVisible)
+      setStarShouldVisible(props.arSceneNavigator.viroAppProps.starShouldVisible)
+    }, [props.arSceneNavigator.viroAppProps.starShouldVisible]);
+
+    useEffect(() => {
+      setChallengeObj(props?.arSceneNavigator.viroAppProps.challengeObj)
+      setChallengeObjParameters(props?.arSceneNavigator.viroAppProps.challengeObj?.parameters)
+      setModelFile(props?.arSceneNavigator.viroAppProps.challengeObj?.model_file)
+    }, [props?.arSceneNavigator.viroAppProps.challengeObj]);
+
     useEffect(() => {
       if (challengeObj?.challenge_choice == "3DMODEL") {
         setLoading(true)
@@ -194,7 +209,7 @@ const StarChallenge = ({
           color="#ffffff"
           intensity={250} />
 
-        {loading && props.viroAppProps.starShouldVisible &&
+        {loading && starShouldVisible &&
           <ViroText
             text={`${progress}% Loading Challenge Completed`}
             color="#ff0000"
@@ -206,7 +221,7 @@ const StarChallenge = ({
         }
 
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath && props.viroAppProps.starShouldVisible &&
+          challengeObj?.challenge_choice == "3DMODEL" && modelPath && starShouldVisible &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -231,7 +246,7 @@ const StarChallenge = ({
           />
         }
 
-        {challengeObj?.challenge_choice == "IMAGE" && props.viroAppProps.starShouldVisible && <ViroImage
+        {challengeObj?.challenge_choice == "IMAGE" && starShouldVisible && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -254,7 +269,7 @@ const StarChallenge = ({
       challengeInformationView: false,
       distanceInFeet: 0,
       starShouldVisible: false,
-      challengeObj: challengeObj,
+      challengeObj: selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {},
       collectedStars: [],
       starsCount: 0
     }
@@ -336,15 +351,15 @@ const StarChallenge = ({
       const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
       const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
       const distance = getCloseLocationDistance(position.coords, neareastPoint)
-      const starShouldVisible = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
+      const starShouldVisibleNow = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
       console.log("distance", distance)
-      console.log("starShouldVisible", starShouldVisible)
-      if (starShouldVisible && !this.isStarIsCollected(neareastPoint)) {
+      console.log("starShouldVisibleNow", starShouldVisibleNow)
+      if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
         this.state.collectedStars.push(neareastPoint)
       }
       this.setState({
         distanceInFeet: convertMetersToFeets(distance),
-        starShouldVisible: starShouldVisible,
+        starShouldVisible: starShouldVisibleNow,
         challengeObj: neareastPoint.starObj?.challenges,
         collectedStars: this.state.collectedStars
       })
@@ -384,7 +399,7 @@ const StarChallenge = ({
       this.getLocationUpdates()
       this.setStarCounts()
     }
-
+    
     componentWillUnmount() {
       this.stopLocationUpdates();
     }
@@ -464,6 +479,7 @@ const StarChallenge = ({
                   viroAppProps={
                     {
                       starShouldVisible: this.state.starShouldVisible,
+                      challengeObj: this.state.challengeObj
                     }
                   }
                   initialScene={{
