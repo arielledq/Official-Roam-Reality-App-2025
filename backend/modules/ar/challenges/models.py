@@ -540,11 +540,11 @@ class StarCollection(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_ar_site_star"
     )
-    collected_stars = models.IntegerField(verbose_name="Collected Stars", default=0)
+    point = gis_models.PointField(_("Point"), blank=True, null=True)
 
     class Meta:
       verbose_name_plural = "Geo AR Star Collections"
       verbose_name = "Geo AR Star Collections"
 
     def __str__(self):
-        return self.name
+        return str(self.id)

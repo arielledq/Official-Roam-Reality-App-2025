@@ -331,6 +331,13 @@ class StarCollectionViewSet(ViewSet):
     def create(self, request, *args, **kwargs):
       user_id = self.request.user.id
       request.data['user'] = user_id
+      geo_site = request.data.get("geo_site")
+      geo_ar_star = request.data.get("geo_ar_star")
+      latitude = request.data.get("latitude")
+      longitude = request.data.get("longitude")
+      from django.contrib.gis.geos import Point
+      pnt = Point(latitude,longitude)
+      request.data['point'] = pnt
       serializer = StarCollectionSerializer(data=request.data, partial=True)
       if serializer.is_valid(raise_exception=True):
         serializer.save()
