@@ -21,7 +21,7 @@ import ArIcon from "../../../assets/geoar/aricon.svg"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { AppHeader, AppText } from "../../../components"
-import { checkGeoPinCheckInDoneAPI, getARChallenges } from "../../../network"
+import { checkGeoPinCheckInDoneAPI, getARChallenges, getCheckInCount, getCollectedStarCount } from "../../../network"
 
 const HomeScreenData = [
   {
@@ -78,6 +78,9 @@ const ChallengeSelection = ({ route }) => {
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const [starsCount, setStarsCount] = useState(0)
+  const [collectedStars, setCollectedStars] = useState(0)
+  const [myCheckIns, setMyCheckIns] = useState(0)
+  const [uniqueExperiences, setUniqueExperiences] = useState(0)
   const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false)
   const isFocused = useIsFocused();
 
@@ -97,9 +100,33 @@ const ChallengeSelection = ({ route }) => {
     })
   }
 
+  const getMyCheckInsCount = () => {
+    getCheckInCount({
+    }).then((res) => {
+      if(res.status == 1){
+        setMyCheckIns(res.count)
+      }
+    }).finally(() => {
+    })
+  }
+
+  const getStarsCollectCount = () => {
+    getCollectedStarCount({
+      geo_site: selectedGeoSite.id
+    }).then((res) => {
+      console.log("getStarsCollectCount:", res)
+      if(res.status == 1){
+        setCollectedStars(res.count)
+      }
+    }).finally(() => {
+    })
+  }
+
   useEffect(() => {
     if (isFocused) {
       checkIfPinCheckIsDone()
+      getStarsCollectCount()
+      getMyCheckInsCount()
     }
   }, [isFocused]);
 
@@ -157,15 +184,15 @@ const ChallengeSelection = ({ route }) => {
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
                 {
                   item?.id == 1 &&
-                  <AppText style={styles.challengesText}>Pin located: {isPinCheckIsDone ? 1 : 0}/1  •  My Check-ins: 9</AppText>
+                  <AppText style={styles.challengesText}>Pin located: {isPinCheckIsDone ? 1 : 0}/1  •  My Check-ins: {myCheckIns}</AppText>
                 }
                 {
                   item?.id == 2 &&
-                  <AppText style={styles.challengesText}> Stars collected: 0/{starsCount}</AppText>
+                  <AppText style={styles.challengesText}> Stars collected: {collectedStars}/{starsCount}</AppText>
                 }
                 {
                   item?.id == 3 &&
-                  <AppText style={styles.challengesText}> Experiences Completed - 0/{selectedDestination.star_ar_sites.length + selectedDestination.unique_ar_sites.length}</AppText>
+                  <AppText style={styles.challengesText}>{selectedDestination.unique_ar_sites.length} Challenges</AppText>
                 }
                 {
                   item?.id == 4 &&

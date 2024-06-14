@@ -172,6 +172,21 @@ export const checkGeoPinCheckInDoneAPI = payload =>
     data: payload
   })
 
+export const getCollectedStarCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/star-count/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getCheckInCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/check-in/check-in-all-count/`,
+    method: "POST",
+    data: payload
+  })
+
+
 export const postGeoPinCheckIn = payload =>
   Request.multiPartCall({
     url: `modules/challenges/check-in/`,
