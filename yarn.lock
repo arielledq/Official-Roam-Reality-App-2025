@@ -8373,7 +8373,6 @@ react-native-gesture-handler@^2.16.2:
   version "2.16.2"
   resolved "https://registry.yarnpkg.com/react-native-gesture-handler/-/react-native-gesture-handler-2.16.2.tgz#032bd2a07334292d7f6cff1dc9d1ec928f72e26d"
   integrity sha512-vGFlrDKlmyI+BT+FemqVxmvO7nqxU33cgXVsn6IKAFishvlG3oV2Ds67D5nPkHMea8T+s1IcuMm0bF8ntZtAyg==
-
   dependencies:
     "@egjs/hammerjs" "^2.0.17"
     hoist-non-react-statics "^3.3.0"
@@ -8514,7 +8513,7 @@ react-native-ratings@^8.1.0:
   dependencies:
     lodash "^4.17.15"
 
-react-native-reanimated@^3.11.0:
+react-native-reanimated@3.11.0:
   version "3.11.0"
   resolved "https://registry.yarnpkg.com/react-native-reanimated/-/react-native-reanimated-3.11.0.tgz#d4265d4e0232623f5958ed60e1686ca884fc3452"
   integrity sha512-BNw/XDgUfs8UhfY1X6IniU8kWpnotWGyt8qmQviaHisTi5lvwnaOdXQKfN1KGONx6ekdFRHRP5EFwLi0UajwKA==
