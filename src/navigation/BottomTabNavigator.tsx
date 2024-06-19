@@ -8,6 +8,8 @@ import Scores from '../screens/scores';
 import Rally from '../screens/rally';
 import Icon from "../components/Icon"
 import { Icons } from '../assets/Icons';
+import GeoArChallenge from '../screens/geoarchallenge';
+
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -20,19 +22,19 @@ const BottomTabNavigator = () => {
   }
   return (
     <Tab.Navigator
-      initialRouteName="HomeScreen"
+      initialRouteName="GeoArChallenge"
       barStyle={styles.tabBarStyle}
       activeColor='#FFFFFF'
       inactiveColor='#FFFFFF'
       theme={theme}
     >
       <Tab.Screen
-        name="HomeScreen"
-        component={Home}
+        name="GeoArChallenge"
+        component={GeoArChallenge}
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative'}}>
+            <View style={{ position: 'relative' }}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedHomeIcon'}
@@ -50,7 +52,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative'}}>
+            <View style={{ position: 'relative' }}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedBadgeIcon'}
@@ -82,7 +84,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative'}}>
+            <View style={{ position: 'relative' }}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedFlagIcon'}
@@ -99,7 +101,7 @@ const BottomTabNavigator = () => {
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
           tabBarIcon: ({ focused }) => (
-            <View style={{ position: 'relative'}}>
+            <View style={{ position: 'relative' }}>
               {focused && glowEffect()}
               <Icon
                 name={'UnselectedProfile'}
@@ -124,7 +126,7 @@ const styles = StyleSheet.create({
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
     paddingHorizontal: 25,
-    paddingVertical : 5
+    paddingVertical: 5
   },
   tabBarIconStyle: {
     marginTop: -40

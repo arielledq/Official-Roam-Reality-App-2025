@@ -20,7 +20,7 @@ const ArChallenge = ({
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
-  const [challengeChoice, setChallengeChoice] = useState("SPONSORED")
+  const [challengeChoice, setChallengeChoice] = useState("PHOTO")
   const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
   const arProfile = useSelector(state => state.ar?.arProfile)
@@ -31,7 +31,7 @@ const ArChallenge = ({
     getARChallenges().then((res) => {
       if (res.status == 1) {
         setSponsoredDataAll(res.data)
-        setSponsoredData(res.data.filter(x => x.challenge_choice == challengeChoice))
+        setSponsoredData(res.data.filter(x => x.challenge_requirement == challengeChoice))
       } else {
         res.message.message = "Error in loading Challenges."
         handleError(res)
@@ -68,8 +68,13 @@ const ArChallenge = ({
 
   const setDataWithChoice = (choice) => {
     setChallengeChoice(choice);
-    const filteredArray = sponsoredDataAll.filter(x => x.challenge_choice == choice)
-    setSponsoredData(filteredArray.slice())
+    if(choice == 'PHOTO'){
+      const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement == 'PHOTO')
+      setSponsoredData(filteredArray.slice())
+    }else{
+      const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement !== 'PHOTO')
+      setSponsoredData(filteredArray.slice())
+    }
   }
 
   useEffect(() => {
@@ -84,7 +89,7 @@ const ArChallenge = ({
 
   const Item = ({ obj }) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={_styles.list_item}>
-      <Image style={_styles.list_image} resizeMode="stretch" source={{ uri: obj.sponsored.image }} />
+      <Image style={_styles.list_image} resizeMode="stretch" source={{ uri: obj.image }} />
       <View style={[_styles.list_image,{backgroundColor:'#00000080'}]} />
       <Text style={_styles.list_title}>{obj.name}</Text>
       <Text style={_styles.s_list_title}>Sponsored By {obj.sponsored.name}</Text>
@@ -112,10 +117,10 @@ const ArChallenge = ({
         </BackgroundWithImage>
       </View>
       <View style={_styles.rowView}>
-        <TouchableOpacity onPress={() => setDataWithChoice("SPONSORED")} activeOpacity={.5} style={challengeChoice == "SPONSORED" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("PHOTO")} activeOpacity={.5} style={challengeChoice == "PHOTO" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Photo Challenges</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => setDataWithChoice("DANCE")} activeOpacity={.5} style={challengeChoice == "DANCE" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+        <TouchableOpacity onPress={() => setDataWithChoice("VIDEO")} activeOpacity={.5} style={challengeChoice == "VIDEO"  ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
           <Text style={_styles.buttonSelectText}>Video Challenges </Text>
         </TouchableOpacity>
       </View>

@@ -24,12 +24,12 @@
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
 	<array>
-    <dict>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>aw5g4n448236v4uh</string>
-        </array>
-      </dict>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>aw5g4n448236v4uh</string>
+			</array>
+		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
@@ -55,9 +55,9 @@
 	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-    <string>fb</string>
-    <string>tiktok</string>
-    <string>facebook-stories</string>
+		<string>fb</string>
+		<string>tiktok</string>
+		<string>facebook-stories</string>
 		<string>fbapi</string>
 		<string>fb-messenger-share-api</string>
 		<string>fbauth2</string>
@@ -67,15 +67,15 @@
 		<string>https</string>
 		<string>http</string>
 		<string>mailto</string>
-    <string>tiktokopensdk</string>
-    <string>tiktoksharesdk</string>
-    <string>snssdk1180</string>
-    <string>snssdk1233</string>
-    <string>instagram</string>
-    <string>instagram-stories</string>
+		<string>tiktokopensdk</string>
+		<string>tiktoksharesdk</string>
+		<string>snssdk1180</string>
+		<string>snssdk1233</string>
+		<string>instagram</string>
+		<string>instagram-stories</string>
 	</array>
-  <key>TikTokAppID</key>
-  <string>aw5g4n448236v4uh</string>
+	<key>TikTokAppID</key>
+	<string>awx8jb1brvngfo5m</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -99,8 +99,8 @@
 	<string>Access to save videos/photos to camera roll.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Access to the photo library is required to select a photo.</string>
-	<key>TikTokAppID</key>
-	<string>awx8jb1brvngfo5m</string>
+	<key>NSContactsUsageDescription</key>
+	<string>Roam Reality requires Contact permission to check your friends on platform</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>
