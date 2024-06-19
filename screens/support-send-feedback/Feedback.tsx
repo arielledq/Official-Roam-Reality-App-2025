@@ -57,6 +57,7 @@ const Feedback = () => {
     sendFeedback(data)
       .then(response => {
         setLoading(false)
+        Keyboard.dismiss()
         if (response.status === 1) {
           resetForm() // Reset form after successful submission
           Alert.alert("Feedback Submitted", "Thank you for your feedback")

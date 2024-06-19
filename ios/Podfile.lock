@@ -305,6 +305,8 @@ PODS:
   - react-native-cameraroll (7.4.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
+  - react-native-contacts (7.0.8):
+    - React-Core
   - react-native-fbsdk-next (12.1.2):
     - React-Core
     - react-native-fbsdk-next/Core (= 12.1.2)
@@ -458,7 +460,8 @@ PODS:
     - SDWebImageWebPCoder (~> 0.8.4)
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.10.1):
+  - RNGestureHandler (2.16.2):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - RNGoogleSignin (11.0.0):
     - GoogleSignIn (~> 7.0)
@@ -474,33 +477,10 @@ PODS:
     - TOCropViewController
   - RNPermissions (4.1.0):
     - React-Core
-  - RNReanimated (2.14.4):
-    - DoubleConversion
-    - FBLazyVector
-    - FBReactNativeSpec
-    - glog
-    - RCT-Folly
-    - RCTRequired
-    - RCTTypeSafety
-    - React-callinvoker
+  - RNReanimated (3.11.0):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
-    - React-Core/DevSupport
-    - React-Core/RCTWebSocket
-    - React-CoreModules
-    - React-cxxreact
-    - React-jsi
-    - React-jsiexecutor
-    - React-jsinspector
-    - React-RCTActionSheet
-    - React-RCTAnimation
-    - React-RCTBlob
-    - React-RCTImage
-    - React-RCTLinking
-    - React-RCTNetwork
-    - React-RCTSettings
-    - React-RCTText
     - ReactCommon/turbomodule/core
-    - Yoga
   - RNScreens (3.20.0):
     - React-Core
     - React-RCTImage
@@ -560,6 +540,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
+  - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
@@ -606,8 +587,8 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - TikTokOpenSDK (~> 5.0.15)
-  - ViroKit (from `../../viro/ios/dist/ViroRenderer/`)
-  - ViroReact (from `../../viro/ios/`)
+  - "ViroKit (from `../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/`)"
+  - "ViroReact (from `../node_modules/@viro-community/react-viro/ios/`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -677,6 +658,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/blur"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-camera-roll/camera-roll"
+  react-native-contacts:
+    :path: "../node_modules/react-native-contacts"
   react-native-fbsdk-next:
     :path: "../node_modules/react-native-fbsdk-next"
   react-native-geolocation-service:
@@ -768,9 +751,9 @@ EXTERNAL SOURCES:
   RNZipArchive:
     :path: "../node_modules/react-native-zip-archive"
   ViroKit:
-    :path: "../../viro/ios/dist/ViroRenderer/"
+    :path: "../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/"
   ViroReact:
-    :path: "../../viro/ios/"
+    :path: "../node_modules/@viro-community/react-viro/ios/"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -811,6 +794,7 @@ SPEC CHECKSUMS:
   React-logger: 3f8ebad1be1bf3299d1ab6d7f971802d7395c7ef
   react-native-blur: 69ecfe61d81b32ee7baae10f5d17aeb4e2594b10
   react-native-cameraroll: 2566fbd372c08338435a78bc04a353e0bac5fcfb
+  react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
   react-native-fbsdk-next: 9c40664b1501be29572795c2e4c8e347f39f556f
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-get-random-values: 384787fd76976f5aec9465aff6fa9e9129af1e74
@@ -846,11 +830,11 @@ SPEC CHECKSUMS:
   RNDateTimePicker: fc2e4f2795877d45e84d85659bebe627eba5c931
   RNFastImage: 8c1b576a014ab4a22769222522a1e398f888b8f8
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: 42ec7c28dd02d540ed6c9159c57a98ff016492dc
+  RNGestureHandler: d678f94a8f74de70ce3d9f5d23eb0f97b686e943
   RNGoogleSignin: fc408799f1990a12497a32f64280c0fe353ffcc1
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   RNPermissions: 7938b2a48a952a4316cfdc86df9a54485b930173
-  RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
+  RNReanimated: c112febb9548b8e0bcc5abddff308f69913c4270
   RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
   RNShare: 859ff710211285676b0bcedd156c12437ea1d564
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
@@ -864,6 +848,7 @@ SPEC CHECKSUMS:
   ViroKit: 700d3d4ca086368d06224de1cbbc19781aea2094
   ViroReact: f4980e6b04918c4340637f9cbaae22a6bb7ea440
   Yoga: d56980c8914db0b51692f55533409e844b66133c
+
 
 PODFILE CHECKSUM: 4355c6c797880484e4767a156ee845b728a73532
 

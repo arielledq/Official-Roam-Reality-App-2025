@@ -271,5 +271,68 @@ export const inviteFriendByEmail = data =>
 export const getGeoARDestinations = () =>
   Request.callAR({
     url: `modules/challenges/geo-ar-location/`,
-    method: 'GET'
+    method: "GET"
+  })
+
+export const searchUsers = payload =>
+  Request.callWithToken({
+    url: `${commonApiRoute}find-friends/`,
+    method: "GET",
+    params: payload
+  })
+
+export const sendFriendRequest = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/`,
+    method: "POST",
+    data
+  })
+
+export const getPendingFriendRequests = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/`,
+    method: "GET"
+  })
+
+export const acceptFriendRequests = userId =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/${userId}/accept_friend_request/`,
+    method: "POST"
+  })
+
+export const rejectFriendRequests = userId =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/${userId}/`,
+    method: "DELETE"
+  })
+
+export const getUserFriendList = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}account-setup/`,
+    method: "GET"
+  })
+
+export const findFriends = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}find-friends/`,
+    method: "POST",
+    data
+  })
+
+export const getUserNotificationList = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/`,
+    method: "GET"
+  })
+
+export const clearNotificationList = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/clear-all/`,
+    method: "PATCH"
+  })
+
+export const markAllNotificationAsRead = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/read-all/`,
+    method: "PATCH"
   })
