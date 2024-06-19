@@ -7,6 +7,8 @@ import 'react-native-devsettings/withAsyncStorage'
 import { LogBox, StyleSheet } from 'react-native'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import SplashScreen from 'react-native-splash-screen'
+import Geocoder from 'react-native-geocoding';
+Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 const App = () => {
   useEffect(() => {
