@@ -20,17 +20,17 @@ const Feedback = () => {
     {
       icon: Images.AppIconLight,
       text: "Our Website",
-      link: "https://www.facebook.com"
+      link: "https://www.facebook.com/RoamReality"
     },
     {
       icon: Images.Facebook,
       text: "Facebook",
-      link: "https://www.facebook.com"
+      link: "https://www.facebook.com/RoamReality"
     },
     {
       icon: Images.Instagram,
       text: "Instagram",
-      link: "https://www.instagram.com"
+      link: "https://www.instagram.com/roamreality"
     },
     {
       icon: Images.TikTok,
@@ -40,7 +40,7 @@ const Feedback = () => {
     {
       icon: Images.YouTube,
       text: "YouTube",
-      link: "https://www.youtube.com"
+      link: "https://www.youtube.com/@roamreality"
     }
   ]
 
