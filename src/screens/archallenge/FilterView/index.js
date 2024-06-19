@@ -29,7 +29,6 @@ const ARFilter = ({
   const viewShotRef = useRef();
   const [location, setLocation] = useState(null)
   const [fullLocation, setFullLocation] = useState(null)
-  console.log("ar_filters:", ar_filters)
 
   const viewComponent = () => <View style={styles.cornerStyles} />;
 
@@ -111,9 +110,9 @@ const ARFilter = ({
     if (location_option == "COUNTRY_ONLY") {
       return country;
     } else {
-      if(admin_area_2){
+      if (admin_area_2) {
         return `${city}, ${admin_area_2}, ${country}`;
-      }else{
+      } else {
         return `${city}, ${country}`;
       }
     }
@@ -141,11 +140,12 @@ const ARFilter = ({
                     {fullLocation &&
                       <View style={[styles.locationTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.locationTextTop : styles.locationTextBottom]}>
                         <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
-                        <Text style={styles.locationText}>{getLocationText(filter.location_option)}</Text>
+                        <Text style={[styles.locationText,
+                        { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
                         <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
                       </View>}
                     <View style={[styles.filterTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.filterTextTop : styles.filterTextBottom]}>
-                      <Text style={styles.bottomText}>{filter.filter_text}</Text>
+                      <Text style={[styles.bottomText, { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
                     </View>
                   </View>
                 )
@@ -154,14 +154,17 @@ const ARFilter = ({
           </PagerView>
         </BackgroundWithImage>
       </ViewShot>
+
       <View style={{
         position: 'absolute', bottom: 20, flex: 1, zIndex: 500, justifyContent: 'center', left: 0, right: 0, alignItems: 'flex-end',
-        padding: 20
+        padding: 20,justifyContent:'space-between',flexDirection:'row'
       }}>
+        <TouchableOpacity  style={{transform: [{ rotate: '180deg' }]}} onPress={()=>navigation.goBack()}>
+          <RightArrowIcon />
+        </TouchableOpacity>
         <TouchableOpacity onPress={navigateToShare}>
           <RightArrowIcon />
         </TouchableOpacity>
-
       </View>
     </View>
   )

@@ -132,6 +132,19 @@ export const getARSposored = () =>
     method: "GET"
   })
 
+export const getAllARSitesStars = (payload) =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-star/get-by-site-id/?id=${payload.id}`,
+    method: "GET"
+  })
+
+
+export const getARSitesHiddenStars = (payload) =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-star/get-hidden-stars/?id=${payload.id}`,
+    method: "GET"
+  })
+
 export const getARProfile = () =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/`,
@@ -145,9 +158,65 @@ export const postArMemory = payload =>
     data: payload
   })
 
+export const postGeoArMemory = payload =>
+  Request.multiPartCall({
+    url: `modules/challenges/memories/check-geo-challenge-create/`,
+    method: "POST",
+    data: payload
+  })
+
+export const checkGeoPinCheckInDoneAPI = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/check-in/check-in-done/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getCollectedStarCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/star-count/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getAllCollectedStars = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/site-stars/`,
+    method: "POST",
+    data: payload
+  })
+
+export const starFoundAndSaveApi = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getCheckInCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/check-in/check-in-all-count/`,
+    method: "POST",
+    data: payload
+  })
+
+export const postGeoPinCheckIn = payload =>
+  Request.multiPartCall({
+    url: `modules/challenges/check-in/`,
+    method: "POST",
+    data: payload
+  })
+
 export const checkARChallengeDoneAPI = payload =>
   Request.callWithToken({
     url: `modules/challenges/memories/check-challenge-done/`,
+    method: "POST",
+    data: payload
+  })
+
+export const checkUniqueARChallengeDoneAPI = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/memories/check-geo-challenge-done/`,
     method: "POST",
     data: payload
   })
