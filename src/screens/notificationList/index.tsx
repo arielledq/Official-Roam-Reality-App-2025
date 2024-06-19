@@ -3,7 +3,8 @@ import { View, Text, TouchableOpacity, FlatList, Pressable } from "react-native"
 import {
   clearNotificationList,
   getUserNotificationList,
-  markAllNotificationAsRead
+  markAllNotificationAsRead,
+  markNotificationAsRead
 } from "../../network"
 import BackgroundWithImage from "../../components/background"
 import { AppHeader } from "../../components"
@@ -17,23 +18,35 @@ const NotificationList: React.FC = () => {
   const _styles = useStyles()
 
   useEffect(() => {
+    getUserNotifications()
+  }, [])
+
+  const getUserNotifications = async () =>
     getUserNotificationList()
       .then(response => {
         if (response && response?.data?.length > 0) {
-          setNotifications(response.data)
+          // Show only unread notifications
+          const unreadNotifications = response.data.filter(
+            notification => !notification?.is_read
+          )
+          setNotifications(unreadNotifications)
         }
       })
       .catch(error => console.error(error))
-  }, [])
 
   const markAsRead = (notificationId: string) => {
-    setNotifications(prevNotifications =>
-      prevNotifications.map(notification =>
-        notification.id === notificationId
-          ? { ...notification, isRead: true }
-          : notification
-      )
-    )
+    const data = {
+      is_read: true
+    }
+    markNotificationAsRead(notificationId, data).then(response => {
+      if (response) {
+        console.info(response)
+        const newNotifications = notifications.filter(
+          notification => notification.id !== notificationId
+        )
+        setNotifications(newNotifications)
+      }
+    })
   }
 
   const clearAll = () => {

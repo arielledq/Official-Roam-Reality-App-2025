@@ -76,14 +76,14 @@ const MyFriends = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={renderFriendItem}
+          renderItem={({ item }) => renderFriendItem(item, _styles)}
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-const renderFriendItem = ({ item }) => {
+const renderFriendItem = (item, styles) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
@@ -95,15 +95,13 @@ const renderFriendItem = ({ item }) => {
           <FastImage
             style={localStyle.image}
             source={{ uri: item?.image }}
-            resizeMode={FastImage.resizeMode.cover}
+            resizeMode={FastImage.resizeMode.stretch}
           />
         </ImageBackground>
         <View>
-          <Text style={{ color: theme.lightColors?.magenta }}>
-            {item?.user?.name}
-          </Text>
+          <Text style={styles.title}>{item?.user?.name}</Text>
           <Text
-            style={{ color: theme.lightColors?.white }}
+            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
@@ -111,15 +109,8 @@ const renderFriendItem = ({ item }) => {
           </Text>
         </View>
       </View>
-      <Pressable
-        onPress={() => onAddFriendClick(item)}
-        style={{ marginLeft: 10 }}
-      >
-        <Icon
-          name="chevronRight"
-          type="antdesign"
-          color={theme.lightColors?.white}
-        />
+      <Pressable onPress={() => {}} style={{ marginLeft: 10 }}>
+        <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>
     </View>
   )
@@ -137,8 +128,7 @@ const localStyle = {
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: theme.lightColors?.inputBG,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingRight: 20,
     borderRadius: 10,
     marginVertical: 5,
     flex: 1
