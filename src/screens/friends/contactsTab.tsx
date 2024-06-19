@@ -125,14 +125,20 @@ const ContactsTab = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => renderContact(item, onAddFriendClick)}
+          renderItem={({ item }) =>
+            renderContact(item, onAddFriendClick, _styles)
+          }
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-const renderContact = (item: any, onAddFriendClick: (user: any) => void) => {
+const renderContact = (
+  item: any,
+  onAddFriendClick: (user: any) => void,
+  styles: any
+) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
@@ -148,9 +154,9 @@ const renderContact = (item: any, onAddFriendClick: (user: any) => void) => {
           />
         </ImageBackground>
         <View>
-          <Text style={{ color: theme.lightColors?.magenta }}>{item.name}</Text>
+          <Text style={styles.title}>{item.name}</Text>
           <Text
-            style={{ color: theme.lightColors?.white }}
+            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >

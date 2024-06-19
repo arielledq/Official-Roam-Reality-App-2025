@@ -267,3 +267,10 @@ export const markAllNotificationAsRead = () =>
     url: `${commonApiRoute}notifications/read-all/`,
     method: "PATCH"
   })
+
+export const markNotificationAsRead = (id, data) =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/${id}/`,
+    method: "PATCH",
+    data: data
+  })
