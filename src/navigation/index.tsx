@@ -41,10 +41,18 @@ import GeoArOutdoor from '../screens/geoarchallenge/outdoorgeoar';
 import ARFilter from '../screens/archallenge/FilterView';
 import Feedback from '../../screens/support-send-feedback/Feedback';
 import InviteFriends from '../screens/inviteFriends/InviteFriends';
+import GeoArSiteArrived from '../screens/geoarchallenge/arrivedsite';
+import ChallengeSelection from '../screens/geoarchallenge/challengeselection';
+import UniqueArChallenge from '../screens/geoarchallenge/uniquechallenge';
+import PinChallenge from '../screens/geoarchallenge/pinchallenge';
+import StarChallenge from '../screens/geoarchallenge/starchallenge';
+import ArPinChallengeShare from '../screens/geoarchallenge/locationpinshare';
+import GeoUniqueArChallengeDetails from '../screens/geoarchallenge/geouniquechallengedetails';
+import UniqueArChallengeCapture from '../screens/geoarchallenge/uniquechallengecapture';
+import UniqueArChallengeShare from '../screens/geoarchallenge/uniquechallengeshare';
 import Friends from '../screens/friends';
 import AddFriendScreen from '../screens/friends/addFriend';
 import NotificationList from '../screens/notificationList';
-
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -111,6 +119,15 @@ const Navigation = () => {
         <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
         <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
         <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
+        <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
+        <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
+        <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
+        <Stack.Screen name="PinChallenge" component={PinChallenge} />
+        <Stack.Screen name="StarChallenge" component={StarChallenge} />
+        <Stack.Screen name="ArPinChallengeShare" component={ArPinChallengeShare} />
+        <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
+        <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
+        <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
