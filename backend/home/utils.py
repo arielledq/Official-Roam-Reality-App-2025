@@ -91,6 +91,13 @@ class SendgridClient(object):
     def send_email(self, email, message, subject):
         if email:
             subject = subject
+            html_content = render_to_string(
+                'invite_email.html',
+                {
+                    'message': message,
+                },
+            )
+            message = strip_tags(html_content)
             email_obj = EmailMessage(
                 subject=subject, body=message, to=[email]
             )
