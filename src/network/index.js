@@ -1,5 +1,5 @@
-import { Request } from './request'
-import { commonApiRoute } from './config'
+import { Request } from "./request"
+import { commonApiRoute } from "./config"
 
 /**
  * Login APIS
@@ -8,84 +8,84 @@ import { commonApiRoute } from './config'
 export const login = data =>
   Request.call({
     url: `${commonApiRoute}login/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 export const logout = data =>
   Request.callWithToken({
     url: `${commonApiRoute}logout/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 export const signUp = data =>
   Request.call({
     url: `${commonApiRoute}signup/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 export const sendCode = data =>
   Request.call({
     url: `${commonApiRoute}send-email-otp/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 export const confirmCode = data =>
   Request.call({
     url: `${commonApiRoute}confirm-email-otp/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 export const changePassword = data =>
   Request.callWithToken({
     url: `${commonApiRoute}change-password/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 
 export const terms = () =>
   Request.call({
     url: `${commonApiRoute}content/terms/`,
-    method: 'GET'
+    method: "GET"
   })
 
 export const saveProfile = payload =>
   Request.callWithToken({
     url: `${commonApiRoute}profile/${payload.id}/`,
-    method: 'PATCH',
+    method: "PATCH",
     data: payload.data
   })
 
 export const deleteAccount = () =>
   Request.callWithToken({
     url: `${commonApiRoute}delete-account/`,
-    method: 'DELETE'
+    method: "DELETE"
   })
 
 export const confirmEmailOtp = data =>
   Request.call({
     url: `${commonApiRoute}confirm-email-otp/token/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 
 export const resetPassword = data =>
   Request.call({
     url: `${commonApiRoute}reset-password/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 
 export const contactUs = data =>
   Request.callWithToken({
     url: `${commonApiRoute}contact-us/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 
 export const googleLogin = data => {
   return Request.call({
     url: `modules/social-auth/google/login/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 }
@@ -93,7 +93,7 @@ export const googleLogin = data => {
 export const appleLogin = data => {
   return Request.call({
     url: `modules/social-auth/apple/login/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 }
@@ -101,7 +101,7 @@ export const appleLogin = data => {
 export const fbLogin = data => {
   return Request.call({
     url: `modules/social-auth/facebook/login/`,
-    method: 'POST',
+    method: "POST",
     data
   })
 }
@@ -109,79 +109,230 @@ export const fbLogin = data => {
 export const getProfieDetails = payload =>
   Request.callWithToken({
     url: `${commonApiRoute}account-setup/${payload.id}/`,
-    method: 'GET',
+    method: "GET",
     payload
   })
 
 export const updateProfile = payload =>
   Request.multiPartCall({
     url: `${commonApiRoute}account-setup/${payload.id}/`,
-    method: 'PATCH',
+    method: "PATCH",
     data: payload.data
   })
 
 export const getARChallenges = () =>
   Request.callAR({
     url: `modules/challenges/user/`,
-    method: 'GET'
+    method: "GET"
   })
 
 export const getARSposored = () =>
   Request.callAR({
     url: `modules/challenges/sponsor/`,
-    method: 'GET'
+    method: "GET"
+  })
+
+export const getAllARSitesStars = (payload) =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-star/get-by-site-id/?id=${payload.id}`,
+    method: "GET"
+  })
+
+
+export const getARSitesHiddenStars = (payload) =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-star/get-hidden-stars/?id=${payload.id}`,
+    method: "GET"
   })
 
 export const getARProfile = () =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/`,
-    method: 'GET'
+    method: "GET"
   })
 
-export const postArMemory = (payload) =>
+export const postArMemory = payload =>
   Request.multiPartCall({
     url: `modules/challenges/memories/`,
-    method: 'POST',
+    method: "POST",
     data: payload
   })
 
-export const checkARChallengeDoneAPI = (payload) =>
+export const postGeoArMemory = payload =>
+  Request.multiPartCall({
+    url: `modules/challenges/memories/check-geo-challenge-create/`,
+    method: "POST",
+    data: payload
+  })
+
+export const checkGeoPinCheckInDoneAPI = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/check-in/check-in-done/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getCollectedStarCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/star-count/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getAllCollectedStars = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/site-stars/`,
+    method: "POST",
+    data: payload
+  })
+
+export const starFoundAndSaveApi = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getCheckInCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/check-in/check-in-all-count/`,
+    method: "POST",
+    data: payload
+  })
+
+export const postGeoPinCheckIn = payload =>
+  Request.multiPartCall({
+    url: `modules/challenges/check-in/`,
+    method: "POST",
+    data: payload
+  })
+
+export const checkARChallengeDoneAPI = payload =>
   Request.callWithToken({
     url: `modules/challenges/memories/check-challenge-done/`,
-    method: 'POST',
+    method: "POST",
+    data: payload
+  })
+
+export const checkUniqueARChallengeDoneAPI = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/memories/check-geo-challenge-done/`,
+    method: "POST",
     data: payload
   })
 
 export const getProfieARMemoriesAPI = () =>
   Request.callWithToken({
     url: `modules/challenges/memories/`,
-    method: 'GET'
+    method: "GET"
   })
 
-export const socialPointsARUpdateAPI = (payload) =>
+export const socialPointsARUpdateAPI = payload =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/update-ar-social-points/`,
-    method: 'POST',
+    method: "POST",
     data: payload
   })
 
 export const getPrivacyPolicy = payload =>
   Request.callWithToken({
     url: `/modules/privacy-policy/`,
-    method: 'GET',
+    method: "GET",
     payload
   })
 
 export const getTermsAndConditions = payload =>
   Request.callWithToken({
     url: `/modules/terms-and-conditions/`,
-    method: 'GET',
+    method: "GET",
     payload
   })
-
 
 export const getARStettings = () =>
   Request.callWithToken({
     url: `/modules/challenges/settings/`,
-    method: 'GET'
+    method: "GET"
+  })
+
+export const sendFeedback = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}contact-us/`,
+    method: "POST",
+    data
+  })
+
+export const inviteFriendByEmail = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}invite-friend/`,
+    method: "POST",
+    data
+  })
+
+export const getGeoARDestinations = () =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-location/`,
+    method: "GET"
+  })
+
+export const searchUsers = payload =>
+  Request.callWithToken({
+    url: `${commonApiRoute}find-friends/`,
+    method: "GET",
+    params: payload
+  })
+
+export const sendFriendRequest = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/`,
+    method: "POST",
+    data
+  })
+
+export const getPendingFriendRequests = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/`,
+    method: "GET"
+  })
+
+export const acceptFriendRequests = userId =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/${userId}/accept_friend_request/`,
+    method: "POST"
+  })
+
+export const rejectFriendRequests = userId =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/${userId}/`,
+    method: "DELETE"
+  })
+
+export const getUserFriendList = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}account-setup/`,
+    method: "GET"
+  })
+
+export const findFriends = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}find-friends/`,
+    method: "POST",
+    data
+  })
+
+export const getUserNotificationList = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/`,
+    method: "GET"
+  })
+
+export const clearNotificationList = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/clear-all/`,
+    method: "PATCH"
+  })
+
+export const markAllNotificationAsRead = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}notifications/read-all/`,
+    method: "PATCH"
   })

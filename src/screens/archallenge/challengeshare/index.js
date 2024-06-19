@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Alert, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Dimensions, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
@@ -23,6 +23,7 @@ import { share, init, events } from 'react-native-tiktok';
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
 import DownloadImg from "../../../assets/ar/download.svg"
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { moderateScale } from "../../../util/AppDimensions";
 
 const ArChallengeShare = ({
 
@@ -42,6 +43,7 @@ const ArChallengeShare = ({
   const fileExt = filePath.split('.').pop();
   const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
+  const [imageHeight, setImageHeight] = useState(0)
   const dispatch = useDispatch()
 
   console.log("challenges", challengeObj.id)
@@ -53,6 +55,16 @@ const ArChallengeShare = ({
       console.log("Tiktok: onShareCompleted", resp)
       // response contains returned errorCode
     });
+    if (fileExt !== 'mp4') {
+      Image.getSize(captureData, (width, height) => {
+        // calculate image width and height 
+        const screenWidth = Dimensions.get('window').width - (2 * moderateScale(26))
+        const scaleFactor = width / screenWidth
+        const imageHeight = height / scaleFactor
+        setImageHeight(imageHeight)
+      })
+    }
+
   }, []);
 
   const shareBtnOnPress = () => {
@@ -286,7 +298,7 @@ const ArChallengeShare = ({
             uri: captureData
           }} />
             :
-            <Image resizeMode={"cover"} source={{ uri: captureData }} style={{ width: '100%', flex: 1 }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', flex: 1, height: imageHeight }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
