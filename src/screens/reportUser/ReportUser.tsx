@@ -2,6 +2,8 @@ import React from "react"
 import { View, Modal, Text, TouchableOpacity } from "react-native"
 import { SvgXml } from "react-native-svg"
 import { Icons } from "../../assets/Icons"
+import ReactNativeModal from "react-native-modal"
+import theme from "../../assets/theme"
 
 interface ReportUserModalProps {
   isVisible: boolean;
@@ -15,7 +17,7 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
   onReportUser
 }) => {
   return (
-    <Modal visible={isVisible} animationType="slide" transparent>
+    <ReactNativeModal isVisible={isVisible} onDismiss={onClose}>
       <View style={styles.container}>
         <View style={styles.modal}>
           <View
@@ -26,7 +28,7 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
             }}
           >
             <Text style={styles.title}>Report/Flag (Content or User)</Text>
-            <SvgXml xml={Icons.close} />
+            <SvgXml xml={Icons.closeModal} />
           </View>
           <View style={styles.buttonContainer}>
             <TouchableOpacity
@@ -38,7 +40,7 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
           </View>
         </View>
       </View>
-    </Modal>
+    </ReactNativeModal>
   )
 }
 
@@ -46,11 +48,10 @@ const styles = {
   container: {
     flex: 1,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)"
+    alignItems: "center"
   },
   modal: {
-    backgroundColor: "white",
+    backgroundColor: theme.lightColors?.inputBlue,
     borderRadius: 8,
     padding: 16,
     width: "80%"

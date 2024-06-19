@@ -18,7 +18,7 @@ import { removeItem } from "../../util/helpers"
 const DrawerList = [
   { icon: 'target', label: 'AR Challenges', navigateTo: 'Home' },
   { icon: "message-square", label: "Chats", navigateTo: "Home" },
-  { icon: "users", label: "Friends", navigateTo: "Home" },
+  { icon: "users", label: "Friends", navigateTo: "Friends" },
   { icon: "Wallet", label: "Wallet", navigateTo: "Home" },
   { icon: "info", label: "About Us", navigateTo: "Home" },
   { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },

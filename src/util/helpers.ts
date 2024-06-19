@@ -1,5 +1,5 @@
 import { Alert } from "react-native"
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage"
 
 export const handleError = (res) => {
   let message = ''
@@ -16,6 +16,17 @@ export const handleError = (res) => {
 
 export const getImage = (image) => {
   return image.split('?X-Amz-Algorithm=')[0]
+    message =
+      res?.message?.message || Array.isArray(res.message[key])
+        ? res.message[key][0]
+        : res.message[key]
+  }
+  console.log({ message })
+  Alert.alert("Error", message)
+}
+
+export const getImage = image => {
+  return image.split("?X-Amz-Algorithm=")[0]
 }
 
 export const setItem = async (key: string, value: string) => {
@@ -48,6 +59,7 @@ export const removeItem = async (key: string) => {
 export const convertKilometersToMiles = (kilometers: any) => {
   return kilometers * 0.621371;
 }
+export const DEBOUNCE_TIME = 1000
 
 export const isPointInPolygon = (latitude: Number, longitude: Number, polygon: []) => {
   if (typeof latitude !== 'number' || typeof longitude !== 'number') {
@@ -71,3 +83,28 @@ export const isPointInPolygon = (latitude: Number, longitude: Number, polygon: [
   }
   return inside
 };
+    await AsyncStorage.setItem(key, value)
+  } catch (e) {
+    console.log("error", e)
+  }
+}
+
+export const getItem = async (key: string) => {
+  try {
+    const value = await AsyncStorage.getItem(key)
+    if (value !== null) {
+      return value
+    }
+  } catch (e) {
+    console.log("error", e)
+  }
+}
+
+export const removeItem = async (key: string) => {
+  try {
+    await AsyncStorage.removeItem(key)
+  } catch (e) {
+    console.log("error", e)
+  }
+}
+

@@ -56,6 +56,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
     inviteFriendByEmail(data)
       .then(response => {
         setLoading(false)
+        Keyboard.dismiss()
         if (response.status === 1) {
           resetForm() // Reset form after successful submission
           Alert.alert("Invite", "An invite has been sent to your friend")
