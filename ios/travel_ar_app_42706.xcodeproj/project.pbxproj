@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* travel_ar_app_42706Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */; };
 		02AFF9238C5F465996CE62FB /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */; };
-		04D28A4BCB4B39F333169F14 /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DB235A84D2ECA9D1131EFCA8 /* libPods-travel_ar_app_42706.a */; };
 		0FD2C6B450084C2ABA964DAB /* sf-ui-display-light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
@@ -23,7 +22,6 @@
 		7241EFA2F08C408BA847C61D /* sf-ui-display-bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */; };
 		732EB55F52334EFD9593556C /* sf-ui-display-regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */; };
 		733259CF4D604031AF68F7DF /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */; };
-		756C5B77F40475345FB44BA4 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = F6C846AB7C46D2B03D00FB6B /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
 		76EE719B016D4CCDAF7A5327 /* NunitoSans_10pt-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */; };
 		78A5E58FE1EA4917A8853C38 /* NunitoSans_10pt-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */; };
 		7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */; };
@@ -31,6 +29,7 @@
 		7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8203743F5590401D93CFBA74 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */; };
+		8BD0DA913D325AFF04175913 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
 		8BF9013D26454852A8AAC264 /* sf-ui-display-ultralight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */; };
 		8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */; };
 		8EB858A8C16C48D09686094D /* NunitoSans_10pt-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = B399D590B2C9401AA9C9817E /* NunitoSans_10pt-Bold.ttf */; };
@@ -54,6 +53,7 @@
 		9CA9F538379E4FD29F9EC5EC /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */; };
 		AA6AFD4BD2404146A54A90D6 /* NunitoSans_10pt-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 70B7CB0E017E451EAB220EA0 /* NunitoSans_10pt-ExtraBold.ttf */; };
 		B45D634D2BC0480EBFA69C7D /* sf-ui-display-thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3020C3A053944525B096A961 /* sf-ui-display-thin.otf */; };
+		B87483F64C2A25E47A261435 /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E15B440137DBEE8140A37FC5 /* libPods-travel_ar_app_42706.a */; };
 		C62A697E5B374603A68AAC5A /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */; };
 		CA66786B9F934F798246E280 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */; };
 		D0BE067D5A634F1EAB11156D /* NunitoSans_10pt-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */; };
@@ -77,7 +77,6 @@
 		00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = travel_ar_app_42706Tests.m; sourceTree = "<group>"; };
 		035E791890C347CAA200494B /* sf-ui-display-heavy.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-heavy.otf"; path = "../src/assets/fonts/sf-ui-display-heavy.otf"; sourceTree = "<group>"; };
 		05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-medium.otf"; path = "../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
-		087CE41A7CD96F56AB877B72 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Roam Reality.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Roam Reality.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = travel_ar_app_42706/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = travel_ar_app_42706/AppDelegate.mm; sourceTree = "<group>"; };
@@ -85,18 +84,20 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = travel_ar_app_42706/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = travel_ar_app_42706/main.m; sourceTree = "<group>"; };
 		162B40CDEEE145B3BC91B877 /* NunitoSans_10pt-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-ExtraLight.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-ExtraLight.ttf"; sourceTree = "<group>"; };
-		1D9F9BDEE32E07ECBF5A3AAD /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../src/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-light.otf"; path = "../src/assets/fonts/sf-ui-display-light.otf"; sourceTree = "<group>"; };
 		27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-regular.ttf"; path = "../src/assets/fonts/sf-ui-display-regular.ttf"; sourceTree = "<group>"; };
 		2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../src/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
 		2FE0364303ED43E4A1DBF5A9 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../src/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		3020C3A053944525B096A961 /* sf-ui-display-thin.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-thin.otf"; path = "../src/assets/fonts/sf-ui-display-thin.otf"; sourceTree = "<group>"; };
+		3718B6537A6B4657B0B19CB0 /* Pods-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706Tests/Pods-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
+		455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-ultralight.otf"; path = "../src/assets/fonts/sf-ui-display-ultralight.otf"; sourceTree = "<group>"; };
-		47DD6D860A5CD1DC64279B54 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
+		4B285C4AB2C689259B681A55 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
 		4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Black.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Black.ttf"; sourceTree = "<group>"; };
 		5217457F90794339A2E07132 /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../src/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
 		5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-bold.otf"; path = "../src/assets/fonts/sf-ui-display-bold.otf"; sourceTree = "<group>"; };
+		5B7EB9410499542E8C5724F5 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Light.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Light.ttf"; sourceTree = "<group>"; };
 		67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Thin.ttf"; path = "../src/assets/fonts/Poppins-Thin.ttf"; sourceTree = "<group>"; };
 		69828AF7D549444A9FB96C62 /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
@@ -108,6 +109,7 @@
 		7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-medium.otf"; path = "../../../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
+		89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
 		8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
 		90EF26452B5039E300872709 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
@@ -128,15 +130,15 @@
 		90EF26542B5039E300872709 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
 		A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../src/assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
 		A53F223FE2914D979DB076EB /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
+		A7086CB91B0E463608DBCCAC /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../src/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Medium.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Medium.ttf"; sourceTree = "<group>"; };
 		B399D590B2C9401AA9C9817E /* NunitoSans_10pt-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Bold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Bold.ttf"; sourceTree = "<group>"; };
+		BFCB5B4D3BDD6363B6AAAF80 /* Pods-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706Tests/Pods-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		C819029DAEAC4167BAC89AB3 /* sf-ui-display-semibold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-semibold.otf"; path = "../src/assets/fonts/sf-ui-display-semibold.otf"; sourceTree = "<group>"; };
-		CBD28A976F5662E11415A419 /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Regular.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Regular.ttf"; sourceTree = "<group>"; };
-		DB235A84D2ECA9D1131EFCA8 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E15B440137DBEE8140A37FC5 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F6C846AB7C46D2B03D00FB6B /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -144,7 +146,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				756C5B77F40475345FB44BA4 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
+				8BD0DA913D325AFF04175913 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,7 +154,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				04D28A4BCB4B39F333169F14 /* libPods-travel_ar_app_42706.a in Frameworks */,
+				B87483F64C2A25E47A261435 /* libPods-travel_ar_app_42706.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -197,8 +199,8 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				DB235A84D2ECA9D1131EFCA8 /* libPods-travel_ar_app_42706.a */,
-				F6C846AB7C46D2B03D00FB6B /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
+				E15B440137DBEE8140A37FC5 /* libPods-travel_ar_app_42706.a */,
+				455E65EB2D5764CF5229BB85 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -306,10 +308,12 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				CBD28A976F5662E11415A419 /* Pods-travel_ar_app_42706.debug.xcconfig */,
-				087CE41A7CD96F56AB877B72 /* Pods-travel_ar_app_42706.release.xcconfig */,
-				1D9F9BDEE32E07ECBF5A3AAD /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
-				47DD6D860A5CD1DC64279B54 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
+				5B7EB9410499542E8C5724F5 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
+				89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
+				A7086CB91B0E463608DBCCAC /* Pods-travel_ar_app_42706.debug.xcconfig */,
+				4B285C4AB2C689259B681A55 /* Pods-travel_ar_app_42706.release.xcconfig */,
+				BFCB5B4D3BDD6363B6AAAF80 /* Pods-travel_ar_app_42706Tests.debug.xcconfig */,
+				3718B6537A6B4657B0B19CB0 /* Pods-travel_ar_app_42706Tests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -321,12 +325,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "travel_ar_app_42706Tests" */;
 			buildPhases = (
-				68F05B813FC62978E95B47F1 /* [CP] Check Pods Manifest.lock */,
+				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				1083E5D62E9525D0F14434DE /* [CP] Embed Pods Frameworks */,
-				01CCB61B53EBB54F925D9338 /* [CP] Copy Pods Resources */,
+				11C253D45E9C48196A1E069D /* [CP] Embed Pods Frameworks */,
+				7F645AFE203E3514B5B8EFD5 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -342,14 +346,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "travel_ar_app_42706" */;
 			buildPhases = (
-				FB4EEF9C74573AB1974F82F9 /* [CP] Check Pods Manifest.lock */,
+				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				8E1BBD241C24E64C55FDF494 /* [CP] Embed Pods Frameworks */,
-				88570A2D6D81830B05DF9C07 /* [CP] Copy Pods Resources */,
+				2A1E3B0C213B6832A6E62503 /* [CP] Embed Pods Frameworks */,
+				DAF4F6F4FE392B7B5E7FFED3 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -477,24 +481,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		01CCB61B53EBB54F925D9338 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		1083E5D62E9525D0F14434DE /* [CP] Embed Pods Frameworks */ = {
+		11C253D45E9C48196A1E069D /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -511,7 +498,41 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		68F05B813FC62978E95B47F1 /* [CP] Check Pods Manifest.lock */ = {
+		2A1E3B0C213B6832A6E62503 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7F645AFE203E3514B5B8EFD5 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -533,41 +554,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		88570A2D6D81830B05DF9C07 /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		8E1BBD241C24E64C55FDF494 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		FB4EEF9C74573AB1974F82F9 /* [CP] Check Pods Manifest.lock */ = {
+		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -587,6 +574,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		DAF4F6F4FE392B7B5E7FFED3 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -641,7 +645,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1D9F9BDEE32E07ECBF5A3AAD /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */;
+			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -668,7 +672,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 47DD6D860A5CD1DC64279B54 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */;
+			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -692,7 +696,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = CBD28A976F5662E11415A419 /* Pods-travel_ar_app_42706.debug.xcconfig */;
+			baseConfigurationReference = A7086CB91B0E463608DBCCAC /* Pods-travel_ar_app_42706.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -702,7 +706,6 @@
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
-				EXCLUDED_ARCHS = arm64;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
@@ -728,7 +731,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 087CE41A7CD96F56AB877B72 /* Pods-travel_ar_app_42706.release.xcconfig */;
+			baseConfigurationReference = 4B285C4AB2C689259B681A55 /* Pods-travel_ar_app_42706.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -737,7 +740,6 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 2;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
-				EXCLUDED_ARCHS = arm64;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";

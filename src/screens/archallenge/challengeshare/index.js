@@ -43,7 +43,7 @@ const ArChallengeShare = ({
   const fileExt = filePath.split('.').pop();
   const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
-  const [imageHeight, setImageHeight] = useState(false)
+  const [imageHeight, setImageHeight] = useState(0)
   const dispatch = useDispatch()
 
   console.log("challenges", challengeObj.id)

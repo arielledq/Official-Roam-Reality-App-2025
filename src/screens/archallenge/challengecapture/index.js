@@ -49,7 +49,7 @@ const ArChallengeCapture = ({
 
 
   const navigateToShare = (captureData, ifImage) => {
-    if (ifImage) {
+    if (ifImage && route?.params?.challengeObj?.ar_filters.length > 0) {
       navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
     } else {
       navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
@@ -149,7 +149,7 @@ const ArChallengeCapture = ({
         });
     }
     useEffect(() => {
-      if (challengeObj.challenge_choice == "DANCE") {
+      if (challengeObj.challenge_choice == "DANCE" && route?.params?.challengeObj?.ar_filters.length == 0) {
         setLoading(true)
         checkIfModelExist()
       }
@@ -179,7 +179,7 @@ const ArChallengeCapture = ({
 
     const _onPinch = (pinchState, scaleFactor, source) => {
       console.log("_onPinch scaleFactor", scaleFactor)
-      if ((scale[0] * scaleFactor) < 0.05) {
+      if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
       let newScale = [
@@ -250,11 +250,11 @@ const ArChallengeCapture = ({
           />
         }
 
-        {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
+        {challengeObj.challenge_choice == "SPONSORED" && route?.params?.challengeObj?.ar_filters.length == 0 && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
-          onDrag={_onDrag}
+          onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
           source={{ uri: challengeObj.image }}
           position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
           challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,

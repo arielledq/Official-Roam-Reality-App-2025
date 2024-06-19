@@ -1,35 +1,21 @@
 import React, { useEffect, useState } from "react"
 
-import {
-  ActivityIndicator,
-  FlatList,
-  Image,
-  ImageBackground,
-  Keyboard,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native"
+
+import { ActivityIndicator, FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
 import { handleError } from "../../util/helpers"
-import {
-  getGeoARDestinations,
-  getARProfile,
-  getARStettings
-} from "../../network"
+import { getGeoARDestinations, getARProfile, getARStettings, getARChallenges } from '../../network'
+
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import { DrawerActions, useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../assets/geoar/starsite.svg"
-import GradientDown from "../../assets/geoar/gradient_down.svg"
 import GradientDownPNG from "../../assets/geoar/gradient_down.png"
 import BellIcon from "../../assets/geoar/bell.svg"
-import LocationIcon from "../../assets/geoar/location.png"
-import BackImg from "../../assets/geoar/back_img.png"
 import ArIcon from "../../assets/geoar/aricon.svg"
-import { updateARUserData, updateARSettings } from "../../redux/AR"
+import { updateARUserData, updateARSettings, updateSelectedDestination, updateAnyWhereChallenges } from "../../redux/AR"
 
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import useStyles from "./styles"
 import LinearGradient from "react-native-linear-gradient"
 import { height, width } from "../../util/AppDimensions"
@@ -40,23 +26,21 @@ const GeoArChallenge = ({}) => {
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
+  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
   const navigation = useNavigation()
 
   const ARSposored = () => {
     setIsLoading(true)
-    getGeoARDestinations()
-      .then(res => {
-        console.log(res.data)
-        if (res.status == 1) {
-          setDestinationData(res.data)
-        } else {
-          res.message.message = "Error in loading Challenges."
-          handleError(res)
-        }
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
+    getGeoARDestinations().then((res) => {
+      if (res.status == 1) {
+        setDestinationData(res.data)
+      } else {
+        res.message.message = "Error in loading Challenges."
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
   }
 
   const ARUserProfile = () => {
@@ -92,10 +76,22 @@ const GeoArChallenge = ({}) => {
     ARSposored()
     ARUserProfile()
     getSettings()
-  }, [])
+    getARChallenges().then((res) => {
+      if (res.status == 1) {
+        setNumberOfChallenges(res?.data?.length)
+        dispatch(updateAnyWhereChallenges(res?.data))
+      } else {
+        res.message.message = "Error in loading Challenges."
+        handleError(res)
+      }
+    }).finally(() => {
+      setIsLoading(false)
+    })
+  }, []);
 
-  const navigateToChallengeDetails = obj => {
-    navigation.navigate("GeoArOutdoor", { challengeObj: obj })
+  const navigateToChallengeDetails = (obj) => {
+    dispatch(updateSelectedDestination(obj))
+    navigation.navigate("GeoArOutdoor", { challengeObj: obj });
   }
 
   const Item = ({ obj }) => (
@@ -154,7 +150,7 @@ const GeoArChallenge = ({}) => {
             </View>
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>64+</Text>
+              <Text style={_styles.s_list_count}>{numberOfChallenges}</Text>
               <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
           </View>

@@ -10,6 +10,7 @@
 #import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
 #import "RNSplashScreen.h" 
 #import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
+#import "GoogleMaps/GoogleMaps.h"
 
 @implementation AppDelegate
 
@@ -56,6 +57,7 @@
   //[RNSplashScreen show]; // Add RNSplashScreen show method call here
   [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
 
+  [GMSServices provideAPIKey:@"AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA"];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
