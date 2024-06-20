@@ -1,9 +1,21 @@
 import React, { useEffect, useState } from "react"
 
-
-import { ActivityIndicator, FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  FlatList,
+  Image,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { handleError } from "../../util/helpers"
-import { getGeoARDestinations, getARProfile, getARStettings, getARChallenges } from '../../network'
+import {
+  getGeoARDestinations,
+  getARProfile,
+  getARStettings,
+  getARChallenges
+} from "../../network"
 
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
@@ -13,7 +25,12 @@ import StarSiteIcon from "../../assets/geoar/starsite.svg"
 import GradientDownPNG from "../../assets/geoar/gradient_down.png"
 import BellIcon from "../../assets/geoar/bell.svg"
 import ArIcon from "../../assets/geoar/aricon.svg"
-import { updateARUserData, updateARSettings, updateSelectedDestination, updateAnyWhereChallenges } from "../../redux/AR"
+import {
+  updateARUserData,
+  updateARSettings,
+  updateSelectedDestination,
+  updateAnyWhereChallenges
+} from "../../redux/AR"
 
 import { useDispatch } from "react-redux"
 import useStyles from "./styles"
@@ -31,16 +48,18 @@ const GeoArChallenge = ({}) => {
 
   const ARSposored = () => {
     setIsLoading(true)
-    getGeoARDestinations().then((res) => {
-      if (res.status == 1) {
-        setDestinationData(res.data)
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
-    })
+    getGeoARDestinations()
+      .then(res => {
+        if (res.status == 1) {
+          setDestinationData(res.data)
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const ARUserProfile = () => {
@@ -76,22 +95,24 @@ const GeoArChallenge = ({}) => {
     ARSposored()
     ARUserProfile()
     getSettings()
-    getARChallenges().then((res) => {
-      if (res.status == 1) {
-        setNumberOfChallenges(res?.data?.length)
-        dispatch(updateAnyWhereChallenges(res?.data))
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }, []);
+    getARChallenges()
+      .then(res => {
+        if (res.status == 1) {
+          setNumberOfChallenges(res?.data?.length)
+          dispatch(updateAnyWhereChallenges(res?.data))
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }, [])
 
-  const navigateToChallengeDetails = (obj) => {
+  const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj))
-    navigation.navigate("GeoArOutdoor", { challengeObj: obj });
+    navigation.navigate("GeoArOutdoor", { challengeObj: obj })
   }
 
   const Item = ({ obj }) => (
@@ -172,7 +193,9 @@ const GeoArChallenge = ({}) => {
   const MenuRightComponent = () => {
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate("Notifications")}
+        onPress={() => {
+          // navigation.navigate("Notifications")
+        }}
         style={{ paddingRight: 5 }}
       >
         <BellIcon />

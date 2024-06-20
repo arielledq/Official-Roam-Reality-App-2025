@@ -33,7 +33,6 @@ const PendingRequests = () => {
   const getPendingRequests = () => {
     getPendingFriendRequests()
       .then(response => {
-        console.info(response)
         if (response) {
           setPendingRequests(response?.data)
         }
@@ -44,9 +43,11 @@ const PendingRequests = () => {
   const onAccept = (user: any) => {
     acceptFriendRequests(user.id)
       .then(response => {
-        Alert.alert("Requests", "You are now friends", [
-          { text: "OK", onPress: () => getPendingRequests() }
-        ])
+        if (response && response?.status === 1) {
+          Alert.alert("Requests", "You are now friends", [
+            { text: "OK", onPress: () => getPendingRequests() }
+          ])
+        }
       })
       .catch(error => {
         Alert.alert("Error", "Something went wrong")
@@ -54,10 +55,8 @@ const PendingRequests = () => {
   }
 
   const onReject = (request: any) => {
-    console.info(request)
     rejectFriendRequests(request.id)
       .then(response => {
-        console.log("rea", response)
         if (response && response?.status === 1) {
           Alert.alert("Requests", "Request has been rejected", [
             { text: "OK", onPress: () => getPendingRequests() }
