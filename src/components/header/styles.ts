@@ -11,6 +11,7 @@ const useStyles = makeStyles((theme) => ({
   },
   containerStyle: {
     borderBottomWidth: 0,
+    alignItems:'center'
   },
   backIcon: { paddingHorizontal: 5 },
 }));

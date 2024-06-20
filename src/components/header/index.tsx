@@ -38,6 +38,7 @@ const AppHeader: FC<AppHeaderProps> = (props) => {
         style: [styles.heading, props?.titleStyle ?? {}],
         onPress: () => onTitlePress(),
       }}
+      rightComponent={props?.rightComponent ? props?.rightComponent : <></> }
       backgroundColor={theme.darkColors?.inputBG}
       containerStyle={styles.containerStyle}
       {...props}
