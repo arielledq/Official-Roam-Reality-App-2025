@@ -55,7 +55,7 @@ class ARMemoriesViewSet(ViewSet):
 
     @action(detail=False, methods=['get'],url_path='public', name='public Memories')
     def public(self, request, *args, **kwargs):
-        objs = self.queryset.filter(user = request.data.get("user_id",""))
+        objs = self.queryset.filter(user = request.GET.get("user_id"))
         serializer = ARMemoriesSerializerGet(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
@@ -153,7 +153,7 @@ class ARProfileViewSet(ViewSet):
 
     @action(detail=False, methods=['get'], url_path='public', name='AR Public')
     def public(self, request):
-        obj, created = ARUserProfile.objects.get_or_create(user=request.data.get("user_id",""))
+        obj, created = ARUserProfile.objects.get_or_create(user=request.GET.get("user_id"))
         serializer = ARUserProfileSerializer(obj)
         return Response(serializer.data)
 
