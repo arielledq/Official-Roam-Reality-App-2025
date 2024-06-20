@@ -21,13 +21,12 @@ import BoxStatContainer from "../../components/boxStatContainer"
 import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import LinearGradient from "react-native-linear-gradient"
-import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
+import { getPublicARProfile, getPublicProfieARMemoriesAPI, sendCode } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
 import { height } from "../../util/AppDimensions"
 import ScreenLoader from "../../components/screenLoader"
-import { updateARUserData } from "../../redux/AR"
 import { BlurView } from "@react-native-community/blur";
 import UserReportCard from "../../components/userInfoCard"
 
@@ -39,26 +38,22 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
   const userProfile = route?.params?.userData;
   const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
-  const arProfile = useSelector(state => state.ar?.arProfile)
+  const [arProfile, updateARUserData] = useState({})
   const [isTransitioning, setIsTransitioning] = useState(true)
 
-  console.log("userProfile:", userProfile)
-  console.log("userProfile: user", userProfile?.user)
-  console.log("userProfile: userProfile?.user.image", userProfile?.image)
-
   const fetchARUserProfile = () => {
-    getARProfile().then((res) => {
+    getPublicARProfile(userProfile.user.id).then((res) => {
+      console.log("getPublicARProfile",res)
       if (res.status == 1) {
-        dispatch(updateARUserData(res))
+        updateARUserData(res)
       }
     }).finally(() => {
     })
   }
 
-
   const getProfieARMemories = async () => {
     try {
-      getProfieARMemoriesAPI().then(res => {
+      getPublicProfieARMemoriesAPI(userProfile.user.id).then(res => {
         if (res.status == 1) {
           setARMemories(res.data)
         } else {
@@ -100,11 +95,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
   for (let i = 0; i < data.length; i += 3) {
     rows.push(data.slice(i, i + 3))
   }
-  const navigateToVerifyMail = email => {
-    sendCode({ email: email.toLowerCase() })
-    setIsTransitioning(true)
-    navigation.navigate('EmailVerificationC', { email: email.toLowerCase(), profile: true })
-  }
+
   const renderHeader = () => (
     <KeyboardAwareScrollView
       style={_styles.header}
