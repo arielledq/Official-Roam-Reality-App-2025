@@ -336,3 +336,9 @@ export const markAllNotificationAsRead = () =>
     url: `${commonApiRoute}notifications/read-all/`,
     method: "PATCH"
   })
+
+export const getGeoARDestinations = () =>
+  Request.callAR({
+    url: `modules/challenges/geo-ar-location/`,
+    method: 'GET'
+  })
