@@ -227,6 +227,19 @@ export const getProfieARMemoriesAPI = () =>
     method: "GET"
   })
 
+export const getPublicProfieARMemoriesAPI = (user_id) =>
+  Request.callWithToken({
+    url: `modules/challenges/memories/public/?user_id=${user_id}`,
+    method: "GET"
+  })
+
+export const getPublicARProfile = (user_id) =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/public/?user_id=${user_id}`,
+    method: "GET"
+  })
+
+
 export const socialPointsARUpdateAPI = payload =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/update-ar-social-points/`,
