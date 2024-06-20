@@ -24,11 +24,11 @@ import Images from "../../assets/images"
 
 const MyFriends = () => {
   const [searchText, setSearchText] = React.useState("")
+  const navigation = useNavigation()
   const [friendList, setFriendList] = useState([])
   const [filteredUsers, setFilteredUsers] = React.useState([])
   const _styles = useStyles()
   const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME)
-  const navigation = useNavigation()
 
   useFocusEffect(
     useCallback(() => {
@@ -55,39 +55,6 @@ const MyFriends = () => {
     onChangeText()
   }, [debounceQuery])
 
-  const renderFriendItem = (item, styles) => {
-    return (
-      <View style={localStyle.contactContainer}>
-        <View style={localStyle.contactLeftWrapper}>
-          <ImageBackground
-            source={Images.BGBlur}
-            style={localStyle.imageBG}
-            resizeMode="stretch"
-          >
-            <FastImage
-              style={localStyle.image}
-              source={{ uri: item?.image }}
-              resizeMode={FastImage.resizeMode.stretch}
-            />
-          </ImageBackground>
-          <View>
-            <Text style={styles.title}>{item?.user?.name}</Text>
-            <Text
-              style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
-              {item?.home_country}
-            </Text>
-          </View>
-        </View>
-        <Pressable onPress={() => { navigation.navigate("PublicProfile", { userData: item }) }} style={{ marginLeft: 10 }}>
-          <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
-        </Pressable>
-      </View>
-    )
-  }
-
   return (
     <KeyboardAwareScrollView
       keyboardShouldPersistTaps="always"
@@ -110,14 +77,45 @@ const MyFriends = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => renderFriendItem(item, _styles)}
+          renderItem={({ item }) => renderFriendItem(item, _styles, navigation)}
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-
+const renderFriendItem = (item, styles, navigation) => {
+  return (
+    <View style={localStyle.contactContainer}>
+      <View style={localStyle.contactLeftWrapper}>
+        <ImageBackground
+          source={Images.BGBlur}
+          style={localStyle.imageBG}
+          resizeMode="stretch"
+        >
+          <FastImage
+            style={localStyle.image}
+            source={{ uri: item?.image }}
+            resizeMode={FastImage.resizeMode.stretch}
+          />
+        </ImageBackground>
+        <View>
+          <Text style={styles.title}>{item?.user?.name}</Text>
+          <Text
+            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
+            ellipsizeMode="tail"
+            numberOfLines={1}
+          >
+            {item?.home_country}
+          </Text>
+        </View>
+      </View>
+      <Pressable onPress={() => { navigation.navigate("PublicProfile", { userData: item }) }} style={{ marginLeft: 10 }}>
+        <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
+      </Pressable>
+    </View>
+  )
+}
 
 const localStyle = {
   container: {
