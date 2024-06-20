@@ -15,7 +15,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import useStyles from "./styles"
 import theme from "../../assets/theme"
 import { Icon } from "react-native-elements"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { getUserFriendList } from "../../network"
 import FastImage from "react-native-fast-image"
 import useDebounce from "../../hooks/debounce"
@@ -28,6 +28,7 @@ const MyFriends = () => {
   const [filteredUsers, setFilteredUsers] = React.useState([])
   const _styles = useStyles()
   const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME)
+  const navigation = useNavigation()
 
   useFocusEffect(
     useCallback(() => {
@@ -53,6 +54,39 @@ const MyFriends = () => {
   React.useEffect(() => {
     onChangeText()
   }, [debounceQuery])
+
+  const renderFriendItem = (item, styles) => {
+    return (
+      <View style={localStyle.contactContainer}>
+        <View style={localStyle.contactLeftWrapper}>
+          <ImageBackground
+            source={Images.BGBlur}
+            style={localStyle.imageBG}
+            resizeMode="stretch"
+          >
+            <FastImage
+              style={localStyle.image}
+              source={{ uri: item?.image }}
+              resizeMode={FastImage.resizeMode.stretch}
+            />
+          </ImageBackground>
+          <View>
+            <Text style={styles.title}>{item?.user?.name}</Text>
+            <Text
+              style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
+              ellipsizeMode="tail"
+              numberOfLines={1}
+            >
+              {item?.home_country}
+            </Text>
+          </View>
+        </View>
+        <Pressable onPress={() => {navigation.navigate("PublicProfile")}} style={{ marginLeft: 10 }}>
+          <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
+        </Pressable>
+      </View>
+    )
+  }
 
   return (
     <KeyboardAwareScrollView
@@ -83,38 +117,7 @@ const MyFriends = () => {
   )
 }
 
-const renderFriendItem = (item, styles) => {
-  return (
-    <View style={localStyle.contactContainer}>
-      <View style={localStyle.contactLeftWrapper}>
-        <ImageBackground
-          source={Images.BGBlur}
-          style={localStyle.imageBG}
-          resizeMode="stretch"
-        >
-          <FastImage
-            style={localStyle.image}
-            source={{ uri: item?.image }}
-            resizeMode={FastImage.resizeMode.stretch}
-          />
-        </ImageBackground>
-        <View>
-          <Text style={styles.title}>{item?.user?.name}</Text>
-          <Text
-            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
-            ellipsizeMode="tail"
-            numberOfLines={1}
-          >
-            {item?.home_country}
-          </Text>
-        </View>
-      </View>
-      <Pressable onPress={() => {}} style={{ marginLeft: 10 }}>
-        <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
-      </Pressable>
-    </View>
-  )
-}
+
 
 const localStyle = {
   container: {

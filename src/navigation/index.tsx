@@ -53,6 +53,7 @@ import UniqueArChallengeShare from '../screens/geoarchallenge/uniquechallengesha
 import Friends from '../screens/friends';
 import AddFriendScreen from '../screens/friends/addFriend';
 import NotificationList from '../screens/notificationList';
+import PublicProfile from '../screens/publicProfile/profile';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -102,6 +103,7 @@ const Navigation = () => {
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
+        <Stack.Screen name="PublicProfile" component={PublicProfile} />
         <Stack.Screen name="Friends" component={Friends} />
         <Stack.Screen name="AddFriend" component={AddFriendScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
