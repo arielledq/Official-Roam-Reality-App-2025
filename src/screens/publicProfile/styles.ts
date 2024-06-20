@@ -107,7 +107,7 @@ const useStyles = makeStyles(theme => ({
   },
   removeBtnContainer: {
     width: 107,
-    backgroundColor: '#D75D50',
+    backgroundColor: theme?.colors?.inputRed,
     height: 44,
     alignItems: 'center',
     justifyContent: 'center',
