@@ -37,7 +37,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
   const _styles = useStyles()
   const dispatch = useDispatch()
   const userProfile = route?.params?.userData;
-  const [profileDetails, setProfileDetails] = useState(null)
   const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
   const arProfile = useSelector(state => state.ar?.arProfile)
@@ -46,27 +45,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
   console.log("userProfile:", userProfile)
   console.log("userProfile: user", userProfile?.user)
   console.log("userProfile: userProfile?.user.image", userProfile?.image)
-
-
-  const fetchProfileDetails = async () => {
-    try {
-      getProfieDetails({
-        id: userProfile.user_profile.id
-      }).then(res => {
-        if (res.status == 1) {
-          setProfileDetails(res)
-        } else {
-          console.error('Error', "Error fetching profile details: ")
-        }
-      }).catch(err => {
-        console.error('Error', "Error fetching profile details: ")
-      }
-      ).finally(() => setloading(false))
-
-    } catch (error) {
-      console.error('Error', "Error fetching profile details: ")
-    }
-  }
 
   const fetchARUserProfile = () => {
     getARProfile().then((res) => {
@@ -105,20 +83,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
       fetchARUserProfile()
     }, [])
   )
-
-
-  const handleMenuButton = () => {
-    return (
-      <TouchableOpacity
-        onPress={() => {
-          setIsTransitioning(true)
-          navigation.openDrawer()
-        }}
-        style={_styles.menuIcon}>
-        <MenuIcon />
-      </TouchableOpacity>
-    )
-  }
 
   const data = [
     { id: 1, value: 0, property: "Sites Visited" },
