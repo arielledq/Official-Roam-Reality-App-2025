@@ -169,8 +169,6 @@ class FriendshipRequestSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     friend_request = FriendshipRequestSerializer()
-    sender = UserSerializer()
-    receiver = UserSerializer()
     class Meta:
         model = Notification
         fields = '__all__'
