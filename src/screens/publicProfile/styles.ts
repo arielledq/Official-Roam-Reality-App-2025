@@ -91,20 +91,33 @@ const useStyles = makeStyles(theme => ({
     zIndex: 10
   },
   editButton: {
-    marginVertical:5,
+    marginVertical: 5,
     // flexDirection: "row",
     // alignItems: "center"
   },
-  container_style:{
-    paddingBottom : '50%'
+  container_style: {
+    paddingBottom: '50%'
   },
-  blurView : {
-      overflow: "hidden",
-      position:'absolute', 
-      top : 0,
-      zIndex : 10,
-      backgroundColor:'transparent'
-    },
+  blurView: {
+    overflow: "hidden",
+    position: 'absolute',
+    top: 0,
+    zIndex: 10,
+    backgroundColor: 'transparent'
+  },
+  removeBtnContainer: {
+    width: 107,
+    backgroundColor: '#D75D50',
+    height: 44,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 8
+  },
+  removeBtnText: {
+    ...fontGroup.ns900,
+    fontSize: FontSizes.S12,
+    margin: 0
+  },
 }))
 
 export default useStyles

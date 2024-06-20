@@ -53,7 +53,7 @@ import UniqueArChallengeShare from '../screens/geoarchallenge/uniquechallengesha
 import Friends from '../screens/friends';
 import AddFriendScreen from '../screens/friends/addFriend';
 import NotificationList from '../screens/notificationList';
-import PublicProfile from '../screens/publicProfile/profile';
+import PublicProfile from '../screens/publicProfile/publicprofile';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
