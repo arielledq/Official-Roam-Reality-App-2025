@@ -33,10 +33,9 @@ const MyFriends = () => {
     useCallback(() => {
       getUserFriendList()
         .then(response => {
-          console.info("friends", JSON.stringify(response))
           if (response) {
-            setFriendList(response?.data || [])
-            setFilteredUsers(response?.data || [])
+            setFriendList(response?.data[0]?.friends || [])
+            setFilteredUsers(response?.data[0]?.friends || [])
           }
         })
         .catch(error => console.error(error))
@@ -94,12 +93,16 @@ const renderFriendItem = (item, styles) => {
         >
           <FastImage
             style={localStyle.image}
-            source={{ uri: item?.image }}
+            source={
+              item?.user_profile?.image
+                ? { uri: item?.user_profile?.image }
+                : Images.ProfileImgGradient
+            }
             resizeMode={FastImage.resizeMode.stretch}
           />
         </ImageBackground>
         <View>
-          <Text style={styles.title}>{item?.user?.name}</Text>
+          <Text style={styles.title}>{item?.name}</Text>
           <Text
             style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
