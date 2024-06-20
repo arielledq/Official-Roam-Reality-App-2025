@@ -256,7 +256,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
             <Pressable style={_styles.removeBtnContainer}>
               <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
             </Pressable>}
-            leftComponent={handleMenuButton()}
           />
         </BlurView>
       </View>
