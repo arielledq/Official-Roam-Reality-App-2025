@@ -81,7 +81,7 @@ const MyFriends = () => {
             </Text>
           </View>
         </View>
-        <Pressable onPress={() => {navigation.navigate("PublicProfile")}} style={{ marginLeft: 10 }}>
+        <Pressable onPress={() => { navigation.navigate("PublicProfile", { userData: item }) }} style={{ marginLeft: 10 }}>
           <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
         </Pressable>
       </View>

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import {
   FlatList,
   Image,
+  Pressable,
   TouchableOpacity,
   View
 } from "react-native"
@@ -26,7 +27,7 @@ import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
 import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
+import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
 import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen"
 import { height, width } from "../../util/AppDimensions"
@@ -36,15 +37,20 @@ import { BlurView } from "@react-native-community/blur";
 
 const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const navigation = useNavigation()
+  const route = useRoute()
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const userProfile = useSelector(state => state.login?.data?.user)
+  const userProfile = route?.params?.userData;
   const [profileDetails, setProfileDetails] = useState(null)
   const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
   const arProfile = useSelector(state => state.ar?.arProfile)
-  const [isProfileUpdated, setIsProfileUpdated] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(true)
+
+  console.log("userProfile:",userProfile)
+  console.log("userProfile: user",userProfile?.user)
+  console.log("userProfile: userProfile?.user.image",userProfile?.image)
+  
 
   const fetchProfileDetails = async () => {
     try {
@@ -104,13 +110,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
     }, [])
   )
 
-  useEffect(() => {
-    fetchProfileDetails();
-  }, [isProfileUpdated, userProfile]);
-
-  const onProfileUpdate = () => {
-    setIsProfileUpdated(prev => !prev)
-  }
 
   const handleMenuButton = () => {
     return (
@@ -150,14 +149,14 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
     <KeyboardAwareScrollView
       style={_styles.header}
     >
-      {profileDetails?.image &&
+      {userProfile?.image &&
         <View style={_styles.avatarContainer}>
           <FastImage
             style={{
               width: '100%',
               height: height * 0.5,
             }}
-            source={{ uri: profileDetails?.image }}
+            source={{ uri: userProfile?.image }}
             resizeMode={FastImage.resizeMode.cover}
           />
           <LinearGradient
@@ -177,10 +176,10 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
       }
       <View style={_styles.scroll}>
         <UserInfoCard
-          image={profileDetails?.image ? true : false}
-          name={profileDetails?.user.name}
-          email={profileDetails?.user.email}
-          verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
+          image={userProfile?.image ? true : false}
+          name={userProfile?.user.name}
+          email={userProfile?.user.email}
+          verifyAction={() => navigateToVerifyMail(userProfile?.user.email)}
           isVerified={profileDetails?.user.user_profile.is_verified}
         />
         <View style={_styles.scoreboardContainer}>
@@ -226,7 +225,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
     </View>
   )
 
-  console.log({ profileDetails })
 
   const renderItem = ({ item }) => (
     <BoxStatContainer
@@ -253,7 +251,11 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
         <BlurView blurType="light" overlayColor='#00000050' enabled={!isTransitioning}>
           <AppHeader
             containerStyle={_styles.headerContainer}
-            title={"Profile"}
+            title={""}
+            rightComponent={
+            <Pressable style={_styles.removeBtnContainer}>
+              <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
+            </Pressable>}
             leftComponent={handleMenuButton()}
           />
         </BlurView>
