@@ -51,8 +51,13 @@ class ARMemoriesViewSet(ViewSet):
     permission_classes = [IsAuthenticated]
     queryset = ARMemories.objects.all()
     serializer_class = ARMemoriesSerializer
-        
     parser_class = (FileUploadParser,)
+
+    @action(detail=False, methods=['get'],url_path='public', name='public Memories')
+    def public(self, request, *args, **kwargs):
+        objs = self.queryset.filter(user = request.data.get("user_id",""))
+        serializer = ARMemoriesSerializerGet(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     def get(self, request, *args, **kwargs):
         objs = self.queryset.filter(user = request.user.id)
@@ -145,6 +150,12 @@ class ARProfileViewSet(ViewSet):
         profileObj.points = F('points')+SOCIAL_POINTS
         profileObj.save()
         return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='public', name='AR Public')
+    def public(self, request):
+        obj, created = ARUserProfile.objects.get_or_create(user=request.data.get("user_id",""))
+        serializer = ARUserProfileSerializer(obj)
+        return Response(serializer.data)
 
     def list(self, request):
         obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
