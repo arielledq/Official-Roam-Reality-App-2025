@@ -19,6 +19,7 @@ module.exports = {
     ],
     "import-glob-meta",
     "@babel/plugin-proposal-export-namespace-from",
-    "react-native-reanimated/plugin"
+    "react-native-reanimated/plugin",
+    "babel-plugin-inline-import"
   ]
 }

@@ -10,5 +10,6 @@
     LetsBegin : "Let's Begin",
     HasOnboarded : "HasOnboarded",
     Onboarded : "Onboarded",
+    GOOGLE_PLACE_API_KEY: "AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA"
 }
 export default Strings;

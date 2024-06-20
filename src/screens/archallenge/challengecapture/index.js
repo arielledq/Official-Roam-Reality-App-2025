@@ -43,18 +43,26 @@ const ArChallengeCapture = ({
   const route = useRoute()
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj;
+  const challengeObjParameters = route?.params?.challengeObj?.parameters;
   const settings = useSelector(state => state.ar?.arSettings)
   const modelFile = challengeObj.model_file;
 
-  const navigateToShare = (captureData) => {
-    navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
+
+  const navigateToShare = (captureData, ifImage) => {
+    if (ifImage && route?.params?.challengeObj?.ar_filters.length > 0) {
+      navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
+    } else {
+      navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
+    }
   }
 
   const ARScreen = () => {
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [scale, setScale] = useState([0.05, 0.05, 0.05]);
+    const [scale, setScale] = useState([challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+    challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+    challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05]);
     const [rotate, setRotate] = useState([0, 0, 0]);
     const [progress, setProgress] = useState([0, 0, 0]);
 
@@ -141,7 +149,7 @@ const ArChallengeCapture = ({
         });
     }
     useEffect(() => {
-      if (challengeObj.challenge_choice == "DANCE") {
+      if (challengeObj.challenge_choice == "DANCE" && route?.params?.challengeObj?.ar_filters.length == 0) {
         setLoading(true)
         checkIfModelExist()
       }
@@ -171,7 +179,7 @@ const ArChallengeCapture = ({
 
     const _onPinch = (pinchState, scaleFactor, source) => {
       console.log("_onPinch scaleFactor", scaleFactor)
-      if((scale[0] * scaleFactor) < 0.05){
+      if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
       let newScale = [
@@ -192,7 +200,10 @@ const ArChallengeCapture = ({
         <ViroAmbientLight color="#FFFFFF" intensity={250} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
-        <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
+        {
+          challengeObjParameters?.bloom &&
+          <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
+        }
 
         <ViroSpotLight
           innerAngle={5}
@@ -218,30 +229,36 @@ const ArChallengeCapture = ({
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
-            position={[0, -5, -30]}
+            position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+            challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
+            challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
             type="VRX"
-            materials={["mat"]}
+            opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
+            materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
-            onRotate={_onRotate}
+            onRotate={challengeObjParameters?.rotation ? _onRotate : null}
             chromaKeyFilteringColor={"transparent"}
-            onPinch={_onPinch}
-            onDrag={_onDrag}
+            onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
+            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
             animation={{
               name: 'Take 001',
               run: true,
-              loop: true,
-              delay: 1000
+              loop: challengeObjParameters?.loop_animations ? true : false,
+              delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000
             }}
           />
         }
 
-        {challengeObj.challenge_choice == "SPONSORED" && <ViroImage
+        {challengeObj.challenge_choice == "SPONSORED" && route?.params?.challengeObj?.ar_filters.length == 0 && <ViroImage
           height={1}
           width={1}
-          onDrag={_onDrag}
+          opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
+          onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
           source={{ uri: challengeObj.image }}
-          position={[0, 0, -5]} />}
+          position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+          challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
+          challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5]} />}
       </ViroARScene>
     );
   };
@@ -414,10 +431,16 @@ const ArChallengeCapture = ({
                 strong: {
                   color: '#fff',
                   fontSize: FontSizes.S18,
+                },
+                ol: {
+                  color: '#fff',
+                },
+                li: {
+                  color: '#fff',
                 }
               }}
               source={{
-                html: `${challengeObj.description}`
+                html: `${challengeObj.description.toString().replaceAll("#000000", "#fff")}`
               }}
             />
           </ScrollView>
@@ -434,7 +457,6 @@ const ArChallengeCapture = ({
     }
 
     InfoView = () => {
-      console.log(settings?.waiver_details.replaceAll("#000000","#fff"))
       return (
         <View style={styles.challengeInfoContainer}>
           <View style={styles.challengeInfoHeaderContainer}>
@@ -456,23 +478,17 @@ const ArChallengeCapture = ({
                 },
                 strong: {
                   color: '#fff',
-                  fontSize: FontSizes.S14,
+                  fontSize: FontSizes.S18,
                 },
-                pre:{
+                ol: {
                   color: '#fff',
-                  fontSize: FontSizes.S14,
                 },
-                span:{
+                li: {
                   color: '#fff',
-                  fontSize: FontSizes.S14,
-                },
-                ol:{
-                  color: '#fff',
-                  fontSize: FontSizes.S14,
                 }
               }}
               source={{
-                html: `${settings?.waiver_details.replaceAll("#000000","#fff")}`
+                html: `${settings?.waiver_details.toString().replaceAll("#000000", "#fff")}}`
               }}
             />
           </ScrollView>
@@ -516,6 +532,23 @@ const ArChallengeCapture = ({
     };
 
     render() {
+
+      const viewComponent = () => <View style={styles.cornerStyles} />;
+
+      const _cornerComponent = [
+        {
+          side: 'TR',
+          customCornerComponent: () => viewComponent()
+        },
+      ];
+
+      const _rotateComponent = {
+        side: 'bottom',
+        customRotationComponent: () => viewComponent()
+      };
+
+      const _resizerSnapPoints = ['right', 'left'];
+
       return (
         <View style={styles.mainContainer}>
           {
@@ -607,7 +640,7 @@ const ArChallengeCapture = ({
               <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
             </TouchableOpacity>
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity onPress={() => {
-              navigateToShare(this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo)
+              navigateToShare(this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo, this.state.capturedImage ? true : false)
             }} activeOpacity={.6} style={styles.bottomButtonContainer}>
               <Text style={styles.bottomButtonText}>Done</Text>
             </TouchableOpacity>
@@ -629,14 +662,14 @@ const ArChallengeCapture = ({
 ViroMaterials.createMaterials({
   grid: {
     lightingModel: "Lambert",
-    bloomThreshold: 0.5,
+    shininess: .6,
   },
   mat: {
     shininess: .6,
     blendMode: "Add",
     lightingModel: "Lambert",
     bloomThreshold: 0.5,
-    diffuseColor:"#fff"
+    diffuseColor: "#fff"
   },
 });
 
