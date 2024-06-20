@@ -108,7 +108,7 @@ const renderFriendItem = (item, styles) => {
             ellipsizeMode="tail"
             numberOfLines={1}
           >
-            {item?.home_country}
+            {item?.user_profile?.home_country}
           </Text>
         </View>
       </View>
