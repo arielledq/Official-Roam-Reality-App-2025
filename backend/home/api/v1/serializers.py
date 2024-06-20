@@ -11,7 +11,7 @@ from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
 from modules.ar.challenges.serializers import ARMemoriesSerializer
 from modules.ar.challenges.models import ARMemories
-from users.models import UserProfile
+from users.models import FriendshipRequest, Notification, UserProfile
 from rest_framework.authtoken.models import Token
 
 from home.utils import EmailOTP
@@ -76,7 +76,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = UserProfile
-        fields = ('id', 'is_verified', 'image', 'account_setup')
+        fields = ('id', 'is_verified', 'image', 'account_setup', 'home_address', 'home_country','country_code', 'phone_number','gender')
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -117,6 +117,9 @@ class ChangePasswordSerializer(serializers.Serializer):
 class AccountSetupSerializer(serializers.ModelSerializer):
     user = UserSerializer()
     name = serializers.CharField(required=False)
+    is_friend = serializers.SerializerMethodField()
+    friends = UserSerializer(many=True, read_only=True)
+
     # ar_memories = serializers.SerializerMethodField()
 
     # def get_ar_memories(self, obj):
@@ -146,3 +149,26 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         instance.user.save()
         instance.save()
         return instance
+    
+    def get_is_friend(self, obj):
+        user = self.context['request'].user
+        if obj.user in user.friends.all():
+            return True
+        else:
+            return False
+
+
+class FriendshipRequestSerializer(serializers.ModelSerializer):
+    from_user = UserSerializer()
+    to_user = UserSerializer()
+
+    class Meta:
+        model = FriendshipRequest
+        fields = "__all__"
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    friend_request = FriendshipRequestSerializer()
+    class Meta:
+        model = Notification
+        fields = '__all__'
