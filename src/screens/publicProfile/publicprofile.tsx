@@ -12,28 +12,24 @@ import {
   RootStackParamList,
   ScreenStackComponent
 } from "../../navigation/types"
-// import { handleErrorMessage } from '../../util/util';
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
 import { MenuIcon } from "../../assets/svg"
-import UserInfoCard from "../../components/userInfoCard"
-import { Avatar } from "@rneui/base"
-import { AppButton, AppText } from "../../components"
+import { AppText } from "../../components"
 import StatContainer from "../../components/statContainer"
 import BoxStatContainer from "../../components/boxStatContainer"
 import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
-import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
 import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
-import { heightPercentageToDP, widthPercentageToDP } from "react-native-responsive-screen"
-import { height, width } from "../../util/AppDimensions"
+import { height } from "../../util/AppDimensions"
 import ScreenLoader from "../../components/screenLoader"
 import { updateARUserData } from "../../redux/AR"
 import { BlurView } from "@react-native-community/blur";
+import UserReportCard from "../../components/userInfoCard"
 
 const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const navigation = useNavigation()
@@ -47,10 +43,10 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [isTransitioning, setIsTransitioning] = useState(true)
 
-  console.log("userProfile:",userProfile)
-  console.log("userProfile: user",userProfile?.user)
-  console.log("userProfile: userProfile?.user.image",userProfile?.image)
-  
+  console.log("userProfile:", userProfile)
+  console.log("userProfile: user", userProfile?.user)
+  console.log("userProfile: userProfile?.user.image", userProfile?.image)
+
 
   const fetchProfileDetails = async () => {
     try {
@@ -175,12 +171,11 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
         </View>
       }
       <View style={_styles.scroll}>
-        <UserInfoCard
+        <UserReportCard
           image={userProfile?.image ? true : false}
           name={userProfile?.user.name}
           email={userProfile?.user.email}
-          verifyAction={() => navigateToVerifyMail(userProfile?.user.email)}
-          isVerified={profileDetails?.user.user_profile.is_verified}
+          reportAction={() => console.log("User Report")}
         />
         <View style={_styles.scoreboardContainer}>
           <AppText
@@ -253,9 +248,9 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
             containerStyle={_styles.headerContainer}
             title={""}
             rightComponent={
-            <Pressable style={_styles.removeBtnContainer}>
-              <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
-            </Pressable>}
+              <Pressable style={_styles.removeBtnContainer}>
+                <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
+              </Pressable>}
           />
         </BlurView>
       </View>

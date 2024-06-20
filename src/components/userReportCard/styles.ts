@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
   },
   verifyNow: {
     ...fontGroup.ns700,
-    color: theme.colors.inputRed,
+    color: theme.colors.inputBlue,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20
   },
