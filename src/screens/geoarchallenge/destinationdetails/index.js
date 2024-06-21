@@ -153,9 +153,9 @@ const GeoArChallengeDetails = ({
             <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
           </View>
           <Switch
-            trackColor={{ false: "transparent", true: "#9003E0" }}
+            trackColor={{ false: "#9003E0", true: "#9003E0" }}
             thumbColor={"#B816E0"}
-            ios_backgroundColor="transparent"
+            ios_backgroundColor="#9003E0"
             onValueChange={setARSitesOnSwitch}
             value={arSitesOn} />
         </View>
@@ -165,9 +165,9 @@ const GeoArChallengeDetails = ({
             <Text style={_styles.selectionTextDetails}>Live Location</Text>
           </View>
           <Switch
-            trackColor={{ false: "transparent", true: "#9003E0" }}
+            trackColor={{ false: "#9003E0", true: "#9003E0" }}
             thumbColor={"#B816E0"}
-            ios_backgroundColor="transparent"
+            ios_backgroundColor="#9003E0"
             onValueChange={setFriendsLocationSitesOn}
             value={friendsLocationSitesOn} />
         </View>
