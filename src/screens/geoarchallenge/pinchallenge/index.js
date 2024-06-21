@@ -329,7 +329,7 @@ const PinChallenge = ({
             color="#ff0000"
             width={2}
             height={2}
-            style={styles.loadingText}
+            style={_styles.loadingText}
             position={[0, 0, -5]}
           />
         }
@@ -395,7 +395,7 @@ const PinChallenge = ({
       this.checkPermission()
       setTimeout(() => {
         this.setState({ isLoadVR: true })
-      }, 1000)
+      }, Platform.OS == 'ios' ? 0 :  1000)
     }
 
     _setARNavigatorRef(ARNavigator) {

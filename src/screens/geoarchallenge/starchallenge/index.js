@@ -24,7 +24,7 @@ import {
 } from '@viro-community/react-viro';
 import RNFetchBlob from 'rn-fetch-blob';
 const Sound = require('react-native-sound');
-import uuid from 'react-native-uuid';
+const RNFS = require('react-native-fs');
 import { unzip } from 'react-native-zip-archive'
 
 const { config, fs } = RNFetchBlob;
@@ -220,7 +220,7 @@ const StarChallenge = ({
             color="#ff0000"
             width={2}
             height={2}
-            style={styles.loadingText}
+            style={_styles.loadingText}
             position={[0, 0, -5]}
           />
         }

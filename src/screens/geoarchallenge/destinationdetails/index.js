@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View, Switch } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -25,6 +25,8 @@ const GeoArChallengeDetails = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
+  const [arSitesOn, setARSitesOnSwitch] = useState(true)
+  const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true)
   const navigation = useNavigation()
   const mapView = useRef();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
@@ -144,6 +146,32 @@ const GeoArChallengeDetails = ({
           </TouchableOpacity> */}
         </ScrollView>
       </View>
+      <View style={{ flexDirection: 'row', marginBottom: 20, justifyContent: 'space-between' }}>
+        <View style={_styles.selectionsContainer}>
+          <View>
+            <Text style={_styles.selectionTextHeading}>Sites</Text>
+            <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
+          </View>
+          <Switch
+            trackColor={{ false: "transparent", true: "#9003E0" }}
+            thumbColor={"#B816E0"}
+            ios_backgroundColor="transparent"
+            onValueChange={setARSitesOnSwitch}
+            value={arSitesOn} />
+        </View>
+        <View style={_styles.selectionsContainer}>
+          <View>
+            <Text style={_styles.selectionTextHeading}>My Friends</Text>
+            <Text style={_styles.selectionTextDetails}>Live Location</Text>
+          </View>
+          <Switch
+            trackColor={{ false: "transparent", true: "#9003E0" }}
+            thumbColor={"#B816E0"}
+            ios_backgroundColor="transparent"
+            onValueChange={setFriendsLocationSitesOn}
+            value={friendsLocationSitesOn} />
+        </View>
+      </View>
       <View style={{ width: '100%', position: 'relative', flex: 1, borderRadius: 16, overflow: 'hidden' }}>
         <MapView
           provider={PROVIDER_GOOGLE}
@@ -163,7 +191,7 @@ const GeoArChallengeDetails = ({
               return _markerView(o)
             })
           } */}
-          {
+          {arSitesOn &&
             selectedDestination.star_ar_sites.map((o) => {
               return _markerView(o)
             })
