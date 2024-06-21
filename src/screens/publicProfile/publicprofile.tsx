@@ -43,7 +43,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
 
   const fetchARUserProfile = () => {
     getPublicARProfile(userProfile.user.id).then((res) => {
-      console.log("getPublicARProfile",res)
       if (res.status == 1) {
         updateARUserData(res)
       }
