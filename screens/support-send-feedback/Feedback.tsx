@@ -17,11 +17,11 @@ const Feedback = () => {
   const [isDescInputFocused, setDescInputFocused] = useState(false)
 
   const SupportOptionsData = [
-    {
-      icon: Images.AppIconLight,
-      text: "Our Website",
-      link: "https://www.facebook.com/RoamReality"
-    },
+    // {
+    //   icon: Images.AppIconLight,
+    //   text: "Our Website",
+    //   link: "https://www.facebook.com/RoamReality"
+    // },
     {
       icon: Images.Facebook,
       text: "Facebook",
@@ -32,11 +32,11 @@ const Feedback = () => {
       text: "Instagram",
       link: "https://www.instagram.com/roamreality"
     },
-    {
-      icon: Images.TikTok,
-      text: "TikTok",
-      link: "https://www.tiktok.com"
-    },
+    // {
+    //   icon: Images.TikTok,
+    //   text: "TikTok",
+    //   link: "https://www.tiktok.com"
+    // },
     {
       icon: Images.YouTube,
       text: "YouTube",
@@ -137,6 +137,7 @@ const Feedback = () => {
                     errorMessage={
                       touched.title && errors?.title ? errors.title : undefined
                     }
+                    maxLength={250}
                     autoCapitalize="none"
                   />
                   <AppInput
@@ -153,6 +154,7 @@ const Feedback = () => {
                     onBlur={() => setDescInputFocused(false)}
                     placeholder="Description"
                     onSubmitEditing={Keyboard.dismiss}
+                    maxLength={500}
                     placeholderTextColor={
                       (touched.description && errors?.description) ||
                       isDescInputFocused
@@ -176,6 +178,12 @@ const Feedback = () => {
                     title={"Submit"}
                     onPress={handleSubmit}
                     loading={loading}
+                    disabled={
+                      values.title?.length === 0 ||
+                      values.description?.length === 0
+                        ? true
+                        : false
+                    }
                   />
                 </View>
               )

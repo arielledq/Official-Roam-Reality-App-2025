@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 import {
+  Alert,
   FlatList,
   Image,
   Pressable,
@@ -21,25 +22,39 @@ import BoxStatContainer from "../../components/boxStatContainer"
 import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import LinearGradient from "react-native-linear-gradient"
-import { getPublicARProfile, getPublicProfieARMemoriesAPI, sendCode } from "../../network"
+import {
+  getPublicARProfile,
+  getPublicProfieARMemoriesAPI,
+  reportContentOrUser,
+  sendCode
+} from "../../network"
 import { useDispatch, useSelector } from "react-redux"
-import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native"
-import FastImage from 'react-native-fast-image'
+import {
+  useFocusEffect,
+  useNavigation,
+  useRoute
+} from "@react-navigation/native"
+import FastImage from "react-native-fast-image"
 import { height } from "../../util/AppDimensions"
 import ScreenLoader from "../../components/screenLoader"
-import { BlurView } from "@react-native-community/blur";
+import { BlurView } from "@react-native-community/blur"
 import UserReportCard from "../../components/userInfoCard"
+import ReportUserModal from "../reportUser/ReportUser"
 
-const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
+const PublicProfile: ScreenStackComponent<
+  RootStackParamList,
+  "Profile"
+> = () => {
   const navigation = useNavigation()
   const route = useRoute()
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const userProfile = route?.params?.userData;
+  const userProfile = route?.params?.userData
   const [arMemories, setARMemories] = useState([])
   const [loading, setloading] = useState(true)
   const [arProfile, updateARUserData] = useState({})
   const [isTransitioning, setIsTransitioning] = useState(true)
+  const [modalVisible, setModalVisible] = useState(false)
 
   const fetchARUserProfile = () => {
     getPublicARProfile(userProfile.user.id).then((res) => {
@@ -52,19 +67,20 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
 
   const getProfieARMemories = async () => {
     try {
-      getPublicProfieARMemoriesAPI(userProfile.user.id).then(res => {
-        if (res.status == 1) {
-          setARMemories(res.data)
-        } else {
-          console.error('Error', "Error fetching ar memories: ")
-        }
-      }).catch(err => {
-        console.error('Error', "Error fetching ar memories: ")
-      }
-      ).finally(() => setloading(false))
-
+      getPublicProfieARMemoriesAPI(userProfile.user_profile.id)
+        .then(res => {
+          if (res.status == 1) {
+            setARMemories(res.data)
+          } else {
+            console.error("Error", "Error fetching ar memories: ")
+          }
+        })
+        .catch(err => {
+          console.error("Error", "Error fetching ar memories: ")
+        })
+        .finally(() => setloading(false))
     } catch (error) {
-      console.error('Error', "Error fetching ar memories: ")
+      console.error("Error", "Error fetching ar memories: ")
     }
   }
 
@@ -86,8 +102,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
     { id: 5, value: 0, property: "Credits" },
     { id: 6, value: 0, property: "Tokens" },
     { id: 7, value: 0, property: "Rallies" },
-    { id: 8, value: 0, property: "Countries" },
-
+    { id: 8, value: 0, property: "Countries" }
   ]
   // Split the data into chunks of 3 for each row
   const rows = []
@@ -95,18 +110,38 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
     rows.push(data.slice(i, i + 3))
   }
 
+  const onReportCloseClick = () => {
+    setModalVisible(visible => !visible)
+  }
+
+  const onReportUser = (reportReason, issueDescripton = "") => {
+    setModalVisible(false)
+    const reportData = {
+      reason: reportReason,
+      custom_reason: issueDescripton,
+      report_user: userProfile?.user_profile?.id
+    }
+    reportContentOrUser(reportData)
+      .then(resposne => {
+        if (resposne && resposne?.status === 1) {
+          Alert.alert("Reported", "User has been reported successfully")
+        }
+      })
+      .catch(error => {
+        console.error("Error", "Error reporting user")
+      })
+  }
+
   const renderHeader = () => (
-    <KeyboardAwareScrollView
-      style={_styles.header}
-    >
-      {userProfile?.image &&
+    <KeyboardAwareScrollView style={_styles.header}>
+      {userProfile?.user_profile?.image && (
         <View style={_styles.avatarContainer}>
           <FastImage
             style={{
-              width: '100%',
-              height: height * 0.5,
+              width: "100%",
+              height: height * 0.5
             }}
-            source={{ uri: userProfile?.image }}
+            source={{ uri: userProfile?.user_profile?.image }}
             resizeMode={FastImage.resizeMode.cover}
           />
           <LinearGradient
@@ -123,31 +158,43 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
             }}
           />
         </View>
-      }
+      )}
       <View style={_styles.scroll}>
         <UserReportCard
-          image={userProfile?.image ? true : false}
-          name={userProfile?.user.name}
-          email={userProfile?.user.email}
-          reportAction={() => console.log("User Report")}
+          image={userProfile?.user_profile?.image ? true : false}
+          name={userProfile?.name}
+          email={userProfile?.email}
+          reportAction={() => setModalVisible(true)}
         />
         <View style={_styles.scoreboardContainer}>
           <AppText
             adjustsFontSizeToFit={true}
             numberOfLines={1}
-            style={_styles.scoreboard}>SCOREBOARD</AppText>
+            style={_styles.scoreboard}
+          >
+            SCOREBOARD
+          </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"0"} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
+        <ReportUserModal
+          isVisible={modalVisible}
+          onClose={onReportCloseClick}
+          onReportUser={onReportUser}
+        />
       </View>
     </KeyboardAwareScrollView>
   )
 
   const navigateToShare = (captureData, challengeObj) => {
-    navigation.navigate("ArChallengeShare", { challengeObj: challengeObj, captureData, hideBottomTab: true });
+    navigation.navigate("ArChallengeShare", {
+      challengeObj: challengeObj,
+      captureData,
+      hideBottomTab: true
+    })
   }
 
   const renderFooter = () => (
@@ -166,14 +213,19 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => (
-            <MemoryContainer onPressAction={navigateToShare} title={"Title"} item={item} description={"description"} image={""} />
+            <MemoryContainer
+              onPressAction={navigateToShare}
+              title={"Title"}
+              item={item}
+              description={"description"}
+              image={""}
+            />
           )}
           keyExtractor={item => item.id.toString()}
         />
       </View>
     </View>
   )
-
 
   const renderItem = ({ item }) => (
     <BoxStatContainer
@@ -186,25 +238,34 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      {loading ? <ScreenLoader /> : <FlatList
-        data={data}
-        contentContainerStyle={_styles.container_style}
-        keyExtractor={item => item.id.toString()}
-        renderItem={renderItem}
-        ListHeaderComponent={renderHeader}
-        numColumns={3}
-        ListFooterComponent={renderFooter}
-        nestedScrollEnabled={false}
-      />}
+      {loading ? (
+        <ScreenLoader />
+      ) : (
+        <FlatList
+          data={data}
+          contentContainerStyle={_styles.container_style}
+          keyExtractor={item => item.id.toString()}
+          renderItem={renderItem}
+          ListHeaderComponent={renderHeader}
+          numColumns={3}
+          ListFooterComponent={renderFooter}
+          nestedScrollEnabled={false}
+        />
+      )}
       <View style={_styles.blurView}>
-        <BlurView blurType="light" overlayColor='#00000050' enabled={!isTransitioning}>
+        <BlurView
+          blurType="light"
+          overlayColor="#00000050"
+          enabled={!isTransitioning}
+        >
           <AppHeader
             containerStyle={_styles.headerContainer}
             title={""}
             rightComponent={
               <Pressable style={_styles.removeBtnContainer}>
                 <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
-              </Pressable>}
+              </Pressable>
+            }
           />
         </BlurView>
       </View>
