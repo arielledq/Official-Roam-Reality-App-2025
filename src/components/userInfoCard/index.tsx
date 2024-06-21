@@ -8,20 +8,17 @@ import theme from "../../assets/theme"
 const UserInfoCard = ({
   name,
   email,
-  isVerified,
-  verifyAction,
+  reportAction,
   image = false,
 }: {
   name: string | null,
   email: string | null,
-  isVerified: boolean,
-  verifyAction: () => void
+  reportAction: () => void
 }) => {
   const styles = useStyles()
-  console.log('props',{ name, email, isVerified, verifyAction })
 
   const truncatedEmail =
-    email?.length > 22 && !isVerified ? `${email?.slice(0, 22)}...` : email
+     email
 
   return (
     <View style={styles.row}>
@@ -30,23 +27,11 @@ const UserInfoCard = ({
         <AppText style={image ? styles.name : styles.name1}>{name}</AppText>
         <View style={styles.containerBottom}>
           <AppText style={styles.userName}>{truncatedEmail}</AppText>
-          {!isVerified && (
-            <>
-              <Icon
-                name={"info"}
-                family="feather"
-                color={theme.lightColors?.yellow}
-                size={16}
-                style={styles.verificationIcon}
-              />
-              <AppText style={styles.verificationStatus}>Not Verified</AppText>
-              <View style={styles.verifyNowContainer}>
-                <Pressable style={styles.verifyButton} onPress={verifyAction}>
-                  <AppText style={styles.verifyNow}>Verify Now</AppText>
-                </Pressable>
-              </View>
-            </>
-          )}
+          <View style={styles.verifyNowContainer}>
+            <Pressable style={styles.verifyButton} onPress={reportAction}>
+              <AppText style={styles.verifyNow}>Report User</AppText>
+            </Pressable>
+          </View>
         </View>
       </View>
     </View>

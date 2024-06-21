@@ -15,7 +15,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import useStyles from "./styles"
 import theme from "../../assets/theme"
 import { Icon } from "react-native-elements"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { getUserFriendList } from "../../network"
 import FastImage from "react-native-fast-image"
 import useDebounce from "../../hooks/debounce"
@@ -24,6 +24,7 @@ import Images from "../../assets/images"
 
 const MyFriends = () => {
   const [searchText, setSearchText] = React.useState("")
+  const navigation = useNavigation()
   const [friendList, setFriendList] = useState([])
   const [filteredUsers, setFilteredUsers] = React.useState([])
   const _styles = useStyles()
@@ -75,14 +76,14 @@ const MyFriends = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => renderFriendItem(item, _styles)}
+          renderItem={({ item }) => renderFriendItem(item, _styles, navigation)}
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-const renderFriendItem = (item, styles) => {
+const renderFriendItem = (item, styles, navigation) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
@@ -112,7 +113,7 @@ const renderFriendItem = (item, styles) => {
           </Text>
         </View>
       </View>
-      <Pressable onPress={() => {}} style={{ marginLeft: 10 }}>
+      <Pressable onPress={() => { navigation.navigate("PublicProfile", { userData: item }) }} style={{ marginLeft: 10 }}>
         <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>
     </View>
