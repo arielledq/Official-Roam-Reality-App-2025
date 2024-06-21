@@ -15,7 +15,7 @@ import theme from "../../assets/theme"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { AppInput } from "../../components"
 import useStyles from "./styles"
-import { color } from "react-native-reanimated"
+import { color, set } from "react-native-reanimated"
 import { FontFamily } from "../../util/FontUtils"
 import Images from "../../assets/images"
 
@@ -80,7 +80,7 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
                   <View style={styles.radioSelected} />
                 )}
               </View>
-              <Text style={styles.optionText}>{option}</Text>
+              <Text style={styles.optionText}>{option?.value}</Text>
             </TouchableOpacity>
           ))}
           <AppInput
@@ -102,7 +102,11 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({
           <View style={styles.buttonContainer}>
             <TouchableOpacity
               style={styles.reportButton}
-              onPress={() => onReportUser(selectedProblem?.key, description)}
+              onPress={() => {
+                onReportUser(selectedProblem?.key, description)
+                setSelectedProblem(null)
+                setDescription("")
+              }}
             >
               <Text style={styles.buttonText}>Report</Text>
             </TouchableOpacity>
@@ -122,7 +126,8 @@ const styles = {
     backgroundColor: theme.lightColors?.boxStatBG,
     borderRadius: 8,
     padding: 16,
-    width: "90%"
+    width: "100%",
+    alignself: "center"
   },
   title: {
     fontSize: 16,
