@@ -292,7 +292,7 @@ class FindFriendsAPIView(APIView):
                             for phone_number in phone_numbers
                         ]
                     )
-                ).exclude(user__in=request.user.user_profile.friends.all()).exclude(id__in=users_with_friend_request)
+                ).exclude(user__in=request.user.user_profile.friends.all()).exclude(user_id__in=users_with_friend_request)
 
                 users = [up.user for up in user_profiles]
                 serializer = UserSerializer(users, many=True)
