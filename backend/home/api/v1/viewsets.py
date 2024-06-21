@@ -163,7 +163,7 @@ class AccountSetupViewset(ModelViewSet):
     def get_queryset(self):
         user_id = self.kwargs.get('pk')
         if user_id:
-            return UserProfile.objects.filter(user_id=user_id)
+            return UserProfile.objects.filter(pk=user_id)
         else:
             return UserProfile.objects.filter(user=self.request.user)
     
