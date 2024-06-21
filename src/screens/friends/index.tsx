@@ -26,7 +26,7 @@ const Friends: React.FC = () => {
     { key: "two", title: tabs.requests }
   ])
   const _styles = useStyles()
-  const [modalVisible, setModalVisible] = useState(false)
+  // const [modalVisible, setModalVisible] = useState(false)
 
   const renderTabBar = props => (
     <TabBar
@@ -48,7 +48,6 @@ const Friends: React.FC = () => {
   )
 
   const onAddFriendClick = () => {
-    // setModalVisible(visible => !visible)
     navigation.navigate("AddFriend")
   }
 
@@ -63,9 +62,11 @@ const Friends: React.FC = () => {
         renderTabBar={renderTabBar}
       />
       {/* <ReportUserModal
-        isVisible
+        isVisible={modalVisible}
         onClose={onAddFriendClick}
-        onReportUser={() => setModalVisible(false)}
+        onReportUser={(reportReason, issueDescripton = "") => {
+          setModalVisible(false)
+        }}
       /> */}
       <AppButton
         buttonStyle={_styles.buttonStyle}
