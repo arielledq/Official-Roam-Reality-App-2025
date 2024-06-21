@@ -11,25 +11,31 @@ from django.conf import settings
 class ReportedContentConstant:
     SPAM = 1
     PORNOGRAPHY = 2
-    HATRED_BULLYING = 3
-    SELF_HARM = 4
-    VIOLENT_GORY = 5
-    CHILD_PORN = 6
-    ILLEGAL_ACTIVITIES = 7
-    DECEPTIVE_CONTENT = 8
-    COPYRIGHT_INFRINGEMENT = 9
-    OTHER = 10
+    HATE = 3
+    BULLYING = 4
+    SELF_HARM = 5
+    VIOLENT = 6
+    GORY = 7
+    HARMFUL_CONTENT = 8
+    CHILD_PORN = 9
+    ILLEGAL_ACTIVITIES = 10
+    DECEPTIVE = 11
+    COPYRIGHT_INFRINGEMENT = 12
+    OTHER = 13
 
     REASON_CHOICES = (
         (SPAM, 'Spam'),
         (PORNOGRAPHY, 'Pornography'),
-        (HATRED_BULLYING, 'Hatred and Bullying'),
-        (SELF_HARM, 'Self-harm'),
-        (VIOLENT_GORY, 'Violent, Gory, and Harmful Content'),
-        (CHILD_PORN, 'Child Pornography'),
+        (HATE, 'Hate'),
+        (BULLYING, 'Bullying'),
+        (SELF_HARM, 'Self-Harm'),
+        (VIOLENT, 'Violent'),
+        (GORY, 'Gory'),
+        (HARMFUL_CONTENT, 'Harmful Content'),
+        (CHILD_PORN, 'Child Porn'),
         (ILLEGAL_ACTIVITIES, 'Illegal Activities'),
-        (DECEPTIVE_CONTENT, 'Deceptive Content'),
-        (COPYRIGHT_INFRINGEMENT, 'Copyright and Trademark Infringement'),
+        (DECEPTIVE, 'Deceptive'),
+        (COPYRIGHT_INFRINGEMENT, 'Copyright & Trademark Infringement'),
         (OTHER, 'Other'),
     )
 
