@@ -274,6 +274,7 @@ class FindFriendsAPIView(APIView):
     def post(self, request):
         try:
             contacts = request.data
+            users_with_friend_request = FriendshipRequest.objects.filter(from_user=request.user).values_list('to_user', flat=True)
 
             phone_numbers = []
             for contact in contacts:
@@ -291,7 +292,7 @@ class FindFriendsAPIView(APIView):
                             for phone_number in phone_numbers
                         ]
                     )
-                ).exclude(user__in=request.user.user_profile.friends.all())
+                ).exclude(user__in=request.user.user_profile.friends.all()).exclude(id__in=users_with_friend_request)
 
                 users = [up.user for up in user_profiles]
                 serializer = UserSerializer(users, many=True)
