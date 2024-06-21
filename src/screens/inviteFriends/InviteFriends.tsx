@@ -51,7 +51,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
     setLoading(true)
     const data = {
       email: values.email?.trim(),
-      message: values.description?.trim()
+      message: values.message?.trim()
     }
     inviteFriendByEmail(data)
       .then(response => {
@@ -92,7 +92,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
         >
           {({ handleChange, handleSubmit, values, errors, touched }) => (
             <View style={_styles.container}>
-              <View style={_styles.chidlView}>
+              <View>
                 <AppInput
                   inputContainerStyle={[
                     _styles.input,
