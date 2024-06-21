@@ -1,16 +1,14 @@
 // MyFriends.tsx
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   Keyboard,
   ImageBackground,
   Pressable
 } from "react-native"
-import BackgroundWithImage from "../../components/background"
-import { AppButton, AppHeader, AppInput } from "../../components"
+import { AppInput } from "../../components"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import useStyles from "./styles"
 import theme from "../../assets/theme"
@@ -29,19 +27,25 @@ const MyFriends = () => {
   const [filteredUsers, setFilteredUsers] = React.useState([])
   const _styles = useStyles()
   const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME)
+  const [isFetching, setFetching] = useState(false)
 
-  useFocusEffect(
-    useCallback(() => {
-      getUserFriendList()
-        .then(response => {
-          if (response) {
-            setFriendList(response?.data[0]?.friends || [])
-            setFilteredUsers(response?.data[0]?.friends || [])
-          }
-        })
-        .catch(error => console.error(error))
-    }, [])
-  )
+  useFocusEffect(useCallback(() => getFriends(), []))
+
+  const getFriends = () => {
+    setFetching(true)
+    getUserFriendList()
+      .then(response => {
+        setFetching(false)
+        if (response) {
+          setFriendList(response?.data[0]?.friends || [])
+          setFilteredUsers(response?.data[0]?.friends || [])
+        }
+      })
+      .catch(error => {
+        setFetching(false)
+        console.error(error)
+      })
+  }
 
   const onChangeText = () => {
     const filtered = friendList?.filter(item =>
@@ -53,6 +57,8 @@ const MyFriends = () => {
   React.useEffect(() => {
     onChangeText()
   }, [debounceQuery])
+
+  const onRefresh = () => getFriends()
 
   return (
     <KeyboardAwareScrollView
@@ -77,6 +83,8 @@ const MyFriends = () => {
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => renderFriendItem(item, _styles, navigation)}
+          onRefresh={() => onRefresh()}
+          refreshing={isFetching}
         />
       </View>
     </KeyboardAwareScrollView>
@@ -113,7 +121,12 @@ const renderFriendItem = (item, styles, navigation) => {
           </Text>
         </View>
       </View>
-      <Pressable onPress={() => { navigation.navigate("PublicProfile", { userData: item }) }} style={{ marginLeft: 10 }}>
+      <Pressable
+        onPress={() => {
+          navigation.navigate("PublicProfile", { userData: item })
+        }}
+        style={{ marginLeft: 10 }}
+      >
         <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>
     </View>

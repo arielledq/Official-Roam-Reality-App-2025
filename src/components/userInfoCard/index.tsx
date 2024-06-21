@@ -9,7 +9,7 @@ const UserInfoCard = ({
   name,
   email,
   reportAction,
-  image = false,
+  image = false
 }: {
   name: string | null,
   email: string | null,
@@ -17,8 +17,7 @@ const UserInfoCard = ({
 }) => {
   const styles = useStyles()
 
-  const truncatedEmail =
-     email
+  const truncatedEmail = email
 
   return (
     <View style={styles.row}>

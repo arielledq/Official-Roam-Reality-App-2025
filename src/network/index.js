@@ -132,14 +132,13 @@ export const getARSposored = () =>
     method: "GET"
   })
 
-export const getAllARSitesStars = (payload) =>
+export const getAllARSitesStars = payload =>
   Request.callAR({
     url: `modules/challenges/geo-ar-star/get-by-site-id/?id=${payload.id}`,
     method: "GET"
   })
 
-
-export const getARSitesHiddenStars = (payload) =>
+export const getARSitesHiddenStars = payload =>
   Request.callAR({
     url: `modules/challenges/geo-ar-star/get-hidden-stars/?id=${payload.id}`,
     method: "GET"
@@ -227,18 +226,17 @@ export const getProfieARMemoriesAPI = () =>
     method: "GET"
   })
 
-export const getPublicProfieARMemoriesAPI = (user_id) =>
+export const getPublicProfieARMemoriesAPI = user_id =>
   Request.callWithToken({
     url: `modules/challenges/memories/public/?user_id=${user_id}`,
     method: "GET"
   })
 
-export const getPublicARProfile = (user_id) =>
+export const getPublicARProfile = user_id =>
   Request.callWithToken({
     url: `modules/challenges/ar-profile/public/?user_id=${user_id}`,
     method: "GET"
   })
-
 
 export const socialPointsARUpdateAPI = payload =>
   Request.callWithToken({
@@ -354,5 +352,12 @@ export const markNotificationAsRead = (id, data) =>
   Request.callWithToken({
     url: `${commonApiRoute}notifications/${id}/`,
     method: "PATCH",
+    data: data
+  })
+
+export const reportContentOrUser = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}report-content/`,
+    method: "POST",
     data: data
   })

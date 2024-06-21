@@ -1,6 +1,6 @@
 // PendingRequests.tsx
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import {
   View,
   Text,
@@ -19,9 +19,11 @@ import theme from "../../assets/theme"
 import { Icon } from "@rneui/base"
 import FastImage from "react-native-fast-image"
 import Images from "../../assets/images"
+import { set } from "react-native-reanimated"
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = React.useState([])
+  const [isFetching, setFetching] = useState(false)
   const _styles = useStyles()
 
   useFocusEffect(
@@ -31,13 +33,17 @@ const PendingRequests = () => {
   )
 
   const getPendingRequests = () => {
+    setFetching(true)
     getPendingFriendRequests()
       .then(response => {
+        setFetching(false)
         if (response) {
           setPendingRequests(response?.data)
         }
       })
-      .catch(error => console.error(error))
+      .catch(error => {
+        setFetching(false)
+      })
   }
 
   const onAccept = (user: any) => {
@@ -70,6 +76,8 @@ const PendingRequests = () => {
       })
   }
 
+  const onRefresh = () => getPendingRequests()
+
   return (
     <View style={_styles.container}>
       <FlatList
@@ -77,6 +85,8 @@ const PendingRequests = () => {
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => renderFriendItem(item, onAccept, onReject)}
         contentContainerStyle={_styles.scroll}
+        onRefresh={() => onRefresh()}
+        refreshing={isFetching}
       />
     </View>
   )

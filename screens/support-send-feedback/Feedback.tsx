@@ -137,6 +137,7 @@ const Feedback = () => {
                     errorMessage={
                       touched.title && errors?.title ? errors.title : undefined
                     }
+                    maxLength={250}
                     autoCapitalize="none"
                   />
                   <AppInput
@@ -153,6 +154,7 @@ const Feedback = () => {
                     onBlur={() => setDescInputFocused(false)}
                     placeholder="Description"
                     onSubmitEditing={Keyboard.dismiss}
+                    maxLength={500}
                     placeholderTextColor={
                       (touched.description && errors?.description) ||
                       isDescInputFocused
@@ -176,6 +178,12 @@ const Feedback = () => {
                     title={"Submit"}
                     onPress={handleSubmit}
                     loading={loading}
+                    disabled={
+                      values.title?.length === 0 ||
+                      values.description?.length === 0
+                        ? true
+                        : false
+                    }
                   />
                 </View>
               )
