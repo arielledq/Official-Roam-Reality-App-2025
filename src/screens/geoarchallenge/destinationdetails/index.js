@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View, Switch } from "react-native";
+import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
 import { getARSitesHiddenStars } from "../../../network";
+import AppSwitch from "../../../components/Switch";
 
 
 const GeoArChallengeDetails = ({
@@ -152,10 +153,7 @@ const GeoArChallengeDetails = ({
             <Text style={_styles.selectionTextHeading}>Sites</Text>
             <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
           </View>
-          <Switch
-            trackColor={{ false: "#9003E0", true: "#9003E0" }}
-            thumbColor={"#B816E0"}
-            ios_backgroundColor="#9003E0"
+          <AppSwitch
             onValueChange={setARSitesOnSwitch}
             value={arSitesOn} />
         </View>
@@ -164,10 +162,7 @@ const GeoArChallengeDetails = ({
             <Text style={_styles.selectionTextHeading}>My Friends</Text>
             <Text style={_styles.selectionTextDetails}>Live Location</Text>
           </View>
-          <Switch
-            trackColor={{ false: "#9003E0", true: "#9003E0" }}
-            thumbColor={"#B816E0"}
-            ios_backgroundColor="#9003E0"
+          <AppSwitch
             onValueChange={setFriendsLocationSitesOn}
             value={friendsLocationSitesOn} />
         </View>
