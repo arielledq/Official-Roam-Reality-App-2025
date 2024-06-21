@@ -22,6 +22,8 @@ const getFontSize = (size: number) => {
 };
 
 export const FontSizes = {
+  S8: getFontSize(8),
+  S9: getFontSize(9),
   S10: getFontSize(10),
   S12: getFontSize(12),
   S13: getFontSize(13),
