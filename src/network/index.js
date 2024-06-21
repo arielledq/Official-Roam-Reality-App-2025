@@ -361,3 +361,9 @@ export const reportContentOrUser = data =>
     method: "POST",
     data: data
   })
+
+export const removeUserFromFriends = id =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/${id}/remove_friend/`,
+    method: "POST"
+  })

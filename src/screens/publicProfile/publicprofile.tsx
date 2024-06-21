@@ -25,6 +25,7 @@ import LinearGradient from "react-native-linear-gradient"
 import {
   getPublicARProfile,
   getPublicProfieARMemoriesAPI,
+  removeUserFromFriends,
   reportContentOrUser,
   sendCode
 } from "../../network"
@@ -236,6 +237,48 @@ const PublicProfile: ScreenStackComponent<
     />
   )
 
+  const onRemoveConfirm = () => {
+    // Call API to remove friend
+    removeUserFromFriends(userProfile?.id)
+      .then(resposne => {
+        if (resposne && resposne.status === 1) {
+          console.log("removeUserFromFriends", resposne)
+          Alert.alert("Success", "Friend removed successfully", [
+            {
+              text: "OK",
+              onPress: () => {
+                navigation.goBack()
+              }
+            }
+          ])
+        }
+      })
+      .catch(error => {
+        Alert.alert("Error", "Error removing friend")
+      })
+  }
+
+  const onRemoveFriendClick = () => {
+    // Prompt user wether they really want to unfriend
+    Alert.alert(
+      "Remove Friend",
+      "Are you sure you want to remove this friend?",
+      [
+        {
+          text: "Yes",
+          onPress: () => {
+            // Call API to remove friend
+            onRemoveConfirm()
+          }
+        },
+        {
+          text: "No",
+          onPress: () => {}
+        }
+      ]
+    )
+  }
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       {loading ? (
@@ -262,7 +305,10 @@ const PublicProfile: ScreenStackComponent<
             containerStyle={_styles.headerContainer}
             title={""}
             rightComponent={
-              <Pressable style={_styles.removeBtnContainer}>
+              <Pressable
+                style={_styles.removeBtnContainer}
+                onPress={onRemoveFriendClick}
+              >
                 <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
               </Pressable>
             }
