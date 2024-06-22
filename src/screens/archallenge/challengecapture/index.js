@@ -551,21 +551,7 @@ const ArChallengeCapture = ({
 
       return (
         <View style={styles.mainContainer}>
-          {
-            this.state.isLoadVR && <ViroARSceneNavigator
-              videoQuality={"High"}
-              autofocus={true}
-              pbrEnabled={true}
-              hdrEnabled={true}
-              bloomEnabled={true}
-              ref={this._setARNavigatorRef}
-              initialScene={{
-                scene: ARScreen,
-              }}
-              style={styles.f1}
-            >
-            </ViroARSceneNavigator>
-          }
+          
 
           {this.state.capturedImage && <Image style={styles.f1} source={{
             uri: this.state.capturedImage
@@ -594,6 +580,21 @@ const ArChallengeCapture = ({
               </View>
             </View>
           </View>
+          {
+            this.state.isLoadVR && <ViroARSceneNavigator
+              videoQuality={"High"}
+              autofocus={true}
+              pbrEnabled={true}
+              hdrEnabled={true}
+              bloomEnabled={true}
+              ref={this._setARNavigatorRef}
+              initialScene={{
+                scene: ARScreen,
+              }}
+              style={styles.f1}
+            >
+            </ViroARSceneNavigator>
+          }
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
             {
               (this.state.recordingStart) && <View style={styles.timerTextContainer}>
