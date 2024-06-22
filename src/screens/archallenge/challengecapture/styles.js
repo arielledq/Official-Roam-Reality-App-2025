@@ -27,17 +27,15 @@ const useStyles = makeStyles(theme => ({
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
     marginTop:20,
-    position: 'absolute',
     top: -20
   },
   container: {
     marginTop: "10%"
   },
   f1: {
-    height: ScreenHeight,
     width: '100%',
-    position:'absolute',
-    top:0
+    flex:1,
+    backgroundColor:'#fff'
   },
   bottomContainer: {
     width: '100%',
@@ -46,8 +44,6 @@ const useStyles = makeStyles(theme => ({
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
     flexDirection: 'row',
     paddingHorizontal: 10,
   },
