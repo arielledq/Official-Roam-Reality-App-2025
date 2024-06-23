@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
 
 import {
   TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView,
@@ -47,11 +47,14 @@ const ArChallengeCapture = ({
   const challengeObjParameters = route?.params?.challengeObj?.parameters;
   const settings = useSelector(state => state.ar?.arSettings)
   const modelFile = challengeObj.model_file;
+  const viewShotRef = useRef();
 
 
   const navigateToShare = (captureData, ifImage) => {
     if (ifImage && route?.params?.challengeObj?.ar_filters.length > 0) {
-      navigation.replace("ARFilter", { challengeObj: challengeObj, captureData });
+      viewShotRef.current.capture().then(uri => {
+        navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData: uri });
+      });
     } else {
       navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData });
     }
@@ -598,7 +601,7 @@ const ArChallengeCapture = ({
             }} />}
             {this.state.capturedImage && challengeObj?.ar_filters.length > 0 &&
               <View style={styles.imageVideoView}>
-                <ARFilter challengeObj={challengeObj} captureData={this.state.capturedImage} />
+                <ARFilter challengeObj={challengeObj} viewShotRef={viewShotRef} captureData={this.state.capturedImage} />
               </View>
             }
           </View>

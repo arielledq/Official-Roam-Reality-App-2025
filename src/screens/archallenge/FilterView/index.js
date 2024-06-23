@@ -19,13 +19,12 @@ Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 const { width } = Dimensions.get('window');
 
 const ARFilter = ({
-  challengeObj, captureData
+  challengeObj, captureData, viewShotRef
 }) => {
   const styles = useStyles()
   const route = useRoute()
   const navigation = useNavigation()
-  const ar_filters = route?.params?.challengeObj?.ar_filters;
-  const viewShotRef = useRef();
+  const ar_filters = challengeObj?.ar_filters;
   const [location, setLocation] = useState(null)
   const [fullLocation, setFullLocation] = useState(null)
 
