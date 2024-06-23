@@ -444,8 +444,7 @@ const ArChallengeCapture = ({
               }}
             />
           </ScrollView>
-          <View style={{ width: '100%', paddingHorizontal: 24 }}>
-
+          <View style={{ width: '100%', paddingHorizontal: 24,marginBottom:20 }}>
             <TouchableOpacity
               activeOpacity={.6}
               onPress={() => this.setState({ challengeInformationView: false })}>
@@ -551,25 +550,17 @@ const ArChallengeCapture = ({
 
       return (
         <View style={styles.mainContainer}>
-          
-
-          {this.state.capturedImage && <Image style={styles.f1} source={{
-            uri: this.state.capturedImage
-          }} />}
-
-          {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
-            uri: this.state.capturedVideo
-          }} />}
-
           <View style={styles.mainHeaderContainer}>
             <AppHeader centerComponent={{
               text: "Anywhere AR Challenges",
               numberOfLines: 2,
               style: [styles.heading],
             }} backgroundColor="transparent" />
+          </View>
+          <View style={styles.detailsViewContainer}>
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center',flex:1 }}>
                   <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
@@ -580,21 +571,31 @@ const ArChallengeCapture = ({
               </View>
             </View>
           </View>
-          {
-            this.state.isLoadVR && <ViroARSceneNavigator
-              videoQuality={"High"}
-              autofocus={true}
-              pbrEnabled={true}
-              hdrEnabled={true}
-              bloomEnabled={true}
-              ref={this._setARNavigatorRef}
-              initialScene={{
-                scene: ARScreen,
-              }}
-              style={styles.f1}
-            >
-            </ViroARSceneNavigator>
-          }
+          <View
+            style={styles.f1}>
+            {
+              this.state.isLoadVR && <ViroARSceneNavigator
+                videoQuality={"High"}
+                autofocus={true}
+                pbrEnabled={true}
+                hdrEnabled={true}
+                bloomEnabled={true}
+                ref={this._setARNavigatorRef}
+                initialScene={{
+                  scene: ARScreen,
+                }}
+                style={styles.imageVideoView}
+              >
+              </ViroARSceneNavigator>
+            }
+            {this.state.capturedImage && <Image style={styles.imageVideoView} source={{
+              uri: this.state.capturedImage
+            }} />}
+
+            {this.state.capturedVideo && <Video repeat={true} style={styles.imageVideoView} source={{
+              uri: this.state.capturedVideo
+            }} />}
+          </View>
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
             {
               (this.state.recordingStart) && <View style={styles.timerTextContainer}>

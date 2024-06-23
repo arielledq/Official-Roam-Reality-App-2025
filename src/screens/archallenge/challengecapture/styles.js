@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     flex:1,
     width: '100%',
     position: 'relative',
-    backgroundColor:'#000'
+    backgroundColor:"#0F1424"
   },
   heading: {
     fontSize: FontSizes.S14,
@@ -27,7 +27,12 @@ const useStyles = makeStyles(theme => ({
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
     marginTop:20,
-    top: -20
+    top:-20,
+    backgroundColor: '#202136',
+  },
+  detailsViewContainer: {
+    paddingHorizontal: screenHorizontalPadding,
+    marginBottom:20,
   },
   container: {
     marginTop: "10%"
@@ -35,6 +40,17 @@ const useStyles = makeStyles(theme => ({
   f1: {
     width: '100%',
     flex:1,
+    backgroundColor:'#fff',
+    position: "relative"
+  },
+  imageVideoView: {
+    width: '100%',
+    flex:1,
+    top:0,
+    bottom:0,
+    left:0,
+    right:0,
+    position:'absolute',
     backgroundColor:'#fff'
   },
   bottomContainer: {
@@ -158,21 +174,19 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#1158F4",
     height: 53,
     borderRadius: 8,
-    marginTop: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingHorizontal: 8,
   },
   viewDetailsIconContainerWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20
+    alignItems: 'center'
   },
   viewDetailsIcon: {
     width: 37,
     height: 37,
-    marginEnd: 10
+    marginEnd:5
   },
-
   borderStyles: {
     borderStyle: 'dashed',
     borderColor: 'gray',
