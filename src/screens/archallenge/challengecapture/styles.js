@@ -38,10 +38,9 @@ const useStyles = makeStyles(theme => ({
     marginTop: "10%"
   },
   f1: {
-    width: '100%',
     flex:1,
-    backgroundColor:'#fff',
-    position: "relative"
+    position: "relative",
+    marginHorizontal: screenHorizontalPadding,
   },
   imageVideoView: {
     width: '100%',
@@ -135,16 +134,12 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
   },
   holdTextContainer: {
-    top: -50,
-    position: 'absolute',
     padding: 5,
     backgroundColor: "#090A1620",
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    left:0,
-    marginHorizontal:20,
-    right:0
+    marginVertical:20
   },
   holdText: {
     ...fontGroup.p600,

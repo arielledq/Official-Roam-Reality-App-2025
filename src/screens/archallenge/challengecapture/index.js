@@ -32,6 +32,7 @@ const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { useSelector } from "react-redux";
+import ARFilter from "../FilterView";
 const { width } = Dimensions.get('window');
 
 const VIDEO_RECORD_TIME = 10
@@ -444,7 +445,7 @@ const ArChallengeCapture = ({
               }}
             />
           </ScrollView>
-          <View style={{ width: '100%', paddingHorizontal: 24,marginBottom:20 }}>
+          <View style={{ width: '100%', paddingHorizontal: 24, marginBottom: 20 }}>
             <TouchableOpacity
               activeOpacity={.6}
               onPress={() => this.setState({ challengeInformationView: false })}>
@@ -560,7 +561,7 @@ const ArChallengeCapture = ({
           <View style={styles.detailsViewContainer}>
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
-                <View style={{ flexDirection: 'row', alignItems: 'center',flex:1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
@@ -588,13 +589,28 @@ const ArChallengeCapture = ({
               >
               </ViroARSceneNavigator>
             }
-            {this.state.capturedImage && <Image style={styles.imageVideoView} source={{
+            {this.state.capturedImage && challengeObj?.ar_filters.length == 0 && <Image style={styles.imageVideoView} source={{
               uri: this.state.capturedImage
             }} />}
 
-            {this.state.capturedVideo && <Video repeat={true} style={styles.imageVideoView} source={{
+            {this.state.capturedVideo && challengeObj?.ar_filters.length == 0 && <Video repeat={true} style={styles.imageVideoView} source={{
               uri: this.state.capturedVideo
             }} />}
+            {this.state.capturedImage && challengeObj?.ar_filters.length > 0 &&
+              <View style={styles.imageVideoView}>
+                <ARFilter challengeObj={challengeObj} captureData={this.state.capturedImage} />
+              </View>
+            }
+          </View>
+          <View style={styles.holdTextContainer}>
+            {
+              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) &&
+              <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
+            }
+            {
+              (this.state.capturedImage || this.state.capturedVideo) && route?.params?.challengeObj?.ar_filters.length > 0 &&
+              <Text style={styles.holdText}>Swipe Left or Right for Filters</Text>
+            }
           </View>
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
             {
@@ -602,11 +618,7 @@ const ArChallengeCapture = ({
                 <Text style={styles.timerText}>{this.state.timer}</Text>
               </View>
             }
-            {
-              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) && <View style={styles.holdTextContainer}>
-                <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
-              </View>
-            }
+
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
