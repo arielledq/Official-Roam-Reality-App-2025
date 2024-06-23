@@ -140,10 +140,10 @@ const ARFilter = ({
                   }
                   {fullLocation &&
                     <View style={[styles.locationTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.locationTextTop : styles.locationTextBottom]}>
-                      <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
+                      {/* <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} /> */}
                       <Text style={[styles.locationText,
                       { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
-                      <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
+                      {/* <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} /> */}
                     </View>}
                   <View style={[styles.filterTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.filterTextTop : styles.filterTextBottom]}>
                     <Text style={[styles.bottomText, { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
