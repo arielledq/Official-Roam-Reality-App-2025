@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     flex:1,
     width: '100%',
     position: 'relative',
-    backgroundColor:'#000'
+    backgroundColor:"#0F1424"
   },
   heading: {
     fontSize: FontSizes.S14,
@@ -27,17 +27,30 @@ const useStyles = makeStyles(theme => ({
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
     marginTop:20,
-    position: 'absolute',
-    top: -20
+    top:-20,
+    backgroundColor: '#202136',
+  },
+  detailsViewContainer: {
+    paddingHorizontal: screenHorizontalPadding,
+    marginBottom:20,
   },
   container: {
     marginTop: "10%"
   },
   f1: {
-    height: ScreenHeight,
+    flex:1,
+    position: "relative",
+    marginHorizontal: screenHorizontalPadding,
+  },
+  imageVideoView: {
     width: '100%',
+    flex:1,
+    top:0,
+    bottom:0,
+    left:0,
+    right:0,
     position:'absolute',
-    top:0
+    backgroundColor:'#fff'
   },
   bottomContainer: {
     width: '100%',
@@ -46,8 +59,6 @@ const useStyles = makeStyles(theme => ({
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
     flexDirection: 'row',
     paddingHorizontal: 10,
   },
@@ -123,16 +134,12 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
   },
   holdTextContainer: {
-    top: -50,
-    position: 'absolute',
     padding: 5,
     backgroundColor: "#090A1620",
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    left:0,
-    marginHorizontal:20,
-    right:0
+    marginVertical:20
   },
   holdText: {
     ...fontGroup.p600,
@@ -162,21 +169,19 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#1158F4",
     height: 53,
     borderRadius: 8,
-    marginTop: 20,
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingHorizontal: 8,
   },
   viewDetailsIconContainerWrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20
+    alignItems: 'center'
   },
   viewDetailsIcon: {
     width: 37,
     height: 37,
-    marginEnd: 10
+    marginEnd:5
   },
-
   borderStyles: {
     borderStyle: 'dashed',
     borderColor: 'gray',

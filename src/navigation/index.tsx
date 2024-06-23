@@ -38,7 +38,6 @@ import GeoArSiteDetails from '../screens/geoarchallenge/sitedetails';
 import GeoArSiteRoutes from '../screens/geoarchallenge/siteroutes';
 import GeoArSiteNavigation from '../screens/geoarchallenge/navigationsite';
 import GeoArOutdoor from '../screens/geoarchallenge/outdoorgeoar';
-import ARFilter from '../screens/archallenge/FilterView';
 import Feedback from '../../screens/support-send-feedback/Feedback';
 import InviteFriends from '../screens/inviteFriends/InviteFriends';
 import GeoArSiteArrived from '../screens/geoarchallenge/arrivedsite';
@@ -115,7 +114,6 @@ const Navigation = () => {
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
         <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
-        <Stack.Screen name="ARFilter" component={ARFilter} />
         <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
         <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
         <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
