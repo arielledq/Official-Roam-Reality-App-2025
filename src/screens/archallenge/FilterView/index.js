@@ -12,21 +12,19 @@ import PagerView from 'react-native-pager-view';
 import { DragTextEditor } from 'react-native-drag-text-editor';
 import Geocoder from 'react-native-geocoding';
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
+import { Image } from "@rneui/base";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 const { width } = Dimensions.get('window');
 
 const ARFilter = ({
-
+  challengeObj, captureData, viewShotRef
 }) => {
   const styles = useStyles()
   const route = useRoute()
   const navigation = useNavigation()
-  const challengeObj = route?.params?.challengeObj;
-  const captureData = route?.params?.captureData;
-  const ar_filters = route?.params?.challengeObj?.ar_filters;
-  const viewShotRef = useRef();
+  const ar_filters = challengeObj?.ar_filters;
   const [location, setLocation] = useState(null)
   const [fullLocation, setFullLocation] = useState(null)
 
@@ -123,50 +121,40 @@ const ARFilter = ({
   }, []);
 
   return (
-    <View style={styles.mainContainer}>
-      <ViewShot ref={viewShotRef} style={styles.mainContainer} options={{ fileName: "filtered_share", format: "jpg", quality: 0.9 }}>
-        <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
-          <PagerView style={styles.pagerView} initialPage={0}>
-            {
-              ar_filters.map((filter) => {
-                return (
-                  <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
-                    <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                      colors={
-                        filter.gradient_direction == 'TOP_TO_BOTTOM' ?
-                          [...filter.gradient_colors, 'transparent'] :
-                          ['transparent', ...filter.gradient_colors]
-                      } />
-                    {fullLocation &&
-                      <View style={[styles.locationTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.locationTextTop : styles.locationTextBottom]}>
-                        <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
-                        <Text style={[styles.locationText,
-                        { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
-                        <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
-                      </View>}
-                    <View style={[styles.filterTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.filterTextTop : styles.filterTextBottom]}>
-                      <Text style={[styles.bottomText, { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
-                    </View>
-                  </View>
-                )
-              })
-            }
-          </PagerView>
-        </BackgroundWithImage>
-      </ViewShot>
+    <ViewShot ref={viewShotRef} style={styles.mainContainer} options={{ fileName: "filtered_share", format: "jpg", quality: 0.9 }}>
+      <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
+        <PagerView style={styles.pagerView} initialPage={0}>
+          {
+            ar_filters.map((filter) => {
+              return (
+                <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
 
-      <View style={{
-        position: 'absolute', bottom: 20, flex: 1, zIndex: 500, justifyContent: 'center', left: 0, right: 0, alignItems: 'flex-end',
-        padding: 20,justifyContent:'space-between',flexDirection:'row'
-      }}>
-        <TouchableOpacity  style={{transform: [{ rotate: '180deg' }]}} onPress={()=>navigation.goBack()}>
-          <RightArrowIcon />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={navigateToShare}>
-          <RightArrowIcon />
-        </TouchableOpacity>
-      </View>
-    </View>
+                  <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                    colors={
+                      filter.gradient_direction == 'TOP_TO_BOTTOM' ?
+                        [...filter.gradient_colors, 'transparent'] :
+                        ['transparent', ...filter.gradient_colors]
+                    } />
+                  {filter.image &&
+                    <Image source={filter.image} resizeMode="cover" style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0, width: '100%', height: '100%' }} />
+                  }
+                  {fullLocation &&
+                    <View style={[styles.locationTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.locationTextTop : styles.locationTextBottom]}>
+                      <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
+                      <Text style={[styles.locationText,
+                      { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
+                      <View style={{ flex: 1, height: 2, backgroundColor: '#fff' }} />
+                    </View>}
+                  <View style={[styles.filterTextView, filter.gradient_direction == 'TOP_TO_BOTTOM' ? styles.filterTextTop : styles.filterTextBottom]}>
+                    <Text style={[styles.bottomText, { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
+                  </View>
+                </View>
+              )
+            })
+          }
+        </PagerView>
+      </BackgroundWithImage>
+    </ViewShot>
   )
 }
 

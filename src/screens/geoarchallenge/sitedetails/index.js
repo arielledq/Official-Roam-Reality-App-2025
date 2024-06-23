@@ -41,6 +41,9 @@ const GeoArSiteDetails = ({
   const [starsCount, setStarsCount] = useState(0)
 
   const getAddress = () => {
+    if(selectedGeoSite.address_text != ""){
+      setAddress(selectedGeoSite.address_text)
+    }
     Geocoder.from({
       latitude: selectedGeoSite.lat_long.coordinates[1],
       longitude: selectedGeoSite.lat_long.coordinates[0],

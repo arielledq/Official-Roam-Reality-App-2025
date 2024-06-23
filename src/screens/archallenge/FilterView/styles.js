@@ -9,8 +9,7 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
-    flex: 1,
-    position: 'relative'
+    flex: 1
   },
   buttonStyle: {
     height: 50
