@@ -63,7 +63,7 @@ const ARFilter = ({
           longitude: location.longitude
         }).then(json => {
           try {
-            var addressComponent = json.results[json.results.length - 2].formatted_address;
+            var addressComponent = json.results[0].formatted_address;
             setFullLocation(json)
             setLocation(addressComponent)
           } catch (ex) {
@@ -81,24 +81,26 @@ const ARFilter = ({
   }
 
   getLocationText = (location_option) => {
-    var city = null;
+    var locality = null;
+    var sublocality = null;
+    var postal_town = null;
+    var neighborhood = null;
     var country = null;
     var admin_area_2 = null;
     var details = fullLocation.results[0].address_components;
+    console.log("location:", location)
     for (var i = details.length - 1; i >= 0; i--) {
       for (var j = 0; j < details[i].types.length; j++) {
         if (details[i].types[j] == 'locality') {
-          city = details[i].long_name;
+          locality = details[i].long_name;
         } else if (details[i].types[j] == 'sublocality') {
-          city = details[i].long_name;
+          sublocality = details[i].long_name;
         } else if (details[i].types[j] == 'neighborhood') {
-          city = details[i].long_name;
+          neighborhood = details[i].long_name;
         } else if (details[i].types[j] == 'postal_town') {
-          city = details[i].long_name;
-          console.log("postal_town=" + city);
+          postal_town = details[i].long_name;
         } else if (details[i].types[j] == 'administrative_area_level_2') {
           admin_area_2 = details[i].long_name;
-          console.log("admin_area_2=" + city);
         }
         // from "google maps API geocoding get address components"
         // https://stackoverflow.com/questions/50225907/google-maps-api-geocoding-get-address-components
@@ -107,13 +109,38 @@ const ARFilter = ({
         }
       }
     }
+    console.log("locality", locality)
+    console.log("sublocality", sublocality)
+    console.log("neighborhood", neighborhood)
+    console.log("postal_town", postal_town)
+    console.log("admin_area_2", admin_area_2)
     if (location_option == "COUNTRY_ONLY") {
       return country;
     } else {
-      if (admin_area_2) {
-        return `${city}, ${admin_area_2}, ${country}`;
+      if (admin_area_2 || locality) {
+        if (sublocality && neighborhood && postal_town) {
+          return `${postal_town}, ${admin_area_2}, ${country}`;
+        } else if (!locality && sublocality && neighborhood && postal_town) {
+          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}, ${country}`;
+        } else if (!locality && !sublocality && neighborhood && postal_town) {
+          return `${neighborhood} ${postal_town}, ${admin_area_2}, ${country}`;
+        } else if (!locality && !sublocality && !neighborhood && postal_town) {
+          return `${postal_town}, ${admin_area_2}, ${country}`;
+        } else if (neighborhood && postal_town && sublocality) {
+          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}, ${country}`;
+        } else if (neighborhood && sublocality) {
+          return `${neighborhood} ${sublocality}, ${admin_area_2}, ${country}`;
+        } else if (postal_town && sublocality) {
+          return `${postal_town} ${sublocality}, ${admin_area_2}, ${country}`;
+        } else if (sublocality) {
+          return `${sublocality}, ${admin_area_2}, ${country}`;
+        } else if (!admin_area_2 && locality) {
+          return `${locality}, ${country}`;
+        } else if (!locality && admin_area_2) {
+          return `${admin_area_2}, ${country}`;
+        }
       } else {
-        return `${city}, ${country}`;
+        return `${country}`;
       }
     }
   }
