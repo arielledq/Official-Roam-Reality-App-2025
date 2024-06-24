@@ -371,6 +371,9 @@ const ArChallengeCapture = ({
 
 
     async startRecordVideo() {
+      if(challengeObj?.ar_filters.length > 0){
+        return;
+      }
       this.setState({
         capturedImage: null,
         recordingStart: true
@@ -607,7 +610,7 @@ const ArChallengeCapture = ({
           </View>
           <View style={styles.holdTextContainer}>
             {
-              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) &&
+              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) && challengeObj?.ar_filters.length == 0 &&
               <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
             }
             {

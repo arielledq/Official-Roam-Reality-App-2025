@@ -26,6 +26,9 @@
 		78A5E58FE1EA4917A8853C38 /* NunitoSans_10pt-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */; };
 		7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */; };
 		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
+		7A5AF0CD2C29979D00A603EE /* GlacialIndifference-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7A5AF0CA2C2982AF00A603EE /* GlacialIndifference-Bold.otf */; };
+		7A5AF0CE2C29979D00A603EE /* GlacialIndifference-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7A5AF0CC2C2982AF00A603EE /* GlacialIndifference-Italic.otf */; };
+		7A5AF0CF2C29979D00A603EE /* GlacialIndifference-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7A5AF0CB2C2982AF00A603EE /* GlacialIndifference-Regular.otf */; };
 		7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8203743F5590401D93CFBA74 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */; };
@@ -106,6 +109,9 @@
 		74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-black.otf"; path = "../src/assets/fonts/sf-ui-display-black.otf"; sourceTree = "<group>"; };
 		7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
 		7A0A2F212B7FA27000E778AF /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../../src/assets/ar/record.mp3; sourceTree = "<group>"; };
+		7A5AF0CA2C2982AF00A603EE /* GlacialIndifference-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "GlacialIndifference-Bold.otf"; path = "../../../src/assets/fonts/GlacialIndifference-Bold.otf"; sourceTree = "<group>"; };
+		7A5AF0CB2C2982AF00A603EE /* GlacialIndifference-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "GlacialIndifference-Regular.otf"; path = "../../../src/assets/fonts/GlacialIndifference-Regular.otf"; sourceTree = "<group>"; };
+		7A5AF0CC2C2982AF00A603EE /* GlacialIndifference-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "GlacialIndifference-Italic.otf"; path = "../../../src/assets/fonts/GlacialIndifference-Italic.otf"; sourceTree = "<group>"; };
 		7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-medium.otf"; path = "../../../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
@@ -292,6 +298,9 @@
 				90EF264B2B5039E300872709 /* AntDesign.ttf */,
 				90EF264C2B5039E300872709 /* Foundation.ttf */,
 				90EF264D2B5039E300872709 /* Ionicons.ttf */,
+				7A5AF0CA2C2982AF00A603EE /* GlacialIndifference-Bold.otf */,
+				7A5AF0CC2C2982AF00A603EE /* GlacialIndifference-Italic.otf */,
+				7A5AF0CB2C2982AF00A603EE /* GlacialIndifference-Regular.otf */,
 				90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */,
 				7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */,
 				90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */,
@@ -412,6 +421,10 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7A5AF0CD2C29979D00A603EE /* GlacialIndifference-Bold.otf in Resources */,
+				7A5AF0CE2C29979D00A603EE /* GlacialIndifference-Italic.otf in Resources */,
+				7A5AF0CF2C29979D00A603EE /* GlacialIndifference-Regular.otf in Resources */,
+				3B7B221EF1F84DE3A93B6D08 /* sf-ui-display-medium.otf in Resources */,
 				90AF16932B55A6A6007514E1 /* Fontisto.ttf in Resources */,
 				90AF16942B55A6A6007514E1 /* Octicons.ttf in Resources */,
 				90AF16952B55A6A6007514E1 /* Feather.ttf in Resources */,
@@ -435,7 +448,6 @@
 				8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */,
 				7241EFA2F08C408BA847C61D /* sf-ui-display-bold.otf in Resources */,
 				0FD2C6B450084C2ABA964DAB /* sf-ui-display-light.otf in Resources */,
-				3B7B221EF1F84DE3A93B6D08 /* sf-ui-display-medium.otf in Resources */,
 				18ECC00FF4674AD1A5278128 /* sf-ui-display-semibold.otf in Resources */,
 				B45D634D2BC0480EBFA69C7D /* sf-ui-display-thin.otf in Resources */,
 				8BF9013D26454852A8AAC264 /* sf-ui-display-ultralight.otf in Resources */,

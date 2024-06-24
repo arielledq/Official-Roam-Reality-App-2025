@@ -139,7 +139,8 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    marginVertical:20
+    marginVertical:20,
+    height:20,
   },
   holdText: {
     ...fontGroup.p600,
