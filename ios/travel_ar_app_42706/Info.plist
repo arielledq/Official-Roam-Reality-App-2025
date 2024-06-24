@@ -144,6 +144,9 @@
 		<string>Poppins-SemiBold.ttf</string>
 		<string>Poppins-Thin.ttf</string>
 		<string>sf-ui-display-regular.ttf</string>
+    <string>GlacialIndifference-Bold.otf</string>
+    <string>GlacialIndifference-Regular.otf</string>
+    <string>GlacialIndifference-Italic.otf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
