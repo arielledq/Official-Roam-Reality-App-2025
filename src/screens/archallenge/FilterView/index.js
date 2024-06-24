@@ -46,12 +46,6 @@ const ARFilter = ({
 
   const _resizerSnapPoints = ['right', 'left'];
 
-  const navigateToShare = () => {
-    viewShotRef.current.capture().then(uri => {
-      navigation.replace("ArChallengeShare", { challengeObj: challengeObj, captureData: uri });
-    });
-  }
-
   const getLocation = () => {
     GetLocation.getCurrentPosition({
       enableHighAccuracy: true,
@@ -166,7 +160,7 @@ const ARFilter = ({
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
                   {filter.image ?
-                    <Image source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%' }} />
+                    <Image source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%',backgroundColor:'tranparent' }} />
                     : <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
                       colors={
                         filter.gradient_direction == 'TOP_TO_BOTTOM' ?
