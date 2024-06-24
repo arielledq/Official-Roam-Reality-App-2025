@@ -61,7 +61,20 @@ const fonts = {
   NS900:
     Platform.OS == 'android'
       ? 'NunitoSans_10pt-Black'
-      : 'Nunito Sans 10pt Black'
+      : 'Nunito Sans 10pt Black',
+
+  GIBold:
+    Platform.OS == 'android'
+      ? 'GlacialIndifference-Bold'
+      : 'Glacial Indifference',
+  GIItalic:
+    Platform.OS == 'android'
+      ? 'GlacialIndifference-Italic'
+      : 'Glacial Indifference Italic',
+  GIRegular:
+    Platform.OS == 'android'
+      ? 'GlacialIndifference-Regular'
+      : 'Glacial Indifference Regular',
 }
 
 const fontGroup = {
@@ -164,6 +177,17 @@ const fontGroup = {
   ns900: {
     fontFamily: fonts.NS900,
     fontWeight: Platform.OS == 'android' ? null : '900'
+  },
+
+  giBold:{
+    fontFamily: fonts.GIBold,
+    fontWeight: "bold"
+  },
+  giItalic:{
+    fontFamily: fonts.GIItalic
+  },
+  giRegular:{
+    fontFamily: fonts.GIRegular
   }
 }
 
