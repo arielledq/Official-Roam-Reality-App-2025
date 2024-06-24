@@ -283,7 +283,7 @@ const UniqueArChallengeShare = ({
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
-          text: "Unique Site AR",
+        text: "Unique Site AR",
         numberOfLines: 2,
         style: [styles.heading],
       }} backgroundColor="transparent" />
@@ -293,13 +293,12 @@ const UniqueArChallengeShare = ({
         }>
         <AppText numberOfLines={3} style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
-        <View style={styles.detailContainer}>
-
+        <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
           {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1 }} source={{
             uri: captureData
           }} />
             :
-            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', flex: 1, height: imageHeight }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
