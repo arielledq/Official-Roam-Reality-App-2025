@@ -139,6 +139,7 @@ class ARChallengeFilters(models.Model):
         _("Filter Name"), default=None, null=False, blank=False, max_length=255
     )
     image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
+    text_form_image = models.BooleanField(_("Load Image Text"), default=False)
     gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False)
     gradient_direction = models.CharField(
         max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=False, null=False
@@ -151,6 +152,9 @@ class ARChallengeFilters(models.Model):
     )
     location_text_size = models.CharField(_("Location Text Size"), max_length=10, blank=False, null=False,default='18')
     location_text_color = models.CharField(_("Location Text Color"), max_length=10, blank=False, null=False,default='#ffffff')
+    app_name_text = models.CharField(_("App Name Text"), max_length=200, blank=True, null=True,default='ROAM REALITY')
+    app_name_text_size = models.CharField(_("App Name Text Size"), max_length=10, blank=False, null=False,default='14')
+    app_name_text_color = models.CharField(_("App Name Text Color"), max_length=10, blank=False, null=False,default='#ffffff')
 
     class Meta:
         verbose_name_plural = "AR Filters"
