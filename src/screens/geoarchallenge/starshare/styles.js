@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S12,
     color: "#F2F2F2",
     width: '100%',
-    marginTop:2
+    marginTop: 2
   },
   challengeSponsorStartDateText: {
     ...fontGroup.p300,
@@ -78,13 +78,13 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "#272741",
     marginVertical: 5,
     overflow: 'hidden',
-    alignItems:'center',
-    justifyContent:'space-between',
-    flexDirection:'row',
-    paddingHorizontal:10
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    paddingHorizontal: 10
   },
-  shareBtn:{
-    marginHorizontal:8
+  shareBtn: {
+    marginHorizontal: 8
   },
   heading: {
     fontSize: FontSizes.S20,
@@ -92,9 +92,9 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     color: theme.colors.white,
     marginTop: 5,
-    textAlign:'center'
+    textAlign: 'center'
   },
-  shareText:{
+  shareText: {
     ...fontGroup.p400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
@@ -104,7 +104,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     backgroundColor: "#272741",
     marginTop: 10,
-    marginBottom:20,
+    marginBottom: 20,
     overflow: 'hidden'
   },
   detailContainer: {
@@ -112,7 +112,7 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     backgroundColor: "#272741",
     marginTop: 10,
-    marginBottom:20,
+    marginBottom: 20,
     overflow: 'hidden'
   },
   pointsParentContainer: {
@@ -123,15 +123,32 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     paddingHorizontal: 20
   },
-  detailPointContainter:
-  {
+  detailPointContainter: {
     flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     width: 73,
     height: 63,
     borderRadius: 8,
-    backgroundColor:'transparent'
+    backgroundColor: 'transparent'
+  },
+  titleText:{
+    ...fontGroup.p600,
+    fontSize: FontSizes.S16,
+    color: '#C881F0',
+  },
+  descriptionText:{
+    ...fontGroup.p400,
+    fontSize: FontSizes.S10,
+    color: theme.colors.white,
+    lineHeight: FontLineHeights.LH14,
+  },
+  sponsoredByText:{
+    ...fontGroup.ns600,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
+    lineHeight: FontLineHeights.LH15,
+    fontWeight:'600'
   }
 }))
 
