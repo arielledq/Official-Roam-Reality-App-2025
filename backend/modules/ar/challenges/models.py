@@ -374,6 +374,11 @@ class GeoArSite(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
+    sponsors = models.ManyToManyField(
+        Sponsor,
+        verbose_name="Sponsors",
+        related_name="ar_sites_sponsored",
+    )
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
