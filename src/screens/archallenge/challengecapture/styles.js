@@ -134,13 +134,12 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
   },
   holdTextContainer: {
-    padding: 5,
     backgroundColor: "#090A1620",
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
     marginVertical:20,
-    height:20,
+    height:25,
   },
   holdText: {
     ...fontGroup.p600,
