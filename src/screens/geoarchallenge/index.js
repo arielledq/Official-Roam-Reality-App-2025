@@ -38,7 +38,7 @@ import LinearGradient from "react-native-linear-gradient"
 import { height, width } from "../../util/AppDimensions"
 import { MenuIcon } from "../../assets/svg"
 
-const GeoArChallenge = ({}) => {
+const GeoArChallenge = ({ }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
@@ -91,10 +91,8 @@ const GeoArChallenge = ({}) => {
       })
   }
 
-  useEffect(() => {
-    ARSposored()
-    ARUserProfile()
-    getSettings()
+  const loadDestinations = () => {
+    setIsLoading(true)
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
@@ -108,6 +106,14 @@ const GeoArChallenge = ({}) => {
       .finally(() => {
         setIsLoading(false)
       })
+
+  }
+
+  useEffect(() => {
+    ARSposored()
+    ARUserProfile()
+    getSettings()
+    loadDestinations()
   }, [])
 
   const navigateToChallengeDetails = obj => {
@@ -214,13 +220,15 @@ const GeoArChallenge = ({}) => {
         }}
         backgroundColor="transparent"
       />
-
-      {isLoading && <ActivityIndicator size="large" />}
       <FlatList
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, marginVertical: 15 }}
         data={destinationData}
         numColumns={1}
+        refreshing={isLoading}
+        onRefresh={() => {
+          loadDestinations()
+        }}
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
