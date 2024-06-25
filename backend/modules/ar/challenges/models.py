@@ -55,6 +55,7 @@ class GeoRegion(models.Model):
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
     latitude_longitude = gis_models.PointField(_("Geo Location"), blank=True, null=True)
+    geo_region = gis_models.MultiLineStringField(_("Geo Region"), blank=True, null=True)
     map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
     map_latitude_delta = models.DecimalField(_("Map Initial Latitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
     
