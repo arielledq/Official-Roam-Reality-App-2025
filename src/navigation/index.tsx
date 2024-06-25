@@ -53,6 +53,7 @@ import Friends from '../screens/friends';
 import AddFriendScreen from '../screens/friends/addFriend';
 import NotificationList from '../screens/notificationList';
 import PublicProfile from '../screens/publicProfile/publicprofile';
+import ArStarChallengeShare from '../screens/geoarchallenge/starshare';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -125,6 +126,7 @@ const Navigation = () => {
         <Stack.Screen name="PinChallenge" component={PinChallenge} />
         <Stack.Screen name="StarChallenge" component={StarChallenge} />
         <Stack.Screen name="ArPinChallengeShare" component={ArPinChallengeShare} />
+        <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
         <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
         <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
         <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />

@@ -20,7 +20,7 @@ import Share from 'react-native-share';
 import RNFS from 'react-native-fs';
 import { share, init, events } from 'react-native-tiktok';
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
-import PinShare from "../../../assets/geoar/pin_share.svg"
+import StarShare from "../../../assets/geoar/star_share.svg"
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { moderateScale } from "../../../util/AppDimensions";
 
@@ -35,18 +35,19 @@ const ArStarChallengeShare = ({
   const styles = useStyles()
   const route = useRoute()
   const navigation = useNavigation()
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = route?.params?.challengeObj;
-  const captureData = route?.params?.captureData;
+  //const captureData = route?.params?.captureData;
+  const captureData = selectedGeoSite.image;
   const hideBottomTab = route?.params?.hideBottomTab;
   let filePath = getPathFromUrl(captureData)
   const fileExt = filePath.split('.').pop();
   const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
   const [imageHeight, setImageHeight] = useState(0)
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const dispatch = useDispatch()
 
-  console.log("challenges", challengeObj.id)
+  console.log("challenges", challengeObj?.id)
   console.log("fileExt", fileExt)
   console.log("captureData", captureData)
 
@@ -254,7 +255,7 @@ const ArStarChallengeShare = ({
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
-        text: "Location Check In",
+        text: "Travel Insights",
         numberOfLines: 2,
         style: [styles.heading],
       }} backgroundColor="transparent" />
@@ -264,22 +265,32 @@ const ArStarChallengeShare = ({
         }>
         <View style={styles.imageContainer}>
           <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />
+          <View style={{ padding: 20 }}>
+            <Text style={styles.titleText}>The Arima Dial</Text>
+            <Text style={styles.descriptionText}>
+              The Arima Dial stands tall and proud as a clock that can be found in the heart of the Borough of Arima in Trinidad. It was purchased in 1898 from France by the then-Mayor John Francis Wallen to commemorate Arima's 10th anniversary as a Royal Borough. Arima had made a name for itself as a hub for cocoa production and was also recognized as the eastern end of the first passenger and freight railway line in Trinidad. Despite facing some setbacks, the Dial was repaired and reinstalled, and it continues to serve as a symbol of Arima's rich history and enduring spirit, ticking away the time with each passing day.
+            </Text>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+              <Text style={styles.sponsoredByText}>Sponsored By</Text>
+              <View></View>
+            </View>
+          </View>
         </View>
         <View style={styles.detailContainer}>
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
               </BackgroundWithImage>
-              <AppText style={styles.pointCount}>{challengeObj.points}</AppText>
+              <AppText style={styles.pointCount}>{challengeObj?.points}</AppText>
               <AppText style={styles.pointCountText}>Points</AppText>
             </View>
             <View style={{ paddingHorizontal: 10, flex: 1 }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
-                <PinShare style={{ width: 24, height: 24, marginEnd: 10 }} />
-                <Text style={styles.challengeSponsorName}>Just Arrived</Text>
+                <StarShare style={{ width: 20, height: 20, marginEnd: 10 }} />
+                <Text style={styles.challengeSponsorName}>Travel Insights</Text>
               </View>
               <View style={{ width: '100%' }}>
-                <Text style={styles.challengeSponsorTipText}>Share your experience for extra points!</Text>
+                <Text style={styles.challengeSponsorTipText}>Must share this to at least one platform to earn all your star points!</Text>
                 <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%', justifyContent: 'space-between', marginTop: 2 }}>
                   <Text style={styles.challengeSponsorStartDateText}>Completed on : {startDate}</Text>
                 </View>
