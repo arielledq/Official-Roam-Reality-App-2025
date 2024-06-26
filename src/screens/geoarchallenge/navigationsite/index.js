@@ -189,7 +189,6 @@ const GeoArSiteNavigation = ({
               longitudeDelta: 0.0032,
             }}
           >
-
             <Marker
               coordinate={{
                 latitude: selectedGeoSite.lat_long.coordinates[1],
