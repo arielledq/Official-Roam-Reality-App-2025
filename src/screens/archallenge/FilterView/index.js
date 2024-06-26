@@ -148,6 +148,8 @@ const ARFilter = ({
           return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (route && sublocality_level_1) {
           return `${route}, ${sublocality_level_1}, ${locality}, ${country}`;
+        } else if (route) {
+          return `${route}, ${locality}, ${country}`;
         } else if (sublocality) {
           return `${sublocality}, ${locality}, ${country}`;
         } else if (!admin_area_2 && locality) {
