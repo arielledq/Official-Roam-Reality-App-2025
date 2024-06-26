@@ -17,6 +17,7 @@ import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
 import { getARSitesHiddenStars } from "../../../network";
 import AppSwitch from "../../../components/Switch";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 
 
 const GeoArChallengeDetails = ({
@@ -27,6 +28,7 @@ const GeoArChallengeDetails = ({
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
   const [arSitesOn, setARSitesOnSwitch] = useState(true)
+  const [selectedRegionName, setSelectedRegionName] = useState('Full')
   const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true)
   const navigation = useNavigation()
   const mapView = useRef();
@@ -58,6 +60,7 @@ const GeoArChallengeDetails = ({
 
   const moveToFullRegion = () => {
     mapView.current.animateToRegion(fullRegion)
+    setSelectedRegionName("Full")
   }
 
   const getHiddenStar = () => {
@@ -108,12 +111,26 @@ const GeoArChallengeDetails = ({
   }
 
   const moveToRegion = (r) => {
+    console.log("moveToRegion", r)
+    console.log("moveToRegion", r.geo_region.coordinates)
+    let arrayPoints = []
+    for (i = 0; i < r.geo_region.coordinates.length; i++) {
+      const points = r.geo_region.coordinates[i];
+      for (j = 0; j < points.length; j++) {
+        const point = points[j]
+        arrayPoints.push({ latitude: point[1], longitude: point[0] })
+      }
+    }
+    const latitude_longitude = getCenterOfBounds(arrayPoints)
+    const bounds = getBounds(arrayPoints)
+    console.log("bounds:", bounds)
     mapView.current.animateToRegion({
-      latitude: Number(r.latitude_longitude.coordinates[0]),
-      longitude: Number(r.latitude_longitude.coordinates[1]),
-      latitudeDelta: Number(r.map_latitude_delta),
-      longitudeDelta: Number(r.map_longitude_delta),
+      latitude: Number(latitude_longitude.latitude),
+      longitude: Number(latitude_longitude.longitude),
+      latitudeDelta: Number(bounds.maxLat - bounds.minLat),
+      longitudeDelta:  Number(bounds.maxLng - bounds.minLng),
     })
+    setSelectedRegionName(r.name)
   }
 
   return (
@@ -127,13 +144,13 @@ const GeoArChallengeDetails = ({
       {isLoading && <ActivityIndicator size="large" />}
       <View style={{ marginVertical: 20 }}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} style={{ width: '100%', height: 50 }} contentContainerStyle={_styles.rowView}>
-          <TouchableOpacity onPress={moveToFullRegion} activeOpacity={.5} style={_styles.selectButtonStyle}>
+          <TouchableOpacity onPress={moveToFullRegion} activeOpacity={.5} style={selectedRegionName == 'Full' ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Full</Text>
           </TouchableOpacity>
           {
             regions.map(e => {
               return (
-                <TouchableOpacity activeOpacity={.5} onPress={() => moveToRegion(e)} style={_styles.unSelectButtonStyle}>
+                <TouchableOpacity activeOpacity={.5} onPress={() => moveToRegion(e)} style={selectedRegionName == e.name ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
                   <Text style={_styles.buttonSelectText}>{e.name}</Text>
                 </TouchableOpacity>
               )

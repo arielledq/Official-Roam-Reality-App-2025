@@ -7,6 +7,14 @@ interface LocationPoint {
   longitude: number;
 }
 
+export const getCenterOfBounds = (coords: LocationPoint[]) => {
+  return geolib.getCenterOfBounds(coords);
+}
+
+export const getBounds = (coords: LocationPoint[]) => {
+  return geolib.getBounds(coords);
+}
+
 export const isLocationPointInPolygon = (point: LocationPoint, coords: LocationPoint[]) => {
   return geolib.isPointInPolygon(point, coords);
 }
