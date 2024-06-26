@@ -144,8 +144,10 @@ const ARFilter = ({
           return `${postal_town} ${sublocality}, ${admin_area_2}, ${country}`;
         } else if (route && sublocality_level_1 && sublocality) {
           return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
-        }else if (sublocality_level_1 && sublocality) {
-          return `${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
+        } else if (route && sublocality_level_1 && sublocality) {
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
+        } else if (route && sublocality_level_1 ) {
+          return `${route}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (sublocality) {
           return `${sublocality}, ${locality}, ${country}`;
         } else if (!admin_area_2 && locality) {
