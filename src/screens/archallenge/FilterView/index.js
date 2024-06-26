@@ -146,7 +146,7 @@ const ARFilter = ({
           return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (route && sublocality_level_1 && sublocality) {
           return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
-        } else if (route && sublocality_level_1 ) {
+        } else if (route && sublocality_level_1) {
           return `${route}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (sublocality) {
           return `${sublocality}, ${locality}, ${country}`;
@@ -193,7 +193,7 @@ const ARFilter = ({
                   <View style={[styles.textFilterView, { justifyContent: filter.gradient_direction == 'TOP_TO_BOTTOM' ? "flex-start" : "flex-end" }]}>
                     {!filter.text_form_image &&
                       <Text
-                        style={[styles.bottomText,
+                        style={[styles.filterTitleText,
                         { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
                     }
                     {fullLocation && !filter.text_form_image &&
