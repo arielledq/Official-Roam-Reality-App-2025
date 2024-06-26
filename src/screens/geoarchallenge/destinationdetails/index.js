@@ -91,6 +91,9 @@ const GeoArChallengeDetails = ({
         fullRegion.latitude = Number(full_latitude_longitude.latitude);
         fullRegion.longitude = Number(full_latitude_longitude.longitude);
       }
+      console.log("full_bounds",full_bounds)
+      console.log("full_latitude_longitude",full_latitude_longitude)
+      console.log("full_latitude_longitude",selectedDestination.border)
       setFullRegion(fullRegion)
     }
     getHiddenStar()
