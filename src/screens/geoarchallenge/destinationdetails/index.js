@@ -49,8 +49,8 @@ const GeoArChallengeDetails = ({
         const fullRegion = {
           latitude: location.lat,
           longitude: location.lng,
-          latitudeDelta: Number(selectedDestination.map_latitude_delta),
-          longitudeDelta: Number(selectedDestination.map_longitude_delta),
+          latitudeDelta: Number(bounds.northeast.lat - bounds.southwest.lat),
+          longitudeDelta: Number(bounds.northeast.lng - bounds.southwest.lng),
         }
         mapView.current.animateToRegion(fullRegion)
         setFullRegion(fullRegion)
@@ -111,8 +111,6 @@ const GeoArChallengeDetails = ({
   }
 
   const moveToRegion = (r) => {
-    console.log("moveToRegion", r)
-    console.log("moveToRegion", r.geo_region.coordinates)
     let arrayPoints = []
     for (i = 0; i < r.geo_region.coordinates.length; i++) {
       const points = r.geo_region.coordinates[i];
@@ -123,12 +121,11 @@ const GeoArChallengeDetails = ({
     }
     const latitude_longitude = getCenterOfBounds(arrayPoints)
     const bounds = getBounds(arrayPoints)
-    console.log("bounds:", bounds)
     mapView.current.animateToRegion({
       latitude: Number(latitude_longitude.latitude),
       longitude: Number(latitude_longitude.longitude),
       latitudeDelta: Number(bounds.maxLat - bounds.minLat),
-      longitudeDelta:  Number(bounds.maxLng - bounds.minLng),
+      longitudeDelta: Number(bounds.maxLng - bounds.minLng),
     })
     setSelectedRegionName(r.name)
   }
@@ -149,11 +146,12 @@ const GeoArChallengeDetails = ({
           </TouchableOpacity>
           {
             regions.map(e => {
-              return (
-                <TouchableOpacity activeOpacity={.5} onPress={() => moveToRegion(e)} style={selectedRegionName == e.name ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
-                  <Text style={_styles.buttonSelectText}>{e.name}</Text>
-                </TouchableOpacity>
-              )
+              if (e.geo_region)
+                return (
+                  <TouchableOpacity key={e.id} activeOpacity={.5} onPress={() => moveToRegion(e)} style={selectedRegionName == e.name ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+                    <Text style={_styles.buttonSelectText}>{e.name}</Text>
+                  </TouchableOpacity>
+                )
             })
           }
           {/* <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
