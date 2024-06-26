@@ -80,11 +80,24 @@ const ARFilter = ({
     var postal_town = null;
     var neighborhood = null;
     var country = null;
+    var route = null;
     var admin_area_2 = null;
+    var sublocality_level_2 = null;
+    var sublocality_level_1 = null;
     var details = fullLocation.results[0].address_components;
     console.log("location:", location)
+    console.log("fullLocation.results[0].address_components:", fullLocation.results[0].address_components)
     for (var i = details.length - 1; i >= 0; i--) {
       for (var j = 0; j < details[i].types.length; j++) {
+        if (details[i].types[j] == 'sublocality_level_2') {
+          sublocality_level_2 = details[i].long_name;
+        }
+        if (details[i].types[j] == 'route') {
+          route = details[i].long_name;
+        }
+        if (details[i].types[j] == 'sublocality_level_1') {
+          sublocality_level_1 = details[i].long_name;
+        }
         if (details[i].types[j] == 'locality') {
           locality = details[i].long_name;
         } else if (details[i].types[j] == 'sublocality') {
@@ -103,8 +116,11 @@ const ARFilter = ({
         }
       }
     }
+    console.log("route", route)
     console.log("locality", locality)
     console.log("sublocality", sublocality)
+    console.log("sublocality_level_2", sublocality_level_2)
+    console.log("sublocality_level_1", sublocality_level_1)
     console.log("neighborhood", neighborhood)
     console.log("postal_town", postal_town)
     console.log("admin_area_2", admin_area_2)
@@ -126,8 +142,12 @@ const ARFilter = ({
           return `${neighborhood} ${sublocality}, ${admin_area_2}, ${country}`;
         } else if (postal_town && sublocality) {
           return `${postal_town} ${sublocality}, ${admin_area_2}, ${country}`;
+        } else if (route && sublocality_level_1 && sublocality) {
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
+        }else if (sublocality_level_1 && sublocality) {
+          return `${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (sublocality) {
-          return `${sublocality}, ${admin_area_2}, ${country}`;
+          return `${sublocality}, ${locality}, ${country}`;
         } else if (!admin_area_2 && locality) {
           return `${locality}, ${country}`;
         } else if (!locality && admin_area_2) {
@@ -160,7 +180,7 @@ const ARFilter = ({
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
                   {filter.image ?
-                    <Image source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%',backgroundColor:'tranparent' }} />
+                    <Image source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
                     : <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
                       colors={
                         filter.gradient_direction == 'TOP_TO_BOTTOM' ?
@@ -169,14 +189,14 @@ const ARFilter = ({
                       } />
                   }
                   <View style={[styles.textFilterView, { justifyContent: filter.gradient_direction == 'TOP_TO_BOTTOM' ? "flex-start" : "flex-end" }]}>
-                    {fullLocation &&
-                      <Text style={[styles.locationText,
-                      { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
-                    }
                     {!filter.text_form_image &&
                       <Text
                         style={[styles.bottomText,
                         { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
+                    }
+                    {fullLocation && !filter.text_form_image &&
+                      <Text style={[styles.locationText,
+                      { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
                     }
                     {!
                       filter.text_form_image &&
