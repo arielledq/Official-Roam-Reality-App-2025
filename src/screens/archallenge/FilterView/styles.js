@@ -57,7 +57,7 @@ const useStyles = makeStyles(theme => ({
     textAlign: 'center',
     ...fontGroup.giRegular,
   },
-  bottomText: {
+  filterTitleText: {
     color: '#fff',
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH33,
