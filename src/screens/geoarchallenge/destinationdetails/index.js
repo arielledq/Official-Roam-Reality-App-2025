@@ -17,6 +17,7 @@ import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
 import { getARSitesHiddenStars } from "../../../network";
 import AppSwitch from "../../../components/Switch";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 
 
 const GeoArChallengeDetails = ({
@@ -27,6 +28,7 @@ const GeoArChallengeDetails = ({
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
   const [arSitesOn, setARSitesOnSwitch] = useState(true)
+  const [selectedRegionName, setSelectedRegionName] = useState('Full')
   const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true)
   const navigation = useNavigation()
   const mapView = useRef();
@@ -47,8 +49,8 @@ const GeoArChallengeDetails = ({
         const fullRegion = {
           latitude: location.lat,
           longitude: location.lng,
-          latitudeDelta: Number(selectedDestination.map_latitude_delta),
-          longitudeDelta: Number(selectedDestination.map_longitude_delta),
+          latitudeDelta: Number(bounds.northeast.lat - bounds.southwest.lat),
+          longitudeDelta: Number(bounds.northeast.lng - bounds.southwest.lng),
         }
         mapView.current.animateToRegion(fullRegion)
         setFullRegion(fullRegion)
@@ -58,6 +60,7 @@ const GeoArChallengeDetails = ({
 
   const moveToFullRegion = () => {
     mapView.current.animateToRegion(fullRegion)
+    setSelectedRegionName("Full")
   }
 
   const getHiddenStar = () => {
@@ -78,6 +81,19 @@ const GeoArChallengeDetails = ({
         latitudeDelta: Number(selectedDestination.map_latitude_delta),
         longitudeDelta: Number(selectedDestination.map_longitude_delta),
       }
+      const full_latitude_longitude = getFullCenter();
+      const full_bounds = getFullBounds();
+      if (full_bounds) {
+        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
+      }
+      if (full_latitude_longitude) {
+        fullRegion.latitude = Number(full_latitude_longitude.latitude);
+        fullRegion.longitude = Number(full_latitude_longitude.longitude);
+      }
+      console.log("full_bounds",full_bounds)
+      console.log("full_latitude_longitude",full_latitude_longitude)
+      console.log("full_latitude_longitude",selectedDestination.border)
       setFullRegion(fullRegion)
     }
     getHiddenStar()
@@ -107,13 +123,76 @@ const GeoArChallengeDetails = ({
     }
   }
 
+  const getFullBounds = _ => {
+    if (selectedDestination.border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedDestination.border.coordinates.length; i++) {
+        const points = selectedDestination.border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const bounds = getBounds(arrayPoints)
+      return bounds;
+    } else {
+      return null
+    }
+  }
+
+  const getFullCenter = _ => {
+    if (selectedDestination.border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedDestination.border.coordinates.length; i++) {
+        const points = selectedDestination.border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const latitude_longitude = getCenterOfBounds(arrayPoints)
+      return latitude_longitude;
+    } else {
+      return null
+    }
+  }
+
   const moveToRegion = (r) => {
+    let arrayPoints = []
+    for (i = 0; i < r.geo_region.coordinates.length; i++) {
+      const points = r.geo_region.coordinates[i];
+      for (j = 0; j < points.length; j++) {
+        const point = points[j]
+        arrayPoints.push({ latitude: point[1], longitude: point[0] })
+      }
+    }
+    const latitude_longitude = getCenterOfBounds(arrayPoints)
+    const bounds = getBounds(arrayPoints)
     mapView.current.animateToRegion({
-      latitude: Number(r.latitude_longitude.coordinates[0]),
-      longitude: Number(r.latitude_longitude.coordinates[1]),
-      latitudeDelta: Number(r.map_latitude_delta),
-      longitudeDelta: Number(r.map_longitude_delta),
+      latitude: Number(latitude_longitude.latitude),
+      longitude: Number(latitude_longitude.longitude),
+      latitudeDelta: Number(bounds.maxLat - bounds.minLat),
+      longitudeDelta: Number(bounds.maxLng - bounds.minLng),
     })
+    setSelectedRegionName(r.name)
+  }
+  const initialRegion = {
+    latitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
+      selectedDestination.geo_location?.coordinates[1] : 21.758821200665473,
+    longitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
+      selectedDestination.geo_location?.coordinates[0] : -80.41984442094248,
+    latitudeDelta: selectedDestination.map_latitude_delta ? Number(selectedDestination.map_latitude_delta) : 0.0922,
+    longitudeDelta: selectedDestination.map_longitude_delta ? Number(selectedDestination.map_longitude_delta) : 0.0421,
+  }
+  const full_latitude_longitude = getFullCenter();
+  const full_bounds = getFullBounds();
+  if (full_bounds) {
+    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
+  }
+  if (full_latitude_longitude) {
+    initialRegion.latitude = Number(full_latitude_longitude.latitude);
+    initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
   return (
@@ -127,24 +206,19 @@ const GeoArChallengeDetails = ({
       {isLoading && <ActivityIndicator size="large" />}
       <View style={{ marginVertical: 20 }}>
         <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} showsVerticalScrollIndicator={false} style={{ width: '100%', height: 50 }} contentContainerStyle={_styles.rowView}>
-          <TouchableOpacity onPress={moveToFullRegion} activeOpacity={.5} style={_styles.selectButtonStyle}>
+          <TouchableOpacity onPress={moveToFullRegion} activeOpacity={.5} style={selectedRegionName == 'Full' ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
             <Text style={_styles.buttonSelectText}>Full</Text>
           </TouchableOpacity>
           {
             regions.map(e => {
-              return (
-                <TouchableOpacity activeOpacity={.5} onPress={() => moveToRegion(e)} style={_styles.unSelectButtonStyle}>
-                  <Text style={_styles.buttonSelectText}>{e.name}</Text>
-                </TouchableOpacity>
-              )
+              if (e.geo_region)
+                return (
+                  <TouchableOpacity key={e.id} activeOpacity={.5} onPress={() => moveToRegion(e)} style={selectedRegionName == e.name ? _styles.selectButtonStyle : _styles.unSelectButtonStyle}>
+                    <Text style={_styles.buttonSelectText}>{e.name}</Text>
+                  </TouchableOpacity>
+                )
             })
           }
-          {/* <TouchableOpacity onPress={() => navigation.navigate("GeoArSiteDetails")} activeOpacity={.5} style={_styles.unSelectButtonStyle}>
-            <Text style={_styles.buttonSelectText}>Diego Martin Region</Text>
-          </TouchableOpacity>
-          <TouchableOpacity activeOpacity={.5} style={_styles.unSelectButtonStyle}>
-            <Text style={_styles.buttonSelectText}>San Juan-Laventille Region</Text>
-          </TouchableOpacity> */}
         </ScrollView>
       </View>
       <View style={{ flexDirection: 'row', marginBottom: 20, justifyContent: 'space-between' }}>
@@ -172,14 +246,7 @@ const GeoArChallengeDetails = ({
           provider={PROVIDER_GOOGLE}
           ref={mapView}
           style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-          initialRegion={{
-            latitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
-              selectedDestination.geo_location?.coordinates[1] : 21.758821200665473,
-            longitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
-              selectedDestination.geo_location?.coordinates[0] : -80.41984442094248,
-            latitudeDelta: selectedDestination.map_latitude_delta ? Number(selectedDestination.map_latitude_delta) : 0.0922,
-            longitudeDelta: selectedDestination.map_longitude_delta ? Number(selectedDestination.map_longitude_delta) : 0.0421,
-          }}
+          initialRegion={initialRegion}
         >
           {/* {
             selectedDestination.unique_ar_sites.map((o) => {

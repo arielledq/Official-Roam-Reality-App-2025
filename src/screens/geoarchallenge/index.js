@@ -92,6 +92,9 @@ const GeoArChallenge = ({ }) => {
   }
 
   const loadDestinations = () => {
+    ARSposored()
+    ARUserProfile()
+    getSettings()
     setIsLoading(true)
     getARChallenges()
       .then(res => {
@@ -110,9 +113,6 @@ const GeoArChallenge = ({ }) => {
   }
 
   useEffect(() => {
-    ARSposored()
-    ARUserProfile()
-    getSettings()
     loadDestinations()
   }, [])
 
