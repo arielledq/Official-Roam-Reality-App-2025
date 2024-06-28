@@ -556,3 +556,34 @@ class StarCollection(models.Model):
 
     def __str__(self):
         return str(self.id)
+    
+
+class GeoARGoldStar(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    image = models.ImageField(upload_to="geoargoldstar/img/", null=True, blank=True)
+    star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
+    fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
+    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        related_name="geo_location_ar_gold_star",
+    ) 
+    sponsors = models.ManyToManyField(
+        Sponsor,
+        verbose_name="Sponsors",
+        related_name="ar_gold_stars_sponsored",
+    )
+    price = models.IntegerField(verbose_name="Price", default=0)
+
+    class Meta:
+      verbose_name_plural = "Geo AR Gold Stars"
+      verbose_name = "Geo AR Gold Star"
+
+    def __str__(self):
+        return self.name
