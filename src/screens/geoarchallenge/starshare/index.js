@@ -46,8 +46,9 @@ const ArStarChallengeShare = ({
   const [isLoading, setIsLoading] = useState(false)
   const [imageHeight, setImageHeight] = useState(0)
   const dispatch = useDispatch()
+  const sponsors = selectedGeoSite?.sponsors;
 
-  console.log("challenges", challengeObj?.id)
+  console.log("selectedGeoSite sponsors", selectedGeoSite?.sponsors)
   console.log("fileExt", fileExt)
   console.log("captureData", captureData)
 
@@ -270,9 +271,15 @@ const ArStarChallengeShare = ({
             <Text style={styles.descriptionText}>
               The Arima Dial stands tall and proud as a clock that can be found in the heart of the Borough of Arima in Trinidad. It was purchased in 1898 from France by the then-Mayor John Francis Wallen to commemorate Arima's 10th anniversary as a Royal Borough. Arima had made a name for itself as a hub for cocoa production and was also recognized as the eastern end of the first passenger and freight railway line in Trinidad. Despite facing some setbacks, the Dial was repaired and reinstalled, and it continues to serve as a symbol of Arima's rich history and enduring spirit, ticking away the time with each passing day.
             </Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15 }}>
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15,alignItems:"center" }}>
               <Text style={styles.sponsoredByText}>Sponsored By</Text>
-              <View></View>
+              <View style={{flexDirection:'row'}}>
+                {
+                  sponsors.map((s, index) =>
+                    <Image style={{ width: 26, height: 26 }} key={i} source={{ uri: s.image }} />
+                  )
+                }
+              </View>
             </View>
           </View>
         </View>

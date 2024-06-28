@@ -440,10 +440,15 @@ const StarChallenge = ({
       this.getLocationUpdates()
       this.setStarCounts()
       this.getCollectedStar()
+      setTimeout(()=>this.navigateToShare(),1500)
     }
 
     componentWillUnmount() {
       this.stopLocationUpdates();
+    }
+
+    navigateToShare(){
+      navigation.navigate("ArStarChallengeShare")
     }
 
     _setARNavigatorRef(ARNavigator) {
