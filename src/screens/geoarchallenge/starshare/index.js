@@ -6,7 +6,7 @@ import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
 import AppText from "../../../components/text"
 import useStyles from "./styles"
-import AppButton from "../../../components/button"
+import { FontSizes } from "../../../util/FontUtils"
 import moment from "moment";
 import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
@@ -23,6 +23,8 @@ import BGArShare from "../../../assets/ar/bg-ar-share.png"
 import StarShare from "../../../assets/geoar/star_share.svg"
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { moderateScale } from "../../../util/AppDimensions";
+import RenderHTML from "react-native-render-html";
+const { width } = Dimensions.get('window');
 
 const ArStarChallengeShare = ({
 
@@ -37,6 +39,7 @@ const ArStarChallengeShare = ({
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const challengeObj = route?.params?.challengeObj;
+  const starObj = route?.params?.starObj;
   //const captureData = route?.params?.captureData;
   const captureData = selectedGeoSite.image;
   const hideBottomTab = route?.params?.hideBottomTab;
@@ -49,6 +52,7 @@ const ArStarChallengeShare = ({
   const sponsors = selectedGeoSite?.sponsors;
 
   console.log("selectedGeoSite sponsors", selectedGeoSite?.sponsors)
+  console.log("challengeObj", challengeObj)
   console.log("fileExt", fileExt)
   console.log("captureData", captureData)
 
@@ -267,13 +271,28 @@ const ArStarChallengeShare = ({
         <View style={styles.imageContainer}>
           <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />
           <View style={{ padding: 20 }}>
-            <Text style={styles.titleText}>The Arima Dial</Text>
-            <Text style={styles.descriptionText}>
-              The Arima Dial stands tall and proud as a clock that can be found in the heart of the Borough of Arima in Trinidad. It was purchased in 1898 from France by the then-Mayor John Francis Wallen to commemorate Arima's 10th anniversary as a Royal Borough. Arima had made a name for itself as a hub for cocoa production and was also recognized as the eastern end of the first passenger and freight railway line in Trinidad. Despite facing some setbacks, the Dial was repaired and reinstalled, and it continues to serve as a symbol of Arima's rich history and enduring spirit, ticking away the time with each passing day.
-            </Text>
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15,alignItems:"center" }}>
+            <Text style={styles.titleText}>{starObj?.name}</Text>
+            <RenderHTML
+              contentWidth={width}
+              tagsStyles={{
+                p: {
+                  lineHeight: 13.64,
+                  color: '#fff',
+                  fontSize: FontSizes.S10
+                },
+                strong: {
+                  lineHeight: 13.64,
+                  color: '#fff',
+                  fontSize: FontSizes.S10
+                }
+              }}
+              source={{
+                html: `${starObj?.fun_facts}`
+              }}
+            />
+            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 15, alignItems: "center" }}>
               <Text style={styles.sponsoredByText}>Sponsored By</Text>
-              <View style={{flexDirection:'row'}}>
+              <View style={{ flexDirection: 'row' }}>
                 {
                   sponsors.map((s, index) =>
                     <Image style={{ width: 26, height: 26 }} key={i} source={{ uri: s.image }} />
