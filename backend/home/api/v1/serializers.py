@@ -9,7 +9,7 @@ from allauth.account.adapter import get_adapter
 from allauth.account.utils import setup_user_email
 from rest_framework import serializers
 from rest_auth.serializers import PasswordResetSerializer
-from modules.ar.challenges.serializers import ARMemoriesSerializer
+from modules.ar.challenges.serializers import ARMemoriesSerializer, ARUserProfileSerializer
 from modules.ar.challenges.models import ARMemories
 from users.models import FriendshipRequest, Notification, UserProfile
 from rest_framework.authtoken.models import Token
@@ -81,10 +81,11 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     user_profile = UserProfileSerializer()
+    user_ar_profile = ARUserProfileSerializer()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'user_profile']
+        fields = ['id', 'email', 'name', 'user_profile', 'user_ar_profile']
 
 
 class PasswordSerializer(PasswordResetSerializer):
