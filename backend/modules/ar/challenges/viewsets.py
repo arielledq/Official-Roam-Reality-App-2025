@@ -151,6 +151,19 @@ class ARProfileViewSet(ViewSet):
         profileObj.save()
         return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['post'],url_path='update--user-location', name='Update User Location')
+    def update_user_location(self, request, *args, **kwargs):
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
+      latitude = request.data.get("latitude")
+      longitude = request.data.get("longitude")
+      from django.contrib.gis.geos import Point
+      pnt = Point(latitude,longitude)
+      profileObj.current_location = pnt
+      profileObj.save()
+      return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'], url_path='public', name='AR Public')
     def public(self, request):
         obj, created = ARUserProfile.objects.get_or_create(user=request.GET.get("user_id"))
