@@ -259,6 +259,7 @@ class ARUserProfile(models.Model):
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="user_ar_profile"
     )
+    current_location = gis_models.PointField(_("Current Location"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
