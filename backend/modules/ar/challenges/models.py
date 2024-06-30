@@ -70,6 +70,7 @@ class GeoLocation(models.Model):
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
     image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    flag_image = models.ImageField(verbose_name="Flag Scoreboard", upload_to="geoar/img-flag/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
     border = gis_models.MultiLineStringField(_("Borders"), blank=True, null=True)
     regions = models.ManyToManyField(GeoRegion,verbose_name="AR Regions",related_name="geo_location_region", blank=True, default=None)
