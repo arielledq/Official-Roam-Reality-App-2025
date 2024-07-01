@@ -42,7 +42,7 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    width:80,overflow:'hidden'
+    width:80
   },
 }))
 

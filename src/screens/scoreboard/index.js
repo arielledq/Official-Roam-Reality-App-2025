@@ -2,30 +2,19 @@ import React, { useCallback, useEffect, useState } from "react"
 import {
   Text,
   View,
-  StyleSheet,
-  Keyboard,
   Pressable,
   ImageBackground,
-  Alert
 } from "react-native"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { AppHeader, AppInput } from "../../components"
 import { FlatList } from "react-native-gesture-handler"
 import useStyles from "./styles"
 import theme from "../../assets/theme"
-import { Icon } from "react-native-elements"
 import { getARProfile, getProfieDetails, searchUsers, sendFriendRequest } from "../../network"
 import FastImage from "react-native-fast-image"
-import { color } from "@rneui/base"
 import Images from "../../assets/images"
-import fontGroup from "../../assets/fonts"
-import { FontSizes } from "../../util/FontUtils"
-import useDebounce from "../../hooks/debounce"
-import { DEBOUNCE_TIME } from "../../util/helpers"
 import { useDispatch, useSelector } from "react-redux"
 import BackgroundWithImage from "../../components/background"
 import { updateARUserData } from "../../redux/AR"
-import LinearGradient from "react-native-linear-gradient"
 import RankBG from "../../assets/geoar/rank_bg.svg"
 
 
@@ -39,6 +28,7 @@ const ScoreBoard = ({
   const userProfile = useSelector(state => state.login?.data?.user)
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [profileDetails, setProfileDetails] = useState(null)
+  const [rankMine, setRankMine] = useState(null)
   const [loading, setloading] = useState(true)
 
   const fetchUsers = () => {
@@ -50,7 +40,17 @@ const ScoreBoard = ({
         if (response?.data?.length > 0) {
           let arProfiles = response?.data.filter(a => a.user_ar_profile)
           arProfiles = arProfiles.filter(a => a.name)
+          if(arProfile && userProfile){
+            userProfile.user_ar_profile = arProfile
+            arProfiles.push(userProfile)
+          }
           const aa = arProfiles.sort((a, b) => b?.user_ar_profile?.points - a?.user_ar_profile?.points)
+          for (var i = 0; i < aa.length; i++) {
+            aa[i].rank = (i + 1)
+            if (aa[i].id == userProfile.id) {
+              setRankMine((i + 1))
+            }
+          }
           setFilteredUsers(aa)
         }
       }
@@ -162,7 +162,7 @@ const ScoreBoard = ({
         <View style={{ flexDirection: 'row', alignItems: 'center' }}>
           <View style={{ marginStart: 10, alignItems: 'center' }}>
             <Text style={_styles.rankText}>Rank</Text>
-            <Text style={_styles.rankTextNumber}>10</Text>
+            <Text style={_styles.rankTextNumber}>{rankMine}</Text>
           </View>
           <ImageBackground
             source={Images.BGBlur}
@@ -199,12 +199,11 @@ const ScoreBoard = ({
   }
 
   const Item = ({ obj }) => (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-      <RankBG style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }} />
+    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#131422', borderRadius: 12, marginVertical: 4 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={{ marginStart: 10, alignItems: 'center' }}>
           <Text style={_styles.rankText}>Rank</Text>
-          <Text style={_styles.rankTextNumber}>10</Text>
+          <Text style={_styles.rankTextNumber}>{obj.rank}</Text>
         </View>
         <ImageBackground
           source={Images.BGBlur}
@@ -253,6 +252,8 @@ const ScoreBoard = ({
       <FlatList
         style={{ flex: 1, marginVertical: 15 }}
         data={filteredUsers}
+        showsHorizontalScrollIndicator={false}
+        showsVerticalScrollIndicator={false}
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
