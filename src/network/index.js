@@ -364,7 +364,7 @@ export const reportContentOrUser = data =>
 
 export const updateUserLocation = payload =>
   Request.callWithToken({
-    url: `modules/challenges/ar-profile/update--user-location/`,
+    url: `modules/challenges/ar-profile/update-user-location/`,
     method: "POST",
     data: payload
   })
