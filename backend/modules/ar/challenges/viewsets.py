@@ -159,7 +159,7 @@ class ARProfileViewSet(ViewSet):
       profileObj.save()
       return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['post'],url_path='update--user-location', name='Update User Location')
+    @action(detail=False, methods=['post'],url_path='update-user-location', name='Update User Location')
     def update_user_location(self, request, *args, **kwargs):
       user_id = self.request.user.id
       request.data['user'] = user_id
