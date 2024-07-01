@@ -54,6 +54,7 @@ import AddFriendScreen from '../screens/friends/addFriend';
 import NotificationList from '../screens/notificationList';
 import PublicProfile from '../screens/publicProfile/publicprofile';
 import ArStarChallengeShare from '../screens/geoarchallenge/starshare';
+import ScoreBoard from '../screens/scoreboard';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -130,6 +131,7 @@ const Navigation = () => {
         <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
         <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
         <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
+        <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
         <Stack.Screen name="Settings" component={Settings} />
         <Stack.Screen name="Privacy" component={Privacy} />
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
