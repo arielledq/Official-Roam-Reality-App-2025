@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import BackgroundWithImage from "../../components/background"
 import { updateARUserData } from "../../redux/AR"
 import RankBG from "../../assets/geoar/rank_bg.svg"
+import { isLocationPointInPolygon } from "../../util/LocationLib"
 
 
 
@@ -25,6 +26,7 @@ const ScoreBoard = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [filteredUsers, setFilteredUsers] = React.useState([])
+  const [allUsers, setAllUsers] = React.useState([])
   const userProfile = useSelector(state => state.login?.data?.user)
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [profileDetails, setProfileDetails] = useState(null)
@@ -54,6 +56,7 @@ const ScoreBoard = ({
             }
           }
           setFilteredUsers(aa)
+          setAllUsers(aa)
         }
       }
     })
@@ -83,7 +86,6 @@ const ScoreBoard = ({
     setIsLoading(true)
     getGeoARDestinations()
       .then(res => {
-        console.log(res.data)
         if (res.status == 1) {
           setDestinationData(res.data)
         } else {
@@ -155,12 +157,46 @@ const ScoreBoard = ({
       </View>)
   }
 
+  const getAllPoints = (destination) => {
+    const arrayPoints = []
+    if (destination?.border?.coordinates) {
+      for (i = 0; i < destination.border.coordinates.length; i++) {
+        const points = destination.border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      return arrayPoints;
+    }
+    return null;
+  }
+
   const filterDestinations = (o, index) => {
     setSelectedDestination(o)
     desRef?.current?.scrollToIndex({
       animated: true,
       index: index,
     });
+    const destinationPoints = getAllPoints(o);
+    if (destinationPoints) {
+      const filterUserWithDes = []
+      for (let i = 0; i < allUsers.length; i++) {
+        const userCheck = allUsers[i];
+        if (userCheck.user_ar_profile && userCheck.user_ar_profile?.current_location) {
+          const pointUser = {
+            latitude: userCheck.user_ar_profile?.current_location.coordinates[1],
+            longitude: userCheck.user_ar_profile?.current_location.coordinates[0]
+          }
+          const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints)
+          console.log("filterDestinations", userCheck.user_ar_profile?.current_location, isInsideSiteArea)
+          if (isInsideSiteArea) {
+            filterUserWithDes.push(userCheck)
+          }
+        }
+        setFilteredUsers(filterUserWithDes)
+      }
+    }
   }
 
   const DestinationItem = ({ obj, index }) => (
