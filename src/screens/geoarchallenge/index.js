@@ -81,6 +81,7 @@ const GeoArChallenge = ({ }) => {
           })
       },
       error => {
+        console.log(error);
       },
       {
         accuracy: {
