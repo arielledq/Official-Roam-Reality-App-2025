@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import {
   Text,
   View,
@@ -9,7 +9,7 @@ import { AppHeader, AppInput } from "../../components"
 import { FlatList } from "react-native-gesture-handler"
 import useStyles from "./styles"
 import theme from "../../assets/theme"
-import { getARProfile, getProfieDetails, searchUsers, sendFriendRequest } from "../../network"
+import { getARProfile, getGeoARDestinations, getProfieDetails, searchUsers, sendFriendRequest } from "../../network"
 import FastImage from "react-native-fast-image"
 import Images from "../../assets/images"
 import { useDispatch, useSelector } from "react-redux"
@@ -29,7 +29,9 @@ const ScoreBoard = ({
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [profileDetails, setProfileDetails] = useState(null)
   const [rankMine, setRankMine] = useState(null)
-  const [loading, setloading] = useState(true)
+  const [destinationData, setDestinationData] = useState([])
+  const [selectedDestination, setSelectedDestination] = useState(null)
+  const desRef = useRef();
 
   const fetchUsers = () => {
     const payload = {
@@ -40,7 +42,7 @@ const ScoreBoard = ({
         if (response?.data?.length > 0) {
           let arProfiles = response?.data.filter(a => a.user_ar_profile)
           arProfiles = arProfiles.filter(a => a.name)
-          if(arProfile && userProfile){
+          if (arProfile && userProfile) {
             userProfile.user_ar_profile = arProfile
             arProfiles.push(userProfile)
           }
@@ -70,11 +72,28 @@ const ScoreBoard = ({
       }).catch(err => {
         console.error('Error', "Error fetching profile details: ")
       }
-      ).finally(() => setloading(false))
+      ).finally(() => setIsLoading(false))
 
     } catch (error) {
       console.error('Error', "Error fetching profile details: ")
     }
+  }
+
+  const ARDestinations = () => {
+    setIsLoading(true)
+    getGeoARDestinations()
+      .then(res => {
+        console.log(res.data)
+        if (res.status == 1) {
+          setDestinationData(res.data)
+        } else {
+          res.message.message = "Error in loading Destinations."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const fetchARUserProfile = () => {
@@ -90,70 +109,8 @@ const ScoreBoard = ({
     fetchProfileDetails();
     fetchUsers()
     fetchARUserProfile()
+    ARDestinations()
   }, [])
-
-  const renderFriendItem = (item, onAddFriendClick, styles) => {
-    return (
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          backgroundColor: theme.lightColors?.inputBG,
-          paddingRight: 20,
-          borderRadius: 10,
-          marginVertical: 5,
-          flex: 1
-        }}
-      >
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            flex: 0.9
-          }}
-        >
-          <ImageBackground
-            source={Images.BGBlur}
-            style={{
-              width: 80,
-              aspectRatio: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-            resizeMode="stretch"
-          >
-            <FastImage
-              style={{
-                width: 30,
-                aspectRatio: 1,
-                borderRadius: 5
-              }}
-              source={{ uri: item?.user_profile?.image }}
-              resizeMode={FastImage.resizeMode.cover}
-            />
-          </ImageBackground>
-          <View>
-            <Text style={_styles.title}>{item.name}</Text>
-            <Text
-              style={[_styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
-              ellipsizeMode="tail"
-              numberOfLines={1}
-            >
-              {item.email}
-            </Text>
-          </View>
-        </View>
-        <Pressable
-          onPress={() => onAddFriendClick(item)}
-          style={{ marginLeft: 10 }}
-        >
-          <Text style={_styles.addButton}>Add as friend</Text>
-        </Pressable>
-      </View>
-    )
-  }
 
   const myRank = () => {
     return (
@@ -197,6 +154,47 @@ const ScoreBoard = ({
         </View>
       </View>)
   }
+
+  const filterDestinations = (o, index) => {
+    setSelectedDestination(o)
+    desRef?.current?.scrollToIndex({
+      animated: true,
+      index: index,
+    });
+  }
+
+  const DestinationItem = ({ obj, index }) => (
+    <Pressable onPress={() => filterDestinations(obj, index)} style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      height: 48,
+      borderRadius: 100,
+      backgroundColor: "",
+      borderColor: "#9003E0",
+      backgroundColor: "#323250",
+      paddingHorizontal: 8,
+      marginHorizontal: 5,
+      borderWidth: obj.id == selectedDestination?.id ? 1 : 0
+    }}>
+      <FastImage
+        style={{
+          width: 40,
+          aspectRatio: 1,
+          borderRadius: 5,
+          height: 40,
+          borderRadius: 100,
+          overflow: 'hidden',
+          marginEnd: 8
+        }}
+        source={{ uri: obj?.flag_image }}
+        resizeMode={FastImage.resizeMode.cover}
+      />
+      <View>
+        <Text style={_styles.destinationText}>{obj.name}</Text>
+        <Text style={_styles.destinationText}>Scoreboard</Text>
+      </View>
+    </Pressable>
+  )
 
   const Item = ({ obj }) => (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#131422', borderRadius: 12, marginVertical: 4 }}>
@@ -246,6 +244,14 @@ const ScoreBoard = ({
           text: 'Scoreboard',
           style: [_styles.heading],
         }} backgroundColor="transparent" />
+      <View style={{ height: 50 }}>
+        <FlatList horizontal
+          ref={desRef}
+          data={destinationData}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />} />
+      </View>
       <Text style={_styles.subTitle}>Your rank</Text>
       {myRank()}
       <Text style={_styles.subTitle}>Leaderboard</Text>

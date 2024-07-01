@@ -44,6 +44,11 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     width:80
   },
+  destinationText: {
+    ...fontGroup.ns700,
+    fontSize: FontSizes.S12,
+    color: '#D1D5DB'
+  },
 }))
 
 export default useStyles
