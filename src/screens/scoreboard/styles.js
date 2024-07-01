@@ -22,6 +22,28 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-start',
     position: 'relative',
   },
+  subTitle: {
+    ...fontGroup.p600,
+    fontSize: FontSizes.S18,
+    color: theme.colors.white,
+    marginVertical:10
+  },
+  rankText: {
+    ...fontGroup.ns400,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white
+  },
+  rankTextNumber: {
+    ...fontGroup.ns600,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white
+  },
+  nameText: {
+    ...fontGroup.ns700,
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
+    width:80,overflow:'hidden'
+  },
 }))
 
 export default useStyles
