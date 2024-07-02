@@ -375,3 +375,9 @@ export const getDestinationFacts = payload =>
     method: "POST",
     data: payload
   })
+
+export const removeUserFromFriends = id =>
+  Request.callWithToken({
+    url: `${commonApiRoute}friends/${id}/remove_friend/`,
+    method: "POST"
+  })
