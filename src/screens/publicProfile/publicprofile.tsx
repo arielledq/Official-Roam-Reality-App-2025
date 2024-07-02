@@ -25,6 +25,7 @@ import LinearGradient from "react-native-linear-gradient"
 import {
   getPublicARProfile,
   getPublicProfieARMemoriesAPI,
+  removeUserFromFriends,
   reportContentOrUser,
   sendCode
 } from "../../network"
@@ -57,17 +58,18 @@ const PublicProfile: ScreenStackComponent<
   const [modalVisible, setModalVisible] = useState(false)
 
   const fetchARUserProfile = () => {
-    getPublicARProfile(userProfile.user.id).then((res) => {
-      if (res.status == 1) {
-        updateARUserData(res)
-      }
-    }).finally(() => {
-    })
+    getPublicARProfile(userProfile?.user_profile?.id)
+      .then(res => {
+        if (res.status == 1) {
+          updateARUserData(res)
+        }
+      })
+      .finally(() => {})
   }
 
   const getProfieARMemories = async () => {
     try {
-      getPublicProfieARMemoriesAPI(userProfile.user_profile.id)
+      getPublicProfieARMemoriesAPI(userProfile?.user_profile?.id)
         .then(res => {
           if (res.status == 1) {
             setARMemories(res.data)
@@ -237,6 +239,48 @@ const PublicProfile: ScreenStackComponent<
     />
   )
 
+  const onRemoveConfirm = () => {
+    // Call API to remove friend
+    removeUserFromFriends(userProfile?.id)
+      .then(resposne => {
+        if (resposne && resposne.status === 1) {
+          console.log("removeUserFromFriends", resposne)
+          Alert.alert("Success", "Friend removed successfully", [
+            {
+              text: "OK",
+              onPress: () => {
+                navigation.goBack()
+              }
+            }
+          ])
+        }
+      })
+      .catch(error => {
+        Alert.alert("Error", "Error removing friend")
+      })
+  }
+
+  const onRemoveFriendClick = () => {
+    // Prompt user wether they really want to unfriend
+    Alert.alert(
+      "Remove Friend",
+      "Are you sure you want to remove this friend?",
+      [
+        {
+          text: "Yes",
+          onPress: () => {
+            // Call API to remove friend
+            onRemoveConfirm()
+          }
+        },
+        {
+          text: "No",
+          onPress: () => {}
+        }
+      ]
+    )
+  }
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       {loading ? (
@@ -263,7 +307,10 @@ const PublicProfile: ScreenStackComponent<
             containerStyle={_styles.headerContainer}
             title={""}
             rightComponent={
-              <Pressable style={_styles.removeBtnContainer}>
+              <Pressable
+                style={_styles.removeBtnContainer}
+                onPress={onRemoveFriendClick}
+              >
                 <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
               </Pressable>
             }

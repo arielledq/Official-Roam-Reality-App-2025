@@ -21,6 +21,7 @@ import { AppInput } from "../../components"
 import useDebounce from "../../hooks/debounce"
 import { DEBOUNCE_TIME } from "../../util/helpers"
 import { Icon } from "react-native-elements"
+import Images from "../../assets/images"
 
 const ContactsTab = () => {
   const _styles = useStyles()
@@ -70,7 +71,9 @@ const ContactsTab = () => {
 
   const fetchContacts = () => {
     Contacts.getAll().then(contactArr => {
+      console.log("Contacts", JSON.stringify(contactArr))
       findFriends(contactArr).then(response => {
+        console.log("Find Friends Response", response)
         if (response && response?.data) {
           setContacts(response?.data)
           setFilteredUsers(response?.data)
@@ -143,7 +146,7 @@ const renderContact = (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
         <ImageBackground
-          source={{ uri: item?.user_profile?.image }}
+          source={Images.BGBlur}
           style={localStyle.imageBG}
           resizeMode="stretch"
         >
