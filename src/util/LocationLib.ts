@@ -54,6 +54,39 @@ export const converXZToLatLong = (x: Number, y: Number) => {
   return ll
 }
 
+const latLongToMerc = (latDeg: any,  longDeg: any) => {
+  // From: https://gist.github.com/scaraveos/5409402 
+  const longRad = (longDeg / 180.0) * Math.PI;
+  const latRad = (latDeg / 180.0) * Math.PI;
+  const smA = 6378137.0;
+  const xmeters = smA * longRad;
+  const ymeters = smA * Math.log((Math.sin(latRad) + 1) / Math.cos(latRad));
+  return { x: xmeters, y: ymeters };
+}
+
+export const transformGpsToAR = (devicePoint: LocationPoint, objPoint: LocationPoint, compassHeading  : any ) => {
+  const isAndroid = Platform.OS === 'android';
+  const latObj    = objPoint.latitude;
+  const longObj   = objPoint.longitude;
+  const latMobile = devicePoint.latitude;
+  const longMobile = devicePoint.longitude;
+
+  const deviceObjPoint = latLongToMerc(latObj, longObj);
+  const mobilePoint = latLongToMerc(latMobile, longMobile);
+  const objDeltaY = deviceObjPoint.y - mobilePoint.y;
+  const objDeltaX = deviceObjPoint.x - mobilePoint.x;
+
+  if (isAndroid) {
+    let degree      = compassHeading;
+    let angleRadian = (degree * Math.PI) / 180;
+    let newObjX     = objDeltaX * Math.cos(angleRadian) - objDeltaY * Math.sin(angleRadian);
+    let newObjY     = objDeltaX * Math.sin(angleRadian) + objDeltaY * Math.cos(angleRadian);
+    return { x: newObjX, z: -newObjY };
+  }
+
+  return { x: objDeltaX, z: -objDeltaY };
+};
+
 
 const hasPermissionIOS = async () => {
   const openSetting = () => {

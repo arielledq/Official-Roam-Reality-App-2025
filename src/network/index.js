@@ -368,3 +368,10 @@ export const updateUserLocation = payload =>
     method: "POST",
     data: payload
   })
+
+export const getDestinationFacts = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/geo-destination-fact/by-destination-id/`,
+    method: "POST",
+    data: payload
+  })

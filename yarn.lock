@@ -8317,6 +8317,11 @@ react-native-codegen@^0.71.5:
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
 
+react-native-compass-heading@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-compass-heading/-/react-native-compass-heading-1.5.0.tgz#88c8de29b9b249cc6c371014194ee63d5ef80b5b"
+  integrity sha512-FQwQYyjH2eZttM90HS2LGuxSC+cRDdRHfenC1o1qmLmGniDlr+sxUMw++5zke6LunaRualv6P2yakFDOj+5TUA==
+
 react-native-contacts@^7.0.8:
   version "7.0.8"
   resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-7.0.8.tgz#485ba7a77653b30205c76f96494808d07b8e57b9"
