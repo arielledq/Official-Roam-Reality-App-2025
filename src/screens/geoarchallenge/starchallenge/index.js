@@ -276,7 +276,8 @@ const StarChallenge = ({
       starShouldVisible: false,
       challengeObj: selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {},
       collectedStars: [],
-      starsCount: 0
+      starsCount: 0,
+      starObj: selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0] : {},
     }
 
     constructor() {
@@ -367,7 +368,8 @@ const StarChallenge = ({
         distanceInFeet: convertMetersToFeets(distance),
         starShouldVisible: starShouldVisibleNow,
         challengeObj: neareastPoint.starObj?.challenges,
-        collectedStars: this.state.collectedStars
+        collectedStars: this.state.collectedStars,
+        starObj: neareastPoint.starObj
       })
     }
 
@@ -387,7 +389,7 @@ const StarChallenge = ({
             })
           }
           const finalCollectedStars = [...collectedStarsFromAPI, ...this.state.collectedStars]
-          console.log("getAllCollectedStars",finalCollectedStars)
+          console.log("getAllCollectedStars", finalCollectedStars)
           this.setState({ collectedStars: finalCollectedStars })
         }
       }).finally(() => {
@@ -440,10 +442,15 @@ const StarChallenge = ({
       this.getLocationUpdates()
       this.setStarCounts()
       this.getCollectedStar()
+      setTimeout(() => this.navigateToShare(), 1500)
     }
 
     componentWillUnmount() {
       this.stopLocationUpdates();
+    }
+
+    navigateToShare() {
+      navigation.navigate("ArStarChallengeShare", { challengeObj: this.state.challengeObj, starObj: this.state.starObj })
     }
 
     _setARNavigatorRef(ARNavigator) {

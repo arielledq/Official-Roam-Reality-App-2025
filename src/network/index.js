@@ -362,6 +362,20 @@ export const reportContentOrUser = data =>
     data: data
   })
 
+export const updateUserLocation = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/update-user-location/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getDestinationFacts = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/geo-destination-fact/by-destination-id/`,
+    method: "POST",
+    data: payload
+  })
+
 export const removeUserFromFriends = id =>
   Request.callWithToken({
     url: `${commonApiRoute}friends/${id}/remove_friend/`,

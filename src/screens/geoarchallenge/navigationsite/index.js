@@ -174,7 +174,10 @@ const GeoArSiteNavigation = ({
           <MapView
             customMapStyle={mapCustomStyle}
             provider={PROVIDER_GOOGLE}
+            showsCompass={true}
             ref={mapView}
+            zoomControlEnabled={true}
+            showsTraffic={true}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
             scrollEnabled={true}
@@ -186,7 +189,6 @@ const GeoArSiteNavigation = ({
               longitudeDelta: 0.0032,
             }}
           >
-
             <Marker
               coordinate={{
                 latitude: selectedGeoSite.lat_long.coordinates[1],

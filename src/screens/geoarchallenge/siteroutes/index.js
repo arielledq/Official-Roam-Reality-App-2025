@@ -20,6 +20,7 @@ import MapViewDirections from 'react-native-maps-directions';
 import GetLocation from "react-native-get-location";
 import { convertKilometersToMiles } from "../../../util/helpers";
 import Strings from "../../../constants/Strings";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 
 
 const GeoArSiteRoutes = ({
@@ -57,6 +58,57 @@ const GeoArSiteRoutes = ({
     getCurrentLocation()
   }, []);
 
+  const getFullBounds = _ => {
+    if (selectedGeoSite.geo_site_border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const bounds = getBounds(arrayPoints)
+      return bounds;
+    } else {
+      return null
+    }
+  }
+
+  const getFullCenter = _ => {
+    if (selectedGeoSite.geo_site_border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const latitude_longitude = getCenterOfBounds(arrayPoints)
+      return latitude_longitude;
+    } else {
+      return null
+    }
+  }
+
+  const initialRegion = {
+    latitude: selectedGeoSite.lat_long.coordinates[1],
+    longitude: selectedGeoSite.lat_long.coordinates[0],
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  }
+  const full_latitude_longitude = getFullCenter();
+  const full_bounds = getFullBounds();
+  if (full_bounds) {
+    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
+  }
+  if (full_latitude_longitude) {
+    initialRegion.latitude = Number(full_latitude_longitude.latitude);
+    initialRegion.longitude = Number(full_latitude_longitude.longitude);
+  }
+
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -73,12 +125,7 @@ const GeoArSiteRoutes = ({
             provider={PROVIDER_GOOGLE}
             ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-            initialRegion={{
-              latitude: selectedGeoSite.lat_long.coordinates[1],
-              longitude: selectedGeoSite.lat_long.coordinates[0],
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            initialRegion={initialRegion}
           >
             <Marker
               coordinate={{
@@ -132,18 +179,9 @@ const GeoArSiteRoutes = ({
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   setRoutes(1)
-
-                  // mapView.fitToCoordinates(result.coordinates, {
-                  //   edgePadding: {
-                  //     right: (width / 20),
-                  //     bottom: (height / 20),
-                  //     left: (width / 20),
-                  //     top: (height / 20),
-                  //   }
-                  // });
                 }}
                 onError={(errorMessage) => {
-                  console.log('GOT AN ERROR',errorMessage);
+                  console.log('GOT AN ERROR', errorMessage);
                   setRoutes(0)
                 }}
               />

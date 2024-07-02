@@ -11,11 +11,12 @@ import SitesIcon from "../../../assets/geoar/sites.svg"
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
-import { getARSitesHiddenStars } from "../../../network";
+import { getARSitesHiddenStars, getUserFriendList } from "../../../network";
 import AppSwitch from "../../../components/Switch";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 
@@ -36,6 +37,8 @@ const GeoArChallengeDetails = ({
   const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
   const regions = selectedDestination?.regions
   const [fullRegion, setFullRegion] = useState(null)
+  const [friendList, setFriendList] = useState([])
+  const [filteredUsers, setFilteredUsers] = React.useState([])
 
   const setMapBounds = () => {
     var address = selectedDestination.name;
@@ -91,13 +94,39 @@ const GeoArChallengeDetails = ({
         fullRegion.latitude = Number(full_latitude_longitude.latitude);
         fullRegion.longitude = Number(full_latitude_longitude.longitude);
       }
-      console.log("full_bounds",full_bounds)
-      console.log("full_latitude_longitude",full_latitude_longitude)
-      console.log("full_latitude_longitude",selectedDestination.border)
+      console.log("full_bounds", full_bounds)
+      console.log("full_latitude_longitude", full_latitude_longitude)
+      console.log("full_latitude_longitude", selectedDestination.border)
       setFullRegion(fullRegion)
     }
     getHiddenStar()
+    getFriends()
   }, []);
+
+
+  const f_markerView = (o) => {
+    if (o?.user_ar_profile?.current_location) {
+      return (
+        <Marker
+          key={o.id}
+          coordinate={{
+            latitude: o?.user_ar_profile?.current_location.coordinates[1],
+            longitude: o?.user_ar_profile?.current_location.coordinates[0]
+          }}
+          title={o.name}
+          onCalloutPress={() => { }}
+        >
+          {Platform.OS == 'ios' && <Callout onPress={() => { }}
+            style={{ backgroundColor: '#fff', minWidth: 100, alignItems: 'center' }}>
+            <Text>{o.name}</Text>
+          </Callout>}
+          <View style={{ width: 30, height: 30 }}>
+            <FriendsMarkerIcon />
+          </View>
+        </Marker>
+      )
+    }
+  }
 
   const _markerView = (o) => {
     if (o.lat_long) {
@@ -138,6 +167,20 @@ const GeoArChallengeDetails = ({
     } else {
       return null
     }
+  }
+
+  const getFriends = () => {
+    getUserFriendList()
+      .then(response => {
+        console.log("getFriends", response?.data[0]?.friends)
+        if (response) {
+          setFriendList(response?.data[0]?.friends || [])
+          setFilteredUsers(response?.data[0]?.friends || [])
+        }
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }
 
   const getFullCenter = _ => {
@@ -258,7 +301,11 @@ const GeoArChallengeDetails = ({
               return _markerView(o)
             })
           }
-
+          {friendsLocationSitesOn &&
+            friendList.map((o) => {
+              return f_markerView(o)
+            })
+          }
         </MapView>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
