@@ -1,9 +1,9 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
-GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar
+GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, DestinationFacts
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
 ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer,GeoStarSerializer, \
-GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, GoldStarCollectionSerializer
+GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, GoldStarCollectionSerializer, DestinationFactsSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -386,10 +386,24 @@ class GoldStarCollectionViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='destination-stars', name='Check destination-stars')
     def destination_stars(self, request):
+      destination = request.data.get("destination")
+      criterion2 = Q(geo_location=destination)
+      objs = self.queryset.filter(criterion2)
+      serializer = GoldStarCollectionSerializer(objs, many=True)
+      return Response(serializer.data, status=status.HTTP_200_OK)
+    
+class DestinationFactsViewSet(ViewSet):
+   
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    queryset = DestinationFacts.objects.all()
+    serializer_class = DestinationFactsSerializer
+
+    @action(detail=False, methods=['post'], url_path='destination-stars', name='Check destination-stars')
+    def destination_stars(self, request):
       user_id = self.request.user.id
       destination = request.data.get("destination")
-      criterion1 = Q(user=user_id)
       criterion2 = Q(geo_location=destination)
-      objs = self.queryset.filter(criterion1 & criterion2)
-      serializer = GoldStarCollectionSerializer(objs, many=True)
+      objs = self.queryset.filter(criterion2)
+      serializer = DestinationFactsSerializer(objs, many=True)
       return Response(serializer.data, status=status.HTTP_200_OK)
