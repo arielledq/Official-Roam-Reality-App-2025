@@ -1,6 +1,7 @@
 import * as geolib from 'geolib';
 import { Alert, Linking, PermissionsAndroid, Platform, ToastAndroid } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+var merc = require('mercator-projection');
 
 interface LocationPoint {
   latitude: number;
@@ -43,6 +44,17 @@ export const convertMetersToFeets = (meters: number) => {
   return Math.round(meters * 3.28084);
 }
 
+export const converLatLongToXZ = (point: LocationPoint) => {
+  var xy = merc.fromLatLngToPoint({ lat: point.latitude, lng: point.longitude });
+  return xy
+}
+
+export const converXZToLatLong = (x: Number, y: Number) => {
+  var ll = merc.fromPointToLatLng({ x: x, y: y })
+  return ll
+}
+
+
 const hasPermissionIOS = async () => {
   const openSetting = () => {
     Linking.openSettings().catch(() => {
@@ -73,7 +85,7 @@ const hasPermissionIOS = async () => {
   return false;
 };
 
-export const  hasLocationPermission = async () => {
+export const hasLocationPermission = async () => {
   if (Platform.OS === 'ios') {
     const hasPermission = await hasPermissionIOS();
     return hasPermission;
