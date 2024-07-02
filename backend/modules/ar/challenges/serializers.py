@@ -1,7 +1,7 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn,\
-    StarCollection, GeoARGoldStar
+    StarCollection, GeoARGoldStar, DestinationFacts
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
@@ -224,6 +224,14 @@ class GoldStarCollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GeoARGoldStar
+        fields = (
+            "__all__"
+        )
+
+class DestinationFactsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = DestinationFacts
         fields = (
             "__all__"
         )
