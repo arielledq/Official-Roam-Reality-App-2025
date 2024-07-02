@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar, \
-  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion,GeoARSiteActivity,StarCollection,ARSitePinCheckIn,GeoARGoldStar
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,DestinationFacts, \
+  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion,GeoARSiteActivity,StarCollection, \
+  ARSitePinCheckIn,GeoARGoldStar
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
@@ -85,7 +86,6 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
 
 
 admin.site.register(Sponsor, ARChallengeAdmin)
-admin.site.register(ARUserProfile, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
 admin.site.register(ARExample, ARChallengeAdmin)
@@ -95,6 +95,8 @@ admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 admin.site.register(ARChallengeFilters, ARChallengeAdmin)
 admin.site.register(StarCollection, GeoArChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
+admin.site.register(DestinationFacts, GeoArChallengeAdmin)
+admin.site.register(ARUserProfile, GeoArChallengeAdmin)
 
 
 
