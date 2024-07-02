@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 
 import {
-  ActivityIndicator,
   FlatList,
   Image,
   ImageBackground,
@@ -14,7 +13,8 @@ import {
   getGeoARDestinations,
   getARProfile,
   getARStettings,
-  getARChallenges
+  getARChallenges,
+  updateUserLocation
 } from "../../network"
 
 import BackgroundWithImage from "../../components/background"
@@ -34,8 +34,8 @@ import {
 
 import { useDispatch } from "react-redux"
 import useStyles from "./styles"
-import LinearGradient from "react-native-linear-gradient"
-import { height, width } from "../../util/AppDimensions"
+import { hasLocationPermission } from "../../util/LocationLib";
+import Geolocation from 'react-native-geolocation-service';
 import { MenuIcon } from "../../assets/svg"
 
 const GeoArChallenge = ({ }) => {
@@ -61,6 +61,43 @@ const GeoArChallenge = ({ }) => {
         setIsLoading(false)
       })
   }
+
+  const getLocation = async () => {
+    const hasPermission = await hasLocationPermission();
+
+    if (!hasPermission) {
+      return;
+    }
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log("getLocation", position)
+        updateUserLocation({
+          latitude: position.latitude,
+          longitude: position.longitude
+        }).then(res => {
+          console.log("updateUserLocation:", res)
+        })
+          .finally(() => {
+          })
+      },
+      error => {
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      },
+    );
+  };
 
   const ARUserProfile = () => {
     setIsLoading(true)
@@ -109,7 +146,7 @@ const GeoArChallenge = ({ }) => {
       .finally(() => {
         setIsLoading(false)
       })
-
+    getLocation()
   }
 
   useEffect(() => {

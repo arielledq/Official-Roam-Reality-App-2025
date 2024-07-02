@@ -336,8 +336,7 @@ const ArChallengeShare = ({
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
-      </ScrollView>
-      {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
+        {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
         <TouchableOpacity onPress={() => { navigation.navigate("Settings") }}>
           <Text style={styles.bottomText}>Link My Profiles</Text>
         </TouchableOpacity>
@@ -351,6 +350,8 @@ const ArChallengeShare = ({
         />
       </View>
       }
+      </ScrollView>
+      
     </BackgroundWithImage>
   )
 }

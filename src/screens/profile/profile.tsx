@@ -213,6 +213,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <AppText
             adjustsFontSizeToFit={true}
             numberOfLines={1}
+            onPress={()=>navigation.navigate("ScoreBoard")}
             style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
