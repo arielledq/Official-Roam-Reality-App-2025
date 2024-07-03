@@ -52,6 +52,7 @@ const StarChallenge = ({
   const navigation = useNavigation()
 
   const ARScreen = (props) => {
+    const funFactCallback = props?.arSceneNavigator.viroAppProps.funFactCallback
     const [challengeObj, setChallengeObj] = useState(props?.arSceneNavigator.viroAppProps.challengeObj)
     const [challengeObjParameters, setChallengeObjParameters] = useState(challengeObj?.parameters)
     const [modelFile, setModelFile] = useState(challengeObj?.model_file)
@@ -229,6 +230,8 @@ const StarChallenge = ({
           challengeObj?.challenge_choice == "3DMODEL" && modelPath && starShouldVisible &&
           <Viro3DObject
             key="obj_3d1"
+            onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
+            onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
             source={{ uri: modelPath }} /// this works
             position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
@@ -254,6 +257,8 @@ const StarChallenge = ({
         {challengeObj?.challenge_choice == "IMAGE" && starShouldVisible && <ViroImage
           height={1}
           width={1}
+          onClick={() => { console.log("ViroImage OnPress"); funFactCallback() }}
+          onPress={() => { console.log("ViroImage OnPress"); funFactCallback() }}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
           onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
           source={{ uri: challengeObj.image }}
@@ -271,6 +276,7 @@ const StarChallenge = ({
       capturedImage: null,
       capturedVideo: null,
       detailsShow: true,
+      factsShow: false,
       challengeInformationView: false,
       distanceInFeet: 0,
       starShouldVisible: false,
@@ -284,6 +290,7 @@ const StarChallenge = ({
       super();
       this._setARNavigatorRef = this._setARNavigatorRef.bind(this);
       this.checkPermission = this.checkPermission.bind(this);
+      this.openFunFacts = this.openFunFacts.bind(this)
     }
 
     setStarCounts = () => {
@@ -335,10 +342,16 @@ const StarChallenge = ({
     isStarIsCollected = (point) => {
       for (i = 0; i < this.state.collectedStars.length; i++) {
         const cPoint = this.state.collectedStars[i]
+        console.log("isStarIsCollected:", cPoint.latitude)
+        console.log("isStarIsCollected:", cPoint.longitude)
+        console.log("isStarIsCollected:", point.latitude)
+        console.log("isStarIsCollected:", point.longitude)
         if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
+          console.log("isStarIsCollected:", true)
           return true;
         }
       }
+      console.log("isStarIsCollected:", false)
       return false;
     }
 
@@ -358,8 +371,6 @@ const StarChallenge = ({
       const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
       const distance = getCloseLocationDistance(position.coords, neareastPoint)
       const starShouldVisibleNow = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
-      console.log("distance", distance)
-      console.log("starShouldVisibleNow", starShouldVisibleNow)
       if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
         this.state.collectedStars.push(neareastPoint)
         this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
@@ -378,7 +389,6 @@ const StarChallenge = ({
       getAllCollectedStars({
         geo_site: selectedGeoSite.id,
       }).then((res) => {
-        console.log("getCollectedStar::", res)
         if (res.status == 1) {
           const stars = res.data;
           const collectedStarsFromAPI = [];
@@ -390,7 +400,6 @@ const StarChallenge = ({
             })
           }
           const finalCollectedStars = [...collectedStarsFromAPI, ...this.state.collectedStars]
-          console.log("getAllCollectedStars", finalCollectedStars)
           this.setState({ collectedStars: finalCollectedStars })
         }
       }).finally(() => {
@@ -398,11 +407,9 @@ const StarChallenge = ({
     }
 
     updateUserPoint = (starObj) => {
-      console.log("starObj:", starObj)
       updateUserPointAPI({
         points: starObj?.challenges?.points
       }).then((res) => {
-        console.log("updateUserPoint::", res)
       }).finally(() => {
       })
     }
@@ -415,7 +422,6 @@ const StarChallenge = ({
         longitude: point.longitude,
         name: new Date().toISOString()
       }).then((res) => {
-        console.log("saveCollectedStar::", res)
       }).finally(() => {
       })
     }
@@ -490,6 +496,53 @@ const StarChallenge = ({
       }
     };
 
+    factsView = () => {
+      return (
+        <View style={_styles.challengeInfoContainer}>
+          <View style={_styles.challengeInfoHeaderContainer}>
+            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+            <Text style={_styles.challengeInfoHeader}>Fun Facts</Text>
+          </View>
+          <ScrollView
+            contentContainerStyle={{ paddingBottom: 100 }}
+            showsVerticalScrollIndicator={false}
+            style={{ flex: 1, width: '100%', padding: 24 }
+            }
+          >
+            <RenderHTML
+              contentWidth={width}
+              tagsStyles={{
+                p: {
+                  color: '#9CA3AF',
+                  fontSize: FontSizes.S14,
+                },
+                strong: {
+                  color: '#fff',
+                  fontSize: FontSizes.S18,
+                },
+                ol: {
+                  color: '#fff',
+                },
+                li: {
+                  color: '#fff',
+                }
+              }}
+              source={{
+                html: `${this.state.starObj?.fun_facts}`
+              }}
+            />
+          </ScrollView>
+          <View style={{ width: '100%', paddingHorizontal: 24 }}>
+            <TouchableOpacity
+              activeOpacity={.6}
+              onPress={() => this.setState({ factsShow: false })}>
+              <Text style={_styles.bottomText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      )
+    }
+
     InfoView = () => {
       return (
         <View style={_styles.challengeInfoContainer}>
@@ -543,6 +596,11 @@ const StarChallenge = ({
       )
     }
 
+    openFunFacts = () => {
+      console.log("openFunFacts")
+      this.setState({ factsShow: true })
+    }
+
     render() {
       return (
         <View style={{ flex: 1 }}>
@@ -593,7 +651,8 @@ const StarChallenge = ({
                     viroAppProps={
                       {
                         starShouldVisible: this.state.starShouldVisible,
-                        challengeObj: this.state.challengeObj
+                        challengeObj: this.state.challengeObj,
+                        funFactCallback: this.openFunFacts
                       }
                     }
                     initialScene={{
@@ -635,6 +694,7 @@ const StarChallenge = ({
             </View>
           </BackgroundWithImage >
           {this.state.detailsShow && this.InfoView()}
+          {this.state.factsShow && this.factsView()}
         </View >
       )
     }
