@@ -342,11 +342,11 @@ const StarChallenge = ({
     isStarIsCollected = (point) => {
       for (i = 0; i < this.state.collectedStars.length; i++) {
         const cPoint = this.state.collectedStars[i]
-        console.log("isStarIsCollected:", cPoint.latitude)
-        console.log("isStarIsCollected:", cPoint.longitude)
-        console.log("isStarIsCollected:", point.latitude)
-        console.log("isStarIsCollected:", point.longitude)
         if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
+          console.log("isStarIsCollected:", cPoint.latitude)
+          console.log("isStarIsCollected:", cPoint.longitude)
+          console.log("isStarIsCollected:", point.latitude)
+          console.log("isStarIsCollected:", point.longitude)
           console.log("isStarIsCollected:", true)
           return true;
         }
@@ -367,22 +367,30 @@ const StarChallenge = ({
           }
         }
       }
-      const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
-      const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
-      const distance = getCloseLocationDistance(position.coords, neareastPoint)
-      const starShouldVisibleNow = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
-      if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
-        this.state.collectedStars.push(neareastPoint)
-        this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
-        this.updateUserPoint(neareastPoint.starObj)
+      try {
+        if (arrayPoints.length > 0) {
+          const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
+          const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
+          const distance = getCloseLocationDistance(position.coords, neareastPoint)
+          const starShouldVisibleNow = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
+          if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
+            this.state.collectedStars.push(neareastPoint)
+            this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
+            this.updateUserPoint(neareastPoint.starObj)
+          }
+          this.setState({
+            distanceInFeet: convertMetersToFeets(distance),
+            starShouldVisible: starShouldVisibleNow,
+            challengeObj: neareastPoint.starObj?.challenges,
+            collectedStars: this.state.collectedStars,
+            starObj: neareastPoint.starObj
+          })
+        } else {
+          console.log("findNearPoint", "Collected All Stars....")
+        }
+      } catch (e) {
+        console.log(e)
       }
-      this.setState({
-        distanceInFeet: convertMetersToFeets(distance),
-        starShouldVisible: starShouldVisibleNow,
-        challengeObj: neareastPoint.starObj?.challenges,
-        collectedStars: this.state.collectedStars,
-        starObj: neareastPoint.starObj
-      })
     }
 
     getCollectedStar = () => {
@@ -394,7 +402,7 @@ const StarChallenge = ({
           const collectedStarsFromAPI = [];
           for (var i = 0; i < stars.length; i++) {
             const s = stars[i]
-            collectedStars.push({
+            collectedStarsFromAPI.push({
               latitude: s.point.coordinates[1],
               longitude: s.point.coordinates[0],
             })
