@@ -291,6 +291,8 @@ const StarChallenge = ({
       this._setARNavigatorRef = this._setARNavigatorRef.bind(this);
       this.checkPermission = this.checkPermission.bind(this);
       this.openFunFacts = this.openFunFacts.bind(this)
+      this.getLocation = this.getLocation.bind(this)
+      this.getLocationUpdates = this.getLocationUpdates.bind(this)
     }
 
     setStarCounts = () => {
@@ -343,11 +345,6 @@ const StarChallenge = ({
       for (i = 0; i < this.state.collectedStars.length; i++) {
         const cPoint = this.state.collectedStars[i]
         if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
-          console.log("isStarIsCollected:", cPoint.latitude)
-          console.log("isStarIsCollected:", cPoint.longitude)
-          console.log("isStarIsCollected:", point.latitude)
-          console.log("isStarIsCollected:", point.longitude)
-          console.log("isStarIsCollected:", true)
           return true;
         }
       }
@@ -377,6 +374,10 @@ const StarChallenge = ({
             this.state.collectedStars.push(neareastPoint)
             this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
             this.updateUserPoint(neareastPoint.starObj)
+          }
+          if (neareastPoint.latitude == this.state.starObj.latitude && neareastPoint.longitude == this.state.starObj.longitude) {
+            console.log("Point already found again so no need to state update..")
+            return
           }
           this.setState({
             distanceInFeet: convertMetersToFeets(distance),
@@ -409,6 +410,8 @@ const StarChallenge = ({
           }
           const finalCollectedStars = [...collectedStarsFromAPI, ...this.state.collectedStars]
           this.setState({ collectedStars: finalCollectedStars })
+          this.getLocation()
+          this.getLocationUpdates()
         }
       }).finally(() => {
       })
@@ -464,10 +467,8 @@ const StarChallenge = ({
 
     componentDidMount() {
       this.checkPermission()
-      this.getLocation()
-      this.getLocationUpdates()
-      this.setStarCounts()
       this.getCollectedStar()
+      this.setStarCounts()
     }
 
     componentWillUnmount() {
