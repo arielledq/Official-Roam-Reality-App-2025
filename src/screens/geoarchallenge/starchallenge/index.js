@@ -39,7 +39,7 @@ import RenderHTML from "react-native-render-html";
 import { AppButton } from "../../../components";
 const { width } = Dimensions.get('window');
 import { FontSizes } from "../../../util/FontUtils"
-import { getAllCollectedStars, starFoundAndSaveApi } from "../../../network";
+import { getAllCollectedStars, starFoundAndSaveApi, updateUserPointAPI } from "../../../network";
 
 const StarChallenge = ({
 
@@ -363,6 +363,7 @@ const StarChallenge = ({
       if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
         this.state.collectedStars.push(neareastPoint)
         this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
+        this.updateUserPoint(neareastPoint.starObj)
       }
       this.setState({
         distanceInFeet: convertMetersToFeets(distance),
@@ -396,12 +397,23 @@ const StarChallenge = ({
       })
     }
 
+    updateUserPoint = (starObj) => {
+      console.log("starObj:", starObj)
+      updateUserPointAPI({
+        points: starObj?.challenges?.points
+      }).then((res) => {
+        console.log("updateUserPoint::", res)
+      }).finally(() => {
+      })
+    }
+
     saveCollectedStar = (point, starObj) => {
       starFoundAndSaveApi({
         geo_site: selectedGeoSite.id,
         geo_ar_star: starObj.id,
         latitude: point.latitude,
-        longitude: point.longitude
+        longitude: point.longitude,
+        name: new Date().toISOString()
       }).then((res) => {
         console.log("saveCollectedStar::", res)
       }).finally(() => {
@@ -442,7 +454,6 @@ const StarChallenge = ({
       this.getLocationUpdates()
       this.setStarCounts()
       this.getCollectedStar()
-      setTimeout(() => this.navigateToShare(), 1500)
     }
 
     componentWillUnmount() {
