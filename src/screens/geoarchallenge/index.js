@@ -72,8 +72,8 @@ const GeoArChallenge = ({ }) => {
       position => {
         console.log("getLocation", position)
         updateUserLocation({
-          latitude: position.latitude,
-          longitude: position.longitude
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
         }).then(res => {
           console.log("updateUserLocation:", res)
         })
