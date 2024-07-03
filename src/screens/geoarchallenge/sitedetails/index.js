@@ -288,8 +288,9 @@ const GeoArSiteDetails = ({
               <AppButton
                 onPress={() => navigation.navigate("GeoArSiteRoutes")}
                 buttonStyle={_styles.buttonStyle}
+                titleStyle={{fontWeight:'bold'}}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Lets Roam"}
+                title={"Let's Roam"}
                 loading={isLoading}
               />
             </View>
