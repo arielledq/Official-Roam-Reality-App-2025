@@ -170,7 +170,7 @@ class ARProfileViewSet(ViewSet):
       pnt = Point(longitude, latitude)
       profileObj.current_location = pnt
       profileObj.save()
-      return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
+      return Response({'message': "Location Points are updated!"}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='public', name='AR Public')
     def public(self, request):
