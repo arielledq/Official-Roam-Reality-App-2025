@@ -167,7 +167,7 @@ class ARProfileViewSet(ViewSet):
       latitude = request.data.get("latitude")
       longitude = request.data.get("longitude")
       from django.contrib.gis.geos import Point
-      pnt = Point(latitude, longitude)
+      pnt = Point(longitude, latitude)
       profileObj.current_location = pnt
       profileObj.save()
       return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
@@ -368,7 +368,7 @@ class StarCollectionViewSet(ViewSet):
       latitude = request.data.get("latitude")
       longitude = request.data.get("longitude")
       from django.contrib.gis.geos import Point
-      pnt = Point(latitude,longitude)
+      pnt = Point(longitude, latitude)
       request.data['point'] = pnt
       serializer = StarCollectionSerializer(data=request.data, partial=True)
       if serializer.is_valid(raise_exception=True):
