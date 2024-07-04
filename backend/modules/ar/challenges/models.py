@@ -623,7 +623,7 @@ class GeoARGoldStar(models.Model):
         return self.name
     
 class PanicMessage(models.Model):
-    user = models.OneToOneField(
+    user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_panic_message"
     )
     message = RichTextField(_("Message"), blank=True, null=True)
