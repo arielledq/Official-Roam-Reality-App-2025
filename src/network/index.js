@@ -389,11 +389,9 @@ export const updateUserPointAPI = payload =>
     data: payload
   })
 
-export const panicMessageAPI = payload => {
-  console.log(payload)
+export const panicMessageAPI = payload =>
   Request.callWithToken({
     url: `modules/challenges/panic-message/`,
     method: "POST",
-    payload
+    data: payload
   })
-}
