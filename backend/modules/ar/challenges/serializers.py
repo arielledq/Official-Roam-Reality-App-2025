@@ -1,7 +1,7 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn,\
-    StarCollection, GeoARGoldStar, DestinationFacts
+    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
@@ -235,3 +235,12 @@ class DestinationFactsSerializer(serializers.ModelSerializer):
         fields = (
             "__all__"
         )
+
+class PanicMessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PanicMessage
+        fields = (
+            "__all__"
+        )
+        
