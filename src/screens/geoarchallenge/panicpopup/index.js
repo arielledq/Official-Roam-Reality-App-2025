@@ -16,12 +16,14 @@ const PanicPopUp = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const submitHandler = values => {
-    console.log(userProfile?.id)
     setIsLoading(true)
+
+    console.log(values?.message)
     panicMessageAPI({
-      message: values?.message,
+      'message': values.message
     })
       .then(res => {
+        console.log("panicMessageAPI res", res)
         if (res.status == 1) {
           Alert.alert("Success", "Message submitted successfully!", [
             {
