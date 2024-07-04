@@ -12,13 +12,16 @@ import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg"
+import Geolocation from 'react-native-geolocation-service';
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
-import { getARSitesHiddenStars, getUserFriendList } from "../../../network";
+import { getARSitesHiddenStars, getDestinationFacts, getUserFriendList } from "../../../network";
 import AppSwitch from "../../../components/Switch";
-import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
+import { getBounds, getCenterOfBounds, hasLocationPermission, isLocationPointInPolygon } from "../../../util/LocationLib";
+import DestinationFactPopUp from "../destinactionfactpopup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
 const GeoArChallengeDetails = ({
@@ -39,6 +42,7 @@ const GeoArChallengeDetails = ({
   const [fullRegion, setFullRegion] = useState(null)
   const [friendList, setFriendList] = useState([])
   const [filteredUsers, setFilteredUsers] = React.useState([])
+  const [popUpFacts, setPopUpFacts] = useState(null)
 
   const setMapBounds = () => {
     var address = selectedDestination.name;
@@ -101,8 +105,69 @@ const GeoArChallengeDetails = ({
     }
     getHiddenStar()
     getFriends()
+    loadDFacts(selectedDestination?.id)
   }, []);
 
+  const loadDFacts = async (id) => {
+    const hasPermission = await hasLocationPermission();
+
+    if (!hasPermission) {
+      return;
+    }
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log("getLocation", position)
+        getDestinationFacts({
+          destination_id: id
+        }).then(async (res) => {
+          for (let i = 0; i < res.data.length; i++) {
+            const facts = res.data[i]
+            const arrayPoints = []
+            if (facts?.border?.coordinates) {
+              for (i = 0; i < facts.border.coordinates.length; i++) {
+                const points = facts.border.coordinates[i];
+                for (j = 0; j < points.length; j++) {
+                  const point = points[j]
+                  arrayPoints.push({ latitude: point[1], longitude: point[0] })
+                }
+              }
+            }
+            isInsideSiteArea = isLocationPointInPolygon(position.coords, arrayPoints);
+            if (isInsideSiteArea) {
+              console.log("PopUp", facts)
+              const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
+              console.log("AsyncStorage:", isOpened)
+              // if don't want to open popup again and again
+              // if (!isOpened || isOpened !== "opened") {
+              //   setPopUpFacts(facts)
+              // }
+              setPopUpFacts(facts)
+              break
+            } else {
+              console.log("Not PopUp", facts)
+            }
+          }
+        }).finally(() => {
+        })
+      },
+      error => {
+        console.log(error);
+      },
+      {
+        accuracy: {
+          android: 'high',
+          ios: 'best',
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      },
+    );
+  };
 
   const f_markerView = (o) => {
     if (o?.user_ar_profile?.current_location) {
@@ -329,6 +394,16 @@ const GeoArChallengeDetails = ({
           <Text style={_styles.s_list_text}>AR Challenges</Text>
         </View>
       </View>
+      {
+        popUpFacts && <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+          <DestinationFactPopUp facts={popUpFacts} onClose={
+            async () => {
+              setPopUpFacts(null);
+              await AsyncStorage.setItem(`open_${popUpFacts.id}`, 'opened')
+            }
+          } />
+        </View>
+      }
     </BackgroundWithImage >
   )
 }
