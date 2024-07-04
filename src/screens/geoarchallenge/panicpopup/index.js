@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { View, Keyboard, Text, TouchableOpacity } from "react-native"
+import { View, Keyboard, Text, TouchableOpacity, Alert } from "react-native"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { AppButton, AppHeader, AppInput } from "../../../components"
 import { PanicPopUpSchema } from "../../../util/ValidationSchemas"
@@ -8,12 +8,37 @@ import { useSelector } from "react-redux"
 import theme from "../../../assets/theme"
 import useStyles from "./styles"
 import { Formik } from "formik"
+import { panicMessageAPI } from "../../../network"
 
-const PanicPopUp = ({ navigation }) => {
-  const userProfile = useSelector(state => state.login?.data?.user)
+const PanicPopUp = ({ onClose }) => {
   const _styles = useStyles()
   const [isMessageInputFocused, setMessageInputFocused] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const submitHandler = values => {
+    console.log(userProfile?.id)
+    setIsLoading(true)
+    panicMessageAPI({
+      message: values?.message,
+    })
+      .then(res => {
+        if (res.status == 1) {
+          Alert.alert("Success", "Message submitted successfully!", [
+            {
+              text: "OK",
+              onPress: () => {
+                onClose()
+              }
+            }
+          ])
+        } else {
+          Alert.alert("Error", res.message.error)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
 
   return (
     <BackgroundWithImage>
