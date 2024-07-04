@@ -11,7 +11,7 @@ import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Geolocation, { GeoPosition } from 'react-native-geolocation-service';
 import MapViewDirections from "react-native-maps-directions";
 import { convertKilometersToMiles } from "../../../util/helpers";
@@ -43,6 +43,7 @@ const GeoArSiteNavigation = ({
   const [location, setLocation] = useState(null);
   const mapView = useRef();
   const watchId = useRef(null);
+  const route = useRoute()
 
   const stopLocationUpdates = () => {
     if (watchId.current !== null) {
@@ -221,7 +222,7 @@ const GeoArSiteNavigation = ({
                 }}
                 precision={"high"}
                 timePrecision={"now"}
-                mode={"DRIVING"}
+                mode={route?.params?.mapMode}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0]
