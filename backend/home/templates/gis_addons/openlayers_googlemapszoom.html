@@ -20,6 +20,8 @@ var base_layer = new ol.layer.Tile({
   map_options: map_options,
   map_srid: {{ map_srid|unlocalize }},
   name: '{{ name }}',
-  default_zoom: 25
+  default_lat: 15.659019,
+  default_lon: -70.975107,
+  default_zoom: 16
 };
 {% endblock %}
