@@ -39,31 +39,28 @@ class GeoARChallengesUpdatedAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 class GeoArChallengeAdmin(admin.ModelAdmin):
-
-    def __init__(self, model, admin_site):
-      
-      super().__init__(model, admin_site)
+    zoomMapWidgets = {"widget": GoogleMapsOpenLayersWidgetZoom}
+    mapWidgets = {"widget": GoogleMapsOpenLayersWidget}
+    zoomMapFields = {
+          MultiPolygonField: zoomMapWidgets,
+          PointField: zoomMapWidgets,
+          MultiLineStringField: zoomMapWidgets,
+          MultiPolygonField: zoomMapWidgets,
+          MultiPointField: zoomMapWidgets,
+    }
+    mapFields = {
+          MultiPolygonField: mapWidgets,
+          PointField: mapWidgets,
+          MultiLineStringField: mapWidgets,
+          MultiPolygonField: mapWidgets,
+          MultiPointField: mapWidgets,
+    }
+    formfield_overrides = mapFields
 
     def get_form(self, request, obj=None, change=False, **kwargs):
       form_class = super().get_form(request, obj, change, **kwargs)
       if obj:
-        print("get_form",obj)
-        self.formfield_overrides = {
-          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidgetZoom},
-          PointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
-          MultiLineStringField: {"widget": GoogleMapsOpenLayersWidgetZoom},
-          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidgetZoom},
-          MultiPointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
-        }
-      else:
-        print("get_form",obj)
-        self.formfield_overrides = {
-          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
-          PointField: {"widget": GoogleMapsOpenLayersWidget},
-          MultiLineStringField: {"widget": GoogleMapsOpenLayersWidget},
-          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
-          MultiPointField: {"widget": GoogleMapsOpenLayersWidget},
-        }
+        self.formfield_overrides = self.zoomMapFields
       return form_class
    
 @admin.register(GeoLocation)
