@@ -44,12 +44,24 @@ class ARExamplesViewSet(viewsets.ModelViewSet):
     serializer_class = ExamplesSerializer
     http_method_names = ["get"]
 
-class PanicMessageViewSet(viewsets.ModelViewSet):
+class PanicMessageViewSet(ViewSet):
     """
     A simple ViewSet for viewing and editing settings.
     """
     queryset = PanicMessage.objects.all()
     serializer_class = PanicMessageSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def create(self, request, *args, **kwargs):
+      user_id = self.request.user.id
+      request.data['user'] = user_id
+      serializer = PanicMessageSerializer(data=request.data, partial=True)
+      if serializer.is_valid(raise_exception=True):
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+      else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ARMemoriesViewSet(ViewSet):
 
