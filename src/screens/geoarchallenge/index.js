@@ -272,7 +272,10 @@ const GeoArChallenge = ({ }) => {
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
-      {openPanicPopUp && <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}><PanicPopUp /></View>}
+      {openPanicPopUp &&
+        <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+          <PanicPopUp onClose={() => { setOpenPanicPopup(false) }} />
+        </View>}
     </BackgroundWithImage>
   )
 }
