@@ -47,7 +47,6 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
     def get_form(self, request, obj=None, change=False, **kwargs):
       form_class = super().get_form(request, obj, change, **kwargs)
       if obj:
-        print("get_form",obj)
         self.formfield_overrides = {
           MultiPolygonField: {"widget": GoogleMapsOpenLayersWidgetZoom},
           PointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
@@ -56,7 +55,6 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
           MultiPointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
         }
       else:
-        print("get_form",obj)
         self.formfield_overrides = {
           MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
           PointField: {"widget": GoogleMapsOpenLayersWidget},
