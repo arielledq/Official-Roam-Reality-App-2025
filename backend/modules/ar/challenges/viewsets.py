@@ -1,9 +1,9 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
-GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, DestinationFacts
+GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage
 from .serializers import ARMemoriesSerializerGet, \
 ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
 ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer,GeoStarSerializer, \
-GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, GoldStarCollectionSerializer, DestinationFactsSerializer
+GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -44,6 +44,12 @@ class ARExamplesViewSet(viewsets.ModelViewSet):
     serializer_class = ExamplesSerializer
     http_method_names = ["get"]
 
+class PanicMessageViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing settings.
+    """
+    queryset = PanicMessage.objects.all()
+    serializer_class = PanicMessageSerializer
 
 class ARMemoriesViewSet(ViewSet):
 
