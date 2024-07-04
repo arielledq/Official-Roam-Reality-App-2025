@@ -404,7 +404,11 @@ const StarChallenge = ({
           }
           if (neareastPoint.latitude == this.state.nearestPoint?.latitude && neareastPoint.longitude == this.state.nearestPoint?.longitude) {
             console.log("Point already found again so no need to state update for other values..")
+            console.log(convertMetersToFeets(distance))
+            console.log(position.coords)
+            
             this.setState({
+              distanceInFeet: convertMetersToFeets(distance),
               currentLocation: position.coords
             })
             return
