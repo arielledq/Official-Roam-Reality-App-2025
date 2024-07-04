@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,DestinationFacts, \
   ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion,GeoARSiteActivity,StarCollection, \
   ARSitePinCheckIn,GeoARGoldStar, PanicMessage
-from .widgets import GoogleMapsOpenLayersWidget
+from .widgets import GoogleMapsOpenLayersWidget, GoogleMapsOpenLayersWidgetZoom
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
 
@@ -39,13 +39,32 @@ class GeoARChallengesUpdatedAdmin(admin.ModelAdmin):
     search_fields = ["name"]
 
 class GeoArChallengeAdmin(admin.ModelAdmin):
-    formfield_overrides = {
-        MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
-        PointField: {"widget": GoogleMapsOpenLayersWidget},
-        MultiLineStringField: {"widget": GoogleMapsOpenLayersWidget},
-        MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
-        MultiPointField: {"widget": GoogleMapsOpenLayersWidget},
-    }
+
+    def __init__(self, model, admin_site):
+      
+      super().__init__(model, admin_site)
+
+    def get_form(self, request, obj=None, change=False, **kwargs):
+      form_class = super().get_form(request, obj, change, **kwargs)
+      if obj:
+        print("get_form",obj)
+        self.formfield_overrides = {
+          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidgetZoom},
+          PointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
+          MultiLineStringField: {"widget": GoogleMapsOpenLayersWidgetZoom},
+          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidgetZoom},
+          MultiPointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
+        }
+      else:
+        print("get_form",obj)
+        self.formfield_overrides = {
+          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
+          PointField: {"widget": GoogleMapsOpenLayersWidget},
+          MultiLineStringField: {"widget": GoogleMapsOpenLayersWidget},
+          MultiPolygonField: {"widget": GoogleMapsOpenLayersWidget},
+          MultiPointField: {"widget": GoogleMapsOpenLayersWidget},
+        }
+      return form_class
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
