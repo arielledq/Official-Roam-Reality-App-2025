@@ -622,3 +622,12 @@ class GeoARGoldStar(models.Model):
 
     def __str__(self):
         return self.name
+    
+class PanicMessage(models.Model):
+    user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="user_panic_message"
+    )
+    message = RichTextField(_("Message"), blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    

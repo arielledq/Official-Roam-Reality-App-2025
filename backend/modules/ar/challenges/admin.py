@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,DestinationFacts, \
   ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion,GeoARSiteActivity,StarCollection, \
-  ARSitePinCheckIn,GeoARGoldStar
+  ARSitePinCheckIn,GeoARGoldStar, PanicMessage
 from .widgets import GoogleMapsOpenLayersWidget
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
@@ -97,6 +97,20 @@ admin.site.register(StarCollection, GeoArChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 admin.site.register(DestinationFacts, GeoArChallengeAdmin)
 admin.site.register(ARUserProfile, GeoArChallengeAdmin)
+
+class PanicMessageAdmin(admin.ModelAdmin):
+    
+    search_fields = (
+        "user__name",
+    )
+    list_display = ('user_name',"message",)
+    list_select_related = ['user']  # To avoid extra queries
+
+    def user_name(self, obj):
+        return obj.user.name
+
+    pass
+admin.site.register(PanicMessage, PanicMessageAdmin)
 
 
 
