@@ -11,6 +11,7 @@ import SitesIcon from "../../../assets/geoar/sites.svg"
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg"
 import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg"
 import Geolocation from 'react-native-geolocation-service';
 
@@ -375,21 +376,21 @@ const GeoArChallengeDetails = ({
       </View>
       <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <SiteIcon style={{ width: 48, height: 48 }} />
+          <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
           <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>Sites</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <SitesIcon style={{ width: 48, height: 48 }} />
+          <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
           <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>Star Sites</Text>
         </View><View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <StarSiteIcon style={{ width: 48, height: 48 }} />
+          <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
           <Text style={_styles.s_list_count}>{hiddenStars}</Text>
           <Text style={_styles.s_list_text}>Hidden Stars</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-          <ArIcon style={{ width: 48, height: 48 }} />
+          <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
           <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
           <Text style={_styles.s_list_text}>AR Challenges</Text>
         </View>
