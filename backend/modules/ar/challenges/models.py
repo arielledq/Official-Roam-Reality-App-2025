@@ -606,8 +606,18 @@ class GeoARGoldStar(models.Model):
         default=None,
         null=False,
         blank=False,
+        verbose_name="Geo Destination",
         related_name="geo_location_ar_gold_star",
     ) 
+    geo_site = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        default=None,
+        null=False,
+        blank=False,
+        verbose_name="Geo Site",
+        related_name="geo_ar_goldstar_ar_site",
+    )
     sponsors = models.ManyToManyField(
         Sponsor,
         verbose_name="Sponsors",
