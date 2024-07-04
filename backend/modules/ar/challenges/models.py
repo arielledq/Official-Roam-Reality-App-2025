@@ -569,7 +569,6 @@ class DestinationFacts(models.Model):
     )
     image = models.ImageField(upload_to="geoargoldstar/img/", null=True, blank=True)
     facts = RichTextField(_("Facts"), blank=True, null=True)
-    visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
     sponsors = models.ManyToManyField(
         Sponsor,
         verbose_name="Sponsors",
@@ -583,7 +582,7 @@ class DestinationFacts(models.Model):
         blank=False,
         related_name="geo_location_ar_facts",
     ) 
-    location = gis_models.MultiPointField(_("Location"), blank=True, null=True)
+    border = gis_models.MultiLineStringField(_("Borders"), blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
 
     class Meta:
