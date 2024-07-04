@@ -37,6 +37,7 @@ import useStyles from "./styles"
 import { hasLocationPermission } from "../../util/LocationLib";
 import Geolocation from 'react-native-geolocation-service';
 import { MenuIcon } from "../../assets/svg"
+import PanicPopUp from "./panicpopup"
 
 const GeoArChallenge = ({ }) => {
   const _styles = useStyles()
@@ -44,6 +45,7 @@ const GeoArChallenge = ({ }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
+  const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
 
   const ARSposored = () => {
@@ -238,6 +240,7 @@ const GeoArChallenge = ({ }) => {
       <TouchableOpacity
         onPress={() => {
           // navigation.navigate("Notifications")
+          setOpenPanicPopup(true)
         }}
         style={{ paddingRight: 5 }}
       >
@@ -269,6 +272,7 @@ const GeoArChallenge = ({ }) => {
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
+      {openPanicPopUp && <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}><PanicPopUp /></View>}
     </BackgroundWithImage>
   )
 }
