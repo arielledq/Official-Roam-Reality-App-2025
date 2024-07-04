@@ -229,6 +229,7 @@ class GoldStarCollectionSerializer(serializers.ModelSerializer):
         )
 
 class DestinationFactsSerializer(serializers.ModelSerializer):
+    sponsors = SponsorSerializer(read_only=True,many=True)
 
     class Meta:
         model = DestinationFacts
