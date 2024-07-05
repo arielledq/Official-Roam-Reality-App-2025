@@ -58,7 +58,7 @@ const PublicProfile: ScreenStackComponent<
   const [modalVisible, setModalVisible] = useState(false)
 
   const fetchARUserProfile = () => {
-    getPublicARProfile(userProfile?.user_profile?.id)
+    getPublicARProfile(userProfile?.id)
       .then(res => {
         if (res.status == 1) {
           updateARUserData(res)
@@ -69,7 +69,7 @@ const PublicProfile: ScreenStackComponent<
 
   const getProfieARMemories = async () => {
     try {
-      getPublicProfieARMemoriesAPI(userProfile?.user_profile?.id)
+      getPublicProfieARMemoriesAPI(userProfile?.id)
         .then(res => {
           if (res.status == 1) {
             setARMemories(res.data)

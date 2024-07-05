@@ -665,7 +665,8 @@ ViroMaterials.createMaterials({
     blendMode: "Add",
     lightingModel: "Lambert",
     bloomThreshold: 0.5,
-    diffuseColor: "#fff"
+    diffuseColor: "#fff",
+    diffuseIntensity: 1
   },
 });
 
