@@ -221,7 +221,7 @@ const GeoArSiteDetails = ({
 
         <View style={{ flexDirection: 'row', paddingVertical: 20, justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={_styles.site_d_header_text}>Site Details</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.goBack()}>
             <CloseBIcon style={{ height: 32, width: 32 }} />
           </TouchableOpacity>
         </View>
