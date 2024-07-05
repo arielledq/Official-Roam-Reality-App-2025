@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.authtoken.models import Token
@@ -66,6 +67,9 @@ class LoginViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
+        if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
+            return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
+            
         user_serializer = UserSerializer(user)
         return Response({"token": token.key, "user": user_serializer.data})
 

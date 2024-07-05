@@ -7,6 +7,8 @@ from users.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+from rest_framework.authtoken.models import Token
+
 
 class ReportedContentConstant:
     SPAM = 1
@@ -70,6 +72,7 @@ def send_feedback_email_to_admin(sender, instance, created, **kwargs):
 class ReportedContent(models.Model):
     post = models.ForeignKey(Challenges, on_delete=models.CASCADE,null=True, blank=True)
     reported_user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
+    block_reported_user = models.BooleanField(default=False)
     reason = models.PositiveIntegerField(max_length=50, choices=ReportedContentConstant.REASON_CHOICES,default=ReportedContentConstant.OTHER,null=True, blank=True) 
     custom_reason = models.TextField(null=True, blank=True)
     is_reviewed = models.BooleanField(default=False)
@@ -78,3 +81,13 @@ class ReportedContent(models.Model):
     class Meta:
         verbose_name = "Reported Content/User"
         verbose_name_plural = "Reported Content/Users"
+
+
+@receiver(post_save, sender=ReportedContent)
+def delete_blocked_user_token(sender, instance, created, **kwargs):
+    try:
+        if instance.block_reported_user:
+            token = Token.objects.get(user=instance.reported_user)
+            token.delete()
+    except:
+        pass
