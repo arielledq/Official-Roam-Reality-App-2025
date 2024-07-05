@@ -79,12 +79,14 @@ const GeoArSiteNavigation = ({
       position => {
         setLocation(position);
         setCurrentLocation(position)
-        mapView.current.animateToRegion({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitudeDelta: 0.0032,
-          longitudeDelta: 0.0032,
-        })
+        if (mapView && mapView.current) {
+          mapView.current.animateToRegion({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.0032,
+            longitudeDelta: 0.0032,
+          })
+        }
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
@@ -126,7 +128,7 @@ const GeoArSiteNavigation = ({
           stopLocationUpdates()
           return;
         }
-        if (mapView) {
+        if (mapView && mapView.current) {
           mapView.current.animateToRegion({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,

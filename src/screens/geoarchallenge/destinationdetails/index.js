@@ -60,14 +60,18 @@ const GeoArChallengeDetails = ({
           latitudeDelta: Number(bounds.northeast.lat - bounds.southwest.lat),
           longitudeDelta: Number(bounds.northeast.lng - bounds.southwest.lng),
         }
-        mapView.current.animateToRegion(fullRegion)
-        setFullRegion(fullRegion)
+        if (mapView && mapView.current) {
+          mapView.current.animateToRegion(fullRegion)
+          setFullRegion(fullRegion)
+        }
       })
       .catch(error => console.warn(error));
   }
 
   const moveToFullRegion = () => {
-    mapView.current.animateToRegion(fullRegion)
+    if (mapView && mapView.current) {
+      mapView.current.animateToRegion(fullRegion)
+    }
     setSelectedRegionName("Full")
   }
 
@@ -277,13 +281,15 @@ const GeoArChallengeDetails = ({
     }
     const latitude_longitude = getCenterOfBounds(arrayPoints)
     const bounds = getBounds(arrayPoints)
-    mapView.current.animateToRegion({
-      latitude: Number(latitude_longitude.latitude),
-      longitude: Number(latitude_longitude.longitude),
-      latitudeDelta: Number(bounds.maxLat - bounds.minLat),
-      longitudeDelta: Number(bounds.maxLng - bounds.minLng),
-    })
-    setSelectedRegionName(r.name)
+    if (mapView && mapView.current) {
+      mapView.current.animateToRegion({
+        latitude: Number(latitude_longitude.latitude),
+        longitude: Number(latitude_longitude.longitude),
+        latitudeDelta: Number(bounds.maxLat - bounds.minLat),
+        longitudeDelta: Number(bounds.maxLng - bounds.minLng),
+      })
+      setSelectedRegionName(r.name)
+    }
   }
   const initialRegion = {
     latitude: selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0 ?
