@@ -158,6 +158,19 @@ const GeoArSiteNavigation = ({
     );
   };
 
+  const minOrHoursWalkDriving = (walkDurationMins) => {
+    if (walkDurationMins < 60) {
+      return (
+        <>{Math.round(walkDurationMins)} <Text style={{ fontSize: 14 }}>mins</Text></>
+      )
+    } else if (walkDurationMins >= 60) {
+      var hours = Math.floor(walkDurationMins / 60);
+      return (
+        <>{Math.round(hours)} <Text style={{ fontSize: 14 }}>hours</Text></>
+      )
+    }
+  }
+
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -264,9 +277,9 @@ const GeoArSiteNavigation = ({
         <View style={{ backgroundColor: "#131422", borderRadius: 16, paddingHorizontal: 20, paddingBottom: 20, marginVertical: 20, alignItems: 'center' }}>
           <HomeIcon style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }} />
           <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <CloseBIcon style={{ width: 32, height: 32 }} />
+            <TouchableOpacity onPress={() => navigation.replace("ChallengeSelection")}><CloseBIcon style={{ width: 32, height: 32 }} /></TouchableOpacity>
             <View style={{ alignItems: 'center', marginVertical: 8 }}>
-              <Text style={_styles.site_distance_time_value_text}>{Math.round(durationMins)} <Text style={{ fontSize: 14 }}>mins</Text></Text>
+              <Text style={_styles.site_distance_time_value_text}>{minOrHoursWalkDriving(durationMins)}</Text>
               <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={_styles.site_distance_time_text}>{mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text></Text>
                 <Text style={_styles.site_distance_time_text}>.</Text>
