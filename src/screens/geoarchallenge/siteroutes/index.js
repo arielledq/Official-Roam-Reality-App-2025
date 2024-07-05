@@ -111,8 +111,20 @@ const GeoArSiteRoutes = ({
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
-  return (
+  const minOrHoursWalkDriving = (walkDurationMins, mode) => {
+    if (walkDurationMins < 60) {
+      return (
+        <>{Math.round(walkDurationMins)} <Text style={{ fontSize: 10 }}>mins ({mode})</Text></>
+      )
+    } else if (walkDurationMins >= 60) {
+      var hours = Math.floor(walkDurationMins / 60);
+      return (
+        <>{Math.round(hours)} <Text style={{ fontSize: 10 }}>hours ({mode})</Text></>
+      )
+    }
+  }
 
+  return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
@@ -248,7 +260,7 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TimeIcon style={{ width: 20, height: 20 }} />
             <Text style={_styles.site_distance_time_text}>Est. Time</Text>
-            <Text style={_styles.site_distance_time_value_text}>{Math.round(durationMins)} <Text style={{ fontSize: 10 }}>mins (Drive)</Text> / {Math.round(walkDurationMins)} <Text style={{ fontSize: 10 }}>mins (Walk)</Text></Text>
+            <Text style={_styles.site_distance_time_value_text}>{minOrHoursWalkDriving(durationMins, "Drive")} /  {minOrHoursWalkDriving(walkDurationMins, "Walk")}</Text>
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
