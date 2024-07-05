@@ -143,10 +143,9 @@ const GeoArChallengeDetails = ({
               const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
               console.log("AsyncStorage:", isOpened)
               // if don't want to open popup again and again
-              // if (!isOpened || isOpened !== "opened") {
-              //   setPopUpFacts(facts)
-              // }
-              setPopUpFacts(facts)
+              if (!isOpened || isOpened !== "opened") {
+                setPopUpFacts(facts)
+              }
               break
             } else {
               console.log("Not PopUp", facts)
