@@ -9,6 +9,7 @@ import Rally from '../screens/rally';
 import Icon from "../components/Icon"
 import { Icons } from '../assets/Icons';
 import GeoArChallenge from '../screens/geoarchallenge';
+import ScoreBoard from '../screens/scoreboard';
 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -48,7 +49,7 @@ const BottomTabNavigator = () => {
       />
       <Tab.Screen
         name="Scores"
-        component={Scores}
+        component={ScoreBoard}
         options={{
           tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
           tabBarIcon: ({ focused }) => (
