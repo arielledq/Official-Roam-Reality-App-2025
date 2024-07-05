@@ -305,6 +305,8 @@ PODS:
   - react-native-cameraroll (7.4.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
+  - react-native-compass-heading (1.5.0):
+    - React-Core
   - react-native-contacts (7.0.8):
     - React-Core
   - react-native-fbsdk-next (12.1.2):
@@ -562,6 +564,7 @@ DEPENDENCIES:
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
+  - react-native-compass-heading (from `../node_modules/react-native-compass-heading`)
   - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
@@ -680,6 +683,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-community/blur"
   react-native-cameraroll:
     :path: "../node_modules/@react-native-camera-roll/camera-roll"
+  react-native-compass-heading:
+    :path: "../node_modules/react-native-compass-heading"
   react-native-contacts:
     :path: "../node_modules/react-native-contacts"
   react-native-fbsdk-next:
@@ -816,6 +821,7 @@ SPEC CHECKSUMS:
   React-logger: 186dd536128ae5924bc38ed70932c00aa740cd5b
   react-native-blur: 69ecfe61d81b32ee7baae10f5d17aeb4e2594b10
   react-native-cameraroll: 2566fbd372c08338435a78bc04a353e0bac5fcfb
+  react-native-compass-heading: 1b4403d1c99dfd8311073ca8fc52bfc8e365cfac
   react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
   react-native-fbsdk-next: 9c40664b1501be29572795c2e4c8e347f39f556f
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b

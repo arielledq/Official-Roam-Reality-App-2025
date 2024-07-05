@@ -35,6 +35,8 @@ const GeoArSiteRoutes = ({
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
+  const [walkMileDistance, setWalkMileDistance] = useState(0)
+  const [walkDurationMins, setWalkDurationMins] = useState(0)
   const [routes, setRoutes] = useState(0)
 
   const getCurrentLocation = () => {
@@ -109,8 +111,20 @@ const GeoArSiteRoutes = ({
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
-  return (
+  const minOrHoursWalkDriving = (walkDurationMins, mode) => {
+    if (walkDurationMins < 60) {
+      return (
+        <>{Math.round(walkDurationMins)} <Text style={{ fontSize: 10 }}>mins ({mode})</Text></>
+      )
+    } else if (walkDurationMins >= 60) {
+      var hours = Math.floor(walkDurationMins / 60);
+      return (
+        <>{Math.round(hours)} <Text style={{ fontSize: 10 }}>hours ({mode})</Text></>
+      )
+    }
+  }
 
+  return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
@@ -186,6 +200,40 @@ const GeoArSiteRoutes = ({
                 }}
               />
             }
+            {currentLocation &&
+              <MapViewDirections
+                origin={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude
+                }}
+                precision={"high"}
+                timePrecision={"now"}
+                mode={"WALKING"}
+                destination={{
+                  latitude: selectedGeoSite.lat_long.coordinates[1],
+                  longitude: selectedGeoSite.lat_long.coordinates[0]
+                }}
+                apikey={Strings.GOOGLE_PLACE_API_KEY}
+                strokeWidth={0}
+                strokeColor="hotpink"
+                optimizeWaypoints={true}
+                onStart={(params) => {
+                  console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
+                }}
+                onReady={result => {
+                  console.log(result)
+                  console.log(result.legs)
+                  console.log(`Distance: ${result.distance} km`)
+                  console.log(`Duration: ${result.duration} min.`)
+                  setWalkDurationMins(result.duration)
+                  setRoutes(1)
+                }}
+                onError={(errorMessage) => {
+                  console.log('GOT AN ERROR', errorMessage);
+                  setRoutes(0)
+                }}
+              />
+            }
           </MapView>
         </View>
 
@@ -212,14 +260,23 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TimeIcon style={{ width: 20, height: 20 }} />
             <Text style={_styles.site_distance_time_text}>Est. Time</Text>
-            <Text style={_styles.site_distance_time_value_text}>{Math.round(durationMins)} <Text style={{ fontSize: 10 }}>mins</Text></Text>
+            <Text style={_styles.site_distance_time_value_text}>{minOrHoursWalkDriving(durationMins, "Drive")} /  {minOrHoursWalkDriving(walkDurationMins, "Walk")}</Text>
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
-              onPress={() => navigation.navigate("GeoArSiteNavigation")}
+              onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "DRIVING" })}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
-              title={"Navigate"}
+              title={"Drive To Location"}
+              loading={isLoading}
+            />
+          </View>
+          <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
+            <AppButton
+              onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "WALKING" })}
+              buttonStyle={_styles.buttonStyle}
+              containerStyle={_styles.buttonContainerStyle}
+              title={"Walk to Location"}
               loading={isLoading}
             />
           </View>

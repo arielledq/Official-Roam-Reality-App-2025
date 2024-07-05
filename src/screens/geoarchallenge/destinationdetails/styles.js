@@ -103,13 +103,16 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     alignItems: 'center',
     textAlign: 'center',
+    position:"absolute",
+    top:15
   },
   s_list_text: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     alignItems: 'center',
-    textAlign: 'center'
+    textAlign: 'center',
+    marginTop:5
   },
   gradient: {
     position: 'absolute',
