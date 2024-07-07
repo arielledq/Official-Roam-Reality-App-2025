@@ -44,6 +44,7 @@ const { width } = Dimensions.get('window');
 import { FontSizes } from "../../../util/FontUtils"
 import { getAllCollectedStars, starFoundAndSaveApi, updateUserPointAPI } from "../../../network";
 import CompassHeading from 'react-native-compass-heading';
+import TravelDataPopUp from "../traveldatapopup";
 
 const StarChallenge = ({
 
@@ -289,6 +290,8 @@ const StarChallenge = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5]} />
         }
+
+        <TravelDataPopUp currentLocation={currentLocation}/>
       </ViroARScene>
     );
   };

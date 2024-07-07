@@ -1,46 +1,45 @@
 import React, { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { StyleSheet } from "react-native";
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
 import {
   ViroImage,
   ViroNode,
-  ViroARScene,
   ViroText,
-  ViroConstants,
-  ViroARSceneNavigator,
   ViroFlexView
-} from 'react-viro';
+} from '@viro-community/react-viro';
 import CompassHeading from 'react-native-compass-heading';
-import { distanceBetweenPoints, transformGpsToAR } from "../../../util/LocationLib";
+import { getLocationDistance, transformGpsToAR } from "../../../util/LocationLib";
 import { getNearbyPlaces } from "../../../util/PlacesAPI";
 
 const TravelDataPopUp = ({
   currentLocation
 }) => {
 
-  const [setCompassHeading, compassHeading] = useState(0)
-  const [setPlaces, places] = useState([])
+  const [compassHeading, setCompassHeading] = useState(0)
+  const [places, setPlaces] = useState([])
   const [placeCordinateLoadPoint, setPlaceCordinateLoadPoint] = useState(currentLocation)
 
   const loadPlaces = () => {
-    const distance = distanceBetweenPoints(currentLocation, placeCordinateLoadPoint);
+    const distance = getLocationDistance(currentLocation, placeCordinateLoadPoint);
     if (distance > 20) {
       getNearbyPlaces(currentLocation, 50, (places) => {
         console.log("getNearbyPlaces", places)
-        setPlaces(setPlaces)
+        setPlaces(places)
       })
       setPlaceCordinateLoadPoint(currentLocation)
     }
   }
 
   const placeARObjects = () => {
-    if (places.length == 0) {
-      return undefined;
+    if (!places && places.length == 0) {
+      return (
+        null
+      )
     }
-    const ARTags = this.state.nearbyPlaces.map((item) => {
+    const ARTags = places.map((item) => {
       const coords = transformGpsToAR(currentLocation, { latitude: item.lat, longitude: item.lng }, compassHeading);
       const scale = Math.abs(Math.round(coords.z / 15));
-      const distance = distanceBetweenPoints(currentLocation, { latitude: item.lat, longitude: item.lng });
+      const distance = getLocationDistance(currentLocation, { latitude: item.lat, longitude: item.lng });
       return (
         <ViroNode key={item.id} scale={[scale, scale, scale]} rotation={[0, 0, 0]} position={[coords.x, 0, coords.z]}>
           <ViroFlexView style={{ alignItems: 'center', justifyContent: 'center' }}>
@@ -77,8 +76,8 @@ const TravelDataPopUp = ({
 
 var styles = StyleSheet.create({
   helloWorldTextStyle: {
-    fontFamily: 'Arial',
-    fontSize: 30,
+    ...fontGroup.ns600,
+    fontSize: FontSizes.S30,
     color: '#ffffff',
     textAlignVertical: 'center',
     textAlign: 'center',
