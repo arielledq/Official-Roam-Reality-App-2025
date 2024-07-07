@@ -20,12 +20,17 @@ const TravelDataPopUp = ({
 
   const [setCompassHeading, compassHeading] = useState(0)
   const [setPlaces, places] = useState([])
+  const [placeCordinateLoadPoint, setPlaceCordinateLoadPoint] = useState(currentLocation)
 
   const loadPlaces = () => {
-    getNearbyPlaces(currentLocation, 50, (places) => {
-      console.log("getNearbyPlaces", places)
-      setPlaces(setPlaces)
-    })
+    const distance = distanceBetweenPoints(currentLocation, placeCordinateLoadPoint);
+    if (distance > 20) {
+      getNearbyPlaces(currentLocation, 50, (places) => {
+        console.log("getNearbyPlaces", places)
+        setPlaces(setPlaces)
+      })
+      setPlaceCordinateLoadPoint(currentLocation)
+    }
   }
 
   const placeARObjects = () => {
@@ -48,6 +53,10 @@ const TravelDataPopUp = ({
     });
     return ARTags;
   }
+
+  useEffect(() => {
+    loadPlaces()
+  }, [currentLocation]);
 
   useEffect(() => {
     loadPlaces()
