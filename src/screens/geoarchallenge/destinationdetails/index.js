@@ -4,10 +4,6 @@ import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View }
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
-import SiteIcon from "../../../assets/geoar/siteicon.svg"
-import StarSiteIcon from "../../../assets/geoar/starsite.svg"
-import ArIcon from "../../../assets/geoar/aricon.svg"
-import SitesIcon from "../../../assets/geoar/sites.svg"
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps';
 import Geocoder from 'react-native-geocoding';
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
