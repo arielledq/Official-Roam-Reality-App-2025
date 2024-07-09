@@ -291,7 +291,7 @@ const StarChallenge = ({
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5]} />
         }
 
-        <TravelDataPopUp currentLocation={currentLocation}/>
+        <TravelDataPopUp currentLocation={currentLocation} />
       </ViroARScene>
     );
   };
@@ -313,6 +313,7 @@ const StarChallenge = ({
       nearestPoint: { latitude: 0, longitude: 0 },
       currentLocation: { latitude: 0, longitude: 0 },
       compassHeading: 0,
+      allStarsCollected: false
     }
 
     constructor() {
@@ -409,7 +410,7 @@ const StarChallenge = ({
             console.log("Point already found again so no need to state update for other values..")
             console.log(convertMetersToFeets(distance))
             console.log(position.coords)
-            
+
             this.setState({
               distanceInFeet: convertMetersToFeets(distance),
               currentLocation: position.coords
@@ -427,6 +428,9 @@ const StarChallenge = ({
           })
         } else {
           console.log("findNearPoint", "Collected All Stars....")
+          this.setState({
+            allStarsCollected: true
+          })
         }
       } catch (e) {
         console.log(e)
@@ -736,7 +740,12 @@ const StarChallenge = ({
                     <MenIcon style={{ width: 40, height: 40 }} />
                     <View>
                       <Text style={_styles.exploringText}>Nearest Star</Text>
-                      <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                      {
+                        this.state.allStarsCollected ? 
+                        <Text style={_styles.arrivedText}>{"You have found all stars!"}</Text>
+                        : 
+                        <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                      }
                     </View>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
