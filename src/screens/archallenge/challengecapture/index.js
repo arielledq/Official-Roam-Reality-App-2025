@@ -584,7 +584,7 @@ const ArChallengeCapture = ({
           <View
             style={styles.f1}>
             {
-              this.state.isLoadVR && <ViroARSceneNavigator
+              <ViroARSceneNavigator
                 videoQuality={"High"}
                 autofocus={true}
                 pbrEnabled={true}
@@ -594,7 +594,7 @@ const ArChallengeCapture = ({
                 initialScene={{
                   scene: ARScreen,
                 }}
-                style={styles.imageVideoView}
+                style={styles.navigatorView}
               >
               </ViroARSceneNavigator>
             }

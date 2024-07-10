@@ -52,6 +52,10 @@ const useStyles = makeStyles(theme => ({
     position:'absolute',
     backgroundColor:'#fff'
   },
+  navigatorView:{
+    width: '100%',
+    flex:1,
+  },
   bottomContainer: {
     width: '100%',
     height: 110,

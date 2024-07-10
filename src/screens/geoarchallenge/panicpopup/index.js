@@ -9,6 +9,7 @@ import theme from "../../../assets/theme"
 import useStyles from "./styles"
 import { Formik } from "formik"
 import { panicMessageAPI } from "../../../network"
+import { getDeviceCurrentLocation } from "../../../util/LocationLib"
 
 const PanicPopUp = ({ onClose }) => {
   const _styles = useStyles()
@@ -16,30 +17,32 @@ const PanicPopUp = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const submitHandler = values => {
-    setIsLoading(true)
-
-    console.log(values?.message)
-    panicMessageAPI({
-      'message': values.message
-    })
-      .then(res => {
-        console.log("panicMessageAPI res", res)
-        if (res.status == 1) {
-          Alert.alert("Success", "Message submitted successfully!", [
-            {
-              text: "OK",
-              onPress: () => {
-                onClose()
+    getDeviceCurrentLocation((position) => {
+      setIsLoading(true)
+      panicMessageAPI({
+        message: values.message,
+        latitude: position.coords.latitude,
+        longitude: position.coords.longitude
+      })
+        .then(res => {
+          console.log("panicMessageAPI res", res)
+          if (res.status == 1) {
+            Alert.alert("Success", "Message submitted successfully!", [
+              {
+                text: "OK",
+                onPress: () => {
+                  onClose()
+                }
               }
-            }
-          ])
-        } else {
-          Alert.alert("Error", res.message.error)
-        }
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
+            ])
+          } else {
+            Alert.alert("Error", res.message.error)
+          }
+        })
+        .finally(() => {
+          setIsLoading(false)
+        })
+    })
   }
 
   return (
@@ -62,6 +65,8 @@ const PanicPopUp = ({ onClose }) => {
         >
           {({ handleChange, handleSubmit, values, errors, touched }) => (
             <View style={_styles.container}>
+              <Text style={_styles.emergencyText}>Emergency Procedure</Text>
+              <Text style={_styles.emergencyTextDes}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ullamcorper erat nec blandit pharetra. Quisque mattis elit semper sem mattis, a commodo nisi mattis.</Text>
               <View style={_styles.chidlView}>
                 <AppInput
                   style={[
