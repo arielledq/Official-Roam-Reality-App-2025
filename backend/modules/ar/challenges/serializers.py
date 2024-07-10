@@ -237,10 +237,11 @@ class DestinationFactsSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
-class PanicMessageSerializer(serializers.ModelSerializer):
+class PanicMessageSerializer(GeoModelSerializer):
 
     class Meta:
         model = PanicMessage
+        geo_field = 'location'
         fields = (
             "__all__"
         )

@@ -639,6 +639,7 @@ class PanicMessage(models.Model):
     message = RichTextField(_("Message"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    location = gis_models.PointField(_("Location"), blank=True, null=True)
 
     class Meta:
       verbose_name_plural = "Panic Messages"
