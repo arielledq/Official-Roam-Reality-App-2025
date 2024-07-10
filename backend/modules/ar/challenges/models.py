@@ -365,6 +365,7 @@ class GeoArSite(models.Model):
         default=None,
         null=False,
         blank=False,
+        verbose_name="Geo Destination",
         related_name="geo_location_ar_site",
     )
     pin_challenge = models.ForeignKey(GeoARChallenges,
