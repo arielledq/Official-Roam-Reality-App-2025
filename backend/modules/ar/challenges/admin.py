@@ -114,7 +114,7 @@ admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 admin.site.register(DestinationFacts, GeoArChallengeAdmin)
 admin.site.register(ARUserProfile, GeoArChallengeAdmin)
 
-class PanicMessageAdmin(admin.ModelAdmin):
+class PanicMessageAdmin(GeoArChallengeAdmin):
     
     search_fields = (
         "user__name",
