@@ -742,7 +742,7 @@ const StarChallenge = ({
                       <Text style={_styles.exploringText}>Nearest Star</Text>
                       {
                         this.state.allStarsCollected ? 
-                        <Text style={_styles.arrivedText}>{"You have found all stars!"}</Text>
+                        <Text style={_styles.arrivedText}>{"You have found all the stars!"}</Text>
                         : 
                         <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
                       }
@@ -768,12 +768,10 @@ const StarChallenge = ({
       )
     }
   }
-
   return (
     <ViroARNavigator />
   )
 }
-
 
 ViroMaterials.createMaterials({
   grid: {
