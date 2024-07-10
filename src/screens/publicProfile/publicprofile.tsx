@@ -121,7 +121,7 @@ const PublicProfile: ScreenStackComponent<
     const reportData = {
       reason: reportReason,
       custom_reason: issueDescripton,
-      report_user: userProfile?.user_profile?.id
+      reported_user: userProfile?.id
     }
     reportContentOrUser(reportData)
       .then(resposne => {
@@ -172,7 +172,7 @@ const PublicProfile: ScreenStackComponent<
           <AppText
             adjustsFontSizeToFit={true}
             numberOfLines={1}
-            onPress={()=>navigation.navigate("ScoreBoard")}
+            onPress={() => navigation.navigate("ScoreBoard")}
             style={_styles.scoreboard}
           >
             SCOREBOARD

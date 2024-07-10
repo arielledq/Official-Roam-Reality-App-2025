@@ -158,13 +158,13 @@ const renderContact = (
         </ImageBackground>
         <View>
           <Text style={styles.title}>{item.name}</Text>
-          <Text
+          {/* <Text
             style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
             {item.email}
-          </Text>
+          </Text> */}
         </View>
       </View>
       <Pressable

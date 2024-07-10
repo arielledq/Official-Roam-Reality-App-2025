@@ -152,7 +152,9 @@ const ContactUs = ({ navigation }) => {
                   onFocus={() => setMessageInputFocused(true)}
                   onBlur={() => setMessageInputFocused(false)}
                   placeholder="Write your message here"
-                  onSubmitEditing={Keyboard.dismiss}
+                  onSubmitEditing={() => Keyboard.dismiss()}
+                  returnKeyType="done"
+                  returnKeyLabel="Done"
                   placeholderTextColor={
                     (touched.message && errors?.message) ||
                     isMessageInputFocused
