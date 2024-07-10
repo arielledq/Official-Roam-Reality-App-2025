@@ -40,6 +40,18 @@ const useStyles = makeStyles((theme) => ({
     color: "#DC2626",
     fontWeight: "700",
   },
+  emergencyText: {
+    ...fontGroup.ns500,
+    fontSize: FontSizes.S14,
+    color: "#fff",
+    marginVertical:5
+  },
+  emergencyTextDes: {
+    ...fontGroup.ns400,
+    fontSize: FontSizes.S12,
+    color: "#fff",
+    marginBottom:10
+  },
 })
 )
 export default useStyles;

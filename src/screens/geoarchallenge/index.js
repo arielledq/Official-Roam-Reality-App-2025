@@ -239,7 +239,8 @@ const GeoArChallenge = ({ }) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          navigation.navigate("Notifications")
+          //navigation.navigate("Notifications")
+          setOpenPanicPopup(true)
         }}
         style={{ paddingRight: 5 }}
       >
