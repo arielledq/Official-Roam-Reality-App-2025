@@ -5,6 +5,9 @@ from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, 
 from .widgets import GoogleMapsOpenLayersWidget, GoogleMapsOpenLayersWidgetZoom
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
+from django.urls import reverse
+from django.utils.http import urlencode
+from django.utils.html import format_html
 
 class ARMemoriesAdmin(admin.ModelAdmin):
     
@@ -65,9 +68,22 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
-    list_display = ('name','sequence_number',)
+    list_display = ('name','sequence_number','view_ar_sites',)
     ordering = ('sequence_number',)
     search_fields = ["name",'sequence_number']
+
+    def view_ar_sites(self, obj):
+        count = obj.geo_location_ar_site.count()
+        info = (GeoArSite._meta.app_label, GeoArSite._meta.model_name)
+        url = reverse('admin:{}_{}_change'.format(*info), args=({"geo_location": f"{obj.id}"},))
+        url = (
+            reverse('admin:{}_{}_changelist'.format(*info))
+            + "?"
+            + urlencode({"geo_location": f"{obj.id}"})
+        )
+        return format_html('<a href="{}">{} AR Sites</a>', url, count)
+
+    view_ar_sites.short_description = "AR Sites"
 
 @admin.register(GeoRegion)
 class GeoRegionAdmin(GeoArChallengeAdmin):
@@ -99,7 +115,6 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     def user_name(self, obj):
         return obj.user.name
     pass
-
 
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
