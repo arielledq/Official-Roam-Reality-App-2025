@@ -54,7 +54,7 @@ export const converXZToLatLong = (x: Number, y: Number) => {
   return ll
 }
 
-const latLongToMerc = (latDeg: any,  longDeg: any) => {
+const latLongToMerc = (latDeg: any, longDeg: any) => {
   // From: https://gist.github.com/scaraveos/5409402 
   const longRad = (longDeg / 180.0) * Math.PI;
   const latRad = (latDeg / 180.0) * Math.PI;
@@ -64,10 +64,10 @@ const latLongToMerc = (latDeg: any,  longDeg: any) => {
   return { x: xmeters, y: ymeters };
 }
 
-export const transformGpsToAR = (devicePoint: LocationPoint, objPoint: LocationPoint, compassHeading  : any ) => {
+export const transformGpsToAR = (devicePoint: LocationPoint, objPoint: LocationPoint, compassHeading: any) => {
   const isAndroid = Platform.OS === 'android';
-  const latObj    = objPoint.latitude;
-  const longObj   = objPoint.longitude;
+  const latObj = objPoint.latitude;
+  const longObj = objPoint.longitude;
   const latMobile = devicePoint.latitude;
   const longMobile = devicePoint.longitude;
 
@@ -77,10 +77,10 @@ export const transformGpsToAR = (devicePoint: LocationPoint, objPoint: LocationP
   const objDeltaX = deviceObjPoint.x - mobilePoint.x;
 
   if (isAndroid) {
-    let degree      = compassHeading;
+    let degree = compassHeading;
     let angleRadian = (degree * Math.PI) / 180;
-    let newObjX     = objDeltaX * Math.cos(angleRadian) - objDeltaY * Math.sin(angleRadian);
-    let newObjY     = objDeltaX * Math.sin(angleRadian) + objDeltaY * Math.cos(angleRadian);
+    let newObjX = objDeltaX * Math.cos(angleRadian) - objDeltaY * Math.sin(angleRadian);
+    let newObjY = objDeltaX * Math.sin(angleRadian) + objDeltaY * Math.cos(angleRadian);
     return { x: newObjX, z: -newObjY };
   }
 
@@ -160,16 +160,44 @@ export const hasLocationPermission = async () => {
 
 export const distanceBetweenPoints = (p1: LocationPoint, p2: LocationPoint) => {
   if (!p1 || !p2) {
-      return 0;
+    return 0;
   }
 
   var R = 6371; // Radius of the Earth in km
   var dLat = (p2.latitude - p1.latitude) * Math.PI / 180;
   var dLon = (p2.longitude - p1.longitude) * Math.PI / 180;
   var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(p1.latitude * Math.PI / 180) * Math.cos(p2.latitude * Math.PI / 180) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    Math.cos(p1.latitude * Math.PI / 180) * Math.cos(p2.latitude * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
   var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   var d = R * c;
   return d;
 };
+
+export const getDeviceCurrentLocation = async (callBack: Function) => {
+  const hasPermission = await hasLocationPermission();
+  if (!hasPermission) {
+    return;
+  }
+  Geolocation.getCurrentPosition(
+    position => {
+      callBack(position)
+    },
+    error => {
+      console.log(error);
+    },
+    {
+      accuracy: {
+        android: 'high',
+        ios: 'best',
+      },
+      enableHighAccuracy: true,
+      timeout: 15000,
+      maximumAge: 10000,
+      distanceFilter: 0,
+      forceRequestLocation: true,
+      forceLocationManager: true,
+      showLocationDialog: true,
+    },
+  );
+}
