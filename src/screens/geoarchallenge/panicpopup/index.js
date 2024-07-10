@@ -62,6 +62,8 @@ const PanicPopUp = ({ onClose }) => {
         >
           {({ handleChange, handleSubmit, values, errors, touched }) => (
             <View style={_styles.container}>
+              <Text style={_styles.emergencyText}>Emergency Procedure</Text>
+              <Text style={_styles.emergencyTextDes}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ullamcorper erat nec blandit pharetra. Quisque mattis elit semper sem mattis, a commodo nisi mattis.</Text>
               <View style={_styles.chidlView}>
                 <AppInput
                   style={[
