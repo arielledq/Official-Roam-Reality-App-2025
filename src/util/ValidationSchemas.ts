@@ -78,5 +78,5 @@ export const inviteFriendSchema = Yup.object().shape({
 })
 
 export const PanicPopUpSchema = Yup.object().shape({
-  message: Yup.string().required("Please write your message")
+  message: Yup.string()
 })
