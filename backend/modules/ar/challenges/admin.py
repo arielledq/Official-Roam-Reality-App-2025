@@ -68,14 +68,46 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
    
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
-    list_display = ('name','sequence_number','view_ar_sites',)
+    list_display = ('name','sequence_number','view_ar_sites','add_ar_sites','view_u_ar_sites','add_u_ar_sites',)
     ordering = ('sequence_number',)
     search_fields = ["name",'sequence_number']
+
+    def add_u_ar_sites(self, obj):
+        count = obj.geo_location_ar_unique_site.count()
+        info = (UniqueChallengeSite._meta.app_label, UniqueChallengeSite._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_add'.format(*info))
+            + "?"
+            + urlencode({"geo_location": f"{obj.id}"})
+        )
+        return format_html('<a href="{}"> ADD Unique Sites</a>', url)
+
+
+    def view_u_ar_sites(self, obj):
+        count = obj.geo_location_ar_unique_site.count()
+        info = (UniqueChallengeSite._meta.app_label, UniqueChallengeSite._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_changelist'.format(*info))
+            + "?"
+            + urlencode({"geo_location": f"{obj.id}"})
+        )
+        return format_html('<a href="{}">{} Unique Sites</a>', url, count)
+
+
+    def add_ar_sites(self, obj):
+        count = obj.geo_location_ar_site.count()
+        info = (GeoArSite._meta.app_label, GeoArSite._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_add'.format(*info))
+            + "?"
+            + urlencode({"geo_location": f"{obj.id}"})
+        )
+        return format_html('<a href="{}"> ADD AR Sites</a>', url)
+
 
     def view_ar_sites(self, obj):
         count = obj.geo_location_ar_site.count()
         info = (GeoArSite._meta.app_label, GeoArSite._meta.model_name)
-        url = reverse('admin:{}_{}_change'.format(*info), args=({"geo_location": f"{obj.id}"},))
         url = (
             reverse('admin:{}_{}_changelist'.format(*info))
             + "?"
@@ -83,6 +115,9 @@ class GeoLocationAdmin(GeoArChallengeAdmin):
         )
         return format_html('<a href="{}">{} AR Sites</a>', url, count)
 
+    add_u_ar_sites.short_description = "Add Unique Sites"
+    view_u_ar_sites.short_description = "Unique Sites"
+    add_ar_sites.short_description = "Add AR Sites"
     view_ar_sites.short_description = "AR Sites"
 
 @admin.register(GeoRegion)
@@ -99,9 +134,32 @@ class UniqueChallengeSiteAdmin(GeoArChallengeAdmin):
 
 @admin.register(GeoArSite)
 class GeoArSiteAdmin(GeoArChallengeAdmin):
-    list_display = ("id",'name',"check_ins",)
+    list_display = ("id",'name',"check_ins","geo_location","view_ar_stars","add_ar_stars",)
     ordering = ("name","check_ins",)
-    search_fields = ["name"]
+    search_fields = ["name","geo_location__name"]
+    list_select_related = ['geo_location']  # To avoid extra queries
+
+    def add_ar_stars(self, obj):
+        info = (GeoARStar._meta.app_label, GeoARStar._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_add'.format(*info))
+            + "?"
+            + urlencode({"geo_site": f"{obj.id}"})
+        )
+        return format_html('<a href="{}"> ADD Stars Site</a>', url)
+
+    def view_ar_stars(self, obj):
+        count = obj.geo_arstar_ar_site.count()
+        info = (GeoARStar._meta.app_label, GeoARStar._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_changelist'.format(*info))
+            + "?"
+            + urlencode({"geo_site": f"{obj.id}"})
+        )
+        return format_html('<a href="{}">{} Stars Site</a>', url, count)
+
+    add_ar_stars.short_description = "Add AR Stars"
+    add_ar_stars.short_description = "AR Stars"
 
 @admin.register(ARSitePinCheckIn)
 class ARSitePinCheckInAdmin(admin.ModelAdmin):
