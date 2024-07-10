@@ -56,6 +56,12 @@ class PanicMessageViewSet(ViewSet):
     def create(self, request, *args, **kwargs):
       user_id = self.request.user.id
       request.data['user'] = user_id
+      latitude = request.data.get("latitude")
+      longitude = request.data.get("longitude")
+      if latitude and longitude:
+        from django.contrib.gis.geos import Point
+        pnt = Point(longitude, latitude)
+        request.data['location'] = pnt
       serializer = PanicMessageSerializer(data=request.data, partial=True)
       if serializer.is_valid(raise_exception=True):
         serializer.save()
