@@ -58,7 +58,7 @@ const StarChallenge = ({
 
   const ARScreen = (props) => {
     const funFactCallback = props?.arSceneNavigator.viroAppProps.funFactCallback
-    const allStarsObj = props?.arSceneNavigator.viroAppProps.allStarsObj
+    const [allStarsObj, setAllStarsObj] = useState(props?.arSceneNavigator.viroAppProps.allStarsObj)
     const [challengeObj, setChallengeObj] = useState(props?.arSceneNavigator.viroAppProps.challengeObj)
     const [currentLocation, setCurrentLocation] = useState(props?.arSceneNavigator.viroAppProps.currentLocation)
     const [nearestPoint, setNearestPoint] = useState(props?.arSceneNavigator.viroAppProps.nearestPoint)
@@ -66,7 +66,6 @@ const StarChallenge = ({
     const [challengeObjParameters, setChallengeObjParameters] = useState(challengeObj?.parameters)
     const [modelFile, setModelFile] = useState(challengeObj?.model_file)
     const [starShouldVisible, setStarShouldVisible] = useState(props.arSceneNavigator.viroAppProps.starShouldVisible)
-    const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState([challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
@@ -116,7 +115,7 @@ const StarChallenge = ({
                   console.log("unzipModelFile", result[i].name)
                   if (result[i].name.includes(".vrx")) {
                     const vrxFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    setModelPath(vrxFile)
+                    console.log("unzipModelFile", vrxFile)
                     callBack(vrxFile)
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
@@ -183,16 +182,20 @@ const StarChallenge = ({
       if (challengeObj?.challenge_choice == "3DMODEL") {
         setLoading(true)
         for (let i = 0; i < allStarsObj.length; i++) {
-          const challengeObj = allStarsObj[i]?.challenges
+          let starsObj = allStarsObj[i]
+          const challengeObj = starsObj?.challenges
           checkIfModelExist(challengeObj?.model_file, (modelPath) => {
-            allStarsObj[i].modelPath = modelPath
+            const newStarObj = Object.assign({ modelPath: modelPath }, starsObj);
+            delete allStarsObj[i]
+            const newArrayStars = [...allStarsObj, newStarObj]
+            console.log(newArrayStars)
+            setAllStarsObj(newArrayStars)
           })
         }
       }
     }, []);
 
     const _onRotate = (rotateState, rotationFactor, source) => {
-      console.log("_onRotate rotateState", rotateState)
       if (rotateState == 3) {
         const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
         setRotate(rotation)
@@ -206,7 +209,6 @@ const StarChallenge = ({
     }
 
     const _onPinch = (pinchState, scaleFactor, source) => {
-      console.log("_onPinch scaleFactor", scaleFactor)
       if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
@@ -242,16 +244,14 @@ const StarChallenge = ({
           allStarsObj.map(starObjE => {
             const challengeObj = starObjE?.challenges;
             const challengeObjParameters = challengeObj?.parameters;
-            const modelFile = challengeObj?.model_file;
             const modelPath = starObjE?.modelPath;
-            
+
             for (j = 0; j < starObjE.star_location.coordinates.length; j++) {
               const point = starObjE.star_location.coordinates[j]
               const starPoint = { latitude: point[1], longitude: point[0] }
               const starShouldVisibleNow = isLocationPointWithinRadius(currentLocation, starPoint, Number(starObjE?.visibility_radius))
               const coords = transformGpsToAR(currentLocation, starPoint, compassHeading);
-              const newScale = Math.abs(Math.round(coords.z / 15));
-
+              const newScale = Math.abs(Math.round(coords.z / 15));;
               if (modelPath && challengeObj?.challenge_choice == "3DMODEL" && starShouldVisibleNow) {
                 return (
                   <Viro3DObject
@@ -260,7 +260,7 @@ const StarChallenge = ({
                     onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
                     source={{ uri: modelPath }} /// this works
                     scale={[newScale, newScale, newScale]}
-                    position={[coords.x, -5, coords.z]}
+                    position={[coords.x, 0, coords.z]}
                     type="VRX"
                     opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
                     materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
