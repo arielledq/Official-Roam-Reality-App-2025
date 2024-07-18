@@ -64,6 +64,8 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
       form_class = super().get_form(request, obj, change, **kwargs)
       if obj:
         self.formfield_overrides = self.zoomMapFields
+      else:
+        self.formfield_overrides = self.mapFields
       return form_class
    
 @admin.register(GeoLocation)
