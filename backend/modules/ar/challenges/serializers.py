@@ -58,7 +58,7 @@ class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer
         )
 
 class ChallengesSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    image = serializers.ImageField()
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     ar_filters = ARChallengeFiltersSerializer(read_only=True, many=True)
@@ -120,7 +120,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
         )
 
 class GeoARChallengesSerializer(serializers.ModelSerializer):
-    image = serializers.SerializerMethodField()
+    image = serializers.ImageField()
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     ar_filters = ARChallengeFiltersSerializer(read_only=True, many=True)
