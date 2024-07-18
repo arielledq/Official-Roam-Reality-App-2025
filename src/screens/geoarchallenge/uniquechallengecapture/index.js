@@ -178,6 +178,9 @@ const UniqueArChallengeCapture = ({
       if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
+      if ((scale[0] * scaleFactor) >= challengeObjParameters?.max_pinch_scale) {
+        return;
+      }
       let newScale = [
         scale[0] * scaleFactor,
         scale[1] * scaleFactor,
@@ -246,7 +249,7 @@ const UniqueArChallengeCapture = ({
           />
         }
 
-        {challengeObj.challenge_choice == "IMAGE"  && <ViroImage
+        {challengeObj.challenge_choice == "IMAGE" && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -649,25 +652,25 @@ const UniqueArChallengeCapture = ({
     }
   }
 
+  ViroMaterials.createMaterials({
+    mat: {
+      shininess: .6,
+      blendMode: "Add",
+      lightingModel: "Lambert",
+      bloomThreshold: challengeObjParameters ? Number(challengeObjParameters?.bloom_threshold) : 0.5,
+      diffuseColor: challengeObjParameters ? challengeObjParameters?.diffuse_text_color : "#fff",
+      diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
+    },
+    grid: {
+      lightingModel: "Lambert",
+      shininess: .6,
+    },
+  });
+
+
   return (
     <ViroARNavigator />
   )
 }
-
-
-ViroMaterials.createMaterials({
-  grid: {
-    lightingModel: "Lambert",
-    shininess: .6,
-  },
-  mat: {
-    shininess: .6,
-    blendMode: "Add",
-    lightingModel: "Lambert",
-    bloomThreshold: 0.5,
-    diffuseColor: "#fff",
-    diffuseIntensity: 1
-  },
-});
 
 export default UniqueArChallengeCapture
