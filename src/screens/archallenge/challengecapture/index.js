@@ -685,6 +685,10 @@ const ArChallengeCapture = ({
       diffuseColor: challengeObjParameters ? challengeObjParameters?.diffuse_text_color : "#fff",
       diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
     },
+    grid: {
+      lightingModel: "Lambert",
+      shininess: .6,
+    },
   });
 
   return (
