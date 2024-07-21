@@ -1,4 +1,5 @@
 import Strings from "../constants/Strings";
+import { searchUsers } from "../network";
 import { LocationPoint } from "./LocationLib";
 
 const PlacesAPIURL = (point: LocationPoint, radius: Number) => {
@@ -29,4 +30,30 @@ export const getNearbyPlaces = async (point: LocationPoint, radius: Number, call
     .catch((error) => {
       console.error(error)
     })
+}
+
+export const getMyRank = (userProfile: any, arProfile: any, callback: (rank: any) => void) => {
+  const payload = {
+    search: ''
+  }
+  searchUsers(payload).then(response => {
+    if (response) {
+      if (response?.data?.length > 0) {
+        let arProfiles = response?.data.filter((a: any) => a.user_ar_profile)
+        arProfiles = arProfiles.filter((a: any) => a.name)
+        if (arProfile && userProfile) {
+          userProfile.user_ar_profile = arProfile
+          arProfiles.push(userProfile)
+        }
+        const aa = arProfiles.sort((a: any, b: any) => b?.user_ar_profile?.points - a?.user_ar_profile?.points)
+        for (var i = 0; i < aa.length; i++) {
+          aa[i].rank = (i + 1)
+          if (aa[i].id == userProfile.id) {
+            callback((i + 1))
+            break;
+          }
+        }
+      }
+    }
+  })
 }
