@@ -33,6 +33,7 @@ const { config, fs } = RNFetchBlob;
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { useSelector } from "react-redux";
 import ARFilter from "../FilterView";
+import BackgroundWithImage from "../../../components/background";
 const { width } = Dimensions.get('window');
 
 const VIDEO_RECORD_TIME = 10
@@ -49,7 +50,6 @@ const ArChallengeCapture = ({
   const modelFile = challengeObj.model_file;
   const viewShotRef = useRef();
 
-
   const navigateToShare = (captureData, ifImage) => {
     if (ifImage && route?.params?.challengeObj?.ar_filters.length > 0) {
       viewShotRef.current.capture().then(uri => {
@@ -61,7 +61,7 @@ const ArChallengeCapture = ({
   }
 
   const ARScreen = () => {
-    const [object3dType, setObject3dType] = useState("VRX");
+    const [object3dType, setObject3dType] = useState(null);
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -121,13 +121,16 @@ const ArChallengeCapture = ({
                     setObject3dType("OBJ")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    sourcesArray.push(sourceFile)
+                    sourcesArray.push({uri: sourceFile})
                   }
                 }
               }
               if (sourcesArray.length > 0) {
                 setSourcesFiles(sourcesArray)
               }
+              console.log("sourceFiles", sourcesArray)
+              console.log("object3dType", object3dType)
+              
               setLoading(false)
             })
         })
@@ -158,9 +161,13 @@ const ArChallengeCapture = ({
           console.log(error);
         });
     }
+
     useEffect(() => {
+      console.log("useEffect:")
+      console.log("challengeObj.challenge_choice:", challengeObj.challenge_choice)
       if (challengeObj.challenge_choice == "DANCE" && route?.params?.challengeObj?.ar_filters.length == 0) {
         setLoading(true)
+        console.log("useEffect:", "checkIfModelExist")
         checkIfModelExist()
       }
     }, []);
@@ -238,7 +245,7 @@ const ArChallengeCapture = ({
         }
 
         {
-          challengeObj.challenge_choice == "DANCE" && modelPath &&
+          challengeObj.challenge_choice == "DANCE" && modelPath && object3dType && 
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -246,7 +253,9 @@ const ArChallengeCapture = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
+            resources={sourcesFiles}
             type={object3dType}
+            onClick={()=>{console.log("TAP")}}
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
@@ -590,19 +599,21 @@ const ArChallengeCapture = ({
           <View
             style={styles.f1}>
             {
-              <ViroARSceneNavigator
-                videoQuality={"High"}
-                autofocus={true}
-                pbrEnabled={true}
-                hdrEnabled={true}
-                bloomEnabled={true}
-                ref={this._setARNavigatorRef}
-                initialScene={{
-                  scene: ARScreen,
-                }}
-                style={styles.navigatorView}
-              >
-              </ViroARSceneNavigator>
+              <BackgroundWithImage>
+                <ViroARSceneNavigator
+                  videoQuality={"High"}
+                  autofocus={true}
+                  pbrEnabled={true}
+                  hdrEnabled={true}
+                  bloomEnabled={true}
+                  ref={this._setARNavigatorRef}
+                  initialScene={{
+                    scene: ARScreen,
+                  }}
+                  style={styles.navigatorView}
+                >
+                </ViroARSceneNavigator>
+              </BackgroundWithImage>
             }
             {this.state.capturedImage && challengeObj?.ar_filters.length == 0 && <Image style={styles.imageVideoView} source={{
               uri: this.state.capturedImage
