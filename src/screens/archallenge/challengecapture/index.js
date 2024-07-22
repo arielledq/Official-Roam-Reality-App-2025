@@ -121,7 +121,7 @@ const ArChallengeCapture = ({
                     setObject3dType("OBJ")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    sourcesArray.push({uri: sourceFile})
+                    sourcesArray.push({ uri: sourceFile })
                   }
                 }
               }
@@ -130,7 +130,7 @@ const ArChallengeCapture = ({
               }
               console.log("sourceFiles", sourcesArray)
               console.log("object3dType", object3dType)
-              
+
               setLoading(false)
             })
         })
@@ -245,7 +245,7 @@ const ArChallengeCapture = ({
         }
 
         {
-          challengeObj.challenge_choice == "DANCE" && modelPath && object3dType && 
+          challengeObj.challenge_choice == "DANCE" && modelPath && object3dType &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -253,9 +253,9 @@ const ArChallengeCapture = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
-            resources={sourcesFiles}
+            resources={[{ "uri": "/var/mobile/Containers/Data/Application/45009326-C736-4F44-B92E-3D390F8A5602/Documents/SM_Pin_Emissive_V2/T_RoamTT_Pin_Alt.jpg" }, { "uri": "/var/mobile/Containers/Data/Application/45009326-C736-4F44-B92E-3D390F8A5602/Documents/SM_Pin_Emissive_V2/SM_Pin_Emissive_V2.mtl" }]}
             type={object3dType}
-            onClick={()=>{console.log("TAP")}}
+            onClick={() => { console.log("Viro3DObject TAP") }}
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
@@ -575,14 +575,14 @@ const ArChallengeCapture = ({
 
       return (
         <View style={styles.mainContainer}>
-          <View style={styles.mainHeaderContainer}>
+          <View style={[styles.mainHeaderContainer, Platform.OS == 'ios' ? styles.mainHeaderContainerIOS : {}]}>
             <AppHeader centerComponent={{
               text: "Anywhere AR Challenges",
               numberOfLines: 2,
               style: [styles.heading],
             }} backgroundColor="transparent" />
           </View>
-          <View style={styles.detailsViewContainer}>
+          <View style={[styles.detailsViewContainer, Platform.OS == 'ios' ? styles.detailsViewContainerIOS : {}]}>
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -597,7 +597,9 @@ const ArChallengeCapture = ({
             </View>
           </View>
           <View
-            style={styles.f1}>
+            style={[styles.f1, {
+              marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -200 : 0
+            }]}>
             {
               <BackgroundWithImage>
                 <ViroARSceneNavigator
