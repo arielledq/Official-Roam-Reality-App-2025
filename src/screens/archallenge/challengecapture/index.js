@@ -253,7 +253,7 @@ const ArChallengeCapture = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
-            resources={[{ "uri": "/var/mobile/Containers/Data/Application/45009326-C736-4F44-B92E-3D390F8A5602/Documents/SM_Pin_Emissive_V2/T_RoamTT_Pin_Alt.jpg" }, { "uri": "/var/mobile/Containers/Data/Application/45009326-C736-4F44-B92E-3D390F8A5602/Documents/SM_Pin_Emissive_V2/SM_Pin_Emissive_V2.mtl" }]}
+            resources={sourcesFiles}
             type={object3dType}
             onClick={() => { console.log("Viro3DObject TAP") }}
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
