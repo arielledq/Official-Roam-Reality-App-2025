@@ -230,6 +230,7 @@ const PinChallenge = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
+            onClick={()=>{console.log("TAP Viro3DObject")}}
             type="VRX"
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
