@@ -207,10 +207,7 @@ const UniqueArChallengeCapture = ({
         <ViroAmbientLight color="#FFFFFF" intensity={250} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
-        {
-          challengeObjParameters?.bloom &&
-          <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
-        }
+        <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
 
         <ViroSpotLight
           innerAngle={5}
