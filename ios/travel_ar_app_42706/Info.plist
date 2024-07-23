@@ -92,7 +92,13 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Access to the camera is required to take the picture or record video.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+  <string>App requires GPS to track</string>
+  <key>NSLocationAlwaysUsageDescription</key>
+  <string>App requires GPS to track</string>
+  <key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+  <string>App requires GPS to track</string>
+  <key>NSLocationWhenInUseUsageDescription</key>
+  <string>App requires GPS to track</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Access to the microphone is required to record a video.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
