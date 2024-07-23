@@ -620,7 +620,6 @@ const ArChallengeCapture = ({
             {this.state.capturedImage && challengeObj?.ar_filters.length == 0 && <Image style={styles.imageVideoView} source={{
               uri: this.state.capturedImage
             }} />}
-
             {this.state.capturedVideo && challengeObj?.ar_filters.length == 0 && <Video repeat={true} style={styles.imageVideoView} source={{
               uri: this.state.capturedVideo
             }} />}
@@ -646,7 +645,6 @@ const ArChallengeCapture = ({
                 <Text style={styles.timerText}>{this.state.timer}</Text>
               </View>
             }
-
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
