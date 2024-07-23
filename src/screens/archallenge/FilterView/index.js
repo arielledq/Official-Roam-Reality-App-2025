@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react"
 
-import { Dimensions, View, Text, TouchableOpacity } from "react-native";
+import { Dimensions, View, Text, TouchableOpacity, ImageBackground } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AppButton from "../../../components/button";
@@ -183,14 +183,16 @@ const ARFilter = ({
               console.log(filter.image)
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
-                  {filter.image ?
-                    <Image source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
-                    : <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                      colors={
-                        filter.gradient_direction == 'TOP_TO_BOTTOM' ?
-                          [...filter.gradient_colors, 'transparent'] :
-                          ['transparent', ...filter.gradient_colors]
-                      } />
+                  {filter.image &&
+                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
+                  }
+                  {filter.gradient_colors &&
+                  <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                    colors={
+                      filter.gradient_direction == 'TOP_TO_BOTTOM' ?
+                        [...filter.gradient_colors, 'transparent'] :
+                        ['transparent', ...filter.gradient_colors]
+                    } />
                   }
                   <View style={[styles.textFilterView, { justifyContent: filter.gradient_direction == 'TOP_TO_BOTTOM' ? "flex-start" : "flex-end" }]}>
                     {!filter.text_form_image &&
