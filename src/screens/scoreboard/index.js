@@ -181,8 +181,9 @@ const ScoreBoard = ({
     const destinationPoints = getAllPoints(o);
     if (destinationPoints) {
       const filterUserWithDes = []
+      let count = 1;
       for (let i = 0; i < allUsers.length; i++) {
-        const userCheck = allUsers[i];
+        let userCheck = allUsers[i];
         if (userCheck.user_ar_profile && userCheck.user_ar_profile?.current_location) {
           const pointUser = {
             latitude: userCheck.user_ar_profile?.current_location.coordinates[1],
@@ -191,7 +192,9 @@ const ScoreBoard = ({
           const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints)
           console.log("filterDestinations", userCheck.user_ar_profile?.current_location, isInsideSiteArea)
           if (isInsideSiteArea) {
+            userCheck.rank = count
             filterUserWithDes.push(userCheck)
+            count++
           }
         }
         setFilteredUsers(filterUserWithDes)

@@ -360,7 +360,7 @@ PODS:
     - React-Core
   - react-native-view-shot (3.8.0):
     - React-Core
-  - react-native-webview (13.8.1):
+  - react-native-webview (13.10.5):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-perflogger (0.71.11)
@@ -505,7 +505,8 @@ PODS:
     - React-RCTText
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (3.20.0):
+  - RNScreens (3.32.0):
+    - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - React-RCTImage
   - RNShare (10.0.2):
@@ -836,7 +837,7 @@ SPEC CHECKSUMS:
   react-native-tiktok: 7daefc5ab8c024fdd077e12e3429bee7e75dc385
   react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
   react-native-view-shot: 6b7ed61d77d88580fed10954d45fad0eb2d47688
-  react-native-webview: bdc091de8cf7f8397653e30182efcd9f772e03b3
+  react-native-webview: f817a7bfd394634877638019ceac547996561372
   React-perflogger: e706562ab7eb8eb590aa83a224d26fa13963d7f2
   React-RCTActionSheet: 57d4bd98122f557479a3359ad5dad8e109e20c5a
   React-RCTAnimation: ccf3ef00101ea74bda73a045d79a658b36728a60
@@ -863,7 +864,7 @@ SPEC CHECKSUMS:
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   RNPermissions: 7938b2a48a952a4316cfdc86df9a54485b930173
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
-  RNScreens: 218801c16a2782546d30bd2026bb625c0302d70f
+  RNScreens: 0bd9eec783bed1032e02a4db9976dae1664a5c7b
   RNShare: 859ff710211285676b0bcedd156c12437ea1d564
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
   RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a

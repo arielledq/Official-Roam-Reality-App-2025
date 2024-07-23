@@ -1,7 +1,7 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
-import { Dimensions } from "react-native";
+import { Dimensions, Platform } from "react-native";
 let ScreenHeight = Dimensions.get("window").height;
 
 /**
@@ -11,10 +11,12 @@ let ScreenHeight = Dimensions.get("window").height;
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
-    flex:1,
+    flex: 1,
     width: '100%',
     position: 'relative',
-    backgroundColor:"#0F1424"
+    backgroundColor: "#0F1424",
+    zIndex: 1000
+
   },
   heading: {
     fontSize: FontSizes.S14,
@@ -22,39 +24,49 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     color: theme.colors.white,
     marginTop: 5,
-    textAlign:'center'
+    textAlign: 'center'
   },
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
-    marginTop:20,
-    top:-20,
+    marginTop: 20,
+    top: -20,
     backgroundColor: '#202136',
+    zIndex: 1000,
+  },
+  mainHeaderContainerIOS: {
+    height: 100,
   },
   detailsViewContainer: {
     paddingHorizontal: screenHorizontalPadding,
-    marginBottom:20,
+    marginTop: -20,
+    backgroundColor: "#0F1424",
+    paddingVertical: 20,
+    zIndex: 1000
+  },
+  detailsViewContainerIOS: {
+    height: 100,
   },
   container: {
     marginTop: "10%"
   },
   f1: {
-    flex:1,
+    flex: 1,
     position: "relative",
     marginHorizontal: screenHorizontalPadding,
   },
   imageVideoView: {
     width: '100%',
-    flex:1,
-    top:0,
-    bottom:0,
-    left:0,
-    right:0,
-    position:'absolute',
-    backgroundColor:'#fff'
+    flex: 1,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    position: 'absolute',
+    backgroundColor: '#fff'
   },
-  navigatorView:{
+  navigatorView: {
     width: '100%',
-    flex:1,
+    flex: 1,
   },
   bottomContainer: {
     width: '100%',
@@ -127,9 +139,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    left:0,
-    marginHorizontal:20,
-    right:0
+    left: 0,
+    marginHorizontal: 20,
+    right: 0
   },
   timerText: {
     ...fontGroup.p600,
@@ -142,8 +154,8 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    marginVertical:20,
-    height:25,
+    marginVertical: 20,
+    height: 25,
   },
   holdText: {
     ...fontGroup.p600,
@@ -164,10 +176,10 @@ const useStyles = makeStyles(theme => ({
   viewDetailBtn: {
     backgroundColor: '#fff',
     height: 30,
-    paddingHorizontal:8,
+    paddingHorizontal: 8,
     alignItems: 'center',
     justifyContent: 'center',
-    borderRadius:4
+    borderRadius: 4
   },
   viewDetailsIconContainer: {
     backgroundColor: "#1158F4",
@@ -184,7 +196,7 @@ const useStyles = makeStyles(theme => ({
   viewDetailsIcon: {
     width: 37,
     height: 37,
-    marginEnd:5
+    marginEnd: 5
   },
   borderStyles: {
     borderStyle: 'dashed',
