@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Alert, Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg"
@@ -169,6 +169,9 @@ const PinChallenge = ({
       if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
+      if ((scale[0] * scaleFactor) >= challengeObjParameters?.max_pinch_scale) {
+        return;
+      }
       let newScale = [
         scale[0] * scaleFactor,
         scale[1] * scaleFactor,
@@ -227,6 +230,7 @@ const PinChallenge = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
+            onClick={() => { console.log("TAP Viro3DObject") }}
             type="VRX"
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
@@ -379,7 +383,7 @@ const PinChallenge = ({
           enableHighAccuracy: true,
           timeout: 15000,
           maximumAge: 10000,
-          distanceFilter: 5,
+          distanceFilter: 0,
           forceRequestLocation: true,
           forceLocationManager: true,
           showLocationDialog: true,
@@ -436,15 +440,19 @@ const PinChallenge = ({
     };
 
     async _takeScreenshot() {
-      this.playCameraSound()
-      this._arNavigator
-        ._takeScreenshot(uuid.v4(), false)
-        .then((retDict) => {
-          console.log("captureImage:", retDict)
-          this.setState({
-            capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
+      if (this.state.isMeInsideInSite) {
+        this.playCameraSound()
+        this._arNavigator
+          ._takeScreenshot(uuid.v4(), false)
+          .then((retDict) => {
+            console.log("captureImage:", retDict)
+            this.setState({
+              capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
+            });
           });
-        });
+      }else{
+        Alert.alert("Pin Not Found.")
+      }
     }
 
     onDonePress() {
@@ -622,23 +630,25 @@ const PinChallenge = ({
     }
   }
 
+  ViroMaterials.createMaterials({
+    mat: {
+      shininess: .6,
+      blendMode: "Add",
+      lightingModel: "Lambert",
+      bloomThreshold: challengeObjParameters ? Number(challengeObjParameters?.bloom_threshold) : 0.5,
+      diffuseColor: challengeObjParameters ? challengeObjParameters?.diffuse_text_color : "#fff",
+      diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
+    },
+    grid: {
+      lightingModel: "Lambert",
+      shininess: .6,
+    },
+  });
+
+
   return (
     <ViroARNavigator />
   )
 }
-
-ViroMaterials.createMaterials({
-  grid: {
-    lightingModel: "Lambert",
-    shininess: .6,
-  },
-  mat: {
-    shininess: .6,
-    blendMode: "Add",
-    lightingModel: "Lambert",
-    bloomThreshold: 0.5,
-    diffuseColor: "#fff"
-  },
-});
 
 export default PinChallenge

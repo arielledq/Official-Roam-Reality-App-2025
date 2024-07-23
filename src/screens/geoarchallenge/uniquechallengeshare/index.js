@@ -331,9 +331,10 @@ const UniqueArChallengeShare = ({
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
-            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
+            {fileExt == 'mp4' && <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
               <TiktokShareImg />
             </TouchableOpacity>
+            }
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
