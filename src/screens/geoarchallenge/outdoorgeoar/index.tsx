@@ -140,7 +140,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
             <AppText style={styles.headerText}>{item?.title}</AppText>
             <AppText style={styles.headerText}>{item?.title1}</AppText>
             <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-            <AppText style={styles.challengesText}>{item?.id === 1 ? numberOfChallenges : selectedDestination.star_ar_sites.length + selectedDestination.unique_ar_sites.length} Challenges</AppText>
+            <AppText style={styles.challengesText}>{item?.id === 1 ? numberOfChallenges : selectedDestination.unique_ar_sites.length} Challenges</AppText>
           </View>
           <TouchableOpacity onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}>
             <RightArrowIcon />
