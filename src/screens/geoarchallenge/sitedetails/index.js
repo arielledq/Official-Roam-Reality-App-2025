@@ -249,7 +249,7 @@ const GeoArSiteDetails = ({
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
+              <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
           </View>

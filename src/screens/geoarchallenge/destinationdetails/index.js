@@ -14,7 +14,7 @@ import Geolocation from 'react-native-geolocation-service';
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { updateSelectedSites } from "../../../redux/AR";
-import { getARSitesHiddenStars, getDestinationFacts, getUserFriendList } from "../../../network";
+import { getARSitesHiddenStars, getARSitesStars, getDestinationFacts, getUserFriendList } from "../../../network";
 import AppSwitch from "../../../components/Switch";
 import { getBounds, getCenterOfBounds, hasLocationPermission, isLocationPointInPolygon } from "../../../util/LocationLib";
 import DestinationFactPopUp from "../destinactionfactpopup";
@@ -28,6 +28,7 @@ const GeoArChallengeDetails = ({
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
+  const [starsSites, setStarsSites] = useState(0)
   const [arSitesOn, setARSitesOnSwitch] = useState(true)
   const [selectedRegionName, setSelectedRegionName] = useState('Full')
   const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true)
@@ -78,6 +79,13 @@ const GeoArChallengeDetails = ({
     })
   }
 
+  const getARStarSites = () => {
+    getARSitesStars({ id: selectedDestination.id }).then((res) => {
+      setStarsSites(res.data[0])
+    }).finally(() => {
+    })
+  }
+
   useEffect(() => {
     if (!selectedDestination.geo_location || selectedDestination.geo_location.coordinates.length == 0) {
       console.log("setMapBounds")
@@ -107,6 +115,7 @@ const GeoArChallengeDetails = ({
     getHiddenStar()
     getFriends()
     loadDFacts(selectedDestination?.id)
+    getARStarSites()
   }, []);
 
   const loadDFacts = async (id) => {
@@ -378,12 +387,12 @@ const GeoArChallengeDetails = ({
       <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
+          <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>Sites</Text>
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
+          <Text style={_styles.s_list_count}>{starsSites}</Text>
           <Text style={_styles.s_list_text}>Star Sites</Text>
         </View><View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
@@ -392,7 +401,7 @@ const GeoArChallengeDetails = ({
         </View>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
+          <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>AR Challenges</Text>
         </View>
       </View>
