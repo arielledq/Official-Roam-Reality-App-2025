@@ -15,7 +15,6 @@ import {
   getARStettings,
   getARChallenges,
   updateUserLocation,
-  getARSitesHiddenStars,
   getARSitesStars
 } from "../../network"
 
@@ -59,7 +58,7 @@ const GeoArChallenge = ({ }) => {
           setDestinationData(res.data)
           for (let i = 0; i < res.data.length; i++) {
             const d = res.data[i]
-            getHiddenStar(d.id)
+            getARStarSites(d.id)
           }
         } else {
           res.message.message = "Error in loading Challenges."
@@ -158,7 +157,7 @@ const GeoArChallenge = ({ }) => {
     getLocation()
   }
 
-  const getHiddenStar = async (id) => {
+  const getARStarSites = async (id) => {
     const res = await getARSitesStars({ id })
     starSitesCount[id] = res.data[0]
     setStarSitesCount({ ...starSitesCount })
