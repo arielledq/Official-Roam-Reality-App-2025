@@ -14,7 +14,8 @@ import {
   getARProfile,
   getARStettings,
   getARChallenges,
-  updateUserLocation
+  updateUserLocation,
+  getARSitesStars
 } from "../../network"
 
 import BackgroundWithImage from "../../components/background"
@@ -44,6 +45,7 @@ const GeoArChallenge = ({ }) => {
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
+  const [starSitesCount, setStarSitesCount] = useState({})
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
   const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
@@ -54,6 +56,10 @@ const GeoArChallenge = ({ }) => {
       .then(res => {
         if (res.status == 1) {
           setDestinationData(res.data)
+          for (let i = 0; i < res.data.length; i++) {
+            const d = res.data[i]
+            getARStarSites(d.id)
+          }
         } else {
           res.message.message = "Error in loading Challenges."
           handleError(res)
@@ -151,6 +157,16 @@ const GeoArChallenge = ({ }) => {
     getLocation()
   }
 
+  const getARStarSites = async (id) => {
+    const res = await getARSitesStars({ id })
+    starSitesCount[id] = res.data[0]
+    setStarSitesCount({ ...starSitesCount })
+  }
+
+  const getStarCount = (id) => {
+    return starSitesCount[id] ? starSitesCount[id] : 0;
+  }
+
   useEffect(() => {
     loadDestinations()
   }, [])
@@ -196,7 +212,7 @@ const GeoArChallenge = ({ }) => {
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>
-                {obj.unique_ar_sites.length}
+                {obj.star_ar_sites.length}
               </Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View>
@@ -210,13 +226,13 @@ const GeoArChallenge = ({ }) => {
             >
               <StarSiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>
-                {obj.star_ar_sites.length}
+                {getStarCount(obj.id)}
               </Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{numberOfChallenges}</Text>
+              <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
           </View>
