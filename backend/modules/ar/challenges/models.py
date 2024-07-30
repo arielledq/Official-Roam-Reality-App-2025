@@ -356,7 +356,7 @@ class GeoArSite(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
-    image = models.ImageField(upload_to="geoar/img/", null=True, blank=True)
+    image = models.ImageField(upload_to="geoar/img/", null=False, blank=False, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     geo_location = models.ForeignKey(
