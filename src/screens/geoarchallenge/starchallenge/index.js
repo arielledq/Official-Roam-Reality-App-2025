@@ -268,11 +268,12 @@ const StarChallenge = ({
                     diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
                   },
                 });
+                console.log("Showed star")
                 return (
                   <Viro3DObject
                     key="obj_3d1"
-                    onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
-                    onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
+                    onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
+                    onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
                     source={{ uri: modelPath }} /// this works
                     scale={[newScale, newScale, newScale]}
                     position={[coords.x, 0, coords.z]}
@@ -296,8 +297,8 @@ const StarChallenge = ({
                   <ViroImage
                     height={1}
                     width={1}
-                    onClick={() => { console.log("ViroImage OnPress"); funFactCallback() }}
-                    onPress={() => { console.log("ViroImage OnPress"); funFactCallback() }}
+                    onClick={() => { console.log("ViroImage OnPress"); funFactCallback(starObjE) }}
+                    onPress={() => { console.log("ViroImage OnPress"); funFactCallback(starObjE) }}
                     opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
                     onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
                     source={{ uri: challengeObj.image }}
@@ -553,8 +554,8 @@ const StarChallenge = ({
       CompassHeading.stop();
     }
 
-    navigateToShare() {
-      navigation.navigate("ArStarChallengeShare", { challengeObj: this.state.challengeObj, starObj: this.state.starObj })
+    navigateToShare(starObjE) {
+      navigation.navigate("ArStarChallengeShare", { challengeObj: this.state.challengeObj, starObj: starObjE })
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -683,8 +684,9 @@ const StarChallenge = ({
       )
     }
 
-    openFunFacts = () => {
+    openFunFacts = (starObjE) => {
       this.setState({ factsShow: true })
+      this.navigateToShare(starObjE)
     }
 
     render() {
