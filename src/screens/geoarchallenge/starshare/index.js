@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { Alert, Dimensions, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
-import AppHeader from "../../../components/header"
+import AppHeaderPopUp from "../../../components/headerPopup"
 import AppText from "../../../components/text"
 import useStyles from "./styles"
 import { FontSizes } from "../../../util/FontUtils"
@@ -11,7 +11,6 @@ import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
 import TiktokShareImg from "../../../assets/ar/tiktok.svg"
 import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI } from "../../../network";
-import { handleError } from "../../../util/helpers";
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
@@ -253,12 +252,13 @@ const ArStarChallengeShare = (props) => {
   return (
     <BackgroundWithImage style={styles.mainContainer}>
 
-      <AppHeader
-        leftComponent={null} centerComponent={{
+      <AppHeaderPopUp
+        centerComponent={{
           text: "Travel Insights",
           numberOfLines: 2,
           style: [styles.heading],
-        }} backgroundColor="transparent" />
+        }} backgroundColor="transparent"
+        onBackPress={closeCallBack} />
 
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -336,7 +336,7 @@ const ArStarChallengeShare = (props) => {
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
-        <TouchableOpacity onPress={() => { closeCallBack() }}>
+        <TouchableOpacity onPress={closeCallBack}>
           <Text style={styles.notShareBottomText}>Do not Share</Text>
         </TouchableOpacity>
       </ScrollView>
