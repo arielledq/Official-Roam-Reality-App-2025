@@ -194,7 +194,7 @@ class GeoLocationSerializer(GeoModelSerializer):
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
-    sponsors = SponsorSerializer(read_only=True)
+    sponsors = SponsorSerializer(read_only=True,many=True)
 
     class Meta:
         model = GeoARStar
