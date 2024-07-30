@@ -2,8 +2,7 @@ import React, { useEffect, useState } from "react"
 
 import { Alert, Dimensions, Image, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
-import { useNavigation, useRoute } from "@react-navigation/native"
-import AppHeader from "../../../components/header"
+import AppHeaderPopUp from "../../../components/headerPopup"
 import AppText from "../../../components/text"
 import useStyles from "./styles"
 import { FontSizes } from "../../../util/FontUtils"
@@ -12,7 +11,6 @@ import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
 import TiktokShareImg from "../../../assets/ar/tiktok.svg"
 import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI } from "../../../network";
-import { handleError } from "../../../util/helpers";
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
 import { ShareDialog } from "react-native-fbsdk-next";
@@ -26,35 +24,29 @@ import { moderateScale } from "../../../util/AppDimensions";
 import RenderHTML from "react-native-render-html";
 const { width } = Dimensions.get('window');
 
-const ArStarChallengeShare = ({
-
-}) => {
+const ArStarChallengeShare = (props) => {
 
   const getPathFromUrl = (url) => {
-    return url.split("?")[0];
+    if (url) {
+      return url.split("?")[0];
+    } else {
+      return ""
+    }
   }
 
   const styles = useStyles()
-  const route = useRoute()
-  const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const challengeObj = route?.params?.challengeObj;
-  const starObj = route?.params?.starObj;
-  //const captureData = route?.params?.captureData;
+  const closeCallBack = props?.closeCallBack;
+  const challengeObj = props?.challengeObj;
+  const starObj = props?.starObj;
   const captureData = selectedGeoSite.image;
-  const hideBottomTab = route?.params?.hideBottomTab;
   let filePath = getPathFromUrl(captureData)
   const fileExt = filePath.split('.').pop();
   const startDate = moment(new Date()).format('DD-MM-YYYY');
   const [isLoading, setIsLoading] = useState(false)
   const [imageHeight, setImageHeight] = useState(0)
   const dispatch = useDispatch()
-  const sponsors = selectedGeoSite?.sponsors;
-
-  console.log("selectedGeoSite sponsors", selectedGeoSite?.sponsors)
-  console.log("challengeObj", challengeObj)
-  console.log("fileExt", fileExt)
-  console.log("captureData", captureData)
+  const sponsors = starObj?.sponsors;
 
   useEffect(() => {
     const shareListener = events.addListener('onShareCompleted', (resp) => {
@@ -259,11 +251,15 @@ const ArStarChallengeShare = ({
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
-      <AppHeader centerComponent={{
-        text: "Travel Insights",
-        numberOfLines: 2,
-        style: [styles.heading],
-      }} backgroundColor="transparent" />
+
+      <AppHeaderPopUp
+        centerComponent={{
+          text: "Travel Insights",
+          numberOfLines: 2,
+          style: [styles.heading],
+        }} backgroundColor="transparent"
+        onBackPress={closeCallBack} />
+
       <ScrollView
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, overflow: 'hidden' }
@@ -332,27 +328,18 @@ const ArStarChallengeShare = ({
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
-            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
-              <TiktokShareImg />
-            </TouchableOpacity>
+            {fileExt == 'mp4' &&
+              <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
+                <TiktokShareImg />
+              </TouchableOpacity>
+            }
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
-      </ScrollView>
-      {/* {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
-        <TouchableOpacity onPress={() => { navigation.navigate("Settings") }}>
-          <Text style={styles.bottomText}>Link My Profiles</Text>
+        <TouchableOpacity onPress={closeCallBack}>
+          <Text style={styles.notShareBottomText}>Do not Share</Text>
         </TouchableOpacity>
-
-        <AppButton
-          onPress={() => shareBtnOnPress()}
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainerStyle}
-          title={"Share Please!"}
-          loading={isLoading}
-        />
-      </View>
-      } */}
+      </ScrollView>
     </BackgroundWithImage>
   )
 }

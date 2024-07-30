@@ -149,7 +149,16 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     lineHeight: FontLineHeights.LH15,
     fontWeight:'600'
-  }
+  },
+  notShareBottomText: {
+    ...fontGroup.p700,
+    fontSize: FontSizes.S19,
+    textAlign: 'center',
+    color: "#DC2626",
+    marginVertical: 15,
+    fontWeight: "700",
+    marginBottom:30
+  },
 }))
 
 export default useStyles
