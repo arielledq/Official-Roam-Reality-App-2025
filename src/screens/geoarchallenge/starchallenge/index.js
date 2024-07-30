@@ -45,6 +45,7 @@ import { FontSizes } from "../../../util/FontUtils"
 import { getAllCollectedStars, starFoundAndSaveApi, updateUserPointAPI } from "../../../network";
 import CompassHeading from 'react-native-compass-heading';
 import TravelDataPopUp from "../traveldatapopup";
+import ArStarChallengeShare from "../starshare";
 
 const StarChallenge = ({
 
@@ -233,7 +234,7 @@ const StarChallenge = ({
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
-        
+
         <ViroSpotLight
           innerAngle={5}
           outerAngle={90}
@@ -268,11 +269,12 @@ const StarChallenge = ({
                     diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
                   },
                 });
+                console.log("Showed star")
                 return (
                   <Viro3DObject
                     key="obj_3d1"
-                    onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
-                    onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback() }}
+                    onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
+                    onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
                     source={{ uri: modelPath }} /// this works
                     scale={[newScale, newScale, newScale]}
                     position={[coords.x, 0, coords.z]}
@@ -296,8 +298,8 @@ const StarChallenge = ({
                   <ViroImage
                     height={1}
                     width={1}
-                    onClick={() => { console.log("ViroImage OnPress"); funFactCallback() }}
-                    onPress={() => { console.log("ViroImage OnPress"); funFactCallback() }}
+                    onClick={() => { console.log("ViroImage OnPress"); funFactCallback(starObjE) }}
+                    onPress={() => { console.log("ViroImage OnPress"); funFactCallback(starObjE) }}
                     opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
                     onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
                     source={{ uri: challengeObj.image }}
@@ -553,8 +555,8 @@ const StarChallenge = ({
       CompassHeading.stop();
     }
 
-    navigateToShare() {
-      navigation.navigate("ArStarChallengeShare", { challengeObj: this.state.challengeObj, starObj: this.state.starObj })
+    navigateToShare(starObjE) {
+      navigation.navigate("ArStarChallengeShare", { challengeObj: this.state.challengeObj, starObj: starObjE })
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -582,53 +584,6 @@ const StarChallenge = ({
         });
       }
     };
-
-    factsView = () => {
-      return (
-        <View style={_styles.challengeInfoContainer}>
-          <View style={_styles.challengeInfoHeaderContainer}>
-            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-            <Text style={_styles.challengeInfoHeader}>Fun Facts</Text>
-          </View>
-          <ScrollView
-            contentContainerStyle={{ paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-            style={{ flex: 1, width: '100%', padding: 24 }
-            }
-          >
-            <RenderHTML
-              contentWidth={width}
-              tagsStyles={{
-                p: {
-                  color: '#9CA3AF',
-                  fontSize: FontSizes.S14,
-                },
-                strong: {
-                  color: '#fff',
-                  fontSize: FontSizes.S18,
-                },
-                ol: {
-                  color: '#fff',
-                },
-                li: {
-                  color: '#fff',
-                }
-              }}
-              source={{
-                html: `${this.state.starObj?.fun_facts}`
-              }}
-            />
-          </ScrollView>
-          <View style={{ width: '100%', paddingHorizontal: 24 }}>
-            <TouchableOpacity
-              activeOpacity={.6}
-              onPress={() => this.setState({ factsShow: false })}>
-              <Text style={_styles.bottomText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )
-    }
 
     InfoView = () => {
       return (
@@ -683,8 +638,8 @@ const StarChallenge = ({
       )
     }
 
-    openFunFacts = () => {
-      this.setState({ factsShow: true })
+    openFunFacts = (starObjE) => {
+      this.setState({ factsShow: true, starObjE })
     }
 
     render() {
@@ -790,7 +745,14 @@ const StarChallenge = ({
             </View>
           </BackgroundWithImage >
           {this.state.detailsShow && this.InfoView()}
-          {this.state.factsShow && this.factsView()}
+          {this.state.factsShow && <View style={{
+            top: 0, bottom: 0, left: 0, right: 0, position: 'absolute'
+          }}>
+            <ArStarChallengeShare
+              closeCallBack={() => { this.setState({ factsShow: false }) }}
+              challengeObj={this.state.challengeObj}
+              starObj={this.state.starObjE} />
+          </View>}
         </View >
       )
     }
