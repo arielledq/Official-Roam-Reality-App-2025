@@ -572,14 +572,14 @@ const ArChallengeCapture = ({
 
       return (
         <View style={styles.mainContainer}>
-          <View style={[styles.mainHeaderContainer, Platform.OS == 'ios' ? styles.mainHeaderContainerIOS : {}]}>
+          <View style={[styles.mainHeaderContainer, Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? styles.mainHeaderContainerIOS : {}]}>
             <AppHeader centerComponent={{
               text: "Anywhere AR Challenges",
               numberOfLines: 2,
               style: [styles.heading],
             }} backgroundColor="transparent" />
           </View>
-          <View style={[styles.detailsViewContainer, Platform.OS == 'ios' ? styles.detailsViewContainerIOS : {}]}>
+          <View style={[styles.detailsViewContainer, Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? styles.detailsViewContainerIOS : {}]}>
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
                 <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
@@ -595,7 +595,7 @@ const ArChallengeCapture = ({
           </View>
           <View
             style={[styles.f1, {
-              marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -200 : 0
+              marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0
             }]}>
             {
               <BackgroundWithImage>
