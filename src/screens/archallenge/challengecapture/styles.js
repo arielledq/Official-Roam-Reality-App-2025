@@ -34,7 +34,7 @@ const useStyles = makeStyles(theme => ({
     zIndex: 1000,
   },
   mainHeaderContainerIOS: {
-    height: 100,
+    height: 120,
   },
   detailsViewContainer: {
     paddingHorizontal: screenHorizontalPadding,
