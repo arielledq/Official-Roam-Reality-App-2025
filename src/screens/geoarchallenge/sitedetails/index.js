@@ -257,26 +257,26 @@ const GeoArSiteDetails = ({
             contentWidth={width}
             tagsStyles={{
               p: {
-                ...fontGroup.ns400,
+                ...fontGroup.ns500,
                 lineHeight: 19.1,
-                color: '#9CA3AF',
-                fontSize: FontSizes.S10
+                color: '#fff',
+                fontSize: FontSizes.S12
               },
               strong: {
-                ...fontGroup.ns400,
+                ...fontGroup.ns500,
                 lineHeight: 19.1,
                 color: '#fff',
                 fontSize: FontSizes.S14
               },
               span: {
-                ...fontGroup.ns400,
+                ...fontGroup.ns500,
                 lineHeight: 19.1,
                 color: '#fff',
-                fontSize: FontSizes.S10
+                fontSize: FontSizes.S12
               }
             }}
             source={{
-              html: `${selectedGeoSite?.description?.toString().replaceAll("#000000", "#C8DFFF")}`
+              html: `${selectedGeoSite?.description?.toString().replaceAll("#000000", "#fff")}`
             }}
           />
           <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
