@@ -131,8 +131,8 @@ const useStyles = makeStyles(theme => ({
   },
   site_d_text: {
     ...fontGroup.ns400,
-    fontSize: FontSizes.S10,
-    color: '#C8DFFF',
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
     marginVertical: 10
   },
   protip_text: {
