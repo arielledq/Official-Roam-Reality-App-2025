@@ -24,7 +24,7 @@ import { DrawerActions, useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../assets/geoar/starsite.svg"
 import GradientDownPNG from "../../assets/geoar/gradient_down.png"
-import BellIcon from "../../assets/geoar/bell.svg"
+import SOSIcon from "../../assets/Icons/sos.svg"
 import ArIcon from "../../assets/geoar/aricon.svg"
 import {
   updateARUserData,
@@ -260,7 +260,7 @@ const GeoArChallenge = ({ }) => {
         }}
         style={{ paddingRight: 5 }}
       >
-        <BellIcon />
+        <SOSIcon width={30} height={30} />
       </TouchableOpacity>
     )
   }
