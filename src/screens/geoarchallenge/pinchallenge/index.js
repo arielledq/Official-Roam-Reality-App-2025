@@ -198,7 +198,7 @@ const PinChallenge = ({
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
-        
+
         <ViroSpotLight
           innerAngle={5}
           outerAngle={90}
@@ -447,7 +447,7 @@ const PinChallenge = ({
               capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
             });
           });
-      }else{
+      } else {
         Alert.alert("Pin Not Found.")
       }
     }
@@ -566,6 +566,10 @@ const PinChallenge = ({
                       style={_styles.f1}
                     >
                     </ViroARSceneNavigator>
+                    {/* transparancy off */}
+                    {this.state.capturedImage && <View style={[_styles.f1, { backgroundColor: "#000" }]} source={{
+                      uri: this.state.capturedImage
+                    }} />}
                     {this.state.capturedImage && <Image style={_styles.f1} source={{
                       uri: this.state.capturedImage
                     }} />}
