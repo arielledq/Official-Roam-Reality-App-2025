@@ -247,6 +247,9 @@ const StarChallenge = ({
             const challengeObj = starObjE?.challenges;
             const challengeObjParameters = challengeObj?.parameters;
             const modelPath = starObjE?.modelPath;
+            const scale = [challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+            challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+            challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05]
 
             for (j = 0; j < starObjE.star_location.coordinates.length; j++) {
               const point = starObjE.star_location.coordinates[j]
@@ -271,27 +274,31 @@ const StarChallenge = ({
                 });
                 console.log("Showed star")
                 return (
-                  <Viro3DObject
-                    key="obj_3d1"
-                    onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
-                    onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
-                    source={{ uri: modelPath }} /// this works
-                    scale={[newScale, newScale, newScale]}
-                    position={[coords.x, 0, coords.z]}
-                    type="VRX"
-                    opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
-                    materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
-                    rotation={rotate}
-                    onRotate={challengeObjParameters?.rotation ? _onRotate : null}
-                    chromaKeyFilteringColor={"transparent"}
-                    onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
-                    animation={{
-                      name: 'Take 001',
-                      run: true,
-                      loop: challengeObjParameters?.loop_animations ? true : false,
-                      delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000
-                    }}
-                  />
+                  <ViroNode key={starObjE.id} scale={[newScale, newScale, newScale]} rotation={[0, 0, 0]} position={[coords.x, 0, coords.z]}>
+                    <Viro3DObject
+                      key="obj_3d1"
+                      onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
+                      onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
+                      source={{ uri: modelPath }} /// this works
+                      scale={[newScale, newScale, newScale]}
+                      position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+                      challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
+                      challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
+                      type="VRX"
+                      opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
+                      materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
+                      rotation={rotate}
+                      onRotate={challengeObjParameters?.rotation ? _onRotate : null}
+                      chromaKeyFilteringColor={"transparent"}
+                      onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
+                      animation={{
+                        name: 'Take 001',
+                        run: true,
+                        loop: challengeObjParameters?.loop_animations ? true : false,
+                        delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000
+                      }}
+                    />
+                  </ViroNode>
                 )
               } else if (challengeObj?.challenge_choice == "IMAGE" && starShouldVisibleNow) {
                 return (
