@@ -112,7 +112,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     alignItems: 'center',
     textAlign: 'center',
-    marginTop:5
+    marginTop:10
   },
   gradient: {
     position: 'absolute',
