@@ -183,9 +183,6 @@ const ARFilter = ({
               console.log(filter.image)
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
-                  {filter.image &&
-                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
-                  }
                   {filter.gradient_colors &&
                     <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
                       colors={
@@ -193,6 +190,9 @@ const ARFilter = ({
                           [...filter.gradient_colors, 'transparent'] :
                           ['transparent', ...filter.gradient_colors]
                       } />
+                  }
+                  {filter.image &&
+                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
                   }
                   {filter.gradient_direction !== 'TOP_TO_BOTTOM' &&
                     <View style={[styles.textFilterView, { justifyContent: "flex-end" }]}>
