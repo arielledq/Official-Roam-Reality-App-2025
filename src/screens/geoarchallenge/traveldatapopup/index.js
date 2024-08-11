@@ -76,7 +76,6 @@ const TravelDataPopUp = ({
 
 var styles = StyleSheet.create({
   helloWorldTextStyle: {
-    ...fontGroup.ns600,
     fontSize: FontSizes.S30,
     color: '#ffffff',
     textAlignVertical: 'center',

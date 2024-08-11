@@ -39,6 +39,7 @@ const useStyles = makeStyles((theme) => ({
     fontSize: FontSizes.S10,
     lineHeight: FontLineHeights.LH12,
     color: theme.colors.TandCgrey,
+    marginBottom:2
   },
   iconStyle: {
     marginBottom: 2,
