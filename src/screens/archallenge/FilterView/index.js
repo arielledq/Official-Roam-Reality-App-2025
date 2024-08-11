@@ -183,32 +183,51 @@ const ARFilter = ({
               console.log(filter.image)
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
+                  {filter.gradient_colors &&
+                    <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
+                      colors={
+                        filter.gradient_direction == 'TOP_TO_BOTTOM' ?
+                          [...filter.gradient_colors, 'transparent'] :
+                          ['transparent', ...filter.gradient_colors]
+                      } />
+                  }
                   {filter.image &&
                     <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
                   }
-                  {filter.gradient_colors &&
-                  <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                    colors={
-                      filter.gradient_direction == 'TOP_TO_BOTTOM' ?
-                        [...filter.gradient_colors, 'transparent'] :
-                        ['transparent', ...filter.gradient_colors]
-                    } />
+                  {filter.gradient_direction !== 'TOP_TO_BOTTOM' &&
+                    <View style={[styles.textFilterView, { justifyContent: "flex-end" }]}>
+                      {!filter.text_form_image &&
+                        <Text
+                          style={[styles.filterTitleText,
+                          { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
+                      }
+                      {fullLocation && !filter.text_form_image &&
+                        <Text style={[styles.locationText,
+                        { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
+                      }
+                      {!
+                        filter.text_form_image &&
+                        <Text style={[styles.appNameText,
+                        { color: filter.app_name_text_color, fontSize: Number(filter.app_name_text_size) }]}>{filter.app_name_text}</Text>}
+                    </View>
                   }
-                  <View style={[styles.textFilterView, { justifyContent: filter.gradient_direction == 'TOP_TO_BOTTOM' ? "flex-start" : "flex-end" }]}>
-                    {!filter.text_form_image &&
-                      <Text
-                        style={[styles.filterTitleText,
-                        { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
-                    }
-                    {fullLocation && !filter.text_form_image &&
-                      <Text style={[styles.locationText,
-                      { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
-                    }
-                    {!
-                      filter.text_form_image &&
-                      <Text style={[styles.appNameText,
-                      { color: filter.app_name_text_color, fontSize: Number(filter.app_name_text_size) }]}>{filter.app_name_text}</Text>}
-                  </View>
+                  {filter.gradient_direction == 'TOP_TO_BOTTOM' &&
+                    <View style={[styles.textFilterView, { justifyContent: "flex-start" }]}>
+                      {!
+                        filter.text_form_image &&
+                        <Text style={[styles.appNameText,
+                        { color: filter.app_name_text_color, fontSize: Number(filter.app_name_text_size) }]}>{filter.app_name_text}</Text>}
+                      {fullLocation && !filter.text_form_image &&
+                        <Text style={[styles.locationText,
+                        { color: filter.location_text_color, fontSize: Number(filter.location_text_size) }]}>{getLocationText(filter.location_option)}</Text>
+                      }
+                      {!filter.text_form_image &&
+                        <Text
+                          style={[styles.filterTitleText,
+                          { color: filter.filter_text_color, fontSize: Number(filter.filter_text_size) }]}>{filter.filter_text}</Text>
+                      }
+                    </View>
+                  }
 
                 </View>
               )

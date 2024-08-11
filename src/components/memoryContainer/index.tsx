@@ -88,7 +88,7 @@ const MemoryContainer = ({
           resizeMode={FastImage.resizeMode.cover}
           source={{ uri: item.memory_type == 'VIDEO' ? item?.thumbnail_memory_video_file : item?.memory_file }} />
         <View style={styles.cardBottomContent}>
-          <View style={{ flexDirection: 'row', marginVertical: 7, alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', marginVertical: 5, alignItems: 'center', justifyContent: 'space-between' }}>
             <AppText numberOfLines={1} style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
             <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10,padding:10 }}>
               <DownloadImg style={{ width: 16, height: 16 }} />

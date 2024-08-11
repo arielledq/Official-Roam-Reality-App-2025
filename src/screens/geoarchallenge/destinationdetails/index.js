@@ -384,7 +384,7 @@ const GeoArChallengeDetails = ({
           }
         </MapView>
       </View>
-      <View><Text style={_styles.s_list_text}>Tap to AR Site Pin to See Details.</Text></View>
+      <View><Text style={_styles.s_list_text}>Click pin to see more details</Text></View>
       <View style={{ flexDirection: 'row', justifyContent: "space-between", width: '100%', alignItems: "flex-start", marginTop: 20, marginBottom: 30 }}>
         <View style={{ alignItems: 'center', justifyContent: 'center' }}>
           <ARSiteCountBG style={{ width: 48, height: 48 }} ></ARSiteCountBG>
