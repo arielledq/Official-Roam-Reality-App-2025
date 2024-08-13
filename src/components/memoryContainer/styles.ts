@@ -30,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
   titleStyle: {
     ...fontGroup.ns800,
     fontSize: FontSizes.S12,
-    lineHeight: FontLineHeights.LH16,
     color: theme.colors.white,
     flex:1,
   },
