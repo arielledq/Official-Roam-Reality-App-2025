@@ -248,7 +248,7 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CarIcon style={{ width: 32, height: 32 }} />
             <View style={{ marginHorizontal: 20, justifyContent: 'flex-start' }}>
-              <Text style={_styles.site_via_text}>via Not available</Text>
+              <Text style={_styles.site_via_text}>Route Available</Text>
               <Text style={_styles.site_via_des_text}>Fastest route now due to traffic conditions</Text>
             </View>
           </View>
