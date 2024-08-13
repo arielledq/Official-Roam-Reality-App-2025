@@ -224,11 +224,16 @@ const ArChallengeCapture = ({
 
         <ViroSpotLight
           innerAngle={5}
-          outerAngle={90}
-          direction={[0, 1, 0]}
-          position={[0, -7, 0]}
+          outerAngle={25}
+          direction={[0, -1, 0]}
+          position={[0, 5, 0]}
           color="#ffffff"
-          intensity={250} />
+          castsShadow={true}
+          shadowMapSize={2048}
+          shadowNearZ={2}
+          shadowFarZ={7}
+          shadowOpacity={.7}
+        />
 
         {loading &&
           <ViroText
@@ -596,7 +601,7 @@ const ArChallengeCapture = ({
           <View
             style={[styles.f1, {
               marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0
-            }]}>
+            }, challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 }]}>
             {
               <BackgroundWithImage>
                 <ViroARSceneNavigator
@@ -636,7 +641,9 @@ const ArChallengeCapture = ({
               <Text style={styles.holdText}>Swipe Left or Right for Filters</Text>
             }
           </View>
-          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
+          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' },
+          challengeObj?.ar_filters.length > 0 ? styles.filterBottomContainer : {}
+          ]}>
             {
               (this.state.recordingStart) && <View style={styles.timerTextContainer}>
                 <Text style={styles.timerText}>{this.state.timer}</Text>

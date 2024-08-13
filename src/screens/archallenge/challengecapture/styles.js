@@ -3,6 +3,7 @@ import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
 import { Dimensions, Platform } from "react-native";
 let ScreenHeight = Dimensions.get("window").height;
+let ScreenWidth = Dimensions.get("window").width;
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -50,9 +51,9 @@ const useStyles = makeStyles(theme => ({
     marginTop: "10%"
   },
   f1: {
-    flex: 1,
     position: "relative",
     marginHorizontal: screenHorizontalPadding,
+    height: (ScreenWidth * 1.2)
   },
   imageVideoView: {
     width: '100%',
@@ -76,7 +77,7 @@ const useStyles = makeStyles(theme => ({
     borderTopStartRadius: 20,
     alignItems: 'center',
     flexDirection: 'row',
-    paddingHorizontal: 10,
+    paddingHorizontal: 10
   },
   bottomButtonContainer:
   {
@@ -221,6 +222,13 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     alignItems: 'center',
   },
+  filterHeight: {
+    height: (ScreenWidth * 1.2)
+  },
+  filterBottomContainer: {
+    position: 'absolute',
+    bottom: 0
+  }
 }))
 
 export default useStyles
