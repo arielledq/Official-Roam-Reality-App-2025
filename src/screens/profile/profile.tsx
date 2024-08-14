@@ -151,15 +151,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       style={_styles.header}
     >
       {profileDetails?.image ?
-        <View style={_styles.avatarContainer}>
-          <FastImage
-            style={{
-              width: '100%',
-              height: height * 0.5,
-            }}
-            source={{ uri: profileDetails?.image }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
+        <View style={[_styles.avatarContainer]}>
           <LinearGradient
             colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
             start={{ x: 0.5, y: 1 }}
@@ -173,6 +165,16 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
               zIndex: 1
             }}
           />
+          <FastImage
+            style={{
+              width: '100%',
+              marginTop: 80, backgroundColor: 'red',
+              aspectRatio: 1
+            }}
+            source={{ uri: profileDetails?.image }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+
           <AppButton
             customColors={["#7B16FF", "#1158F4"]}
             buttonStyle={_styles.editButton}
@@ -213,7 +215,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <AppText
             adjustsFontSizeToFit={true}
             numberOfLines={1}
-            onPress={()=>navigation.navigate("ScoreBoard")}
+            onPress={() => navigation.navigate("ScoreBoard")}
             style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
