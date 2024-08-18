@@ -188,9 +188,9 @@ const GeoArChallengeDetails = ({
             longitude: o?.user_ar_profile?.current_location.coordinates[0]
           }}
           title={o.name}
-          onCalloutPress={() => { }}
+          onCalloutPress={() => { navigation.navigate("PublicProfile", { userData: o })}}
         >
-          {Platform.OS == 'ios' && <Callout onPress={() => { }}
+          {Platform.OS == 'ios' && <Callout onPress={() => { navigation.navigate("PublicProfile", { userData: o }) }}
             style={{ backgroundColor: '#fff', minWidth: 100, alignItems: 'center' }}>
             <Text>{o.name}</Text>
           </Callout>}
