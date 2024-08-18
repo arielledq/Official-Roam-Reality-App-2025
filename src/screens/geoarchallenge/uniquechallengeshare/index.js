@@ -298,7 +298,7 @@ const UniqueArChallengeShare = ({
             uri: captureData
           }} />
             :
-            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ backgroundColor: "transparent", width: '100%', height: imageHeight }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
