@@ -512,14 +512,13 @@ const PinChallenge = ({
     render() {
       return (
         <View style={{ flex: 1 }}>
-          <View style={_styles.mainContainer}>
-
-            <View style={{ width: '100%', height: 200, zIndex: 11, marginBottom: 20, backgroundColor: "#1f2236" }}>
+          <BackgroundWithImage style={_styles.mainContainer}>
+            <View style={{ width: '100%', height: 200, marginBottom: 20, zIndex: 11 }}>
               <AppHeader
                 centerComponent={{
                   text: "Location Check In\n" + selectedGeoSite.name,
                   numberOfLines: 2,
-                  style: [_styles.heading, { zIndex: 11 }],
+                  style: [_styles.heading],
                 }} backgroundColor="transparent" />
 
               <View style={{
@@ -547,11 +546,11 @@ const PinChallenge = ({
                 </View>
               </View>
             </View>
-            <View style={{ width: '100%', flex: 1 }} showsVerticalScrollIndicator={false}>
+            <View style={{ width: '100%', flex: 1, overflow: "hidden", borderRadius: 16 }} showsVerticalScrollIndicator={false}>
               <View style={{
-                flex: 1, marginVertical: 20, zIndex: -99
+                flex: 1, marginVertical: 20
               }}>
-                <View style={{ flex: 1, marginTop: -210, zIndex: -99, position: 'relative' }} >
+                <View style={{ flex: 1, marginTop: -240, position: 'relative' }} >
                   <View style={_styles.ARMainContainer}>
                     <ViroARSceneNavigator
                       autofocus={true}
@@ -628,7 +627,7 @@ const PinChallenge = ({
                 </View>
               </View>
             </View>
-          </View >
+          </BackgroundWithImage >
           {this.state.detailsShow && this.InfoView()}
         </View>
       )
