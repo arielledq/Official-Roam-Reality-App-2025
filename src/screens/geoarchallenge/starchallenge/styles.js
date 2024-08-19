@@ -182,7 +182,8 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     lineHeight: 13.64,
-    marginVertical: 4
+    marginVertical: 4,
+    width:'100%'
   },
   infoText: {
     ...fontGroup.ns400,
