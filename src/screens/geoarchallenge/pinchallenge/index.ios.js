@@ -580,7 +580,7 @@ const PinChallenge = ({
                   <TouchableOpacity disabled={this.state.capturedImage ? true : false} onPress={() => {
                     this._takeScreenshot();
                   }} style={{
-                    width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0
+                    width: 56, height: 56, position: "absolute", bottom: -28, alignSelf: 'center', marginLeft: 0, marginRight: 0, zIndex: 20
                   }}>
                     <CaptureIcon />
                   </TouchableOpacity>
