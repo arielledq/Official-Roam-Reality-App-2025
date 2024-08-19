@@ -28,8 +28,8 @@ const useStyles = makeStyles(theme => ({
     width: '100%',
     position: 'relative',
     backgroundColor: '#000',
-    overflow: 'hidden', 
-     zIndex:-99 
+    overflow: 'hidden',
+    borderRadius:16
   },
   f1: {
     bottom: 0,
