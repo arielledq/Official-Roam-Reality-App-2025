@@ -220,6 +220,26 @@ class ARProfileViewSet(ViewSet):
         obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
         serializer = ARUserProfileSerializer(obj)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'],url_path='get-rank', name='Get User Rank') 
+    def get_rank(self, request, *args, **kwargs):
+      from django.db.models import F, Window
+      from django.db.models.functions import Rank
+      user_id = request.data.get("user_id")
+      qs = ARUserProfile.objects.all(
+          ).annotate(
+          rank=Window(
+          expression=Rank(),
+          order_by=F('points').desc(),
+        )
+      )
+      for item in qs:
+        print(item.rank)
+        print(item.user.id)
+        if item.user.id == user_id:
+          return Response({"rank": item.rank}, status=status.HTTP_200_OK)
+        
+      return Response({"rank": 0}, status=status.HTTP_200_OK)
 		
     def partial_update(self, request, *args, **kwargs):
         instance = self.queryset.get(pk=kwargs.get('pk'))
@@ -337,6 +357,24 @@ class ARSitePinCheckInViewSet(ViewSet):
       user_id = self.request.user.id
       criterion1 = Q(user=user_id)
       count = ARSitePinCheckIn.objects.filter(criterion1).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+
+
+    @action(detail=False, methods=['post'], url_path='country-checkins-count', name='Check Country Check-ins')
+    def country_checkins(self, request):
+      user_id = request.data.get("user_id")
+      print(user_id)
+      criterion1 = Q(user=user_id)
+      qs = ARSitePinCheckIn.objects.filter(criterion1)
+      print(qs)
+      countryArray = {}
+      count = 0
+      for item in qs:
+        if item.geo_site.geo_location not in countryArray:
+           countryArray[item.geo_site.geo_location] = True
+           count += 1
+      
+      print(countryArray)
       return Response({'count': count}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
