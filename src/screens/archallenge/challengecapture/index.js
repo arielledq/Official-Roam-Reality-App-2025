@@ -136,9 +136,6 @@ const ArChallengeCapture = ({
               if (sourcesArray.length > 0) {
                 setSourcesFiles(sourcesArray)
               }
-              console.log("sourceFiles", sourcesArray)
-              console.log("object3dType", object3dType)
-
               setLoading(false)
             })
         })
@@ -222,6 +219,8 @@ const ArChallengeCapture = ({
       }
     };
 
+    console.log("sourcesFiles", sourcesFiles)
+    console.log("object3dType", object3dType)
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
 
