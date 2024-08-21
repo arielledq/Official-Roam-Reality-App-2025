@@ -275,7 +275,11 @@ const ArChallengeShare = ({
   const checkPermission = () => {
     CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
       Alert.alert("Saved to Camera Roll.")
-    });
+    })
+    .catch((err) => {
+      console.log('err:', err);
+      Alert.alert("Error!", "Not able to save, please check permission.")
+    });;
   };
 
 

@@ -204,13 +204,6 @@ const DestinationFactPopUp = ({
     }
   }
 
-  const checkPermission = () => {
-    CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
-      Alert.alert("Saved to Camera Roll.")
-    });
-  };
-
-
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader leftComponent={null} centerComponent={{

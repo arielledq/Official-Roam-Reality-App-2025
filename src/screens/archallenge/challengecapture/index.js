@@ -221,6 +221,7 @@ const ArChallengeCapture = ({
 
     console.log("sourcesFiles", sourcesFiles)
     console.log("object3dType", object3dType)
+    console.log("modelPath", modelPath)
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
 
