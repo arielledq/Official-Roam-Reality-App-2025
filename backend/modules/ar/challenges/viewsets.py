@@ -220,6 +220,26 @@ class ARProfileViewSet(ViewSet):
         obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
         serializer = ARUserProfileSerializer(obj)
         return Response(serializer.data)
+    
+    @action(detail=False, methods=['post'],url_path='get-rank', name='Get User Rank') 
+    def get_rank(self, request, *args, **kwargs):
+      from django.db.models import F, Window
+      from django.db.models.functions import Rank
+      user_id = request.data.get("user_id")
+      qs = ARUserProfile.objects.all(
+          ).annotate(
+          rank=Window(
+          expression=Rank(),
+          order_by=F('points').desc(),
+        )
+      )
+      for item in qs:
+        print(item.rank)
+        print(item.user.id)
+        if item.user.id == user_id:
+          return Response({"rank": item.rank}, status=status.HTTP_200_OK)
+        
+      return Response({"rank": 0}, status=status.HTTP_200_OK)
 		
     def partial_update(self, request, *args, **kwargs):
         instance = self.queryset.get(pk=kwargs.get('pk'))
