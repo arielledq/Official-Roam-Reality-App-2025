@@ -58,10 +58,16 @@ class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer
         )
 
 class ChallengesSerializer(serializers.ModelSerializer):
+    
+    @staticmethod
+    def get_ar_filters_sorted(instance):
+        ar_filters = instance.ar_filters.order_by('name')
+        return ARChallengeFiltersSerializer(ar_filters, many=True).data
+    
     image = serializers.ImageField()
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
-    ar_filters = ARChallengeFiltersSerializer(read_only=True, many=True)
+    ar_filters = serializers.SerializerMethodField(method_name='get_ar_filters_sorted')
 
     def get_image(self, obj):
         return obj.image.url

@@ -176,6 +176,16 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
         return obj.user.name
     pass
 
+
+@admin.register(ARChallengeFilters)
+class ARChallengeFiltersAdmin(admin.ModelAdmin):
+    search_fields = (
+        "name",
+    )
+    list_display = ('name',)
+    ordering = ("name",)
+    pass
+
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
@@ -183,7 +193,6 @@ admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARGoldStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
-admin.site.register(ARChallengeFilters, ARChallengeAdmin)
 admin.site.register(StarCollection, GeoArChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 admin.site.register(DestinationFacts, GeoArChallengeAdmin)
