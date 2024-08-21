@@ -256,7 +256,7 @@ const StarChallenge = ({
               const starPoint = { latitude: point[1], longitude: point[0] }
               const starShouldVisibleNow = isLocationPointWithinRadius(currentLocation, starPoint, Number(starObjE?.visibility_radius))
               const coords = transformGpsToAR(currentLocation, starPoint, compassHeading);
-              const newScale = Math.abs(Math.round(coords.z / 15));;
+              const newScale = Math.abs(Math.round(coords.z / 15));
               if (modelPath && challengeObj?.challenge_choice == "3DMODEL" && starShouldVisibleNow) {
                 ViroMaterials.createMaterials({
                   grid: {
@@ -274,7 +274,9 @@ const StarChallenge = ({
                 });
                 console.log("Showed star")
                 return (
-                  <ViroNode key={starObjE.id} scale={[newScale, newScale, newScale]} rotation={[0, 0, 0]} position={[coords.x, 0, coords.z]}>
+                  <ViroNode key={starObjE.id}
+                    scale={[isNaN(newScale) ? scale : newScale, isNaN(newScale) ? scale : newScale, isNaN(newScale) ? scale : newScale]}
+                    rotation={[0, 0, 0]} position={[isNaN(coords.x) ? 0 : coords.x, -5, isNaN(coords.z) ? 0 : coords.z]} >
                     <Viro3DObject
                       key="obj_3d1"
                       onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
@@ -310,7 +312,7 @@ const StarChallenge = ({
                     opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
                     onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
                     source={{ uri: challengeObj.image }}
-                    position={[coords.x, -5, coords.z]} />
+                    position={[isNaN(coords.x) ? 0 : coords.x, -5, isNaN(coords.z) ? 0 : coords.z]} />
                 )
               } else if (loading && starShouldVisible) {
                 return (
@@ -320,7 +322,7 @@ const StarChallenge = ({
                     width={2}
                     height={2}
                     style={_styles.loadingText}
-                    position={[coords.x, -5, coords.z]}
+                    position={[isNaN(coords.x) ? 0 : coords.x, -5, isNaN(coords.z) ? 0 : coords.z]}
                   />
                 )
               }
@@ -686,7 +688,7 @@ const StarChallenge = ({
                 </View>
               </View>
               <View style={{
-                flex: 1, marginVertical: 20, overflow:'hidden', borderRadius:16
+                flex: 1, marginVertical: 20, overflow: 'hidden', borderRadius: 16
               }}>
                 <View style={_styles.ARMainContainer}>
                   <ViroARSceneNavigator
