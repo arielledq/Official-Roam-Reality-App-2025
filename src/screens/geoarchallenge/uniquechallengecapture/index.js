@@ -112,6 +112,14 @@ const UniqueArChallengeCapture = ({
                     const objFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
                     setModelPath(objFile)
                     setObject3dType("OBJ")
+                  } else if (result[i].name.includes(".glb") || result[i].name.includes(".GLB")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLB")
+                  } else if (result[i].name.includes(".gltf") || result[i].name.includes(".GLTF")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLTF")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
                     sourcesArray.push({ uri: sourceFile })
