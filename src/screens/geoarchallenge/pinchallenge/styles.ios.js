@@ -1,7 +1,6 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
-import { Platform } from "react-native"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -21,16 +20,16 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,
     justifyContent: 'flex-start',
-    alignItems: 'center'
+    alignItems: 'center',
+    backgroundColor: "#1f2236",
   },
   ARMainContainer: {
     flex: 1,
     width: '100%',
     position: 'relative',
     backgroundColor: '#000',
-    overflow: 'hidden', 
-    borderRadius: 16,
-    marginTop: Platform.OS == 'ios' ? -205 : 0
+    overflow: 'hidden',
+    borderRadius:16
   },
   f1: {
     bottom: 0,
@@ -184,8 +183,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     lineHeight: 13.64,
-    marginVertical: 4,
-    width:'100%'
+    marginVertical: 4
   },
   infoText: {
     ...fontGroup.ns400,
@@ -206,6 +204,11 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.p700,
     color: theme.colors.white,
     fontSize: FontSizes.S16,
+  },
+  loadingText: {
+    fontSize: FontSizes.S24,
+    color: theme.colors.black,
+    marginTop: 10,
   },
   //information view
   challengeInfoContainer: { width: '100%', backgroundColor: "#131422", height: 420, borderRadius: 30, position: 'absolute', bottom: 0, alignItems: 'center' },

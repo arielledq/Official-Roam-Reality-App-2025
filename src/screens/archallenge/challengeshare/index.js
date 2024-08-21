@@ -275,7 +275,11 @@ const ArChallengeShare = ({
   const checkPermission = () => {
     CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
       Alert.alert("Saved to Camera Roll.")
-    });
+    })
+    .catch((err) => {
+      console.log('err:', err);
+      Alert.alert("Error!", "Not able to save, please check permission.")
+    });;
   };
 
 
@@ -297,7 +301,7 @@ const ArChallengeShare = ({
             uri: captureData
           }} />
             :
-            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight, marginTop: Platform.OS == "ios" && challengeObj?.ar_filters.length == 0 ? -200 : 0 }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ backgroundColor: "transparent", width: '100%', height: imageHeight, marginTop: Platform.OS == "ios" && challengeObj?.ar_filters.length == 0 ? -200 : 0 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>

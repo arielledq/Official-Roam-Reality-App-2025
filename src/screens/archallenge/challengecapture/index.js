@@ -119,6 +119,14 @@ const ArChallengeCapture = ({
                     const objFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
                     setModelPath(objFile)
                     setObject3dType("OBJ")
+                  } else if (result[i].name.includes(".glb") || result[i].name.includes(".GLB")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLB")
+                  } else if (result[i].name.includes(".gltf") || result[i].name.includes(".GLTF")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLTF")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
                     sourcesArray.push({ uri: sourceFile })
@@ -128,9 +136,6 @@ const ArChallengeCapture = ({
               if (sourcesArray.length > 0) {
                 setSourcesFiles(sourcesArray)
               }
-              console.log("sourceFiles", sourcesArray)
-              console.log("object3dType", object3dType)
-
               setLoading(false)
             })
         })
@@ -214,6 +219,9 @@ const ArChallengeCapture = ({
       }
     };
 
+    console.log("sourcesFiles", sourcesFiles)
+    console.log("object3dType", object3dType)
+    console.log("modelPath", modelPath)
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
 
@@ -224,11 +232,16 @@ const ArChallengeCapture = ({
 
         <ViroSpotLight
           innerAngle={5}
-          outerAngle={90}
-          direction={[0, 1, 0]}
-          position={[0, -7, 0]}
+          outerAngle={25}
+          direction={[0, -1, 0]}
+          position={[0, 5, 0]}
           color="#ffffff"
-          intensity={250} />
+          castsShadow={true}
+          shadowMapSize={2048}
+          shadowNearZ={2}
+          shadowFarZ={7}
+          shadowOpacity={.7}
+        />
 
         {loading &&
           <ViroText
@@ -596,7 +609,7 @@ const ArChallengeCapture = ({
           <View
             style={[styles.f1, {
               marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0
-            }]}>
+            }, challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 }]}>
             {
               <BackgroundWithImage>
                 <ViroARSceneNavigator
@@ -636,7 +649,9 @@ const ArChallengeCapture = ({
               <Text style={styles.holdText}>Swipe Left or Right for Filters</Text>
             }
           </View>
-          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
+          <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' },
+          challengeObj?.ar_filters.length > 0 ? styles.filterBottomContainer : {}
+          ]}>
             {
               (this.state.recordingStart) && <View style={styles.timerTextContainer}>
                 <Text style={styles.timerText}>{this.state.timer}</Text>

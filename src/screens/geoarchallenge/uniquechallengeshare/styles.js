@@ -123,7 +123,13 @@ const useStyles = makeStyles(theme => ({
     height: 63,
     borderRadius: 8,
     backgroundColor:'transparent'
-  }
+  }, 
+  mainHeaderContainerIOS: {
+    height: 120,
+  },
+  detailsViewContainerIOS: {
+    height: 100,
+  },
 }))
 
 export default useStyles

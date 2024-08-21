@@ -276,7 +276,10 @@ const UniqueArChallengeShare = ({
   const checkPermission = () => {
     CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
       Alert.alert("Saved to Camera Roll.")
-    });
+    })
+      .catch((err) => {
+        Alert.alert("Error!", "Not able to save, please check permission.")
+      });
   };
 
 
@@ -294,11 +297,11 @@ const UniqueArChallengeShare = ({
         <AppText numberOfLines={3} style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
         <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
-          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1 }} source={{
+          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1, marginTop: Platform.OS == "ios" ? -200 : 0 }} source={{
             uri: captureData
           }} />
             :
-            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ backgroundColor: "transparent", width: '100%', height: imageHeight, marginTop: Platform.OS == "ios" ? -200 : 0 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
