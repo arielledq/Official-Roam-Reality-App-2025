@@ -686,7 +686,7 @@ const StarChallenge = ({
                 </View>
               </View>
               <View style={{
-                flex: 1, marginVertical: 20
+                flex: 1, marginVertical: 20, overflow:'hidden', borderRadius:16
               }}>
                 <View style={_styles.ARMainContainer}>
                   <ViroARSceneNavigator
@@ -725,9 +725,9 @@ const StarChallenge = ({
                 alignItems: 'center'
               }}>
                 <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-                  <View style={{ flexDirection: 'row' }}>
+                  <View style={{ flexDirection: 'row', flex: 1 }}>
                     <MenIcon style={{ width: 40, height: 40 }} />
-                    <View>
+                    <View style={{ flex: 1 }}>
                       <Text style={_styles.exploringText}>Nearest Star</Text>
                       {
                         this.state.allStarsCollected ?

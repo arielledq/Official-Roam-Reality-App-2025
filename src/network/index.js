@@ -401,3 +401,15 @@ export const panicMessageAPI = payload =>
     method: "POST",
     data: payload
   })
+
+export const getGeoARExamples = (id) =>
+  Request.callAR({
+    url: `modules/challenges/examples/get-by-geo-ar-id/?id=${id}`,
+    method: "GET"
+  })
+
+export const getAnyARExamples = (id) =>
+  Request.callAR({
+    url: `modules/challenges/examples/get-by-any-ar-id/?id=${id}`,
+    method: "GET"
+  })
