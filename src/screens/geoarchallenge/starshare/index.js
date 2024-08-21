@@ -242,13 +242,6 @@ const ArStarChallengeShare = (props) => {
     }
   }
 
-  const checkPermission = () => {
-    CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
-      Alert.alert("Saved to Camera Roll.")
-    });
-  };
-
-
   return (
     <BackgroundWithImage style={styles.mainContainer}>
 
