@@ -11,13 +11,13 @@ import GetLocation from 'react-native-get-location';
 import PagerView from 'react-native-pager-view';
 import { DragTextEditor } from 'react-native-drag-text-editor';
 import Geocoder from 'react-native-geocoding';
-import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
 import { Image } from "@rneui/base";
 import { moderateScale } from "../../../util/AppDimensions";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 const { width } = Dimensions.get('window');
+let ScreenWidth = Dimensions.get("window").width;
 
 const ARFilter = ({
   challengeObj, captureData, viewShotRef
@@ -216,15 +216,17 @@ const ARFilter = ({
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
                   {filter.gradient_colors &&
-                    <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                      colors={
-                        filter.gradient_direction == 'TOP_TO_BOTTOM' ?
-                          [...filter.gradient_colors, 'transparent'] :
-                          ['transparent', ...filter.gradient_colors]
-                      } />
+                    <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                      <LinearGradient style={{
+                        flex: 1, transform: [{ rotate: filter.gradient_direction !== 'TOP_TO_BOTTOM' ? '0deg' : '180deg'}]
+                      }}
+                        colors={
+                          [...filter.gradient_colors, 'transparent']
+                        } />
+                    </View>
                   }
                   {filter.image &&
-                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
+                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: (ScreenWidth * 1.2), width: '100%', backgroundColor: 'tranparent' }} />
                   }
                   {filter.gradient_direction !== 'TOP_TO_BOTTOM' &&
                     <View style={[styles.textFilterView, { justifyContent: "flex-end" }]}>
