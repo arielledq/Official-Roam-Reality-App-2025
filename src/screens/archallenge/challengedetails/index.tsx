@@ -79,16 +79,15 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
 
   const openExample = () => {
     if (examples.length > 0) {
-      Alert.alert("AR Example!","You are about to leave the app and open a web browser. Do you want to continue?", [
+      Alert.alert("AR Example!", "You are about to leave the app and open a web browser. Do you want to continue?", [
         {
           text: 'Cancel',
           onPress: () => console.log('Cancel Pressed'),
           style: 'cancel',
         },
-        {text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image)},
+        { text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image) },
       ]);
-      
-    }else{
+    } else {
       Alert.alert("No Example available.")
     }
   }
