@@ -24,7 +24,7 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
+import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, getUserCollectedStarCount, sendCode } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
@@ -45,6 +45,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [isProfileUpdated, setIsProfileUpdated] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(true)
+  const [starsCount, setStarsCount] = useState(0)
 
   const fetchProfileDetails = async () => {
     try {
@@ -75,6 +76,20 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     })
   }
 
+  const getUserCollectedStar = async () => {
+    getUserCollectedStarCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getUserCollectedStarCount:", res)
+      if(res.status == 1){
+        setStarsCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
 
   const getProfieARMemories = async () => {
     try {
@@ -101,6 +116,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       }, 500)
       getProfieARMemories()
       fetchARUserProfile()
+      getUserCollectedStar()
     }, [])
   )
 
@@ -126,8 +142,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }
 
   const data = [
-    { id: 1, value: 0, property: "Sites Visited" },
-    { id: 2, value: 0, property: "Stars" },
+    { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
+    { id: 2, value: starsCount, property: "Stars" },
     { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
     { id: 4, value: 0, property: "Friends" },
     { id: 5, value: 0, property: "Credits" },
@@ -254,8 +270,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       </View>
     </View>
   )
-
-  console.log({ profileDetails })
 
   const renderItem = ({ item }) => (
     <BoxStatContainer
