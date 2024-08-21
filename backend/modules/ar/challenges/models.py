@@ -164,6 +164,7 @@ class ARChallengeFilters(models.Model):
     class Meta:
         verbose_name_plural = "AR Filters"
         verbose_name = "AR Filter"
+        ordering = ['name']
 
     def __str__(self):
         return self.name
