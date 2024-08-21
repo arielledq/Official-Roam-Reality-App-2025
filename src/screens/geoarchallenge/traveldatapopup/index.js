@@ -41,7 +41,8 @@ const TravelDataPopUp = ({
       const scale = Math.abs(Math.round(coords.z / 15));
       const distance = getLocationDistance(currentLocation, { latitude: item.lat, longitude: item.lng });
       return (
-        <ViroNode key={item.id} scale={[scale, scale, scale]} rotation={[0, 0, 0]} position={[coords.x, 0, coords.z]}>
+        <ViroNode key={item.id} scale={[isNaN(scale) ? 0 : scale, isNaN(scale) ? 0 : scale, isNaN(scale) ? 0 : scale]} rotation={[0, 0, 0]}
+          position={[isNaN(coords.x) ? 0 : coords.x, 0, isNaN(coords.z) ? 0 : coords.z]}>
           <ViroFlexView style={{ alignItems: 'center', justifyContent: 'center' }}>
             <ViroText width={4} height={0.5} text={item.title} style={styles.helloWorldTextStyle} />
             <ViroText width={4} height={0.5} text={`${Number(distance).toFixed(2)} km`} style={styles.helloWorldTextStyle} position={[0, -0.75, 0]} />

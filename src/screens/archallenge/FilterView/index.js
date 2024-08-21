@@ -11,13 +11,13 @@ import GetLocation from 'react-native-get-location';
 import PagerView from 'react-native-pager-view';
 import { DragTextEditor } from 'react-native-drag-text-editor';
 import Geocoder from 'react-native-geocoding';
-import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
 import { Image } from "@rneui/base";
 import { moderateScale } from "../../../util/AppDimensions";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
 const { width } = Dimensions.get('window');
+let ScreenWidth = Dimensions.get("window").width;
 
 const ARFilter = ({
   challengeObj, captureData, viewShotRef
@@ -126,6 +126,38 @@ const ARFilter = ({
     console.log("admin_area_2", admin_area_2)
     if (location_option == "COUNTRY_ONLY") {
       return country;
+    } else if (location_option == "SITE_ONLY") {
+      if (admin_area_2 || locality) {
+        if (sublocality && neighborhood && postal_town) {
+          return `${postal_town}, ${admin_area_2}`;
+        } else if (!locality && sublocality && neighborhood && postal_town) {
+          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}`;
+        } else if (!locality && !sublocality && neighborhood && postal_town) {
+          return `${neighborhood} ${postal_town}, ${admin_area_2}`;
+        } else if (!locality && !sublocality && !neighborhood && postal_town) {
+          return `${postal_town}, ${admin_area_2}}`;
+        } else if (neighborhood && postal_town && sublocality) {
+          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}`;
+        } else if (neighborhood && sublocality) {
+          return `${neighborhood} ${sublocality}, ${admin_area_2}`;
+        } else if (postal_town && sublocality) {
+          return `${postal_town} ${sublocality}, ${admin_area_2}`;
+        } else if (route && sublocality_level_1 && sublocality) {
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`;
+        } else if (route && sublocality_level_1 && sublocality) {
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`;
+        } else if (route && sublocality_level_1) {
+          return `${route}, ${sublocality_level_1}, ${locality}`;
+        } else if (route) {
+          return `${route}, ${locality}`;
+        } else if (sublocality) {
+          return `${sublocality}, ${locality}`;
+        } else if (!admin_area_2 && locality) {
+          return `${locality}`;
+        } else if (!locality && admin_area_2) {
+          return `${admin_area_2}`;
+        }
+      }
     } else {
       if (admin_area_2 || locality) {
         if (sublocality && neighborhood && postal_town) {
@@ -184,15 +216,17 @@ const ARFilter = ({
               return (
                 <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
                   {filter.gradient_colors &&
-                    <LinearGradient style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-                      colors={
-                        filter.gradient_direction == 'TOP_TO_BOTTOM' ?
-                          [...filter.gradient_colors, 'transparent'] :
-                          ['transparent', ...filter.gradient_colors]
-                      } />
+                    <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                      <LinearGradient style={{
+                        flex: 1, transform: [{ rotate: filter.gradient_direction !== 'TOP_TO_BOTTOM' ? '0deg' : '180deg'}]
+                      }}
+                        colors={
+                          [...filter.gradient_colors, 'transparent']
+                        } />
+                    </View>
                   }
                   {filter.image &&
-                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: imageHeight, width: '100%', backgroundColor: 'tranparent' }} />
+                    <ImageBackground source={{ uri: filter.image }} resizeMode="cover" style={{ height: (ScreenWidth * 1.2), width: '100%', backgroundColor: 'tranparent' }} />
                   }
                   {filter.gradient_direction !== 'TOP_TO_BOTTOM' &&
                     <View style={[styles.textFilterView, { justifyContent: "flex-end" }]}>
