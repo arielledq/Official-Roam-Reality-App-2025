@@ -53,6 +53,7 @@ const PinChallenge = ({
   const settings = useSelector(state => state.ar?.arSettings)
 
   const ARScreen = (props) => {
+    const [object3dType, setObject3dType] = useState(null);
     const [isMeInsideInSite, setIsMeInsideInSite] = useState(props?.arSceneNavigator.viroAppProps.isMeInsideInSite)
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
@@ -106,12 +107,25 @@ const PinChallenge = ({
               for (let i = 0; i < result.length; i++) {
                 if (result[i].isFile) {
                   console.log("unzipModelFile", result[i].name)
-                  if (result[i].name.includes(".vrx")) {
+                  if (result[i].name.includes(".vrx") || result[i].name.includes(".VRX")) {
                     const vrxFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setObject3dType("VRX")
                     setModelPath(vrxFile)
+                  } else if (result[i].name.includes(".obj") || result[i].name.includes(".OBJ")) {
+                    const objFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(objFile)
+                    setObject3dType("OBJ")
+                  } else if (result[i].name.includes(".glb") || result[i].name.includes(".GLB")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLB")
+                  } else if (result[i].name.includes(".gltf") || result[i].name.includes(".GLTF")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLTF")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    sourcesArray.push(sourceFile)
+                    sourcesArray.push({ uri: sourceFile })
                   }
                 }
               }
@@ -228,7 +242,8 @@ const PinChallenge = ({
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
             onClick={() => { console.log("TAP Viro3DObject") }}
-            type="VRX"
+            type={object3dType}
+            resources={sourcesFiles}
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
