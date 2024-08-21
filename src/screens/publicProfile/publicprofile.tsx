@@ -23,8 +23,11 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import LinearGradient from "react-native-linear-gradient"
 import {
+  getCountryCount,
   getPublicARProfile,
   getPublicProfieARMemoriesAPI,
+  getUserCollectedStarCount,
+  getUserRankCount,
   removeUserFromFriends,
   reportContentOrUser,
   sendCode
@@ -56,6 +59,9 @@ const PublicProfile: ScreenStackComponent<
   const [arProfile, updateARUserData] = useState({})
   const [isTransitioning, setIsTransitioning] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
+  const [starsCount, setStarsCount] = useState(0)
+  const [countryCount, setCountryCount] = useState(0)
+  const [globalRank, setGlobalRank] = useState(0)
 
   const fetchARUserProfile = () => {
     getPublicARProfile(userProfile?.id)
@@ -86,6 +92,51 @@ const PublicProfile: ScreenStackComponent<
     }
   }
 
+  const getUserCollectedStar = async () => {
+    getUserCollectedStarCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getUserCollectedStarCount:", res)
+      if(res.status == 1){
+        setStarsCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
+  const getRank = async () => {
+    getUserRankCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getRank:", res)
+      if(res.status == 1){
+        setGlobalRank(res.rank)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
+  const getCountry = async () => {
+    getCountryCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getCountry:", res)
+      if(res.status == 1){
+        setCountryCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
   useFocusEffect(
     useCallback(() => {
       setTimeout(() => {
@@ -93,18 +144,21 @@ const PublicProfile: ScreenStackComponent<
       }, 500)
       getProfieARMemories()
       fetchARUserProfile()
+      getUserCollectedStar()
+      getRank()
+      getCountry()
     }, [])
   )
 
   const data = [
-    { id: 1, value: 0, property: "Sites Visited" },
-    { id: 2, value: 0, property: "Stars" },
+    { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
+    { id: 2, value: starsCount, property: "Stars" },
     { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
     { id: 4, value: 0, property: "Friends" },
     { id: 5, value: 0, property: "Credits" },
     { id: 6, value: 0, property: "Tokens" },
     { id: 7, value: 0, property: "Rallies" },
-    { id: 8, value: 0, property: "Countries" }
+    { id: 8, value: countryCount, property: "Countries" }
   ]
   // Split the data into chunks of 3 for each row
   const rows = []
@@ -179,7 +233,7 @@ const PublicProfile: ScreenStackComponent<
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"0"} property={"Global Rank"} />
+          <StatContainer value={""+globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
