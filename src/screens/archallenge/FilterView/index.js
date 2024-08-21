@@ -126,6 +126,38 @@ const ARFilter = ({
     console.log("admin_area_2", admin_area_2)
     if (location_option == "COUNTRY_ONLY") {
       return country;
+    } else if (location_option == "SITE_ONLY") {
+      if (admin_area_2 || locality) {
+        if (sublocality && neighborhood && postal_town) {
+          return `${postal_town}, ${admin_area_2}`;
+        } else if (!locality && sublocality && neighborhood && postal_town) {
+          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}`;
+        } else if (!locality && !sublocality && neighborhood && postal_town) {
+          return `${neighborhood} ${postal_town}, ${admin_area_2}`;
+        } else if (!locality && !sublocality && !neighborhood && postal_town) {
+          return `${postal_town}, ${admin_area_2}}`;
+        } else if (neighborhood && postal_town && sublocality) {
+          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}`;
+        } else if (neighborhood && sublocality) {
+          return `${neighborhood} ${sublocality}, ${admin_area_2}`;
+        } else if (postal_town && sublocality) {
+          return `${postal_town} ${sublocality}, ${admin_area_2}`;
+        } else if (route && sublocality_level_1 && sublocality) {
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`;
+        } else if (route && sublocality_level_1 && sublocality) {
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`;
+        } else if (route && sublocality_level_1) {
+          return `${route}, ${sublocality_level_1}, ${locality}`;
+        } else if (route) {
+          return `${route}, ${locality}`;
+        } else if (sublocality) {
+          return `${sublocality}, ${locality}`;
+        } else if (!admin_area_2 && locality) {
+          return `${locality}`;
+        } else if (!locality && admin_area_2) {
+          return `${admin_area_2}`;
+        }
+      }
     } else {
       if (admin_area_2 || locality) {
         if (sublocality && neighborhood && postal_town) {
