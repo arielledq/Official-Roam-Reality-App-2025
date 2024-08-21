@@ -32,6 +32,7 @@ const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { useSelector } from "react-redux";
+import BackgroundWithImage from "../../../components/background";
 const { width } = Dimensions.get('window');
 
 const VIDEO_RECORD_TIME = 10
@@ -113,7 +114,7 @@ const UniqueArChallengeCapture = ({
                     setObject3dType("OBJ")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    sourcesArray.push({uri: sourceFile})
+                    sourcesArray.push({ uri: sourceFile })
                   }
                 }
               }
@@ -229,7 +230,7 @@ const UniqueArChallengeCapture = ({
         }
 
         {
-          challengeObj.challenge_choice == "3DMODEL" && modelPath && object3dType && 
+          challengeObj.challenge_choice == "3DMODEL" && modelPath && object3dType &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -556,39 +557,17 @@ const UniqueArChallengeCapture = ({
 
       return (
         <View style={styles.mainContainer}>
-          {
-            this.state.isLoadVR && <ViroARSceneNavigator
-              videoQuality={"High"}
-              autofocus={true}
-              pbrEnabled={true}
-              hdrEnabled={true}
-              bloomEnabled={true}
-              ref={this._setARNavigatorRef}
-              initialScene={{
-                scene: ARScreen,
-              }}
-              style={styles.f1}
-            >
-            </ViroARSceneNavigator>
-          }
-
-          {this.state.capturedImage && <Image style={styles.f1} source={{
-            uri: this.state.capturedImage
-          }} />}
-
-          {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
-            uri: this.state.capturedVideo
-          }} />}
-
-          <View style={styles.mainHeaderContainer}>
+          <View style={[styles.mainHeaderContainer, Platform.OS == 'ios' ? styles.mainHeaderContainerIOS : {}]}>
             <AppHeader centerComponent={{
               text: "Unique Site AR",
               numberOfLines: 2,
               style: [styles.heading],
             }} backgroundColor="transparent" />
+          </View>
+          <View style={[styles.detailsViewContainer, Platform.OS == 'ios' ? styles.detailsViewContainerIOS : {}]}>
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
@@ -599,17 +578,47 @@ const UniqueArChallengeCapture = ({
               </View>
             </View>
           </View>
+          <View
+            style={[styles.f1, {
+              marginTop: Platform.OS == 'ios' ? -220 : 0
+            }, { flex: 1 }]}>
+            {
+              <BackgroundWithImage>
+                <ViroARSceneNavigator
+                  videoQuality={"High"}
+                  autofocus={true}
+                  pbrEnabled={true}
+                  hdrEnabled={true}
+                  bloomEnabled={true}
+                  ref={this._setARNavigatorRef}
+                  initialScene={{
+                    scene: ARScreen,
+                  }}
+                  style={styles.navigatorView}
+                >
+                </ViroARSceneNavigator>
+              </BackgroundWithImage>
+            }
+            {this.state.capturedImage && <Image style={styles.imageVideoView} source={{
+              uri: this.state.capturedImage
+            }} />}
+            {this.state.capturedVideo && <Video repeat={true} style={styles.imageVideoView} source={{
+              uri: this.state.capturedVideo
+            }} />}
+          </View>
+          <View style={styles.holdTextContainer}>
+            {
+              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) &&
+              <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
+            }
+          </View>
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
             {
               (this.state.recordingStart) && <View style={styles.timerTextContainer}>
                 <Text style={styles.timerText}>{this.state.timer}</Text>
               </View>
             }
-            {
-              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) && <View style={styles.holdTextContainer}>
-                <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
-              </View>
-            }
+            
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
