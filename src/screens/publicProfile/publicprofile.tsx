@@ -25,6 +25,7 @@ import LinearGradient from "react-native-linear-gradient"
 import {
   getPublicARProfile,
   getPublicProfieARMemoriesAPI,
+  getUserCollectedStarCount,
   removeUserFromFriends,
   reportContentOrUser,
   sendCode
@@ -56,6 +57,7 @@ const PublicProfile: ScreenStackComponent<
   const [arProfile, updateARUserData] = useState({})
   const [isTransitioning, setIsTransitioning] = useState(true)
   const [modalVisible, setModalVisible] = useState(false)
+  const [starsCount, setStarsCount] = useState(0)
 
   const fetchARUserProfile = () => {
     getPublicARProfile(userProfile?.id)
@@ -86,6 +88,21 @@ const PublicProfile: ScreenStackComponent<
     }
   }
 
+  const getUserCollectedStar = async () => {
+    getUserCollectedStarCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getUserCollectedStarCount:", res)
+      if(res.status == 1){
+        setStarsCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
   useFocusEffect(
     useCallback(() => {
       setTimeout(() => {
@@ -93,11 +110,12 @@ const PublicProfile: ScreenStackComponent<
       }, 500)
       getProfieARMemories()
       fetchARUserProfile()
+      getUserCollectedStar()
     }, [])
   )
 
   const data = [
-    { id: 1, value: 0, property: "Sites Visited" },
+    { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
     { id: 2, value: 0, property: "Stars" },
     { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
     { id: 4, value: 0, property: "Friends" },
