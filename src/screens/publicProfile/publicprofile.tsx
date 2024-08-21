@@ -116,7 +116,7 @@ const PublicProfile: ScreenStackComponent<
 
   const data = [
     { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
-    { id: 2, value: 0, property: "Stars" },
+    { id: 2, value: starsCount, property: "Stars" },
     { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
     { id: 4, value: 0, property: "Friends" },
     { id: 5, value: 0, property: "Credits" },
