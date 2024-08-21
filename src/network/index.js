@@ -414,9 +414,23 @@ export const getAnyARExamples = (id) =>
     method: "GET"
   })
 
-  export const getUserCollectedStarCount = payload =>
-    Request.callWithToken({
-      url: `modules/challenges/geo-ar-star-collect/user-stars-count/`,
-      method: "POST",
-      data: payload
-    })
+export const getUserCollectedStarCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-ar-star-collect/user-stars-count/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getUserRankCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/ar-profile/get-rank/`,
+    method: "POST",
+    data: payload
+  })
+
+export const getCountryCount = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/check-in/country-checkins-count/`,
+    method: "POST",
+    data: payload
+  })
