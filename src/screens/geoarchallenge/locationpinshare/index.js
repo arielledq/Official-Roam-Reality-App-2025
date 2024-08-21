@@ -11,7 +11,7 @@ import moment from "moment";
 import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
 import TiktokShareImg from "../../../assets/ar/tiktok.svg"
-import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI } from "../../../network";
+import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI, updateUserPointAPI } from "../../../network";
 import { handleError } from "../../../util/helpers";
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
@@ -83,6 +83,7 @@ const ArPinChallengeShare = ({
       ARUserProfile()
       if (res.status == 1) {
         console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
+        updateUserPoint()
       } else {
         console.log("postCheckIn:", res)
       }
@@ -98,6 +99,15 @@ const ArPinChallengeShare = ({
       if (res.status == 1) {
         console.log(res.message)
       }
+    })
+  }
+
+  const updateUserPoint = () => {
+    updateUserPointAPI({
+      points: challengeObj.points
+    }).then((res) => {
+      console.log("updateUserPoint:",res)
+    }).finally(() => {
     })
   }
 

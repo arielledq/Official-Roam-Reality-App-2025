@@ -686,7 +686,7 @@ const StarChallenge = ({
                 </View>
               </View>
               <View style={{
-                flex: 1, marginVertical: 20
+                flex: 1, marginVertical: 20, overflow:'hidden', borderRadius:16
               }}>
                 <View style={_styles.ARMainContainer}>
                   <ViroARSceneNavigator
