@@ -24,7 +24,7 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, getUserCollectedStarCount, sendCode } from "../../network"
+import { getARProfile, getCountryCount, getProfieARMemoriesAPI, getProfieDetails, getUserCollectedStarCount, getUserRankCount, sendCode } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
@@ -46,6 +46,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const [isProfileUpdated, setIsProfileUpdated] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(true)
   const [starsCount, setStarsCount] = useState(0)
+  const [countryCount, setCountryCount] = useState(0)
+  const [globalRank, setGlobalRank] = useState(0)
 
   const fetchProfileDetails = async () => {
     try {
@@ -91,6 +93,36 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     ).finally(() => setloading(false))
   }
 
+  const getRank = async () => {
+    getUserRankCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getRank:", res)
+      if(res.status == 1){
+        setGlobalRank(res.rank)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
+  const getCountry = async () => {
+    getCountryCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getCountry:", res)
+      if(res.status == 1){
+        setCountryCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
   const getProfieARMemories = async () => {
     try {
       getProfieARMemoriesAPI().then(res => {
@@ -117,6 +149,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getProfieARMemories()
       fetchARUserProfile()
       getUserCollectedStar()
+      getRank()
+      getCountry()
     }, [])
   )
 
@@ -149,7 +183,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     { id: 5, value: 0, property: "Credits" },
     { id: 6, value: 0, property: "Tokens" },
     { id: 7, value: 0, property: "Rallies" },
-    { id: 8, value: 0, property: "Countries" },
+    { id: 8, value: countryCount, property: "Countries" },
 
   ]
   // Split the data into chunks of 3 for each row
@@ -235,7 +269,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"0"} property={"Global Rank"} />
+          <StatContainer value={""+globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
