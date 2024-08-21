@@ -398,6 +398,14 @@ class StarCollectionViewSet(ViewSet):
       criterion1 = Q(user=user_id)
       count = StarCollection.objects.filter(criterion1).count()
       return Response({'count': count}, status=status.HTTP_200_OK)
+    
+    @action(detail=False, methods=['post'], url_path='user-stars-count', name='Check all-count')
+    def star_call_count(self, request):
+      user_id = request.data.get("user_id")
+      criterion1 = Q(user=user_id)
+      count = StarCollection.objects.filter(criterion1).count()
+      return Response({'count': count}, status=status.HTTP_200_OK)
+
 
     def get(self, request, *args, **kwargs):
         objs = self.queryset.filter(user = request.user.id)
