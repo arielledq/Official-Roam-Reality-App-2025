@@ -218,7 +218,7 @@ const ARFilter = ({
                   {filter.gradient_colors &&
                     <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
                       <LinearGradient style={{
-                        flex: 1, transform: [{ rotate: filter.gradient_direction !== 'TOP_TO_BOTTOM' ? '0deg' : '180deg'}]
+                        flex: 1, transform: [{ rotate: filter.gradient_direction === 'TOP_TO_BOTTOM' ? '0deg' : '180deg'}]
                       }}
                         colors={
                           [...filter.gradient_colors, 'transparent']
