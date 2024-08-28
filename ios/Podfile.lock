@@ -613,8 +613,8 @@ DEPENDENCIES:
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
   - TikTokOpenSDK (~> 5.0.15)
-  - ViroKit (from `../../viro/ios/dist/ViroRenderer/`)
-  - ViroReact (from `../../viro/ios/`)
+  - "ViroKit (from `../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/`)"
+  - "ViroReact (from `../node_modules/@viro-community/react-viro/ios/`)"
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -779,9 +779,9 @@ EXTERNAL SOURCES:
   RNZipArchive:
     :path: "../node_modules/react-native-zip-archive"
   ViroKit:
-    :path: "../../viro/ios/dist/ViroRenderer/"
+    :path: "../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/"
   ViroReact:
-    :path: "../../viro/ios/"
+    :path: "../node_modules/@viro-community/react-viro/ios/"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -878,6 +878,6 @@ SPEC CHECKSUMS:
   ViroReact: f4980e6b04918c4340637f9cbaae22a6bb7ea440
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
 
-PODFILE CHECKSUM: 4355c6c797880484e4767a156ee845b728a73532
+PODFILE CHECKSUM: ae819f11b1e3fb72b9667b4bd426a848d84c5ddf
 
-COCOAPODS: 1.15.2
+COCOAPODS: 1.13.0
