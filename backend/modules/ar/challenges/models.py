@@ -119,7 +119,7 @@ class ARChallengeParameterSettings(models.Model):
     image_opacity = models.BooleanField(_("Image Opacity"), default=False)
     image_opacity_value = models.DecimalField(_("Image Opacity Value"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=1.00)
     tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
-    scale_object = models.DecimalField(_("Object Scale"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=0.05)
+    scale_object = models.DecimalField(_("Object Scale"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('8.00'))], max_digits = 3, decimal_places=2, default=0.05)
     positionX = models.IntegerField(_("Position X"), default=0, null=False, blank=False)
     positionY = models.IntegerField(_("Position Y"), default=0, null=False, blank=False)
     positionZ = models.IntegerField(_("Position Z"), default=-25, null=False, blank=False)
