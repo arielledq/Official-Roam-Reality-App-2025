@@ -88,6 +88,7 @@ class Challenges(models.Model):
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    scale = models.DecimalField(max_digits=20, decimal_places=10, default=0.05)
     geo_location = models.ForeignKey(
         GeoLocation,
         on_delete=models.CASCADE,
