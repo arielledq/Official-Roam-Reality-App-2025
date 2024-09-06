@@ -9,7 +9,7 @@ class ContactUs(CommonModel):
 
     def __str__(self):
         return self.sender.email
-    
+
     class Meta:
         verbose_name = "Contact Us"
         verbose_name_plural = "Contact Us"
