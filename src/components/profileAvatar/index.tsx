@@ -17,33 +17,36 @@ const ProfileAvatar: FC<ProfileAvatarProps> = props => {
   return (
     <View style={styles.parent}>
       {avatarUrl ? (
-        <ImageBackground source={Images.ProfileImgGradient} style={styles.imagePresentBackground}>
+        <ImageBackground
+          source={Images.ProfileImgGradient}
+          style={styles.imagePresentBackground}
+        >
           <TouchableOpacity onPress={onChangeProfilePic}>
-          <View style={[styles.avatarContainer, styles.avatarViewStyles]}>
-            <FastImage
-              style={[styles.avatarContainer,styles.avatarStyles]}
-              source={{ uri: avatarUrl }}
-              resizeMode="cover"
-            />
+            <View style={[styles.avatarContainer, styles.avatarViewStyles]}>
+              <FastImage
+                style={[styles.avatarContainer, styles.avatarStyles]}
+                source={{ uri: avatarUrl }}
+                resizeMode="contain"
+              />
             </View>
-          <Icons.ProfilePicPlusIcon style={styles.plusIconWithImage}/>
+            <Icons.ProfilePicPlusIcon style={styles.plusIconWithImage} />
           </TouchableOpacity>
         </ImageBackground>
       ) : (
-      <TouchableOpacity style={styles.parent} onPress={onChangeProfilePic}>
-        <ImageBackground
-          source={Images.ProfileImgGradient}
-          style={styles.imageBackground}
-        >
-          <Image
-            style={styles.addImage}
-            resizeMode="contain"
-            source={Images.ProfileImage}
-          />
-        </ImageBackground>
-        <Icons.ProfilePicPlusIcon style={styles.plusIcon}/>
-      </TouchableOpacity>
-      )} 
+        <TouchableOpacity style={styles.parent} onPress={onChangeProfilePic}>
+          <ImageBackground
+            source={Images.ProfileImgGradient}
+            style={styles.imageBackground}
+          >
+            <Image
+              style={styles.addImage}
+              resizeMode="contain"
+              source={Images.ProfileImage}
+            />
+          </ImageBackground>
+          <Icons.ProfilePicPlusIcon style={styles.plusIcon} />
+        </TouchableOpacity>
+      )}
     </View>
   )
 }

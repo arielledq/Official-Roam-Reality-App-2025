@@ -23,6 +23,7 @@ import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
 import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
 import { getAllARSitesStars } from "../../../network";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 
 
 const GeoArSiteDetails = ({
@@ -41,6 +42,9 @@ const GeoArSiteDetails = ({
   const [starsCount, setStarsCount] = useState(0)
 
   const getAddress = () => {
+    if (selectedGeoSite.address_text != "") {
+      setAddress(selectedGeoSite.address_text)
+    }
     Geocoder.from({
       latitude: selectedGeoSite.lat_long.coordinates[1],
       longitude: selectedGeoSite.lat_long.coordinates[0],
@@ -66,8 +70,8 @@ const GeoArSiteDetails = ({
 
   const setStarCounts = () => {
     let count = 0;
-    for(const stars_site of selectedGeoARSiteStars){
-      if(stars_site.star_location && stars_site.star_location.coordinates){
+    for (const stars_site of selectedGeoARSiteStars) {
+      if (stars_site.star_location && stars_site.star_location.coordinates) {
         count += stars_site.star_location.coordinates.length;
       }
     }
@@ -133,6 +137,57 @@ const GeoArSiteDetails = ({
     )
   }
 
+  const getFullBounds = _ => {
+    if (selectedGeoSite.geo_site_border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const bounds = getBounds(arrayPoints)
+      return bounds;
+    } else {
+      return null
+    }
+  }
+
+  const getFullCenter = _ => {
+    if (selectedGeoSite.geo_site_border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const latitude_longitude = getCenterOfBounds(arrayPoints)
+      return latitude_longitude;
+    } else {
+      return null
+    }
+  }
+
+  const initialRegion = {
+    latitude: selectedGeoSite.lat_long.coordinates[1],
+    longitude: selectedGeoSite.lat_long.coordinates[0],
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  }
+  const full_latitude_longitude = getFullCenter();
+  const full_bounds = getFullBounds();
+  if (full_bounds) {
+    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
+  }
+  if (full_latitude_longitude) {
+    initialRegion.latitude = Number(full_latitude_longitude.latitude);
+    initialRegion.longitude = Number(full_latitude_longitude.longitude);
+  }
+
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -148,12 +203,7 @@ const GeoArSiteDetails = ({
           <MapView
             provider={PROVIDER_GOOGLE}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-            initialRegion={{
-              latitude: selectedGeoSite.lat_long.coordinates[1],
-              longitude: selectedGeoSite.lat_long.coordinates[0],
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            initialRegion={initialRegion}
           >
             <Marker
               coordinate={{
@@ -171,7 +221,7 @@ const GeoArSiteDetails = ({
 
         <View style={{ flexDirection: 'row', paddingVertical: 20, justifyContent: 'space-between', alignItems: 'center' }}>
           <Text style={_styles.site_d_header_text}>Site Details</Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.goBack()}>
             <CloseBIcon style={{ height: 32, width: 32 }} />
           </TouchableOpacity>
         </View>
@@ -199,7 +249,7 @@ const GeoArSiteDetails = ({
             </View>
             <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{anywhereARChallenges.length}</Text>
+              <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
           </View>
@@ -207,26 +257,26 @@ const GeoArSiteDetails = ({
             contentWidth={width}
             tagsStyles={{
               p: {
-                ...fontGroup.ns400,
+                ...fontGroup.ns500,
                 lineHeight: 19.1,
-                color: '#9CA3AF',
-                fontSize: FontSizes.S10
+                color: '#fff',
+                fontSize: FontSizes.S12
               },
               strong: {
-                ...fontGroup.ns400,
+                ...fontGroup.ns500,
                 lineHeight: 19.1,
                 color: '#fff',
                 fontSize: FontSizes.S14
               },
               span: {
-                ...fontGroup.ns400,
+                ...fontGroup.ns500,
                 lineHeight: 19.1,
                 color: '#fff',
-                fontSize: FontSizes.S10
+                fontSize: FontSizes.S12
               }
             }}
             source={{
-              html: `${selectedGeoSite?.description?.toString().replaceAll("#000000", "#C8DFFF")}`
+              html: `${selectedGeoSite?.description?.toString().replaceAll("#000000", "#fff")}`
             }}
           />
           <View style={{ justifyContent: 'space-between', flexDirection: 'row', alignItems: 'center' }}>
@@ -238,8 +288,9 @@ const GeoArSiteDetails = ({
               <AppButton
                 onPress={() => navigation.navigate("GeoArSiteRoutes")}
                 buttonStyle={_styles.buttonStyle}
+                titleStyle={{fontWeight:'bold'}}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Lets Roam"}
+                title={"Let's Roam"}
                 loading={isLoading}
               />
             </View>

@@ -74,7 +74,7 @@ const ContactUs = ({ navigation }) => {
     <BackgroundWithImage>
       <AppHeader title={"Contact Us"} backgroundColor="transparent" />
       <KeyboardAwareScrollView
-        keyboardShouldPersistTaps="always"
+        keyboardShouldPersistTaps="handled"
         nestedScrollEnabled
         contentContainerStyle={_styles.scroll}
         enableOnAndroid={true}
@@ -152,10 +152,12 @@ const ContactUs = ({ navigation }) => {
                   onFocus={() => setMessageInputFocused(true)}
                   onBlur={() => setMessageInputFocused(false)}
                   placeholder="Write your message here"
-                  onSubmitEditing={Keyboard.dismiss}
+                  onSubmitEditing={() => Keyboard.dismiss()}
+                  returnKeyType="done"
+                  returnKeyLabel="Done"
                   placeholderTextColor={
                     (touched.message && errors?.message) ||
-                    isMessageInputFocused
+                      isMessageInputFocused
                       ? theme.darkColors?.white
                       : theme.darkColors?.grey
                   }

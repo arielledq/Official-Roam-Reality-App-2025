@@ -20,11 +20,14 @@ import {
   ViroAmbientLight,
   ViroDirectionalLight,
   ViroSpotLight,
-  ViroText
+  ViroText,
+  ViroNode,
+  ViroCamera,
+  ViroARCamera
 } from '@viro-community/react-viro';
 import RNFetchBlob from 'rn-fetch-blob';
 const Sound = require('react-native-sound');
-import uuid from 'react-native-uuid';
+const RNFS = require('react-native-fs');
 import { unzip } from 'react-native-zip-archive'
 
 const { config, fs } = RNFetchBlob;
@@ -33,13 +36,16 @@ import useStyles from "./styles"
 import { useNavigation } from "@react-navigation/native";
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import Geolocation from 'react-native-geolocation-service';
-import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, getLocationDistance, hasLocationPermission, isLocationPointInPolygon, isLocationPointWithinRadius, orderByDistanceLocationPoint } from "../../../util/LocationLib";
+import { convertMetersToFeets, findNearestLocationPoint, getCloseLocationDistance, hasLocationPermission, isLocationPointWithinRadius, orderByDistanceLocationPoint, transformGpsToAR } from "../../../util/LocationLib";
 import { Image } from "react-native";
 import RenderHTML from "react-native-render-html";
 import { AppButton } from "../../../components";
 const { width } = Dimensions.get('window');
 import { FontSizes } from "../../../util/FontUtils"
-import { getAllCollectedStars, starFoundAndSaveApi } from "../../../network";
+import { getAllCollectedStars, starFoundAndSaveApi, updateUserPointAPI } from "../../../network";
+import CompassHeading from 'react-native-compass-heading';
+import TravelDataPopUp from "../traveldatapopup";
+import ArStarChallengeShare from "../starshare";
 
 const StarChallenge = ({
 
@@ -52,11 +58,15 @@ const StarChallenge = ({
   const navigation = useNavigation()
 
   const ARScreen = (props) => {
+    const funFactCallback = props?.arSceneNavigator.viroAppProps.funFactCallback
+    const [allStarsObj, setAllStarsObj] = useState(props?.arSceneNavigator.viroAppProps.allStarsObj)
     const [challengeObj, setChallengeObj] = useState(props?.arSceneNavigator.viroAppProps.challengeObj)
+    const [currentLocation, setCurrentLocation] = useState(props?.arSceneNavigator.viroAppProps.currentLocation)
+    const [nearestPoint, setNearestPoint] = useState(props?.arSceneNavigator.viroAppProps.nearestPoint)
+    const [compassHeading, setCompassHeading] = useState(props?.arSceneNavigator.viroAppProps.compassHeading)
     const [challengeObjParameters, setChallengeObjParameters] = useState(challengeObj?.parameters)
     const [modelFile, setModelFile] = useState(challengeObj?.model_file)
     const [starShouldVisible, setStarShouldVisible] = useState(props.arSceneNavigator.viroAppProps.starShouldVisible)
-    const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
     const [scale, setScale] = useState([challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
@@ -73,7 +83,7 @@ const StarChallenge = ({
       }
     }
 
-    const downloadModelFile = (sourcePath, targetPath) => {
+    const downloadModelFile = (sourcePath, targetPath, callBack) => {
       config({
         fileCache: true,
         path: sourcePath,
@@ -85,14 +95,14 @@ const StarChallenge = ({
         })
         .then((res) => {// the temp file path
           console.log('The file saved to ', res.path());
-          unzipModelFile(res.path(), targetPath)
+          unzipModelFile(res.path(), targetPath, callBack)
         })
         .catch((error) => {
           console.error(error)
         });
     }
 
-    const unzipModelFile = (sourcePath, targetPath) => {
+    const unzipModelFile = (sourcePath, targetPath, callBack) => {
       const charset = 'UTF-8'
       unzip(sourcePath, targetPath, charset)
         .then((path) => {
@@ -106,7 +116,8 @@ const StarChallenge = ({
                   console.log("unzipModelFile", result[i].name)
                   if (result[i].name.includes(".vrx")) {
                     const vrxFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    setModelPath(vrxFile)
+                    console.log("unzipModelFile", vrxFile)
+                    callBack(vrxFile)
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
                     sourcesArray.push(sourceFile)
@@ -122,11 +133,10 @@ const StarChallenge = ({
         .catch((error) => {
           console.error(error)
           setLoading(true)
-          downloadModelFile(sourcePath, targetPath)
         })
     }
 
-    const checkIfModelExist = () => {
+    const checkIfModelExist = (modelFile, callBack) => {
       let filename = modelFile.split('/').pop()
       filename = filename.split('?')[0];
       withoutExtFilename = filename.split('.')[0];
@@ -137,9 +147,9 @@ const StarChallenge = ({
           console.log("exists:", exists)
           if (exists) {
             console.log('File exists');
-            unzipModelFile(sourcePath, targetPath)
+            unzipModelFile(sourcePath, targetPath, callBack)
           } else {
-            downloadModelFile(sourcePath, targetPath)
+            downloadModelFile(sourcePath, targetPath, callBack)
           }
         })
         .catch((error) => {
@@ -148,9 +158,20 @@ const StarChallenge = ({
     }
 
     useEffect(() => {
-      console.log("AR Scene useEffect:", starShouldVisible)
       setStarShouldVisible(props.arSceneNavigator.viroAppProps.starShouldVisible)
     }, [props.arSceneNavigator.viroAppProps.starShouldVisible]);
+
+    useEffect(() => {
+      setCurrentLocation(props.arSceneNavigator.viroAppProps.currentLocation)
+    }, [props.arSceneNavigator.viroAppProps.currentLocation]);
+
+    useEffect(() => {
+      setNearestPoint(props.arSceneNavigator.viroAppProps.nearestPoint)
+    }, [props.arSceneNavigator.viroAppProps?.nearestPoint]);
+
+    useEffect(() => {
+      setCompassHeading(props.arSceneNavigator.viroAppProps.compassHeading)
+    }, [props.arSceneNavigator.viroAppProps?.compassHeading]);
 
     useEffect(() => {
       setChallengeObj(props?.arSceneNavigator.viroAppProps.challengeObj)
@@ -161,12 +182,21 @@ const StarChallenge = ({
     useEffect(() => {
       if (challengeObj?.challenge_choice == "3DMODEL") {
         setLoading(true)
-        checkIfModelExist()
+        for (let i = 0; i < allStarsObj.length; i++) {
+          let starsObj = allStarsObj[i]
+          const challengeObj = starsObj?.challenges
+          checkIfModelExist(challengeObj?.model_file, (modelPath) => {
+            const newStarObj = Object.assign({ modelPath: modelPath }, starsObj);
+            delete allStarsObj[i]
+            const newArrayStars = [...allStarsObj, newStarObj]
+            console.log(newArrayStars)
+            setAllStarsObj(newArrayStars)
+          })
+        }
       }
     }, []);
 
     const _onRotate = (rotateState, rotationFactor, source) => {
-      console.log("_onRotate rotateState", rotateState)
       if (rotateState == 3) {
         const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
         setRotate(rotation)
@@ -180,8 +210,10 @@ const StarChallenge = ({
     }
 
     const _onPinch = (pinchState, scaleFactor, source) => {
-      console.log("_onPinch scaleFactor", scaleFactor)
       if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
+        return;
+      }
+      if ((scale[0] * scaleFactor) >= challengeObjParameters?.max_pinch_scale) {
         return;
       }
       let newScale = [
@@ -198,14 +230,11 @@ const StarChallenge = ({
 
     return (
       <ViroARScene onTrackingUpdated={onInitialized}>
-
         <ViroAmbientLight color="#FFFFFF" intensity={250} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
-        {
-          challengeObjParameters?.bloom &&
-          <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
-        }
+        <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
+
         <ViroSpotLight
           innerAngle={5}
           outerAngle={90}
@@ -213,54 +242,95 @@ const StarChallenge = ({
           position={[0, -7, 0]}
           color="#ffffff"
           intensity={250} />
-
-        {loading && starShouldVisible &&
-          <ViroText
-            text={`${progress}% Loading Challenge Completed`}
-            color="#ff0000"
-            width={2}
-            height={2}
-            style={styles.loadingText}
-            position={[0, 0, -5]}
-          />
-        }
-
         {
-          challengeObj?.challenge_choice == "3DMODEL" && modelPath && starShouldVisible &&
-          <Viro3DObject
-            key="obj_3d1"
-            source={{ uri: modelPath }} /// this works
-            position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-            challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
-            challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
-            scale={scale}
-            type="VRX"
-            opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
-            materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
-            rotation={rotate}
-            onRotate={challengeObjParameters?.rotation ? _onRotate : null}
-            chromaKeyFilteringColor={"transparent"}
-            onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
-            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            animation={{
-              name: 'Take 001',
-              run: true,
-              loop: challengeObjParameters?.loop_animations ? true : false,
-              delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000
-            }}
-          />
+          allStarsObj.map(starObjE => {
+            const challengeObj = starObjE?.challenges;
+            const challengeObjParameters = challengeObj?.parameters;
+            const modelPath = starObjE?.modelPath;
+            const scale = [challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+            challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
+            challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05]
+
+            for (j = 0; j < starObjE.star_location.coordinates.length; j++) {
+              const point = starObjE.star_location.coordinates[j]
+              const starPoint = { latitude: point[1], longitude: point[0] }
+              const starShouldVisibleNow = isLocationPointWithinRadius(currentLocation, starPoint, Number(starObjE?.visibility_radius))
+              const coords = transformGpsToAR(currentLocation, starPoint, compassHeading);
+              const newScale = Math.abs(Math.round(coords.z / 15));
+              if (modelPath && challengeObj?.challenge_choice == "3DMODEL" && starShouldVisibleNow) {
+                ViroMaterials.createMaterials({
+                  grid: {
+                    lightingModel: "Lambert",
+                    shininess: .6,
+                  },
+                  mat: {
+                    shininess: .6,
+                    blendMode: "Add",
+                    lightingModel: "Lambert",
+                    bloomThreshold: challengeObjParameters ? Number(challengeObjParameters?.bloom_threshold) : 0.5,
+                    diffuseColor: challengeObjParameters ? challengeObjParameters?.diffuse_text_color : "#fff",
+                    diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
+                  },
+                });
+                console.log("Showed star")
+                return (
+                  <ViroNode key={starObjE.id}
+                    scale={[isNaN(newScale) ? scale : newScale, isNaN(newScale) ? scale : newScale, isNaN(newScale) ? scale : newScale]}
+                    rotation={[0, 0, 0]} position={[isNaN(coords.x) ? 0 : coords.x, -5, isNaN(coords.z) ? 0 : coords.z]} >
+                    <Viro3DObject
+                      key="obj_3d1"
+                      onClick={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
+                      onPress={() => { console.log("Viro3DObject OnPress"); funFactCallback(starObjE) }}
+                      source={{ uri: modelPath }} /// this works
+                      scale={[newScale, newScale, newScale]}
+                      position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+                      challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
+                      challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
+                      type="VRX"
+                      opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
+                      materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
+                      rotation={rotate}
+                      onRotate={challengeObjParameters?.rotation ? _onRotate : null}
+                      chromaKeyFilteringColor={"transparent"}
+                      onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
+                      animation={{
+                        name: 'Take 001',
+                        run: true,
+                        loop: challengeObjParameters?.loop_animations ? true : false,
+                        delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000
+                      }}
+                    />
+                  </ViroNode>
+                )
+              } else if (challengeObj?.challenge_choice == "IMAGE" && starShouldVisibleNow) {
+                return (
+                  <ViroImage
+                    height={1}
+                    width={1}
+                    onClick={() => { console.log("ViroImage OnPress"); funFactCallback(starObjE) }}
+                    onPress={() => { console.log("ViroImage OnPress"); funFactCallback(starObjE) }}
+                    opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
+                    onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
+                    source={{ uri: challengeObj.image }}
+                    position={[isNaN(coords.x) ? 0 : coords.x, -5, isNaN(coords.z) ? 0 : coords.z]} />
+                )
+              } else if (loading && starShouldVisible) {
+                return (
+                  <ViroText
+                    text={`${progress}% Loading Star`}
+                    color="#ff0000"
+                    width={2}
+                    height={2}
+                    style={_styles.loadingText}
+                    position={[isNaN(coords.x) ? 0 : coords.x, -5, isNaN(coords.z) ? 0 : coords.z]}
+                  />
+                )
+              }
+
+            }
+          })
         }
-
-        {challengeObj?.challenge_choice == "IMAGE" && starShouldVisible && <ViroImage
-          height={1}
-          width={1}
-          opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
-          onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-          source={{ uri: challengeObj.image }}
-          position={[challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-          challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
-          challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5]} />}
-
+        <TravelDataPopUp currentLocation={currentLocation} />
       </ViroARScene>
     );
   };
@@ -271,18 +341,27 @@ const StarChallenge = ({
       capturedImage: null,
       capturedVideo: null,
       detailsShow: true,
+      factsShow: false,
       challengeInformationView: false,
       distanceInFeet: 0,
       starShouldVisible: false,
       challengeObj: selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {},
       collectedStars: [],
-      starsCount: 0
+      starsCount: 0,
+      starObj: selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0] : {},
+      nearestPoint: { latitude: 0, longitude: 0 },
+      currentLocation: { latitude: 0, longitude: 0 },
+      compassHeading: 0,
+      allStarsCollected: false
     }
 
     constructor() {
       super();
       this._setARNavigatorRef = this._setARNavigatorRef.bind(this);
       this.checkPermission = this.checkPermission.bind(this);
+      this.openFunFacts = this.openFunFacts.bind(this)
+      this.getLocation = this.getLocation.bind(this)
+      this.getLocationUpdates = this.getLocationUpdates.bind(this)
     }
 
     setStarCounts = () => {
@@ -311,6 +390,9 @@ const StarChallenge = ({
       Geolocation.getCurrentPosition(
         position => {
           this.findNearPoint(position)
+          this.setState({
+            currentLocation: position.coords
+          })
         },
         error => {
           console.log(error);
@@ -353,43 +435,70 @@ const StarChallenge = ({
           }
         }
       }
-      const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
-      const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
-      const distance = getCloseLocationDistance(position.coords, neareastPoint)
-      const starShouldVisibleNow = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
-      console.log("distance", distance)
-      console.log("starShouldVisibleNow", starShouldVisibleNow)
-      if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
-        this.state.collectedStars.push(neareastPoint)
-        this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
+      try {
+        if (arrayPoints.length > 0) {
+          const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
+          const neareastPoint = findNearestLocationPoint(position.coords, nearestPoints);
+          const distance = getCloseLocationDistance(position.coords, neareastPoint)
+          const starShouldVisibleNow = isLocationPointWithinRadius(position.coords, neareastPoint, Number(neareastPoint.starObj.visibility_radius))
+          if (starShouldVisibleNow && !this.isStarIsCollected(neareastPoint)) {
+            this.state.collectedStars.push(neareastPoint)
+            this.saveCollectedStar(neareastPoint, neareastPoint.starObj)
+            this.updateUserPoint(neareastPoint.starObj)
+          }
+          if (neareastPoint.latitude == this.state.nearestPoint?.latitude && neareastPoint.longitude == this.state.nearestPoint?.longitude) {
+            this.setState({
+              distanceInFeet: convertMetersToFeets(distance),
+              currentLocation: position.coords
+            })
+            return
+          }
+          this.setState({
+            distanceInFeet: convertMetersToFeets(distance),
+            starShouldVisible: starShouldVisibleNow,
+            challengeObj: neareastPoint.starObj?.challenges,
+            collectedStars: this.state.collectedStars,
+            starObj: neareastPoint.starObj,
+            nearestPoint: neareastPoint,
+            currentLocation: position.coords
+          })
+        } else {
+          this.setState({
+            allStarsCollected: true
+          })
+        }
+      } catch (e) {
+        console.log(e)
       }
-      this.setState({
-        distanceInFeet: convertMetersToFeets(distance),
-        starShouldVisible: starShouldVisibleNow,
-        challengeObj: neareastPoint.starObj?.challenges,
-        collectedStars: this.state.collectedStars
-      })
     }
 
     getCollectedStar = () => {
       getAllCollectedStars({
         geo_site: selectedGeoSite.id,
       }).then((res) => {
-        console.log("getCollectedStar::", res)
         if (res.status == 1) {
           const stars = res.data;
           const collectedStarsFromAPI = [];
           for (var i = 0; i < stars.length; i++) {
             const s = stars[i]
-            collectedStars.push({
+            collectedStarsFromAPI.push({
               latitude: s.point.coordinates[1],
               longitude: s.point.coordinates[0],
             })
           }
           const finalCollectedStars = [...collectedStarsFromAPI, ...this.state.collectedStars]
-          console.log("getAllCollectedStars",finalCollectedStars)
           this.setState({ collectedStars: finalCollectedStars })
+          this.getLocation()
+          this.getLocationUpdates()
         }
+      }).finally(() => {
+      })
+    }
+
+    updateUserPoint = (starObj) => {
+      updateUserPointAPI({
+        points: starObj?.challenges?.points
+      }).then((res) => {
       }).finally(() => {
       })
     }
@@ -399,9 +508,9 @@ const StarChallenge = ({
         geo_site: selectedGeoSite.id,
         geo_ar_star: starObj.id,
         latitude: point.latitude,
-        longitude: point.longitude
+        longitude: point.longitude,
+        name: new Date().toISOString()
       }).then((res) => {
-        console.log("saveCollectedStar::", res)
       }).finally(() => {
       })
     }
@@ -414,6 +523,9 @@ const StarChallenge = ({
       this.watchId = Geolocation.watchPosition(
         position => {
           this.findNearPoint(position)
+          this.setState({
+            currentLocation: position.coords
+          })
         },
         error => {
           console.log(error);
@@ -436,14 +548,24 @@ const StarChallenge = ({
 
     componentDidMount() {
       this.checkPermission()
-      this.getLocation()
-      this.getLocationUpdates()
-      this.setStarCounts()
       this.getCollectedStar()
+      this.setStarCounts()
+      this.CompassHeadingStart()
+    }
+
+    CompassHeadingStart() {
+      CompassHeading.start(3, (heading) => {
+        //this.setState({ compassHeading: heading });
+      });
     }
 
     componentWillUnmount() {
       this.stopLocationUpdates();
+      CompassHeading.stop();
+    }
+
+    navigateToShare(starObjE) {
+      navigation.navigate("ArStarChallengeShare", { challengeObj: this.state.challengeObj, starObj: starObjE })
     }
 
     _setARNavigatorRef(ARNavigator) {
@@ -525,6 +647,10 @@ const StarChallenge = ({
       )
     }
 
+    openFunFacts = (starObjE) => {
+      this.setState({ factsShow: true, starObjE })
+    }
+
     render() {
       return (
         <View style={{ flex: 1 }}>
@@ -562,7 +688,7 @@ const StarChallenge = ({
                 </View>
               </View>
               <View style={{
-                flex: 1, marginVertical: 20
+                flex: 1, marginVertical: 20, overflow: 'hidden', borderRadius: 16
               }}>
                 <View style={_styles.ARMainContainer}>
                   <ViroARSceneNavigator
@@ -575,7 +701,13 @@ const StarChallenge = ({
                     viroAppProps={
                       {
                         starShouldVisible: this.state.starShouldVisible,
-                        challengeObj: this.state.challengeObj
+                        challengeObj: this.state.challengeObj,
+                        starsObj: this.state.starObj,
+                        funFactCallback: this.openFunFacts,
+                        nearestPoint: this.state.nearestPoint,
+                        compassHeading: this.state.compassHeading,
+                        currentLocation: this.state.currentLocation,
+                        allStarsObj: selectedGeoARSiteStars
                       }
                     }
                     initialScene={{
@@ -595,11 +727,16 @@ const StarChallenge = ({
                 alignItems: 'center'
               }}>
                 <View style={{ width: '100%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 15 }}>
-                  <View style={{ flexDirection: 'row' }}>
+                  <View style={{ flexDirection: 'row', flex: 1 }}>
                     <MenIcon style={{ width: 40, height: 40 }} />
-                    <View>
+                    <View style={{ flex: 1 }}>
                       <Text style={_styles.exploringText}>Nearest Star</Text>
-                      <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                      {
+                        this.state.allStarsCollected ?
+                          <Text style={_styles.arrivedText}>{"You have found all the stars!"}</Text>
+                          :
+                          <Text style={_styles.arrivedText}>{this.state.starShouldVisible ? "You found a star!" : `${this.state.distanceInFeet} feet away`}</Text>
+                      }
                     </View>
                   </View>
                   <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center' }}>
@@ -617,6 +754,14 @@ const StarChallenge = ({
             </View>
           </BackgroundWithImage >
           {this.state.detailsShow && this.InfoView()}
+          {this.state.factsShow && <View style={{
+            top: 0, bottom: 0, left: 0, right: 0, position: 'absolute'
+          }}>
+            <ArStarChallengeShare
+              closeCallBack={() => { this.setState({ factsShow: false }) }}
+              challengeObj={this.state.challengeObj}
+              starObj={this.state.starObjE} />
+          </View>}
         </View >
       )
     }
@@ -626,20 +771,5 @@ const StarChallenge = ({
     <ViroARNavigator />
   )
 }
-
-
-ViroMaterials.createMaterials({
-  grid: {
-    lightingModel: "Lambert",
-    shininess: .6,
-  },
-  mat: {
-    shininess: .6,
-    blendMode: "Add",
-    lightingModel: "Lambert",
-    bloomThreshold: 0.5,
-    diffuseColor: "#fff"
-  },
-});
 
 export default StarChallenge

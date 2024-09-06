@@ -1,6 +1,7 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
+import { Platform } from "react-native"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -28,7 +29,8 @@ const useStyles = makeStyles(theme => ({
     position: 'relative',
     backgroundColor: '#000',
     overflow: 'hidden', 
-    borderRadius: 16
+    borderRadius: 16,
+    marginTop: Platform.OS == 'ios' ? -205 : 0
   },
   f1: {
     bottom: 0,
@@ -182,7 +184,8 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     lineHeight: 13.64,
-    marginVertical: 4
+    marginVertical: 4,
+    width:'100%'
   },
   infoText: {
     ...fontGroup.ns400,

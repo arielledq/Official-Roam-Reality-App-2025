@@ -7031,6 +7031,11 @@ memoize-one@^5.0.0:
   resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.2.1.tgz#8337aa3c4335581839ec01c3d594090cebe8f00e"
   integrity sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==
 
+mercator-projection@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/mercator-projection/-/mercator-projection-0.0.2.tgz#6195ec2d6e154d066020eef9626d7d79d5db0d3d"
+  integrity sha512-KMQP7YvOLigbDFxU+LMtR4+BUXZs/q4WnLbNByeMuCLKfoevG+YLnogHt1ihD2TPf8U+lGdCMr+vfdAph2B0Ug==
+
 merge-descriptors@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
@@ -8312,6 +8317,11 @@ react-native-codegen@^0.71.5:
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
 
+react-native-compass-heading@^1.5.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-native-compass-heading/-/react-native-compass-heading-1.5.0.tgz#88c8de29b9b249cc6c371014194ee63d5ef80b5b"
+  integrity sha512-FQwQYyjH2eZttM90HS2LGuxSC+cRDdRHfenC1o1qmLmGniDlr+sxUMw++5zke6LunaRualv6P2yakFDOj+5TUA==
+
 react-native-contacts@^7.0.8:
   version "7.0.8"
   resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-7.0.8.tgz#485ba7a77653b30205c76f96494808d07b8e57b9"
@@ -8569,10 +8579,10 @@ react-native-safe-area-context@^4.5.2:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-4.5.3.tgz#e98eb1a73a6b3846d296545fe74760754dbaaa69"
   integrity sha512-ihYeGDEBSkYH+1aWnadNhVtclhppVgd/c0tm4mj0+HV11FoiWJ8N6ocnnZnRLvM5Fxc+hUqxR9bm5AXU3rXiyA==
 
-react-native-screens@^3.20.0:
-  version "3.20.0"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.20.0.tgz#4d154177395e5541387d9a05bc2e12e54d2fb5b1"
-  integrity sha512-joWUKWAVHxymP3mL9gYApFHAsbd9L6ZcmpoZa6Sl3W/82bvvNVMqcfP7MeNqVCg73qZ8yL4fW+J/syusHleUgg==
+react-native-screens@^3.32.0:
+  version "3.32.0"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-3.32.0.tgz#47c3d2efc9cd5ed18af41b34efc8b46df05b87b4"
+  integrity sha512-wybqZAHX7v8ipOXhh90CqGLkBHw5JYqKNRBX7R/b0c2WQisTOgu0M0yGwBMM6LyXRBT+4k3NTGHdDbpJVpq0yQ==
   dependencies:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
@@ -8674,10 +8684,10 @@ react-native-web@^0.18.10:
     postcss-value-parser "^4.2.0"
     styleq "^0.1.2"
 
-react-native-webview@^13.8.1:
-  version "13.8.1"
-  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-13.8.1.tgz#d0058c063e38241476049aaab2e5cc9f254d5480"
-  integrity sha512-7Jqm1WzWJrOWraBAXQfKtr/Uo5Jw/IJHzC40jYLwgV/eVGmLJ9BpGKw6QVw7wpRkjmTZ2Typ4B1aHJLJJQFslA==
+react-native-webview@^13.10.5:
+  version "13.10.5"
+  resolved "https://registry.yarnpkg.com/react-native-webview/-/react-native-webview-13.10.5.tgz#d6d2238b12dd295765eb5d4fdbb34759ffd1df27"
+  integrity sha512-ZfQJHyifuZop8cQB8HYpL9dxss9Cw9sOlMU+/yarfG/ugoL0rky/0tq9QmEydFMXjDSplSUb22OrRdFlqfXe0g==
   dependencies:
     escape-string-regexp "2.0.0"
     invariant "2.2.4"

@@ -24,7 +24,7 @@ import Images from "../../assets/images"
 import MemoryContainer from "../../components/memoryContainer"
 import Icon from "../../components/Icon"
 import LinearGradient from "react-native-linear-gradient"
-import { getARProfile, getProfieARMemoriesAPI, getProfieDetails, sendCode } from "../../network"
+import { getARProfile, getCountryCount, getProfieARMemoriesAPI, getProfieDetails, getUserCollectedStarCount, getUserRankCount, sendCode } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import FastImage from 'react-native-fast-image'
@@ -45,6 +45,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const arProfile = useSelector(state => state.ar?.arProfile)
   const [isProfileUpdated, setIsProfileUpdated] = useState(false)
   const [isTransitioning, setIsTransitioning] = useState(true)
+  const [starsCount, setStarsCount] = useState(0)
+  const [countryCount, setCountryCount] = useState(0)
+  const [globalRank, setGlobalRank] = useState(0)
 
   const fetchProfileDetails = async () => {
     try {
@@ -75,6 +78,50 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     })
   }
 
+  const getUserCollectedStar = async () => {
+    getUserCollectedStarCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getUserCollectedStarCount:", res)
+      if(res.status == 1){
+        setStarsCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
+  const getRank = async () => {
+    getUserRankCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getRank:", res)
+      if(res.status == 1){
+        setGlobalRank(res.rank)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
+
+  const getCountry = async () => {
+    getCountryCount({
+      user_id: userProfile.id
+    }).then(res => {
+      console.log("getCountry:", res)
+      if(res.status == 1){
+        setCountryCount(res.count)
+      }
+    }
+    ).catch(err => {
+      console.error('Error', "Error fetching ar memories: ")
+    }
+    ).finally(() => setloading(false))
+  }
 
   const getProfieARMemories = async () => {
     try {
@@ -101,6 +148,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       }, 500)
       getProfieARMemories()
       fetchARUserProfile()
+      getUserCollectedStar()
+      getRank()
+      getCountry()
     }, [])
   )
 
@@ -126,14 +176,14 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }
 
   const data = [
-    { id: 1, value: 0, property: "Sites Visited" },
-    { id: 2, value: 0, property: "Stars" },
+    { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
+    { id: 2, value: starsCount, property: "Stars" },
     { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
     { id: 4, value: 0, property: "Friends" },
     { id: 5, value: 0, property: "Credits" },
     { id: 6, value: 0, property: "Tokens" },
     { id: 7, value: 0, property: "Rallies" },
-    { id: 8, value: 0, property: "Countries" },
+    { id: 8, value: countryCount, property: "Countries" },
 
   ]
   // Split the data into chunks of 3 for each row
@@ -151,15 +201,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       style={_styles.header}
     >
       {profileDetails?.image ?
-        <View style={_styles.avatarContainer}>
-          <FastImage
-            style={{
-              width: '100%',
-              height: height * 0.5,
-            }}
-            source={{ uri: profileDetails?.image }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
+        <View style={[_styles.avatarContainer]}>
           <LinearGradient
             colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
             start={{ x: 0.5, y: 1 }}
@@ -173,6 +215,16 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
               zIndex: 1
             }}
           />
+          <FastImage
+            style={{
+              width: '100%',
+              marginTop: 80, backgroundColor: 'red',
+              aspectRatio: 1
+            }}
+            source={{ uri: profileDetails?.image }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+
           <AppButton
             customColors={["#7B16FF", "#1158F4"]}
             buttonStyle={_styles.editButton}
@@ -213,10 +265,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <AppText
             adjustsFontSizeToFit={true}
             numberOfLines={1}
+            onPress={() => navigation.navigate("ScoreBoard")}
             style={_styles.scoreboard}>SCOREBOARD</AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"0"} property={"Global Rank"} />
+          <StatContainer value={""+globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
@@ -251,8 +304,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       </View>
     </View>
   )
-
-  console.log({ profileDetails })
 
   const renderItem = ({ item }) => (
     <BoxStatContainer

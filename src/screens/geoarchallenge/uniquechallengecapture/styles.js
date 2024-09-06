@@ -3,6 +3,7 @@ import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
 import { Dimensions } from "react-native";
 let ScreenHeight = Dimensions.get("window").height;
+let ScreenWidth = Dimensions.get("window").width;
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -10,11 +11,14 @@ let ScreenHeight = Dimensions.get("window").height;
  */
 
 const useStyles = makeStyles(theme => ({
+
   mainContainer: {
-    flex:1,
+    flex: 1,
     width: '100%',
     position: 'relative',
-    backgroundColor:'#000'
+    backgroundColor: "#0F1424",
+    zIndex: 1000
+
   },
   heading: {
     fontSize: FontSizes.S14,
@@ -22,22 +26,32 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     color: theme.colors.white,
     marginTop: 5,
-    textAlign:'center'
+    textAlign: 'center'
   },
   mainHeaderContainer: {
     paddingHorizontal: screenHorizontalPadding,
-    marginTop:20,
-    position: 'absolute',
-    top: -20
+    marginTop: 20,
+    top: -20,
+    backgroundColor: '#202136',
+    zIndex: 1000,
+  },
+  mainHeaderContainerIOS: {
+    height: 120,
+  },
+  detailsViewContainer: {
+    paddingHorizontal: screenHorizontalPadding,
+    marginTop: -20,
+    backgroundColor: "#0F1424",
+    paddingVertical: 20,
+    zIndex: 1000
   },
   container: {
     marginTop: "10%"
   },
   f1: {
-    height: ScreenHeight,
-    width: '100%',
-    position:'absolute',
-    top:0
+    position: "relative",
+    marginHorizontal: screenHorizontalPadding,
+    height: (ScreenWidth * 1.2)
   },
   bottomContainer: {
     width: '100%',
@@ -46,10 +60,8 @@ const useStyles = makeStyles(theme => ({
     borderTopEndRadius: 20,
     borderTopStartRadius: 20,
     alignItems: 'center',
-    position: 'absolute',
-    bottom: 0,
     flexDirection: 'row',
-    paddingHorizontal: 10,
+    paddingHorizontal: 10
   },
   bottomButtonContainer:
   {
@@ -123,16 +135,12 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
   },
   holdTextContainer: {
-    top: -50,
-    position: 'absolute',
-    padding: 5,
     backgroundColor: "#090A1620",
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 4,
-    left:0,
-    marginHorizontal:20,
-    right:0
+    marginVertical: 20,
+    height: 25,
   },
   holdText: {
     ...fontGroup.p600,
@@ -199,6 +207,21 @@ const useStyles = makeStyles(theme => ({
   contentContainer: {
     flex: 1,
     alignItems: 'center',
+  },
+
+  imageVideoView: {
+    width: '100%',
+    flex: 1,
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    position: 'absolute',
+    backgroundColor: '#fff'
+  },
+  navigatorView: {
+    width: '100%',
+    flex: 1,
   },
 }))
 

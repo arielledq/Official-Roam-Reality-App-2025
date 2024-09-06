@@ -20,6 +20,7 @@ import MapViewDirections from 'react-native-maps-directions';
 import GetLocation from "react-native-get-location";
 import { convertKilometersToMiles } from "../../../util/helpers";
 import Strings from "../../../constants/Strings";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 
 
 const GeoArSiteRoutes = ({
@@ -34,6 +35,8 @@ const GeoArSiteRoutes = ({
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
+  const [walkMileDistance, setWalkMileDistance] = useState(0)
+  const [walkDurationMins, setWalkDurationMins] = useState(0)
   const [routes, setRoutes] = useState(0)
 
   const getCurrentLocation = () => {
@@ -57,8 +60,71 @@ const GeoArSiteRoutes = ({
     getCurrentLocation()
   }, []);
 
-  return (
+  const getFullBounds = _ => {
+    if (selectedGeoSite.geo_site_border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const bounds = getBounds(arrayPoints)
+      return bounds;
+    } else {
+      return null
+    }
+  }
 
+  const getFullCenter = _ => {
+    if (selectedGeoSite.geo_site_border) {
+      let arrayPoints = []
+      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
+        for (j = 0; j < points.length; j++) {
+          const point = points[j]
+          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        }
+      }
+      const latitude_longitude = getCenterOfBounds(arrayPoints)
+      return latitude_longitude;
+    } else {
+      return null
+    }
+  }
+
+  const initialRegion = {
+    latitude: selectedGeoSite.lat_long.coordinates[1],
+    longitude: selectedGeoSite.lat_long.coordinates[0],
+    latitudeDelta: 0.0922,
+    longitudeDelta: 0.0421,
+  }
+  const full_latitude_longitude = getFullCenter();
+  const full_bounds = getFullBounds();
+  if (full_bounds) {
+    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
+  }
+  if (full_latitude_longitude) {
+    initialRegion.latitude = Number(full_latitude_longitude.latitude);
+    initialRegion.longitude = Number(full_latitude_longitude.longitude);
+  }
+
+  const minOrHoursWalkDriving = (walkDurationMins, mode) => {
+    if (walkDurationMins < 60) {
+      return (
+        <>{Math.round(walkDurationMins)} <Text style={{ fontSize: 10 }}>mins ({mode})</Text></>
+      )
+    } else if (walkDurationMins >= 60) {
+      var hours = Math.floor(walkDurationMins / 60);
+      return (
+        <>{Math.round(hours)} <Text style={{ fontSize: 10 }}>hours ({mode})</Text></>
+      )
+    }
+  }
+
+  return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
@@ -73,12 +139,7 @@ const GeoArSiteRoutes = ({
             provider={PROVIDER_GOOGLE}
             ref={mapView}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
-            initialRegion={{
-              latitude: selectedGeoSite.lat_long.coordinates[1],
-              longitude: selectedGeoSite.lat_long.coordinates[0],
-              latitudeDelta: 0.0922,
-              longitudeDelta: 0.0421,
-            }}
+            initialRegion={initialRegion}
           >
             <Marker
               coordinate={{
@@ -132,18 +193,43 @@ const GeoArSiteRoutes = ({
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   setRoutes(1)
-
-                  // mapView.fitToCoordinates(result.coordinates, {
-                  //   edgePadding: {
-                  //     right: (width / 20),
-                  //     bottom: (height / 20),
-                  //     left: (width / 20),
-                  //     top: (height / 20),
-                  //   }
-                  // });
                 }}
                 onError={(errorMessage) => {
-                  console.log('GOT AN ERROR',errorMessage);
+                  console.log('GOT AN ERROR', errorMessage);
+                  setRoutes(0)
+                }}
+              />
+            }
+            {currentLocation &&
+              <MapViewDirections
+                origin={{
+                  latitude: currentLocation.latitude,
+                  longitude: currentLocation.longitude
+                }}
+                precision={"high"}
+                timePrecision={"now"}
+                mode={"WALKING"}
+                destination={{
+                  latitude: selectedGeoSite.lat_long.coordinates[1],
+                  longitude: selectedGeoSite.lat_long.coordinates[0]
+                }}
+                apikey={Strings.GOOGLE_PLACE_API_KEY}
+                strokeWidth={0}
+                strokeColor="hotpink"
+                optimizeWaypoints={true}
+                onStart={(params) => {
+                  console.log(`Started routing between "${params.origin}" and "${params.destination}"`);
+                }}
+                onReady={result => {
+                  console.log(result)
+                  console.log(result.legs)
+                  console.log(`Distance: ${result.distance} km`)
+                  console.log(`Duration: ${result.duration} min.`)
+                  setWalkDurationMins(result.duration)
+                  setRoutes(1)
+                }}
+                onError={(errorMessage) => {
+                  console.log('GOT AN ERROR', errorMessage);
                   setRoutes(0)
                 }}
               />
@@ -162,7 +248,7 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <CarIcon style={{ width: 32, height: 32 }} />
             <View style={{ marginHorizontal: 20, justifyContent: 'flex-start' }}>
-              <Text style={_styles.site_via_text}>via Not available</Text>
+              <Text style={_styles.site_via_text}>Route Available</Text>
               <Text style={_styles.site_via_des_text}>Fastest route now due to traffic conditions</Text>
             </View>
           </View>
@@ -174,14 +260,23 @@ const GeoArSiteRoutes = ({
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TimeIcon style={{ width: 20, height: 20 }} />
             <Text style={_styles.site_distance_time_text}>Est. Time</Text>
-            <Text style={_styles.site_distance_time_value_text}>{Math.round(durationMins)} <Text style={{ fontSize: 10 }}>mins</Text></Text>
+            <Text style={_styles.site_distance_time_value_text}>{minOrHoursWalkDriving(durationMins, "Drive")} /  {minOrHoursWalkDriving(walkDurationMins, "Walk")}</Text>
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
-              onPress={() => navigation.navigate("GeoArSiteNavigation")}
+              onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "DRIVING" })}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
-              title={"Navigate"}
+              title={"Drive To Location"}
+              loading={isLoading}
+            />
+          </View>
+          <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
+            <AppButton
+              onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "WALKING" })}
+              buttonStyle={_styles.buttonStyle}
+              containerStyle={_styles.buttonContainerStyle}
+              title={"Walk to Location"}
               loading={isLoading}
             />
           </View>

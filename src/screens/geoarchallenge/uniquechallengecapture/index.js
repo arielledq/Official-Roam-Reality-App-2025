@@ -32,6 +32,7 @@ const Sound = require('react-native-sound');
 const { config, fs } = RNFetchBlob;
 import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions';
 import { useSelector } from "react-redux";
+import BackgroundWithImage from "../../../components/background";
 const { width } = Dimensions.get('window');
 
 const VIDEO_RECORD_TIME = 10
@@ -53,6 +54,7 @@ const UniqueArChallengeCapture = ({
   }
 
   const ARScreen = () => {
+    const [object3dType, setObject3dType] = useState(null);
     const [modelPath, setModelPath] = useState(null);
     const [sourcesFiles, setSourcesFiles] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -102,18 +104,33 @@ const UniqueArChallengeCapture = ({
               for (let i = 0; i < result.length; i++) {
                 if (result[i].isFile) {
                   console.log("unzipModelFile", result[i].name)
-                  if (result[i].name.includes(".vrx")) {
+                  if (result[i].name.includes(".vrx") || result[i].name.includes(".VRX")) {
                     const vrxFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setObject3dType("VRX")
                     setModelPath(vrxFile)
+                  } else if (result[i].name.includes(".obj") || result[i].name.includes(".OBJ")) {
+                    const objFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(objFile)
+                    setObject3dType("OBJ")
+                  } else if (result[i].name.includes(".glb") || result[i].name.includes(".GLB")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLB")
+                  } else if (result[i].name.includes(".gltf") || result[i].name.includes(".GLTF")) {
+                    const glbFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
+                    setModelPath(glbFile)
+                    setObject3dType("GLTF")
                   } else {
                     const sourceFile = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                    sourcesArray.push(sourceFile)
+                    sourcesArray.push({ uri: sourceFile })
                   }
                 }
               }
               if (sourcesArray.length > 0) {
                 setSourcesFiles(sourcesArray)
               }
+              console.log("sourceFiles", sourcesArray)
+              console.log("object3dType", object3dType)
               setLoading(false)
             })
         })
@@ -178,6 +195,9 @@ const UniqueArChallengeCapture = ({
       if ((scale[0] * scaleFactor) <= challengeObjParameters?.min_pinch_scale) {
         return;
       }
+      if ((scale[0] * scaleFactor) >= challengeObjParameters?.max_pinch_scale) {
+        return;
+      }
       let newScale = [
         scale[0] * scaleFactor,
         scale[1] * scaleFactor,
@@ -196,10 +216,7 @@ const UniqueArChallengeCapture = ({
         <ViroAmbientLight color="#FFFFFF" intensity={250} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
-        {
-          challengeObjParameters?.bloom &&
-          <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
-        }
+        <ViroDirectionalLight color="#FFFFFF" direction={[-1, 0, 0]} />
 
         <ViroSpotLight
           innerAngle={5}
@@ -221,7 +238,7 @@ const UniqueArChallengeCapture = ({
         }
 
         {
-          challengeObj.challenge_choice == "3DMODEL" && modelPath &&
+          challengeObj.challenge_choice == "3DMODEL" && modelPath && object3dType &&
           <Viro3DObject
             key="obj_3d1"
             source={{ uri: modelPath }} /// this works
@@ -229,7 +246,8 @@ const UniqueArChallengeCapture = ({
             challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
             challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25]}
             scale={scale}
-            type="VRX"
+            resources={sourcesFiles}
+            type={object3dType}
             opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
             materials={challengeObjParameters?.bloom ? ["mat"] : ["grid"]}
             rotation={rotate}
@@ -246,7 +264,7 @@ const UniqueArChallengeCapture = ({
           />
         }
 
-        {challengeObj.challenge_choice == "IMAGE"  && <ViroImage
+        {challengeObj.challenge_choice == "IMAGE" && <ViroImage
           height={1}
           width={1}
           opacity={challengeObjParameters?.image_opacity ? Number(challengeObjParameters?.image_opacity_value) : 1}
@@ -547,39 +565,17 @@ const UniqueArChallengeCapture = ({
 
       return (
         <View style={styles.mainContainer}>
-          {
-            this.state.isLoadVR && <ViroARSceneNavigator
-              videoQuality={"High"}
-              autofocus={true}
-              pbrEnabled={true}
-              hdrEnabled={true}
-              bloomEnabled={true}
-              ref={this._setARNavigatorRef}
-              initialScene={{
-                scene: ARScreen,
-              }}
-              style={styles.f1}
-            >
-            </ViroARSceneNavigator>
-          }
-
-          {this.state.capturedImage && <Image style={styles.f1} source={{
-            uri: this.state.capturedImage
-          }} />}
-
-          {this.state.capturedVideo && <Video repeat={true} style={styles.f1} source={{
-            uri: this.state.capturedVideo
-          }} />}
-
-          <View style={styles.mainHeaderContainer}>
+          <View style={[styles.mainHeaderContainer, Platform.OS == 'ios' ? styles.mainHeaderContainerIOS : {}]}>
             <AppHeader centerComponent={{
               text: "Unique Site AR",
               numberOfLines: 2,
               style: [styles.heading],
             }} backgroundColor="transparent" />
+          </View>
+          <View style={[styles.detailsViewContainer, Platform.OS == 'ios' ? styles.detailsViewContainerIOS : {}]}>
             <View style={styles.viewDetailsIconContainer}>
               <View style={styles.viewDetailsIconContainerWrapper}>
-                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
                   <Image style={styles.viewDetailsIcon} source={{ uri: challengeObj.sponsored.image }} />
                   <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
                 </View>
@@ -590,17 +586,47 @@ const UniqueArChallengeCapture = ({
               </View>
             </View>
           </View>
+          <View
+            style={[styles.f1, {
+              marginTop: Platform.OS == 'ios' ? -220 : 0
+            }, { flex: 1 }]}>
+            {
+              <BackgroundWithImage>
+                <ViroARSceneNavigator
+                  videoQuality={"High"}
+                  autofocus={true}
+                  pbrEnabled={true}
+                  hdrEnabled={true}
+                  bloomEnabled={true}
+                  ref={this._setARNavigatorRef}
+                  initialScene={{
+                    scene: ARScreen,
+                  }}
+                  style={styles.navigatorView}
+                >
+                </ViroARSceneNavigator>
+              </BackgroundWithImage>
+            }
+            {this.state.capturedImage && <Image style={styles.imageVideoView} source={{
+              uri: this.state.capturedImage
+            }} />}
+            {this.state.capturedVideo && <Video repeat={true} style={styles.imageVideoView} source={{
+              uri: this.state.capturedVideo
+            }} />}
+          </View>
+          <View style={styles.holdTextContainer}>
+            {
+              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) &&
+              <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
+            }
+          </View>
           <View style={[styles.bottomContainer, { justifyContent: this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center' }]}>
             {
               (this.state.recordingStart) && <View style={styles.timerTextContainer}>
                 <Text style={styles.timerText}>{this.state.timer}</Text>
               </View>
             }
-            {
-              (!this.state.capturedImage && !this.state.capturedVideo && !this.state.recordingStart) && <View style={styles.holdTextContainer}>
-                <Text style={styles.holdText}>Press and hold the capture button to start recording. Release to stop</Text>
-              </View>
-            }
+            
             {(this.state.capturedImage || this.state.capturedVideo) && <TouchableOpacity activeOpacity={.6} onPress={() => {
               this.setState({ capturedImage: null, capturedVideo: null })
             }} style={styles.bottomButtonContainer}>
@@ -649,24 +675,25 @@ const UniqueArChallengeCapture = ({
     }
   }
 
+  ViroMaterials.createMaterials({
+    mat: {
+      shininess: .6,
+      blendMode: "Add",
+      lightingModel: "Lambert",
+      bloomThreshold: challengeObjParameters ? Number(challengeObjParameters?.bloom_threshold) : 0.5,
+      diffuseColor: challengeObjParameters ? challengeObjParameters?.diffuse_text_color : "#fff",
+      diffuseIntensity: challengeObjParameters ? Number(challengeObjParameters?.diffuse_intensity) : 1,
+    },
+    grid: {
+      lightingModel: "Lambert",
+      shininess: .6,
+    },
+  });
+
+
   return (
     <ViroARNavigator />
   )
 }
-
-
-ViroMaterials.createMaterials({
-  grid: {
-    lightingModel: "Lambert",
-    shininess: .6,
-  },
-  mat: {
-    shininess: .6,
-    blendMode: "Add",
-    lightingModel: "Lambert",
-    bloomThreshold: 0.5,
-    diffuseColor: "#fff"
-  },
-});
 
 export default UniqueArChallengeCapture

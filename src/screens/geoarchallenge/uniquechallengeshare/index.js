@@ -276,14 +276,17 @@ const UniqueArChallengeShare = ({
   const checkPermission = () => {
     CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
       Alert.alert("Saved to Camera Roll.")
-    });
+    })
+      .catch((err) => {
+        Alert.alert("Error!", "Not able to save, please check permission.")
+      });
   };
 
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
-          text: "Unique Site AR",
+        text: "Unique Site AR",
         numberOfLines: 2,
         style: [styles.heading],
       }} backgroundColor="transparent" />
@@ -293,13 +296,12 @@ const UniqueArChallengeShare = ({
         }>
         <AppText numberOfLines={3} style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
-        <View style={styles.detailContainer}>
-
-          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1 }} source={{
+        <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
+          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1, marginTop: Platform.OS == "ios" ? -200 : 0 }} source={{
             uri: captureData
           }} />
             :
-            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', flex: 1, height: imageHeight }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ backgroundColor: "transparent", width: '100%', height: imageHeight, marginTop: Platform.OS == "ios" ? -200 : 0 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
@@ -332,9 +334,10 @@ const UniqueArChallengeShare = ({
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
-            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
+            {fileExt == 'mp4' && <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
               <TiktokShareImg />
             </TouchableOpacity>
+            }
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
