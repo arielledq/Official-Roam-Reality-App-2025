@@ -39,3 +39,5 @@ sendgrid = "*"
 django-allauth = "==0.45.0"
 django-ckeditor = "*"
 ffmpeg_downloader = "*"
+django-taggit = '*'
+djangorestframework-gis = '*'

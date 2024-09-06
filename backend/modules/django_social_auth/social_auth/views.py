@@ -1,3 +1,4 @@
+from feedback.models import ReportedContent
 from rest_framework.permissions import AllowAny
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
 from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
@@ -39,6 +40,8 @@ class FacebookLogin(SocialLoginView):
     def get_response(self):
         token = self.token
         user = self.user
+        if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
+            return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
         user_profile = UserProfile.objects.get(user=user)
         user_profile.is_verified = True
         user_profile.save()
@@ -61,6 +64,8 @@ class GoogleLogin(SocialLoginView):
     def get_response(self):
         token = self.token
         user = self.user
+        if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
+            return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
         user_profile = UserProfile.objects.get(user=user)
         user_profile.is_verified = True
         user_profile.save()
@@ -84,6 +89,8 @@ class AppleLogin(SocialLoginView):
     def get_response(self):
         token = self.token
         user = self.user
+        if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
+            return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
         user_profile = UserProfile.objects.get(user=user)
         user_profile.is_verified = True
         user_profile.save()
