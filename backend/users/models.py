@@ -4,8 +4,10 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from home.constants import Gender
 from core.utils import get_file_path
-
+from django.utils import timezone
 from home.common import CommonModel
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 
 class User(AbstractUser):
@@ -51,6 +53,7 @@ class UserProfile(CommonModel):
     country_code = models.CharField(max_length=5, blank=True, null=True)
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     account_setup = models.BooleanField(default=False)
+    friends = models.ManyToManyField(User, related_name='friends')
 
     def __str__(self):
         return self.user.email
@@ -73,3 +76,57 @@ class EmailTokenVerification(CommonModel):
 
 class PasswordReset(EmailTokenVerification):
     pass
+
+
+class FriendshipRequest(models.Model):
+    from_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="friendship_requests_sent",
+    )
+    to_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="friendship_requests_received",
+    )
+    created = models.DateTimeField(default=timezone.now)
+
+    class Meta:
+        verbose_name = _("Friendship Request")
+        verbose_name_plural = _("Friendship Requests")
+
+    def __str__(self):
+        return "%s" % self.from_user_id
+    
+@receiver(post_save, sender=FriendshipRequest)
+def new_friend_request_received(sender, instance, created, **kwargs):
+    if created:
+        Notification.objects.create(
+            sender=instance.from_user,
+            receiver=instance.to_user,
+            title="Friend Request",
+            message=f"{instance.from_user.name} sent you a friend request",
+            notification_type=Notification.FRIEND_REQUEST,
+            friend_request=instance
+        )
+    
+
+class Notification(CommonModel):
+    FRIEND_REQUEST = 'friend_request'
+    OTHER = 'other'
+    NOTIFICATION_TYPE_CHOICES = (
+        (FRIEND_REQUEST, 'Friend Request'),
+        (OTHER, 'Other'),
+    )
+
+    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name="sender_notification", null=True, blank=True)
+    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name="receiver_notification", null=True, blank=True)
+    title = models.CharField(max_length=200,null=True, blank=True)
+    message = models.TextField(null=True, blank=True)
+    notification_type = models.CharField(choices=NOTIFICATION_TYPE_CHOICES, max_length=20, null=True, blank=True, default=OTHER)
+    friend_request = models.ForeignKey(FriendshipRequest, on_delete=models.CASCADE, null=True, blank=True)
+    is_read = models.BooleanField(default=False)
+    is_hidden = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.sender)
