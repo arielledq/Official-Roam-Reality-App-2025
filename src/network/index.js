@@ -297,7 +297,6 @@ export const getUserNotificationList = () =>
     url: `${commonApiRoute}notifications/`,
     method: "GET"
   })
-
 export const clearNotificationList = () =>
   Request.callWithToken({
     url: `${commonApiRoute}notifications/clear-all/`,
