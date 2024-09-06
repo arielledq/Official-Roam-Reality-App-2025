@@ -49,7 +49,7 @@ target 'travel_ar_app_42706' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
-  
+
   pod 'ViroReact', :path => '../node_modules/@viro-community/react-viro/ios/'
   pod 'ViroKit', :path => '../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer/'
   # pod 'TikTokOpenSDK', '~> 5.0.15'
@@ -57,7 +57,7 @@ target 'travel_ar_app_42706' do
   # pod 'ViroReact', :path => '../../viro/ios/'
   # pod 'ViroKit', :path => '../../viro/ios/dist/ViroRenderer/'
   pod 'react-native-google-maps', :path => '../node_modules/react-native-maps'
-  pod 'GoogleMaps' 
+  pod 'GoogleMaps'
   pod 'TikTokOpenSDK', '~> 5.0.15'
 
   target 'travel_ar_app_42706Tests' do
@@ -65,7 +65,7 @@ target 'travel_ar_app_42706' do
     # Pods for testing
   end
 
-  
+
 
   post_install do |installer|
     react_native_post_install(
