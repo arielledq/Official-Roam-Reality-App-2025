@@ -73,7 +73,7 @@ class ReportedContent(models.Model):
     post = models.ForeignKey(Challenges, on_delete=models.CASCADE,null=True, blank=True)
     reported_user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     block_reported_user = models.BooleanField(default=False)
-    reason = models.PositiveIntegerField(max_length=50, choices=ReportedContentConstant.REASON_CHOICES,default=ReportedContentConstant.OTHER,null=True, blank=True) 
+    reason = models.PositiveIntegerField(choices=ReportedContentConstant.REASON_CHOICES,default=ReportedContentConstant.OTHER,null=True, blank=True)
     custom_reason = models.TextField(null=True, blank=True)
     is_reviewed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
