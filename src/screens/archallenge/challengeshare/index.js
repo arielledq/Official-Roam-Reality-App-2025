@@ -275,7 +275,11 @@ const ArChallengeShare = ({
   const checkPermission = () => {
     CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
       Alert.alert("Saved to Camera Roll.")
-    });
+    })
+    .catch((err) => {
+      console.log('err:', err);
+      Alert.alert("Error!", "Not able to save, please check permission.")
+    });;
   };
 
 
@@ -292,13 +296,12 @@ const ArChallengeShare = ({
         }>
         <AppText numberOfLines={3} style={[styles.headerText]}>Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience! </AppText>
         <AppText numberOfLines={3} style={[styles.subHeaderText]}>Please note you must share your experience to at least one social platform to earn all your points.</AppText>
-        <View style={styles.detailContainer}>
-
-          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1 }} source={{
+        <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
+          {fileExt == 'mp4' ? <Video resizeMode={"cover"} repeat={true} style={{ width: '100%', flex: 1, marginTop: Platform.OS == "ios" && challengeObj?.ar_filters.length == 0 ? -200 : 0 }} source={{
             uri: captureData
           }} />
             :
-            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', flex: 1, height: imageHeight }} />}
+            <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ backgroundColor: "transparent", width: '100%', height: imageHeight, marginTop: Platform.OS == "ios" && challengeObj?.ar_filters.length == 0 ? -200 : 0 }} />}
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage imageSource={BGArShare} style={{ backgroundColor: 'transparent', position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
@@ -331,27 +334,29 @@ const ArChallengeShare = ({
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
-            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
+            {fileExt == 'mp4' && <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
               <TiktokShareImg />
             </TouchableOpacity>
+            }
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
-      </ScrollView>
-      {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
-        <TouchableOpacity onPress={() => { navigation.navigate("Settings") }}>
-          <Text style={styles.bottomText}>Link My Profiles</Text>
-        </TouchableOpacity>
+        {!hideBottomTab && <View style={{ height: 104, justifyContent: 'flex-end', marginBottom: 30 }}>
+          <TouchableOpacity onPress={() => { navigation.navigate("Settings") }}>
+            <Text style={styles.bottomText}>Link My Profiles</Text>
+          </TouchableOpacity>
 
-        <AppButton
-          onPress={() => shareBtnOnPress()}
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainerStyle}
-          title={"Share Please!"}
-          loading={isLoading}
-        />
-      </View>
-      }
+          <AppButton
+            onPress={() => shareBtnOnPress()}
+            buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            title={"Share Please!"}
+            loading={isLoading}
+          />
+        </View>
+        }
+      </ScrollView>
+
     </BackgroundWithImage>
   )
 }

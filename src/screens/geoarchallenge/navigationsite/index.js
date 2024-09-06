@@ -11,7 +11,7 @@ import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import Geolocation, { GeoPosition } from 'react-native-geolocation-service';
 import MapViewDirections from "react-native-maps-directions";
 import { convertKilometersToMiles } from "../../../util/helpers";
@@ -43,6 +43,7 @@ const GeoArSiteNavigation = ({
   const [location, setLocation] = useState(null);
   const mapView = useRef();
   const watchId = useRef(null);
+  const route = useRoute()
 
   const stopLocationUpdates = () => {
     if (watchId.current !== null) {
@@ -78,12 +79,14 @@ const GeoArSiteNavigation = ({
       position => {
         setLocation(position);
         setCurrentLocation(position)
-        mapView.current.animateToRegion({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitudeDelta: 0.0032,
-          longitudeDelta: 0.0032,
-        })
+        if (mapView && mapView.current) {
+          mapView.current.animateToRegion({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            latitudeDelta: 0.0032,
+            longitudeDelta: 0.0032,
+          })
+        }
       },
       error => {
         Alert.alert(`Code ${error.code}`, error.message);
@@ -125,7 +128,7 @@ const GeoArSiteNavigation = ({
           stopLocationUpdates()
           return;
         }
-        if (mapView) {
+        if (mapView && mapView.current) {
           mapView.current.animateToRegion({
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
@@ -155,6 +158,19 @@ const GeoArSiteNavigation = ({
     );
   };
 
+  const minOrHoursWalkDriving = (walkDurationMins) => {
+    if (walkDurationMins < 60) {
+      return (
+        <>{Math.round(walkDurationMins)} <Text style={{ fontSize: 14 }}>mins</Text></>
+      )
+    } else if (walkDurationMins >= 60) {
+      var hours = Math.floor(walkDurationMins / 60);
+      return (
+        <>{Math.round(hours)} <Text style={{ fontSize: 14 }}>hours</Text></>
+      )
+    }
+  }
+
   return (
 
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -174,7 +190,10 @@ const GeoArSiteNavigation = ({
           <MapView
             customMapStyle={mapCustomStyle}
             provider={PROVIDER_GOOGLE}
+            showsCompass={true}
             ref={mapView}
+            zoomControlEnabled={true}
+            showsTraffic={true}
             style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
             scrollEnabled={true}
@@ -186,7 +205,6 @@ const GeoArSiteNavigation = ({
               longitudeDelta: 0.0032,
             }}
           >
-
             <Marker
               coordinate={{
                 latitude: selectedGeoSite.lat_long.coordinates[1],
@@ -219,7 +237,7 @@ const GeoArSiteNavigation = ({
                 }}
                 precision={"high"}
                 timePrecision={"now"}
-                mode={"DRIVING"}
+                mode={route?.params?.mapMode}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0]
@@ -259,9 +277,9 @@ const GeoArSiteNavigation = ({
         <View style={{ backgroundColor: "#131422", borderRadius: 16, paddingHorizontal: 20, paddingBottom: 20, marginVertical: 20, alignItems: 'center' }}>
           <HomeIcon style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }} />
           <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-            <CloseBIcon style={{ width: 32, height: 32 }} />
+            <TouchableOpacity onPress={() => navigation.replace("ChallengeSelection")}><CloseBIcon style={{ width: 32, height: 32 }} /></TouchableOpacity>
             <View style={{ alignItems: 'center', marginVertical: 8 }}>
-              <Text style={_styles.site_distance_time_value_text}>{Math.round(durationMins)} <Text style={{ fontSize: 14 }}>mins</Text></Text>
+              <Text style={_styles.site_distance_time_value_text}>{minOrHoursWalkDriving(durationMins)}</Text>
               <View style={{ width: '100%', flexDirection: 'row', alignItems: 'center' }}>
                 <Text style={_styles.site_distance_time_text}>{mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text></Text>
                 <Text style={_styles.site_distance_time_text}>.</Text>

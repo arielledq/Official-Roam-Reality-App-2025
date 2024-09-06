@@ -11,7 +11,7 @@ import moment from "moment";
 import FacebookShareImg from "../../../assets/ar/facebook.svg"
 import InstagramShareImg from "../../../assets/ar/insta.svg"
 import TiktokShareImg from "../../../assets/ar/tiktok.svg"
-import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI } from "../../../network";
+import { getARProfile, postArMemory, postGeoPinCheckIn, socialPointsARUpdateAPI, updateUserPointAPI } from "../../../network";
 import { handleError } from "../../../util/helpers";
 import { useDispatch, useSelector } from "react-redux"
 import { updateARUserData } from "../../../redux/AR";
@@ -83,6 +83,7 @@ const ArPinChallengeShare = ({
       ARUserProfile()
       if (res.status == 1) {
         console.log("Pin Check-ins!", "Successfully, completed your pin check-ins.")
+        updateUserPoint()
       } else {
         console.log("postCheckIn:", res)
       }
@@ -98,6 +99,15 @@ const ArPinChallengeShare = ({
       if (res.status == 1) {
         console.log(res.message)
       }
+    })
+  }
+
+  const updateUserPoint = () => {
+    updateUserPointAPI({
+      points: challengeObj.points
+    }).then((res) => {
+      console.log("updateUserPoint:",res)
+    }).finally(() => {
     })
   }
 
@@ -244,13 +254,6 @@ const ArPinChallengeShare = ({
     }
   }
 
-  const checkPermission = () => {
-    CameraRoll.saveAsset(captureData, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
-      Alert.alert("Saved to Camera Roll.")
-    });
-  };
-
-
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
@@ -263,7 +266,8 @@ const ArPinChallengeShare = ({
         style={{ flex: 1, overflow: 'hidden' }
         }>
         <View style={styles.imageContainer}>
-          <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight }} />
+
+          <Image resizeMode={"contain"} source={{ uri: captureData }} style={{ width: '100%', height: imageHeight, marginTop: Platform.OS == "ios" ? -200 : 0 }} />
         </View>
         <View style={styles.detailContainer}>
           <View style={styles.pointsParentContainer}>
@@ -295,9 +299,9 @@ const ArPinChallengeShare = ({
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
               <InstagramShareImg />
             </TouchableOpacity>
-            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
+            {fileExt == 'mp4' && <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
               <TiktokShareImg />
-            </TouchableOpacity>
+            </TouchableOpacity>}
           </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>

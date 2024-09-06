@@ -56,7 +56,7 @@ class GeoRegion(models.Model):
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
     geo_region = gis_models.MultiLineStringField(_("Geo Region"), blank=True, null=True)
-    
+
     class Meta:
         verbose_name_plural = "Geo Regions"
         verbose_name = "Geo Region"
@@ -203,6 +203,7 @@ class Challenges(models.Model):
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    scale = models.DecimalField(max_digits=20, decimal_places=10, default=0.05)
 
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)
@@ -382,7 +383,7 @@ class GeoArSite(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
-    
+
     class Meta:
         verbose_name_plural = "Geo AR Site"
         verbose_name = "Geo AR Site"
@@ -470,7 +471,7 @@ class UniqueChallengeSite(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class GeoARSiteActivity(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=True, blank=True, max_length=255
@@ -494,7 +495,7 @@ class GeoARSiteActivity(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class ARSitePinCheckIn(models.Model):
     geo_site = models.ForeignKey(
         GeoArSite,
@@ -560,7 +561,7 @@ class StarCollection(models.Model):
 
     def __str__(self):
         return str(self.id)
-    
+
 class DestinationFacts(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
@@ -579,7 +580,7 @@ class DestinationFacts(models.Model):
         null=False,
         blank=False,
         related_name="geo_location_ar_facts",
-    ) 
+    )
     border = gis_models.MultiLineStringField(_("Borders"), blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
 
@@ -589,7 +590,7 @@ class DestinationFacts(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class GeoARGoldStar(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
@@ -606,7 +607,7 @@ class GeoARGoldStar(models.Model):
         blank=False,
         verbose_name="Geo Destination",
         related_name="geo_location_ar_gold_star",
-    ) 
+    )
     geo_site = models.ForeignKey(
         GeoArSite,
         on_delete=models.CASCADE,
@@ -629,7 +630,7 @@ class GeoARGoldStar(models.Model):
 
     def __str__(self):
         return self.name
-    
+
 class PanicMessage(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_panic_message"
@@ -642,4 +643,3 @@ class PanicMessage(models.Model):
     class Meta:
       verbose_name_plural = "Panic Messages"
       verbose_name = "Panic Message"
-    

@@ -20,5 +20,6 @@ declare module '@rneui/themed' {
     drawerBG : string;
     magenta: string;
     green: string;
+    inputRed: string;
   }
 }

@@ -21,6 +21,7 @@ import { AppInput } from "../../components"
 import useDebounce from "../../hooks/debounce"
 import { DEBOUNCE_TIME } from "../../util/helpers"
 import { Icon } from "react-native-elements"
+import Images from "../../assets/images"
 
 const ContactsTab = () => {
   const _styles = useStyles()
@@ -70,7 +71,9 @@ const ContactsTab = () => {
 
   const fetchContacts = () => {
     Contacts.getAll().then(contactArr => {
+      console.log("Contacts", JSON.stringify(contactArr))
       findFriends(contactArr).then(response => {
+        console.log("Find Friends Response", response)
         if (response && response?.data) {
           setContacts(response?.data)
           setFilteredUsers(response?.data)
@@ -125,19 +128,25 @@ const ContactsTab = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => renderContact(item, onAddFriendClick)}
+          renderItem={({ item }) =>
+            renderContact(item, onAddFriendClick, _styles)
+          }
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-const renderContact = (item: any, onAddFriendClick: (user: any) => void) => {
+const renderContact = (
+  item: any,
+  onAddFriendClick: (user: any) => void,
+  styles: any
+) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
         <ImageBackground
-          source={{ uri: item?.user_profile?.image }}
+          source={Images.BGBlur}
           style={localStyle.imageBG}
           resizeMode="stretch"
         >
@@ -148,14 +157,14 @@ const renderContact = (item: any, onAddFriendClick: (user: any) => void) => {
           />
         </ImageBackground>
         <View>
-          <Text style={{ color: theme.lightColors?.magenta }}>{item.name}</Text>
-          <Text
-            style={{ color: theme.lightColors?.white }}
+          <Text style={styles.title}>{item.name}</Text>
+          {/* <Text
+            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
             {item.email}
-          </Text>
+          </Text> */}
         </View>
       </View>
       <Pressable

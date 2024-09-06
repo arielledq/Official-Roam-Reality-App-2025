@@ -1,6 +1,11 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
+import {
+  FontFamily,
+  FontLineHeights,
+  FontSizes,
+  fontGroup
+} from "../../../util/FontUtils"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -10,66 +15,111 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
-    position: 'relative'
+    backgroundColor: "transparent"
   },
   buttonStyle: {
     height: 50
   },
   buttonContainerStyle: {
     marginTop: 20,
-    width: '100%'
+    width: "100%"
   },
   pagerView: {
-    flex: 1,
+    flex: 1
   },
   borderStyles: {
-    borderStyle: 'dashed',
-    borderColor: 'gray',
+    borderStyle: "dashed",
+    borderColor: "gray"
   },
   textStyles: {
-    color: '#fff',
+    color: "#fff",
     fontSize: FontSizes.S22,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.ns700
   },
   cornerStyles: {
     padding: 8,
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: 'white',
-    borderColor: '#aaa',
+    backgroundColor: "white",
+    borderColor: "#aaa"
   },
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: 'white',
+    backgroundColor: "white"
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center"
   },
   locationText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: FontSizes.S22,
-    lineHeight: FontLineHeights.LH25,
-    ...fontGroup.p700,
-    marginHorizontal: 8,
-    maxWidth:'75%',
-    textAlign:'center'
+    // lineHeight: FontLineHeights.LH25,
+    // marginHorizontal: 8,
+    maxWidth: "75%",
+    textAlign: "center",
+    ...fontGroup.giRegular
   },
-  bottomText: {
-    color: '#fff',
+  filterTitleText: {
+    color: "#fff",
     fontSize: FontSizes.S30,
-    lineHeight: FontLineHeights.LH33,
-    ...fontGroup.p900,
-    marginHorizontal: 5
+    // lineHeight: FontLineHeights.LH33,
+    ...fontGroup.giBold,
+    // marginHorizontal: 5,
+    textAlign: "center"
   },
-  filterTextView: { position: 'absolute', zIndex: 20, right: 0, left: 0, alignItems: 'center' },
-  locationTextView: { position: 'absolute', right: 0, left: 0, flexDirection: 'row', alignItems: 'center' },
-  filterTextBottom: {bottom: 80},
-  locationTextBottom: {bottom: 150},
-  filterTextTop: {top: 150},
-  locationTextTop: {top: 80},
+  filterTextView: {
+    position: "absolute",
+    zIndex: 20,
+    right: 0,
+    left: 0,
+    alignItems: "center"
+  },
+  locationTextView: {
+    position: "absolute",
+    right: 0,
+    left: 0,
+    alignItems: "center"
+  },
+  filterTextBottom: {
+    bottom: 25
+  },
+  locationTextBottom: {
+    bottom: 80
+  },
+  filterTextTop: {
+    top: 80
+  },
+  locationTextTop: {
+    top: 25
+  },
+  appNameText: {
+    color: "#fff",
+    fontSize: FontSizes.S14,
+    // lineHeight: FontLineHeights.LH33,
+    ...fontGroup.giRegular,
+    // marginHorizontal: 5,
+    textAlign: "center"
+  },
+  textFilterView: {
+    justifyContent: "flex-start",
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+    gap: 2,
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
+    paddingVertical: 10
+  },
+  imageFilterView: {
+    width: 100,
+    height: 100
+  }
 }))
 
 export default useStyles

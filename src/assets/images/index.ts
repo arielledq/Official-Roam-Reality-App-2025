@@ -25,7 +25,8 @@ const Images = {
   TikTok: require("./TikTok.png"),
   YouTube: require("./Youtube.png"),
   ShareInvite: require("./ShareInvite.png"),
-  BGBlur: require("./blurImageBg.png")
+  BGBlur: require("./blurImageBg.png"),
+  CloseModal: require("./closeModal.png")
 }
 
 export default Images

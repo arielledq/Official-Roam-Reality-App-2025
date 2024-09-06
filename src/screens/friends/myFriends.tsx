@@ -1,21 +1,19 @@
 // MyFriends.tsx
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import {
   View,
   Text,
-  TextInput,
   FlatList,
   Keyboard,
   ImageBackground,
   Pressable
 } from "react-native"
-import BackgroundWithImage from "../../components/background"
-import { AppButton, AppHeader, AppInput } from "../../components"
+import { AppInput } from "../../components"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import useStyles from "./styles"
 import theme from "../../assets/theme"
 import { Icon } from "react-native-elements"
-import { useFocusEffect } from "@react-navigation/native"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { getUserFriendList } from "../../network"
 import FastImage from "react-native-fast-image"
 import useDebounce from "../../hooks/debounce"
@@ -24,24 +22,30 @@ import Images from "../../assets/images"
 
 const MyFriends = () => {
   const [searchText, setSearchText] = React.useState("")
+  const navigation = useNavigation()
   const [friendList, setFriendList] = useState([])
   const [filteredUsers, setFilteredUsers] = React.useState([])
   const _styles = useStyles()
   const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME)
+  const [isFetching, setFetching] = useState(false)
 
-  useFocusEffect(
-    useCallback(() => {
-      getUserFriendList()
-        .then(response => {
-          console.info("friends", JSON.stringify(response))
-          if (response) {
-            setFriendList(response?.data || [])
-            setFilteredUsers(response?.data || [])
-          }
-        })
-        .catch(error => console.error(error))
-    }, [])
-  )
+  useFocusEffect(useCallback(() => getFriends(), []))
+
+  const getFriends = () => {
+    setFetching(true)
+    getUserFriendList()
+      .then(response => {
+        setFetching(false)
+        if (response) {
+          setFriendList(response?.data[0]?.friends || [])
+          setFilteredUsers(response?.data[0]?.friends || [])
+        }
+      })
+      .catch(error => {
+        setFetching(false)
+        console.error(error)
+      })
+  }
 
   const onChangeText = () => {
     const filtered = friendList?.filter(item =>
@@ -53,6 +57,8 @@ const MyFriends = () => {
   React.useEffect(() => {
     onChangeText()
   }, [debounceQuery])
+
+  const onRefresh = () => getFriends()
 
   return (
     <KeyboardAwareScrollView
@@ -76,14 +82,16 @@ const MyFriends = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={renderFriendItem}
+          renderItem={({ item }) => renderFriendItem(item, _styles, navigation)}
+          onRefresh={() => onRefresh()}
+          refreshing={isFetching}
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-const renderFriendItem = ({ item }) => {
+const renderFriendItem = (item, styles, navigation) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
@@ -94,32 +102,32 @@ const renderFriendItem = ({ item }) => {
         >
           <FastImage
             style={localStyle.image}
-            source={{ uri: item?.image }}
-            resizeMode={FastImage.resizeMode.cover}
+            source={
+              item?.user_profile?.image
+                ? { uri: item?.user_profile?.image }
+                : Images.ProfileImgGradient
+            }
+            resizeMode={FastImage.resizeMode.stretch}
           />
         </ImageBackground>
         <View>
-          <Text style={{ color: theme.lightColors?.magenta }}>
-            {item?.user?.name}
-          </Text>
+          <Text style={styles.title}>{item?.name}</Text>
           <Text
-            style={{ color: theme.lightColors?.white }}
+            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
-            {item?.home_country}
+            {item?.user_profile?.home_country}
           </Text>
         </View>
       </View>
       <Pressable
-        onPress={() => onAddFriendClick(item)}
+        onPress={() => {
+          navigation.navigate("PublicProfile", { userData: item })
+        }}
         style={{ marginLeft: 10 }}
       >
-        <Icon
-          name="chevronRight"
-          type="antdesign"
-          color={theme.lightColors?.white}
-        />
+        <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>
     </View>
   )
@@ -137,8 +145,7 @@ const localStyle = {
     justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: theme.lightColors?.inputBG,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingRight: 20,
     borderRadius: 10,
     marginVertical: 5,
     flex: 1
