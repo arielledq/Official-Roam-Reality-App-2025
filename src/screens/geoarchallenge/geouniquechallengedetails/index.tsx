@@ -89,7 +89,7 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
         { text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image) },
       ]);
     } else {
-      Alert.alert("No Example available.")
+      showMessage('No Example available.', 'info')
     }
   }
 
