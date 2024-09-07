@@ -18,7 +18,7 @@ import theme from "../../assets/theme"
 import AppText from "../../components/text"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { confirmCode, sendCode } from "../../network"
-import { handleError } from "../../util/helpers"
+import { handleError, showMessage } from "../../util/helpers"
 import { useDispatch } from "react-redux"
 import { updateUserData } from "../../redux/Login"
 import Timer from "../../components/timer"
@@ -49,7 +49,7 @@ const EmailVerification: ScreenStackComponent<
     sendCode({ email }).then(res => {
       if (res.status == 1) {
         setTimerVisible(true)
-        Alert.alert('Success', 'Code sent successfully')
+        showMessage('Code sent successfully')
       } else {
         handleError(res)
       }
@@ -57,7 +57,10 @@ const EmailVerification: ScreenStackComponent<
   }
 
   const verifyEmail = (values) => {
-    if (!values.code) { return Alert.alert('Code', 'Please enter the verification code') }
+    if (!values.code) {
+      showMessage('Please enter the verification code', 'error')
+      return
+    }
     setIsLoading(true)
     confirmCode({ email: email, otp: values.code }).then(res => {
       console.log({ res })

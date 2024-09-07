@@ -13,10 +13,10 @@ import { useDispatch } from "react-redux"
 import { resetState } from "../../redux/Login"
 import LinearGradient from "react-native-linear-gradient"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
-import { removeItem } from "../../util/helpers"
+import { removeItem, showMessage } from "../../util/helpers"
 
 const DrawerList = [
-  { icon: 'target', label: 'AR Challenges', navigateTo: 'Home' },
+  { icon: "target", label: "AR Challenges", navigateTo: "Home" },
   { icon: "message-square", label: "Chats", navigateTo: "Home" },
   { icon: "users", label: "Friends", navigateTo: "Friends" },
   { icon: "Wallet", label: "Wallet", navigateTo: "Home" },
@@ -156,9 +156,9 @@ function DrawerContent(props) {
       console.log({ res })
       if (res.status == 1) {
         handleLogOutButton()
-        Alert.alert("Success", "Your account has been deleted successfully")
+        showMessage("Your account has been deleted successfully")
       } else {
-        Alert.alert("Error", res.message.error)
+        showMessage(res.message.error, "error")
       }
     })
   }

@@ -44,6 +44,7 @@ import ScreenLoader from "../../components/screenLoader"
 import { BlurView } from "@react-native-community/blur"
 import UserReportCard from "../../components/userInfoCard"
 import ReportUserModal from "../reportUser/ReportUser"
+import { showMessage } from "../../util/helpers"
 
 const PublicProfile: ScreenStackComponent<
   RootStackParamList,
@@ -95,46 +96,49 @@ const PublicProfile: ScreenStackComponent<
   const getUserCollectedStar = async () => {
     getUserCollectedStarCount({
       user_id: userProfile.id
-    }).then(res => {
-      console.log("getUserCollectedStarCount:", res)
-      if(res.status == 1){
-        setStarsCount(res.count)
-      }
-    }
-    ).catch(err => {
-      console.error('Error', "Error fetching ar memories: ")
-    }
-    ).finally(() => setloading(false))
+    })
+      .then(res => {
+        console.log("getUserCollectedStarCount:", res)
+        if (res.status == 1) {
+          setStarsCount(res.count)
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ")
+      })
+      .finally(() => setloading(false))
   }
 
   const getRank = async () => {
     getUserRankCount({
       user_id: userProfile.id
-    }).then(res => {
-      console.log("getRank:", res)
-      if(res.status == 1){
-        setGlobalRank(res.rank)
-      }
-    }
-    ).catch(err => {
-      console.error('Error', "Error fetching ar memories: ")
-    }
-    ).finally(() => setloading(false))
+    })
+      .then(res => {
+        console.log("getRank:", res)
+        if (res.status == 1) {
+          setGlobalRank(res.rank)
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ")
+      })
+      .finally(() => setloading(false))
   }
 
   const getCountry = async () => {
     getCountryCount({
       user_id: userProfile.id
-    }).then(res => {
-      console.log("getCountry:", res)
-      if(res.status == 1){
-        setCountryCount(res.count)
-      }
-    }
-    ).catch(err => {
-      console.error('Error', "Error fetching ar memories: ")
-    }
-    ).finally(() => setloading(false))
+    })
+      .then(res => {
+        console.log("getCountry:", res)
+        if (res.status == 1) {
+          setCountryCount(res.count)
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ")
+      })
+      .finally(() => setloading(false))
   }
 
   useFocusEffect(
@@ -180,11 +184,11 @@ const PublicProfile: ScreenStackComponent<
     reportContentOrUser(reportData)
       .then(resposne => {
         if (resposne && resposne?.status === 1) {
-          Alert.alert("Reported", "User has been reported successfully")
+          showMessage("User has been reported successfully")
         }
       })
       .catch(error => {
-        console.error("Error", "Error reporting user")
+        showMessage("Error reporting user", "error")
       })
   }
 
@@ -233,7 +237,7 @@ const PublicProfile: ScreenStackComponent<
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={""+globalRank} property={"Global Rank"} />
+          <StatContainer value={"" + globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
@@ -298,19 +302,12 @@ const PublicProfile: ScreenStackComponent<
     removeUserFromFriends(userProfile?.id)
       .then(resposne => {
         if (resposne && resposne.status === 1) {
-          console.log("removeUserFromFriends", resposne)
-          Alert.alert("Success", "Friend removed successfully", [
-            {
-              text: "OK",
-              onPress: () => {
-                navigation.goBack()
-              }
-            }
-          ])
+          showMessage("Friend removed successfully")
+          navigation.goBack()
         }
       })
       .catch(error => {
-        Alert.alert("Error", "Error removing friend")
+        showMessage("Error removing friend", "error")
       })
   }
 

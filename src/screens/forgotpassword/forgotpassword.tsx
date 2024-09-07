@@ -20,7 +20,7 @@ import Images from "../../assets/images"
 import fontGroup from "../../assets/fonts"
 import { confirmEmailOtp, sendCode } from "../../network"
 import { ForgotPasswordSchema, OTPSchema } from "../../util/ValidationSchemas"
-import { handleError } from "../../util/helpers"
+import { handleError, showMessage } from "../../util/helpers"
 import Timer from "../../components/timer"
 
 const ForgotPassword: ScreenStackComponent<
@@ -47,13 +47,7 @@ const ForgotPassword: ScreenStackComponent<
           resetForm()
           setEmailData(email)
           setCodeSent(true)
-          Alert.alert(
-            'Code Sent!',
-            `Code has been sent to ${values.input}. Please check your email.`,
-            [
-              { text: 'OK' },
-            ]
-          );
+          showMessage(`Code has been sent to ${values.input}. Please check your email.`, 'success', 'Code Sent!')
         } else {
           handleError(res)
         }
@@ -78,7 +72,7 @@ const ForgotPassword: ScreenStackComponent<
     sendCode({ email: emailData }).then(res => {
       if (res.status == 1) {
         setTimerVisible(true)
-        Alert.alert('Success', 'Code sent successfully')
+        showMessage('Code sent successfully')
       } else {
         handleError(res)
       }

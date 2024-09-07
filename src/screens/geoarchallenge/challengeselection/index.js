@@ -13,15 +13,20 @@ import theme from "../../../assets/theme"
 import Images from "../../../assets/images"
 import useStyles from "./styles"
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
-import { handleError } from "../../../util/helpers"
-import { BlurView } from "@react-native-community/blur";
+import { handleError, showMessage } from "../../../util/helpers"
+import { BlurView } from "@react-native-community/blur"
 import SiteIcon from "../../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../../assets/geoar/starsite.svg"
 import ArIcon from "../../../assets/geoar/aricon.svg"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
 import { useIsFocused, useNavigation } from "@react-navigation/native"
 import { AppHeader, AppText } from "../../../components"
-import { checkGeoPinCheckInDoneAPI, getARChallenges, getCheckInCount, getCollectedStarCount } from "../../../network"
+import {
+  checkGeoPinCheckInDoneAPI,
+  getARChallenges,
+  getCheckInCount,
+  getCollectedStarCount
+} from "../../../network"
 
 const HomeScreenData = [
   {
@@ -32,7 +37,8 @@ const HomeScreenData = [
     id: 1,
     title: "Check in with our ",
     title1: "Roam Pin!",
-    subtitle: "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
+    subtitle:
+      "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
     image: Images.Home,
     Icon: SiteIcon,
     navigation: "PinChallenge"
@@ -41,7 +47,8 @@ const HomeScreenData = [
     id: 2,
     title: "Let's go chase the ",
     title1: "stars!",
-    subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
+    subtitle:
+      "Use our GPS navigation to find all our hidden stars located at this site!",
     image: Images.Home1,
     Icon: StarSiteIcon,
     navigation: "StarChallenge"
@@ -50,7 +57,8 @@ const HomeScreenData = [
     id: 3,
     title: "Engage in unique  ",
     title1: "AR Experiences!",
-    subtitle: "Participate in some extra fun AR experiences found at this site for extra points.",
+    subtitle:
+      "Participate in some extra fun AR experiences found at this site for extra points.",
     image: Images.Home1,
     Icon: ArIcon,
     navigation: "UniqueArChallenge"
@@ -66,60 +74,65 @@ const HomeScreenData = [
   }
 ]
 
-
 const ChallengeSelection = ({ route }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
 
   const dispatch = useDispatch()
   const navigation = useNavigation()
-  const styles = useStyles();
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
+  const styles = useStyles()
+  const selectedDestination = useSelector(
+    state => state.ar?.selectedDestination
+  )
+  const selectedGeoARSiteStars = useSelector(
+    state => state.ar?.selectedGeoARSiteStars
+  )
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const [starsCount, setStarsCount] = useState(0)
   const [collectedStars, setCollectedStars] = useState(0)
   const [myCheckIns, setMyCheckIns] = useState(0)
   const [uniqueExperiences, setUniqueExperiences] = useState(0)
   const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false)
-  const isFocused = useIsFocused();
+  const isFocused = useIsFocused()
 
   const checkIfPinCheckIsDone = () => {
     checkGeoPinCheckInDoneAPI({
       geo_site: selectedGeoSite.id
-    }).then((res) => {
-      console.log("checkIfPinCheckIsDone:", res)
-      if (res.errorStatus == 403) {
-        console.log("checkIfPinCheckIsDone", "true")
-        setIsPinCheckIsDone(true)
-      } else {
-        console.log("checkIfPinCheckIsDone", "false")
-        setIsPinCheckIsDone(false)
-      }
-    }).finally(() => {
     })
+      .then(res => {
+        console.log("checkIfPinCheckIsDone:", res)
+        if (res.errorStatus == 403) {
+          console.log("checkIfPinCheckIsDone", "true")
+          setIsPinCheckIsDone(true)
+        } else {
+          console.log("checkIfPinCheckIsDone", "false")
+          setIsPinCheckIsDone(false)
+        }
+      })
+      .finally(() => {})
   }
 
   const getMyCheckInsCount = () => {
-    getCheckInCount({
-    }).then((res) => {
-      if(res.status == 1){
-        setMyCheckIns(res.count)
-      }
-    }).finally(() => {
-    })
+    getCheckInCount({})
+      .then(res => {
+        if (res.status == 1) {
+          setMyCheckIns(res.count)
+        }
+      })
+      .finally(() => {})
   }
 
   const getStarsCollectCount = () => {
     getCollectedStarCount({
       geo_site: selectedGeoSite.id
-    }).then((res) => {
-      console.log("getStarsCollectCount:", res)
-      if(res.status == 1){
-        setCollectedStars(res.count)
-      }
-    }).finally(() => {
     })
+      .then(res => {
+        console.log("getStarsCollectCount:", res)
+        if (res.status == 1) {
+          setCollectedStars(res.count)
+        }
+      })
+      .finally(() => {})
   }
 
   useEffect(() => {
@@ -128,76 +141,99 @@ const ChallengeSelection = ({ route }) => {
       getStarsCollectCount()
       getMyCheckInsCount()
     }
-  }, [isFocused]);
+  }, [isFocused])
 
   useEffect(() => {
     setIsLoading(true)
-    getARChallenges().then((res) => {
-      if (res.status == 1) {
-        setNumberOfChallenges(res?.data?.length)
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
-    })
+    getARChallenges()
+      .then(res => {
+        if (res.status == 1) {
+          setNumberOfChallenges(res?.data?.length)
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }, [])
 
-  const goToRoute = (route) => {
+  const goToRoute = route => {
     if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
-      Alert.alert("Pin Challenge is unavailable right now");
-    } if (route === "StarChallenge" && selectedGeoARSiteStars.length == 0) {
-      Alert.alert("Stars Challenges are unavailable right now");
+      showMessage("Pin Challenge is unavailable right now", "error")
+    }
+    if (route === "StarChallenge" && selectedGeoARSiteStars.length == 0) {
+      showMessage("Stars Challenges are unavailable right now", "error")
     } else {
       navigation.navigate(route)
     }
   }
 
   const setStarCounts = () => {
-    let count = 0;
+    let count = 0
     for (const stars_site of selectedGeoARSiteStars) {
       if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length;
+        count += stars_site.star_location.coordinates.length
       }
     }
-    setStarsCount(count);
+    setStarsCount(count)
   }
 
   useEffect(() => {
     setStarCounts()
-  }, [selectedGeoARSiteStars]);
+  }, [selectedGeoARSiteStars])
 
-  const HomeScreenARItem = (item) => {
+  const HomeScreenARItem = item => {
     return (
-      <View
-        style={styles.imageBg}
-      >
+      <View style={styles.imageBg}>
         <View style={styles.row}>
           <View style={styles.innerView}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', width: '100%' }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%"
+              }}
+            >
               <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />
-              <AppText style={styles.headerText}>{item?.title}{item?.title1}</AppText>
+              <AppText style={styles.headerText}>
+                {item?.title}
+                {item?.title1}
+              </AppText>
             </View>
-            <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: "space-between", flex: 1 }}>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                flex: 1
+              }}
+            >
               <View style={{ flex: 1 }}>
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-                {
-                  item?.id == 1 &&
-                  <AppText style={styles.challengesText}>Pin located: {isPinCheckIsDone ? 1 : 0}/1  •  My Check-ins: {myCheckIns}</AppText>
-                }
-                {
-                  item?.id == 2 &&
-                  <AppText style={styles.challengesText}> Stars collected: {collectedStars}/{starsCount}</AppText>
-                }
-                {
-                  item?.id == 3 &&
-                  <AppText style={styles.challengesText}>{selectedDestination.unique_ar_sites.length} Challenges</AppText>
-                }
-                {
-                  item?.id == 4 &&
-                  <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
-                }
+                {item?.id == 1 && (
+                  <AppText style={styles.challengesText}>
+                    Pin located: {isPinCheckIsDone ? 1 : 0}/1 • My Check-ins:{" "}
+                    {myCheckIns}
+                  </AppText>
+                )}
+                {item?.id == 2 && (
+                  <AppText style={styles.challengesText}>
+                    {" "}
+                    Stars collected: {collectedStars}/{starsCount}
+                  </AppText>
+                )}
+                {item?.id == 3 && (
+                  <AppText style={styles.challengesText}>
+                    {selectedDestination.unique_ar_sites.length} Challenges
+                  </AppText>
+                )}
+                {item?.id == 4 && (
+                  <AppText style={styles.challengesText}>
+                    {numberOfChallenges} Challenges
+                  </AppText>
+                )}
               </View>
               <TouchableOpacity onPress={() => goToRoute(item.navigation)}>
                 <RightArrowIcon />
@@ -212,20 +248,31 @@ const ChallengeSelection = ({ route }) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
-        {isLoading ? <ActivityIndicator size="large" /> :
+        {isLoading ? (
+          <ActivityIndicator size="large" />
+        ) : (
           <FlatList
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
-            renderItem={({ item }) => item.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />}
-            keyExtractor={(item) => item.id}
+            renderItem={({ item }) =>
+              item.blank ? (
+                <View style={{ minHeight: 120 }} />
+              ) : (
+                <HomeScreenARItem {...item} />
+              )
+            }
+            keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
           />
-        }
+        )}
       </View>
       <View style={styles.blurView}>
-        <BlurView blurType="regular" overlayColor='transparent'
-          style={{ backgroundColor: 'transparent' }}>
+        <BlurView
+          blurType="regular"
+          overlayColor="transparent"
+          style={{ backgroundColor: "transparent" }}
+        >
           <AppHeader
             title={"Explore The Site"}
             containerStyle={styles.headerContainer}

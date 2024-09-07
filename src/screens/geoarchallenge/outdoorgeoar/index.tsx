@@ -27,7 +27,7 @@ import BottomSheet from "@gorhom/bottom-sheet"
 import Images from "../../../assets/images"
 import useStyles from "./styles"
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon"
-import { handleError } from "../../../util/helpers"
+import { handleError, showMessage } from "../../../util/helpers"
 import { HomeScreenData } from "../../../util/HomeScreenUtils"
 import { BlurView } from "@react-native-community/blur";
 
@@ -94,9 +94,9 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
             console.log({ res })
             if (res.status == 1) {
               handleLogOutButton();
-              Alert.alert(('Success'), ('Your account has been deleted successfully'));
+              showMessage('Your account has been deleted successfully')
             } else {
-              Alert.alert('Error', res.message.error)
+              showMessage(res.message.error, 'error')
             }
           })
         },
