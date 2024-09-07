@@ -97,7 +97,7 @@ const UniqueArChallengeShare = ({}) => {
           showMessage(
             "Successfully, completed your challenge.",
             "success",
-            "AR Challenge Share!"
+            "AR Photo Challenge Share!"
           )
         } else {
           res.message.message =

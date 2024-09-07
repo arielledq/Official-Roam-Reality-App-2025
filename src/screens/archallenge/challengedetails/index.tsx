@@ -67,7 +67,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
     if (!isChallengeDone) {
       navigation.navigate("ArChallengeCapture", { challengeObj });
     } else {
-      showMessage("You have already completed the challenge.", 'info', "Anywhere AR Challenges")
+      showMessage("You have already completed the challenge.", 'info', "Anywhere AR Photo Challenges")
     }
   }
 
@@ -97,7 +97,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
 
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
-        text: "Anywhere AR Challenges",
+        text: "Anywhere AR Photo Challenges",
         numberOfLines: 2,
         style: [styles.heading],
       }} backgroundColor="transparent" />

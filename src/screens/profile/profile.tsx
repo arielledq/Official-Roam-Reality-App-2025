@@ -178,7 +178,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const data = [
     { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
     { id: 2, value: starsCount, property: "Stars" },
-    { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
+    { id: 3, value: arProfile?.challenge_completed, property: "AR Photo Challenges" },
     { id: 4, value: 0, property: "Friends" },
     { id: 5, value: 0, property: "Credits" },
     { id: 6, value: 0, property: "Tokens" },
