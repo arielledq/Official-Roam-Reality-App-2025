@@ -59,7 +59,7 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
     if (!isChallengeDone) {
       navigation.navigate("UniqueArChallengeCapture", { challengeObj });
     } else {
-      showMessage("You have already completed the challenge.", 'info', "Unique AR Challenges")
+      showMessage("You have already completed the challenge.", 'info', "Unique AR Photo Challenges")
     }
   }
 

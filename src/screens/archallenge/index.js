@@ -130,7 +130,7 @@ const ArChallenge = ({}) => {
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Anywhere AR Challenges",
+          text: "Anywhere AR Photo Challenges",
           style: [_styles.heading]
         }}
         backgroundColor="transparent"
@@ -138,7 +138,7 @@ const ArChallenge = ({}) => {
       <View style={_styles.rowView}>
         <View style={{ flex: 0.5 }}>
           <AppText style={[_styles.headerText]}>
-            Choose Your AR Challenge
+            Choose Your AR Photo Challenge
           </AppText>
           <AppText style={[_styles.subHeaderText]}>Sponsored</AppText>
         </View>

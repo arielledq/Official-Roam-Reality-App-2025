@@ -96,7 +96,7 @@ const ArChallengeShare = ({}) => {
           showMessage(
             "Successfully, completed your challenge.",
             "success",
-            "AR Challenge Share!"
+            "AR Photo Challenge Share!"
           )
         } else {
           res.message.message =
@@ -324,7 +324,7 @@ const ArChallengeShare = ({}) => {
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Anywhere AR Challenges",
+          text: "Anywhere AR Photo Challenges",
           numberOfLines: 2,
           style: [styles.heading]
         }}

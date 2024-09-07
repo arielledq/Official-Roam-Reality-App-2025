@@ -692,7 +692,7 @@ const ArChallengeCapture = ({}) => {
           >
             <AppHeader
               centerComponent={{
-                text: "Anywhere AR Challenges",
+                text: "Anywhere AR Photo Challenges",
                 numberOfLines: 2,
                 style: [styles.heading]
               }}
