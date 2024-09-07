@@ -88,6 +88,8 @@ LOCAL_APPS = [
     'home',
     'users.apps.UsersConfig',
     'feedback',
+    'notifications',
+    'onesignal_client',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -253,6 +255,11 @@ AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
 AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME", "")
 AWS_STORAGE_REGION = env.str("AWS_STORAGE_REGION", "")
+
+# ONESIGNAL keys
+ONESIGNAL_APP_ID = env.str("ONESIGNAL_APP_ID", "")
+ONESIGNAL_REST_API_KEY = env.str("ONESIGNAL_REST_API_KEY", "")
+ONESIGNAL_USER_AUTH_KEY = env.str("ONESIGNAL_USER_AUTH_KEY", "")
 
 USE_S3 = (
     AWS_ACCESS_KEY_ID and
