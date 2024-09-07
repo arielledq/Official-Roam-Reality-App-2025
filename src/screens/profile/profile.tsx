@@ -218,7 +218,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <FastImage
             style={{
               width: '100%',
-              marginTop: 80, backgroundColor: 'red',
+              marginTop: 80,
               aspectRatio: 1
             }}
             source={{ uri: profileDetails?.image }}

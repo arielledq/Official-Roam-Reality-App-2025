@@ -19,7 +19,7 @@ import useStyles from "./styles"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { AppInput } from "../../components"
 import useDebounce from "../../hooks/debounce"
-import { DEBOUNCE_TIME } from "../../util/helpers"
+import { DEBOUNCE_TIME, showMessage } from "../../util/helpers"
 import { Icon } from "react-native-elements"
 import Images from "../../assets/images"
 
@@ -87,13 +87,13 @@ const ContactsTab = () => {
     sendFriendRequest({ to_user: user?.id })
       .then(response => {
         if (response && response?.status === 1) {
-          Alert.alert("Requests", "Friend request sent successfully")
+          showMessage("Friend request sent successfully")
         } else {
-          Alert.alert("Friend Request Error", response?.message?.message)
+          showMessage(response?.message?.message, 'error', "Friend Request Error")
         }
       })
       .catch(error => {
-        Alert.alert("Friend Request Error", error?.message)
+        showMessage(error?.message, 'error', "Friend Request Error")
       })
   }
 

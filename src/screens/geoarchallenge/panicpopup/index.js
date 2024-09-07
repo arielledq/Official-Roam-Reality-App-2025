@@ -10,6 +10,7 @@ import useStyles from "./styles"
 import { Formik } from "formik"
 import { panicMessageAPI } from "../../../network"
 import { getDeviceCurrentLocation } from "../../../util/LocationLib"
+import { showMessage } from "../../../util/helpers"
 
 const PanicPopUp = ({ onClose }) => {
   const _styles = useStyles()
@@ -17,7 +18,7 @@ const PanicPopUp = ({ onClose }) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const submitHandler = values => {
-    getDeviceCurrentLocation((position) => {
+    getDeviceCurrentLocation(position => {
       setIsLoading(true)
       panicMessageAPI({
         message: values.message,
@@ -27,16 +28,10 @@ const PanicPopUp = ({ onClose }) => {
         .then(res => {
           console.log("panicMessageAPI res", res)
           if (res.status == 1) {
-            Alert.alert("Success", "Message submitted successfully!", [
-              {
-                text: "OK",
-                onPress: () => {
-                  onClose()
-                }
-              }
-            ])
+            showMessage("Message submitted successfully!")
+            onClose()
           } else {
-            Alert.alert("Error", res.message.error)
+            showMessage(res.message.error, "error")
           }
         })
         .finally(() => {
@@ -47,7 +42,11 @@ const PanicPopUp = ({ onClose }) => {
 
   return (
     <BackgroundWithImage>
-      <AppHeader title={"Emergency Message"} leftComponent={null} backgroundColor="transparent" />
+      <AppHeader
+        title={"Emergency Message"}
+        leftComponent={null}
+        backgroundColor="transparent"
+      />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps="always"
         nestedScrollEnabled
@@ -66,7 +65,11 @@ const PanicPopUp = ({ onClose }) => {
           {({ handleChange, handleSubmit, values, errors, touched }) => (
             <View style={_styles.container}>
               <Text style={_styles.emergencyText}>Emergency Procedure</Text>
-              <Text style={_styles.emergencyTextDes}>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ullamcorper erat nec blandit pharetra. Quisque mattis elit semper sem mattis, a commodo nisi mattis.</Text>
+              <Text style={_styles.emergencyTextDes}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
+                ullamcorper erat nec blandit pharetra. Quisque mattis elit
+                semper sem mattis, a commodo nisi mattis.
+              </Text>
               <View style={_styles.chidlView}>
                 <AppInput
                   style={[
@@ -82,7 +85,7 @@ const PanicPopUp = ({ onClose }) => {
                   onSubmitEditing={Keyboard.dismiss}
                   placeholderTextColor={
                     (touched.message && errors?.message) ||
-                      isMessageInputFocused
+                    isMessageInputFocused
                       ? theme.darkColors?.white
                       : theme.darkColors?.grey
                   }
@@ -105,7 +108,11 @@ const PanicPopUp = ({ onClose }) => {
                 onPress={handleSubmit}
                 loading={isLoading}
               />
-              <TouchableOpacity onPress={() => { onClose() }}>
+              <TouchableOpacity
+                onPress={() => {
+                  onClose()
+                }}
+              >
                 <Text style={_styles.notShareBottomText}>Cancel</Text>
               </TouchableOpacity>
             </View>

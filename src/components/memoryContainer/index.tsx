@@ -7,6 +7,7 @@ import FastImage from "react-native-fast-image"
 import DownloadImg from "../../assets/ar/download.svg"
 import RNFetchBlob from "rn-fetch-blob";
 import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
+import { showMessage } from "../../util/helpers";
 
 const MemoryContainer = ({
   title,
@@ -58,12 +59,12 @@ const MemoryContainer = ({
       if (Platform.OS == 'ios') {
         console.log("res.path::", res)
         CameraRoll.saveAsset(res.data, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
-          Alert.alert("AR Memories!", 'Saved to Camera Roll');
+          showMessage('Saved to Camera Roll', 'success', 'AR Memories!')
         })
           .catch((err) => {
             console.log('err:', err);
           });;
-      } else { Alert.alert("AR Memories!", 'Saved to Camera Roll'); }
+      } else { showMessage('Saved to Camera Roll', 'success', 'AR Memories!'); }
     });
   }
 
