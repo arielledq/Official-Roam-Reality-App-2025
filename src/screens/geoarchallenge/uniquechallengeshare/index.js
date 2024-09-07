@@ -338,10 +338,6 @@ const UniqueArChallengeShare = ({}) => {
           Congrats on completing the {challengeObj?.sponsored?.name} Photo AR
           Experience!{" "}
         </AppText>
-        <AppText numberOfLines={3} style={[styles.subHeaderText]}>
-          Please note you must share your experience to at least one social
-          platform to earn all your points.
-        </AppText>
         <View
           style={[
             styles.detailContainer,
@@ -353,7 +349,7 @@ const UniqueArChallengeShare = ({}) => {
               resizeMode={"cover"}
               repeat={true}
               style={{
-                width: "100%",
+                width: "70%",
                 flex: 1,
                 marginTop: Platform.OS == "ios" ? -200 : 0
               }}
@@ -367,8 +363,8 @@ const UniqueArChallengeShare = ({}) => {
               source={{ uri: captureData }}
               style={{
                 backgroundColor: "transparent",
-                width: "100%",
-                height: imageHeight,
+                width: "70%",
+                height: imageHeight * 0.7,
                 marginTop: Platform.OS == "ios" ? -200 : 0
               }}
             />
@@ -455,13 +451,13 @@ const UniqueArChallengeShare = ({}) => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
+          <Text style={styles.shareText}>
+            Click icons to share, 1 Extra Point Per Platform
+          </Text>
         </View>
       </ScrollView>
       {!hideBottomTab && (
-        <View
-          style={{ height: 104, justifyContent: "flex-end", marginBottom: 30 }}
-        >
+        <View style={{ justifyContent: "flex-end" }}>
           <TouchableOpacity
             onPress={() => {
               navigation.navigate("Settings")
@@ -477,8 +473,19 @@ const UniqueArChallengeShare = ({}) => {
             title={"Share Please!"}
             loading={isLoading}
           />
+          <AppButton
+            onPress={() => navigation.replace("Home")}
+            buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            title={"End Experience"}
+            loading={isLoading}
+          />
         </View>
       )}
+      <AppText numberOfLines={3} style={[styles.subHeaderText]}>
+        Please note you must share your experience to at least one social
+        platform to earn all your points.
+      </AppText>
     </BackgroundWithImage>
   )
 }
