@@ -11,8 +11,8 @@ class NotificationErrorAdmin(NotificationError):
     search_fields = ["id", "message"]
 
 
-@admin.register(NotificationError)
-class NotificationErrorAdmin(NotificationError):
+@admin.register(Notification)
+class NotificationAdmin(Notification):
     list_display = ('id', 'title')
     ordering = ("id",)
     search_fields = ["id", "title"]
