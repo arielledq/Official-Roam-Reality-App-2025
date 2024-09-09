@@ -98,17 +98,17 @@ class FriendshipRequest(models.Model):
     def __str__(self):
         return "%s" % self.from_user_id
     
-@receiver(post_save, sender=FriendshipRequest)
-def new_friend_request_received(sender, instance, created, **kwargs):
-    if created:
-        Notification.objects.create(
-            sender=instance.from_user,
-            receiver=instance.to_user,
-            title="Friend Request",
-            message=f"{instance.from_user.name} sent you a friend request",
-            notification_type=Notification.FRIEND_REQUEST,
-            friend_request=instance
-        )
+# @receiver(post_save, sender=FriendshipRequest)
+# def new_friend_request_received(sender, instance, created, **kwargs):
+#     if created:
+#         Notification.objects.create(
+#             sender=instance.from_user,
+#             receiver=instance.to_user,
+#             title="Friend Request",
+#             message=f"{instance.from_user.name} sent you a friend request",
+#             notification_type=Notification.FRIEND_REQUEST,
+#             friend_request=instance
+#         )
     
 
 class Notification(CommonModel):
