@@ -38,22 +38,36 @@ class Notification(models.Model):
     sent = models.BooleanField(default=False)
     is_read = models.BooleanField(default=False)
 
-    class NotificationChannel(models.IntegerChoices):
-        EMAIL = (1, 'EMAIL')
-        SMS = (2, 'SMS')
-        PUSH = (3, 'PUSH')
+    class NotificationChannel:
+        EMAIL = 1
+        SMS = 2
+        PUSH = 3
+
+        choices = (
+            (EMAIL, 'EMAIL'),
+            (SMS, 'SMS'),
+            (PUSH, 'PUSH')
+        )
+
+    class NotificationType:
+        DEFAULT = 1
+        CONNECTIONS = 2
+        REVIEWS = 3
+        TASKS = 4
+        FEEDBACK = 5
+
+        choices = (
+            (DEFAULT, 'DEFAULT'),
+            (CONNECTIONS, 'CONNECTIONS'),
+            (REVIEWS, 'REVIEWS'),
+            (TASKS, 'TASKS'),
+            (FEEDBACK, 'FEEDBACK')
+        )
 
     channel = models.IntegerField(
         choices=NotificationChannel.choices,
         default=NotificationChannel.PUSH
     )
-
-    class NotificationType(models.IntegerChoices):
-        DEFAULT = (1, 'DEFAULT')
-        CONNECTIONS = (2, 'CONNECTIONS')
-        REVIEWS = (3, 'REVIEWS')
-        TASKS = (4, 'TASKS')
-        FEEDBACK = (5, 'FEEDBACK')
 
     type = models.IntegerField(
         choices=NotificationType.choices,
