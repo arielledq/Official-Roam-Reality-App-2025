@@ -12,6 +12,17 @@ User = get_user_model()
 LOGGER = logging.getLogger('django')
 
 
+class NotificationTypes:
+    AR_SITE_NEARBY = 'AR SITE NEARBY',
+    STAR_NEARBY = 'STAR NEARBY',
+    FRIEND_ROAMING_ONLINE = 'FRIEND ROAMING ONLINE',
+    POINTS_REVOKED = 'POINTS REVOKED',
+    FRIEND_REQUEST_SENT = 'FRIEND REQUEST SENT',
+    FRIEND_REQUEST_ACCEPTED = 'FRIEND REQUEST ACCEPTED',
+    EXPERIENCE_ABOUT_EXPIRE = 'EXPERIENCE ABOUT EXPIRE',
+    REFRESH_APP_REMINDER = 'REFRESH APP REMINDER'
+
+
 class NotificationError(models.Model):
     """
     Model to store notification errors.
