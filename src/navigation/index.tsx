@@ -106,7 +106,9 @@ const Navigation = () => {
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
-        {/* <Stack.Screen name="PublicProfile" component={PublicProfile} /> */}
+        <Stack.Screen name="PublicProfile" component={PublicProfile} />
+        <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
+        <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
         <Stack.Screen name="Friends" component={Friends} />
         <Stack.Screen name="AddFriend" component={AddFriendScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
