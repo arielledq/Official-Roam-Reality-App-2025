@@ -88,8 +88,8 @@ LOCAL_APPS = [
     'home',
     'users.apps.UsersConfig',
     'feedback',
-    # 'notifications',
-    # 'onesignal_client',
+    'notifications',
+    'onesignal_client',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',

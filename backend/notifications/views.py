@@ -7,7 +7,7 @@ from notifications.models import Notification
 from notifications.serializers import NotificationSerializer
 from onesignal_client.api.v1.serializers import UserIdPushTokenSerializer
 from onesignal_client.models import UserDevice
-from utils.utils import may_fail, DefaultPagination
+from utils import may_fail, DefaultPagination
 from onesignal_client.views import PostViewsetMixin
 
 
