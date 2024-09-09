@@ -16,7 +16,7 @@ RUN groupadd -r django \
   && useradd -d /opt/webapp -r -g django django \
   && chown django:django -R /opt/webapp
 
-USER root
+USER django
 RUN apt update
 RUN apt-get install -y software-properties-common 
 RUN add-apt-repository ppa:ubuntugis/ppa
