@@ -7,19 +7,24 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		00C5DAB9E74228F680399FAA /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */; };
 		00E356F31AD99517003FC87E /* travel_ar_app_42706Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */; };
 		02AFF9238C5F465996CE62FB /* Poppins-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */; };
+		06180FBCD8B1C674F82B3D87 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
 		0FD2C6B450084C2ABA964DAB /* sf-ui-display-light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		18ECC00FF4674AD1A5278128 /* sf-ui-display-semibold.otf in Resources */ = {isa = PBXBuildFile; fileRef = C819029DAEAC4167BAC89AB3 /* sf-ui-display-semibold.otf */; };
+		31DFAB8440AB41F9AF5D55CB /* GlacialIndifference-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AB103DFF0C5D4B22B9CF3244 /* GlacialIndifference-Regular.otf */; };
 		3235135242414B33812B78CA /* sf-ui-display-black.otf in Resources */ = {isa = PBXBuildFile; fileRef = 74CC6328F15D4CE7BA75F102 /* sf-ui-display-black.otf */; };
 		3900D0AA5E0345C8B41EFBEC /* Poppins-Medium.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2FE0364303ED43E4A1DBF5A9 /* Poppins-Medium.ttf */; };
 		3B7B221EF1F84DE3A93B6D08 /* sf-ui-display-medium.otf in Resources */ = {isa = PBXBuildFile; fileRef = 05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */; };
 		3D603FCECA2143A7AF9DB4E2 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A53F223FE2914D979DB076EB /* Poppins-SemiBold.ttf */; };
-		4382E8D2046CF57AEC6F5CB4 /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 8B28DDF05B64827A397784F9 /* libPods-travel_ar_app_42706.a */; };
 		475566C6FDC443F49225D0C0 /* NunitoSans_10pt-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6E1BB610A5784CC698E44AA8 /* NunitoSans_10pt-SemiBold.ttf */; };
+		53F7E19B2C8F7226007954D6 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F7E19A2C8F7226007954D6 /* NotificationService.swift */; };
+		53F7E19F2C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		59C6D19D189D4C88918CC5D4 /* GlacialIndifference-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = FB19541829D34458B9377668 /* GlacialIndifference-Bold.otf */; };
 		7241EFA2F08C408BA847C61D /* sf-ui-display-bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */; };
 		732EB55F52334EFD9593556C /* sf-ui-display-regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */; };
 		733259CF4D604031AF68F7DF /* Poppins-Thin.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */; };
@@ -31,6 +36,7 @@
 		7A5AF0CE2C29979D00A603EE /* GlacialIndifference-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7A5AF0CC2C2982AF00A603EE /* GlacialIndifference-Italic.otf */; };
 		7A5AF0CF2C29979D00A603EE /* GlacialIndifference-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 7A5AF0CB2C2982AF00A603EE /* GlacialIndifference-Regular.otf */; };
 		7DA9DD95E3BE4B7697979033 /* NunitoSans_10pt-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */; };
+		7EB00F8752A546E68FF89919 /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 7B5A9DBA841740F191CB3208 /* index.js */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8203743F5590401D93CFBA74 /* Poppins-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */; };
 		8BF9013D26454852A8AAC264 /* sf-ui-display-ultralight.otf in Resources */ = {isa = PBXBuildFile; fileRef = 464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */; };
@@ -55,16 +61,12 @@
 		9CA9F538379E4FD29F9EC5EC /* Poppins-Light.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */; };
 		AA6AFD4BD2404146A54A90D6 /* NunitoSans_10pt-ExtraBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 70B7CB0E017E451EAB220EA0 /* NunitoSans_10pt-ExtraBold.ttf */; };
 		B45D634D2BC0480EBFA69C7D /* sf-ui-display-thin.otf in Resources */ = {isa = PBXBuildFile; fileRef = 3020C3A053944525B096A961 /* sf-ui-display-thin.otf */; };
-		C19F8AE4AD272DE5C36B154E /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 594E1A2B86F68DCD33D6D58C /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
+		BB97441EF15744B1A6EF1F2B /* GlacialIndifference-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9889D6EA874B41A88B435790 /* GlacialIndifference-Italic.otf */; };
 		C62A697E5B374603A68AAC5A /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */; };
 		CA66786B9F934F798246E280 /* Poppins-Bold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */; };
 		D0BE067D5A634F1EAB11156D /* NunitoSans_10pt-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */; };
 		D861E940FA984C13850C042A /* NunitoSans_10pt-ExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 162B40CDEEE145B3BC91B877 /* NunitoSans_10pt-ExtraLight.ttf */; };
 		FF3279F34BD54D6B88C7827D /* Poppins-Black.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 5217457F90794339A2E07132 /* Poppins-Black.ttf */; };
-		59C6D19D189D4C88918CC5D4 /* GlacialIndifference-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = FB19541829D34458B9377668 /* GlacialIndifference-Bold.otf */; };
-		BB97441EF15744B1A6EF1F2B /* GlacialIndifference-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9889D6EA874B41A88B435790 /* GlacialIndifference-Italic.otf */; };
-		31DFAB8440AB41F9AF5D55CB /* GlacialIndifference-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = AB103DFF0C5D4B22B9CF3244 /* GlacialIndifference-Regular.otf */; };
-		7EB00F8752A546E68FF89919 /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 7B5A9DBA841740F191CB3208 /* index.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,7 +77,28 @@
 			remoteGlobalIDString = 13B07F861A680F5B00A75B9A;
 			remoteInfo = travel_ar_app_42706;
 		};
+		53F7E19D2C8F7226007954D6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53F7E1972C8F7226007954D6;
+			remoteInfo = OneSignalNotificationServiceExtension;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		53F7E1A02C8F7227007954D6 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				53F7E19F2C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		00E356EE1AD99517003FC87E /* travel_ar_app_42706Tests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = travel_ar_app_42706Tests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -83,8 +106,7 @@
 		00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = travel_ar_app_42706Tests.m; sourceTree = "<group>"; };
 		035E791890C347CAA200494B /* sf-ui-display-heavy.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-heavy.otf"; path = "../src/assets/fonts/sf-ui-display-heavy.otf"; sourceTree = "<group>"; };
 		05A54F40E2A8422F87588B59 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-medium.otf"; path = "../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
-		081C4F3E407E63C3253860F9 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
-		11A842419B1CE1951EEEE78F /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
+		09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Roam Reality.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Roam Reality.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = travel_ar_app_42706/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = travel_ar_app_42706/AppDelegate.mm; sourceTree = "<group>"; };
@@ -95,14 +117,17 @@
 		25B5A085BA5D41608FA6979D /* Poppins-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Regular.ttf"; path = "../src/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		263FDD44A73B426BB38561E1 /* sf-ui-display-light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-light.otf"; path = "../src/assets/fonts/sf-ui-display-light.otf"; sourceTree = "<group>"; };
 		27FDA785FBE3483896AFC972 /* sf-ui-display-regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-regular.ttf"; path = "../src/assets/fonts/sf-ui-display-regular.ttf"; sourceTree = "<group>"; };
+		2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2E2871F9DE6A45C6B2395823 /* Poppins-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Light.ttf"; path = "../src/assets/fonts/Poppins-Light.ttf"; sourceTree = "<group>"; };
 		2FE0364303ED43E4A1DBF5A9 /* Poppins-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Medium.ttf"; path = "../src/assets/fonts/Poppins-Medium.ttf"; sourceTree = "<group>"; };
 		3020C3A053944525B096A961 /* sf-ui-display-thin.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-thin.otf"; path = "../src/assets/fonts/sf-ui-display-thin.otf"; sourceTree = "<group>"; };
 		464818B460574AB185F570CC /* sf-ui-display-ultralight.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-ultralight.otf"; path = "../src/assets/fonts/sf-ui-display-ultralight.otf"; sourceTree = "<group>"; };
 		4FB86370881444ABB63EB623 /* NunitoSans_10pt-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Black.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Black.ttf"; sourceTree = "<group>"; };
 		5217457F90794339A2E07132 /* Poppins-Black.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Black.ttf"; path = "../src/assets/fonts/Poppins-Black.ttf"; sourceTree = "<group>"; };
+		53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		53F7E19A2C8F7226007954D6 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		53F7E19C2C8F7226007954D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		5824BB05D58F41A8BB69006C /* sf-ui-display-bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-bold.otf"; path = "../src/assets/fonts/sf-ui-display-bold.otf"; sourceTree = "<group>"; };
-		594E1A2B86F68DCD33D6D58C /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		651D4A39226F4A9B80283875 /* NunitoSans_10pt-Light.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Light.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Light.ttf"; sourceTree = "<group>"; };
 		67B20C52DB8C459580F59ED7 /* Poppins-Thin.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Thin.ttf"; path = "../src/assets/fonts/Poppins-Thin.ttf"; sourceTree = "<group>"; };
 		6E1BB610A5784CC698E44AA8 /* NunitoSans_10pt-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-SemiBold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -114,11 +139,9 @@
 		7A5AF0CB2C2982AF00A603EE /* GlacialIndifference-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "GlacialIndifference-Regular.otf"; path = "../../../src/assets/fonts/GlacialIndifference-Regular.otf"; sourceTree = "<group>"; };
 		7A5AF0CC2C2982AF00A603EE /* GlacialIndifference-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "GlacialIndifference-Italic.otf"; path = "../../../src/assets/fonts/GlacialIndifference-Italic.otf"; sourceTree = "<group>"; };
 		7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "sf-ui-display-medium.otf"; path = "../../../src/assets/fonts/sf-ui-display-medium.otf"; sourceTree = "<group>"; };
-		7A9ACCDD4DB2F70D3B5F426B /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		7B5A9DBA841740F191CB3208 /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		8719B76477404311A7CA7F03 /* Poppins-ExtraLight.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraLight.ttf"; path = "../src/assets/fonts/Poppins-ExtraLight.ttf"; sourceTree = "<group>"; };
-		8B28DDF05B64827A397784F9 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		8BDDC96E434A1C586BD4B991 /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
 		90EF26452B5039E300872709 /* Fontisto.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = Fontisto.ttf; sourceTree = "<group>"; };
@@ -137,18 +160,21 @@
 		90EF26522B5039E300872709 /* EvilIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = EvilIcons.ttf; sourceTree = "<group>"; };
 		90EF26532B5039E300872709 /* SimpleLineIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = SimpleLineIcons.ttf; sourceTree = "<group>"; };
 		90EF26542B5039E300872709 /* MaterialIcons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; path = MaterialIcons.ttf; sourceTree = "<group>"; };
+		9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig"; sourceTree = "<group>"; };
+		9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9889D6EA874B41A88B435790 /* GlacialIndifference-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GlacialIndifference-Italic.otf"; path = "../src/assets/fonts/GlacialIndifference-Italic.otf"; sourceTree = "<group>"; };
+		9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		A0E2E296E62B4C41AF1C67C5 /* Poppins-ExtraBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-ExtraBold.ttf"; path = "../src/assets/fonts/Poppins-ExtraBold.ttf"; sourceTree = "<group>"; };
 		A53F223FE2914D979DB076EB /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-SemiBold.ttf"; path = "../src/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
+		AB103DFF0C5D4B22B9CF3244 /* GlacialIndifference-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GlacialIndifference-Regular.otf"; path = "../src/assets/fonts/GlacialIndifference-Regular.otf"; sourceTree = "<group>"; };
 		ABDDB675A7334996B47C4B58 /* Poppins-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Poppins-Bold.ttf"; path = "../src/assets/fonts/Poppins-Bold.ttf"; sourceTree = "<group>"; };
 		B22491BC42A04BF88632C0D1 /* NunitoSans_10pt-Medium.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Medium.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Medium.ttf"; sourceTree = "<group>"; };
 		B399D590B2C9401AA9C9817E /* NunitoSans_10pt-Bold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Bold.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Bold.ttf"; sourceTree = "<group>"; };
+		B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
 		C819029DAEAC4167BAC89AB3 /* sf-ui-display-semibold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "sf-ui-display-semibold.otf"; path = "../src/assets/fonts/sf-ui-display-semibold.otf"; sourceTree = "<group>"; };
 		D0F391C41CEF415E96916908 /* NunitoSans_10pt-Regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "NunitoSans_10pt-Regular.ttf"; path = "../src/assets/fonts/NunitoSans_10pt-Regular.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		FB19541829D34458B9377668 /* GlacialIndifference-Bold.otf */ = {isa = PBXFileReference; name = "GlacialIndifference-Bold.otf"; path = "../src/assets/fonts/GlacialIndifference-Bold.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		9889D6EA874B41A88B435790 /* GlacialIndifference-Italic.otf */ = {isa = PBXFileReference; name = "GlacialIndifference-Italic.otf"; path = "../src/assets/fonts/GlacialIndifference-Italic.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		AB103DFF0C5D4B22B9CF3244 /* GlacialIndifference-Regular.otf */ = {isa = PBXFileReference; name = "GlacialIndifference-Regular.otf"; path = "../src/assets/fonts/GlacialIndifference-Regular.otf"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
-		7B5A9DBA841740F191CB3208 /* index.js */ = {isa = PBXFileReference; name = "index.js"; path = "../src/assets/fonts/index.js"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
+		FB19541829D34458B9377668 /* GlacialIndifference-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "GlacialIndifference-Bold.otf"; path = "../src/assets/fonts/GlacialIndifference-Bold.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -156,7 +182,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C19F8AE4AD272DE5C36B154E /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
+				06180FBCD8B1C674F82B3D87 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -164,7 +190,14 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				4382E8D2046CF57AEC6F5CB4 /* libPods-travel_ar_app_42706.a in Frameworks */,
+				00C5DAB9E74228F680399FAA /* libPods-travel_ar_app_42706.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53F7E1952C8F7226007954D6 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -209,10 +242,19 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				8B28DDF05B64827A397784F9 /* libPods-travel_ar_app_42706.a */,
-				594E1A2B86F68DCD33D6D58C /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
+				9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */,
+				2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		53F7E1992C8F7226007954D6 /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				53F7E19A2C8F7226007954D6 /* NotificationService.swift */,
+				53F7E19C2C8F7226007954D6 /* Info.plist */,
+			);
+			path = OneSignalNotificationServiceExtension;
 			sourceTree = "<group>";
 		};
 		7A0A2F1F2B7FA24600E778AF /* Sounds */ = {
@@ -274,6 +316,7 @@
 				13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* travel_ar_app_42706Tests */,
+				53F7E1992C8F7226007954D6 /* OneSignalNotificationServiceExtension */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
@@ -289,6 +332,7 @@
 			children = (
 				13B07F961A680F5B00A75B9A /* Roam Reality.app */,
 				00E356EE1AD99517003FC87E /* travel_ar_app_42706Tests.xctest */,
+				53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -324,10 +368,10 @@
 		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				8BDDC96E434A1C586BD4B991 /* Pods-travel_ar_app_42706.debug.xcconfig */,
-				081C4F3E407E63C3253860F9 /* Pods-travel_ar_app_42706.release.xcconfig */,
-				7A9ACCDD4DB2F70D3B5F426B /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
-				11A842419B1CE1951EEEE78F /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
+				9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */,
+				B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */,
+				09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
+				9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -339,12 +383,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "travel_ar_app_42706Tests" */;
 			buildPhases = (
-				AE5C92191F4ACEC0C924BBEA /* [CP] Check Pods Manifest.lock */,
+				6F58A6FCF8200117B4ED943C /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				ABF6C7309F77319B44ECDA49 /* [CP] Embed Pods Frameworks */,
-				A9CFF2E70D3BC3EACB83EF02 /* [CP] Copy Pods Resources */,
+				D045E593F7392C51344A1915 /* [CP] Embed Pods Frameworks */,
+				34F22EAC672971E8CE2BD7C1 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -360,23 +404,42 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "travel_ar_app_42706" */;
 			buildPhases = (
-				1C90EA0ADCCFED818901A898 /* [CP] Check Pods Manifest.lock */,
+				8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				6E8D829FF8AA1C42A392E929 /* [CP] Embed Pods Frameworks */,
-				CA7E6DEBC07DF0506D569166 /* [CP] Copy Pods Resources */,
+				53F7E1A02C8F7227007954D6 /* Embed Foundation Extensions */,
+				14D7E42D0C5B1038644775CA /* [CP] Embed Pods Frameworks */,
+				C883D88DD3D2C2EE6CE9E21C /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				53F7E19E2C8F7226007954D6 /* PBXTargetDependency */,
 			);
 			name = travel_ar_app_42706;
 			productName = travel_ar_app_42706;
 			productReference = 13B07F961A680F5B00A75B9A /* Roam Reality.app */;
 			productType = "com.apple.product-type.application";
+		};
+		53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53F7E1A32C8F7227007954D6 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */;
+			buildPhases = (
+				53F7E1942C8F7226007954D6 /* Sources */,
+				53F7E1952C8F7226007954D6 /* Frameworks */,
+				53F7E1962C8F7226007954D6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OneSignalNotificationServiceExtension;
+			productName = OneSignalNotificationServiceExtension;
+			productReference = 53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 /* End PBXNativeTarget section */
 
@@ -384,6 +447,7 @@
 		83CBB9F71A601CBA00E9B192 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -392,6 +456,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+					};
+					53F7E1972C8F7226007954D6 = {
+						CreatedOnToolsVersion = 15.0.1;
 					};
 				};
 			};
@@ -410,6 +477,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* travel_ar_app_42706 */,
 				00E356ED1AD99517003FC87E /* travel_ar_app_42706Tests */,
+				53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */,
 			);
 		};
 /* End PBXProject section */
@@ -482,6 +550,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		53F7E1962C8F7226007954D6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
@@ -501,29 +576,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
-		1C90EA0ADCCFED818901A898 /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-travel_ar_app_42706-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		6E8D829FF8AA1C42A392E929 /* [CP] Embed Pods Frameworks */ = {
+		14D7E42D0C5B1038644775CA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -540,7 +593,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		A9CFF2E70D3BC3EACB83EF02 /* [CP] Copy Pods Resources */ = {
+		34F22EAC672971E8CE2BD7C1 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -557,24 +610,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		ABF6C7309F77319B44ECDA49 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		AE5C92191F4ACEC0C924BBEA /* [CP] Check Pods Manifest.lock */ = {
+		6F58A6FCF8200117B4ED943C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -596,7 +632,29 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		CA7E6DEBC07DF0506D569166 /* [CP] Copy Pods Resources */ = {
+		8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-travel_ar_app_42706-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C883D88DD3D2C2EE6CE9E21C /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -611,6 +669,23 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		D045E593F7392C51344A1915 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
@@ -652,6 +727,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		53F7E1942C8F7226007954D6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53F7E19B2C8F7226007954D6 /* NotificationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -660,12 +743,17 @@
 			target = 13B07F861A680F5B00A75B9A /* travel_ar_app_42706 */;
 			targetProxy = 00E356F41AD99517003FC87E /* PBXContainerItemProxy */;
 		};
+		53F7E19E2C8F7226007954D6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */;
+			targetProxy = 53F7E19D2C8F7226007954D6 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 7A9ACCDD4DB2F70D3B5F426B /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */;
+			baseConfigurationReference = 09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -692,7 +780,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 11A842419B1CE1951EEEE78F /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */;
+			baseConfigurationReference = 9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -716,8 +804,9 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 8BDDC96E434A1C586BD4B991 /* Pods-travel_ar_app_42706.debug.xcconfig */;
+			baseConfigurationReference = 9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
@@ -751,8 +840,9 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 081C4F3E407E63C3253860F9 /* Pods-travel_ar_app_42706.release.xcconfig */;
+			baseConfigurationReference = B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
@@ -779,6 +869,89 @@
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
+			};
+			name = Release;
+		};
+		53F7E1A12C8F7227007954D6 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = AB35BNBR3J;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OneSignalNotificationServiceExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality.OneSignalNotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		53F7E1A22C8F7227007954D6 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				CURRENT_PROJECT_VERSION = 1;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = AB35BNBR3J;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = OneSignalNotificationServiceExtension;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality.OneSignalNotificationServiceExtension;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -936,6 +1109,15 @@
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53F7E1A32C8F7227007954D6 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53F7E1A12C8F7227007954D6 /* Debug */,
+				53F7E1A22C8F7227007954D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

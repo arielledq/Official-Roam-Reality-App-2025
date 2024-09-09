@@ -9,8 +9,22 @@ import { GestureHandlerRootView } from "react-native-gesture-handler"
 import SplashScreen from "react-native-splash-screen"
 import Geocoder from "react-native-geocoding"
 import Toast, { ErrorToast, SuccessToast } from "react-native-toast-message"
+import OneSignal from "react-native-onesignal"
+import { NotificationProvider } from "./NotificationProvider"
+import Config from "./config"
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA")
+
+OneSignal.setAppId(Config.ONE_SIGNAL_APP_ID)
+
+OneSignal.promptForPushNotificationsWithUserResponse()
+
+OneSignal.setNotificationWillShowInForegroundHandler(
+  notificationReceivedEvent => {
+    const notification = notificationReceivedEvent.getNotification()
+    notificationReceivedEvent.complete(notification)
+  }
+)
 
 const toastConfig = {
   success: props => (
@@ -31,15 +45,17 @@ const App = () => {
   }, [])
 
   return (
-    <Provider store={store}>
-      {/* this  GestureHandlerRootView is used for https://gorhom.github.io/react-native-bottom-sheet/*/}
-      <GestureHandlerRootView style={styles.root}>
-        <PersistGate loading={null} persistor={persistor}>
-          <Navigation />
-        </PersistGate>
-      </GestureHandlerRootView>
-      <Toast config={toastConfig} />
-    </Provider>
+    <NotificationProvider>
+      <Provider store={store}>
+        {/* this  GestureHandlerRootView is used for https://gorhom.github.io/react-native-bottom-sheet/*/}
+        <GestureHandlerRootView style={styles.root}>
+          <PersistGate loading={null} persistor={persistor}>
+            <Navigation />
+          </PersistGate>
+        </GestureHandlerRootView>
+        <Toast config={toastConfig} />
+      </Provider>
+    </NotificationProvider>
   )
 }
 
