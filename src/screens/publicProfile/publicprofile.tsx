@@ -45,6 +45,7 @@ import { BlurView } from "@react-native-community/blur"
 import UserReportCard from "../../components/userInfoCard"
 import ReportUserModal from "../reportUser/ReportUser"
 import { showMessage } from "../../util/helpers"
+import ConfirmationPopUp from "../../components/confirmationPopUp"
 
 const PublicProfile: ScreenStackComponent<
   RootStackParamList,
@@ -63,6 +64,7 @@ const PublicProfile: ScreenStackComponent<
   const [starsCount, setStarsCount] = useState(0)
   const [countryCount, setCountryCount] = useState(0)
   const [globalRank, setGlobalRank] = useState(0)
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false)
 
   const fetchARUserProfile = () => {
     getPublicARProfile(userProfile?.id)
@@ -311,26 +313,8 @@ const PublicProfile: ScreenStackComponent<
       })
   }
 
-  const onRemoveFriendClick = () => {
-    // Prompt user wether they really want to unfriend
-    Alert.alert(
-      "Remove Friend",
-      "Are you sure you want to remove this friend?",
-      [
-        {
-          text: "Yes",
-          onPress: () => {
-            // Call API to remove friend
-            onRemoveConfirm()
-          }
-        },
-        {
-          text: "No",
-          onPress: () => {}
-        }
-      ]
-    )
-  }
+  const onRemoveFriendClick = () => setConfirmationModalVisible(true)
+
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -368,6 +352,15 @@ const PublicProfile: ScreenStackComponent<
           />
         </BlurView>
       </View>
+      <ConfirmationPopUp
+        title={'Remove Friend'}
+        description={'Are you sure you want to remove this friend?'}
+        confirmText={'Confirm'}
+        confirmHandler={onRemoveConfirm}
+        isVisible={confirmationModalVisible}
+        cancelText={"Cancel"}
+        cancelHandler={() => setConfirmationModalVisible(false)}
+      />
     </BackgroundWithImage>
   )
 }
