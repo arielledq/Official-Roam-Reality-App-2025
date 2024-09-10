@@ -89,6 +89,17 @@ const ArChallengeCapture = ({}) => {
     const [rotate, setRotate] = useState([0, 0, 0])
     const [progress, setProgress] = useState([0, 0, 0])
 
+    const [cameraPosition, setCameraPosition] = useState([0, 0, 0])
+    const [cameraRotation, setCameraRotation] = useState([0, 0, 0])
+
+    const handleCameraTransformUpdate = cameraTransform => {
+      console.log(" cameraTransform ", JSON.stringify(cameraTransform, null, 2))
+      // Get the camera position and rotation
+      const { position, rotation } = cameraTransform
+      setCameraPosition(position)
+      setCameraRotation(rotation)
+    }
+
     function onInitialized(state, reason) {
       // console.log("guncelleme", state, reason)
       if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
@@ -273,7 +284,10 @@ const ArChallengeCapture = ({}) => {
     // console.log("object3dType", object3dType)
     // console.log("modelPath", modelPath)
     return (
-      <ViroARScene onTrackingUpdated={onInitialized}>
+      <ViroARScene
+        onTrackingUpdated={onInitialized}
+        // onCameraTransformUpdate={handleCameraTransformUpdate}
+      >
         <ViroAmbientLight color="#FFFFFF" intensity={250} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, -1, 0]} />
         <ViroDirectionalLight color="#FFFFFF" direction={[0, 0, -1]} />
@@ -303,6 +317,11 @@ const ArChallengeCapture = ({}) => {
           />
         )}
 
+        {console.log(
+          " challengeObjParameters ===>>> ",
+          JSON.stringify(challengeObjParameters, null, 2)
+        )}
+
         {challengeObj.challenge_choice == "DANCE" &&
           modelPath &&
           object3dType && (
@@ -320,6 +339,11 @@ const ArChallengeCapture = ({}) => {
                   ? Number(challengeObjParameters?.positionZ)
                   : -25
               ]}
+              // position={[
+              //   cameraPosition[0],
+              //   cameraPosition[1],
+              //   cameraPosition[2] - 25 // Adjust the z-offset as needed
+              // ]}
               scale={scale}
               resources={sourcesFiles}
               type={object3dType}
