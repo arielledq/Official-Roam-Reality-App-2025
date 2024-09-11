@@ -15,6 +15,7 @@ import LinearGradient from "react-native-linear-gradient"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 import { removeItem, showMessage, setItem, getItem } from "../../util/helpers"
 import AppSwitch from "../../components/Switch"
+import userLocationHook from "./location.hook"
 
 const DrawerList = [
   { icon: "target", label: "AR Photo Challenges", navigateTo: "Home" },
@@ -44,6 +45,7 @@ const DrawerLayout = ({
 }) => {
   const dispatch = useDispatch()
   const userData = useSelector(state => state?.login?.data)
+  const { setLocationEnabled } = userLocationHook()
 
   function getIconFamily(icon) {
     const customIcons = [
@@ -58,12 +60,14 @@ const DrawerLayout = ({
   }
 
   const toggleLiveLocation = async () => {
+    const locationEnabled = !Boolean(userData?.locationEnabled)
     dispatch(
       updateUserData({
         ...userData,
-        locationEnabled: !Boolean(userData?.locationEnabled)
+        locationEnabled: locationEnabled
       })
     )
+    setLocationEnabled(locationEnabled)
   }
 
   const renderDrawerItem = () => {
