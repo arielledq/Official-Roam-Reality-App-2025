@@ -227,6 +227,10 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
           {ar_filters.map(filter => {
             return (
               <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
+                {console.log(
+                  " filter ======>>>> ",
+                  JSON.stringify(filter, null, 2)
+                )}
                 {filter.gradient_colors && (
                   // grandient
                   <View
@@ -244,7 +248,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                         transform: [
                           {
                             rotate:
-                              filter.gradient_direction !== "TOP_TO_BOTTOM"
+                              filter.gradient_direction === "TOP_TO_BOTTOM"
                                 ? "0deg"
                                 : "180deg"
                           }
@@ -286,7 +290,6 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                           }
                         ]}
                       >
-                        asd
                         {filter.filter_text}
                       </Text>
                     )}
@@ -361,7 +364,6 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                           }
                         ]}
                       >
-                        asd
                         {filter.filter_text}
                       </Text>
                     )}
