@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { checkARChallengeDoneAPI, getAnyARExamples } from "../../../network";
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
+import { showMessage } from "../../../util/helpers";
 
 const { width } = Dimensions.get('window');
 
@@ -66,7 +67,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
     if (!isChallengeDone) {
       navigation.navigate("ArChallengeCapture", { challengeObj });
     } else {
-      Alert.alert("Anywhere AR Challenges", "You have already completed the challenge.")
+      showMessage("You have already completed the challenge.", 'info', "Anywhere AR Photo Challenges")
     }
   }
 
@@ -88,7 +89,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
         { text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image) },
       ]);
     } else {
-      Alert.alert("No Example available.")
+      showMessage("No Example available.", 'error')
     }
   }
 
@@ -96,7 +97,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
 
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
-        text: "Anywhere AR Challenges",
+        text: "Anywhere AR Photo Challenges",
         numberOfLines: 2,
         style: [styles.heading],
       }} backgroundColor="transparent" />

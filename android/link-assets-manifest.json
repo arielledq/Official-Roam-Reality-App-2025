@@ -2,6 +2,18 @@
   "migIndex": 1,
   "data": [
     {
+      "path": "src/assets/fonts/GlacialIndifference-Bold.otf",
+      "sha1": "3de2363bbe5afcc79bcbc64ddf95626663137317"
+    },
+    {
+      "path": "src/assets/fonts/GlacialIndifference-Italic.otf",
+      "sha1": "6329a38f8d1599a30c75a6ed997109c47ccabf8b"
+    },
+    {
+      "path": "src/assets/fonts/GlacialIndifference-Regular.otf",
+      "sha1": "15bfdfd55e31ad2c56f7bee8ebffc8147945ae68"
+    },
+    {
       "path": "src/assets/fonts/NunitoSans_10pt-Black.ttf",
       "sha1": "b5920e7324121e9dc2a4d65cbedac76a07cc0e82"
     },
@@ -71,7 +83,7 @@
     },
     {
       "path": "src/assets/fonts/index.js",
-      "sha1": "9b477d06d2666d2149795aab185688279702a51c"
+      "sha1": "e5ab73e0414da644fcb0c093eabd516aac9fc9d1"
     },
     {
       "path": "src/assets/fonts/sf-ui-display-black.otf",

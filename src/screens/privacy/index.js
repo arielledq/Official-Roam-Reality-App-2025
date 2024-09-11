@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import BackgroundWithImage from '../../components/background'
-import theme from '../../assets/theme'
-import { AppHeader, AppText } from '../../components'
-import Icon from '../../components/Icon'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import { useNavigation } from '@react-navigation/native'
-import ToggleSwitch from 'toggle-switch-react-native'
+import React, { useState } from "react"
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native"
+import BackgroundWithImage from "../../components/background"
+import theme from "../../assets/theme"
+import { AppHeader, AppText } from "../../components"
+import Icon from "../../components/Icon"
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
+import { useNavigation } from "@react-navigation/native"
+import ToggleSwitch from "toggle-switch-react-native"
 
 function PrivacyToggle({ label, value, setter, icon }) {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         backgroundColor: theme.darkColors?.inputBlue,
         paddingHorizontal: 15,
         paddingVertical: 12,
@@ -25,8 +25,8 @@ function PrivacyToggle({ label, value, setter, icon }) {
     >
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center'
+          flexDirection: "row",
+          alignItems: "center"
         }}
       >
         <Icon name={icon} family="custom" size={24} />
@@ -60,10 +60,10 @@ const Privacy = () => {
   })
 
   const handleChangePassword = () => {
-    navigation.navigate('ChangePassword')
+    navigation.navigate("ChangePassword")
   }
   const handlePrivacy = () => {
-    navigation.navigate('Privacy')
+    navigation.navigate("Privacy")
   }
   const handleNotificationToggle = (key, value) => {
     setNotificationToggles({
@@ -79,7 +79,7 @@ const Privacy = () => {
   }
   return (
     <BackgroundWithImage style={styles.mainContainer}>
-      <AppHeader title={'Privacy'} backgroundColor="transparent" />
+      <AppHeader title={"Privacy"} backgroundColor="transparent" />
       <AppText
         style={{
           ...fontGroup.ns400,
@@ -94,35 +94,35 @@ const Privacy = () => {
         icon="file"
         label="News and Updates"
         value={notificationToggles.newsAndUpdates}
-        setter={value => handleNotificationToggle('newsAndUpdates', value)}
+        setter={value => handleNotificationToggle("newsAndUpdates", value)}
       />
       <PrivacyToggle
-        icon={'star'}
+        icon={"star"}
         label="AR Route Nearby"
         value={notificationToggles.arRouteNearby}
-        setter={value => handleNotificationToggle('arRouteNearby', value)}
+        setter={value => handleNotificationToggle("arRouteNearby", value)}
       />
       <PrivacyToggle
         icon="flag"
         label="Rally Event Updates"
         value={notificationToggles.rallyEventUpdates}
-        setter={value => handleNotificationToggle('rallyEventUpdates', value)}
+        setter={value => handleNotificationToggle("rallyEventUpdates", value)}
       />
       <PrivacyToggle
         icon="scores"
         label="Level/Ranking Upgrades"
         value={notificationToggles.levelRankingUpgrades}
         setter={value =>
-          handleNotificationToggle('levelRankingUpgrades', value)
+          handleNotificationToggle("levelRankingUpgrades", value)
         }
       />
       <PrivacyToggle
         icon="user"
         label="Friend Request"
         value={notificationToggles.friendRequest}
-        setter={value => handleNotificationToggle('friendRequest', value)}
+        setter={value => handleNotificationToggle("friendRequest", value)}
       />
-      <AppText
+      {/* <AppText
         style={{
           ...fontGroup.ns400,
           fontSize: FontSizes.S20,
@@ -147,7 +147,7 @@ const Privacy = () => {
         }}
       >
         Manage your app permissions in app settings, click here
-      </AppText>
+      </AppText> */}
     </BackgroundWithImage>
   )
 }

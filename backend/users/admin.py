@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
-from users.models import UserOtp, UserProfile
+from users.models import FriendshipRequest, UserOtp, UserProfile
 
 from users.forms import UserChangeForm, UserCreationForm
 
@@ -40,3 +40,10 @@ class UserOTP(admin.ModelAdmin):
     list_display = ["email", "otp"]
     search_fields = ["email", "otp"]
     list_display_links = ["email", "otp"]
+
+
+@admin.register(FriendshipRequest)
+class FriendshipRequestAdmin(admin.ModelAdmin):
+    list_display = ["id", "from_user", "to_user"]
+    search_fields = ["from_user__name", "to_user__name"]
+    list_display_links = ["id", "from_user", "to_user"]
