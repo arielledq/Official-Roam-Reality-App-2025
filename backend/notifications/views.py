@@ -20,12 +20,12 @@ class SetDeviceViewset(PostViewsetMixin, viewsets.GenericViewSet):
         data = serializer.validated_data
         #
         if data['active']:
-            devices = UserDevice.objects.filter(device_id=data.get('user_id')).exclude(user=user)
+            devices = UserDevice.objects.filter(device_id=data.get('userId')).exclude(user=user)
             if devices:
                 for device in devices:
                     device.active = False
                     device.save()
-            UserDevice.activate_device(user, data.get('user_id'), data.get('push_token'))
+            UserDevice.activate_device(user, data.get('userId'), data.get('pushToken'))
         else:
             UserDevice.deactivate_all_devices(user)
 

@@ -290,7 +290,7 @@ const GeoArSiteNavigation = ({}) => {
                   )
                 }}
                 onReady={result => {
-                  console.log(result.via_waypoint)
+                  // console.log(result.via_waypoint)
                   // console.log(result.legs)
                   // console.log(`Distance: ${result.distance} km`)
                   // console.log(`Duration: ${result.duration} min.`)
