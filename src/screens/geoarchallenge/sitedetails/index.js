@@ -51,6 +51,11 @@ const GeoArSiteDetails = ({}) => {
   const [address, setAddress] = useState(null)
   const [starsCount, setStarsCount] = useState(0)
 
+  console.log(
+    " selectedGeoSite ===>>> ",
+    JSON.stringify(selectedGeoSite, null, 2)
+  )
+
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
       setAddress(selectedGeoSite.address_text)
@@ -315,25 +320,45 @@ const GeoArSiteDetails = ({}) => {
               marginBottom: 30
             }}
           >
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <SiteIcon style={{ width: 48, height: 48 }} />
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1
+              }}
+            >
+              <SiteIcon style={{ width: 44, height: 44, marginBottom: 10 }} />
               <Text style={_styles.s_list_count}>
                 {selectedGeoSite.check_ins}
               </Text>
               <Text style={_styles.s_list_text}>Check-ins</Text>
             </View>
             {/* <View style={{ alignItems: 'center', justifyContent: 'center' }}>
-              <StarSiteIcon style={{ width: 48, height: 48 }} />
+              <StarSiteIcon style={{ width: 44, height: 44, marginBottom: 10 }} />
               <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View> */}
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <StarSiteIcon style={{ width: 48, height: 48 }} />
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1
+              }}
+            >
+              <StarSiteIcon
+                style={{ width: 44, height: 44, marginBottom: 10 }}
+              />
               <Text style={_styles.s_list_count}>{starsCount}</Text>
               <Text style={_styles.s_list_text}>Stars</Text>
             </View>
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <ArIcon style={{ width: 48, height: 48 }} />
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                flex: 1
+              }}
+            >
+              <ArIcon style={{ width: 44, height: 44, marginBottom: 10 }} />
               <Text style={_styles.s_list_count}>
                 {selectedDestination.unique_ar_sites.length}
               </Text>
@@ -372,7 +397,8 @@ const GeoArSiteDetails = ({}) => {
             style={{
               justifyContent: "space-between",
               flexDirection: "row",
-              alignItems: "center"
+              alignItems: "center",
+              marginTop: 10
             }}
           >
             <TouchableOpacity

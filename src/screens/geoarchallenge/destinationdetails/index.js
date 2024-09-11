@@ -36,6 +36,7 @@ import {
 } from "../../../util/LocationLib"
 import DestinationFactPopUp from "../destinactionfactpopup"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import Icon from "../../../components/Icon"
 
 const GeoArChallengeDetails = ({}) => {
   const _styles = useStyles()
@@ -400,7 +401,19 @@ const GeoArChallengeDetails = ({}) => {
       />
 
       {isLoading && <ActivityIndicator size="large" />}
-      <View style={{ marginVertical: 20 }}>
+      <View
+        style={{
+          marginBottom: 10,
+          alignItems: "flex-end",
+          gap: 10
+        }}
+      >
+        <Icon
+          name={"angle-double-right"}
+          family="font-awesome"
+          size={25}
+          color="gray"
+        />
         <ScrollView
           horizontal={true}
           showsHorizontalScrollIndicator={false}
