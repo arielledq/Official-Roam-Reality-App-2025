@@ -44,6 +44,8 @@ import ScreenLoader from "../../components/screenLoader"
 import { BlurView } from "@react-native-community/blur"
 import UserReportCard from "../../components/userInfoCard"
 import ReportUserModal from "../reportUser/ReportUser"
+import { showMessage } from "../../util/helpers"
+import ConfirmationPopUp from "../../components/confirmationPopUp"
 
 const PublicProfile: ScreenStackComponent<
   RootStackParamList,
@@ -62,6 +64,7 @@ const PublicProfile: ScreenStackComponent<
   const [starsCount, setStarsCount] = useState(0)
   const [countryCount, setCountryCount] = useState(0)
   const [globalRank, setGlobalRank] = useState(0)
+  const [confirmationModalVisible, setConfirmationModalVisible] = useState(false)
 
   const fetchARUserProfile = () => {
     getPublicARProfile(userProfile?.id)
@@ -95,46 +98,49 @@ const PublicProfile: ScreenStackComponent<
   const getUserCollectedStar = async () => {
     getUserCollectedStarCount({
       user_id: userProfile.id
-    }).then(res => {
-      console.log("getUserCollectedStarCount:", res)
-      if(res.status == 1){
-        setStarsCount(res.count)
-      }
-    }
-    ).catch(err => {
-      console.error('Error', "Error fetching ar memories: ")
-    }
-    ).finally(() => setloading(false))
+    })
+      .then(res => {
+        console.log("getUserCollectedStarCount:", res)
+        if (res.status == 1) {
+          setStarsCount(res.count)
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ")
+      })
+      .finally(() => setloading(false))
   }
 
   const getRank = async () => {
     getUserRankCount({
       user_id: userProfile.id
-    }).then(res => {
-      console.log("getRank:", res)
-      if(res.status == 1){
-        setGlobalRank(res.rank)
-      }
-    }
-    ).catch(err => {
-      console.error('Error', "Error fetching ar memories: ")
-    }
-    ).finally(() => setloading(false))
+    })
+      .then(res => {
+        console.log("getRank:", res)
+        if (res.status == 1) {
+          setGlobalRank(res.rank)
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ")
+      })
+      .finally(() => setloading(false))
   }
 
   const getCountry = async () => {
     getCountryCount({
       user_id: userProfile.id
-    }).then(res => {
-      console.log("getCountry:", res)
-      if(res.status == 1){
-        setCountryCount(res.count)
-      }
-    }
-    ).catch(err => {
-      console.error('Error', "Error fetching ar memories: ")
-    }
-    ).finally(() => setloading(false))
+    })
+      .then(res => {
+        console.log("getCountry:", res)
+        if (res.status == 1) {
+          setCountryCount(res.count)
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ")
+      })
+      .finally(() => setloading(false))
   }
 
   useFocusEffect(
@@ -153,7 +159,7 @@ const PublicProfile: ScreenStackComponent<
   const data = [
     { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
     { id: 2, value: starsCount, property: "Stars" },
-    { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
+    { id: 3, value: arProfile?.challenge_completed, property: "AR Photo Challenges" },
     { id: 4, value: 0, property: "Friends" },
     { id: 5, value: 0, property: "Credits" },
     { id: 6, value: 0, property: "Tokens" },
@@ -180,11 +186,11 @@ const PublicProfile: ScreenStackComponent<
     reportContentOrUser(reportData)
       .then(resposne => {
         if (resposne && resposne?.status === 1) {
-          Alert.alert("Reported", "User has been reported successfully")
+          showMessage("User has been reported successfully")
         }
       })
       .catch(error => {
-        console.error("Error", "Error reporting user")
+        showMessage("Error reporting user", "error")
       })
   }
 
@@ -233,7 +239,7 @@ const PublicProfile: ScreenStackComponent<
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={""+globalRank} property={"Global Rank"} />
+          <StatContainer value={"" + globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
           <StatContainer value={"0"} property={"TT Rank"} />
         </View>
@@ -298,42 +304,17 @@ const PublicProfile: ScreenStackComponent<
     removeUserFromFriends(userProfile?.id)
       .then(resposne => {
         if (resposne && resposne.status === 1) {
-          console.log("removeUserFromFriends", resposne)
-          Alert.alert("Success", "Friend removed successfully", [
-            {
-              text: "OK",
-              onPress: () => {
-                navigation.goBack()
-              }
-            }
-          ])
+          showMessage("Friend removed successfully")
+          navigation.goBack()
         }
       })
       .catch(error => {
-        Alert.alert("Error", "Error removing friend")
+        showMessage("Error removing friend", "error")
       })
   }
 
-  const onRemoveFriendClick = () => {
-    // Prompt user wether they really want to unfriend
-    Alert.alert(
-      "Remove Friend",
-      "Are you sure you want to remove this friend?",
-      [
-        {
-          text: "Yes",
-          onPress: () => {
-            // Call API to remove friend
-            onRemoveConfirm()
-          }
-        },
-        {
-          text: "No",
-          onPress: () => {}
-        }
-      ]
-    )
-  }
+  const onRemoveFriendClick = () => setConfirmationModalVisible(true)
+
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -371,6 +352,15 @@ const PublicProfile: ScreenStackComponent<
           />
         </BlurView>
       </View>
+      <ConfirmationPopUp
+        title={'Remove Friend'}
+        description={'Are you sure you want to remove this friend?'}
+        confirmText={'Confirm'}
+        confirmHandler={onRemoveConfirm}
+        isVisible={confirmationModalVisible}
+        cancelText={"Cancel"}
+        cancelHandler={() => setConfirmationModalVisible(false)}
+      />
     </BackgroundWithImage>
   )
 }

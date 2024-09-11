@@ -1,6 +1,7 @@
 import * as geolib from 'geolib';
 import { Alert, Linking, PermissionsAndroid, Platform, ToastAndroid } from 'react-native';
 import Geolocation from 'react-native-geolocation-service';
+import { showMessage } from './helpers';
 var merc = require('mercator-projection');
 
 export interface LocationPoint {
@@ -55,7 +56,7 @@ export const converXZToLatLong = (x: Number, y: Number) => {
 }
 
 const latLongToMerc = (latDeg: any, longDeg: any) => {
-  // From: https://gist.github.com/scaraveos/5409402 
+  // From: https://gist.github.com/scaraveos/5409402
   const longRad = (longDeg / 180.0) * Math.PI;
   const latRad = (latDeg / 180.0) * Math.PI;
   const smA = 6378137.0;
@@ -91,7 +92,7 @@ export const transformGpsToAR = (devicePoint: LocationPoint, objPoint: LocationP
 const hasPermissionIOS = async () => {
   const openSetting = () => {
     Linking.openSettings().catch(() => {
-      Alert.alert('Unable to open settings');
+      showMessage('Unable to open settings', 'error')
     });
   };
   const status = await Geolocation.requestAuthorization('whenInUse');
@@ -101,7 +102,7 @@ const hasPermissionIOS = async () => {
   }
 
   if (status === 'denied') {
-    Alert.alert('Location permission denied');
+    showMessage('Location permission denied', 'error')
   }
 
   if (status === 'disabled') {

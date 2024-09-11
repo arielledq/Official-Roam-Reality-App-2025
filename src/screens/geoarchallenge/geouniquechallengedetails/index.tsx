@@ -16,6 +16,7 @@ import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
 import { checkUniqueARChallengeDoneAPI, getGeoARExamples } from "../../../network";
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
+import { showMessage } from "../../../util/helpers";
 
 const { width } = Dimensions.get('window');
 
@@ -58,7 +59,7 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
     if (!isChallengeDone) {
       navigation.navigate("UniqueArChallengeCapture", { challengeObj });
     } else {
-      Alert.alert("Unique AR Challenges", "You have already completed the challenge.")
+      showMessage("You have already completed the challenge.", 'info', "Unique AR Photo Challenges")
     }
   }
 
@@ -88,7 +89,7 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
         { text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image) },
       ]);
     } else {
-      Alert.alert("No Example available.")
+      showMessage('No Example available.', 'info')
     }
   }
 

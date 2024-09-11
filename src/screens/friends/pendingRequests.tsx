@@ -20,6 +20,7 @@ import { Icon } from "@rneui/base"
 import FastImage from "react-native-fast-image"
 import Images from "../../assets/images"
 import { set } from "react-native-reanimated"
+import { showMessage } from "../../util/helpers"
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = React.useState([])
@@ -50,13 +51,11 @@ const PendingRequests = () => {
     acceptFriendRequests(user.id)
       .then(response => {
         if (response && response?.status === 1) {
-          Alert.alert("Requests", "You are now friends", [
-            { text: "OK", onPress: () => getPendingRequests() }
-          ])
+          showMessage("You are now friends")
         }
       })
       .catch(error => {
-        Alert.alert("Error", "Something went wrong")
+        showMessage("Something went wrong", 'error')
       })
   }
 
@@ -64,15 +63,14 @@ const PendingRequests = () => {
     rejectFriendRequests(request.id)
       .then(response => {
         if (response && response?.status === 1) {
-          Alert.alert("Requests", "Request has been rejected", [
-            { text: "OK", onPress: () => getPendingRequests() }
-          ])
+          showMessage("Request has been rejected", 'error')
+          getPendingRequests()
         } else {
-          Alert.alert("Error", "Something went wrong")
+          showMessage("Something went wrong", 'error')
         }
       })
       .catch(error => {
-        Alert.alert("Error", "Something went wrong")
+        showMessage("Something went wrong", 'error')
       })
   }
 

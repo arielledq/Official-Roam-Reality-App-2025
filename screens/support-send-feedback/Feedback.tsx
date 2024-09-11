@@ -9,6 +9,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import useStyles from "./styles"
 import { sendFeedback } from "../../src/network"
 import Images from "../../src/assets/images"
+import { showMessage } from "../../src/util/helpers"
 
 const Feedback = () => {
   const _styles = useStyles()
@@ -60,15 +61,15 @@ const Feedback = () => {
         Keyboard.dismiss()
         if (response.status === 1) {
           resetForm() // Reset form after successful submission
-          Alert.alert("Feedback Submitted", "Thank you for your feedback")
+          showMessage('Thank you for your feedback', 'success','Feedback Submitted')
         } else {
-          Alert.alert("Error", "Something went wrong")
+          showMessage('Something went wrong', 'error')
         }
       })
       .catch(error => {
         setLoading(false)
         console.error("error", JSON.stringify(error))
-        Alert.alert("Error", "Something went wrong")
+        showMessage('Something went wrong', 'error')
       })
   }
 
