@@ -19,11 +19,13 @@ class SetDeviceViewset(PostViewsetMixin, viewsets.GenericViewSet):
     def perform_post(self, serializer):
         user = self.request.user
         data = serializer.validated_data
+        print(data)
         #
         if data['active']:
             devices = UserDevice.objects.filter(device_id=data.get('userId')).exclude(user=user)
             if devices:
                 for device in devices:
+                    print(device)
                     device.active = False
                     device.save()
             UserDevice.activate_device(user, data.get('userId'), data.get('pushToken'))
