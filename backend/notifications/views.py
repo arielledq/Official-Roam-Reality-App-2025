@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework.authentication import TokenAuthentication
 from notifications.models import Notification
 from notifications.serializers import NotificationSerializer
 from onesignal_client.api.v1.serializers import UserIdPushTokenSerializer
@@ -13,6 +13,7 @@ from onesignal_client.views import PostViewsetMixin
 
 class SetDeviceViewset(PostViewsetMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     serializer_class = UserIdPushTokenSerializer
 
     def perform_post(self, serializer):

@@ -10,7 +10,8 @@ import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/Fon
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
-    paddingHorizontal: screenHorizontalPadding
+    paddingHorizontal: screenHorizontalPadding,
+    paddingBottom: 20
   },
   container: { marginTop: "9%" },
   headerText: {
