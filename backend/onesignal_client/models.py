@@ -21,6 +21,8 @@ class UserDevice(models.Model):
 
     @staticmethod
     def activate_device(user, device_id, device_token):
+        print('device_id')
+        print(device_id)
         if not device_id:
             return
         try:
