@@ -28,7 +28,7 @@ import {
 } from "react-native-image-picker"
 import { useDispatch, useSelector } from "react-redux"
 import { getProfieDetails, updateProfile } from "../../network"
-import { handleError } from "../../util/helpers"
+import { handleError, showMessage } from "../../util/helpers"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import { updateAccountFlag, updateName } from "../../redux/Login"
 
@@ -62,7 +62,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
   const [countryData, setCountryData] = useState([])
   const [height, setHeight] = useState(0);
   const nameRef = useRef()
-  // Function to fetch 
+  // Function to fetch
   const fetchProfileDetails = async () => {
     try {
       // const details = await getProfieDetails({
@@ -166,7 +166,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
 
   }
 
-  const handleNavigaion = () => {
+  const handleNavigation = () => {
     if (edit) {
       onProfileUpdate()
       navigation.goBack()
@@ -213,9 +213,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
     })
       .then(res => {
         if (res.status == 1) {
-          Alert.alert("Success", 'Details saved successfully!', [
-            { text: "OK", onPress: handleNavigaion }
-          ])
+          showMessage('Details saved successfully!')
+          handleNavigation()
         } else {
           handleError(res)
         }
@@ -228,7 +227,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = (
   const formatPhoneNumber = (input : string) => {
     // Remove non-digit characters
     const cleaned = input.replace(/\D/g, '');
-    
+
     // Apply desired format
     let formatted = '';
     for (let i = 0; i < cleaned.length; i++) {

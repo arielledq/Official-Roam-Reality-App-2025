@@ -1,36 +1,36 @@
-import React, { useEffect } from 'react'
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
+import React, { useEffect } from "react"
+import { Platform, StyleSheet, TouchableOpacity, View } from "react-native"
 import {
   GoogleSignin,
   statusCodes
-} from '@react-native-google-signin/google-signin'
-import DividerWithText from '../dividerwithtextcomponent'
-import { AppleIcon, FacebookIcon, GoogleIcon } from '../../assets/svg'
+} from "@react-native-google-signin/google-signin"
+import DividerWithText from "../dividerwithtextcomponent"
+import { AppleIcon, FacebookIcon, GoogleIcon } from "../../assets/svg"
 import {
   AccessToken,
   AuthenticationToken,
   GraphRequest,
   GraphRequestManager,
   LoginManager
-} from 'react-native-fbsdk-next'
-import 'react-native-get-random-values'
-import uuid from 'react-native-uuid'
+} from "react-native-fbsdk-next"
+import "react-native-get-random-values"
+import uuid from "react-native-uuid"
 import appleAuth, {
   appleAuthAndroid
-} from '@invertase/react-native-apple-authentication'
-import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from '../../network/config'
-import { googleLogin, appleLogin } from '../../network'
-import { useDispatch, useSelector } from 'react-redux'
-import { updateUserData } from '../../redux/Login'
-import { updateAsOldUser } from '../../redux/Persist'
-import { handleError } from '../../util/helpers'
+} from "@invertase/react-native-apple-authentication"
+import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from "../../network/config"
+import { googleLogin, appleLogin } from "../../network"
+import { useDispatch, useSelector } from "react-redux"
+import { updateUserData } from "../../redux/Login"
+import { updateAsOldUser } from "../../redux/Persist"
+import { handleError, showMessage } from "../../util/helpers"
 
 const SocialSignin = ({ setLoading }) => {
   const dispatch = useDispatch()
   const newUser = useSelector(state => state.persist.newUser)
 
   const handleGoogleLogin = async () => {
-    console.log('login called')
+    console.log("login called")
     setLoading(true)
     try {
       await GoogleSignin.hasPlayServices()
@@ -63,10 +63,10 @@ const SocialSignin = ({ setLoading }) => {
         // user cancelled the login flow
         // alert('Cancel')
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        alert('Signin in progress')
+        alert("Signin in progress")
         // operation (f.e. sign in) is in progress already
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        alert('PLAY_SERVICES_NOT_AVAILABLE')
+        alert("PLAY_SERVICES_NOT_AVAILABLE")
         // play services not available or outdated
       } else {
         // some other error happened
@@ -78,27 +78,27 @@ const SocialSignin = ({ setLoading }) => {
 
   const _fblogin = () => {
     LoginManager.logOut()
-    return LoginManager.logInWithPermissions(['email', 'public_profile']).then(
+    return LoginManager.logInWithPermissions(["email", "public_profile"]).then(
       res => {
-        console.log('res of fb login', res)
+        console.log("res of fb login", res)
         if (
           res.declinedPermissions &&
-          res.declinedPermissions.includes('email')
+          res.declinedPermissions.includes("email")
         ) {
-          Alert.alert('Email is required')
+          showMessage("Email is required", "error")
         }
         if (res.isCancelled) {
-          console.error('err')
+          console.error("err")
         } else {
           const req = new GraphRequest(
-            '/me?fields=email,name,picture',
+            "/me?fields=email,name,picture",
             null,
             (err, result) => {
               if (err) {
-                console.error('err', err)
+                console.error("err", err)
                 return
               } else {
-                console.log('res of login fb', result)
+                console.log("res of login fb", result)
                 AccessToken.getCurrentAccessToken().then(data => {
                   console.log({ data })
                   console.log(data?.accessToken.toString())
@@ -115,7 +115,7 @@ const SocialSignin = ({ setLoading }) => {
         }
       },
       err => {
-        console.error('error in login', err)
+        console.error("error in login", err)
       }
     )
   }
@@ -124,7 +124,7 @@ const SocialSignin = ({ setLoading }) => {
     try {
       await _fblogin()
     } catch (err) {
-      console.log('err in catch', err)
+      console.log("err in catch", err)
     }
   }
 
@@ -146,13 +146,13 @@ const SocialSignin = ({ setLoading }) => {
       if (response) {
         console.log({ responseApple: response })
         const payload = {
-          id_token: response.id_token ?? '',
-          access_token: response.code ?? ''
+          id_token: response.id_token ?? "",
+          access_token: response.code ?? ""
         }
         console.log({ payload })
         appleLogin(payload)
           .then(res => {
-            console.log('apple response',{ res })
+            console.log("apple response", { res })
             if (res.status == 1) {
               dispatch(updateUserData(res))
               if (newUser) {
@@ -171,7 +171,7 @@ const SocialSignin = ({ setLoading }) => {
       }
     } catch (error) {
       if (error && error?.code === appleAuth.Error.CANCELED) {
-        throw new Error('The user canceled the signin request.')
+        throw new Error("The user canceled the signin request.")
       }
       throw error
     }
@@ -184,7 +184,7 @@ const SocialSignin = ({ setLoading }) => {
         requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME]
       })
       if (!appleAuthRequestResponse.identityToken) {
-        throw new Error('Apple Sign-In failed - no identify token returned')
+        throw new Error("Apple Sign-In failed - no identify token returned")
       }
 
       // const { identityToken, nonce } = appleAuthRequestResponse
@@ -195,30 +195,30 @@ const SocialSignin = ({ setLoading }) => {
       }
       console.log({ payload })
       appleLogin(payload)
-      .then(res => {
-        console.log('apple response',{ res })
-        if (res.status == 1) {
-          dispatch(updateUserData(res))
-          if (newUser) {
-            dispatch(updateAsOldUser())
+        .then(res => {
+          console.log("apple response", { res })
+          if (res.status == 1) {
+            dispatch(updateUserData(res))
+            if (newUser) {
+              dispatch(updateAsOldUser())
+            }
+          } else {
+            handleError(res)
           }
-        } else {
-          handleError(res)
-        }
-      })
-      .catch(err => {
-        console.log({ err })
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+        })
+        .catch(err => {
+          console.log({ err })
+        })
+        .finally(() => {
+          setLoading(false)
+        })
     } catch (err) {
       console.log({ err })
     }
   }
 
   const handleAppleLogin = async () => {
-    if (Platform.OS === 'android') {
+    if (Platform.OS === "android") {
       handleAppleAndroid()
     } else {
       handleAppleiOS()
@@ -227,13 +227,13 @@ const SocialSignin = ({ setLoading }) => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      scopes: ['email', 'profile']
+      scopes: ["email", "profile"]
     })
   }, [])
 
   return (
     <View>
-      <DividerWithText containerStyle={styles.divider} label={'OR'} />
+      <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
         <TouchableOpacity onPress={handleFBLogin}>
           <FacebookIcon style={styles.socialSIicon} />
@@ -253,13 +253,13 @@ export default SocialSignin
 
 const styles = StyleSheet.create({
   divider: {
-    marginBottom: '10%',
+    marginBottom: "10%",
     marginTop: 20
   },
   socialSUcontainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center'
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center"
   },
   socialSIicon: {
     marginHorizontal: 10

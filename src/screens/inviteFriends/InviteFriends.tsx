@@ -20,6 +20,7 @@ import { Icons } from "../../assets/Icons"
 import useStyles from "./styles"
 import Images from "../../assets/images"
 import { inviteFriendByEmail } from "../../network"
+import { showMessage } from "../../util/helpers"
 
 interface InviteFriendsProps {}
 
@@ -39,7 +40,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
     })
     if (result.action === Share.sharedAction) {
       // Link has been successfully shared
-      Alert.alert("App link shared successfully")
+      showMessage("App link shared successfully")
     }
   }
 
@@ -51,23 +52,23 @@ const InviteFriends = (props: InviteFriendsProps) => {
     setLoading(true)
     const data = {
       email: values.email?.trim(),
-      message: values.description?.trim()
+      message: values.message?.trim()
     }
     inviteFriendByEmail(data)
       .then(response => {
         setLoading(false)
         Keyboard.dismiss()
         if (response.status === 1) {
+          showMessage("An invite has been sent to your friend")
           resetForm() // Reset form after successful submission
-          Alert.alert("Invite", "An invite has been sent to your friend")
         } else {
-          Alert.alert("Error", "Something went wrong")
+          showMessage("Something went wrong", 'error')
         }
       })
       .catch(error => {
         setLoading(false)
         console.error("error", JSON.stringify(error))
-        Alert.alert("Error", "Something went wrong")
+        showMessage("Something went wrong", 'error')
       })
   }
 
@@ -92,7 +93,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
         >
           {({ handleChange, handleSubmit, values, errors, touched }) => (
             <View style={_styles.container}>
-              <View style={_styles.chidlView}>
+              <View>
                 <AppInput
                   inputContainerStyle={[
                     _styles.input,

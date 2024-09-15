@@ -1,5 +1,6 @@
 import { Alert } from "react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import Toast from "react-native-toast-message"
 
 export const handleError = res => {
   let message = ""
@@ -14,7 +15,7 @@ export const handleError = res => {
         : res.message[key]
   }
   console.log({ message })
-  Alert.alert("Error", message)
+  showMessage(message, 'error')
 }
 
 export const getImage = image => {
@@ -50,52 +51,87 @@ export const removeItem = async (key: string) => {
 
 export const DEBOUNCE_TIME = 1000
 
-export const isPointInPolygon = (latitude: Number, longitude: Number, polygon: []) => {
-  if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-    throw new TypeError('Invalid latitude or longitude. Numbers are expected')
+export const isPointInPolygon = (
+  latitude: Number,
+  longitude: Number,
+  polygon: []
+) => {
+  if (typeof latitude !== "number" || typeof longitude !== "number") {
+    throw new TypeError("Invalid latitude or longitude. Numbers are expected")
   } else if (!polygon || !Array.isArray(polygon)) {
-    throw new TypeError('Invalid polygon. Array with locations expected')
+    throw new TypeError("Invalid polygon. Array with locations expected")
   } else if (polygon.length === 0) {
-    throw new TypeError('Invalid polygon. Non-empty Array expected')
+    throw new TypeError("Invalid polygon. Non-empty Array expected")
   }
 
-  const x = latitude; const y = longitude
+  const x = latitude
+  const y = longitude
 
   let inside = false
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i][0]; const yi = polygon[i][1]
-    const xj = polygon[j][0]; const yj = polygon[j][1]
+    const xi = polygon[i][0]
+    const yi = polygon[i][1]
+    const xj = polygon[j][0]
+    const yj = polygon[j][1]
 
-    const intersect = ((yi > y) !== (yj > y)) &&
-      (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+    const intersect =
+      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
     if (intersect) inside = !inside
   }
   return inside
-};
+}
 
 export const convert = (latitude: Number, longitude: Number, polygon: []) => {
-  if (typeof latitude !== 'number' || typeof longitude !== 'number') {
-    throw new TypeError('Invalid latitude or longitude. Numbers are expected')
+  if (typeof latitude !== "number" || typeof longitude !== "number") {
+    throw new TypeError("Invalid latitude or longitude. Numbers are expected")
   } else if (!polygon || !Array.isArray(polygon)) {
-    throw new TypeError('Invalid polygon. Array with locations expected')
+    throw new TypeError("Invalid polygon. Array with locations expected")
   } else if (polygon.length === 0) {
-    throw new TypeError('Invalid polygon. Non-empty Array expected')
+    throw new TypeError("Invalid polygon. Non-empty Array expected")
   }
 
-  const x = latitude; const y = longitude
+  const x = latitude
+  const y = longitude
 
   let inside = false
   for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
-    const xi = polygon[i][0]; const yi = polygon[i][1]
-    const xj = polygon[j][0]; const yj = polygon[j][1]
+    const xi = polygon[i][0]
+    const yi = polygon[i][1]
+    const xj = polygon[j][0]
+    const yj = polygon[j][1]
 
-    const intersect = ((yi > y) !== (yj > y)) &&
-      (x < (xj - xi) * (y - yi) / (yj - yi) + xi)
+    const intersect =
+      yi > y !== yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
     if (intersect) inside = !inside
   }
   return inside
-};
+}
 
 export const convertKilometersToMiles = (kilometers: any) => {
-  return kilometers * 0.621371;
+  return kilometers * 0.621371
+}
+
+type messageTypes = "error" | "success" | "info"
+
+export const showMessage = (
+  error = "An error occurred while communicating with the server, please try again in a few moments",
+  type: messageTypes = "success",
+  title = ""
+) => {
+  let titleShow = title
+  if (title === "") {
+    if (type === "success") {
+      titleShow = "Success"
+    } else if (type === "info") {
+      titleShow = "Info"
+    } else {
+      titleShow = "Error"
+    }
+  }
+
+  Toast.show({
+    type,
+    text1: titleShow,
+    text2: error
+  })
 }

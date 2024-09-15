@@ -21,7 +21,7 @@ import Images from "../../assets/images"
 import fontGroup from "../../assets/fonts"
 import { FontSizes } from "../../util/FontUtils"
 import useDebounce from "../../hooks/debounce"
-import { DEBOUNCE_TIME } from "../../util/helpers"
+import { DEBOUNCE_TIME, showMessage } from "../../util/helpers"
 
 const InAppUsers = () => {
   const _styles = useStyles()
@@ -49,7 +49,7 @@ const InAppUsers = () => {
     sendFriendRequest({ to_user: userObj?.id })
       .then(response => {
         if (response) {
-          Alert.alert("Success", "Friend request sent successfully")
+          showMessage("Friend request sent successfully")
           setSearchText("")
           fetchUsers() // Refresh the list after sending request
         }
@@ -143,13 +143,13 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
         </ImageBackground>
         <View>
           <Text style={styles.title}>{item.name}</Text>
-          <Text
+          {/* <Text
             style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
             {item.email}
-          </Text>
+          </Text> */}
         </View>
       </View>
       <Pressable

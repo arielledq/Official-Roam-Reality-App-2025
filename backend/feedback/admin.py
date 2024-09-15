@@ -12,3 +12,5 @@ class ContactUsAdmin(admin.ModelAdmin):
 class ReportedContentAdmin(admin.ModelAdmin):
     list_display = ('id', 'post', 'reported_user', 'reason', 'is_reviewed', 'created_at')
     list_display_links = ('id',)
+    search_fields = ('custom_reason',)  
+    list_filter = ('reason',)

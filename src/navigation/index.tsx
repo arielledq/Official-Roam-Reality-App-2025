@@ -54,6 +54,10 @@ import Friends from '../screens/friends';
 import AddFriendScreen from '../screens/friends/addFriend';
 import NotificationList from '../screens/notificationList';
 import PublicProfile from '../screens/publicProfile/publicprofile';
+import ArStarChallengeShare from '../screens/geoarchallenge/starshare';
+import Legal from '../screens/legal';
+import ScoreBoard from '../screens/scoreboard';
+// import PublicProfile from '../screens/publicProfile/publicprofile';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -104,6 +108,8 @@ const Navigation = () => {
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="PublicProfile" component={PublicProfile} />
+        <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
+        <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
         <Stack.Screen name="Friends" component={Friends} />
         <Stack.Screen name="AddFriend" component={AddFriendScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
@@ -137,6 +143,8 @@ const Navigation = () => {
         <Stack.Screen name="ContactUs" component={ContactUs} />
         <Stack.Screen name="FAQ" component={FAQ} />
         <Stack.Screen name="Notifications" component={NotificationList} />
+        <Stack.Screen name="Legal" component={Legal} />
+
       </>
     )
   }

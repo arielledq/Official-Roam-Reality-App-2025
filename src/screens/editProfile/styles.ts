@@ -118,9 +118,8 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.colors.pink
   },
   errorText: {
-    color: 'red',
-    fontSize: FontSizes.S13, 
-    marginLeft: 5, 
+    fontSize: FontSizes.S13,
+    marginLeft: 5,
   },
   loaderContainer: {
     flex: 1,

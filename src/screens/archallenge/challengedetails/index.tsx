@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import { fontGroup, FontSizes } from "../../../util/FontUtils"
-import { Alert, Dimensions, Image, Keyboard, ScrollView, Text, View } from "react-native";
+import { Alert, Dimensions, Image, Keyboard, Linking, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import {
   RootStackParamList,
   ScreenStackComponent
@@ -14,8 +14,9 @@ import RenderHtml from 'react-native-render-html';
 import moment from 'moment'
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { checkARChallengeDoneAPI } from "../../../network";
+import { checkARChallengeDoneAPI, getAnyARExamples } from "../../../network";
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
+import { showMessage } from "../../../util/helpers";
 
 const { width } = Dimensions.get('window');
 
@@ -26,14 +27,15 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const route = useRoute()
+  const [examples, setExamples] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj;
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY');
-  console.log("expiry_date:",challengeObj.expiry_date)
+  console.log("expiry_date:", challengeObj.expiry_date)
   const expiryDate = moment(challengeObj.expiry_date).format('DD-MM-YYYY');
   const isFocused = useIsFocused();
-  console.log("challengeObj:",challengeObj)
+  console.log("challengeObj:", challengeObj)
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true)
@@ -53,11 +55,19 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
     })
   }
 
+  const getExample = () => {
+    getAnyARExamples(challengeObj.id).then((res) => {
+      console.log("getExample:", res)
+      setExamples(res.data)
+    }).finally(() => {
+    })
+  }
+
   const navigateToChallengeCapture = () => {
     if (!isChallengeDone) {
       navigation.navigate("ArChallengeCapture", { challengeObj });
     } else {
-      Alert.alert("Anywhere AR Challenges", "You have already completed the challenge.")
+      showMessage("You have already completed the challenge.", 'info', "Anywhere AR Photo Challenges")
     }
   }
 
@@ -65,13 +75,29 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
     if (isFocused) {
       checkIfChallengeIsDone()
     }
+    getExample()
   }, [isFocused]);
+
+  const openExample = () => {
+    if (examples.length > 0) {
+      Alert.alert("AR Example!", "You are about to leave the app and open a web browser. Do you want to continue?", [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image) },
+      ]);
+    } else {
+      showMessage("No Example available.", 'error')
+    }
+  }
 
   return (
 
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
-        text: "Anywhere AR Challenges",
+        text: "Anywhere AR Photo Challenges",
         numberOfLines: 2,
         style: [styles.heading],
       }} backgroundColor="transparent" />
@@ -83,12 +109,12 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
           <Text style={styles.pointCount}>{challengeObj.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
         </View>
-        <View style={{ paddingHorizontal: 10,flex:1}}>
+        <View style={{ paddingHorizontal: 10, flex: 1 }}>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <Image style={{ width: 24, height: 24, marginEnd: 10 }} source={{ uri: challengeObj.sponsored.image }} />
             <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
           </View>
-          <View style={{ marginTop: 10, justifyContent: "space-between",width:'100%' }}>
+          <View style={{ marginTop: 10, justifyContent: "space-between", width: '100%' }}>
             <Text style={styles.challengeSponsorStartDateText}>Started on: <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text></Text>
             <Text style={styles.challengeSponsorStartDateText}>Ends on: <Text style={styles.challengeSponsorStartDateTextValue}>{challengeObj.expiry_date ? expiryDate : "None"}</Text></Text>
           </View>
@@ -104,12 +130,12 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
           contentWidth={width}
           tagsStyles={{
             p: {
-              lineHeight:19.1,
+              lineHeight: 19.1,
               color: '#9CA3AF',
               fontSize: FontSizes.S14
             },
             strong: {
-              lineHeight:19.1,
+              lineHeight: 19.1,
               color: '#fff',
               fontSize: FontSizes.S18
             }
@@ -120,7 +146,9 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
         />
       </ScrollView>
       <View style={{ height: 152 }}>
-        <Text style={styles.bottomText}>Let's see an example</Text>
+        <TouchableOpacity onPress={openExample}>
+          <Text style={styles.bottomText}>Let's see an example</Text>
+        </TouchableOpacity>
         <AppButton
           onPress={() => navigateToChallengeCapture()}
           buttonStyle={styles.buttonStyle}

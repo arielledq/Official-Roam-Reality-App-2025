@@ -23,7 +23,8 @@ const theme = createTheme({
     grey31: "#4F4F4F",
     drawerBG: "#202136",
     magenta: "#C881F0",
-    green: "#67CE67"
+    green: "#67CE67",
+    inputRed:"#D75D50"
   },
   darkColors: {
     white: "#FFFFFF",
@@ -42,7 +43,8 @@ const theme = createTheme({
     toggleOff: "#6F6F76",
     grey: "#BCBCBC",
     grey31: "#4F4F4F",
-    drawerBG: "#202136"
+    drawerBG: "#202136",
+    inputRed:"#D75D50"
   },
   mode: "light"
 })

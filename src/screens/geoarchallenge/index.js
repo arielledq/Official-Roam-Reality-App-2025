@@ -1,9 +1,22 @@
 import React, { useEffect, useState } from "react"
 
-
-import { ActivityIndicator, FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  Text,
+  TouchableOpacity,
+  View
+} from "react-native"
 import { handleError } from "../../util/helpers"
-import { getGeoARDestinations, getARProfile, getARStettings, getARChallenges } from '../../network'
+import {
+  getGeoARDestinations,
+  getARProfile,
+  getARStettings,
+  getARChallenges,
+  updateUserLocation,
+  getARSitesStars
+} from "../../network"
 
 import BackgroundWithImage from "../../components/background"
 import AppHeader from "../../components/header"
@@ -11,36 +24,87 @@ import { DrawerActions, useNavigation } from "@react-navigation/native"
 import SiteIcon from "../../assets/geoar/siteicon.svg"
 import StarSiteIcon from "../../assets/geoar/starsite.svg"
 import GradientDownPNG from "../../assets/geoar/gradient_down.png"
-import BellIcon from "../../assets/geoar/bell.svg"
+import SOSIcon from "../../assets/Icons/sos.svg"
 import ArIcon from "../../assets/geoar/aricon.svg"
-import { updateARUserData, updateARSettings, updateSelectedDestination, updateAnyWhereChallenges } from "../../redux/AR"
+import {
+  updateARUserData,
+  updateARSettings,
+  updateSelectedDestination,
+  updateAnyWhereChallenges
+} from "../../redux/AR"
 
 import { useDispatch } from "react-redux"
 import useStyles from "./styles"
-import LinearGradient from "react-native-linear-gradient"
-import { height, width } from "../../util/AppDimensions"
+import { hasLocationPermission } from "../../util/LocationLib"
+import Geolocation from "react-native-geolocation-service"
 import { MenuIcon } from "../../assets/svg"
+import PanicPopUp from "./panicpopup"
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
+  const [starSitesCount, setStarSitesCount] = useState({})
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
+  const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
 
   const ARSposored = () => {
     setIsLoading(true)
-    getGeoARDestinations().then((res) => {
-      if (res.status == 1) {
-        setDestinationData(res.data)
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
+    getGeoARDestinations()
+      .then(res => {
+        if (res.status == 1) {
+          setDestinationData(res.data)
+          for (let i = 0; i < res.data.length; i++) {
+            const d = res.data[i]
+            getARStarSites(d.id)
+          }
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
+  const getLocation = async () => {
+    const hasPermission = await hasLocationPermission()
+
+    if (!hasPermission) {
+      return
+    }
+    Geolocation.getCurrentPosition(
+      position => {
+        console.log("getLocation", position)
+        updateUserLocation({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        })
+          .then(res => {
+            console.log("updateUserLocation:", res)
+          })
+          .finally(() => {})
+      },
+      error => {
+        console.log(error)
+      },
+      {
+        accuracy: {
+          android: "high",
+          ios: "best"
+        },
+        enableHighAccuracy: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true
       }
-    }).finally(() => {
-      setIsLoading(false)
-    })
+    )
   }
 
   const ARUserProfile = () => {
@@ -72,26 +136,44 @@ const GeoArChallenge = ({}) => {
       })
   }
 
-  useEffect(() => {
+  const loadDestinations = () => {
     ARSposored()
     ARUserProfile()
     getSettings()
-    getARChallenges().then((res) => {
-      if (res.status == 1) {
-        setNumberOfChallenges(res?.data?.length)
-        dispatch(updateAnyWhereChallenges(res?.data))
-      } else {
-        res.message.message = "Error in loading Challenges."
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
-    })
-  }, []);
+    setIsLoading(true)
+    getARChallenges()
+      .then(res => {
+        if (res.status == 1) {
+          setNumberOfChallenges(res?.data?.length)
+          dispatch(updateAnyWhereChallenges(res?.data))
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+    getLocation()
+  }
 
-  const navigateToChallengeDetails = (obj) => {
+  const getARStarSites = async id => {
+    const res = await getARSitesStars({ id })
+    starSitesCount[id] = res.data[0]
+    setStarSitesCount({ ...starSitesCount })
+  }
+
+  const getStarCount = id => {
+    return starSitesCount[id] ? starSitesCount[id] : 0
+  }
+
+  useEffect(() => {
+    loadDestinations()
+  }, [])
+
+  const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj))
-    navigation.navigate("GeoArOutdoor", { challengeObj: obj });
+    navigation.navigate("GeoArOutdoor", { challengeObj: obj })
   }
 
   const Item = ({ obj }) => (
@@ -130,7 +212,7 @@ const GeoArChallenge = ({}) => {
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>
-                {obj.unique_ar_sites.length}
+                {obj.star_ar_sites.length}
               </Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View>
@@ -143,15 +225,15 @@ const GeoArChallenge = ({}) => {
               }}
             >
               <StarSiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>
-                {obj.star_ar_sites.length}
-              </Text>
+              <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{numberOfChallenges}</Text>
-              <Text style={_styles.s_list_text}>AR Challenges</Text>
+              <Text style={_styles.s_list_count}>
+                {obj.unique_ar_sites.length}
+              </Text>
+              <Text style={_styles.s_list_text}>AR Photo Challenges</Text>
             </View>
           </View>
         </View>
@@ -172,10 +254,13 @@ const GeoArChallenge = ({}) => {
   const MenuRightComponent = () => {
     return (
       <TouchableOpacity
-        onPress={() => navigation.navigate("Notifications")}
+        onPress={() => {
+          //navigation.navigate("Notifications")
+          setOpenPanicPopup(true)
+        }}
         style={{ paddingRight: 5 }}
       >
-        <BellIcon />
+        <SOSIcon width={30} height={30} />
       </TouchableOpacity>
     )
   }
@@ -191,16 +276,29 @@ const GeoArChallenge = ({}) => {
         }}
         backgroundColor="transparent"
       />
-
-      {isLoading && <ActivityIndicator size="large" />}
       <FlatList
         showsVerticalScrollIndicator={false}
         style={{ flex: 1, marginVertical: 15 }}
         data={destinationData}
         numColumns={1}
+        refreshing={isLoading}
+        onRefresh={() => {
+          loadDestinations()
+        }}
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
+      {openPanicPopUp && (
+        <View
+          style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
+        >
+          <PanicPopUp
+            onClose={() => {
+              setOpenPanicPopup(false)
+            }}
+          />
+        </View>
+      )}
     </BackgroundWithImage>
   )
 }

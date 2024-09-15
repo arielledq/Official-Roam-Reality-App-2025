@@ -49,6 +49,7 @@ GEO_CHALLENGE_CHOICES = (
     ("3DMODEL", "3D MODEL"),
 )
 
+
 class GeoRegion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -56,13 +57,14 @@ class GeoRegion(models.Model):
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
     geo_region = gis_models.MultiLineStringField(_("Geo Region"), blank=True, null=True)
-    
+
     class Meta:
         verbose_name_plural = "Geo Regions"
         verbose_name = "Geo Region"
 
     def __str__(self):
         return self.name
+
 
 class GeoLocation(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -74,10 +76,13 @@ class GeoLocation(models.Model):
     flag_image = models.ImageField(verbose_name="Flag Scoreboard", upload_to="geoar/img-flag/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
     border = gis_models.MultiLineStringField(_("Borders"), blank=True, null=True)
-    regions = models.ManyToManyField(GeoRegion,verbose_name="AR Regions",related_name="geo_location_region", blank=True, default=None)
+    regions = models.ManyToManyField(GeoRegion, verbose_name="AR Regions", related_name="geo_location_region",
+                                     blank=True, default=None)
     sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)
-    map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"),decimal_places=4,max_digits=6, default=1)
-    map_latitude_delta = models.DecimalField(_("Map Initial Latitude Delta"),decimal_places=4,max_digits=6, default=0.0922)
+    map_longitude_delta = models.DecimalField(_("Map Initial Longitude Delta"), decimal_places=4, max_digits=6,
+                                              default=1)
+    map_latitude_delta = models.DecimalField(_("Map Initial Latitude Delta"), decimal_places=4, max_digits=6,
+                                             default=0.0922)
 
     class Meta:
         verbose_name_plural = "Geo Destination"
@@ -85,6 +90,7 @@ class GeoLocation(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Sponsor(models.Model):
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
@@ -101,25 +107,39 @@ class Sponsor(models.Model):
     def __str__(self):
         return self.name
 
+
 class ARChallengeParameterSettings(models.Model):
     name = models.CharField(
         _("Settings Name"), default=None, null=False, blank=False, max_length=255
     )
     loop_animations = models.BooleanField(_("Loop Animation"), default=False)
-    loop_delay = models.IntegerField(_("Loop Delay"),validators=[MinValueValidator(0)], default=1000, null=False, blank=False)
+    loop_delay = models.IntegerField(_("Loop Delay"), validators=[MinValueValidator(0)], default=1000, null=False,
+                                     blank=False)
     pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
-    min_pinch_scale = models.DecimalField(_("Minimum Zoom Scaling"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=0.02)
-    max_pinch_scale = models.DecimalField(_("Maximum Zoom Scaling"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=0.8)
+    min_pinch_scale = models.DecimalField(_("Minimum Zoom Scaling"), validators=[MinValueValidator(Decimal('0.00')),
+                                                                                 MaxValueValidator(Decimal('1.00'))],
+                                          max_digits=3, decimal_places=2, default=0.02)
+    max_pinch_scale = models.DecimalField(_("Maximum Zoom Scaling"), validators=[MinValueValidator(Decimal('0.00')),
+                                                                                 MaxValueValidator(Decimal('1.00'))],
+                                          max_digits=3, decimal_places=2, default=0.8)
     rotation = models.BooleanField(_("Rotation"), default=False)
     bloom = models.BooleanField(_("Bloom"), default=False)
-    bloom_threshold = models.DecimalField(_("Bloom Threshold"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=1.00)
-    diffuse_text_color = models.CharField(_("Diffuse Color"), max_length=10, blank=True, null=True,default='#ffffff')
-    diffuse_intensity = models.DecimalField(_("Diffuse Intensity"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=1.00)
+    bloom_threshold = models.DecimalField(_("Bloom Threshold"), validators=[MinValueValidator(Decimal('0.00')),
+                                                                            MaxValueValidator(Decimal('1.00'))],
+                                          max_digits=3, decimal_places=2, default=1.00)
+    diffuse_text_color = models.CharField(_("Diffuse Color"), max_length=10, blank=True, null=True, default='#ffffff')
+    diffuse_intensity = models.DecimalField(_("Diffuse Intensity"), validators=[MinValueValidator(Decimal('0.00')),
+                                                                                MaxValueValidator(Decimal('1.00'))],
+                                            max_digits=3, decimal_places=2, default=1.00)
     sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
     image_opacity = models.BooleanField(_("Image Opacity"), default=False)
-    image_opacity_value = models.DecimalField(_("Image Opacity Value"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))], max_digits = 3, decimal_places=2, default=1.00)
+    image_opacity_value = models.DecimalField(_("Image Opacity Value"), validators=[MinValueValidator(Decimal('0.00')),
+                                                                                    MaxValueValidator(Decimal('1.00'))],
+                                              max_digits=3, decimal_places=2, default=1.00)
     tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
-    scale_object = models.DecimalField(_("Object Scale"),validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('8.00'))], max_digits = 3, decimal_places=2, default=0.05)
+    scale_object = models.DecimalField(_("Object Scale"), validators=[MinValueValidator(Decimal('0.00')),
+                                                                      MaxValueValidator(Decimal('8.00'))], max_digits=8,
+                                       decimal_places=5, default=0.05)
     positionX = models.IntegerField(_("Position X"), default=0, null=False, blank=False)
     positionY = models.IntegerField(_("Position Y"), default=0, null=False, blank=False)
     positionZ = models.IntegerField(_("Position Z"), default=-25, null=False, blank=False)
@@ -133,33 +153,38 @@ class ARChallengeParameterSettings(models.Model):
     )
 
     class Meta:
-      verbose_name_plural = "AR Challenge Parameter Settings"
-      verbose_name = "AR Challenge Parameter Settings"
+        verbose_name_plural = "AR Challenge Parameter Settings"
+        verbose_name = "AR Challenge Parameter Settings"
 
     def __str__(self):
         return self.name
+
 
 class ARChallengeFilters(models.Model):
     name = models.CharField(
         _("Filter Name"), default=None, null=False, blank=False, max_length=255
     )
-    image = models.ImageField(_("Filter Image"),upload_to="filters/img/", null=True, blank=True)
+    image = models.ImageField(_("Filter Image"), upload_to="filters/img/", null=True, blank=True)
     text_form_image = models.BooleanField(_("Load Image Text"), default=False)
     gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False)
     gradient_direction = models.CharField(
         max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=False, null=False
     )
-    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=True, null=True,default='')
-    filter_text_color = models.CharField(_("Filter Text Color"), max_length=10, blank=True, null=True,default='#ffffff')
-    filter_text_size = models.CharField(_("Filter Text Size"), max_length=10, blank=True, null=True,default='22')
+    filter_text = models.CharField(_("Filter Text"), max_length=200, blank=True, null=True, default='')
+    filter_text_color = models.CharField(_("Filter Text Color"), max_length=10, blank=True, null=True,
+                                         default='#ffffff')
+    filter_text_size = models.CharField(_("Filter Text Size"), max_length=10, blank=True, null=True, default='22')
     location_option = models.CharField(_("Location Text"),
-        max_length=50, choices=LOCATION_OPTION, default="COUNTRY_ONLY", blank=False, null=False
-    )
-    location_text_size = models.CharField(_("Location Text Size"), max_length=10, blank=False, null=False,default='18')
-    location_text_color = models.CharField(_("Location Text Color"), max_length=10, blank=False, null=False,default='#ffffff')
-    app_name_text = models.CharField(_("App Name Text"), max_length=200, blank=True, null=True,default='ROAM REALITY')
-    app_name_text_size = models.CharField(_("App Name Text Size"), max_length=10, blank=False, null=False,default='14')
-    app_name_text_color = models.CharField(_("App Name Text Color"), max_length=10, blank=False, null=False,default='#ffffff')
+                                       max_length=50, choices=LOCATION_OPTION, default="COUNTRY_ONLY", blank=False,
+                                       null=False
+                                       )
+    location_text_size = models.CharField(_("Location Text Size"), max_length=10, blank=False, null=False, default='18')
+    location_text_color = models.CharField(_("Location Text Color"), max_length=10, blank=False, null=False,
+                                           default='#ffffff')
+    app_name_text = models.CharField(_("App Name Text"), max_length=200, blank=True, null=True, default='ROAM REALITY')
+    app_name_text_size = models.CharField(_("App Name Text Size"), max_length=10, blank=False, null=False, default='14')
+    app_name_text_color = models.CharField(_("App Name Text Color"), max_length=10, blank=False, null=False,
+                                           default='#ffffff')
 
     class Meta:
         verbose_name_plural = "AR Filters"
@@ -168,6 +193,7 @@ class ARChallengeFilters(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Challenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
@@ -190,9 +216,10 @@ class Challenges(models.Model):
         max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
     )
     challenge_choice = models.CharField(verbose_name="Challenge Load From",
-        max_length=50, choices=CHALLENGE_CHOICES, default="DANCE"
-    )
-    ar_filters = models.ManyToManyField(ARChallengeFilters,verbose_name="AR Filters",related_name="filter_ar_challenge", blank=True, default=None)
+                                        max_length=50, choices=CHALLENGE_CHOICES, default="DANCE"
+                                        )
+    ar_filters = models.ManyToManyField(ARChallengeFilters, verbose_name="AR Filters",
+                                        related_name="filter_ar_challenge", blank=True, default=None)
     parameter_settings = models.ForeignKey(
         ARChallengeParameterSettings,
         on_delete=models.CASCADE,
@@ -213,6 +240,7 @@ class Challenges(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class GeoARChallenges(models.Model):
     name = models.CharField(
@@ -235,8 +263,8 @@ class GeoARChallenges(models.Model):
         max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
     )
     challenge_choice = models.CharField(verbose_name="Challenge Load From",
-        max_length=50, choices=GEO_CHALLENGE_CHOICES, default="3DMODEL"
-    )
+                                        max_length=50, choices=GEO_CHALLENGE_CHOICES, default="3DMODEL"
+                                        )
     parameter_settings = models.ForeignKey(
         ARChallengeParameterSettings,
         on_delete=models.CASCADE,
@@ -249,7 +277,7 @@ class GeoARChallenges(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
 
     def save(self, *args, **kwargs):
-        #self.clean()
+        # self.clean()
         return super(GeoARChallenges, self).save(*args, **kwargs)
 
     class Meta:
@@ -258,6 +286,7 @@ class GeoARChallenges(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ARUserProfile(models.Model):
     points = models.BigIntegerField(verbose_name="Challenge Points", default=0)
@@ -274,6 +303,7 @@ class ARUserProfile(models.Model):
 
     def __str__(self):
         return str(self.user.name)
+
 
 class ARMemories(models.Model):
     memory_file = models.FileField(upload_to="ar/memories/")
@@ -327,12 +357,14 @@ class ARMemories(models.Model):
             self.user.name + " " + str(self.memory_file)
         )
 
+
 class ARSettings(models.Model):
     class Meta:
         verbose_name_plural = "AR Settings and Legal"
         verbose_name = "AR Settings and Legal"
 
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
+
 
 class ARExample(models.Model):
     class Meta:
@@ -346,13 +378,16 @@ class ARExample(models.Model):
     )
     video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
-    any_where_challenges = models.ManyToManyField(Challenges,verbose_name="Any Where AR Challenges",related_name="ar_example_challenge", blank=True, default=None)
-    geo_challenges = models.ManyToManyField(GeoARChallenges,verbose_name="Geo AR Challenges",related_name="geo_ar_example_challenge", blank=True, default=None)
+    any_where_challenges = models.ManyToManyField(Challenges, verbose_name="Any Where AR Challenges",
+                                                  related_name="ar_example_challenge", blank=True, default=None)
+    geo_challenges = models.ManyToManyField(GeoARChallenges, verbose_name="Geo AR Challenges",
+                                            related_name="geo_ar_example_challenge", blank=True, default=None)
 
     def __str__(self):
         return str(
             self.name
         )
+
 
 class GeoArSite(models.Model):
     name = models.CharField(
@@ -371,24 +406,25 @@ class GeoArSite(models.Model):
         related_name="geo_location_ar_site",
     )
     pin_challenge = models.ForeignKey(GeoARChallenges,
-       verbose_name="Geo Pin Challenge Name",
-        on_delete=models.SET_DEFAULT,
-        related_name="challenge_geo_ar_pin_site",
-        blank=True, null=True, default=None
-    )
-    address_text = models.TextField(_("Address Text"),default=None, blank=True, null=True)
+                                      verbose_name="Geo Pin Challenge Name",
+                                      on_delete=models.SET_DEFAULT,
+                                      related_name="challenge_geo_ar_pin_site",
+                                      blank=True, null=True, default=None
+                                      )
+    address_text = models.TextField(_("Address Text"), default=None, blank=True, null=True)
     lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
     geo_site_border = gis_models.MultiLineStringField(_("Geo Site Line"), blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
-    
+
     class Meta:
         verbose_name_plural = "Geo AR Site"
         verbose_name = "Geo AR Site"
 
     def __str__(self):
         return self.name
+
 
 class GeoARStar(models.Model):
     name = models.CharField(
@@ -406,11 +442,11 @@ class GeoARStar(models.Model):
         related_name="geo_arstar_ar_site",
     )
     challenges = models.ForeignKey(GeoARChallenges,
-       verbose_name="Geo Challenge Name",
-        on_delete=models.SET_DEFAULT,
-        related_name="challenges_geo_ar_star_site",
-        blank=False, null=False, default=None
-    )
+                                   verbose_name="Geo Challenge Name",
+                                   on_delete=models.SET_DEFAULT,
+                                   related_name="challenges_geo_ar_star_site",
+                                   blank=False, null=False, default=None
+                                   )
     sponsors = models.ManyToManyField(
         Sponsor,
         verbose_name="Sponsors",
@@ -418,11 +454,12 @@ class GeoARStar(models.Model):
     )
 
     class Meta:
-      verbose_name_plural = "Geo AR Stars"
-      verbose_name = "Geo AR Star"
+        verbose_name_plural = "Geo AR Stars"
+        verbose_name = "Geo AR Star"
 
     def __str__(self):
         return self.name
+
 
 class GeoARSpecificSiteRoute(models.Model):
     name = models.CharField(
@@ -437,12 +474,14 @@ class GeoARSpecificSiteRoute(models.Model):
         related_name="geo_route_ar_site",
     )
     route = gis_models.MultiPolygonField(_("Geo Site Route"), blank=True, null=True)
+
     class Meta:
-      verbose_name_plural = "Geo AR Specific Routes"
-      verbose_name = "Geo AR Specific Routes"
+        verbose_name_plural = "Geo AR Specific Routes"
+        verbose_name = "Geo AR Specific Routes"
 
     def __str__(self):
         return self.name
+
 
 class UniqueChallengeSite(models.Model):
     name = models.CharField(
@@ -457,20 +496,21 @@ class UniqueChallengeSite(models.Model):
         related_name="geo_location_ar_unique_site",
     )
     challenge = models.ManyToManyField(GeoARChallenges,
-        verbose_name="Geo Challenge Name",
-        related_name="challenges_geo_ar_unique_site",
-        blank=False, default=None
-    )
+                                       verbose_name="Geo Challenge Name",
+                                       related_name="challenges_geo_ar_unique_site",
+                                       blank=False, default=None
+                                       )
     latitude_longitude = gis_models.PointField(_("Geo Location"), blank=True, null=True)
     visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
 
     class Meta:
-      verbose_name_plural = "Geo AR Unique Sites"
-      verbose_name = "Geo AR Unique Site"
+        verbose_name_plural = "Geo AR Unique Sites"
+        verbose_name = "Geo AR Unique Site"
 
     def __str__(self):
         return self.name
-    
+
+
 class GeoARSiteActivity(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=True, blank=True, max_length=255
@@ -489,12 +529,13 @@ class GeoARSiteActivity(models.Model):
     description = models.TextField(_("Description"), blank=True, null=True)
 
     class Meta:
-      verbose_name_plural = "Geo AR Site Activities"
-      verbose_name = "Geo AR Site Activity"
+        verbose_name_plural = "Geo AR Site Activities"
+        verbose_name = "Geo AR Site Activity"
 
     def __str__(self):
         return self.name
-    
+
+
 class ARSitePinCheckIn(models.Model):
     geo_site = models.ForeignKey(
         GeoArSite,
@@ -529,6 +570,7 @@ class ARSitePinCheckIn(models.Model):
                     "Declined Reason is mandotory, When challenge is declined!"
                 )
 
+
 class StarCollection(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=True, blank=True, max_length=255
@@ -555,12 +597,13 @@ class StarCollection(models.Model):
     point = gis_models.PointField(_("Point"), blank=True, null=True)
 
     class Meta:
-      verbose_name_plural = "Geo AR Star Collections"
-      verbose_name = "Geo AR Star Collections"
+        verbose_name_plural = "Geo AR Star Collections"
+        verbose_name = "Geo AR Star Collections"
 
     def __str__(self):
         return str(self.id)
-    
+
+
 class DestinationFacts(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
@@ -579,17 +622,18 @@ class DestinationFacts(models.Model):
         null=False,
         blank=False,
         related_name="geo_location_ar_facts",
-    ) 
+    )
     border = gis_models.MultiLineStringField(_("Borders"), blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
 
     class Meta:
-      verbose_name_plural = "Geo Destination Facts"
-      verbose_name = "Geo Destination Fact"
+        verbose_name_plural = "Geo Destination Facts"
+        verbose_name = "Geo Destination Fact"
 
     def __str__(self):
         return self.name
-    
+
+
 class GeoARGoldStar(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
@@ -606,7 +650,7 @@ class GeoARGoldStar(models.Model):
         blank=False,
         verbose_name="Geo Destination",
         related_name="geo_location_ar_gold_star",
-    ) 
+    )
     geo_site = models.ForeignKey(
         GeoArSite,
         on_delete=models.CASCADE,
@@ -624,12 +668,13 @@ class GeoARGoldStar(models.Model):
     price = models.IntegerField(verbose_name="Price", default=0)
 
     class Meta:
-      verbose_name_plural = "Geo AR Gold Stars"
-      verbose_name = "Geo AR Gold Star"
+        verbose_name_plural = "Geo AR Gold Stars"
+        verbose_name = "Geo AR Gold Star"
 
     def __str__(self):
         return self.name
-    
+
+
 class PanicMessage(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_panic_message"
@@ -640,6 +685,5 @@ class PanicMessage(models.Model):
     location = gis_models.PointField(_("Location"), blank=True, null=True)
 
     class Meta:
-      verbose_name_plural = "Panic Messages"
-      verbose_name = "Panic Message"
-    
+        verbose_name_plural = "Panic Messages"
+        verbose_name = "Panic Message"
