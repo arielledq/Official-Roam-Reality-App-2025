@@ -9,6 +9,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import useStyles from "./styles"
 import { sendFeedback } from "../../src/network"
 import Images from "../../src/assets/images"
+import { showMessage } from "../../src/util/helpers"
 
 const Feedback = () => {
   const _styles = useStyles()
@@ -17,30 +18,30 @@ const Feedback = () => {
   const [isDescInputFocused, setDescInputFocused] = useState(false)
 
   const SupportOptionsData = [
-    {
-      icon: Images.AppIconLight,
-      text: "Our Website",
-      link: "https://www.facebook.com"
-    },
+    // {
+    //   icon: Images.AppIconLight,
+    //   text: "Our Website",
+    //   link: "https://www.facebook.com/RoamReality"
+    // },
     {
       icon: Images.Facebook,
       text: "Facebook",
-      link: "https://www.facebook.com"
+      link: "https://www.facebook.com/RoamReality"
     },
     {
       icon: Images.Instagram,
       text: "Instagram",
-      link: "https://www.instagram.com"
+      link: "https://www.instagram.com/roamreality"
     },
-    {
-      icon: Images.TikTok,
-      text: "TikTok",
-      link: "https://www.tiktok.com"
-    },
+    // {
+    //   icon: Images.TikTok,
+    //   text: "TikTok",
+    //   link: "https://www.tiktok.com"
+    // },
     {
       icon: Images.YouTube,
       text: "YouTube",
-      link: "https://www.youtube.com"
+      link: "https://www.youtube.com/@roamreality"
     }
   ]
 
@@ -60,15 +61,15 @@ const Feedback = () => {
         Keyboard.dismiss()
         if (response.status === 1) {
           resetForm() // Reset form after successful submission
-          Alert.alert("Feedback Submitted", "Thank you for your feedback")
+          showMessage('Thank you for your feedback', 'success','Feedback Submitted')
         } else {
-          Alert.alert("Error", "Something went wrong")
+          showMessage('Something went wrong', 'error')
         }
       })
       .catch(error => {
         setLoading(false)
         console.error("error", JSON.stringify(error))
-        Alert.alert("Error", "Something went wrong")
+        showMessage('Something went wrong', 'error')
       })
   }
 
@@ -137,6 +138,7 @@ const Feedback = () => {
                     errorMessage={
                       touched.title && errors?.title ? errors.title : undefined
                     }
+                    maxLength={250}
                     autoCapitalize="none"
                   />
                   <AppInput
@@ -153,6 +155,7 @@ const Feedback = () => {
                     onBlur={() => setDescInputFocused(false)}
                     placeholder="Description"
                     onSubmitEditing={Keyboard.dismiss}
+                    maxLength={500}
                     placeholderTextColor={
                       (touched.description && errors?.description) ||
                       isDescInputFocused
@@ -176,6 +179,12 @@ const Feedback = () => {
                     title={"Submit"}
                     onPress={handleSubmit}
                     loading={loading}
+                    disabled={
+                      values.title?.length === 0 ||
+                      values.description?.length === 0
+                        ? true
+                        : false
+                    }
                   />
                 </View>
               )

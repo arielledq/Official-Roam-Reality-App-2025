@@ -19,8 +19,9 @@ import useStyles from "./styles"
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
 import { AppInput } from "../../components"
 import useDebounce from "../../hooks/debounce"
-import { DEBOUNCE_TIME } from "../../util/helpers"
+import { DEBOUNCE_TIME, showMessage } from "../../util/helpers"
 import { Icon } from "react-native-elements"
+import Images from "../../assets/images"
 
 const ContactsTab = () => {
   const _styles = useStyles()
@@ -70,7 +71,9 @@ const ContactsTab = () => {
 
   const fetchContacts = () => {
     Contacts.getAll().then(contactArr => {
+      console.log("Contacts", JSON.stringify(contactArr))
       findFriends(contactArr).then(response => {
+        console.log("Find Friends Response", response)
         if (response && response?.data) {
           setContacts(response?.data)
           setFilteredUsers(response?.data)
@@ -84,13 +87,13 @@ const ContactsTab = () => {
     sendFriendRequest({ to_user: user?.id })
       .then(response => {
         if (response && response?.status === 1) {
-          Alert.alert("Requests", "Friend request sent successfully")
+          showMessage("Friend request sent successfully")
         } else {
-          Alert.alert("Friend Request Error", response?.message?.message)
+          showMessage(response?.message?.message, 'error', "Friend Request Error")
         }
       })
       .catch(error => {
-        Alert.alert("Friend Request Error", error?.message)
+        showMessage(error?.message, 'error', "Friend Request Error")
       })
   }
 
@@ -125,19 +128,25 @@ const ContactsTab = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => renderContact(item, onAddFriendClick)}
+          renderItem={({ item }) =>
+            renderContact(item, onAddFriendClick, _styles)
+          }
         />
       </View>
     </KeyboardAwareScrollView>
   )
 }
 
-const renderContact = (item: any, onAddFriendClick: (user: any) => void) => {
+const renderContact = (
+  item: any,
+  onAddFriendClick: (user: any) => void,
+  styles: any
+) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
         <ImageBackground
-          source={{ uri: item?.user_profile?.image }}
+          source={Images.BGBlur}
           style={localStyle.imageBG}
           resizeMode="stretch"
         >
@@ -148,14 +157,14 @@ const renderContact = (item: any, onAddFriendClick: (user: any) => void) => {
           />
         </ImageBackground>
         <View>
-          <Text style={{ color: theme.lightColors?.magenta }}>{item.name}</Text>
-          <Text
-            style={{ color: theme.lightColors?.white }}
+          <Text style={styles.title}>{item.name}</Text>
+          {/* <Text
+            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
             {item.email}
-          </Text>
+          </Text> */}
         </View>
       </View>
       <Pressable

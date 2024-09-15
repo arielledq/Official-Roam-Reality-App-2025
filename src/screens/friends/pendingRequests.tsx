@@ -1,6 +1,6 @@
 // PendingRequests.tsx
 import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import {
   View,
   Text,
@@ -19,9 +19,12 @@ import theme from "../../assets/theme"
 import { Icon } from "@rneui/base"
 import FastImage from "react-native-fast-image"
 import Images from "../../assets/images"
+import { set } from "react-native-reanimated"
+import { showMessage } from "../../util/helpers"
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = React.useState([])
+  const [isFetching, setFetching] = useState(false)
   const _styles = useStyles()
 
   useFocusEffect(
@@ -31,45 +34,47 @@ const PendingRequests = () => {
   )
 
   const getPendingRequests = () => {
+    setFetching(true)
     getPendingFriendRequests()
       .then(response => {
-        console.info(response)
+        setFetching(false)
         if (response) {
           setPendingRequests(response?.data)
         }
       })
-      .catch(error => console.error(error))
+      .catch(error => {
+        setFetching(false)
+      })
   }
 
   const onAccept = (user: any) => {
     acceptFriendRequests(user.id)
       .then(response => {
-        Alert.alert("Requests", "You are now friends", [
-          { text: "OK", onPress: () => getPendingRequests() }
-        ])
+        if (response && response?.status === 1) {
+          showMessage("You are now friends")
+        }
       })
       .catch(error => {
-        Alert.alert("Error", "Something went wrong")
+        showMessage("Something went wrong", 'error')
       })
   }
 
   const onReject = (request: any) => {
-    console.info(request)
     rejectFriendRequests(request.id)
       .then(response => {
-        console.log("rea", response)
         if (response && response?.status === 1) {
-          Alert.alert("Requests", "Request has been rejected", [
-            { text: "OK", onPress: () => getPendingRequests() }
-          ])
+          showMessage("Request has been rejected", 'error')
+          getPendingRequests()
         } else {
-          Alert.alert("Error", "Something went wrong")
+          showMessage("Something went wrong", 'error')
         }
       })
       .catch(error => {
-        Alert.alert("Error", "Something went wrong")
+        showMessage("Something went wrong", 'error')
       })
   }
+
+  const onRefresh = () => getPendingRequests()
 
   return (
     <View style={_styles.container}>
@@ -78,6 +83,8 @@ const PendingRequests = () => {
         keyExtractor={item => item.id.toString()}
         renderItem={({ item }) => renderFriendItem(item, onAccept, onReject)}
         contentContainerStyle={_styles.scroll}
+        onRefresh={() => onRefresh()}
+        refreshing={isFetching}
       />
     </View>
   )

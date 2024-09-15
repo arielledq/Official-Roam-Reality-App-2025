@@ -1,4 +1,5 @@
 from django.shortcuts import get_object_or_404
+from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet
 from rest_framework.authtoken.models import Token
@@ -11,6 +12,9 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
+
+from notifications.models import NotificationTypes
+from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
 from home.utils import EmailOTP
 from django.utils.translation import ugettext_lazy as _
@@ -66,6 +70,9 @@ class LoginViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
+        if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
+            return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
+            
         user_serializer = UserSerializer(user)
         return Response({"token": token.key, "user": user_serializer.data})
 
@@ -163,7 +170,7 @@ class AccountSetupViewset(ModelViewSet):
     def get_queryset(self):
         user_id = self.kwargs.get('pk')
         if user_id:
-            return UserProfile.objects.filter(user_id=user_id)
+            return UserProfile.objects.filter(pk=user_id)
         else:
             return UserProfile.objects.filter(user=self.request.user)
     
@@ -185,6 +192,7 @@ class FriendshipViewSet(ModelViewSet):
                 return Response({"message": "Friendship request already sent."}, status=status.HTTP_400_BAD_REQUEST)
 
             FriendshipRequest.objects.create(from_user=from_user, to_user=to_user)
+            send_notification(NotificationTypes.FRIEND_REQUEST_SENT, to_user)
             return Response({"message": "Friendship request sent."}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
@@ -213,14 +221,14 @@ class FriendshipViewSet(ModelViewSet):
             friendship_request.delete()
             to_user.user_profile.friends.add(from_user)
             from_user.user_profile.friends.add(to_user)
-
-            Notification.objects.create(
-            sender=from_user,
-            receiver=from_user,
-            title="Friend Request",
-            message=f"{to_user.name} accpeted your friend request",
-            notification_type=Notification.FRIEND_REQUEST,
-             )
+            send_notification(NotificationTypes.FRIEND_REQUEST_ACCEPTED, from_user)
+            # Notification.objects.create(
+            # sender=from_user,
+            # receiver=from_user,
+            # title="Friend Request",
+            # message=f"{to_user.name} accpeted your friend request",
+            # notification_type=Notification.FRIEND_REQUEST,
+            #  )
             return Response({"message": "Friendship request accepted."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -274,6 +282,7 @@ class FindFriendsAPIView(APIView):
     def post(self, request):
         try:
             contacts = request.data
+            users_with_friend_request = FriendshipRequest.objects.filter(from_user=request.user).values_list('to_user', flat=True)
 
             phone_numbers = []
             for contact in contacts:
@@ -291,7 +300,7 @@ class FindFriendsAPIView(APIView):
                             for phone_number in phone_numbers
                         ]
                     )
-                ).exclude(user__in=request.user.user_profile.friends.all())
+                ).exclude(user__in=request.user.user_profile.friends.all()).exclude(user_id__in=users_with_friend_request)
 
                 users = [up.user for up in user_profiles]
                 serializer = UserSerializer(users, many=True)

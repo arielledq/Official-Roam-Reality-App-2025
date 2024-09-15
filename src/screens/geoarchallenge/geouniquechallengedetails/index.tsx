@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 
 import { fontGroup, FontSizes } from "../../../util/FontUtils"
-import { Alert, Dimensions, Image, Keyboard, ScrollView, Text, View } from "react-native";
+import { Alert, Dimensions, Image, Keyboard, Linking, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import {
   RootStackParamList,
   ScreenStackComponent
@@ -14,8 +14,9 @@ import RenderHtml from 'react-native-render-html';
 import moment from 'moment'
 import { useDispatch, useSelector } from "react-redux"
 import useStyles from "./styles"
-import { checkUniqueARChallengeDoneAPI } from "../../../network";
+import { checkUniqueARChallengeDoneAPI, getGeoARExamples } from "../../../network";
 import BGArShare from "../../../assets/ar/bg-ar-share.png"
+import { showMessage } from "../../../util/helpers";
 
 const { width } = Dimensions.get('window');
 
@@ -26,6 +27,7 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const route = useRoute()
+  const [examples, setExamples] = useState([])
   const [isLoading, setIsLoading] = useState(false)
   const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj;
@@ -57,7 +59,7 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
     if (!isChallengeDone) {
       navigation.navigate("UniqueArChallengeCapture", { challengeObj });
     } else {
-      Alert.alert("Unique AR Challenges", "You have already completed the challenge.")
+      showMessage("You have already completed the challenge.", 'info', "Unique AR Photo Challenges")
     }
   }
 
@@ -65,10 +67,33 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
     if (isFocused) {
       checkIfChallengeIsDone()
     }
+    getExample()
   }, [isFocused]);
 
-  return (
+  const getExample = () => {
+    getGeoARExamples(challengeObj.id).then((res) => {
+      console.log("getExample:", res)
+      setExamples(res.data)
+    }).finally(() => {
+    })
+  }
 
+  const openExample = () => {
+    if (examples.length > 0) {
+      Alert.alert("AR Example!", "You are about to leave the app and open a web browser. Do you want to continue?", [
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel',
+        },
+        { text: 'OK', onPress: () => Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image) },
+      ]);
+    } else {
+      showMessage('No Example available.', 'info')
+    }
+  }
+
+  return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader centerComponent={{
           text: "Unique Site AR",
@@ -120,7 +145,9 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArC
         />
       </ScrollView>
       <View style={{ height: 152 }}>
-        <Text style={styles.bottomText}>Let's see an example</Text>
+        <TouchableOpacity onPress={openExample}>
+          <Text style={styles.bottomText}>Let's see an example</Text>
+        </TouchableOpacity>
         <AppButton
           onPress={() => navigateToChallengeCapture()}
           buttonStyle={styles.buttonStyle}

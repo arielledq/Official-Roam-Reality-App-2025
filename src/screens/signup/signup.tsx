@@ -22,7 +22,7 @@ import AppText from "../../components/text"
 import Icon from "../../components/Icon"
 import { signUp } from "../../network"
 import fontGroup from "../../assets/fonts"
-import { handleError } from "../../util/helpers"
+import { handleError, showMessage } from "../../util/helpers"
 import { SignUpSchema } from "../../util/ValidationSchemas"
 import SocialSignin from "../../components/socialSignin"
 import { useNavigation } from "@react-navigation/native"
@@ -53,10 +53,8 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
       if (res.status == 1) {
         resData.current = res
         dispatch(updateAsOldUser())
-        Alert.alert('Registration Successful', 'Please verify your email to continue', [{
-          text: 'OK',
-          onPress: () => navigateToVerifyMail(v.email, resetForm)
-        }])
+        showMessage('Please verify your email to continue', 'success', 'Registration Successful')
+        navigateToVerifyMail(v.email, resetForm)
       } else {
         handleError(res)
       }

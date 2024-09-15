@@ -1,6 +1,11 @@
 import { makeStyles } from "@rneui/themed"
 import { screenHorizontalPadding } from "../../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
+import {
+  FontFamily,
+  FontLineHeights,
+  FontSizes,
+  fontGroup
+} from "../../../util/FontUtils"
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -14,67 +19,65 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     color: theme.colors.white,
     marginTop: 5,
-    textAlign: 'center'
+    textAlign: "center"
   },
   mainContainer: {
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,
-    justifyContent: 'flex-start',
-    position: 'relative',
+    justifyContent: "flex-start",
+    position: "relative"
   },
   container: { marginTop: "10%" },
   headerText: {
     ...fontGroup.ns900,
     fontSize: FontSizes.S24,
-    color: theme.colors.white,
+    color: theme.colors.white
   },
   subHeaderText: {
     ...fontGroup.p400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    marginTop: 5,
+    marginTop: 5
   },
   pointsText: {
     ...fontGroup.ns900,
     fontSize: FontSizes.S24,
-    color: theme.colors.white,
+    color: theme.colors.white
   },
   yourPointsText: {
     ...fontGroup.p400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    marginTop: 5,
+    marginTop: 5
   },
   rowView: {
-    flexDirection: 'row',
+    flexDirection: "row"
   },
   buttonSelectText: {
     fontSize: FontSizes.S14,
     color: theme.colors.white,
-    fontWeight: 'bold'
+    fontWeight: "bold"
   },
-  selectButtonStyle:
-  {
+  selectButtonStyle: {
     backgroundColor: "#B816E050",
     borderColor: "#B816E0",
     borderRadius: 2,
     borderWidth: 1,
     height: 37,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginEnd: 2,
     marginStart: 2,
     paddingHorizontal: 8
   },
-  unSelectButtonStyle:
-  {
+  unSelectButtonStyle: {
     backgroundColor: "#77777750",
     borderColor: "#6B7280",
     borderRadius: 2,
     borderWidth: 1,
     height: 37,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     marginStart: 2,
     marginEnd: 2,
     paddingHorizontal: 8
@@ -89,39 +92,42 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     borderRadius: 12,
     margin: 5,
-    overflow: 'hidden',
-    position: 'relative'
+    overflow: "hidden",
+    position: "relative"
   },
   list_title: {
     ...fontGroup.ns800,
     fontSize: FontSizes.S26,
     color: theme.colors.white,
-    marginTop: 5,
+    marginTop: 5
   },
   s_list_count: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
-    alignItems: 'center',
-    textAlign: 'center',
+    alignItems: "center",
+    textAlign: "center"
   },
   s_list_text: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    alignItems: 'center',
-    textAlign: 'center'
+    alignItems: "center",
+    textAlign: "center"
   },
   gradient: {
-    position: 'absolute',
-    top: 0, bottom: 0, left: 0, right: 0
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
   },
   site_d_header_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
-    alignItems: 'center',
-    textAlign: 'center'
+    alignItems: "center",
+    textAlign: "center"
   },
   site_d_header: {
     ...fontGroup.ns800,
@@ -131,46 +137,45 @@ const useStyles = makeStyles(theme => ({
   },
   site_d_text: {
     ...fontGroup.ns400,
-    fontSize: FontSizes.S10,
-    color: '#C8DFFF',
+    fontSize: FontSizes.S12,
+    color: theme.colors.white,
     marginVertical: 10
   },
   protip_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S16,
-    color: '#1E63EF',
+    color: "#1E63EF",
     marginVertical: 10
   },
   challengeInfoContainer: {
-    left: 0, right: 0,
+    left: 0,
+    right: 0,
     backgroundColor: "#131422",
     height: 420,
     paddingBottom: 30,
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
-    alignItems: 'center',
+    alignItems: "center",
     borderTopEndRadius: 30,
-    borderTopStartRadius: 30,
+    borderTopStartRadius: 30
   },
   challengeInfoHeaderContainer: {
     paddingVertical: 20,
-    alignItems: 'center',
+    alignItems: "center",
     borderBottomColor: "#2C2D41",
     borderBottomWidth: 1,
-    width: '100%'
+    width: "100%"
   },
   challengeInfoHeader: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
-    marginTop: 10,
+    marginTop: 10
   },
   buttonStyle: {
     height: 50
   },
-  buttonContainerStyle: {
-    marginTop: 20
-  },
+  buttonContainerStyle: {}
 }))
 
 export default useStyles

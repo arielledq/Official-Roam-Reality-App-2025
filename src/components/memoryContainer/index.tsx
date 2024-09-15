@@ -7,6 +7,7 @@ import FastImage from "react-native-fast-image"
 import DownloadImg from "../../assets/ar/download.svg"
 import RNFetchBlob from "rn-fetch-blob";
 import { requestMultiple, PERMISSIONS } from 'react-native-permissions';
+import { showMessage } from "../../util/helpers";
 
 const MemoryContainer = ({
   title,
@@ -58,12 +59,12 @@ const MemoryContainer = ({
       if (Platform.OS == 'ios') {
         console.log("res.path::", res)
         CameraRoll.saveAsset(res.data, { type: fileExt == 'mp4' ? 'video' : "photo" }).then(() => {
-          Alert.alert("AR Memories!", 'Saved to Camera Roll'); 
+          showMessage('Saved to Camera Roll', 'success', 'AR Memories!')
         })
           .catch((err) => {
             console.log('err:', err);
           });;
-      } else { Alert.alert("AR Memories!", 'Saved to Camera Roll'); }
+      } else { showMessage('Saved to Camera Roll', 'success', 'AR Memories!'); }
     });
   }
 
@@ -82,16 +83,16 @@ const MemoryContainer = ({
   };
 
   return (
-    <Pressable style={styles.cardContainer} onPress={()=>onPressAction(item?.memory_file,item?.challenge_details)}>
+    <Pressable style={styles.cardContainer} onPress={() => onPressAction(item?.memory_file, item?.challenge_details)}>
       <View style={styles.cardInner}>
         <FastImage style={styles.iconStyle}
           resizeMode={FastImage.resizeMode.cover}
           source={{ uri: item.memory_type == 'VIDEO' ? item?.thumbnail_memory_video_file : item?.memory_file }} />
         <View style={styles.cardBottomContent}>
-          <View style={{ flexDirection: 'row', marginVertical: 7, alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', marginVertical: 5, marginBottom: 0, alignItems: 'center', justifyContent: 'space-between' }}>
             <AppText numberOfLines={1} style={styles.titleStyle}>{item?.challenge_details?.name}</AppText>
-            <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10,padding:10 }}>
-              <DownloadImg style={{ width: 16, height: 16 }} />
+            <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10, padding: 4 }}>
+              <DownloadImg style={{ width: 16, height: 12 }} />
             </TouchableOpacity>
           </View>
           <AppText numberOfLines={2} style={styles.Text}>{item?.challenge_details?.description.replace(/<[^>]+>/g, '')}</AppText>

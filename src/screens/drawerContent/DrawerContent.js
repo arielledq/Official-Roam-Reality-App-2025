@@ -13,39 +13,44 @@ import { useDispatch } from "react-redux"
 import { resetState } from "../../redux/Login"
 import LinearGradient from "react-native-linear-gradient"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
-import { removeItem } from "../../util/helpers"
+import { removeItem, showMessage } from "../../util/helpers"
+import AppSwitch from "../../components/Switch"
 
 const DrawerList = [
-  { icon: 'target', label: 'AR Challenges', navigateTo: 'Home' },
-  { icon: "message-square", label: "Chats", navigateTo: "Home" },
-  { icon: "users", label: "Friends", navigateTo: "Friends" },
-  { icon: "Wallet", label: "Wallet", navigateTo: "Home" },
-  { icon: "info", label: "About Us", navigateTo: "Home" },
-  { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },
-  { icon: "Folder", label: "Privacy Policy", navigateTo: "PrivacyPolicy" },
-  { icon: "info", label: "Send Feedback", navigateTo: "SendFeedback" },
+  { icon: "target", label: "AR Photo Challenges", navigateTo: "Home" },
   {
-    icon: "Folder",
-    label: "Terms and Conditions",
-    navigateTo: "TermsAndConditions"
+    icon: "pin",
+    label: "My Live Location",
+    description: "Allows your friends to see your live location",
+    navigateTo: "toggleLocation"
   },
-  { icon: "Contact", label: "Contact Us", navigateTo: "ContactUs" },
+  { icon: "users", label: "Friends", navigateTo: "Friends" },
+  { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },
+  { icon: "Folder", label: "Legal", navigateTo: "Legal" },
+  { icon: "info", label: "Suport & Feedback", navigateTo: "SendFeedback" },
   { icon: "Question", label: "FAQ", navigateTo: "FAQ" },
   { icon: "settings", label: "Settings", navigateTo: "Settings" },
-  { icon: "trash-2", label: "Delete Account", navigateTo: "delete" },
   { icon: "log-out", label: "Logout", navigateTo: "logout" }
 ]
 
 const DrawerLayout = ({
   icon,
   label,
+  description,
   navigateTo,
-  isLastTwoItems,
+  isLastItem,
   index,
   onPress
 }) => {
   function getIconFamily(icon) {
-    const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet"]
+    const customIcons = [
+      "Contact",
+      "Question",
+      "Folder",
+      "Invite",
+      "Wallet",
+      "pin"
+    ]
     return customIcons.includes(icon) ? "custom" : "feather"
   }
   const renderDrawerItem = () => {
@@ -63,8 +68,17 @@ const DrawerLayout = ({
           color={"white"}
           size={20}
         />
-        <AppText style={styles.Text}>{label}</AppText>
-        {!isLastTwoItems && (
+        <View style={{ flex: 1 }}>
+          <AppText style={styles.Text}>{label}</AppText>
+          {description && (
+            <AppText style={styles.Description}>{description}</AppText>
+          )}
+        </View>
+        {navigateTo === "toggleLocation" ? (
+          <AppSwitch />
+        ) : isLastItem ? (
+          <></>
+        ) : (
           <Icon
             name="chevron-right"
             family="entypo"
@@ -107,9 +121,10 @@ const DrawerItems = ({ onPress }) => {
         key={i}
         icon={el.icon}
         label={el.label}
+        description={el.description}
         navigateTo={el.navigateTo}
         index={i}
-        isLastTwoItems={i >= DrawerList.length - 2}
+        isLastItem={i >= DrawerList.length - 1}
         onPress={v => onPress(el.navigateTo)}
       />
     )
@@ -135,6 +150,7 @@ function DrawerContent(props) {
         cancelText: "Cancel"
       })
       setConfirmationVisible(true)
+    } else if (navigateTo === "toggleLocation") {
     } else {
       navigation.navigate(navigateTo)
     }
@@ -156,9 +172,9 @@ function DrawerContent(props) {
       console.log({ res })
       if (res.status == 1) {
         handleLogOutButton()
-        Alert.alert("Success", "Your account has been deleted successfully")
+        showMessage("Your account has been deleted successfully")
       } else {
-        Alert.alert("Error", res.message.error)
+        showMessage(res.message.error, "error")
       }
     })
   }
@@ -209,8 +225,12 @@ const styles = StyleSheet.create({
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,
-    marginLeft: 10,
-    flex: 1
+    marginLeft: 10
+  },
+  Description: {
+    fontSize: FontSizes.S8,
+    color: theme.darkColors?.white,
+    marginLeft: 10
   },
   checkIcon: {
     alignItems: "center",

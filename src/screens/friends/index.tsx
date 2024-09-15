@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { View, Text, TouchableOpacity, useWindowDimensions } from "react-native"
+import React from "react"
+import { Text, useWindowDimensions } from "react-native"
 import MyFriends from "./myFriends"
 import PendingRequests from "./pendingRequests"
 import { AppButton, AppHeader } from "../../components"
@@ -9,7 +9,6 @@ import { TabView, SceneMap, TabBar } from "react-native-tab-view"
 import theme from "../../assets/theme"
 import { FontFamily, FontSizes } from "../../util/FontUtils"
 import { useNavigation } from "@react-navigation/native"
-import ReportUserModal from "../reportUser/ReportUser"
 
 const tabs = {
   myFriends: "My Friends",
@@ -26,7 +25,6 @@ const Friends: React.FC = () => {
     { key: "two", title: tabs.requests }
   ])
   const _styles = useStyles()
-  const [modalVisible, setModalVisible] = useState(false)
 
   const renderTabBar = props => (
     <TabBar
@@ -48,7 +46,6 @@ const Friends: React.FC = () => {
   )
 
   const onAddFriendClick = () => {
-    // setModalVisible(visible => !visible)
     navigation.navigate("AddFriend")
   }
 
@@ -56,17 +53,13 @@ const Friends: React.FC = () => {
     <BackgroundWithImage>
       <AppHeader title={tabs.myFriends} backgroundColor="transparent" />
       <TabView
+        lazy
         navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
         initialLayout={{ width: layout.width }}
         renderTabBar={renderTabBar}
       />
-      {/* <ReportUserModal
-        isVisible
-        onClose={onAddFriendClick}
-        onReportUser={() => setModalVisible(false)}
-      /> */}
       <AppButton
         buttonStyle={_styles.buttonStyle}
         containerStyle={[_styles.buttonContainer, { marginHorizontal: 15 }]}
@@ -77,9 +70,9 @@ const Friends: React.FC = () => {
   )
 }
 
-const MyFriendsRoute = () => <MyFriends />
+const MyFriendsRoute = () => <MyFriends key={1} />
 
-const PedningRequestsRoute = () => <PendingRequests />
+const PedningRequestsRoute = () => <PendingRequests key={2} />
 
 const renderScene = SceneMap({
   one: MyFriendsRoute,

@@ -76,3 +76,7 @@ export const inviteFriendSchema = Yup.object().shape({
     .matches(emailRegex, Strings.EmailError)
     .required("Email is required")
 })
+
+export const PanicPopUpSchema = Yup.object().shape({
+  message: Yup.string()
+})

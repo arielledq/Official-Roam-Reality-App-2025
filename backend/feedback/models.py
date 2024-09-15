@@ -7,29 +7,37 @@ from users.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
+from rest_framework.authtoken.models import Token
+
 
 class ReportedContentConstant:
     SPAM = 1
     PORNOGRAPHY = 2
-    HATRED_BULLYING = 3
-    SELF_HARM = 4
-    VIOLENT_GORY = 5
-    CHILD_PORN = 6
-    ILLEGAL_ACTIVITIES = 7
-    DECEPTIVE_CONTENT = 8
-    COPYRIGHT_INFRINGEMENT = 9
-    OTHER = 10
+    HATE = 3
+    BULLYING = 4
+    SELF_HARM = 5
+    VIOLENT = 6
+    GORY = 7
+    HARMFUL_CONTENT = 8
+    CHILD_PORN = 9
+    ILLEGAL_ACTIVITIES = 10
+    DECEPTIVE = 11
+    COPYRIGHT_INFRINGEMENT = 12
+    OTHER = 13
 
     REASON_CHOICES = (
         (SPAM, 'Spam'),
         (PORNOGRAPHY, 'Pornography'),
-        (HATRED_BULLYING, 'Hatred and Bullying'),
-        (SELF_HARM, 'Self-harm'),
-        (VIOLENT_GORY, 'Violent, Gory, and Harmful Content'),
-        (CHILD_PORN, 'Child Pornography'),
+        (HATE, 'Hate'),
+        (BULLYING, 'Bullying'),
+        (SELF_HARM, 'Self-Harm'),
+        (VIOLENT, 'Violent'),
+        (GORY, 'Gory'),
+        (HARMFUL_CONTENT, 'Harmful Content'),
+        (CHILD_PORN, 'Child Porn'),
         (ILLEGAL_ACTIVITIES, 'Illegal Activities'),
-        (DECEPTIVE_CONTENT, 'Deceptive Content'),
-        (COPYRIGHT_INFRINGEMENT, 'Copyright and Trademark Infringement'),
+        (DECEPTIVE, 'Deceptive'),
+        (COPYRIGHT_INFRINGEMENT, 'Copyright & Trademark Infringement'),
         (OTHER, 'Other'),
     )
 
@@ -40,7 +48,7 @@ class ContactUs(CommonModel):
 
     def __str__(self):
         return self.sender.email
-    
+
     class Meta:
         verbose_name = "Contact Us"
         verbose_name_plural = "Contact Us"
@@ -64,7 +72,8 @@ def send_feedback_email_to_admin(sender, instance, created, **kwargs):
 class ReportedContent(models.Model):
     post = models.ForeignKey(Challenges, on_delete=models.CASCADE,null=True, blank=True)
     reported_user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
-    reason = models.PositiveIntegerField(max_length=50, choices=ReportedContentConstant.REASON_CHOICES,default=ReportedContentConstant.OTHER,null=True, blank=True) 
+    block_reported_user = models.BooleanField(default=False)
+    reason = models.PositiveIntegerField(choices=ReportedContentConstant.REASON_CHOICES,default=ReportedContentConstant.OTHER,null=True, blank=True)
     custom_reason = models.TextField(null=True, blank=True)
     is_reviewed = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -72,3 +81,13 @@ class ReportedContent(models.Model):
     class Meta:
         verbose_name = "Reported Content/User"
         verbose_name_plural = "Reported Content/Users"
+
+
+@receiver(post_save, sender=ReportedContent)
+def delete_blocked_user_token(sender, instance, created, **kwargs):
+    try:
+        if instance.block_reported_user:
+            token = Token.objects.get(user=instance.reported_user)
+            token.delete()
+    except:
+        pass
