@@ -12,7 +12,7 @@ export const login = data =>
     data
   })
 export const setDevice = data =>
-  Request.call({
+  Request.callWithToken({
     url: `${commonApiRoute}set-device/`,
     method: "POST",
     data

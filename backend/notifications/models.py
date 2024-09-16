@@ -2,13 +2,11 @@
 # Others
 import logging
 from datetime import datetime
-
-from django.contrib.auth import get_user_model
 from django.db import models
 
 from onesignal_client.client import OneSignalClient
 
-User = get_user_model()
+from users.models import User
 LOGGER = logging.getLogger('django')
 
 
