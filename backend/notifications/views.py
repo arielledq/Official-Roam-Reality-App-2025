@@ -2,7 +2,7 @@ from rest_framework import viewsets, mixins
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-
+from rest_framework.authentication import TokenAuthentication
 from notifications.models import Notification
 from notifications.serializers import NotificationSerializer
 from onesignal_client.api.v1.serializers import UserIdPushTokenSerializer
@@ -13,19 +13,22 @@ from onesignal_client.views import PostViewsetMixin
 
 class SetDeviceViewset(PostViewsetMixin, viewsets.GenericViewSet):
     permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
     serializer_class = UserIdPushTokenSerializer
 
     def perform_post(self, serializer):
         user = self.request.user
         data = serializer.validated_data
+        print(data)
         #
         if data['active']:
-            devices = UserDevice.objects.filter(device_id=data.get('user_id')).exclude(user=user)
+            devices = UserDevice.objects.filter(device_id=data.get('userId')).exclude(user=user)
             if devices:
                 for device in devices:
+                    print(device)
                     device.active = False
                     device.save()
-            UserDevice.activate_device(user, data.get('user_id'), data.get('push_token'))
+            UserDevice.activate_device(user, data.get('userId'), data.get('pushToken'))
         else:
             UserDevice.deactivate_all_devices(user)
 

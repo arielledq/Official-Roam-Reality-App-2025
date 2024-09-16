@@ -9,12 +9,13 @@ import AppText from "../../components/text"
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
 import ConfirmationPopUp from "../../components/confirmationPopUp"
 import { deleteAccount, logout } from "../../network"
-import { useDispatch } from "react-redux"
-import { resetState } from "../../redux/Login"
+import { useDispatch, useSelector } from "react-redux"
+import { resetState, updateUserData } from "../../redux/Login"
 import LinearGradient from "react-native-linear-gradient"
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
-import { removeItem, showMessage } from "../../util/helpers"
+import { removeItem, showMessage, setItem, getItem } from "../../util/helpers"
 import AppSwitch from "../../components/Switch"
+import userLocationHook from "./location.hook"
 
 const DrawerList = [
   { icon: "target", label: "AR Photo Challenges", navigateTo: "Home" },
@@ -42,6 +43,10 @@ const DrawerLayout = ({
   index,
   onPress
 }) => {
+  const dispatch = useDispatch()
+  const userData = useSelector(state => state?.login?.data)
+  const { setLocationEnabled } = userLocationHook()
+
   function getIconFamily(icon) {
     const customIcons = [
       "Contact",
@@ -53,6 +58,18 @@ const DrawerLayout = ({
     ]
     return customIcons.includes(icon) ? "custom" : "feather"
   }
+
+  const toggleLiveLocation = async () => {
+    const locationEnabled = !Boolean(userData?.locationEnabled)
+    dispatch(
+      updateUserData({
+        ...userData,
+        locationEnabled: locationEnabled
+      })
+    )
+    setLocationEnabled(locationEnabled)
+  }
+
   const renderDrawerItem = () => {
     return (
       <View
@@ -75,7 +92,10 @@ const DrawerLayout = ({
           )}
         </View>
         {navigateTo === "toggleLocation" ? (
-          <AppSwitch />
+          <AppSwitch
+            onValueChange={toggleLiveLocation}
+            value={userData?.locationEnabled}
+          />
         ) : isLastItem ? (
           <></>
         ) : (
