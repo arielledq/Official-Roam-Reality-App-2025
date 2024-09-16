@@ -34,6 +34,12 @@ const MARGIN_ARRIVAL_METERS = 50
 
 const GeoArSiteNavigation = ({ }) => {
 
+  const [mapRegion, setMapRegion] = useState({
+    longitude: 0,
+    latitude: 0,
+    longitudeDelta: 0.004,
+    latitudeDelta: 0.009
+  })
   const [compassHeading, setCompassHeading] = useState(3)
   const _styles = useStyles()
   const dispatch = useDispatch()
@@ -75,7 +81,7 @@ const GeoArSiteNavigation = ({ }) => {
     CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
       setCompassHeading(heading)
       if (mapView && mapView.current) {
-        mapView.current.animateCamera(heading);
+        mapView.current.animateCamera({ heading });
       }
     });
     return () => {
@@ -86,23 +92,23 @@ const GeoArSiteNavigation = ({ }) => {
 
   const getLocation = async () => {
     const hasPermission = await hasLocationPermission()
-
     if (!hasPermission) {
       return
     }
-
     Geolocation.getCurrentPosition(
       position => {
         setLocation(position)
         setCurrentLocation(position)
         if (mapView && mapView.current) {
-          mapView.current.animateToRegion({
+          const currentRegion = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             latitudeDelta: 0.0032,
             longitudeDelta: 0.0032
-          })
-          mapView.current.animateCamera(compassHeading);
+          }
+          setMapRegion(currentRegion)
+          mapView.current.animateToRegion(currentRegion)
+          mapView.current.animateCamera({ heading: compassHeading });
         }
       },
       error => {
@@ -142,15 +148,6 @@ const GeoArSiteNavigation = ({ }) => {
           navigation.replace("GeoArSiteArrived")
           stopLocationUpdates()
           return
-        }
-        if (mapView && mapView.current) {
-          mapView.current.animateToRegion({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            latitudeDelta: 0.0032,
-            longitudeDelta: 0.0032
-          })
-          mapView.current.animateCamera(compassHeading);
         }
       },
       error => {
@@ -234,6 +231,7 @@ const GeoArSiteNavigation = ({ }) => {
             ref={mapView}
             zoomControlEnabled={true}
             showsTraffic={true}
+            region={mapRegion}
             style={{
               position: "absolute",
               top: 0,
@@ -241,6 +239,7 @@ const GeoArSiteNavigation = ({ }) => {
               left: 0,
               right: 0
             }}
+            showsMyLocationButton={true}
             zoomEnabled={true}
             scrollEnabled={true}
             showsUserLocation={true}
