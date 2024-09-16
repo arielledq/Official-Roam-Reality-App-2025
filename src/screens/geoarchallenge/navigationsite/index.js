@@ -27,11 +27,20 @@ import mapCustomStyle from "../../../constants/MapCustomStyles"
 import {
   getLocationDistance,
   hasLocationPermission
-} from "../../../util/LocationLib"
+} from "../../../util/LocationLib";
+import CompassHeading from 'react-native-compass-heading';
 
 const MARGIN_ARRIVAL_METERS = 50
 
-const GeoArSiteNavigation = ({}) => {
+const GeoArSiteNavigation = ({ }) => {
+
+  const [mapRegion, setMapRegion] = useState({
+    longitude: 0,
+    latitude: 0,
+    longitudeDelta: 0.004,
+    latitudeDelta: 0.009
+  })
+  const [compassHeading, setCompassHeading] = useState(3)
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
@@ -63,36 +72,43 @@ const GeoArSiteNavigation = ({}) => {
   const calculatedEstimatedTime = duration => {
     var now = new Date()
     const calcTime = moment(now).add(duration, "minutes").format("hh:mm A")
-    console.log("Now: " + calcTime)
     setEstimatedTime(calcTime)
   }
 
   useEffect(() => {
     getLocation()
     getLocationUpdates()
+    CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
+      setCompassHeading(heading)
+      if (mapView && mapView.current) {
+        mapView.current.animateCamera({ heading });
+      }
+    });
     return () => {
       stopLocationUpdates()
+      CompassHeading.stop();
     }
   }, [])
 
   const getLocation = async () => {
     const hasPermission = await hasLocationPermission()
-
     if (!hasPermission) {
       return
     }
-
     Geolocation.getCurrentPosition(
       position => {
         setLocation(position)
         setCurrentLocation(position)
         if (mapView && mapView.current) {
-          mapView.current.animateToRegion({
+          const currentRegion = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             latitudeDelta: 0.0032,
             longitudeDelta: 0.0032
-          })
+          }
+          setMapRegion(currentRegion)
+          mapView.current.animateToRegion(currentRegion)
+          mapView.current.animateCamera({ heading: compassHeading });
         }
       },
       error => {
@@ -123,25 +139,15 @@ const GeoArSiteNavigation = ({}) => {
     }
     watchId.current = Geolocation.watchPosition(
       position => {
-        console.log("getLocationUpdates:", position)
         setLocation(position)
         const dis = getLocationDistance(position.coords, {
           latitude: selectedGeoSite.lat_long.coordinates[1],
           longitude: selectedGeoSite.lat_long.coordinates[0]
         })
-        console.log("getLocationUpdates: dis", dis)
         if (dis < selectedGeoSite.check_in_site_radius) {
           navigation.replace("GeoArSiteArrived")
           stopLocationUpdates()
           return
-        }
-        if (mapView && mapView.current) {
-          mapView.current.animateToRegion({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            latitudeDelta: 0.0032,
-            longitudeDelta: 0.0032
-          })
         }
       },
       error => {
@@ -225,6 +231,7 @@ const GeoArSiteNavigation = ({}) => {
             ref={mapView}
             zoomControlEnabled={true}
             showsTraffic={true}
+            region={mapRegion}
             style={{
               position: "absolute",
               top: 0,
@@ -232,6 +239,7 @@ const GeoArSiteNavigation = ({}) => {
               left: 0,
               right: 0
             }}
+            showsMyLocationButton={true}
             zoomEnabled={true}
             scrollEnabled={true}
             showsUserLocation={true}
@@ -290,10 +298,6 @@ const GeoArSiteNavigation = ({}) => {
                   )
                 }}
                 onReady={result => {
-                  // console.log(result.via_waypoint)
-                  // console.log(result.legs)
-                  // console.log(`Distance: ${result.distance} km`)
-                  // console.log(`Duration: ${result.duration} min.`)
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   calculatedEstimatedTime(result.duration)
