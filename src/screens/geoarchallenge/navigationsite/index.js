@@ -29,7 +29,7 @@ import {
   hasLocationPermission
 } from "../../../util/LocationLib"
 
-const MARGIN_ARRIVAL_METERS = 10
+const MARGIN_ARRIVAL_METERS = 50
 
 const GeoArSiteNavigation = ({}) => {
   const _styles = useStyles()
@@ -130,7 +130,7 @@ const GeoArSiteNavigation = ({}) => {
           longitude: selectedGeoSite.lat_long.coordinates[0]
         })
         console.log("getLocationUpdates: dis", dis)
-        if (dis < MARGIN_ARRIVAL_METERS) {
+        if (dis < selectedGeoSite.check_in_site_radius) {
           navigation.replace("GeoArSiteArrived")
           stopLocationUpdates()
           return
