@@ -27,11 +27,14 @@ import mapCustomStyle from "../../../constants/MapCustomStyles"
 import {
   getLocationDistance,
   hasLocationPermission
-} from "../../../util/LocationLib"
+} from "../../../util/LocationLib";
+import CompassHeading from 'react-native-compass-heading';
 
 const MARGIN_ARRIVAL_METERS = 50
 
-const GeoArSiteNavigation = ({}) => {
+const GeoArSiteNavigation = ({ }) => {
+
+  const [compassHeading, setCompassHeading] = useState(3)
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
@@ -63,15 +66,21 @@ const GeoArSiteNavigation = ({}) => {
   const calculatedEstimatedTime = duration => {
     var now = new Date()
     const calcTime = moment(now).add(duration, "minutes").format("hh:mm A")
-    console.log("Now: " + calcTime)
     setEstimatedTime(calcTime)
   }
 
   useEffect(() => {
     getLocation()
     getLocationUpdates()
+    CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
+      setCompassHeading(heading)
+      if (mapView && mapView.current) {
+        mapView.current.animateCamera(heading);
+      }
+    });
     return () => {
       stopLocationUpdates()
+      CompassHeading.stop();
     }
   }, [])
 
@@ -93,6 +102,7 @@ const GeoArSiteNavigation = ({}) => {
             latitudeDelta: 0.0032,
             longitudeDelta: 0.0032
           })
+          mapView.current.animateCamera(compassHeading);
         }
       },
       error => {
@@ -123,13 +133,11 @@ const GeoArSiteNavigation = ({}) => {
     }
     watchId.current = Geolocation.watchPosition(
       position => {
-        console.log("getLocationUpdates:", position)
         setLocation(position)
         const dis = getLocationDistance(position.coords, {
           latitude: selectedGeoSite.lat_long.coordinates[1],
           longitude: selectedGeoSite.lat_long.coordinates[0]
         })
-        console.log("getLocationUpdates: dis", dis)
         if (dis < selectedGeoSite.check_in_site_radius) {
           navigation.replace("GeoArSiteArrived")
           stopLocationUpdates()
@@ -142,6 +150,7 @@ const GeoArSiteNavigation = ({}) => {
             latitudeDelta: 0.0032,
             longitudeDelta: 0.0032
           })
+          mapView.current.animateCamera(compassHeading);
         }
       },
       error => {
@@ -290,10 +299,6 @@ const GeoArSiteNavigation = ({}) => {
                   )
                 }}
                 onReady={result => {
-                  console.log(result.via_waypoint)
-                  // console.log(result.legs)
-                  // console.log(`Distance: ${result.distance} km`)
-                  // console.log(`Duration: ${result.duration} min.`)
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   calculatedEstimatedTime(result.duration)
