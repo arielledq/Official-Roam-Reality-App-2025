@@ -81,7 +81,7 @@ const GeoArSiteNavigation = ({ }) => {
     CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
       setCompassHeading(heading)
       if (mapView && mapView.current) {
-        mapView.current.animateCamera({ heading });
+       mapView.current.animateCamera({ heading });
       }
     });
     return () => {
@@ -107,8 +107,7 @@ const GeoArSiteNavigation = ({ }) => {
             longitudeDelta: 0.0032
           }
           setMapRegion(currentRegion)
-          mapView.current.animateToRegion(currentRegion)
-          mapView.current.animateCamera({ heading: compassHeading });
+          mapView.current.animateCamera({center:position.coords, heading: compassHeading });
         }
       },
       error => {
@@ -139,7 +138,6 @@ const GeoArSiteNavigation = ({ }) => {
     }
     watchId.current = Geolocation.watchPosition(
       position => {
-        setLocation(position)
         const dis = getLocationDistance(position.coords, {
           latitude: selectedGeoSite.lat_long.coordinates[1],
           longitude: selectedGeoSite.lat_long.coordinates[0]
@@ -149,6 +147,16 @@ const GeoArSiteNavigation = ({ }) => {
           stopLocationUpdates()
           return
         }
+
+        const currentRegion = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          latitudeDelta: 0.0032,
+          longitudeDelta: 0.0032
+        }
+        setMapRegion(currentRegion)
+        setLocation(position)
+        mapView.current.animateCamera({center:position.coords, heading: compassHeading });
       },
       error => {
         setLocation(null)
