@@ -76,12 +76,12 @@ const GeoArSiteNavigation = ({ }) => {
   }
 
   useEffect(() => {
-    getLocation()
+    getFirstLocation()
     getLocationUpdates()
     CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
       setCompassHeading(heading)
       if (mapView && mapView.current) {
-       mapView.current.animateCamera({ heading });
+        mapView.current.animateCamera({ heading });
       }
     });
     return () => {
@@ -90,7 +90,7 @@ const GeoArSiteNavigation = ({ }) => {
     }
   }, [])
 
-  const getLocation = async () => {
+  const getFirstLocation = async () => {
     const hasPermission = await hasLocationPermission()
     if (!hasPermission) {
       return
@@ -107,7 +107,7 @@ const GeoArSiteNavigation = ({ }) => {
             longitudeDelta: 0.0032
           }
           setMapRegion(currentRegion)
-          mapView.current.animateCamera({center:position.coords, heading: compassHeading });
+          mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
         }
       },
       error => {
@@ -147,16 +147,14 @@ const GeoArSiteNavigation = ({ }) => {
           stopLocationUpdates()
           return
         }
-
-        const currentRegion = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          latitudeDelta: 0.0032,
-          longitudeDelta: 0.0032
+        if (location) {
+          const lastLocationDistance = getLocationDistance(position.coords, location.coords)
+          console.log("lastLocationDistance:", lastLocationDistance)
+          if (lastLocationDistance > 10) {
+            setLocation(position)
+            mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
+          }
         }
-        setMapRegion(currentRegion)
-        setLocation(position)
-        mapView.current.animateCamera({center:position.coords, heading: compassHeading });
       },
       error => {
         setLocation(null)
@@ -168,7 +166,7 @@ const GeoArSiteNavigation = ({ }) => {
           ios: "best"
         },
         enableHighAccuracy: highAccuracy,
-        distanceFilter: 5,
+        distanceFilter: 0,
         interval: 5000,
         fastestInterval: 2000,
         forceRequestLocation: forceLocation,
