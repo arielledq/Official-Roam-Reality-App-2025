@@ -76,7 +76,7 @@ const GeoArSiteNavigation = ({ }) => {
   }
 
   useEffect(() => {
-    getLocation()
+    getFirstLocation()
     getLocationUpdates()
     CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
       setCompassHeading(heading)
@@ -90,7 +90,7 @@ const GeoArSiteNavigation = ({ }) => {
     }
   }, [])
 
-  const getLocation = async () => {
+  const getFirstLocation = async () => {
     const hasPermission = await hasLocationPermission()
     if (!hasPermission) {
       return
@@ -107,8 +107,7 @@ const GeoArSiteNavigation = ({ }) => {
             longitudeDelta: 0.0032
           }
           setMapRegion(currentRegion)
-          mapView.current.animateToRegion(currentRegion)
-          mapView.current.animateCamera({ heading: compassHeading });
+          mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
         }
       },
       error => {
@@ -139,7 +138,6 @@ const GeoArSiteNavigation = ({ }) => {
     }
     watchId.current = Geolocation.watchPosition(
       position => {
-        setLocation(position)
         const dis = getLocationDistance(position.coords, {
           latitude: selectedGeoSite.lat_long.coordinates[1],
           longitude: selectedGeoSite.lat_long.coordinates[0]
@@ -148,6 +146,14 @@ const GeoArSiteNavigation = ({ }) => {
           navigation.replace("GeoArSiteArrived")
           stopLocationUpdates()
           return
+        }
+        if (location && location.coords) {
+          const lastLocationDistance = getLocationDistance(position.coords, location.coords)
+          console.log("lastLocationDistance:", lastLocationDistance)
+          if (lastLocationDistance > 10) {
+            setLocation(position)
+            mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
+          }
         }
       },
       error => {
@@ -160,7 +166,7 @@ const GeoArSiteNavigation = ({ }) => {
           ios: "best"
         },
         enableHighAccuracy: highAccuracy,
-        distanceFilter: 5,
+        distanceFilter: 0,
         interval: 5000,
         fastestInterval: 2000,
         forceRequestLocation: forceLocation,
