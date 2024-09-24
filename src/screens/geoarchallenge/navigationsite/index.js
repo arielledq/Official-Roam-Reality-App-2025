@@ -147,7 +147,7 @@ const GeoArSiteNavigation = ({ }) => {
           stopLocationUpdates()
           return
         }
-        if (location) {
+        if (location && location.coords) {
           const lastLocationDistance = getLocationDistance(position.coords, location.coords)
           console.log("lastLocationDistance:", lastLocationDistance)
           if (lastLocationDistance > 10) {
