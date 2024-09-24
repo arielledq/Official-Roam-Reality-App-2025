@@ -53,7 +53,6 @@ const GeoArSiteNavigation = ({ }) => {
   const [highAccuracy, setHighAccuracy] = useState(true)
   const [locationDialog, setLocationDialog] = useState(true)
   const [significantChanges, setSignificantChanges] = useState(false)
-  const [foregroundService, setForegroundService] = useState(false)
   const [useLocationManager, setUseLocationManager] = useState(false)
   const [estimatedTime, setEstimatedTime] = useState("")
   const [location, setLocation] = useState(null)
@@ -112,7 +111,6 @@ const GeoArSiteNavigation = ({ }) => {
       },
       error => {
         showMessage(error.message, "error", `Code ${error.code}`)
-        setLocation(null)
         console.log(error)
       },
       {
@@ -147,9 +145,11 @@ const GeoArSiteNavigation = ({ }) => {
           stopLocationUpdates()
           return
         }
-        if (location && location.coords) {
+        if (!location) {
+          setLocation(position)
+          mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
+        } else if (location && location.coords) {
           const lastLocationDistance = getLocationDistance(position.coords, location.coords)
-          console.log("lastLocationDistance:", lastLocationDistance)
           if (lastLocationDistance > 10) {
             setLocation(position)
             mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
@@ -157,7 +157,6 @@ const GeoArSiteNavigation = ({ }) => {
         }
       },
       error => {
-        setLocation(null)
         console.log(error)
       },
       {
@@ -166,7 +165,7 @@ const GeoArSiteNavigation = ({ }) => {
           ios: "best"
         },
         enableHighAccuracy: highAccuracy,
-        distanceFilter: 0,
+        distanceFilter: 1,
         interval: 5000,
         fastestInterval: 2000,
         forceRequestLocation: forceLocation,
