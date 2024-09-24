@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from 'react'
 
 import {
   ActivityIndicator,
@@ -25,7 +25,7 @@ const ArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
-  const [challengeChoice, setChallengeChoice] = useState("PHOTO")
+  const [challengeChoice, setChallengeChoice] = useState('PHOTO')
   const [sponsoredDataAll, setSponsoredDataAll] = useState([])
   const [sponsoredData, setSponsoredData] = useState([])
   const arProfile = useSelector(state => state.ar?.arProfile)
@@ -79,6 +79,15 @@ const ArChallenge = ({}) => {
       .finally(() => {
         setIsLoading(false)
       })
+    getARStettings()
+      .then(res => {
+        if (res.data.length > 0) {
+          dispatch(updateARSettings(res.data[0]))
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const setDataWithChoice = choice => {
@@ -100,6 +109,7 @@ const ArChallenge = ({}) => {
     ARSposored()
     ARUserProfile()
     getSettings()
+  }, [])
   }, [])
 
   const navigateToChallengeDetails = obj => {
@@ -125,12 +135,13 @@ const ArChallenge = ({}) => {
       </Text>
     </TouchableOpacity>
   )
+  )
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: "Anywhere AR Photo Challenges",
+          text: "AR Photo Challenges",
           style: [_styles.heading]
         }}
         backgroundColor="transparent"
@@ -181,7 +192,7 @@ const ArChallenge = ({}) => {
         </TouchableOpacity>
       </View>
 
-      {isLoading && <ActivityIndicator size="large" />}
+      {isLoading && <ActivityIndicator size='large' />}
       <FlatList
         style={{ flex: 1, marginVertical: 15 }}
         data={sponsoredData}
@@ -190,7 +201,9 @@ const ArChallenge = ({}) => {
         keyExtractor={item => item.id}
       />
     </BackgroundWithImage>
+    </BackgroundWithImage>
   )
 }
 
 export default ArChallenge
+
