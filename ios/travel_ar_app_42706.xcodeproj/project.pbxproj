@@ -895,7 +895,7 @@
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
@@ -931,7 +931,7 @@
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
