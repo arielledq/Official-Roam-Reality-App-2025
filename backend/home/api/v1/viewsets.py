@@ -70,9 +70,11 @@ class LoginViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, created = Token.objects.get_or_create(user=user)
-        if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
+        if ReportedContent.objects.filter(reported_user=user, block_reported_user=True).exists():
             return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
-            
+
+        # Here send notification to friends
+        [send_notification(NotificationTypes.FRIEND_ROAMING_ONLINE, user) for user in user.user_profile.friends.all()]
         user_serializer = UserSerializer(user)
         return Response({"token": token.key, "user": user_serializer.data})
 
@@ -221,7 +223,12 @@ class FriendshipViewSet(ModelViewSet):
             friendship_request.delete()
             to_user.user_profile.friends.add(from_user)
             from_user.user_profile.friends.add(to_user)
-            send_notification(NotificationTypes.FRIEND_REQUEST_ACCEPTED, from_user)
+            send_notification(
+                NotificationTypes.FRIEND_REQUEST_ACCEPTED,
+                from_user,
+                {},
+                {'friend_name': to_user.get_full_name()}
+            )
             # Notification.objects.create(
             # sender=from_user,
             # receiver=from_user,
