@@ -1,44 +1,37 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState } from 'react'
 
-import {
-  FlatList,
-  Image,
-  ImageBackground,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native"
-import { handleError } from "../../util/helpers"
+import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native'
+import { handleError } from '../../util/helpers'
 import {
   getGeoARDestinations,
   getARProfile,
   getARStettings,
   getARChallenges,
   updateUserLocation,
-  getARSitesStars
-} from "../../network"
+  getARSitesStars,
+} from '../../network'
 
-import BackgroundWithImage from "../../components/background"
-import AppHeader from "../../components/header"
-import { DrawerActions, useNavigation } from "@react-navigation/native"
-import SiteIcon from "../../assets/geoar/siteicon.svg"
-import StarSiteIcon from "../../assets/geoar/starsite.svg"
-import GradientDownPNG from "../../assets/geoar/gradient_down.png"
-import SOSIcon from "../../assets/Icons/sos.svg"
-import ArIcon from "../../assets/geoar/aricon.svg"
+import BackgroundWithImage from '../../components/background'
+import AppHeader from '../../components/header'
+import { DrawerActions, useNavigation } from '@react-navigation/native'
+import SiteIcon from '../../assets/geoar/siteicon.svg'
+import StarSiteIcon from '../../assets/geoar/starsite.svg'
+import GradientDownPNG from '../../assets/geoar/gradient_down.png'
+import SOSIcon from '../../assets/Icons/sos.svg'
+import ArIcon from '../../assets/geoar/aricon.svg'
 import {
   updateARUserData,
   updateARSettings,
   updateSelectedDestination,
-  updateAnyWhereChallenges
-} from "../../redux/AR"
+  updateAnyWhereChallenges,
+} from '../../redux/AR'
 
-import { useDispatch } from "react-redux"
-import useStyles from "./styles"
-import { hasLocationPermission } from "../../util/LocationLib"
-import Geolocation from "react-native-geolocation-service"
-import { MenuIcon } from "../../assets/svg"
-import PanicPopUp from "./panicpopup"
+import { useDispatch } from 'react-redux'
+import useStyles from './styles'
+import { hasLocationPermission } from '../../util/LocationLib'
+import Geolocation from 'react-native-geolocation-service'
+import { MenuIcon } from '../../assets/svg'
+import PanicPopUp from './panicpopup'
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
@@ -61,7 +54,7 @@ const GeoArChallenge = ({}) => {
             getARStarSites(d.id)
           }
         } else {
-          res.message.message = "Error in loading Challenges."
+          res.message.message = 'Error in loading Challenges.'
           handleError(res)
         }
       })
@@ -78,13 +71,13 @@ const GeoArChallenge = ({}) => {
     }
     Geolocation.getCurrentPosition(
       position => {
-        console.log("getLocation", position)
+        console.log('getLocation', position)
         updateUserLocation({
           latitude: position.coords.latitude,
-          longitude: position.coords.longitude
+          longitude: position.coords.longitude,
         })
           .then(res => {
-            console.log("updateUserLocation:", res)
+            console.log('updateUserLocation:', res)
           })
           .finally(() => {})
       },
@@ -93,8 +86,8 @@ const GeoArChallenge = ({}) => {
       },
       {
         accuracy: {
-          android: "high",
-          ios: "best"
+          android: 'high',
+          ios: 'best',
         },
         enableHighAccuracy: true,
         timeout: 15000,
@@ -102,7 +95,7 @@ const GeoArChallenge = ({}) => {
         distanceFilter: 0,
         forceRequestLocation: true,
         forceLocationManager: true,
-        showLocationDialog: true
+        showLocationDialog: true,
       }
     )
   }
@@ -114,7 +107,7 @@ const GeoArChallenge = ({}) => {
         if (res.status == 1) {
           dispatch(updateARUserData(res))
         } else {
-          res.message.message = "Error in loading Challenges."
+          res.message.message = 'Error in loading Challenges.'
           handleError(res)
         }
       })
@@ -147,7 +140,7 @@ const GeoArChallenge = ({}) => {
           setNumberOfChallenges(res?.data?.length)
           dispatch(updateAnyWhereChallenges(res?.data))
         } else {
-          res.message.message = "Error in loading Challenges."
+          res.message.message = 'Error in loading Challenges.'
           handleError(res)
         }
       })
@@ -173,66 +166,55 @@ const GeoArChallenge = ({}) => {
 
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj))
-    navigation.navigate("GeoArOutdoor", { challengeObj: obj })
+    navigation.navigate('GeoArOutdoor', { challengeObj: obj })
   }
 
   const Item = ({ obj }) => (
-    <TouchableOpacity
-      onPress={() => navigateToChallengeDetails(obj)}
-      style={{ width: "100%" }}
-    >
-      <ImageBackground
-        style={_styles.containerView}
-        resizeMode="cover"
-        source={{ uri: obj.image }}
-      >
+    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{ width: '100%' }}>
+      <ImageBackground style={_styles.containerView} resizeMode='cover' source={{ uri: obj.image }}>
         <Image
           source={GradientDownPNG}
-          resizeMode="cover"
+          resizeMode='cover'
           style={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
             top: 0,
-            width: "110%"
+            width: '110%',
           }}
         />
-        <View style={{ width: "100%", marginBottom: 10 }}>
+        <View style={{ width: '100%', marginBottom: 10 }}>
           <Text style={_styles.list_title}>{obj.name}</Text>
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              width: "100%",
-              alignItems: "flex-start",
-              marginTop: 20
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              width: '100%',
+              alignItems: 'flex-start',
+              marginTop: 20,
             }}
           >
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>
-                {obj.star_ar_sites.length}
-              </Text>
+              <Text style={_styles.s_list_count}>{obj.star_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View>
             <View
               style={{
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
                 marginStart: 22,
-                marginEnd: 10
+                marginEnd: 10,
               }}
             >
               <StarSiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>
-                {obj.unique_ar_sites.length}
-              </Text>
+              <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>AR Photo Challenges</Text>
             </View>
           </View>
@@ -271,10 +253,10 @@ const GeoArChallenge = ({}) => {
         rightComponent={<MenuRightComponent />}
         leftComponent={handleMenuButton()}
         centerComponent={{
-          text: "AR Experiences",
-          style: [_styles.heading]
+          text: 'AR Experiences',
+          style: [_styles.heading],
         }}
-        backgroundColor="transparent"
+        backgroundColor='transparent'
       />
       <FlatList
         showsVerticalScrollIndicator={false}
@@ -289,9 +271,7 @@ const GeoArChallenge = ({}) => {
         keyExtractor={item => item.id}
       />
       {openPanicPopUp && (
-        <View
-          style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
-        >
+        <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
           <PanicPopUp
             onClose={() => {
               setOpenPanicPopup(false)
