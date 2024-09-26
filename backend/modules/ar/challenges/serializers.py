@@ -1,7 +1,7 @@
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories,\
-    ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings,\
-    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn,\
-    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
+    ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
+    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
+    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo
 from rest_framework import serializers
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
@@ -32,13 +32,31 @@ class SettingsSerializer(serializers.ModelSerializer):
             "__all__"
         )
 
+
+class ExampleImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ARExampleImage
+        fields = "__all__"
+
+
+class ExampleVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ARExampleVideo
+        fields = "__all__"
+
+
 class ExamplesSerializer(serializers.ModelSerializer):
-  
+    images = ExampleImageSerializer(many=True)
+    videos = ExampleVideoSerializer(many=True)
+
     class Meta:
         model = ARExample
-        fields = (
-            "__all__"
-        )
+        # fields = (
+        #     "__all__"
+        # )
+        fields = ["name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
+
 
 class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
   

@@ -235,8 +235,8 @@ class Challenges(models.Model):
         return super(Challenges, self).save(*args, **kwargs)
 
     class Meta:
-        verbose_name_plural = "Anywhere AR Challenge"
-        verbose_name = "Anywhere AR Challenge"
+        verbose_name_plural = "AR Challenge"
+        verbose_name = "AR Challenge"
 
     def __str__(self):
         return self.name
@@ -371,12 +371,12 @@ class ARExample(models.Model):
         verbose_name_plural = "AR Example"
 
     name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
-    image = models.ImageField(
-        upload_to="ar/example/",
-        blank=True,
-        null=True,
-    )
-    video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
+    # image = models.ImageField(
+    #     upload_to="ar/example/",
+    #     blank=True,
+    #     null=True,
+    # )
+    # video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
     description = RichTextField(_("Example Details"), blank=True, null=True)
     any_where_challenges = models.ManyToManyField(Challenges, verbose_name="Any Where AR Challenges",
                                                   related_name="ar_example_challenge", blank=True, default=None)
@@ -387,6 +387,26 @@ class ARExample(models.Model):
         return str(
             self.name
         )
+
+
+class ARExampleImage(models.Model):
+    ar_example = models.ForeignKey(ARExample, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(
+        upload_to="ar/example/",
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return f'AR Example Image Id: {self.id} - {self.ar_example.name}'
+
+
+class ARExampleVideo(models.Model):
+    ar_example = models.ForeignKey(ARExample, on_delete=models.CASCADE, related_name="videos")
+    video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
+
+    def __str__(self):
+        return f'AR Example Video Id: {self.id} - {self.ar_example.name}'
 
 
 class GeoArSite(models.Model):
