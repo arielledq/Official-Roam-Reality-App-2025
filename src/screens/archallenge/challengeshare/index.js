@@ -303,7 +303,7 @@ const ArChallengeShare = ({}) => {
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: 'AR Photo Challenges',
+          text: 'AR Challenges',
           numberOfLines: 2,
           style: [styles.heading],
         }}
@@ -321,7 +321,7 @@ const ArChallengeShare = ({}) => {
               style={{
                 width: '70%',
                 flex: 1,
-                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -200 : 0,
+                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
               }}
               source={{
                 uri: captureData,
@@ -335,7 +335,7 @@ const ArChallengeShare = ({}) => {
                 backgroundColor: 'transparent',
                 width: '70%',
                 height: imageHeight * 0.7,
-                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -200 : 0,
+                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
               }}
             />
           )}
@@ -365,13 +365,13 @@ const ArChallengeShare = ({}) => {
               >
                 <Image
                   style={{ width: 24, height: 24, marginEnd: 10 }}
-                  source={{ uri: challengeObj.sponsored.image }}
+                  source={{ uri: challengeObj?.sponsored?.image }}
                 />
                 <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
               </View>
               <View style={{ width: '100%' }}>
                 <Text style={styles.challengeSponsorTipText}>
-                  Share your recorded experience for extra credits!
+                  Share your content to earn points!
                 </Text>
                 <View
                   style={{
@@ -407,7 +407,7 @@ const ArChallengeShare = ({}) => {
               </TouchableOpacity>
             )}
           </View>
-          <Text style={styles.shareText}>Click icons to share, 1 Extra Point Per Platform</Text>
+          <Text style={styles.shareText}>Tap the icons to share and earn points</Text>
         </View>
         {!hideBottomTab && (
           <View
