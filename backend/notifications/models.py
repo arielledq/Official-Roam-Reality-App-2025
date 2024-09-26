@@ -13,14 +13,40 @@ LOGGER = logging.getLogger('django')
 
 
 class NotificationTypes:
-    AR_SITE_NEARBY = 'AR SITE NEARBY',
-    STAR_NEARBY = 'STAR NEARBY',
-    FRIEND_ROAMING_ONLINE = 'FRIEND ROAMING ONLINE',
-    POINTS_REVOKED = 'POINTS REVOKED',
-    FRIEND_REQUEST_SENT = 'FRIEND REQUEST SENT',
-    FRIEND_REQUEST_ACCEPTED = 'FRIEND REQUEST ACCEPTED',
-    EXPERIENCE_ABOUT_EXPIRE = 'EXPERIENCE ABOUT EXPIRE',
-    REFRESH_APP_REMINDER = 'REFRESH APP REMINDER'
+    DEFAULT = 1
+    AR_SITE_NEARBY = 2
+    STAR_NEARBY = 3
+    AR_EXPERIENCE_NEARBY = 4
+    FRIEND_ROAMING_ONLINE = 5
+    POINTS_REVOKED = 6
+    FRIEND_REQUEST_SENT = 7
+    FRIEND_REQUEST_ACCEPTED = 8
+    EXPERIENCE_ABOUT_EXPIRE = 9
+    REFRESH_APP_REMINDER = 10
+
+    choices = (
+        (DEFAULT, 'DEFAULT'),
+        (AR_SITE_NEARBY, 'AR SITE NEARBY'),
+        (STAR_NEARBY, 'STAR NEARBY'),
+        (AR_EXPERIENCE_NEARBY, 'AR EXPERIENCE NEARBY'),
+        (FRIEND_ROAMING_ONLINE, 'FRIEND ROAMING ONLINE'),
+        (POINTS_REVOKED, 'POINTS REVOKED'),
+        (FRIEND_REQUEST_SENT, 'FRIEND REQUEST SENT'),
+        (FRIEND_REQUEST_ACCEPTED, 'FRIEND REQUEST ACCEPTED'),
+        (EXPERIENCE_ABOUT_EXPIRE, 'EXPERIENCE ABOUT EXPIRE'),
+        (REFRESH_APP_REMINDER, 'REFRESH APP REMINDER')
+    )
+
+    # DEFAULT = 'DEFAULT',
+    # AR_SITE_NEARBY = 'AR SITE NEARBY',
+    # STAR_NEARBY = 'STAR NEARBY',
+    # AR_EXPERIENCE_NEARBY = 'AR EXPERIENCE NEARBY'
+    # FRIEND_ROAMING_ONLINE = 'FRIEND ROAMING ONLINE',
+    # POINTS_REVOKED = 'POINTS REVOKED',
+    # FRIEND_REQUEST_SENT = 'FRIEND REQUEST SENT',
+    # FRIEND_REQUEST_ACCEPTED = 'FRIEND REQUEST ACCEPTED',
+    # EXPERIENCE_ABOUT_EXPIRE = 'EXPERIENCE ABOUT EXPIRE',
+    # REFRESH_APP_REMINDER = 'REFRESH APP REMINDER'
 
 
 class NotificationError(models.Model):
@@ -50,30 +76,26 @@ class Notification(models.Model):
     is_read = models.BooleanField(default=False)
 
     class NotificationChannel:
-        EMAIL = 1
-        SMS = 2
-        PUSH = 3
+        PUSH = 1
 
         choices = (
-            (EMAIL, 'EMAIL'),
-            (SMS, 'SMS'),
-            (PUSH, 'PUSH')
+            (PUSH, 'PUSH'),
         )
 
-    class NotificationType:
-        DEFAULT = 1
-        CONNECTIONS = 2
-        REVIEWS = 3
-        TASKS = 4
-        FEEDBACK = 5
-
-        choices = (
-            (DEFAULT, 'DEFAULT'),
-            (CONNECTIONS, 'CONNECTIONS'),
-            (REVIEWS, 'REVIEWS'),
-            (TASKS, 'TASKS'),
-            (FEEDBACK, 'FEEDBACK')
-        )
+    # class NotificationType:
+    #     DEFAULT = 1
+    #     CONNECTIONS = 2
+    #     REVIEWS = 3
+    #     TASKS = 4
+    #     FEEDBACK = 5
+    #
+    #     choices = (
+    #         (DEFAULT, 'DEFAULT'),
+    #         (CONNECTIONS, 'CONNECTIONS'),
+    #         (REVIEWS, 'REVIEWS'),
+    #         (TASKS, 'TASKS'),
+    #         (FEEDBACK, 'FEEDBACK')
+    #     )
 
     channel = models.IntegerField(
         choices=NotificationChannel.choices,
@@ -81,8 +103,8 @@ class Notification(models.Model):
     )
 
     type = models.IntegerField(
-        choices=NotificationType.choices,
-        default=NotificationType.DEFAULT
+        choices=NotificationTypes.choices,
+        default=NotificationTypes.DEFAULT
     )
 
     def register_error(self, message, user):
