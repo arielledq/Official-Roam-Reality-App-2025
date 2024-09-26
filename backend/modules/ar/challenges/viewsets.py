@@ -509,3 +509,9 @@ class DestinationFactsViewSet(ViewSet):
         objs = self.queryset.filter(criterion)
         serializer = DestinationFactsSerializer(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'])
+    def get_all(self, request):
+        objs = self.queryset.all()
+        serializer = DestinationFactsSerializer(objs, many=True)
+        return Response(serializer.data)
