@@ -1,7 +1,9 @@
 from django.contrib import admin
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, GeoARStar,DestinationFacts, \
-  ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion,GeoARSiteActivity,StarCollection, \
-  ARSitePinCheckIn,GeoARGoldStar, PanicMessage
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
+    GeoARStar, DestinationFacts, \
+    ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
+    GeoARSiteActivity, StarCollection, \
+    ARSitePinCheckIn, GeoARGoldStar, PanicMessage, ARExampleImage, ARExampleVideo
 from .widgets import GoogleMapsOpenLayersWidget, GoogleMapsOpenLayersWidgetZoom
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
@@ -186,10 +188,28 @@ class ARChallengeFiltersAdmin(admin.ModelAdmin):
     ordering = ("name",)
     pass
 
+
+class ARExampleImageInline(admin.TabularInline):
+    model = ARExampleImage
+    extra = 1  # Number of extra forms to display
+    fields = ['image']
+
+
+class ARExampleVideoInline(admin.TabularInline):
+    model = ARExampleVideo
+    extra = 1
+    fields = ['video_file']
+
+
+class ARExampleAdmin(admin.ModelAdmin):
+    inlines = [ARExampleImageInline, ARExampleVideoInline]
+
+
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
-admin.site.register(ARExample, ARChallengeAdmin)
+# admin.site.register(ARExample, ARChallengeAdmin)
+admin.site.register(ARExample, ARExampleAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARGoldStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
