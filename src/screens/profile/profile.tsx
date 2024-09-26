@@ -222,7 +222,6 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
             style={{
               width: '100%',
               marginTop: 80,
-              backgroundColor: 'red',
               aspectRatio: 1,
             }}
             source={{ uri: profileDetails?.image }}
