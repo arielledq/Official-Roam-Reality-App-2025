@@ -40,7 +40,6 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
 
   const setOnesignalDevice = () => {
     OneSignal.getDeviceState().then(deviceData => {
-      console.log(" deviceData ===>>>> ", JSON.stringify(deviceData, null, 2))
       if (deviceData?.userId) {
         setDevice({ ...deviceData, active: true })
       }

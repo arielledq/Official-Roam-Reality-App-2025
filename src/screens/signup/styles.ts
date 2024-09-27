@@ -11,6 +11,7 @@ const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,
+    paddingBottom: 20,
   },
   container: { marginTop: '9%' },
   headerText: {
