@@ -1,26 +1,17 @@
-import * as React from "react"
-import {
-  Text,
-  View,
-  StyleSheet,
-  Keyboard,
-  Pressable,
-  Image,
-  Share,
-  Alert
-} from "react-native"
-import BackgroundWithImage from "../../components/background"
-import { AppButton, AppHeader, AppInput } from "../../components"
-import { Formik } from "formik"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { inviteFriendSchema } from "../../util/ValidationSchemas"
-import theme from "../../assets/theme"
-import { SvgXml } from "react-native-svg"
-import { Icons } from "../../assets/Icons"
-import useStyles from "./styles"
-import Images from "../../assets/images"
-import { inviteFriendByEmail } from "../../network"
-import { showMessage } from "../../util/helpers"
+import * as React from 'react'
+import { Text, View, StyleSheet, Keyboard, Pressable, Image, Share, Alert } from 'react-native'
+import BackgroundWithImage from '../../components/background'
+import { AppButton, AppHeader, AppInput } from '../../components'
+import { Formik } from 'formik'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { inviteFriendSchema } from '../../util/ValidationSchemas'
+import theme from '../../assets/theme'
+import { SvgXml } from 'react-native-svg'
+import { Icons } from '../../assets/Icons'
+import useStyles from './styles'
+import Images from '../../assets/images'
+import { inviteFriendByEmail } from '../../network'
+import { showMessage } from '../../util/helpers'
 
 interface InviteFriendsProps {}
 
@@ -35,12 +26,12 @@ const InviteFriends = (props: InviteFriendsProps) => {
    */
   const onShareLinkClick = async () => {
     const result = Share.share({
-      message: "https://www.google.com",
-      title: "Invite Friends"
+      message: 'https://www.google.com',
+      title: 'Invite Friends',
     })
     if (result.action === Share.sharedAction) {
       // Link has been successfully shared
-      showMessage("App link shared successfully")
+      showMessage('App link shared successfully')
     }
   }
 
@@ -52,40 +43,40 @@ const InviteFriends = (props: InviteFriendsProps) => {
     setLoading(true)
     const data = {
       email: values.email?.trim(),
-      message: values.message?.trim()
+      message: values.message?.trim(),
     }
     inviteFriendByEmail(data)
       .then(response => {
         setLoading(false)
         Keyboard.dismiss()
         if (response.status === 1) {
-          showMessage("An invite has been sent to your friend")
+          showMessage('An invite has been sent to your friend')
           resetForm() // Reset form after successful submission
         } else {
-          showMessage("Something went wrong", 'error')
+          showMessage('Something went wrong', 'error')
         }
       })
       .catch(error => {
         setLoading(false)
-        console.error("error", JSON.stringify(error))
-        showMessage("Something went wrong", 'error')
+        console.error('error', JSON.stringify(error))
+        showMessage('Something went wrong', 'error')
       })
   }
 
   return (
-    <BackgroundWithImage>
-      <AppHeader title={"Invite Friends"} backgroundColor="transparent" />
+    <BackgroundWithImage style={_styles.mainContainer}>
+      <AppHeader title={'Invite Friends'} backgroundColor='transparent' />
       <KeyboardAwareScrollView
-        keyboardShouldPersistTaps="always"
+        keyboardShouldPersistTaps='always'
         nestedScrollEnabled
-        contentContainerStyle={_styles.scroll}
+        contentContainerStyle={[_styles.scroll, { paddingHorizontal: 25 }]}
         enableOnAndroid={true}
         enableAutomaticScroll={true}
       >
         <Formik
           initialValues={{
-            email: "",
-            message: ""
+            email: '',
+            message: '',
           }}
           onSubmit={(values, { resetForm }) => inviteFriends(values, resetForm)}
           enableReinitialize
@@ -98,12 +89,12 @@ const InviteFriends = (props: InviteFriendsProps) => {
                   inputContainerStyle={[
                     _styles.input,
                     isEmailInputFocused ? _styles.focusedInput : {},
-                    touched.email && errors?.email ? _styles.inputError : {}
+                    touched.email && errors?.email ? _styles.inputError : {},
                   ]}
-                  selectionColor={"white"}
+                  selectionColor={'white'}
                   onFocus={() => setEmailInputFocused(true)}
                   onBlur={() => setEmailInputFocused(false)}
-                  placeholder="Email Address"
+                  placeholder='Email Address'
                   onSubmitEditing={Keyboard.dismiss}
                   placeholderTextColor={
                     (touched.email && errors?.email) || isEmailInputFocused
@@ -111,23 +102,21 @@ const InviteFriends = (props: InviteFriendsProps) => {
                       : theme.darkColors?.grey
                   }
                   value={values.email}
-                  onChangeText={handleChange("email")}
-                  errorMessage={
-                    touched.email && errors?.email ? errors.email : undefined
-                  }
-                  autoCapitalize="none"
+                  onChangeText={handleChange('email')}
+                  errorMessage={touched.email && errors?.email ? errors.email : undefined}
+                  autoCapitalize='none'
                 />
                 <AppInput
                   style={[
                     _styles.input,
                     _styles.textbox,
                     isMessageFocused ? _styles.focusedInput : {},
-                    touched.message && errors?.message ? _styles.inputError : {}
+                    touched.message && errors?.message ? _styles.inputError : {},
                   ]}
-                  selectionColor={"white"}
+                  selectionColor={'white'}
                   onFocus={() => setMessageFocused(true)}
                   onBlur={() => setMessageFocused(false)}
-                  placeholder="Write your message here"
+                  placeholder='Write your message here'
                   onSubmitEditing={Keyboard.dismiss}
                   placeholderTextColor={
                     (touched.message && errors?.message) || isMessageFocused
@@ -135,21 +124,17 @@ const InviteFriends = (props: InviteFriendsProps) => {
                       : theme.darkColors?.grey
                   }
                   value={values.message}
-                  onChangeText={handleChange("message")}
-                  errorMessage={
-                    touched.message && errors?.message
-                      ? errors.message
-                      : undefined
-                  }
-                  autoCapitalize="none"
-                  textAlignVertical="top"
+                  onChangeText={handleChange('message')}
+                  errorMessage={touched.message && errors?.message ? errors.message : undefined}
+                  autoCapitalize='none'
+                  textAlignVertical='top'
                   multiline={true}
                 />
               </View>
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainer}
-                title={"Submit"}
+                title={'Submit'}
                 onPress={handleSubmit}
                 loading={loading}
               />
@@ -157,7 +142,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
                 <Image
                   source={Images.ShareInvite}
                   style={_styles.shareInvite}
-                  resizeMode="contain"
+                  resizeMode='contain'
                 />
               </Pressable>
             </View>
@@ -171,5 +156,5 @@ const InviteFriends = (props: InviteFriendsProps) => {
 export default InviteFriends
 
 const styles = StyleSheet.create({
-  container: {}
+  container: {},
 })
