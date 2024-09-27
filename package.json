@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "web": "./node_modules/.bin/webpack-dev-server --config ./webpack.config.js --live-reload --color --mode development",
     "web:build": "./node_modules/.bin/webpack --config ./webpack.config.js --color --mode production",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "build-apk": "bash ./scripts/build-apk.sh"
   },
   "dependencies": {
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
@@ -89,7 +90,7 @@
     "react-native-tiktok": "https://github.com/shabeebhasan/react-native-tiktok",
     "react-native-toast-message": "^2.2.0",
     "react-native-uuid": "^2.0.1",
-    "react-native-vector-icons": "^9.2.0",
+    "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^5.2.1",
     "react-native-view-shot": "^3.8.0",
     "react-native-web": "^0.18.10",
