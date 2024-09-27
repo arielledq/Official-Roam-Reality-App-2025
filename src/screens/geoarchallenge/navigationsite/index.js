@@ -27,11 +27,20 @@ import mapCustomStyle from "../../../constants/MapCustomStyles"
 import {
   getLocationDistance,
   hasLocationPermission
-} from "../../../util/LocationLib"
+} from "../../../util/LocationLib";
+import CompassHeading from 'react-native-compass-heading';
 
-const MARGIN_ARRIVAL_METERS = 10
+const MARGIN_ARRIVAL_METERS = 50
 
-const GeoArSiteNavigation = ({}) => {
+const GeoArSiteNavigation = ({ }) => {
+
+  const [mapRegion, setMapRegion] = useState({
+    longitude: 0,
+    latitude: 0,
+    longitudeDelta: 0.004,
+    latitudeDelta: 0.009
+  })
+  const [compassHeading, setCompassHeading] = useState(3)
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
@@ -44,7 +53,6 @@ const GeoArSiteNavigation = ({}) => {
   const [highAccuracy, setHighAccuracy] = useState(true)
   const [locationDialog, setLocationDialog] = useState(true)
   const [significantChanges, setSignificantChanges] = useState(false)
-  const [foregroundService, setForegroundService] = useState(false)
   const [useLocationManager, setUseLocationManager] = useState(false)
   const [estimatedTime, setEstimatedTime] = useState("")
   const [location, setLocation] = useState(null)
@@ -63,41 +71,46 @@ const GeoArSiteNavigation = ({}) => {
   const calculatedEstimatedTime = duration => {
     var now = new Date()
     const calcTime = moment(now).add(duration, "minutes").format("hh:mm A")
-    console.log("Now: " + calcTime)
     setEstimatedTime(calcTime)
   }
 
   useEffect(() => {
-    getLocation()
+    getFirstLocation()
     getLocationUpdates()
+    CompassHeading.start(compassHeading, ({ heading, accuracy }) => {
+      setCompassHeading(heading)
+      if (mapView && mapView.current) {
+        mapView.current.animateCamera({ heading });
+      }
+    });
     return () => {
       stopLocationUpdates()
+      CompassHeading.stop();
     }
   }, [])
 
-  const getLocation = async () => {
+  const getFirstLocation = async () => {
     const hasPermission = await hasLocationPermission()
-
     if (!hasPermission) {
       return
     }
-
     Geolocation.getCurrentPosition(
       position => {
         setLocation(position)
         setCurrentLocation(position)
         if (mapView && mapView.current) {
-          mapView.current.animateToRegion({
+          const currentRegion = {
             latitude: position.coords.latitude,
             longitude: position.coords.longitude,
             latitudeDelta: 0.0032,
             longitudeDelta: 0.0032
-          })
+          }
+          setMapRegion(currentRegion)
+          mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
         }
       },
       error => {
         showMessage(error.message, "error", `Code ${error.code}`)
-        setLocation(null)
         console.log(error)
       },
       {
@@ -123,29 +136,27 @@ const GeoArSiteNavigation = ({}) => {
     }
     watchId.current = Geolocation.watchPosition(
       position => {
-        console.log("getLocationUpdates:", position)
-        setLocation(position)
         const dis = getLocationDistance(position.coords, {
           latitude: selectedGeoSite.lat_long.coordinates[1],
           longitude: selectedGeoSite.lat_long.coordinates[0]
         })
-        console.log("getLocationUpdates: dis", dis)
-        if (dis < MARGIN_ARRIVAL_METERS) {
+        if (dis < selectedGeoSite.check_in_site_radius) {
           navigation.replace("GeoArSiteArrived")
           stopLocationUpdates()
           return
         }
-        if (mapView && mapView.current) {
-          mapView.current.animateToRegion({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            latitudeDelta: 0.0032,
-            longitudeDelta: 0.0032
-          })
+        if (!location) {
+          setLocation(position)
+          mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
+        } else if (location && location.coords) {
+          const lastLocationDistance = getLocationDistance(position.coords, location.coords)
+          if (lastLocationDistance > 10) {
+            setLocation(position)
+            mapView.current.animateCamera({ center: position.coords, heading: compassHeading });
+          }
         }
       },
       error => {
-        setLocation(null)
         console.log(error)
       },
       {
@@ -154,7 +165,7 @@ const GeoArSiteNavigation = ({}) => {
           ios: "best"
         },
         enableHighAccuracy: highAccuracy,
-        distanceFilter: 5,
+        distanceFilter: 1,
         interval: 5000,
         fastestInterval: 2000,
         forceRequestLocation: forceLocation,
@@ -225,6 +236,7 @@ const GeoArSiteNavigation = ({}) => {
             ref={mapView}
             zoomControlEnabled={true}
             showsTraffic={true}
+            region={mapRegion}
             style={{
               position: "absolute",
               top: 0,
@@ -232,6 +244,7 @@ const GeoArSiteNavigation = ({}) => {
               left: 0,
               right: 0
             }}
+            showsMyLocationButton={true}
             zoomEnabled={true}
             scrollEnabled={true}
             showsUserLocation={true}
@@ -290,10 +303,6 @@ const GeoArSiteNavigation = ({}) => {
                   )
                 }}
                 onReady={result => {
-                  console.log(result.via_waypoint)
-                  // console.log(result.legs)
-                  // console.log(`Distance: ${result.distance} km`)
-                  // console.log(`Duration: ${result.duration} min.`)
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   calculatedEstimatedTime(result.duration)

@@ -1,7 +1,5 @@
-from django.contrib.auth import get_user_model
+from users.models import User
 from django.db import models
-
-User = get_user_model()
 
 
 class UserDevice(models.Model):
@@ -9,7 +7,7 @@ class UserDevice(models.Model):
     Model used to send notifications to user devices
     The active field is used to determine if the user has notifications enabled on the device
     """
-    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='devices')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='devices')
     device_id = models.CharField('Device Id', max_length=64)
     device_token = models.CharField('Device token', max_length=200, null=True, blank=True)
     active = models.BooleanField(default=True)
@@ -23,6 +21,8 @@ class UserDevice(models.Model):
 
     @staticmethod
     def activate_device(user, device_id, device_token):
+        print('device_id')
+        print(device_id)
         if not device_id:
             return
         try:
