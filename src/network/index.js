@@ -338,6 +338,11 @@ export const getDestinationFacts = payload =>
     method: "POST",
     data: payload
   })
+export const getDestinationFactsAll = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-destination-fact/get_all/`,
+    method: "GET",
+  })
 export const removeUserFromFriends = id =>
   Request.callWithToken({
     url: `${commonApiRoute}friends/${id}/remove_friend/`,

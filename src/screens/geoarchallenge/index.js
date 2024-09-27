@@ -15,7 +15,8 @@ import {
   getARStettings,
   getARChallenges,
   updateUserLocation,
-  getARSitesStars
+  getARSitesStars,
+  getDestinationFactsAll
 } from "../../network"
 
 import BackgroundWithImage from "../../components/background"
@@ -33,16 +34,18 @@ import {
   updateAnyWhereChallenges
 } from "../../redux/AR"
 
-import { useDispatch } from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
 import useStyles from "./styles"
 import { hasLocationPermission } from "../../util/LocationLib"
 import Geolocation from "react-native-geolocation-service"
 import { MenuIcon } from "../../assets/svg"
 import PanicPopUp from "./panicpopup"
+import {updateDestinationFactsAll} from "../../redux/AR/reducer";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
+  const destinationFactsAll = useSelector(state => state.ar?.destinationFactsAll)
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [starSitesCount, setStarSitesCount] = useState({})
@@ -123,6 +126,22 @@ const GeoArChallenge = ({}) => {
       })
   }
 
+  const getDestinationFacts =  () => {
+    setIsLoading(true)
+    getDestinationFactsAll()
+      .then(res => {
+        if (res.status == 1) {
+          dispatch(updateDestinationFactsAll(res.data))
+        } else {
+          res.message.message = "Error in loading Challenges."
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
+  }
+
   const getSettings = () => {
     setIsLoading(true)
     getARStettings()
@@ -154,7 +173,7 @@ const GeoArChallenge = ({}) => {
       .finally(() => {
         setIsLoading(false)
       })
-    getLocation()
+    getDestinationFacts()
   }
 
   const getARStarSites = async id => {
@@ -167,8 +186,18 @@ const GeoArChallenge = ({}) => {
     return starSitesCount[id] ? starSitesCount[id] : 0
   }
 
+  const checkLocationDestinationFacts = () => {
+    if (destinationFactsAll.length > 0) {
+      console.log("checkLocationDestinationFacts", destinationFactsAll)
+    }
+  }
+
   useEffect(() => {
     loadDestinations()
+    setInterval(() => {
+      getLocation()
+      checkLocationDestinationFacts()
+    }, 5000)
   }, [])
 
   const navigateToChallengeDetails = obj => {

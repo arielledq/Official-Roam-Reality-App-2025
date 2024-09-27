@@ -6,7 +6,9 @@ const initialState = {
   selectedDestination: {},
   anywhereChallenges: {},
   selectedGeoSite: {},
-  selectedGeoARSiteStars: []
+  selectedGeoARSiteStars: [],
+  destinationFactsAll: []
+
 }
 
 export const sliceAR = createSlice({
@@ -31,6 +33,9 @@ export const sliceAR = createSlice({
     },
     updateSelectedGeoARSiteStars: (state, action) => {
       state.selectedGeoARSiteStars = action.payload
+    },
+    updateDestinationFactsAll: (state, action) => {
+      state.destinationFactsAll = action.payload
     }
   }
 })
@@ -38,5 +43,5 @@ export const sliceAR = createSlice({
 export const { resetState, updateARUserData,
   updateARSettings, updateSelectedDestination,
   updateAnyWhereChallenges, updateSelectedSites,
-  updateSelectedGeoARSiteStars
+  updateSelectedGeoARSiteStars, updateDestinationFactsAll
 } = sliceAR.actions
