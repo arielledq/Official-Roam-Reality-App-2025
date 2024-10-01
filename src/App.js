@@ -12,6 +12,7 @@ import Toast, { ErrorToast, SuccessToast } from "react-native-toast-message"
 import OneSignal from "react-native-onesignal"
 import { NotificationProvider } from "./NotificationProvider"
 import Config from "./config"
+import {GeolocationProvider} from "./GeolocationProvider";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA")
 
@@ -50,7 +51,9 @@ const App = () => {
         {/* this  GestureHandlerRootView is used for https://gorhom.github.io/react-native-bottom-sheet/*/}
         <GestureHandlerRootView style={styles.root}>
           <PersistGate loading={null} persistor={persistor}>
-            <Navigation />
+            <GeolocationProvider>
+              <Navigation />
+            </GeolocationProvider>
           </PersistGate>
         </GestureHandlerRootView>
         <Toast config={toastConfig} />
