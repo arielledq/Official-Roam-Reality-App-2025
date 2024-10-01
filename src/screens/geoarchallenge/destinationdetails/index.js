@@ -31,6 +31,8 @@ import DestinationFactPopUp from '../destinactionfactpopup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from '../../../components/Icon'
 
+const SCROLL_AMOUNT = 70
+
 const GeoArChallengeDetails = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
@@ -43,12 +45,19 @@ const GeoArChallengeDetails = ({}) => {
   const navigation = useNavigation()
   const mapView = useRef()
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const anywhereARChallenges = useSelector(state => state.ar?.anywhereChallenges)
   const regions = selectedDestination?.regions
   const [fullRegion, setFullRegion] = useState(null)
   const [friendList, setFriendList] = useState([])
   const [filteredUsers, setFilteredUsers] = React.useState([])
   const [popUpFacts, setPopUpFacts] = useState(null)
+  const scrollViewRef = useRef(null)
+  const [scrollPosition, setScrollPosition] = useState(0)
+
+  const scrollRegionsPressHandler = () => {
+    const newPosition = scrollPosition + SCROLL_AMOUNT
+    scrollViewRef.current?.scrollTo({ x: newPosition, y: 0, animated: true })
+    setScrollPosition(newPosition)
+  }
 
   const setMapBounds = () => {
     var address = selectedDestination.name
@@ -384,8 +393,11 @@ const GeoArChallengeDetails = ({}) => {
           gap: 10,
         }}
       >
-        <Icon name={'angle-double-right'} family='font-awesome' size={25} color='gray' />
+        <TouchableOpacity onPress={scrollRegionsPressHandler}>
+          <Icon name={'angle-double-right'} family='font-awesome' size={25} color='gray' />
+        </TouchableOpacity>
         <ScrollView
+          ref={scrollViewRef}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
