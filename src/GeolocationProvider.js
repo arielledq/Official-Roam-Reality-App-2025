@@ -7,7 +7,7 @@ import {handleError, isPointInPolygon, showMessage} from "./util/helpers";
 import DestinationFactModal from "./screens/DestinationFactModal/DestinationFactModal";
 import {updateDestinationVisited} from "./redux/AR/reducer";
 
-const GeolocationContext = createContext()
+export const GeolocationContext = createContext()
 
 export const GeolocationProvider = ({ children }) => {
   const userToken = useSelector(state => state.login.data.token)

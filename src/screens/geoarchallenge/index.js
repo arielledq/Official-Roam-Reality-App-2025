@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, {useContext, useEffect, useState} from "react"
 
 import {
   FlatList,
@@ -41,12 +41,13 @@ import Geolocation from "react-native-geolocation-service"
 import { MenuIcon } from "../../assets/svg"
 import PanicPopUp from "./panicpopup"
 import {updateDestinationFactsAll} from "../../redux/AR/reducer";
+import {GeolocationContext} from "../../GeolocationProvider";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const [destinationFactsAll, setDestinationFactsAll] = useState([])
-  const [userLocation, setUserLocation] = useState(null)
+  // const { userLocation } = useContext(GeolocationContext);
+  // console.log("userLocation  ==> ", userLocation)
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [starSitesCount, setStarSitesCount] = useState({})
@@ -72,46 +73,6 @@ const GeoArChallenge = ({}) => {
       .finally(() => {
         setIsLoading(false)
       })
-  }
-
-  const getLocation = async () => {
-    const hasPermission = await hasLocationPermission()
-
-    if (!hasPermission) {
-      return
-    }
-    Geolocation.getCurrentPosition(
-      position => {
-        // console.log("getLocation", position)
-        updateUserLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        })
-          .then(res => {
-            setUserLocation({
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            })
-          })
-          .finally(() => {})
-      },
-      error => {
-        console.log(error)
-      },
-      {
-        accuracy: {
-          android: "high",
-          ios: "best"
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true
-      }
-    )
   }
 
   const ARUserProfile = () => {
