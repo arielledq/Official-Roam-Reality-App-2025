@@ -8,7 +8,7 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
-import { handleError } from "../../util/helpers"
+import {handleError, isPointInPolygon} from "../../util/helpers"
 import {
   getGeoARDestinations,
   getARProfile,
@@ -45,7 +45,8 @@ import {updateDestinationFactsAll} from "../../redux/AR/reducer";
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const destinationFactsAll = useSelector(state => state.ar?.destinationFactsAll)
+  const [destinationFactsAll, setDestinationFactsAll] = useState([])
+  const [userLocation, setUserLocation] = useState(null)
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [starSitesCount, setStarSitesCount] = useState({})
@@ -81,13 +82,16 @@ const GeoArChallenge = ({}) => {
     }
     Geolocation.getCurrentPosition(
       position => {
-        console.log("getLocation", position)
+        // console.log("getLocation", position)
         updateUserLocation({
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         })
           .then(res => {
-            console.log("updateUserLocation:", res)
+            setUserLocation({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            })
           })
           .finally(() => {})
       },
@@ -116,22 +120,6 @@ const GeoArChallenge = ({}) => {
       .then(res => {
         if (res.status == 1) {
           dispatch(updateARUserData(res))
-        } else {
-          res.message.message = "Error in loading Challenges."
-          handleError(res)
-        }
-      })
-      .finally(() => {
-        setIsLoading(false)
-      })
-  }
-
-  const getDestinationFacts =  () => {
-    setIsLoading(true)
-    getDestinationFactsAll()
-      .then(res => {
-        if (res.status == 1) {
-          dispatch(updateDestinationFactsAll(res.data))
         } else {
           res.message.message = "Error in loading Challenges."
           handleError(res)
@@ -173,7 +161,6 @@ const GeoArChallenge = ({}) => {
       .finally(() => {
         setIsLoading(false)
       })
-    getDestinationFacts()
   }
 
   const getARStarSites = async id => {
@@ -186,18 +173,8 @@ const GeoArChallenge = ({}) => {
     return starSitesCount[id] ? starSitesCount[id] : 0
   }
 
-  const checkLocationDestinationFacts = () => {
-    if (destinationFactsAll.length > 0) {
-      console.log("checkLocationDestinationFacts", destinationFactsAll)
-    }
-  }
-
   useEffect(() => {
     loadDestinations()
-    setInterval(() => {
-      getLocation()
-      checkLocationDestinationFacts()
-    }, 5000)
   }, [])
 
   const navigateToChallengeDetails = obj => {

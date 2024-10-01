@@ -36,7 +36,6 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   // const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  console.log({ login })
 
   const setOnesignalDevice = () => {
     OneSignal.getDeviceState().then(deviceData => {
