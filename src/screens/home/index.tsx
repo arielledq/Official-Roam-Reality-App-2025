@@ -1,14 +1,13 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Alert,
-  ScrollView,
   StyleSheet,
   TouchableOpacity,
   View,
   ActivityIndicator,
   FlatList,
 } from 'react-native'
-import { AppButton, AppHeader, AppText } from '../../components'
+import { AppHeader, AppText } from '../../components'
 import { resetState } from '../../redux/Login'
 import { deleteAccount, getARChallenges, logout } from '../../network'
 import { useDispatch, useSelector } from 'react-redux'
@@ -17,11 +16,9 @@ import { MenuIcon } from '../../assets/svg'
 import { screenHorizontalPadding } from '../../util/AppDimensions'
 import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
 import theme from '../../assets/theme'
-import AppBottomSheet from '../../components/bottomSheet'
 import BackgroundWithImage from '../../components/background'
 import { RootStackParamList, ScreenStackComponent } from '../../navigation/types'
 import BottomSheet from '@gorhom/bottom-sheet'
-import Images from '../../assets/images'
 import useStyles from './styles'
 import RightArrowIcon from '../../assets/svg/RightArrowIcon'
 import { handleError, showMessage } from '../../util/helpers'
@@ -35,7 +32,6 @@ const Home: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route }) => {
   const [numberOfChallenges, setNumberOfChallenges] = useState(0)
 
   const bottomSheetRef = useRef < BottomSheet > null
-  const snapPoints = useMemo(() => ['33%'], [])
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const styles = useStyles()
