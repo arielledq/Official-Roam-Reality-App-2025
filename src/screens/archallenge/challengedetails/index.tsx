@@ -105,7 +105,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, 'ArChallengeD
         ]
       )
     } else {
-      showMessage('No Example available.', 'error')
+      showMessage('No Example available.', 'info')
     }
   }
 

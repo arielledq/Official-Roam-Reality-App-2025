@@ -291,7 +291,8 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
     </KeyboardAwareScrollView>
   )
 
-  const navigateToShare = (captureData, challengeObj) => {
+  const navigateToShare = (captureData: any, challengeObj: any) => {
+    // @ts-ignore
     navigation.navigate('ArChallengeShare', {
       challengeObj: challengeObj,
       captureData,
@@ -309,20 +310,12 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
       </TouchableOpacity>
       <View style={{ marginHorizontal: -22 }}>
         <FlatList
-          contentContainerStyle={{ marginBottom: 50 }}
+          contentContainerStyle={{ marginBottom: 50, paddingHorizontal: 20, gap: 18 }}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => (
-            <MemoryContainer
-              onPressAction={navigateToShare}
-              title={'Title'}
-              item={item}
-              description={'description'}
-              image={''}
-            />
-          )}
+          renderItem={({ item }) => <MemoryContainer item={item} onPressAction={navigateToShare} />}
           keyExtractor={item => item.id.toString()}
         />
       </View>
