@@ -130,24 +130,25 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route 
 
   const HomeScreenARItem = item => {
     return (
-      <View style={styles.imageBg}>
-        <View style={styles.row}>
-          <View style={styles.innerView}>
-            <AppText style={styles.headerText}>{item?.title}</AppText>
-            <AppText style={styles.headerText}>{item?.title1}</AppText>
-            <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-            <AppText style={styles.challengesText}>
-              {item?.id === 1 ? numberOfChallenges : selectedDestination.unique_ar_sites.length}{' '}
-              Challenges
-            </AppText>
-          </View>
-          <TouchableOpacity
-            onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
-          >
+      <TouchableOpacity
+        onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
+      >
+        <View style={styles.imageBg}>
+          <View style={styles.row}>
+            <View style={styles.innerView}>
+              <AppText style={styles.headerText}>{item?.title}</AppText>
+              <AppText style={styles.headerText}>{item?.title1}</AppText>
+              <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
+              <AppText style={styles.challengesText}>
+                {item?.id === 1 ? numberOfChallenges : selectedDestination.unique_ar_sites.length}{' '}
+                Challenges
+              </AppText>
+            </View>
+
             <RightArrowIcon />
-          </TouchableOpacity>
+          </View>
         </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 

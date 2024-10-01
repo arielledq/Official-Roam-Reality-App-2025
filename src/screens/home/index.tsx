@@ -129,23 +129,17 @@ const Home: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route }) => {
       <TouchableOpacity
         onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
       >
-        <BackgroundWithImage
-          imageSource={item?.image}
-          style={styles.imageBg}
-          imageStyle={styles.imageStyle}
-        >
-          <View style={styles.firstView} />
-          <View style={styles.row}>
+        <View style={styles.imageBg}>
+          <View style={styles.row1}>
             <View style={styles.innerView}>
               <AppText style={styles.headerText}>{item?.title}</AppText>
               <AppText style={styles.headerText}>{item?.title1}</AppText>
               <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
               <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
             </View>
-
             <RightArrowIcon />
           </View>
-        </BackgroundWithImage>
+        </View>
       </TouchableOpacity>
     )
   }
