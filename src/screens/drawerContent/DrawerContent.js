@@ -122,23 +122,48 @@ function DrawerContent(props) {
   const [popupDetails, setPopupDetails] = useState({})
   const [isConfirmationVisible, setConfirmationVisible] = useState(false)
   const onPressHandler = navigateTo => {
-    if (navigateTo === 'delete') {
-      setPopupDetails({
-        title: 'Delete Account',
-        description: 'Are you sure you want to delete your account?',
-        cancelText: 'Cancel',
-      })
-      setConfirmationVisible(true)
-    } else if (navigateTo === 'logout') {
-      setPopupDetails({
-        title: 'Log Out',
-        description: 'Are you sure you want to logout?',
-        cancelText: 'Cancel',
-      })
-      setConfirmationVisible(true)
-    } else if (navigateTo === 'toggleLocation') {
-    } else {
-      navigation.navigate(navigateTo)
+    switch (navigateTo) {
+      case 'delete': {
+        setPopupDetails({
+          title: 'Delete Account',
+          description: 'Are you sure you want to delete your account?',
+          cancelText: 'Cancel',
+        })
+        setConfirmationVisible(true)
+        break
+      }
+      case 'logout': {
+        setPopupDetails({
+          title: 'Delete Account',
+          description: 'Are you sure you want to delete your account?',
+          cancelText: 'Cancel',
+        })
+        setConfirmationVisible(true)
+        break
+      }
+      case 'delete': {
+        setPopupDetails({
+          title: 'Log Out',
+          description: 'Are you sure you want to logout?',
+          cancelText: 'Cancel',
+        })
+        setConfirmationVisible(true)
+        break
+      }
+      case 'toggleLocation': {
+        break
+      }
+      case 'Home': {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'TabNavigator', params: { screen: 'GeoArChallenge' } }],
+        })
+        break
+      }
+
+      default:
+        navigation.navigate(navigateTo)
+        break
     }
   }
   const handleLogOutButton = async () => {
