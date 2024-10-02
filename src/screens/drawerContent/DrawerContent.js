@@ -134,15 +134,6 @@ function DrawerContent(props) {
       }
       case 'logout': {
         setPopupDetails({
-          title: 'Delete Account',
-          description: 'Are you sure you want to delete your account?',
-          cancelText: 'Cancel',
-        })
-        setConfirmationVisible(true)
-        break
-      }
-      case 'delete': {
-        setPopupDetails({
           title: 'Log Out',
           description: 'Are you sure you want to logout?',
           cancelText: 'Cancel',
