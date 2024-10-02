@@ -369,7 +369,12 @@ const ArPinChallengeShare = ({}) => {
             />
 
             <AppButton
-              onPress={() => navigation.replace('Home')}
+              onPress={() => {
+                navigation.reset({
+                  index: 0,
+                  routes: [{ name: 'TabNavigator', params: { screen: 'GeoArChallenge' } }],
+                })
+              }}
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
               title={'End Experience'}
