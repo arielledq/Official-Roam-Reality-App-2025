@@ -83,7 +83,7 @@ export const GeolocationProvider = ({ children }) => {
 
       if (!openDestinationFactModal) {
         for (let i = 0; i < destinationFactsAll.length; i++) {
-          const isInside = isPointInPolygon([userLocation.latitude, userLocation.longitude], destinationFactsAll[i].border.coordinates)
+          const isInside = isPointInPolygon([userLocation.longitude, userLocation.latitude], destinationFactsAll[i].border.coordinates)
           if (isInside && !userVisitedDestinations.includes(destinationFactsAll[i].id)) {
             dispatch(updateDestinationVisited(destinationFactsAll[i].id))
             setOpenDestinationFactModal(true)
