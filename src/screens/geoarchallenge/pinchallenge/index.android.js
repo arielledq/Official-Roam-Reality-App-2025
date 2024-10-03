@@ -508,18 +508,18 @@ const PinChallenge = ({}) => {
     }, [])
 
     useEffect(() => {
-      if (distanceInFeet <= 200) {
+      if (distanceInFeet <= 200 && distanceInFeet > 100) {
         setBlinkTimer(3000)
-        console.log('distanceInFeet <= 200')
-      } else if (distanceInFeet <= 100) {
+        console.log('distanceInFeet <= 200 && distanceInFeet > 100')
+      } else if (distanceInFeet <= 100 && distanceInFeet >= 50) {
         setBlinkTimer(2000)
-        console.log('distanceInFeet <= 100')
-      } else if (distanceInFeet <= 50) {
+        console.log('distanceInFeet <= 100 && distanceInFeet >= 50')
+      } else if (distanceInFeet < 50 && distanceInFeet >= 10) {
         setBlinkTimer(1000)
-        console.log('distanceInFeet <= 50')
-      } else if (distanceInFeet <= 10) {
+        console.log('distanceInFeet < 50 && distanceInFeet >= 25')
+      } else if (distanceInFeet < 10) {
         setBlinkTimer(500)
-        console.log('distanceInFeet <= 10')
+        console.log('distanceInFeet < 10')
       } else {
         setBlinkTimer(0)
       }
