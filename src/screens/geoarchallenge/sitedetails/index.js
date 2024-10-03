@@ -42,7 +42,7 @@ const GeoArSiteDetails = ({}) => {
   const [address, setAddress] = useState(null)
   const [starsCount, setStarsCount] = useState(0)
 
-  console.log(' selectedGeoSite ===>>> ', JSON.stringify(selectedGeoSite, null, 2))
+  // console.log(' selectedGeoSite ===>>> ', JSON.stringify(selectedGeoSite, null, 2))
 
   const getAddress = () => {
     if (selectedGeoSite.address_text != '') {
@@ -92,7 +92,7 @@ const GeoArSiteDetails = ({}) => {
     setStarCounts()
   }, [selectedGeoARSiteStars])
 
-  InfoView = () => {
+  const InfoView = () => {
     return (
       <View style={_styles.challengeInfoContainer}>
         <View style={_styles.challengeInfoHeaderContainer}>
@@ -151,9 +151,9 @@ const GeoArSiteDetails = ({}) => {
   const getFullBounds = _ => {
     if (selectedGeoSite.geo_site_border) {
       let arrayPoints = []
-      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
         const points = selectedGeoSite.geo_site_border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
@@ -168,9 +168,9 @@ const GeoArSiteDetails = ({}) => {
   const getFullCenter = _ => {
     if (selectedGeoSite.geo_site_border) {
       let arrayPoints = []
-      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
         const points = selectedGeoSite.geo_site_border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }

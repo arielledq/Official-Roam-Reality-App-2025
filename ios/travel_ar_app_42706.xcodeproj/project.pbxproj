@@ -15,6 +15,7 @@
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		53F7E19B2C8F7226007954D6 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F7E19A2C8F7226007954D6 /* NotificationService.swift */; };
 		53F7E19F2C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6A35CD164AA24AC38B40103B /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 4997716CFFB9458BBC41B850 /* index.js */; };
 		7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */; };
 		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
@@ -63,7 +64,6 @@
 		DCB501352CA49EAD000B3F37 /* SFUIDisplayThin.otf in Resources */ = {isa = PBXBuildFile; fileRef = DCB501192CA49EAC000B3F37 /* SFUIDisplayThin.otf */; };
 		DCB501362CA49EAD000B3F37 /* PoppinsSemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCB5011A2CA49EAC000B3F37 /* PoppinsSemiBold.ttf */; };
 		DCB501372CA49EAD000B3F37 /* PoppinsBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCB5011B2CA49EAC000B3F37 /* PoppinsBold.ttf */; };
-		6A35CD164AA24AC38B40103B /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 4997716CFFB9458BBC41B850 /* index.js */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -109,6 +109,7 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = travel_ar_app_42706/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = travel_ar_app_42706/main.m; sourceTree = "<group>"; };
 		2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4997716CFFB9458BBC41B850 /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
 		53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		53F7E19A2C8F7226007954D6 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		53F7E19C2C8F7226007954D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -166,7 +167,6 @@
 		DCB5011A2CA49EAC000B3F37 /* PoppinsSemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = PoppinsSemiBold.ttf; path = ../src/assets/fonts/PoppinsSemiBold.ttf; sourceTree = "<group>"; };
 		DCB5011B2CA49EAC000B3F37 /* PoppinsBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = PoppinsBold.ttf; path = ../src/assets/fonts/PoppinsBold.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		4997716CFFB9458BBC41B850 /* index.js */ = {isa = PBXFileReference; name = "index.js"; path = "../src/assets/fonts/index.js"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = unknown; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -340,11 +340,7 @@
 				90EF264B2B5039E300872709 /* AntDesign.ttf */,
 				90EF264C2B5039E300872709 /* Foundation.ttf */,
 				90EF264D2B5039E300872709 /* Ionicons.ttf */,
-				7A5AF0CA2C2982AF00A603EE /* GlacialIndifference-Bold.otf */,
-				7A5AF0CC2C2982AF00A603EE /* GlacialIndifference-Italic.otf */,
-				7A5AF0CB2C2982AF00A603EE /* GlacialIndifference-Regular.otf */,
 				90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */,
-				7A74365F2B9B50E100BD6427 /* sf-ui-display-medium.otf */,
 				90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */,
 				90EF26502B5039E300872709 /* FontAwesome.ttf */,
 				90EF26512B5039E300872709 /* Zocial.ttf */,
