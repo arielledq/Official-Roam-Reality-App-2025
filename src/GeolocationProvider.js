@@ -7,7 +7,7 @@ import {handleError, isPointInPolygon, showMessage} from "./util/helpers";
 import DestinationFactModal from "./screens/DestinationFactModal/DestinationFactModal";
 import {updateDestinationVisited} from "./redux/AR/reducer";
 
-const GeolocationContext = createContext()
+export const GeolocationContext = createContext()
 
 export const GeolocationProvider = ({ children }) => {
   const userToken = useSelector(state => state.login.data.token)
@@ -83,7 +83,7 @@ export const GeolocationProvider = ({ children }) => {
 
       if (!openDestinationFactModal) {
         for (let i = 0; i < destinationFactsAll.length; i++) {
-          const isInside = isPointInPolygon([userLocation.latitude, userLocation.longitude], destinationFactsAll[i].border.coordinates)
+          const isInside = isPointInPolygon([userLocation.longitude, userLocation.latitude], destinationFactsAll[i].border.coordinates)
           if (isInside && !userVisitedDestinations.includes(destinationFactsAll[i].id)) {
             dispatch(updateDestinationVisited(destinationFactsAll[i].id))
             setOpenDestinationFactModal(true)

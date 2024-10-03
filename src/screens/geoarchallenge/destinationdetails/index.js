@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, {useContext, useEffect, useRef, useState} from 'react'
 
 import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import BackgroundWithImage from '../../../components/background'
@@ -30,12 +30,16 @@ import {
 import DestinationFactPopUp from '../destinactionfactpopup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from '../../../components/Icon'
+import {GeolocationContext} from "../../../GeolocationProvider";
 
 const SCROLL_AMOUNT = 70
 
 const GeoArChallengeDetails = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
+  const { userLocation } = useContext(GeolocationContext);
+  const latitude = userLocation?.latitude
+  const longitude = userLocation?.longitude
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
   const [starsSites, setStarsSites] = useState(0)
@@ -111,7 +115,7 @@ const GeoArChallengeDetails = ({}) => {
       !selectedDestination.geo_location ||
       selectedDestination.geo_location.coordinates.length == 0
     ) {
-      console.log('setMapBounds')
+      // console.log('setMapBounds')
       setTimeout(setMapBounds, 500)
     } else {
       const fullRegion = {
@@ -130,9 +134,9 @@ const GeoArChallengeDetails = ({}) => {
         fullRegion.latitude = Number(full_latitude_longitude.latitude)
         fullRegion.longitude = Number(full_latitude_longitude.longitude)
       }
-      console.log('full_bounds', full_bounds)
-      console.log('full_latitude_longitude', full_latitude_longitude)
-      console.log('full_latitude_longitude', selectedDestination.border)
+      // console.log('full_bounds', full_bounds)
+      // console.log('full_latitude_longitude', full_latitude_longitude)
+      // console.log('full_latitude_longitude', selectedDestination.border)
       setFullRegion(fullRegion)
     }
     getHiddenStar()
@@ -142,67 +146,39 @@ const GeoArChallengeDetails = ({}) => {
   }, [])
 
   const loadDFacts = async id => {
-    const hasPermission = await hasLocationPermission()
 
-    if (!hasPermission) {
-      return
-    }
-    Geolocation.getCurrentPosition(
-      position => {
-        console.log('getLocation', position)
-        getDestinationFacts({
-          destination_id: id,
-        })
-          .then(async res => {
-            for (let i = 0; i < res.data.length; i++) {
-              const facts = res.data[i]
-              const arrayPoints = []
-              if (facts?.border?.coordinates) {
-                for (i = 0; i < facts.border.coordinates.length; i++) {
-                  const points = facts.border.coordinates[i]
-                  for (j = 0; j < points.length; j++) {
-                    const point = points[j]
-                    arrayPoints.push({
-                      latitude: point[1],
-                      longitude: point[0],
-                    })
-                  }
-                }
-              }
-              isInsideSiteArea = isLocationPointInPolygon(position.coords, arrayPoints)
-              if (isInsideSiteArea) {
-                console.log('PopUp', facts)
-                const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
-                console.log('AsyncStorage:', isOpened)
-                // if don't want to open popup again and again
-                if (!isOpened || isOpened !== 'opened') {
-                  setPopUpFacts(facts)
-                }
-                break
-              } else {
-                console.log('Not PopUp', facts)
+    getDestinationFacts({
+      destination_id: id,
+    })
+      .then(async res => {
+        console.log('res', res)
+        for (let i = 0; i < res.data.length; i++) {
+          const facts = res.data[i]
+          const arrayPoints = []
+          if (facts?.border?.coordinates) {
+            for (i = 0; i < facts.border.coordinates.length; i++) {
+              const points = facts.border.coordinates[i]
+              for (j = 0; j < points.length; j++) {
+                const point = points[j]
+                arrayPoints.push({
+                  latitude: point[1],
+                  longitude: point[0],
+                })
               }
             }
-          })
-          .finally(() => {})
-      },
-      error => {
-        console.log(error)
-      },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      }
-    )
+          }
+          const isInsideSiteArea = isLocationPointInPolygon({latitude, longitude}, arrayPoints)
+          if (isInsideSiteArea) {
+            const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
+            // if don't want to open popup again and again
+            if (!isOpened || isOpened !== 'opened') {
+              setPopUpFacts(facts)
+            }
+            break
+          }
+        }
+      })
+      .finally(() => {})
   }
 
   const f_markerView = o => {
@@ -352,11 +328,11 @@ const GeoArChallengeDetails = ({}) => {
     latitude:
       selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0
         ? selectedDestination.geo_location?.coordinates[1]
-        : 21.758821200665473,
+        : latitude,
     longitude:
       selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0
         ? selectedDestination.geo_location?.coordinates[0]
-        : -80.41984442094248,
+        : longitude,
     latitudeDelta: selectedDestination.map_latitude_delta
       ? Number(selectedDestination.map_latitude_delta)
       : 0.0922,
