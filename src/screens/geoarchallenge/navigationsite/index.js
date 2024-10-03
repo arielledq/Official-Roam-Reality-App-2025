@@ -115,7 +115,11 @@ const GeoArSiteNavigation = ({ }) => {
     setLocation(position)
     setCurrentLocation(position)
     if (mapView && mapView.current) {
-      mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current });
+      console.log('animateCamera', position.coords, compassHeading.current)
+      mapView.current.getCamera().then(camera => {
+        console.log('camera', camera)
+      })
+      mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
     }
   }
 
@@ -144,6 +148,7 @@ const GeoArSiteNavigation = ({ }) => {
     if (!hasPermission) {
       return
     }
+    // TODO: Move this to GeolocationProvider
 
     watchId.current = Geolocation.watchPosition(
       position => {
@@ -159,12 +164,12 @@ const GeoArSiteNavigation = ({ }) => {
 
         if (!location) {
           setLocation(position)
-          mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current });
+          mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
         } else if (location && location.coords) {
           const lastLocationDistance = getLocationDistance(position.coords, location.coords)
           if (lastLocationDistance > 10) {
             setLocation(position)
-            mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current });
+            mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
           }
         }
       },
@@ -248,7 +253,7 @@ const GeoArSiteNavigation = ({ }) => {
             ref={mapView}
             zoomControlEnabled={true}
             showsTraffic={true}
-            region={mapRegion}
+            // region={mapRegion}
             style={{
               position: "absolute",
               top: 0,
@@ -310,9 +315,9 @@ const GeoArSiteNavigation = ({ }) => {
                 strokeColor="#01AFFC"
                 optimizeWaypoints={true}
                 onStart={params => {
-                  console.log(
-                    `Started routing between "${params.origin}" and "${params.destination}"`
-                  )
+                  // console.log(
+                  //   `Started routing between "${params.origin}" and "${params.destination}"`
+                  // )
                 }}
                 onReady={result => {
                   setMileDistance(convertKilometersToMiles(result.distance))
