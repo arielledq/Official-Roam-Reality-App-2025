@@ -17,10 +17,8 @@ const GeoArSiteArrived = ({
 
 }) => {
   const _styles = useStyles()
-  const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
-  const [location, setLocation] = useState(null);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
 
   return (
