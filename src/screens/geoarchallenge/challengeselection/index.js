@@ -180,7 +180,7 @@ const ChallengeSelection = ({ route }) => {
 
   const HomeScreenARItem = item => {
     return (
-      <View style={styles.imageBg}>
+      <TouchableOpacity style={styles.imageBg} onPress={() => goToRoute(item.navigation)}>
         <View style={styles.row}>
           <View style={styles.innerView}>
             <View
@@ -232,7 +232,7 @@ const ChallengeSelection = ({ route }) => {
             </View>
           </View>
         </View>
-      </View>
+      </TouchableOpacity>
     )
   }
 

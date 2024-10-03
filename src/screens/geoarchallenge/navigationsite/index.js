@@ -100,6 +100,14 @@ const GeoArSiteNavigation = ({ }) => {
       longitude: selectedGeoSite.lat_long.coordinates[0]
     }
 
+    const currentRegion = {
+      latitude: position.coords.latitude,
+      longitude: position.coords.longitude,
+      latitudeDelta: 0.0032,
+      longitudeDelta: 0.0032
+    }
+    setMapRegion(currentRegion)
+
     const headingValue = calculateBearing(position.coords.latitude, position.coords.longitude, endPosition.latitude, endPosition.longitude)
 
     compassHeading.current = headingValue
@@ -240,7 +248,7 @@ const GeoArSiteNavigation = ({ }) => {
             ref={mapView}
             zoomControlEnabled={true}
             showsTraffic={true}
-            // region={mapRegion}
+            region={mapRegion}
             style={{
               position: "absolute",
               top: 0,
