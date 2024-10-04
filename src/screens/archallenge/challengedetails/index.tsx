@@ -87,25 +87,11 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, 'ArChallengeD
   }, [isFocused])
 
   const openExample = () => {
-    if (examples.length > 0) {
-      Alert.alert(
-        'AR Example!',
-        'You are about to leave the app and open a web browser. Do you want to continue?',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () =>
-              Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image),
-          },
-        ]
-      )
+    const examplesList = examples?.length ? examples[0] : null
+    if (examplesList) {
+      navigation.navigate('ChallengeExamples', { examples: examplesList })
     } else {
-      showMessage('No Example available.', 'info')
+      showMessage('We are working on adding examples to this challenge.', 'info')
     }
   }
 

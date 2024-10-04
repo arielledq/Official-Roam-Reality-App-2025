@@ -1,7 +1,7 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { ThemeProvider } from '@rneui/themed'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { navigationRef } from '../services/navigationService'
 import { RootStackParamList } from './types'
 import theme from '../assets/theme'
@@ -12,13 +12,13 @@ import SignUp from '../screens/signup/signup'
 import EmailVerification from '../screens/emailVerification/emailVerification'
 import VerificationSuccess from '../screens/verificationSuccess/verificationSuccess'
 import Profile from '../screens/profile/profile'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import EditProfile from '../screens/editProfile/editProfile'
-import Home from '../screens/home'
 import TermsAndConditions from '../screens/termsAndConditions'
 import PrivacyPolicy from '../screens/PrivacyPolicy'
 import FPChangePassword from '../screens/fpchangepassword/fpchangepassword'
 import ArChallengeDetails from '../screens/archallenge/challengedetails'
+import ChallengeExamples from '../screens/archallenge/ChallengeExamples'
 import ArChallengeCapture from '../screens/archallenge/challengecapture'
 import ARChallenge from '../screens/archallenge'
 import ArChallengeShare from '../screens/archallenge/challengeshare'
@@ -57,7 +57,12 @@ import PublicProfile from '../screens/publicProfile/publicprofile'
 import ArStarChallengeShare from '../screens/geoarchallenge/starshare'
 import Legal from '../screens/legal'
 import ScoreBoard from '../screens/scoreboard'
-// import PublicProfile from '../screens/publicProfile/publicprofile';
+
+import { subscribeToStorageChanges, unsubscribeFromStorageChanges } from '../util/EventsListener'
+import { resetState } from '../redux/Login'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import { removeItem } from '../util/helpers'
+import { logout } from '../network'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 const Drawer = createDrawerNavigator()
@@ -71,6 +76,30 @@ const Navigation = () => {
   const splashShown = useSelector(state => state.splash?.splashShown)
   const token = useSelector(state => state.login?.data?.token)
   const { newUser } = useSelector(state => state.persist)
+  const dispatch = useDispatch()
+
+  // useEffect(() => {
+  //   // Define a callback function to handle storage changes
+  //   const handleStorageChange = async ({ key, value }: { key: string; value: any }) => {
+  //     if (key === 'userToken' && !value) {
+  //       await GoogleSignin.revokeAccess().catch(err => console.log(err))
+  //       await GoogleSignin.signOut().catch(err => console.log(err))
+  //       await removeItem('fbToken')
+  //       await removeItem('instaToken')
+  //       await removeItem('tiktokToken')
+  //       logout()
+  //       dispatch(resetState())
+  //     }
+  //   }
+
+  //   // Subscribe to storage changes
+  //   subscribeToStorageChanges(handleStorageChange)
+
+  //   // Clean up the listener on component unmount
+  //   return () => {
+  //     unsubscribeFromStorageChanges(handleStorageChange)
+  //   }
+  // }, [])
 
   const renderAuthStack = () => {
     return (
@@ -117,6 +146,7 @@ const Navigation = () => {
         <Stack.Screen name='TermsAndConditions' component={TermsAndConditions} />
         <Stack.Screen name='ARChallenge' component={ARChallenge} />
         <Stack.Screen name='ArChallengeDetails' component={ArChallengeDetails} />
+        <Stack.Screen name='ChallengeExamples' component={ChallengeExamples} />
         <Stack.Screen name='ArChallengeCapture' component={ArChallengeCapture} />
         <Stack.Screen name='ArChallengeShare' component={ArChallengeShare} />
         <Stack.Screen name='GeoArOutdoor' component={GeoArOutdoor} />
