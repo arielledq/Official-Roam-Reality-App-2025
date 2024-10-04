@@ -111,7 +111,7 @@ const MemoryContainer = ({
             </TouchableOpacity>
           </View>
           <AppText numberOfLines={2} style={styles.description}>
-            {item?.challenge_details?.description.replace(/<[^>]+>/g, '')}
+            {truncateText(item?.challenge_details?.description.replace(/<[^>]+>/g, ''), 30)}
           </AppText>
         </View>
       </View>
