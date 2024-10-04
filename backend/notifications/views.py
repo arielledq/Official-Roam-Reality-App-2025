@@ -24,7 +24,6 @@ class SetDeviceViewset(PostViewsetMixin, viewsets.GenericViewSet):
             devices = UserDevice.objects.filter(device_id=data.get('user_id')).exclude(user=user)
             if devices:
                 for device in devices:
-                    print(device)
                     device.active = False
                     device.save()
             UserDevice.activate_device(user, data.get('user_id'), data.get('push_token'))
