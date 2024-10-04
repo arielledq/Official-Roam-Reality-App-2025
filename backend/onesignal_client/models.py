@@ -29,6 +29,7 @@ class UserDevice(models.Model):
         if device:
             device.active = True
             device.device_token = device_token
+            device.device_id = device_id
             device.save()
         else:
             UserDevice.objects.create(
