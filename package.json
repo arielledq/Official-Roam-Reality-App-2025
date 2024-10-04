@@ -37,6 +37,7 @@
     "add": "^2.0.6",
     "axios": "^1.7.2",
     "babel-plugin-inline-import": "^3.0.0",
+    "events": "^3.3.0",
     "formik": "^2.4.5",
     "geolib": "^3.3.4",
     "haversine": "^1.1.1",

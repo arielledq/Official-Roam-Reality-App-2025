@@ -78,28 +78,28 @@ const Navigation = () => {
   const { newUser } = useSelector(state => state.persist)
   const dispatch = useDispatch()
 
-  // useEffect(() => {
-  //   // Define a callback function to handle storage changes
-  //   const handleStorageChange = async ({ key, value }: { key: string; value: any }) => {
-  //     if (key === 'userToken' && !value) {
-  //       await GoogleSignin.revokeAccess().catch(err => console.log(err))
-  //       await GoogleSignin.signOut().catch(err => console.log(err))
-  //       await removeItem('fbToken')
-  //       await removeItem('instaToken')
-  //       await removeItem('tiktokToken')
-  //       logout()
-  //       dispatch(resetState())
-  //     }
-  //   }
+  useEffect(() => {
+    // Define a callback function to handle storage changes
+    const handleStorageChange = async ({ key, value }: { key: string; value: any }) => {
+      if (key === 'userToken' && !value) {
+        await GoogleSignin.revokeAccess().catch(err => console.log(err))
+        await GoogleSignin.signOut().catch(err => console.log(err))
+        await removeItem('fbToken')
+        await removeItem('instaToken')
+        await removeItem('tiktokToken')
+        logout()
+        dispatch(resetState())
+      }
+    }
 
-  //   // Subscribe to storage changes
-  //   subscribeToStorageChanges(handleStorageChange)
+    // Subscribe to storage changes
+    subscribeToStorageChanges(handleStorageChange)
 
-  //   // Clean up the listener on component unmount
-  //   return () => {
-  //     unsubscribeFromStorageChanges(handleStorageChange)
-  //   }
-  // }, [])
+    // Clean up the listener on component unmount
+    return () => {
+      unsubscribeFromStorageChanges(handleStorageChange)
+    }
+  }, [])
 
   const renderAuthStack = () => {
     return (
