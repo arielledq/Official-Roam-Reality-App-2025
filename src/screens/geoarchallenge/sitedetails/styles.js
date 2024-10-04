@@ -1,6 +1,6 @@
-import { makeStyles } from "@rneui/themed"
-import { screenHorizontalPadding } from "../../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
+import { makeStyles } from '@rneui/themed'
+import { screenHorizontalPadding } from '../../../util/AppDimensions'
+import { FontLineHeights, FontSizes, fontGroup } from '../../../util/FontUtils'
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -14,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.ns700,
     color: theme.colors.white,
     marginTop: 5,
-    textAlign: 'center'
+    textAlign: 'center',
   },
   mainContainer: {
     flex: 1,
@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'flex-start',
     position: 'relative',
   },
-  container: { marginTop: "10%" },
+  container: { marginTop: '10%' },
   headerText: {
     ...fontGroup.ns900,
     fontSize: FontSizes.S24,
@@ -51,12 +51,11 @@ const useStyles = makeStyles(theme => ({
   buttonSelectText: {
     fontSize: FontSizes.S14,
     color: theme.colors.white,
-    fontWeight: 'bold'
+    fontWeight: 'bold',
   },
-  selectButtonStyle:
-  {
-    backgroundColor: "#B816E050",
-    borderColor: "#B816E0",
+  selectButtonStyle: {
+    backgroundColor: '#B816E050',
+    borderColor: '#B816E0',
     borderRadius: 2,
     borderWidth: 1,
     height: 37,
@@ -64,12 +63,11 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     marginEnd: 2,
     marginStart: 2,
-    paddingHorizontal: 8
+    paddingHorizontal: 8,
   },
-  unSelectButtonStyle:
-  {
-    backgroundColor: "#77777750",
-    borderColor: "#6B7280",
+  unSelectButtonStyle: {
+    backgroundColor: '#77777750',
+    borderColor: '#6B7280',
     borderRadius: 2,
     borderWidth: 1,
     height: 37,
@@ -77,7 +75,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     marginStart: 2,
     marginEnd: 2,
-    paddingHorizontal: 8
+    paddingHorizontal: 8,
   },
   //Flat Item
   containerView: {
@@ -85,12 +83,12 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 15,
     flex: 1,
     minHeight: 280,
-    justifyContent: "flex-end",
-    alignItems: "center",
+    justifyContent: 'flex-end',
+    alignItems: 'center',
     borderRadius: 12,
     margin: 5,
     overflow: 'hidden',
-    position: 'relative'
+    position: 'relative',
   },
   list_title: {
     ...fontGroup.ns800,
@@ -98,52 +96,42 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     marginTop: 5,
   },
-  s_list_count: {
-    ...fontGroup.ns700,
-    fontSize: FontSizes.S14,
-    color: theme.colors.white,
-    alignItems: 'center',
-    textAlign: 'center',
-  },
-  s_list_text: {
-    ...fontGroup.ns400,
-    fontSize: FontSizes.S12,
-    color: theme.colors.white,
-    alignItems: 'center',
-    textAlign: 'center'
-  },
   gradient: {
     position: 'absolute',
-    top: 0, bottom: 0, left: 0, right: 0
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
   site_d_header_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
     alignItems: 'center',
-    textAlign: 'center'
+    textAlign: 'center',
   },
   site_d_header: {
     ...fontGroup.ns800,
     fontSize: FontSizes.S20,
     color: theme.colors.white,
-    marginVertical: 10
+    marginVertical: 10,
   },
   site_d_text: {
     ...fontGroup.ns400,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
-    marginVertical: 10
+    marginVertical: 10,
   },
   protip_text: {
     ...fontGroup.ns700,
     fontSize: FontSizes.S16,
     color: '#1E63EF',
-    marginVertical: 10
+    marginVertical: 10,
   },
   challengeInfoContainer: {
-    left: 0, right: 0,
-    backgroundColor: "#131422",
+    left: 0,
+    right: 0,
+    backgroundColor: '#131422',
     height: 420,
     paddingBottom: 30,
     position: 'absolute',
@@ -155,9 +143,9 @@ const useStyles = makeStyles(theme => ({
   challengeInfoHeaderContainer: {
     paddingVertical: 20,
     alignItems: 'center',
-    borderBottomColor: "#2C2D41",
+    borderBottomColor: '#2C2D41',
     borderBottomWidth: 1,
-    width: '100%'
+    width: '100%',
   },
   challengeInfoHeader: {
     ...fontGroup.ns700,
@@ -166,11 +154,9 @@ const useStyles = makeStyles(theme => ({
     marginTop: 10,
   },
   buttonStyle: {
-    height: 50
+    height: 50,
   },
-  buttonContainerStyle: {
-    marginTop: 20
-  },
+  buttonContainerStyle: {},
 }))
 
 export default useStyles

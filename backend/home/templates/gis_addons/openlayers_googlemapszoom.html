@@ -1,0 +1,27 @@
+{% extends "gis/openlayers.html" %}
+
+{% load i18n l10n %}
+
+{% block base_layer %}
+var base_layer = new ol.layer.Tile({
+    source: new ol.source.XYZ({
+        attributions: [new ol.Attribution({ html: '<a href=""></a>' })],
+        maxZoom: 25,
+        url: "http://mt0.google.com/vt/lyrs=r&hl=en&x={x}&y={y}&z={z}&s=Ga"
+    })
+});
+{% endblock %}
+
+{% block options %}var options = {
+  base_layer: base_layer,
+  geom_name: '{{ geom_type }}',
+  id: '{{ id }}',
+  map_id: '{{ id }}_map',
+  map_options: map_options,
+  map_srid: {{ map_srid|unlocalize }},
+  name: '{{ name }}',
+  default_lat: 15.659019,
+  default_lon: -70.975107,
+  default_zoom: 16
+};
+{% endblock %}

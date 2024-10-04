@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, {useContext, useEffect, useState} from "react"
 
 import {
   FlatList,
@@ -8,14 +8,15 @@ import {
   TouchableOpacity,
   View
 } from "react-native"
-import { handleError } from "../../util/helpers"
+import {handleError, isPointInPolygon} from "../../util/helpers"
 import {
   getGeoARDestinations,
   getARProfile,
   getARStettings,
   getARChallenges,
   updateUserLocation,
-  getARSitesStars
+  getARSitesStars,
+  getDestinationFactsAll, setDevice
 } from "../../network"
 
 import BackgroundWithImage from "../../components/background"
@@ -33,22 +34,41 @@ import {
   updateAnyWhereChallenges
 } from "../../redux/AR"
 
-import { useDispatch } from "react-redux"
+import {useDispatch, useSelector} from "react-redux"
 import useStyles from "./styles"
-import { hasLocationPermission } from "../../util/LocationLib";
-import Geolocation from 'react-native-geolocation-service';
+import { hasLocationPermission } from "../../util/LocationLib"
+import Geolocation from "react-native-geolocation-service"
 import { MenuIcon } from "../../assets/svg"
 import PanicPopUp from "./panicpopup"
+import {updateDestinationFactsAll} from "../../redux/AR/reducer";
+import {GeolocationContext} from "../../GeolocationProvider";
+import OneSignal from "react-native-onesignal";
 
-const GeoArChallenge = ({ }) => {
+const GeoArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
+  // const { userLocation } = useContext(GeolocationContext);
+  // console.log("userLocation  ==> ", userLocation)
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [starSitesCount, setStarSitesCount] = useState({})
-  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
+  // const [numberOfChallenges, setNumberOfChallenges] = useState(0)
   const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
+
+  const setOnesignalDevice = () => {
+    OneSignal.getDeviceState().then(deviceData => {
+      console.log("Device Data", deviceData)
+      if (deviceData?.userId) {
+        setDevice({ ...deviceData, active: true }).then(res => {
+          console.log("Device Data Updated", res)
+        }).catch(err => {
+          console.log("Device Data Update Error", err)
+        })
+      }
+    })
+  }
+
 
   const ARSposored = () => {
     setIsLoading(true)
@@ -69,43 +89,6 @@ const GeoArChallenge = ({ }) => {
         setIsLoading(false)
       })
   }
-
-  const getLocation = async () => {
-    const hasPermission = await hasLocationPermission();
-
-    if (!hasPermission) {
-      return;
-    }
-    Geolocation.getCurrentPosition(
-      position => {
-        console.log("getLocation", position)
-        updateUserLocation({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        }).then(res => {
-          console.log("updateUserLocation:", res)
-        })
-          .finally(() => {
-          })
-      },
-      error => {
-        console.log(error);
-      },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      },
-    );
-  };
 
   const ARUserProfile = () => {
     setIsLoading(true)
@@ -144,7 +127,7 @@ const GeoArChallenge = ({ }) => {
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          setNumberOfChallenges(res?.data?.length)
+          // setNumberOfChallenges(res?.data?.length)
           dispatch(updateAnyWhereChallenges(res?.data))
         } else {
           res.message.message = "Error in loading Challenges."
@@ -154,21 +137,21 @@ const GeoArChallenge = ({ }) => {
       .finally(() => {
         setIsLoading(false)
       })
-    getLocation()
   }
 
-  const getARStarSites = async (id) => {
+  const getARStarSites = async id => {
     const res = await getARSitesStars({ id })
     starSitesCount[id] = res.data[0]
     setStarSitesCount({ ...starSitesCount })
   }
 
-  const getStarCount = (id) => {
-    return starSitesCount[id] ? starSitesCount[id] : 0;
+  const getStarCount = id => {
+    return starSitesCount[id] ? starSitesCount[id] : 0
   }
 
   useEffect(() => {
     loadDestinations()
+    setOnesignalDevice()
   }, [])
 
   const navigateToChallengeDetails = obj => {
@@ -225,15 +208,15 @@ const GeoArChallenge = ({ }) => {
               }}
             >
               <StarSiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>
-                {getStarCount(obj.id)}
-              </Text>
+              <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>AR Challenges</Text>
+              <Text style={_styles.s_list_count}>
+                {obj.unique_ar_sites.length}
+              </Text>
+              <Text style={_styles.s_list_text}>AR Photo Challenges</Text>
             </View>
           </View>
         </View>
@@ -288,10 +271,17 @@ const GeoArChallenge = ({ }) => {
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
-      {openPanicPopUp &&
-        <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
-          <PanicPopUp onClose={() => { setOpenPanicPopup(false) }} />
-        </View>}
+      {openPanicPopUp && (
+        <View
+          style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
+        >
+          <PanicPopUp
+            onClose={() => {
+              setOpenPanicPopup(false)
+            }}
+          />
+        </View>
+      )}
     </BackgroundWithImage>
   )
 }

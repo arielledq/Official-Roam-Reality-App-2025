@@ -29,11 +29,11 @@ class RequestClass {
       const data = get(error, "response.data", {})
       const method = get(error, "response.config.method", {})
       const url = get(error, "response.config.url", {})
-      console.info("my data", data)
-      console.warn("AXIOS_errorStatus", errorStatus)
-      console.warn("AXIOS_errorURL", url)
-      console.error("AXIOS_errorMethod", method)
-      console.warn("AXIOS_errorData", typeof data)
+      // console.info("my data", data)
+      // console.warn("AXIOS_errorStatus", errorStatus)
+      // console.warn("AXIOS_errorURL", url)
+      // console.error("AXIOS_errorMethod", method)
+      // console.warn("AXIOS_errorData", typeof data)
       return {
         status: 0,
         errorStatus,

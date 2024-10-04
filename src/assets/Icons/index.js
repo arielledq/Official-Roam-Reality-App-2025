@@ -39,6 +39,7 @@ import Wallet from "./wallet.svg"
 import IconBGHome from "./icon_bg.png"
 import close from "./close.svg"
 import closeModal from "./closeModal.svg"
+import pin from "./pin.svg"
 export const Icons = {
   password,
   lock,
@@ -80,5 +81,6 @@ export const Icons = {
   Wallet,
   IconBGHome,
   close,
-  closeModal
+  closeModal,
+  pin
 }

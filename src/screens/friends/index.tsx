@@ -1,18 +1,18 @@
-import React from "react"
-import { Text, useWindowDimensions } from "react-native"
-import MyFriends from "./myFriends"
-import PendingRequests from "./pendingRequests"
-import { AppButton, AppHeader } from "../../components"
-import BackgroundWithImage from "../../components/background"
-import useStyles from "./styles"
-import { TabView, SceneMap, TabBar } from "react-native-tab-view"
-import theme from "../../assets/theme"
-import { FontFamily, FontSizes } from "../../util/FontUtils"
-import { useNavigation } from "@react-navigation/native"
+import React from 'react'
+import { Text, useWindowDimensions, View } from 'react-native'
+import MyFriends from './myFriends'
+import PendingRequests from './pendingRequests'
+import { AppButton, AppHeader } from '../../components'
+import BackgroundWithImage from '../../components/background'
+import useStyles from './styles'
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view'
+import theme from '../../assets/theme'
+import { FontFamily, FontSizes } from '../../util/FontUtils'
+import { useNavigation } from '@react-navigation/native'
 
 const tabs = {
-  myFriends: "My Friends",
-  requests: "Pending Requests"
+  myFriends: 'My Friends',
+  requests: 'Pending Requests',
 }
 
 const Friends: React.FC = () => {
@@ -21,8 +21,8 @@ const Friends: React.FC = () => {
 
   const [index, setIndex] = React.useState(0)
   const [routes] = React.useState([
-    { key: "one", title: tabs.myFriends },
-    { key: "two", title: tabs.requests }
+    { key: 'one', title: tabs.myFriends },
+    { key: 'two', title: tabs.requests },
   ])
   const _styles = useStyles()
 
@@ -30,13 +30,13 @@ const Friends: React.FC = () => {
     <TabBar
       {...props}
       indicatorStyle={{ backgroundColor: theme.lightColors?.magenta }}
-      style={{ backgroundColor: "transparent" }}
+      style={{ backgroundColor: 'transparent' }}
       renderLabel={({ route, focused, color }) => (
         <Text
           style={{
             color,
             fontSize: FontSizes.S18,
-            fontFamily: FontFamily.NunitoSansSemiBold
+            fontFamily: FontFamily.NunitoSansSemiBold,
           }}
         >
           {route.title}
@@ -46,26 +46,28 @@ const Friends: React.FC = () => {
   )
 
   const onAddFriendClick = () => {
-    navigation.navigate("AddFriend")
+    navigation.navigate('AddFriend')
   }
 
   return (
-    <BackgroundWithImage>
-      <AppHeader title={tabs.myFriends} backgroundColor="transparent" />
-      <TabView
-        lazy
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        onIndexChange={setIndex}
-        initialLayout={{ width: layout.width }}
-        renderTabBar={renderTabBar}
-      />
-      <AppButton
-        buttonStyle={_styles.buttonStyle}
-        containerStyle={[_styles.buttonContainer, { marginHorizontal: 15 }]}
-        title={"Add a new friend"}
-        onPress={onAddFriendClick}
-      />
+    <BackgroundWithImage style={_styles.mainContainer}>
+      <AppHeader title={tabs.myFriends} backgroundColor='transparent' />
+      <View style={{ flex: 1, paddingHorizontal: 25 }}>
+        <TabView
+          lazy
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={{ width: layout.width }}
+          renderTabBar={renderTabBar}
+        />
+        <AppButton
+          buttonStyle={_styles.buttonStyle}
+          containerStyle={[_styles.buttonContainer, { marginHorizontal: 15 }]}
+          title={'Add a new friend'}
+          onPress={onAddFriendClick}
+        />
+      </View>
     </BackgroundWithImage>
   )
 }
@@ -76,7 +78,7 @@ const PedningRequestsRoute = () => <PendingRequests key={2} />
 
 const renderScene = SceneMap({
   one: MyFriendsRoute,
-  two: PedningRequestsRoute
+  two: PedningRequestsRoute,
 })
 
 export default Friends

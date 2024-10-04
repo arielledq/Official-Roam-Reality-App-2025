@@ -11,6 +11,12 @@ export const login = data =>
     method: "POST",
     data
   })
+export const setDevice = data =>
+  Request.callWithToken({
+    url: `${commonApiRoute}set-device/`,
+    method: "POST",
+    data
+  })
 export const logout = data =>
   Request.callWithToken({
     url: `${commonApiRoute}logout/`,
@@ -331,6 +337,11 @@ export const getDestinationFacts = payload =>
     url: `modules/challenges/geo-destination-fact/by-destination-id/`,
     method: "POST",
     data: payload
+  })
+export const getDestinationFactsAll = payload =>
+  Request.callWithToken({
+    url: `modules/challenges/geo-destination-fact/get_all/`,
+    method: "GET",
   })
 export const removeUserFromFriends = id =>
   Request.callWithToken({

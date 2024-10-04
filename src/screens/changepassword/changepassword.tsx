@@ -15,6 +15,7 @@ import AppInput from "../../components/input"
 import Icon from "../../components/Icon"
 import { ChangePasswordSchema } from "../../util/ValidationSchemas"
 import { changePassword } from "../../network"
+import { showMessage } from "../../util/helpers"
 
 type ChangePasswordFormValues = {
   oldPassword: string,
@@ -44,11 +45,10 @@ const ChangePassword: ScreenStackComponent<
       .then(res => {
         console.log({ res })
         if (res.status == 1) {
-          Alert.alert("Success", res.message, [
-            { text: "OK", onPress: () => navigation.goBack() }
-          ])
+          showMessage(res.message)
+          navigation.goBack()
         } else {
-          Alert.alert("Error", res.message.error)
+          showMessage(res.message.error, 'error')
         }
       })
       .finally(() => {

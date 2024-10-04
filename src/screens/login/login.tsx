@@ -11,15 +11,12 @@ import {
 } from "../../navigation/types"
 import AppButton from "../../components/button"
 import AppInput from "../../components/input"
-import {
-  LockIcon,
-  MailIcon
-} from "../../assets/svg"
+import { LockIcon, MailIcon } from "../../assets/svg"
 import AppHeader from "../../components/header"
 import BackgroundWithImage from "../../components/background"
 import theme from "../../assets/theme"
 import AppText from "../../components/text"
-import { login } from '../../network'
+import { login, setDevice } from "../../network"
 import { useDispatch, useSelector } from "react-redux"
 import { updateUserData } from "../../redux/Login"
 import { useNavigation } from "@react-navigation/native"
@@ -28,6 +25,7 @@ import Icon from "../../components/Icon"
 import { handleError } from "../../util/helpers"
 import SocialSignin from "../../components/socialSignin"
 import { updateAsOldUser } from "../../redux/Persist"
+import OneSignal from "react-native-onesignal"
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   navigation
@@ -38,26 +36,36 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   // const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
-  console.log({ login })
 
-  const handleLogin = (v) => {
+  const setOnesignalDevice = () => {
+    OneSignal.getDeviceState().then(deviceData => {
+      if (deviceData?.userId) {
+        setDevice({ ...deviceData, active: true })
+      }
+    })
+  }
+
+  const handleLogin = v => {
     setIsLoading(true)
     login({
       username: v.email.toLowerCase(),
       password: v.password
-    }).then(res => {
-      console.log({ res })
-      if (res.status == 1) {
-        dispatch(updateUserData(res))
-        if (newUser) {
-          dispatch(updateAsOldUser())
-        }
-      } else {
-        handleError(res)
-      }
-    }).finally(() => {
-      setIsLoading(false)
     })
+      .then(res => {
+        console.log({ res })
+        if (res.status == 1) {
+          dispatch(updateUserData(res))
+          setOnesignalDevice()
+          if (newUser) {
+            dispatch(updateAsOldUser())
+          }
+        } else {
+          handleError(res)
+        }
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   const navigateToResetPassword = () => {
@@ -75,13 +83,17 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
       <AppText style={_styles.subHeaderText}>
         Login to ROAM a new dimension with captivating AR experiences.
       </AppText>
-      <KeyboardAwareScrollView style={{ flex: 1 }} nestedScrollEnabled={false} keyboardShouldPersistTaps="always">
+      <KeyboardAwareScrollView
+        style={{ flex: 1 }}
+        nestedScrollEnabled={false}
+        keyboardShouldPersistTaps="always"
+      >
         <Formik
           initialValues={{
             email: "",
             password: ""
           }}
-          onSubmit={(v) => handleLogin(v)}
+          onSubmit={v => handleLogin(v)}
           validationSchema={SigninSchema}
         >
           {({
@@ -101,7 +113,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 value={values.email}
                 autoCapitalize="none"
                 onChangeText={handleChange("email")}
-                onBlur={handleBlur('email')}
+                onBlur={handleBlur("email")}
                 errorMessage={
                   touched.email && errors?.email ? errors.email : undefined
                 }
@@ -119,7 +131,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.password}
                 onChangeText={handleChange("password")}
-                onBlur={handleBlur('password')}
+                onBlur={handleBlur("password")}
                 errorMessage={
                   touched.password && errors?.password
                     ? errors.password
@@ -128,17 +140,20 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 autoCapitalize="none"
                 leftIcon={<LockIcon />}
                 rightIcon={
-                  <Icon onPress={() => {
-                    setPasswordVisibility(p => !p)
-                  }} name={passwordVisibility ? 'eye' : 'eye-off'} family='feather' color={'#9CA3AF'} size={23} />
+                  <Icon
+                    onPress={() => {
+                      setPasswordVisibility(p => !p)
+                    }}
+                    name={passwordVisibility ? "eye" : "eye-off"}
+                    family="feather"
+                    color={"#9CA3AF"}
+                    size={23}
+                  />
                 }
               />
 
               {/* forgot password */}
-              <AppText
-                style={_styles.fpText}
-                onPress={navigateToResetPassword}
-              >
+              <AppText style={_styles.fpText} onPress={navigateToResetPassword}>
                 Forgot Password?
               </AppText>
 
@@ -158,15 +173,16 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 <AppText
                   style={_styles.TandCLink}
                   onPress={() => {
-                    navigation.navigate('TermsAndConditions')
+                    navigation.navigate("TermsAndConditions")
                   }}
                 >
                   {`Terms and Conditions `}
-                </AppText>and
+                </AppText>
+                and
                 <AppText
                   style={_styles.TandCLink}
                   onPress={() => {
-                    navigation.navigate('PrivacyPolicy')
+                    navigation.navigate("PrivacyPolicy")
                   }}
                 >
                   {` Privacy Policy.`}
@@ -174,25 +190,17 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
               </AppText>
 
               {/* social sign in options */}
-              <SocialSignin
-                setLoading={setIsLoading}
-              />
-
+              <SocialSignin setLoading={setIsLoading} />
             </View>
           )}
         </Formik>
-
       </KeyboardAwareScrollView>
       <AppText style={_styles.alreadyHaveAccount}>
         Don’t have an account? {""}
-        <AppText
-          style={_styles.SignInLink}
-          onPress={navigateToSignUp}
-        >
+        <AppText style={_styles.SignInLink} onPress={navigateToSignUp}>
           Sign Up
         </AppText>
       </AppText>
-
     </BackgroundWithImage>
   )
 }

@@ -31,8 +31,18 @@ env_file = os.path.join(BASE_DIR, ".env")
 env = environ.Env()
 env.read_env(env_file)
 
-# GDAL_LIBRARY_PATH = '/opt/homebrew/Cellar/gdal/3.8.5/lib/libgdal.dylib' 
-# GEOS_LIBRARY_PATH = '/opt/homebrew/Cellar/geos/3.12.1/lib/libgeos_c.dylib'
+# if os.name == 'posix':
+#     GDAL_LIBRARY_PATH = '/opt/homebrew/Cellar/gdal/3.8.5/lib/libgdal.dylib' 
+#     GEOS_LIBRARY_PATH = '/opt/homebrew/Cellar/geos/3.12.1/lib/libgeos_c.dylib'
+# elif os.name == 'nt':
+#     import platform
+#     OSGEO4W = r"C:\OSGeo4W"
+#     assert os.path.isdir(OSGEO4W), "Directory does not exist: " + OSGEO4W
+#     os.environ['OSGEO4W_ROOT'] = OSGEO4W
+#     os.environ['GDAL_DATA'] = OSGEO4W + r"\share\gdal"
+#     os.environ['PROJ_LIB'] = OSGEO4W + r"\share\proj"
+#     os.environ['PATH'] = OSGEO4W + r"\bin;" + os.environ['PATH']
+#     GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env.bool("DEBUG", default=False)
@@ -78,6 +88,8 @@ LOCAL_APPS = [
     'home',
     'users.apps.UsersConfig',
     'feedback',
+    'notifications',
+    'onesignal_client',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -95,7 +107,9 @@ THIRD_PARTY_APPS = [
     'drf_spectacular',
     'storages',
     'import_export',
-    'ckeditor'
+    'ckeditor',
+    'taggit',
+    'rest_framework_gis',
 ]
 MODULES_APPS = get_modules()
 
@@ -241,6 +255,11 @@ AWS_ACCESS_KEY_ID = env.str("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY = env.str("AWS_SECRET_ACCESS_KEY", "")
 AWS_STORAGE_BUCKET_NAME = env.str("AWS_STORAGE_BUCKET_NAME", "")
 AWS_STORAGE_REGION = env.str("AWS_STORAGE_REGION", "")
+
+# ONESIGNAL keys
+ONESIGNAL_APP_ID = env.str("ONESIGNAL_APP_ID", "")
+ONESIGNAL_REST_API_KEY = env.str("ONESIGNAL_REST_API_KEY", "")
+ONESIGNAL_USER_AUTH_KEY = env.str("ONESIGNAL_USER_AUTH_KEY", "")
 
 USE_S3 = (
     AWS_ACCESS_KEY_ID and

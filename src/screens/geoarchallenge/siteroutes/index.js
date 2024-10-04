@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, {useContext, useEffect, useRef, useState} from "react"
 
 import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background"
@@ -21,6 +21,7 @@ import GetLocation from "react-native-get-location";
 import { convertKilometersToMiles } from "../../../util/helpers";
 import Strings from "../../../constants/Strings";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
+import {GeolocationContext} from "../../../GeolocationProvider";
 
 
 const GeoArSiteRoutes = ({
@@ -32,6 +33,9 @@ const GeoArSiteRoutes = ({
   const navigation = useNavigation()
   const mapView = useRef();
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
+  const { userLocation } = useContext(GeolocationContext);
+  const latitude = userLocation?.latitude
+  const longitude = userLocation?.longitude
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
@@ -39,33 +43,19 @@ const GeoArSiteRoutes = ({
   const [walkDurationMins, setWalkDurationMins] = useState(0)
   const [routes, setRoutes] = useState(0)
 
-  const getCurrentLocation = () => {
-    GetLocation.getCurrentPosition({
-      enableHighAccuracy: true,
-      timeout: 60000,
-    })
-      .then(location => {
-        setCurrentLocation({
-          latitude: location.latitude,
-          longitude: location.longitude
-        })
-      })
-      .catch(error => {
-        const { code, message } = error;
-        console.warn(code, message);
-      })
-  }
-
   useEffect(() => {
-    getCurrentLocation()
+    setCurrentLocation({
+      latitude,
+      longitude
+    })
   }, []);
 
   const getFullBounds = _ => {
     if (selectedGeoSite.geo_site_border) {
       let arrayPoints = []
-      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
         const points = selectedGeoSite.geo_site_border.coordinates[i];
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
@@ -80,9 +70,9 @@ const GeoArSiteRoutes = ({
   const getFullCenter = _ => {
     if (selectedGeoSite.geo_site_border) {
       let arrayPoints = []
-      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
         const points = selectedGeoSite.geo_site_border.coordinates[i];
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
