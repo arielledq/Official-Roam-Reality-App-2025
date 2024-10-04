@@ -86,8 +86,8 @@ const Login: ScreenStackComponent<RootStackParamList, 'Login'> = ({ navigation }
       >
         <Formik
           initialValues={{
-            email: 'user01@yopmail.com',
-            password: 'Password123@',
+            email: '',
+            password: '',
           }}
           onSubmit={v => handleLogin(v)}
           validationSchema={SigninSchema}
