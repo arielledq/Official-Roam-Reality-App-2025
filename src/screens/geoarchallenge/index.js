@@ -16,7 +16,7 @@ import {
   getARChallenges,
   updateUserLocation,
   getARSitesStars,
-  getDestinationFactsAll
+  getDestinationFactsAll, setDevice
 } from "../../network"
 
 import BackgroundWithImage from "../../components/background"
@@ -42,6 +42,7 @@ import { MenuIcon } from "../../assets/svg"
 import PanicPopUp from "./panicpopup"
 import {updateDestinationFactsAll} from "../../redux/AR/reducer";
 import {GeolocationContext} from "../../GeolocationProvider";
+import OneSignal from "react-native-onesignal";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
@@ -51,9 +52,23 @@ const GeoArChallenge = ({}) => {
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [starSitesCount, setStarSitesCount] = useState({})
-  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
+  // const [numberOfChallenges, setNumberOfChallenges] = useState(0)
   const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
+
+  const setOnesignalDevice = () => {
+    OneSignal.getDeviceState().then(deviceData => {
+      console.log("Device Data", deviceData)
+      if (deviceData?.userId) {
+        setDevice({ ...deviceData, active: true }).then(res => {
+          console.log("Device Data Updated", res)
+        }).catch(err => {
+          console.log("Device Data Update Error", err)
+        })
+      }
+    })
+  }
+
 
   const ARSposored = () => {
     setIsLoading(true)
@@ -112,7 +127,7 @@ const GeoArChallenge = ({}) => {
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          setNumberOfChallenges(res?.data?.length)
+          // setNumberOfChallenges(res?.data?.length)
           dispatch(updateAnyWhereChallenges(res?.data))
         } else {
           res.message.message = "Error in loading Challenges."
@@ -136,6 +151,7 @@ const GeoArChallenge = ({}) => {
 
   useEffect(() => {
     loadDestinations()
+    setOnesignalDevice()
   }, [])
 
   const navigateToChallengeDetails = obj => {
