@@ -6,7 +6,7 @@ import {
   ViroNode,
   ViroText,
   ViroFlexView
-} from '@viro-community/react-viro';
+} from '@reactvision/react-viro';
 import CompassHeading from 'react-native-compass-heading';
 import { getLocationDistance, transformGpsToAR } from "../../../util/LocationLib";
 import { getNearbyPlaces } from "../../../util/PlacesAPI";

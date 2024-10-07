@@ -33,6 +33,7 @@
     android:icon="@mipmap/ic_launcher"
     android:roundIcon="@mipmap/ic_launcher_round"
     android:hardwareAccelerated="true"
+    android:usesCleartextTraffic="true"
     android:allowBackup="false" android:theme="@style/AppTheme">
 
     <meta-data android:name="com.google.ar.core" android:value="optional" />
@@ -92,6 +93,7 @@
   </application>
 
   <queries>
+    <package android:name="com.google.ar.core" />
     <package android:name="com.ecom.zhiliaoapp.musically" />
     <package android:name="android.permission.QUERY_ALL_PACKAGES" />
     <intent>

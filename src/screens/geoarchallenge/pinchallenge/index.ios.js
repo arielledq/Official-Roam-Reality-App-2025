@@ -31,7 +31,7 @@ import {
   ViroDirectionalLight,
   ViroSpotLight,
   ViroText,
-} from '@viro-community/react-viro'
+} from '@reactvision/react-viro'
 
 const RNFS = require('react-native-fs')
 import RNFetchBlob from 'rn-fetch-blob'

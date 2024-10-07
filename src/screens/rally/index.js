@@ -8,8 +8,8 @@ import {
   ViroAmbientLight,
   ViroDirectionalLight,
   ViroTrackingStateConstants,
-  ViroSpotLight, ViroQuad, ViroSphere, ViroAnimatedImage, ViroOmniLight, ViroSkyBox,
-} from "@viro-community/react-viro";
+  ViroSpotLight, ViroQuad, ViroSphere, ViroAnimatedImage, ViroOmniLight, ViroSkyBox, ViroScene, ViroSceneNavigator,
+} from "@reactvision/react-viro";
 
 const RallyScene = () => {
   function onInitialized(state, reason) {
@@ -23,16 +23,16 @@ const RallyScene = () => {
 
   return (
     <ViroARScene onTrackingUpdated={onInitialized}>
-      <ViroSkyBox
-        source={{
-          nx: require('../../assets/images/black.jpg'),
-          px: require('../../assets/images/black.jpg'),
-          ny: require('../../assets/images/black.jpg'),
-          py: require('../../assets/images/black.jpg'),
-          nz: require('../../assets/images/black.jpg'),
-          pz: require('../../assets/images/black.jpg')
-        }}
-      />
+      {/*<ViroSkyBox*/}
+      {/*  source={{*/}
+      {/*    nx: require('../../assets/images/black.jpg'),*/}
+      {/*    px: require('../../assets/images/black.jpg'),*/}
+      {/*    ny: require('../../assets/images/black.jpg'),*/}
+      {/*    py: require('../../assets/images/black.jpg'),*/}
+      {/*    nz: require('../../assets/images/black.jpg'),*/}
+      {/*    pz: require('../../assets/images/black.jpg')*/}
+      {/*  }}*/}
+      {/*/>*/}
       <ViroAmbientLight color="#FFFFFF" intensity={250} />
       {/*<ViroDirectionalLight color="#FFFFFF" direction={[0, -1,  0]}/>*/}
       {/*<ViroDirectionalLight color="#FFFFFF" direction={[0,  0, -1]}/>*/}
@@ -64,15 +64,15 @@ const RallyScene = () => {
       {/*/>*/}
 
 
-      {/*<ViroAnimatedImage*/}
-      {/*  // imageClipMode={'None'}*/}
-      {/*  loop={true}*/}
-      {/*  position={[0, 0.2, -1]}*/}
-      {/*  height={1}*/}
-      {/*  width={1}*/}
-      {/*  placeholderSource={require('../../assets/images/texture.jpg')}*/}
-      {/*  source={require('../../assets/images/fire.gif')}*/}
-      {/*/>*/}
+      <ViroAnimatedImage
+        // imageClipMode={'None'}
+        loop={true}
+        position={[0, 0.2, -1]}
+        height={1}
+        width={1}
+        placeholderSource={require('../../assets/images/texture.jpg')}
+        source={require('../../assets/images/fire.gif')}
+      />
       {/*<ViroSphere*/}
       {/*  facesOutward={false}*/}
       {/*  // heightSegmentCount={20}*/}
@@ -158,7 +158,7 @@ ViroMaterials.createMaterials({
     bloomThreshold: 0.0,
     shininess: 10,
     diffuseColor: "#FFFFFF",
-    metalness: 0.5,
+    // metalness: 0.5,
     roughness: 0.1,
     // blendMode:'Add'
   },

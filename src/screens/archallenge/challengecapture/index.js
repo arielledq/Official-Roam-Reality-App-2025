@@ -13,8 +13,8 @@ import {
   ViroAmbientLight,
   ViroDirectionalLight,
   ViroSpotLight,
-  ViroText,
-} from '@viro-community/react-viro'
+  ViroText, ViroBox,
+} from "@reactvision/react-viro";
 import Video from 'react-native-video'
 import uuid from 'react-native-uuid'
 import { FontSizes } from '../../../util/FontUtils'
@@ -154,6 +154,7 @@ const ArChallengeCapture = ({}) => {
             }
             if (sourcesArray.length > 0) {
               setSourcesFiles(sourcesArray)
+              console.log('Source-----------------',sourcesArray)
             }
             setLoading(false)
           })

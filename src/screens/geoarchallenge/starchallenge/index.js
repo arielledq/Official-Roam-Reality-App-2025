@@ -24,7 +24,7 @@ import {
   ViroNode,
   ViroCamera,
   ViroARCamera
-} from '@viro-community/react-viro';
+} from '@reactvision/react-viro';
 import RNFetchBlob from 'rn-fetch-blob';
 const Sound = require('react-native-sound');
 const RNFS = require('react-native-fs');

@@ -22,7 +22,7 @@ import {
   ViroDirectionalLight,
   ViroSpotLight,
   ViroText
-} from "@viro-community/react-viro"
+} from "@reactvision/react-viro"
 import Video from "react-native-video"
 import uuid from "react-native-uuid"
 import { FontSizes } from "../../../util/FontUtils"
