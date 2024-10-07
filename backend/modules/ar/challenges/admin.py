@@ -204,6 +204,10 @@ class ARExampleVideoInline(admin.TabularInline):
 class ARExampleAdmin(admin.ModelAdmin):
     inlines = [ARExampleImageInline, ARExampleVideoInline]
 
+@admin.register(StarCollection)
+class StarCollectionAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
