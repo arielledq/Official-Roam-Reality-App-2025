@@ -87,7 +87,7 @@ const Navigation = () => {
         await removeItem('fbToken')
         await removeItem('instaToken')
         await removeItem('tiktokToken')
-        logout()
+        // await logout()
         dispatch(resetState())
       }
     }
