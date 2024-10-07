@@ -17,7 +17,7 @@ import MemoryContainer from '../../components/memoryContainer'
 import Icon from '../../components/Icon'
 import LinearGradient from 'react-native-linear-gradient'
 import {
-  getARProfile,
+  getARProfile, getCheckInCount,
   getCountryCount,
   getProfieARMemoriesAPI,
   getProfieDetails,
@@ -48,6 +48,17 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   const [starsCount, setStarsCount] = useState(0)
   const [countryCount, setCountryCount] = useState(0)
   const [globalRank, setGlobalRank] = useState(0)
+  const [myCheckIns, setMyCheckIns] = useState(0)
+
+  const getMyCheckInsCount = () => {
+    getCheckInCount({})
+      .then(res => {
+        if (res.status === 1) {
+          setMyCheckIns(res.count)
+        }
+      })
+      .finally(() => {})
+  }
 
   const fetchProfileDetails = async () => {
     try {
@@ -161,6 +172,7 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   )
 
   useEffect(() => {
+    getMyCheckInsCount()
     fetchProfileDetails()
   }, [isProfileUpdated, userProfile])
 
@@ -183,10 +195,10 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   }
 
   const data = [
-    { id: 1, value: arProfile?.check_ins, property: 'Sites Visited' },
+    { id: 1, value: myCheckIns, property: 'Sites Visited' },
     { id: 2, value: starsCount, property: 'Stars' },
     { id: 3, value: arProfile?.challenge_completed, property: 'AR Photo Challenges' },
-    { id: 4, value: 0, property: 'Friends' },
+    { id: 4, value: profileDetails?.friends?.length, property: 'Friends' },
   ]
   // Split the data into chunks of 3 for each row
   const rows = []

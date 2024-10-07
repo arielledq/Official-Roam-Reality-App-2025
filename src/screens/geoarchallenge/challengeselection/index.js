@@ -94,8 +94,7 @@ const ChallengeSelection = ({ route }) => {
       geo_site: selectedGeoSite.id,
     })
       .then(res => {
-        console.log('checkIfPinCheckIsDone:', res)
-        if (res.errorStatus == 403) {
+        if (res.errorStatus === 403) {
           console.log('checkIfPinCheckIsDone', 'true')
           setIsPinCheckIsDone(true)
         } else {
@@ -109,7 +108,7 @@ const ChallengeSelection = ({ route }) => {
   const getMyCheckInsCount = () => {
     getCheckInCount({})
       .then(res => {
-        if (res.status == 1) {
+        if (res.status === 1) {
           setMyCheckIns(res.count)
         }
       })
