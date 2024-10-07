@@ -406,17 +406,25 @@ class ARSitePinCheckInViewSet(ViewSet):
         criterion2 = Q(geo_site=geo_site)
         results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
         geosite = GeoArSite.objects.get(pk=geo_site)
-        if len(results) < 1:
-            serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                geosite.check_ins = F('check_ins') + 1
-                geosite.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            geosite.check_ins = F('check_ins') + 1
+            geosite.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # if len(results) < 1:
+        #     serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
+        #     if serializer.is_valid(raise_exception=True):
+        #         serializer.save()
+        #         geosite.check_ins = F('check_ins') + 1
+        #         geosite.save()
+        #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+        #     else:
+        #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # else:
+        #     return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
 
 
 class StarCollectionViewSet(ViewSet):
