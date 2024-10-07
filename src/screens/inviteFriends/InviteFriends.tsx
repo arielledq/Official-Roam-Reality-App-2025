@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { Text, View, StyleSheet, Keyboard, Pressable, Image, Share, Alert } from 'react-native'
+import { View, StyleSheet, Keyboard, Pressable, Image, Share } from 'react-native'
 import BackgroundWithImage from '../../components/background'
 import { AppButton, AppHeader, AppInput } from '../../components'
 import { Formik } from 'formik'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import { inviteFriendSchema } from '../../util/ValidationSchemas'
 import theme from '../../assets/theme'
-import { SvgXml } from 'react-native-svg'
-import { Icons } from '../../assets/Icons'
 import useStyles from './styles'
 import Images from '../../assets/images'
 import { inviteFriendByEmail } from '../../network'
@@ -21,6 +19,8 @@ const InviteFriends = (props: InviteFriendsProps) => {
   const [isEmailInputFocused, setEmailInputFocused] = React.useState(false)
   const [loading, setLoading] = React.useState(false)
 
+  const initialEmail = props?.route?.params?.email
+
   /**
    * Method to share the app link through email, message, etc.
    */
@@ -29,7 +29,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
       message: 'https://www.google.com',
       title: 'Invite Friends',
     })
-    if (result.action === Share.sharedAction) {
+    if (result?.action === Share.sharedAction) {
       // Link has been successfully shared
       showMessage('App link shared successfully')
     }
@@ -52,6 +52,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
         if (response.status === 1) {
           showMessage('An invite has been sent to your friend')
           resetForm() // Reset form after successful submission
+          props?.navigation?.goBack()
         } else {
           showMessage('Something went wrong', 'error')
         }
@@ -75,7 +76,7 @@ const InviteFriends = (props: InviteFriendsProps) => {
       >
         <Formik
           initialValues={{
-            email: '',
+            email: initialEmail ? initialEmail : '',
             message: '',
           }}
           onSubmit={(values, { resetForm }) => inviteFriends(values, resetForm)}
