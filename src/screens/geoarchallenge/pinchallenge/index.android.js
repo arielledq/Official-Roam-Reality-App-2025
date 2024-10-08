@@ -173,8 +173,10 @@ const PinChallenge = ({}) => {
       let filename = modelFile.split('/').pop()
       filename = filename.split('?')[0]
       let withoutExtFilename = filename.split('.')[0]
+      console.log('filename, withoutExtFilename', filename, withoutExtFilename)
       const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`
+      console.log('sourcePath, targetPath', sourcePath, targetPath)
       RNFS.exists(sourcePath)
         .then(exists => {
           console.log('exists:', exists)
@@ -215,7 +217,6 @@ const PinChallenge = ({}) => {
 
       if (pinchState == 3) {
         setScale(newScale)
-
       }
     }
 
@@ -226,93 +227,108 @@ const PinChallenge = ({}) => {
       }
     }, [])
 
+    console.log('challengeObj', challengeObj)
+    console.log('challengeObj?.challenge_choice', challengeObj?.challenge_choice)
+    // console.log('modelPath', JSON.stringify(modelPath, null, 2))
+    console.log('object3dType', JSON.stringify(object3dType, null, 2))
+
     return (
-      <ViroARScene onTrackingUpdated={onInitialized}>
-        <ViroAmbientLight color='#FFFFFF' intensity={250} />
-        <ViroDirectionalLight color='#FFFFFF' direction={[0, -1, 0]} />
-        <ViroDirectionalLight color='#FFFFFF' direction={[0, 0, -1]} />
-        <ViroDirectionalLight color='#FFFFFF' direction={[-1, 0, 0]} />
+      <>
+        <ViroARScene onTrackingUpdated={onInitialized}>
+          <ViroAmbientLight color='#FFFFFF' intensity={250} />
+          <ViroDirectionalLight color='#FFFFFF' direction={[0, -1, 0]} />
+          <ViroDirectionalLight color='#FFFFFF' direction={[0, 0, -1]} />
+          <ViroDirectionalLight color='#FFFFFF' direction={[-1, 0, 0]} />
 
-        <ViroSpotLight
-          innerAngle={5}
-          outerAngle={90}
-          direction={[0, 1, 0]}
-          position={[0, -7, 0]}
-          color='#ffffff'
-          intensity={250}
-        />
-
-        {loading && isMeInsideInSite && (
-          <ViroText
-            text={`${progress}% Loading Challenge Completed`}
-            color='#ff0000'
-            width={2}
-            height={2}
-            style={_styles.loadingText}
-            position={[0, 0, -5]}
+          <ViroSpotLight
+            innerAngle={5}
+            outerAngle={90}
+            direction={[0, 1, 0]}
+            position={[0, -7, 0]}
+            color='#ffffff'
+            intensity={250}
           />
-        )}
 
-        {challengeObj?.challenge_choice == '3DMODEL' && modelPath && isMeInsideInSite && (
-          <Viro3DObject
-            key='obj_3d1'
-            source={{ uri: modelPath }} /// this works
-            position={[
-              challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-              challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
-              challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
-            ]}
-            scale={scale}
-            onClick={() => {
-              console.log('TAP Viro3DObject')
-            }}
-            type={object3dType}
-            resources={sourcesFiles}
-            opacity={
-              challengeObjParameters?.image_opacity
-                ? Number(challengeObjParameters?.image_opacity_value)
-                : 1
-            }
-            materials={challengeObjParameters?.bloom ? ['mat'] : ['grid']}
-            rotation={rotate}
-            onRotate={challengeObjParameters?.rotation ? _onRotate : null}
-            chromaKeyFilteringColor={'transparent'}
-            onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
-            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            animation={{
-              name: 'Take 001',
-              run: true,
-              loop: challengeObjParameters?.loop_animations ? true : false,
-              delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000,
-            }}
-          />
-        )}
+          {loading && isMeInsideInSite && (
+            <ViroText
+              text={`${progress}% Loading Challenge Completed`}
+              color='#ff0000'
+              width={2}
+              height={2}
+              style={_styles.loadingText}
+              position={[0, 0, -5]}
+            />
+          )}
 
-        {challengeObj?.challenge_choice == 'IMAGE' && isMeInsideInSite && (
-          <ViroImage
-            height={1}
-            width={1}
-            opacity={
-              challengeObjParameters?.image_opacity
-                ? Number(challengeObjParameters?.image_opacity_value)
-                : 1
-            }
-            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            source={{ uri: challengeObj.image }}
-            position={[
-              challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-              challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
-              challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5,
-            ]}
-          />
-        )}
-      </ViroARScene>
+          {challengeObj?.challenge_choice == '3DMODEL' &&
+            modelPath &&
+            isMeInsideInSite &&
+            object3dType &&
+            !loading && (
+              <Viro3DObject
+                key='obj_3d1'
+                source={{ uri: modelPath }} /// this works
+                position={[
+                  challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+                  challengeObjParameters?.positionY
+                    ? Number(challengeObjParameters?.positionY)
+                    : -5,
+                  challengeObjParameters?.positionZ
+                    ? Number(challengeObjParameters?.positionZ)
+                    : -25,
+                ]}
+                scale={scale}
+                onClick={() => {
+                  console.log('TAP Viro3DObject')
+                }}
+                type={object3dType}
+                resources={sourcesFiles}
+                opacity={
+                  challengeObjParameters?.image_opacity
+                    ? Number(challengeObjParameters?.image_opacity_value)
+                    : 1
+                }
+                materials={challengeObjParameters?.bloom ? ['mat'] : ['grid']}
+                rotation={rotate}
+                onRotate={challengeObjParameters?.rotation ? _onRotate : null}
+                chromaKeyFilteringColor={'transparent'}
+                onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
+                onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
+                animation={{
+                  name: 'Take 001',
+                  run: true,
+                  loop: challengeObjParameters?.loop_animations ? true : false,
+                  delay: challengeObjParameters?.loop_delay
+                    ? challengeObjParameters?.loop_delay
+                    : 1000,
+                }}
+              />
+            )}
+
+          {challengeObj?.challenge_choice == 'IMAGE' && isMeInsideInSite && (
+            <ViroImage
+              height={1}
+              width={1}
+              opacity={
+                challengeObjParameters?.image_opacity
+                  ? Number(challengeObjParameters?.image_opacity_value)
+                  : 1
+              }
+              onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
+              source={{ uri: challengeObj.image }}
+              position={[
+                challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+                challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
+                challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5,
+              ]}
+            />
+          )}
+        </ViroARScene>
+      </>
     )
   }
 
   const Blink = ({ duration, style, children }) => {
-
-
     if (duration === 0) {
       return <View style={{ ...style }}>{children}</View>
     }
@@ -380,16 +396,13 @@ const PinChallenge = ({}) => {
 
     const playProximitySound = () => {
       Sound.setCategory('Playback')
-      let proximitySound = new Sound('record.mp3',
-        Sound.MAIN_BUNDLE,
-        error => {
-          if (error) {
-            console.log('failed to load the sound', error)
-          } else {
-            proximitySound.play()
-          }
+      let proximitySound = new Sound('record.mp3', Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.log('failed to load the sound', error)
+        } else {
+          proximitySound.play()
         }
-      )
+      })
     }
 
     const playCameraSound = () => {
@@ -533,7 +546,6 @@ const PinChallenge = ({}) => {
       }, blinkTimer)
 
       if (blinkTimer > 0) {
-
       } else {
         clearInterval(setInterValSoundBlink)
       }
@@ -712,8 +724,9 @@ const PinChallenge = ({}) => {
                     <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
                   </Blink>
                   <TouchableOpacity onPress={() => setMuteSound(!muteSound)}>
-                    <SpeakerIcon style={{ width: 40, height: 40, color: !muteSound ? '#fff' : '#000'
-                    }} />
+                    <SpeakerIcon
+                      style={{ width: 40, height: 40, color: !muteSound ? '#fff' : '#000' }}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
