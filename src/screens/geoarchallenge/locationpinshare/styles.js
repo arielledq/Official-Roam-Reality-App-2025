@@ -107,6 +107,8 @@ const useStyles = makeStyles(theme => ({
     marginTop: 10,
     marginBottom: 20,
     overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailContainer: {
     borderRadius: 12,
