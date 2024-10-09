@@ -636,7 +636,7 @@ const PinChallenge = ({}) => {
                   {capturedImage && <Image style={_styles.f1} source={{ uri: capturedImage }} />}
                 </View>
                 <TouchableOpacity
-                  disabled={capturedImage}
+                  disabled={!!capturedImage}
                   onPress={_takeScreenshot}
                   style={{
                     width: 56,

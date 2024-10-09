@@ -278,8 +278,9 @@ const ArPinChallengeShare = ({}) => {
             resizeMode={'contain'}
             source={{ uri: captureData }}
             style={{
-              width: '100%',
-              height: imageHeight,
+              backgroundColor: 'transparent',
+              width: '70%',
+              height: imageHeight * 0.7,
               marginTop: Platform.OS == 'ios' ? -200 : 0,
             }}
           />
