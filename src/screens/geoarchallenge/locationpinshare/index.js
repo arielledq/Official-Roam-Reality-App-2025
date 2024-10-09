@@ -270,6 +270,9 @@ const ArPinChallengeShare = ({}) => {
         backgroundColor='transparent'
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
+        <AppText numberOfLines={3} style={[styles.headerText]}>
+          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
+        </AppText>
         <View style={styles.imageContainer}>
           <Image
             resizeMode={'contain'}
