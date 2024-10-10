@@ -329,13 +329,13 @@ const ArChallengeShare = ({}) => {
             />
           ) : (
             <Image
-              resizeMode={'contain'}
+              resizeMode={'stretch'}
               source={{ uri: captureData }}
               style={{
                 backgroundColor: 'transparent',
                 width: '70%',
-                height: imageHeight * 0.8,
-                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
+                height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
+                marginTop: 0,
               }}
             />
           )}

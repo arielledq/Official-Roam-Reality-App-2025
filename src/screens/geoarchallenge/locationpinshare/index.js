@@ -275,13 +275,13 @@ const ArPinChallengeShare = ({}) => {
         </AppText>
         <View style={styles.detailContainer}>
           <Image
-            resizeMode={'contain'}
+            resizeMode={'stretch'}
             source={{ uri: captureData }}
             style={{
               backgroundColor: 'transparent',
               width: '70%',
-              height: imageHeight * 0.8,
-              marginTop: Platform.OS == 'ios' ? -200 : 0,
+              height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
+              marginTop: 0,
             }}
           />
           <View style={styles.pointsParentContainer}>
