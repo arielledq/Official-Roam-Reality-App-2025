@@ -30,6 +30,7 @@ import {
 } from "../../../util/LocationLib";
 import CompassHeading from 'react-native-compass-heading';
 import {GeolocationContext} from "../../../GeolocationProvider";
+import Sound from "react-native-sound";
 
 const MARGIN_ARRIVAL_METERS = 50
 
@@ -61,6 +62,7 @@ const GeoArSiteNavigation = ({ }) => {
   const [useLocationManager, setUseLocationManager] = useState(false)
   const [estimatedTime, setEstimatedTime] = useState("")
   const [location, setLocation] = useState(null)
+  const [isFirstCalculation, setIsFirstCalculation] = useState(true);
   const mapView = useRef()
   const watchId = useRef(null)
   const route = useRoute()
@@ -115,11 +117,13 @@ const GeoArSiteNavigation = ({ }) => {
     setLocation(position)
     setCurrentLocation(position)
     if (mapView && mapView.current) {
-      console.log('animateCamera', position.coords, compassHeading.current)
-      mapView.current.getCamera().then(camera => {
-        console.log('camera', camera)
-      })
+      // console.log('animateCamera', position.coords, compassHeading.current)
+      // mapView.current.getCamera().then(camera => {
+      //   // console.log('camera', camera)
+      // })
+    setTimeout(() => {
       mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
+    }, 500)
     }
   }
 
@@ -164,12 +168,12 @@ const GeoArSiteNavigation = ({ }) => {
 
         if (!location) {
           setLocation(position)
-          mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
+          // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
         } else if (location && location.coords) {
           const lastLocationDistance = getLocationDistance(position.coords, location.coords)
           if (lastLocationDistance > 10) {
             setLocation(position)
-            mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
+            // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
           }
         }
       },
@@ -209,6 +213,20 @@ const GeoArSiteNavigation = ({ }) => {
         </>
       )
     }
+  }
+
+  const playProximitySound = () => {
+    Sound.setCategory('Playback')
+    let proximitySound = new Sound('record.mp3',
+      Sound.MAIN_BUNDLE,
+      error => {
+        if (error) {
+          console.log('failed to load the sound', error)
+        } else {
+          proximitySound.play()
+        }
+      }
+    )
   }
 
   return (
@@ -315,6 +333,7 @@ const GeoArSiteNavigation = ({ }) => {
                 strokeColor="#01AFFC"
                 optimizeWaypoints={true}
                 onStart={params => {
+                  console.log('onStart', params)
                   // console.log(
                   //   `Started routing between "${params.origin}" and "${params.destination}"`
                   // )
@@ -323,17 +342,15 @@ const GeoArSiteNavigation = ({ }) => {
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   calculatedEstimatedTime(result.duration)
-
-                  // mapView.fitToCoordinates(result.coordinates, {
-                  //   edgePadding: {
-                  //     right: (width / 20),
-                  //     bottom: (height / 20),
-                  //     left: (width / 20),
-                  //     top: (height / 20),
-                  //   }
-                  // });
+                  if (!isFirstCalculation) {
+                    showMessage('Route recalculated!');
+                    playProximitySound();
+                  } else {
+                    setIsFirstCalculation(false); // Mark the first calculation as completed
+                  }
                 }}
                 onError={errorMessage => {
+                  console.log('onError', errorMessage)
                   // console.log('GOT AN ERROR');
                 }}
               />
