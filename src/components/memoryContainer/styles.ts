@@ -26,7 +26,7 @@ const useStyles = makeStyles(theme => ({
   },
   cardImage: {
     width: 100,
-    height: 100 / (9 / 16),
+    height: 100 / (100 / 143),
     borderRadius: 10,
   },
   cardContent: {
