@@ -66,7 +66,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, 'EditProfile'> = () 
       console.error('Error fetching profile details: ', error)
     }
   }
-  console.log(profileDetails)
   useEffect(() => {
     // fetchProfileDetails()
     //   .then(() => setPageLoading(false))
@@ -95,7 +94,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, 'EditProfile'> = () 
         setCountryData(countryArray)
       })
       .catch(function (error) {
-        console.log(error)
+        console.error(error)
       })
   }, [])
   const [isFocus, setIsFocus] = useState(false)
@@ -179,7 +178,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, 'EditProfile'> = () 
 
     // Check if formattedDate has a value, if not, use the existing value
     const updatedDateOfBirth = formattedDate ? formattedDate : profileDetails?.date_of_birth
-    console.log('dob: ' + updatedDateOfBirth)
     nameRef.current = values.name
     const updatedProfileData = new FormData()
     updatedProfileData.append('name', values.name)
@@ -234,12 +232,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, 'EditProfile'> = () 
   }
 
   const handleInputName = (input: string) => {
-    console.log('name', input)
     setProfileDetails({ ...profileDetails, user: { name: input } })
   }
 
   const handleInputAddress = (input: string) => {
-    console.log('name', input)
     setProfileDetails({ ...profileDetails, home_address: input })
   }
   return (

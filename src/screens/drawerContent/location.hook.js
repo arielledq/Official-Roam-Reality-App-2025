@@ -1,13 +1,11 @@
-import React, { useState, useEffect, useRef } from "react"
-import { useSelector } from "react-redux"
-import { showMessage } from "../../util/helpers"
-import Geolocation from "react-native-geolocation-service"
-import { hasLocationPermission } from "../../util/LocationLib"
+import React, { useState, useEffect, useRef } from 'react'
+import { useSelector } from 'react-redux'
+import { showMessage } from '../../util/helpers'
+import Geolocation from 'react-native-geolocation-service'
+import { hasLocationPermission } from '../../util/LocationLib'
 
 const userLocationHook = () => {
-  const initalLocationEnabled = useSelector(
-    state => state?.login?.data?.locationEnabled
-  )
+  const initalLocationEnabled = useSelector(state => state?.login?.data?.locationEnabled)
   const watchId = useRef(null)
 
   const [location, setLocation] = useState({})
@@ -20,17 +18,16 @@ const userLocationHook = () => {
     }
     watchId.current = Geolocation.watchPosition(
       position => {
-        console.log("getLocation ====>>>> ", JSON.stringify(position, null, 2))
         setLocation(position)
       },
       error => {
         setLocation(null)
-        console.log(error)
+        console.error(error)
       },
       {
         accuracy: {
-          android: "high",
-          ios: "best"
+          android: 'high',
+          ios: 'best',
         },
         enableHighAccuracy: true,
         distanceFilter: 5,
@@ -39,7 +36,7 @@ const userLocationHook = () => {
         forceRequestLocation: true,
         forceLocationManager: false,
         showLocationDialog: true,
-        useSignificantChanges: false
+        useSignificantChanges: false,
       }
     )
   }
@@ -64,7 +61,7 @@ const userLocationHook = () => {
   }, [])
 
   return {
-    setLocationEnabled
+    setLocationEnabled,
   }
 }
 

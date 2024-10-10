@@ -1,46 +1,37 @@
-import React, { useEffect } from "react"
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native"
-import {
-  GoogleSignin,
-  statusCodes
-} from "@react-native-google-signin/google-signin"
-import DividerWithText from "../dividerwithtextcomponent"
-import { AppleIcon, FacebookIcon, GoogleIcon } from "../../assets/svg"
+import React, { useEffect } from 'react'
+import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin'
+import DividerWithText from '../dividerwithtextcomponent'
+import { AppleIcon, FacebookIcon, GoogleIcon } from '../../assets/svg'
 import {
   AccessToken,
   AuthenticationToken,
   GraphRequest,
   GraphRequestManager,
-  LoginManager
-} from "react-native-fbsdk-next"
-import "react-native-get-random-values"
-import uuid from "react-native-uuid"
-import appleAuth, {
-  appleAuthAndroid
-} from "@invertase/react-native-apple-authentication"
-import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from "../../network/config"
-import { googleLogin, appleLogin } from "../../network"
-import { useDispatch, useSelector } from "react-redux"
-import { updateUserData } from "../../redux/Login"
-import { updateAsOldUser } from "../../redux/Persist"
-import { handleError, showMessage } from "../../util/helpers"
+  LoginManager,
+} from 'react-native-fbsdk-next'
+import 'react-native-get-random-values'
+import uuid from 'react-native-uuid'
+import appleAuth, { appleAuthAndroid } from '@invertase/react-native-apple-authentication'
+import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from '../../network/config'
+import { googleLogin, appleLogin } from '../../network'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateUserData } from '../../redux/Login'
+import { updateAsOldUser } from '../../redux/Persist'
+import { handleError, showMessage } from '../../util/helpers'
 
 const SocialSignin = ({ setLoading }) => {
   const dispatch = useDispatch()
   const newUser = useSelector(state => state.persist.newUser)
 
   const handleGoogleLogin = async () => {
-    console.log("login called")
     setLoading(true)
     try {
       await GoogleSignin.hasPlayServices()
       const userinfo = await GoogleSignin.signIn()
       const tokens = await GoogleSignin.getTokens()
-      console.log({ userinfo })
-      console.log({ tokens })
       googleLogin({
-        access_token: tokens.accessToken
-        // code: userinfo.serverAuthCode
+        access_token: tokens.accessToken,
       })
         .then(res => {
           if (res.status == 1) {
@@ -53,7 +44,7 @@ const SocialSignin = ({ setLoading }) => {
           }
         })
         .catch(err => {
-          console.log({ err })
+          console.error({ err })
         })
         .finally(() => {
           setLoading(false)
@@ -63,14 +54,14 @@ const SocialSignin = ({ setLoading }) => {
         // user cancelled the login flow
         // alert('Cancel')
       } else if (error.code === statusCodes.IN_PROGRESS) {
-        alert("Signin in progress")
+        alert('Signin in progress')
         // operation (f.e. sign in) is in progress already
       } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
-        alert("PLAY_SERVICES_NOT_AVAILABLE")
+        alert('PLAY_SERVICES_NOT_AVAILABLE')
         // play services not available or outdated
       } else {
         // some other error happened
-        console.log({ errorHere: error })
+        console.error({ errorHere: error })
       }
       setLoading(false)
     }
@@ -78,44 +69,27 @@ const SocialSignin = ({ setLoading }) => {
 
   const _fblogin = () => {
     LoginManager.logOut()
-    return LoginManager.logInWithPermissions(["email", "public_profile"]).then(
+    return LoginManager.logInWithPermissions(['email', 'public_profile']).then(
       res => {
-        console.log("res of fb login", res)
-        if (
-          res.declinedPermissions &&
-          res.declinedPermissions.includes("email")
-        ) {
-          showMessage("Email is required", "error")
+        if (res.declinedPermissions && res.declinedPermissions.includes('email')) {
+          showMessage('Email is required', 'error')
         }
         if (res.isCancelled) {
-          console.error("err")
+          console.error('err')
         } else {
-          const req = new GraphRequest(
-            "/me?fields=email,name,picture",
-            null,
-            (err, result) => {
-              if (err) {
-                console.error("err", err)
-                return
-              } else {
-                console.log("res of login fb", result)
-                AccessToken.getCurrentAccessToken().then(data => {
-                  console.log({ data })
-                  console.log(data?.accessToken.toString())
-                  // dispatch(
-                  //   LoginActions.fb_login({
-                  //     access_token: data?.accessToken.toString()
-                  //   })
-                  // )
-                })
-              }
+          const req = new GraphRequest('/me?fields=email,name,picture', null, (err, result) => {
+            if (err) {
+              console.error('err', err)
+              return
+            } else {
+              AccessToken.getCurrentAccessToken().then(data => {})
             }
-          )
+          })
           new GraphRequestManager().addRequest(req).start()
         }
       },
       err => {
-        console.error("error in login", err)
+        console.error('error in login', err)
       }
     )
   }
@@ -124,7 +98,7 @@ const SocialSignin = ({ setLoading }) => {
     try {
       await _fblogin()
     } catch (err) {
-      console.log("err in catch", err)
+      console.error('err in catch', err)
     }
   }
 
@@ -138,21 +112,19 @@ const SocialSignin = ({ setLoading }) => {
         responseType: appleAuthAndroid.ResponseType.ALL,
         scope: appleAuthAndroid.Scope.ALL,
         nonce: rawNonce,
-        state
+        state,
       })
 
       const response = await appleAuthAndroid.signIn()
 
       if (response) {
-        console.log({ responseApple: response })
         const payload = {
-          id_token: response.id_token ?? "",
-          access_token: response.code ?? ""
+          id_token: response.id_token ?? '',
+          access_token: response.code ?? '',
         }
-        console.log({ payload })
+
         appleLogin(payload)
           .then(res => {
-            console.log("apple response", { res })
             if (res.status == 1) {
               dispatch(updateUserData(res))
               if (newUser) {
@@ -163,7 +135,7 @@ const SocialSignin = ({ setLoading }) => {
             }
           })
           .catch(err => {
-            console.log({ err })
+            console.error({ err })
           })
           .finally(() => {
             setLoading(false)
@@ -171,7 +143,7 @@ const SocialSignin = ({ setLoading }) => {
       }
     } catch (error) {
       if (error && error?.code === appleAuth.Error.CANCELED) {
-        throw new Error("The user canceled the signin request.")
+        throw new Error('The user canceled the signin request.')
       }
       throw error
     }
@@ -181,22 +153,19 @@ const SocialSignin = ({ setLoading }) => {
     try {
       const appleAuthRequestResponse = await appleAuth.performRequest({
         requestedOperation: appleAuth.Operation.LOGIN,
-        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME]
+        requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
       })
       if (!appleAuthRequestResponse.identityToken) {
-        throw new Error("Apple Sign-In failed - no identify token returned")
+        throw new Error('Apple Sign-In failed - no identify token returned')
       }
 
-      // const { identityToken, nonce } = appleAuthRequestResponse
-      console.log({ appleAuthRequestResponse })
       const payload = {
         id_token: appleAuthRequestResponse.identityToken,
-        access_token: appleAuthRequestResponse.authorizationCode
+        access_token: appleAuthRequestResponse.authorizationCode,
       }
-      console.log({ payload })
+
       appleLogin(payload)
         .then(res => {
-          console.log("apple response", { res })
           if (res.status == 1) {
             dispatch(updateUserData(res))
             if (newUser) {
@@ -207,18 +176,18 @@ const SocialSignin = ({ setLoading }) => {
           }
         })
         .catch(err => {
-          console.log({ err })
+          console.error({ err })
         })
         .finally(() => {
           setLoading(false)
         })
     } catch (err) {
-      console.log({ err })
+      console.error({ err })
     }
   }
 
   const handleAppleLogin = async () => {
-    if (Platform.OS === "android") {
+    if (Platform.OS === 'android') {
       handleAppleAndroid()
     } else {
       handleAppleiOS()
@@ -227,13 +196,13 @@ const SocialSignin = ({ setLoading }) => {
 
   useEffect(() => {
     GoogleSignin.configure({
-      scopes: ["email", "profile"]
+      scopes: ['email', 'profile'],
     })
   }, [])
 
   return (
     <View>
-      <DividerWithText containerStyle={styles.divider} label={"OR"} />
+      <DividerWithText containerStyle={styles.divider} label={'OR'} />
       <View style={styles.socialSUcontainer}>
         <TouchableOpacity onPress={handleFBLogin}>
           <FacebookIcon style={styles.socialSIicon} />
@@ -253,15 +222,15 @@ export default SocialSignin
 
 const styles = StyleSheet.create({
   divider: {
-    marginBottom: "10%",
-    marginTop: 20
+    marginBottom: '10%',
+    marginTop: 20,
   },
   socialSUcontainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center"
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   socialSIicon: {
-    marginHorizontal: 10
-  }
+    marginHorizontal: 10,
+  },
 })

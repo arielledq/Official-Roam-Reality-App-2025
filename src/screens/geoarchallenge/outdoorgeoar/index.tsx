@@ -89,7 +89,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route 
         text: 'yes',
         onPress: () => {
           deleteAccount().then(res => {
-            console.log({ res })
             if (res.status == 1) {
               handleLogOutButton()
               showMessage('Your account has been deleted successfully')
