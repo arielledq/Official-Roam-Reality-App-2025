@@ -311,7 +311,7 @@ const ArChallengeShare = ({}) => {
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
         <AppText numberOfLines={3} style={[styles.headerText]}>
-          Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{' '}
+          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
         </AppText>
         <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
           {fileExt == 'mp4' ? (
@@ -329,13 +329,13 @@ const ArChallengeShare = ({}) => {
             />
           ) : (
             <Image
-              resizeMode={'contain'}
+              resizeMode={'stretch'}
               source={{ uri: captureData }}
               style={{
                 backgroundColor: 'transparent',
                 width: '70%',
-                height: imageHeight * 0.7,
-                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
+                height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
+                marginTop: 0,
               }}
             />
           )}
