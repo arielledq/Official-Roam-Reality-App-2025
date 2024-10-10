@@ -60,7 +60,6 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
               setFullLocation(json)
               setLocation(addressComponent)
             } catch (ex) {
-              console.log(ex)
               setLocation('')
             }
           })
@@ -83,11 +82,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
     var sublocality_level_2 = null
     var sublocality_level_1 = null
     var details = fullLocation.results[0].address_components
-    console.log('location:', location)
-    console.log(
-      'fullLocation.results[0].address_components:',
-      fullLocation.results[0].address_components
-    )
+
     for (var i = details.length - 1; i >= 0; i--) {
       for (var j = 0; j < details[i].types.length; j++) {
         if (details[i].types[j] == 'sublocality_level_2') {
@@ -117,14 +112,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
         }
       }
     }
-    console.log('route', route)
-    console.log('locality', locality)
-    console.log('sublocality', sublocality)
-    console.log('sublocality_level_2', sublocality_level_2)
-    console.log('sublocality_level_1', sublocality_level_1)
-    console.log('neighborhood', neighborhood)
-    console.log('postal_town', postal_town)
-    console.log('admin_area_2', admin_area_2)
+
     if (location_option == 'COUNTRY_ONLY') {
       return country
     } else if (location_option == 'SITE_ONLY') {
@@ -218,7 +206,6 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
           {ar_filters.map(filter => {
             return (
               <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
-                {console.log(' filter ======>>>> ', JSON.stringify(filter, null, 2))}
                 {filter.gradient_colors && (
                   // grandient
                   <View

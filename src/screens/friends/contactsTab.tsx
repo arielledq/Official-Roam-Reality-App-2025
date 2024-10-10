@@ -55,10 +55,8 @@ const ContactsTab = () => {
             }
           )
           if (granted === PermissionsAndroid.RESULTS.GRANTED) {
-            console.log('Contacts permission granted')
             fetchContacts()
           } else {
-            console.log('Contacts permission denied')
           }
         } catch (err) {
           console.warn(err)
@@ -86,13 +84,12 @@ const ContactsTab = () => {
         })
       }
     })
-    console.log(contactsList)
+
     setContacts(contactsList)
     setFilteredUsers(contactsList)
   }
 
   const onAddFriendClick = (user: any) => {
-    console.log('user', user.email)
     // @ts-expect-error
     navigation.navigate('InviteFriends', { email: user?.email })
   }

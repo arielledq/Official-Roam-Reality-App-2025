@@ -81,7 +81,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, 'Profile'> = () =>
       user_id: userProfile.id,
     })
       .then(res => {
-        console.log('getUserCollectedStarCount:', res)
         if (res.status == 1) {
           setStarsCount(res.count)
         }
@@ -97,7 +96,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, 'Profile'> = () =>
       user_id: userProfile.id,
     })
       .then(res => {
-        console.log('getRank:', res)
         if (res.status == 1) {
           setGlobalRank(res.rank)
         }
@@ -113,7 +111,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, 'Profile'> = () =>
       user_id: userProfile.id,
     })
       .then(res => {
-        console.log('getCountry:', res)
         if (res.status == 1) {
           setCountryCount(res.count)
         }

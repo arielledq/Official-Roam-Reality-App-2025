@@ -42,8 +42,6 @@ const GeoArSiteDetails = ({}) => {
   const [address, setAddress] = useState(null)
   const [starsCount, setStarsCount] = useState(0)
 
-  // console.log(' selectedGeoSite ===>>> ', JSON.stringify(selectedGeoSite, null, 2))
-
   const getAddress = () => {
     if (selectedGeoSite.address_text != '') {
       setAddress(selectedGeoSite.address_text)

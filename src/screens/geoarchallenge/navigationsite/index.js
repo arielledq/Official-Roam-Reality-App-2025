@@ -1,46 +1,36 @@
-import React, {useContext, useEffect, useRef, useState} from "react"
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
-import {
-  ActivityIndicator,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native"
-import BackgroundWithImage from "../../../components/background"
-import AppHeader from "../../../components/header"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import HomeIcon from "../../../assets/geoar/home.svg"
-import CloseBIcon from "../../../assets/geoar/close-square.svg"
-import SkipIcon from "../../../assets/geoar/skip.svg"
-import MarkerIcon from "../../../assets/geoar/marker_img.svg"
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import BackgroundWithImage from '../../../components/background'
+import AppHeader from '../../../components/header'
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
+import HomeIcon from '../../../assets/geoar/home.svg'
+import CloseBIcon from '../../../assets/geoar/close-square.svg'
+import SkipIcon from '../../../assets/geoar/skip.svg'
+import MarkerIcon from '../../../assets/geoar/marker_img.svg'
 
-import { useDispatch, useSelector } from "react-redux"
-import useStyles from "./styles"
-import { useNavigation, useRoute } from "@react-navigation/native"
-import Geolocation, { GeoPosition } from "react-native-geolocation-service"
-import MapViewDirections from "react-native-maps-directions"
-import { convertKilometersToMiles, showMessage } from "../../../util/helpers"
-import moment from "moment"
-import Strings from "../../../constants/Strings"
-import mapCustomStyle from "../../../constants/MapCustomStyles"
-import {
-  getLocationDistance,
-  hasLocationPermission
-} from "../../../util/LocationLib";
-import CompassHeading from 'react-native-compass-heading';
-import {GeolocationContext} from "../../../GeolocationProvider";
-import Sound from "react-native-sound";
+import { useDispatch, useSelector } from 'react-redux'
+import useStyles from './styles'
+import { useNavigation, useRoute } from '@react-navigation/native'
+import Geolocation, { GeoPosition } from 'react-native-geolocation-service'
+import MapViewDirections from 'react-native-maps-directions'
+import { convertKilometersToMiles, showMessage } from '../../../util/helpers'
+import moment from 'moment'
+import Strings from '../../../constants/Strings'
+import mapCustomStyle from '../../../constants/MapCustomStyles'
+import { getLocationDistance, hasLocationPermission } from '../../../util/LocationLib'
+import CompassHeading from 'react-native-compass-heading'
+import { GeolocationContext } from '../../../GeolocationProvider'
+import Sound from 'react-native-sound'
 
 const MARGIN_ARRIVAL_METERS = 50
 
-const GeoArSiteNavigation = ({ }) => {
-
+const GeoArSiteNavigation = ({}) => {
   const [mapRegion, setMapRegion] = useState({
     longitude: 0,
     latitude: 0,
     longitudeDelta: 0.004,
-    latitudeDelta: 0.009
+    latitudeDelta: 0.009,
   })
   const compassHeading = useRef(0)
 
@@ -48,7 +38,7 @@ const GeoArSiteNavigation = ({ }) => {
   const dispatch = useDispatch()
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const { userLocation } = useContext(GeolocationContext);
+  const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
   const [isLoading, setIsLoading] = useState(false)
@@ -60,9 +50,9 @@ const GeoArSiteNavigation = ({ }) => {
   const [locationDialog, setLocationDialog] = useState(true)
   const [significantChanges, setSignificantChanges] = useState(false)
   const [useLocationManager, setUseLocationManager] = useState(false)
-  const [estimatedTime, setEstimatedTime] = useState("")
+  const [estimatedTime, setEstimatedTime] = useState('')
   const [location, setLocation] = useState(null)
-  const [isFirstCalculation, setIsFirstCalculation] = useState(true);
+  const [isFirstCalculation, setIsFirstCalculation] = useState(true)
   const mapView = useRef()
   const watchId = useRef(null)
   const route = useRoute()
@@ -77,7 +67,7 @@ const GeoArSiteNavigation = ({ }) => {
 
   const calculatedEstimatedTime = duration => {
     var now = new Date()
-    const calcTime = moment(now).add(duration, "minutes").format("hh:mm A")
+    const calcTime = moment(now).add(duration, 'minutes').format('hh:mm A')
     setEstimatedTime(calcTime)
   }
 
@@ -94,57 +84,62 @@ const GeoArSiteNavigation = ({ }) => {
       coords: {
         latitude,
         longitude,
-      }
+      },
     }
 
-    const endPosition ={
+    const endPosition = {
       latitude: selectedGeoSite.lat_long.coordinates[1],
-      longitude: selectedGeoSite.lat_long.coordinates[0]
+      longitude: selectedGeoSite.lat_long.coordinates[0],
     }
 
     const currentRegion = {
       latitude: position.coords.latitude,
       longitude: position.coords.longitude,
       latitudeDelta: 0.0032,
-      longitudeDelta: 0.0032
+      longitudeDelta: 0.0032,
     }
     setMapRegion(currentRegion)
 
-    const headingValue = calculateBearing(position.coords.latitude, position.coords.longitude, endPosition.latitude, endPosition.longitude)
+    const headingValue = calculateBearing(
+      position.coords.latitude,
+      position.coords.longitude,
+      endPosition.latitude,
+      endPosition.longitude
+    )
 
     compassHeading.current = headingValue
 
     setLocation(position)
     setCurrentLocation(position)
     if (mapView && mapView.current) {
-      // console.log('animateCamera', position.coords, compassHeading.current)
-      // mapView.current.getCamera().then(camera => {
-      //   // console.log('camera', camera)
-      // })
-    setTimeout(() => {
-      mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
-    }, 500)
+      setTimeout(() => {
+        mapView.current.animateCamera({
+          center: position.coords,
+          heading: compassHeading.current,
+          zoom: 17,
+        })
+      }, 500)
     }
   }
 
   function calculateBearing(startLat, startLng, endLat, endLng) {
-    const startLatRad = (Math.PI / 180) * startLat;
-    const startLngRad = (Math.PI / 180) * startLng;
-    const endLatRad = (Math.PI / 180) * endLat;
-    const endLngRad = (Math.PI / 180) * endLng;
+    const startLatRad = (Math.PI / 180) * startLat
+    const startLngRad = (Math.PI / 180) * startLng
+    const endLatRad = (Math.PI / 180) * endLat
+    const endLngRad = (Math.PI / 180) * endLng
 
-    const dLng = endLngRad - startLngRad;
+    const dLng = endLngRad - startLngRad
 
-    const x = Math.sin(dLng) * Math.cos(endLatRad);
+    const x = Math.sin(dLng) * Math.cos(endLatRad)
     const y =
       Math.cos(startLatRad) * Math.sin(endLatRad) -
-      Math.sin(startLatRad) * Math.cos(endLatRad) * Math.cos(dLng);
+      Math.sin(startLatRad) * Math.cos(endLatRad) * Math.cos(dLng)
 
-    let bearing = Math.atan2(x, y);
-    bearing = (bearing * 180) / Math.PI; // Convert from radians to degrees
-    bearing = (bearing + 360) % 360; // Normalize to 0-360
+    let bearing = Math.atan2(x, y)
+    bearing = (bearing * 180) / Math.PI // Convert from radians to degrees
+    bearing = (bearing + 360) % 360 // Normalize to 0-360
 
-    return bearing;
+    return bearing
   }
 
   const getLocationUpdates = async () => {
@@ -158,10 +153,10 @@ const GeoArSiteNavigation = ({ }) => {
       position => {
         const dis = getLocationDistance(position.coords, {
           latitude: selectedGeoSite.lat_long.coordinates[1],
-          longitude: selectedGeoSite.lat_long.coordinates[0]
+          longitude: selectedGeoSite.lat_long.coordinates[0],
         })
         if (dis < selectedGeoSite.check_in_site_radius) {
-          navigation.replace("GeoArSiteArrived")
+          navigation.replace('GeoArSiteArrived')
           stopLocationUpdates()
           return
         }
@@ -178,12 +173,12 @@ const GeoArSiteNavigation = ({ }) => {
         }
       },
       error => {
-        console.log(error)
+        console.error(error)
       },
       {
         accuracy: {
-          android: "high",
-          ios: "best"
+          android: 'high',
+          ios: 'best',
         },
         enableHighAccuracy: highAccuracy,
         distanceFilter: 1,
@@ -192,7 +187,7 @@ const GeoArSiteNavigation = ({ }) => {
         forceRequestLocation: forceLocation,
         forceLocationManager: useLocationManager,
         showLocationDialog: locationDialog,
-        useSignificantChanges: significantChanges
+        useSignificantChanges: significantChanges,
       }
     )
   }
@@ -201,8 +196,7 @@ const GeoArSiteNavigation = ({ }) => {
     if (walkDurationMins < 60) {
       return (
         <>
-          {Math.round(walkDurationMins)}{" "}
-          <Text style={{ fontSize: 14 }}>mins</Text>
+          {Math.round(walkDurationMins)} <Text style={{ fontSize: 14 }}>mins</Text>
         </>
       )
     } else if (walkDurationMins >= 60) {
@@ -217,16 +211,13 @@ const GeoArSiteNavigation = ({ }) => {
 
   const playProximitySound = () => {
     Sound.setCategory('Playback')
-    let proximitySound = new Sound('record.mp3',
-      Sound.MAIN_BUNDLE,
-      error => {
-        if (error) {
-          console.log('failed to load the sound', error)
-        } else {
-          proximitySound.play()
-        }
+    let proximitySound = new Sound('record.mp3', Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.error('failed to load the sound', error)
+      } else {
+        proximitySound.play()
       }
-    )
+    })
   }
 
   return (
@@ -236,32 +227,29 @@ const GeoArSiteNavigation = ({ }) => {
           <TouchableOpacity
             onPress={() => {
               stopLocationUpdates()
-              navigation.replace("ChallengeSelection")
+              navigation.replace('ChallengeSelection')
             }}
           >
             <SkipIcon style={{ width: 48, height: 36 }} />
           </TouchableOpacity>
         )}
         centerComponent={{
-          text: "Navigate to Site",
-          style: [_styles.heading]
+          text: 'Navigate to Site',
+          style: [_styles.heading],
         }}
-        backgroundColor="transparent"
+        backgroundColor='transparent'
       />
 
-      {isLoading && <ActivityIndicator size="large" />}
-      <ScrollView
-        style={{ width: "100%" }}
-        showsVerticalScrollIndicator={false}
-      >
+      {isLoading && <ActivityIndicator size='large' />}
+      <ScrollView style={{ width: '100%' }} showsVerticalScrollIndicator={false}>
         <View
           style={{
-            position: "relative",
+            position: 'relative',
             minHeight: 520,
             borderRadius: 16,
-            overflow: "hidden",
+            overflow: 'hidden',
             marginTop: 20,
-            marginHorizontal: 30
+            marginHorizontal: 30,
           }}
         >
           <MapView
@@ -273,11 +261,11 @@ const GeoArSiteNavigation = ({ }) => {
             showsTraffic={true}
             // region={mapRegion}
             style={{
-              position: "absolute",
+              position: 'absolute',
               top: 0,
               bottom: 0,
               left: 0,
-              right: 0
+              right: 0,
             }}
             showsMyLocationButton={true}
             zoomEnabled={true}
@@ -287,13 +275,13 @@ const GeoArSiteNavigation = ({ }) => {
               latitude: selectedGeoSite.lat_long.coordinates[1],
               longitude: selectedGeoSite.lat_long.coordinates[0],
               latitudeDelta: 0.0032,
-              longitudeDelta: 0.0032
+              longitudeDelta: 0.0032,
             }}
           >
             <Marker
               coordinate={{
                 latitude: selectedGeoSite.lat_long.coordinates[1],
-                longitude: selectedGeoSite.lat_long.coordinates[0]
+                longitude: selectedGeoSite.lat_long.coordinates[0],
               }}
               title={selectedGeoSite.name}
             >
@@ -306,9 +294,9 @@ const GeoArSiteNavigation = ({ }) => {
               <Marker
                 coordinate={{
                   latitude: currentLocation.coords.latitude,
-                  longitude: currentLocation.coords.longitude
+                  longitude: currentLocation.coords.longitude,
                 }}
-                title={"Start Location"}
+                title={'Start Location'}
               >
                 <View style={{ width: 30, height: 30 }}>
                   <MarkerIcon />
@@ -319,39 +307,33 @@ const GeoArSiteNavigation = ({ }) => {
               <MapViewDirections
                 origin={{
                   latitude: location.coords.latitude,
-                  longitude: location.coords.longitude
+                  longitude: location.coords.longitude,
                 }}
-                precision={"high"}
-                timePrecision={"now"}
+                precision={'high'}
+                timePrecision={'now'}
                 mode={route?.params?.mapMode}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
-                  longitude: selectedGeoSite.lat_long.coordinates[0]
+                  longitude: selectedGeoSite.lat_long.coordinates[0],
                 }}
                 apikey={Strings.GOOGLE_PLACE_API_KEY}
                 strokeWidth={8}
-                strokeColor="#01AFFC"
+                strokeColor='#01AFFC'
                 optimizeWaypoints={true}
-                onStart={params => {
-                  console.log('onStart', params)
-                  // console.log(
-                  //   `Started routing between "${params.origin}" and "${params.destination}"`
-                  // )
-                }}
+                onStart={params => {}}
                 onReady={result => {
                   setMileDistance(convertKilometersToMiles(result.distance))
                   setDurationMins(result.duration)
                   calculatedEstimatedTime(result.duration)
                   if (!isFirstCalculation) {
-                    showMessage('Route recalculated!');
-                    playProximitySound();
+                    showMessage('Route recalculated!')
+                    playProximitySound()
                   } else {
-                    setIsFirstCalculation(false); // Mark the first calculation as completed
+                    setIsFirstCalculation(false) // Mark the first calculation as completed
                   }
                 }}
                 onError={errorMessage => {
-                  console.log('onError', errorMessage)
-                  // console.log('GOT AN ERROR');
+                  console.error('onError', errorMessage)
                 }}
               />
             )}
@@ -359,49 +341,42 @@ const GeoArSiteNavigation = ({ }) => {
         </View>
         <View
           style={{
-            backgroundColor: "#131422",
+            backgroundColor: '#131422',
             borderRadius: 16,
             paddingHorizontal: 20,
             paddingBottom: 20,
             marginVertical: 20,
-            alignItems: "center"
+            alignItems: 'center',
           }}
         >
-          <HomeIcon
-            style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }}
-          />
+          <HomeIcon style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }} />
           <View
             style={{
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between"
+              width: '100%',
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
             }}
           >
-            <TouchableOpacity
-              onPress={() => navigation.replace("ChallengeSelection")}
-            >
+            <TouchableOpacity onPress={() => navigation.replace('ChallengeSelection')}>
               <CloseBIcon style={{ width: 32, height: 32 }} />
             </TouchableOpacity>
-            <View style={{ alignItems: "center", marginVertical: 8 }}>
+            <View style={{ alignItems: 'center', marginVertical: 8 }}>
               <Text style={_styles.site_distance_time_value_text}>
                 {minOrHoursWalkDriving(durationMins)}
               </Text>
               <View
                 style={{
-                  width: "100%",
-                  flexDirection: "row",
-                  alignItems: "center"
+                  width: '100%',
+                  flexDirection: 'row',
+                  alignItems: 'center',
                 }}
               >
                 <Text style={_styles.site_distance_time_text}>
-                  {mileDistance.toFixed(2)}{" "}
-                  <Text style={{ fontSize: 10 }}>miles</Text>
+                  {mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text>
                 </Text>
                 <Text style={_styles.site_distance_time_text}>.</Text>
-                <Text style={_styles.site_distance_time_text}>
-                  {estimatedTime}
-                </Text>
+                <Text style={_styles.site_distance_time_text}>{estimatedTime}</Text>
               </View>
             </View>
             <View></View>

@@ -158,8 +158,8 @@ function DrawerContent(props) {
     }
   }
   const handleLogOutButton = async () => {
-    await GoogleSignin.revokeAccess().catch(err => console.log(err))
-    await GoogleSignin.signOut().catch(err => console.log(err))
+    await GoogleSignin.revokeAccess().catch(err => console.error(err))
+    await GoogleSignin.signOut().catch(err => console.error(err))
     await removeItem('fbToken')
     await removeItem('instaToken')
     await removeItem('tiktokToken')
@@ -171,7 +171,6 @@ function DrawerContent(props) {
   }
   const handleDeleteAccount = () => {
     deleteAccount().then(res => {
-      console.log({ res })
       if (res.status == 1) {
         handleLogOutButton()
         showMessage('Your account has been deleted successfully')

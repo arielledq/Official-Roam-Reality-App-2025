@@ -26,7 +26,6 @@ export const APP_JSON_HEADER = {
 
 export const TOKEN_HEADER = async () => {
   const token = await store.getState().login.data.token
-  // console.log({ token })
   const header = {
     Accept: 'application/json',
     'Content-Type': 'application/json',
