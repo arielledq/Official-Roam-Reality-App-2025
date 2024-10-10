@@ -47,7 +47,6 @@ const Login: ScreenStackComponent<RootStackParamList, 'Login'> = ({ navigation }
       password: v.password,
     })
       .then(res => {
-        console.log({ res })
         if (res.status == 1) {
           setItemWithListener('userToken', res?.token)
           dispatch(updateUserData(res))

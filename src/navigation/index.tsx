@@ -82,8 +82,8 @@ const Navigation = () => {
     // Define a callback function to handle storage changes
     const handleStorageChange = async ({ key, value }: { key: string; value: any }) => {
       if (key === 'userToken' && !value) {
-        await GoogleSignin.revokeAccess().catch(err => console.log(err))
-        await GoogleSignin.signOut().catch(err => console.log(err))
+        await GoogleSignin.revokeAccess().catch(err => console.error(err))
+        await GoogleSignin.signOut().catch(err => console.error(err))
         await removeItem('fbToken')
         await removeItem('instaToken')
         await removeItem('tiktokToken')

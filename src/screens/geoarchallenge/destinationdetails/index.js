@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import BackgroundWithImage from '../../../components/background'
@@ -30,14 +30,14 @@ import {
 import DestinationFactPopUp from '../destinactionfactpopup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from '../../../components/Icon'
-import {GeolocationContext} from "../../../GeolocationProvider";
+import { GeolocationContext } from '../../../GeolocationProvider'
 
 const SCROLL_AMOUNT = 70
 
 const GeoArChallengeDetails = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const { userLocation } = useContext(GeolocationContext);
+  const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
   const [isLoading, setIsLoading] = useState(false)
@@ -115,7 +115,6 @@ const GeoArChallengeDetails = ({}) => {
       !selectedDestination.geo_location ||
       selectedDestination.geo_location.coordinates.length == 0
     ) {
-      // console.log('setMapBounds')
       setTimeout(setMapBounds, 500)
     } else {
       const fullRegion = {
@@ -134,9 +133,6 @@ const GeoArChallengeDetails = ({}) => {
         fullRegion.latitude = Number(full_latitude_longitude.latitude)
         fullRegion.longitude = Number(full_latitude_longitude.longitude)
       }
-      // console.log('full_bounds', full_bounds)
-      // console.log('full_latitude_longitude', full_latitude_longitude)
-      // console.log('full_latitude_longitude', selectedDestination.border)
       setFullRegion(fullRegion)
     }
     getHiddenStar()
@@ -146,12 +142,10 @@ const GeoArChallengeDetails = ({}) => {
   }, [])
 
   const loadDFacts = async id => {
-
     getDestinationFacts({
       destination_id: id,
     })
       .then(async res => {
-        console.log('res', res)
         for (let i = 0; i < res.data.length; i++) {
           const facts = res.data[i]
           const arrayPoints = []
@@ -167,7 +161,7 @@ const GeoArChallengeDetails = ({}) => {
               }
             }
           }
-          const isInsideSiteArea = isLocationPointInPolygon({latitude, longitude}, arrayPoints)
+          const isInsideSiteArea = isLocationPointInPolygon({ latitude, longitude }, arrayPoints)
           if (isInsideSiteArea) {
             const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
             // if don't want to open popup again and again
@@ -275,7 +269,6 @@ const GeoArChallengeDetails = ({}) => {
   const getFriends = () => {
     getUserFriendList()
       .then(response => {
-        console.log('getFriends', response?.data[0]?.friends)
         if (response) {
           setFriendList(response?.data[0]?.friends || [])
           setFilteredUsers(response?.data[0]?.friends || [])

@@ -79,7 +79,6 @@ const ArChallengeCapture = ({}) => {
     const [cameraRotation, setCameraRotation] = useState([0, 0, 0])
 
     const handleCameraTransformUpdate = cameraTransform => {
-      console.log(' cameraTransform ', JSON.stringify(cameraTransform, null, 2))
       // Get the camera position and rotation
       const { position, rotation } = cameraTransform
       setCameraPosition(position)
@@ -87,7 +86,6 @@ const ArChallengeCapture = ({}) => {
     }
 
     function onInitialized(state, reason) {
-      // console.log("guncelleme", state, reason)
       if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
       } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
         // Handle loss of tracking
@@ -101,12 +99,10 @@ const ArChallengeCapture = ({}) => {
       })
         .fetch('GET', modelFile)
         .progress((received, total) => {
-          // console.log("progress", received / total)
           setProgress(Math.trunc(Number((received / total) * 100)))
         })
         .then(res => {
           // the temp file path
-          // console.log("The file saved to ", res.path())
           unzipModelFile(res.path(), targetPath)
         })
         .catch(error => {
@@ -118,13 +114,10 @@ const ArChallengeCapture = ({}) => {
       const charset = 'UTF-8'
       unzip(sourcePath, targetPath, charset)
         .then(path => {
-          // console.log(`unzip completed at ${path}`)
           RNFS.readDir(path).then(result => {
-            // console.log("GOT RESULT", result)
             const sourcesArray = []
             for (let i = 0; i < result.length; i++) {
               if (result[i].isFile) {
-                // console.log("unzipModelFile", result[i].name)
                 if (result[i].name.includes('.vrx') || result[i].name.includes('.VRX')) {
                   const vrxFile =
                     Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
@@ -173,37 +166,29 @@ const ArChallengeCapture = ({}) => {
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`
       RNFS.exists(sourcePath)
         .then(exists => {
-          // console.log("exists:", exists)
           if (exists) {
-            // console.log("File exists")
             unzipModelFile(sourcePath, targetPath)
           } else {
             downloadModelFile(sourcePath, targetPath)
           }
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
         })
     }
 
     useEffect(() => {
-      // console.log("useEffect:")
-      // console.log(
-      //   "challengeObj.challenge_choice:",
-      //   challengeObj.challenge_choice
-      // )
       if (
         challengeObj.challenge_choice == 'DANCE' &&
         route?.params?.challengeObj?.ar_filters.length == 0
       ) {
         setLoading(true)
-        // console.log("useEffect:", "checkIfModelExist")
+
         checkIfModelExist()
       }
     }, [])
 
     const _onRotate = (rotateState, rotationFactor, source) => {
-      // console.log("_onRotate rotateState", rotateState)
       if (rotateState == 3) {
         const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
         setRotate(rotation)
@@ -213,19 +198,9 @@ const ArChallengeCapture = ({}) => {
       setRotate(rotation)
     }
 
-    const _onDrag = (draggedToPosition, source) => {
-      // console.log(
-      //   "Dragged to: x" +
-      //   draggedToPosition[0] +
-      //   " y:" +
-      //   draggedToPosition[1] +
-      //   " z: " +
-      //   draggedToPosition[2]
-      // );
-    }
+    const _onDrag = (draggedToPosition, source) => {}
 
     const _onPinch = (pinchState, scaleFactor, source) => {
-      // console.log("_onPinch scaleFactor", scaleFactor)
       if (scale[0] * scaleFactor <= challengeObjParameters?.min_pinch_scale) {
         return
       }
@@ -240,14 +215,8 @@ const ArChallengeCapture = ({}) => {
       }
     }
 
-    // console.log("sourcesFiles", sourcesFiles)
-    // console.log("object3dType", object3dType)
-    // console.log("modelPath", modelPath)
     return (
-      <ViroARScene
-        onTrackingUpdated={onInitialized}
-        // onCameraTransformUpdate={handleCameraTransformUpdate}
-      >
+      <ViroARScene onTrackingUpdated={onInitialized}>
         <ViroAmbientLight color='#FFFFFF' intensity={250} />
         <ViroDirectionalLight color='#FFFFFF' direction={[0, -1, 0]} />
         <ViroDirectionalLight color='#FFFFFF' direction={[0, 0, -1]} />
@@ -277,11 +246,6 @@ const ArChallengeCapture = ({}) => {
           />
         )}
 
-        {console.log(
-          ' challengeObjParameters ===>>> ',
-          JSON.stringify(challengeObjParameters, null, 2)
-        )}
-
         {challengeObj.challenge_choice == 'DANCE' && modelPath && object3dType && (
           <Viro3DObject
             key='obj_3d1'
@@ -291,17 +255,10 @@ const ArChallengeCapture = ({}) => {
               challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
               challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
             ]}
-            // position={[
-            //   cameraPosition[0],
-            //   cameraPosition[1],
-            //   cameraPosition[2] - 25 // Adjust the z-offset as needed
-            // ]}
             scale={scale}
             resources={sourcesFiles}
             type={object3dType}
-            onClick={() => {
-              // console.log("Viro3DObject TAP")
-            }}
+            onClick={() => {}}
             opacity={
               challengeObjParameters?.image_opacity
                 ? Number(challengeObjParameters?.image_opacity_value)
@@ -431,7 +388,7 @@ const ArChallengeCapture = ({}) => {
         Sound.MAIN_BUNDLE,
         error => {
           if (error) {
-            // console.log("failed to load the sound", error)
+            console.error('failed to load the sound', error)
           } else {
             cameraSound.play() // have to put the call to play() in the onload callback
           }
@@ -443,7 +400,7 @@ const ArChallengeCapture = ({}) => {
       Sound.setCategory('Playback')
       let cameraSound = new Sound('record.mp3', Sound.MAIN_BUNDLE, error => {
         if (error) {
-          // console.log("failed to load the sound", error)
+          console.error('failed to load the sound', error)
         } else {
           cameraSound.play() // have to put the call to play() in the onload callback
         }
@@ -461,7 +418,7 @@ const ArChallengeCapture = ({}) => {
         },
         () => {
           const onError = error => {
-            // console.log("startRecordVideo: error:", error)
+            console.error('startRecordVideo: error:', error)
           }
           this.playRecordSound()
           this.startTimer()
@@ -473,7 +430,6 @@ const ArChallengeCapture = ({}) => {
     async stopRecordVideo() {
       this.clearTimer()
       const retDict = await this._arNavigator._stopVideoRecording()
-      // console.log("stopRecordVideo:", retDict)
       this.setState({
         capturedVideo: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url,
         capturedImage: null,
@@ -599,9 +555,7 @@ const ArChallengeCapture = ({}) => {
           PERMISSIONS.ANDROID.RECORD_AUDIO,
           PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
           PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-        ]).then(response => {
-          // console.log("PERMISSIONS.ANDROID:: ", response)
-        })
+        ]).then(response => {})
       }
       if (Platform.OS == 'ios') {
         requestMultiple([
@@ -609,9 +563,7 @@ const ArChallengeCapture = ({}) => {
           PERMISSIONS.IOS.MICROPHONE,
           PERMISSIONS.IOS.PHOTO_LIBRARY,
           PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-        ]).then(response => {
-          // console.log("PERMISSIONS.OS", response)
-        })
+        ]).then(response => {})
       }
     }
 
@@ -708,10 +660,7 @@ const ArChallengeCapture = ({}) => {
                 ></ViroARSceneNavigator>
               </BackgroundWithImage>
             }
-            {/* {console.log(
-              " ===========================>> ",
-              JSON.stringify(challengeObj?.ar_filters, null, 2)
-            )} */}
+
             {this.state.capturedImage && challengeObj?.ar_filters.length == 0 && (
               <Image
                 style={styles.imageVideoView}

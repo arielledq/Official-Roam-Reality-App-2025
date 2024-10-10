@@ -3,7 +3,7 @@ import Toast from 'react-native-toast-message'
 
 export const handleError = (res: any) => {
   let message = ''
-  console.log({ res, message: res?.message?.message })
+  console.error({ res, message: res?.message?.message })
   if (res?.message?.message) {
     message = res?.message?.message
   } else {
@@ -13,7 +13,7 @@ export const handleError = (res: any) => {
         ? res.message[key][0]
         : res.message[key]
   }
-  console.log({ message })
+  console.error({ message })
   showMessage(message, 'error')
 }
 
@@ -25,7 +25,7 @@ export const setItem = async (key: string, value: string) => {
   try {
     await AsyncStorage.setItem(key, value)
   } catch (e) {
-    console.log('error', e)
+    console.error('error', e)
   }
 }
 
@@ -36,7 +36,7 @@ export const getItem = async (key: string) => {
       return value
     }
   } catch (e) {
-    console.log('error', e)
+    console.error('error', e)
   }
 }
 
@@ -44,7 +44,7 @@ export const removeItem = async (key: string) => {
   try {
     await AsyncStorage.removeItem(key)
   } catch (e) {
-    console.log('error', e)
+    console.error('error', e)
   }
 }
 
@@ -141,18 +141,18 @@ export const truncateText = (str: string, maxLength: number) => {
 }
 
 export function isPointInPolygon(point, polygon) {
-  const [lat, lng] = point;
-  const polygonInner= polygon[0];
-  let isInside = false;
+  const [lat, lng] = point
+  const polygonInner = polygon[0]
+  let isInside = false
 
   for (let i = 0, j = polygonInner.length - 1; i < polygonInner.length; j = i++) {
-    const [lat1, lng1] = polygonInner[i];
-    const [lat2, lng2] = polygonInner[j];
+    const [lat1, lng1] = polygonInner[i]
+    const [lat2, lng2] = polygonInner[j]
 
-    const intersect = ((lng1 > lng) !== (lng2 > lng)) &&
-      (lat < (lat2 - lat1) * (lng - lng1) / (lng2 - lng1) + lat1);
-    if (intersect) isInside = !isInside;
+    const intersect =
+      lng1 > lng !== lng2 > lng && lat < ((lat2 - lat1) * (lng - lng1)) / (lng2 - lng1) + lat1
+    if (intersect) isInside = !isInside
   }
 
-  return isInside;
+  return isInside
 }

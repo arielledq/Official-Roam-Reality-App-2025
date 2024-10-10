@@ -16,7 +16,6 @@ export enum FontFamily {
 // Basic fonts size to use in Application
 const fontScale = PixelRatio.getFontScale()
 const getFontSize = (size: number) => {
-  // console.log(`${size} >>> ${size / fontScale} (fontScale: ${fontScale}))`);
   return moderateScale(size * 0.9)
   // return size / fontScale;
 }
