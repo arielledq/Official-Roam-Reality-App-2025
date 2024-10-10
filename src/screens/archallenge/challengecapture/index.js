@@ -488,7 +488,6 @@ const ArChallengeCapture = ({}) => {
       })
       this.playCameraSound()
       this._arNavigator._takeScreenshot(uuid.v4(), false).then(retDict => {
-        // console.log("captureImage:", retDict)
         this.setState({
           capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url,
         })
@@ -690,7 +689,7 @@ const ArChallengeCapture = ({}) => {
               {
                 marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0,
               },
-              challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 },
+              { flex: 1 },
             ]}
           >
             {
