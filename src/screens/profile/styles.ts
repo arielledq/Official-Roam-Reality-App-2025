@@ -28,8 +28,8 @@ const useStyles = makeStyles(theme => ({
   },
   heading: {
     ...fontGroup.ns800,
-    fontSize: FontSizes.S22,
-    fontWeight: 800,
+    fontSize: FontSizes.S24,
+    fontWeight: '800',
     lineHeight: FontLineHeights.LH30,
     color: theme.colors.white,
     flex: 1,

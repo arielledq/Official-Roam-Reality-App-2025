@@ -211,7 +211,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
     <ViewShot
       ref={viewShotRef}
       style={styles.mainContainer}
-      options={{ fileName: 'filtered_share', format: 'jpg', quality: 0.9 }}
+      options={{ fileName: 'filtered_share', format: 'png', quality: 0.9 }}
     >
       <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>

@@ -92,7 +92,7 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
         </View>
 
         {/* Media Slider */}
-        <View style={{ height: 300, width: width - 40 }}>
+        <View style={{ height: (width - 40) / (100 / 143), width: width - 40 }}>
           <FlatList
             ref={flatListRef}
             data={isImageTab ? examples?.images : examples?.videos}
@@ -179,7 +179,7 @@ const styles = StyleSheet.create({
   },
   media: {
     width: width - 40,
-    height: width * 0.75,
+    height: (width - 40) / (100 / 143),
     borderRadius: 16,
   },
   navButtons: {
