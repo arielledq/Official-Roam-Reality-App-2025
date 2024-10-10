@@ -270,18 +270,20 @@ const ArPinChallengeShare = ({}) => {
         backgroundColor='transparent'
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
-        <View style={styles.imageContainer}>
+        <AppText numberOfLines={3} style={[styles.headerText]}>
+          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
+        </AppText>
+        <View style={styles.detailContainer}>
           <Image
-            resizeMode={'contain'}
+            resizeMode={'stretch'}
             source={{ uri: captureData }}
             style={{
-              width: '100%',
-              height: imageHeight,
-              marginTop: Platform.OS == 'ios' ? -200 : 0,
+              backgroundColor: 'transparent',
+              width: '70%',
+              height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
+              marginTop: 0,
             }}
           />
-        </View>
-        <View style={styles.detailContainer}>
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage
