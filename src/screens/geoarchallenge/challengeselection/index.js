@@ -95,10 +95,8 @@ const ChallengeSelection = ({ route }) => {
     })
       .then(res => {
         if (res.errorStatus === 403) {
-          console.log('checkIfPinCheckIsDone', 'true')
           setIsPinCheckIsDone(true)
         } else {
-          console.log('checkIfPinCheckIsDone', 'false')
           setIsPinCheckIsDone(false)
         }
       })
@@ -120,7 +118,6 @@ const ChallengeSelection = ({ route }) => {
       geo_site: selectedGeoSite.id,
     })
       .then(res => {
-        console.log('getStarsCollectCount:', res)
         if (res.status == 1) {
           setCollectedStars(res.count)
         }

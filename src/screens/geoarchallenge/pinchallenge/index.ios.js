@@ -87,7 +87,6 @@ const PinChallenge = ({}) => {
     const [progress, setProgress] = useState([0, 0, 0])
 
     function onInitialized(state, reason) {
-      console.log('guncelleme', state, reason)
       if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
       } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
         // Handle loss of tracking
@@ -105,12 +104,11 @@ const PinChallenge = ({}) => {
       })
         .fetch('GET', modelFile)
         .progress((received, total) => {
-          console.log('progress', received / total)
           setProgress(Math.trunc(Number((received / total) * 100)))
         })
         .then(res => {
           // the temp file path
-          console.log('The file saved to ', res.path())
+
           unzipModelFile(res.path(), targetPath)
         })
         .catch(error => {
@@ -122,13 +120,10 @@ const PinChallenge = ({}) => {
       const charset = 'UTF-8'
       unzip(sourcePath, targetPath, charset)
         .then(path => {
-          console.log(`unzip completed at ${path}`)
           RNFS.readDir(path).then(result => {
-            console.log('GOT RESULT', result)
             const sourcesArray = []
             for (let i = 0; i < result.length; i++) {
               if (result[i].isFile) {
-                console.log('unzipModelFile', result[i].name)
                 if (result[i].name.includes('.vrx') || result[i].name.includes('.VRX')) {
                   const vrxFile =
                     Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
@@ -177,21 +172,18 @@ const PinChallenge = ({}) => {
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`
       RNFS.exists(sourcePath)
         .then(exists => {
-          console.log('exists:', exists)
           if (exists) {
-            console.log('File exists')
             unzipModelFile(sourcePath, targetPath)
           } else {
             downloadModelFile(sourcePath, targetPath)
           }
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
         })
     }
 
     const _onRotate = (rotateState, rotationFactor, source) => {
-      console.log('_onRotate rotateState', rotateState)
       if (rotateState == 3) {
         const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
         setRotate(rotation)
@@ -204,7 +196,6 @@ const PinChallenge = ({}) => {
     const _onDrag = (draggedToPosition, source) => {}
 
     const _onPinch = (pinchState, scaleFactor, source) => {
-      console.log('_onPinch scaleFactor', scaleFactor)
       if (scale[0] * scaleFactor <= challengeObjParameters?.min_pinch_scale) {
         return
       }
@@ -266,9 +257,7 @@ const PinChallenge = ({}) => {
                 challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
               ]}
               scale={scale}
-              onClick={() => {
-                console.log('TAP Viro3DObject')
-              }}
+              onClick={() => {}}
               type={object3dType}
               resources={sourcesFiles}
               opacity={
@@ -366,18 +355,14 @@ const PinChallenge = ({}) => {
           PERMISSIONS.ANDROID.RECORD_AUDIO,
           PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
           PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-        ]).then(response => {
-          console.log('PERMISSIONS.ANDROID:: ', response)
-        })
+        ]).then(response => {})
       } else if (Platform.OS === 'ios') {
         requestMultiple([
           PERMISSIONS.IOS.CAMERA,
           PERMISSIONS.IOS.MICROPHONE,
           PERMISSIONS.IOS.PHOTO_LIBRARY,
           PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-        ]).then(response => {
-          console.log('PERMISSIONS.OS', response)
-        })
+        ]).then(response => {})
       }
     }
 
@@ -385,7 +370,7 @@ const PinChallenge = ({}) => {
       Sound.setCategory('Playback')
       let proximitySound = new Sound('record.mp3', Sound.MAIN_BUNDLE, error => {
         if (error) {
-          console.log('failed to load the sound', error)
+          console.error('failed to load the sound', error)
         } else {
           proximitySound.play()
         }
@@ -399,7 +384,7 @@ const PinChallenge = ({}) => {
         Sound.MAIN_BUNDLE,
         error => {
           if (error) {
-            console.log('failed to load the sound', error)
+            console.error('failed to load the sound', error)
           } else {
             cameraSound.play()
           }
@@ -411,7 +396,6 @@ const PinChallenge = ({}) => {
       if (isMeInsideInSite) {
         playCameraSound()
         arNavigatorRef.current._takeScreenshot(uuid.v4(), false).then(retDict => {
-          console.log('captureImage:', retDict)
           setCapturedImage(Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url)
         })
       } else {
@@ -460,7 +444,7 @@ const PinChallenge = ({}) => {
           }
         },
         error => {
-          console.log(error)
+          console.error(error)
         },
         {
           accuracy: { android: 'high', ios: 'best' },
@@ -485,7 +469,7 @@ const PinChallenge = ({}) => {
           if (!isMeInsideInSite) findNearPoint(position)
         },
         error => {
-          console.log(error)
+          console.error(error)
         },
         {
           accuracy: { android: 'high', ios: 'best' },
@@ -510,16 +494,12 @@ const PinChallenge = ({}) => {
     useEffect(() => {
       if (distanceInFeet <= 200 && distanceInFeet > 100) {
         setBlinkTimer(3000)
-        console.log('distanceInFeet <= 200 && distanceInFeet > 100')
       } else if (distanceInFeet <= 100 && distanceInFeet >= 50) {
         setBlinkTimer(2000)
-        console.log('distanceInFeet <= 100 && distanceInFeet >= 50')
       } else if (distanceInFeet < 50 && distanceInFeet >= 25) {
         setBlinkTimer(1000)
-        console.log('distanceInFeet < 50 && distanceInFeet >= 25')
       } else if (distanceInFeet < 10) {
         setBlinkTimer(500)
-        console.log('distanceInFeet < 10')
       } else {
         setBlinkTimer(0)
       }

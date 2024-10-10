@@ -1,11 +1,11 @@
 import React, { createContext, useEffect, useState } from 'react'
-import {useDispatch, useSelector} from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { hasLocationPermission } from './util/LocationLib'
 import Geolocation from 'react-native-geolocation-service'
-import {getDestinationFactsAll, updateUserLocation} from './network'
-import {handleError, isPointInPolygon, showMessage} from "./util/helpers";
-import DestinationFactModal from "./screens/DestinationFactModal/DestinationFactModal";
-import {updateDestinationVisited} from "./redux/AR/reducer";
+import { getDestinationFactsAll, updateUserLocation } from './network'
+import { handleError, isPointInPolygon, showMessage } from './util/helpers'
+import DestinationFactModal from './screens/DestinationFactModal/DestinationFactModal'
+import { updateDestinationVisited } from './redux/AR/reducer'
 
 export const GeolocationContext = createContext()
 
@@ -31,7 +31,7 @@ export const GeolocationProvider = ({ children }) => {
         setUserLocation({ latitude, longitude })
       },
       error => {
-        console.log(error)
+        console.error(error)
       },
       {
         accuracy: {
@@ -49,15 +49,13 @@ export const GeolocationProvider = ({ children }) => {
     )
   }
 
-  const getDestinationFacts =  () => {
-    getDestinationFactsAll()
-      .then(res => {
-        if (res.status === 1) {
-          setDestinationFactsAll(res.data)
-        }
-      })
+  const getDestinationFacts = () => {
+    getDestinationFactsAll().then(res => {
+      if (res.status === 1) {
+        setDestinationFactsAll(res.data)
+      }
+    })
   }
-
 
   useEffect(() => {
     if (userToken) {
@@ -72,18 +70,16 @@ export const GeolocationProvider = ({ children }) => {
 
   useEffect(() => {
     if (userLocation) {
-      // console.log('GeolocationProvider userLocation', userLocation)
       updateUserLocation(userLocation)
-        .then(res => {
-          // console.log('GeolocationProvider updateUserLocation', res)
-        })
-        .catch(error => {
-          // console.log('GeolocationProvider updateUserLocation error', error)
-        })
+        .then(res => {})
+        .catch(error => {})
 
       if (!openDestinationFactModal) {
         for (let i = 0; i < destinationFactsAll.length; i++) {
-          const isInside = isPointInPolygon([userLocation.longitude, userLocation.latitude], destinationFactsAll[i].border.coordinates)
+          const isInside = isPointInPolygon(
+            [userLocation.longitude, userLocation.latitude],
+            destinationFactsAll[i].border.coordinates
+          )
           if (isInside && !userVisitedDestinations.includes(destinationFactsAll[i].id)) {
             dispatch(updateDestinationVisited(destinationFactsAll[i].id))
             setOpenDestinationFactModal(true)
@@ -92,8 +88,6 @@ export const GeolocationProvider = ({ children }) => {
           }
         }
       }
-
-
     }
   }, [userLocation])
 
