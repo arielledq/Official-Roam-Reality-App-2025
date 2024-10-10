@@ -325,7 +325,7 @@ const UniqueArChallengeShare = ({}) => {
               style={{
                 backgroundColor: 'transparent',
                 width: '70%',
-                height: imageHeight * 0.7,
+                height: imageHeight * 0.8,
                 marginTop: Platform.OS == 'ios' ? -200 : 0,
               }}
             />

@@ -334,7 +334,7 @@ const ArChallengeShare = ({}) => {
               style={{
                 backgroundColor: 'transparent',
                 width: '70%',
-                height: imageHeight * 0.7,
+                height: imageHeight * 0.8,
                 marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
               }}
             />
