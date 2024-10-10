@@ -273,19 +273,17 @@ const ArPinChallengeShare = ({}) => {
         <AppText numberOfLines={3} style={[styles.headerText]}>
           Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
         </AppText>
-        <View style={styles.imageContainer}>
+        <View style={styles.detailContainer}>
           <Image
             resizeMode={'contain'}
             source={{ uri: captureData }}
             style={{
               backgroundColor: 'transparent',
               width: '70%',
-              height: imageHeight * 0.7,
+              height: imageHeight * 0.8,
               marginTop: Platform.OS == 'ios' ? -200 : 0,
             }}
           />
-        </View>
-        <View style={styles.detailContainer}>
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage
