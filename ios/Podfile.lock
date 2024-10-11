@@ -522,6 +522,10 @@ PODS:
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
     - React-RCTImage
+  - RNSentry (5.33.2):
+    - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+    - Sentry/HybridSDK (= 8.36.0)
   - RNShare (10.0.2):
     - React-Core
   - RNSound (0.11.2):
@@ -544,6 +548,7 @@ PODS:
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
+  - Sentry/HybridSDK (8.36.0)
   - SSZipArchive (2.4.3)
   - TikTokOpenSDK (5.0.15)
   - TOCropViewController (2.6.1)
@@ -622,6 +627,7 @@ DEPENDENCIES:
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNShare (from `../node_modules/react-native-share`)
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -650,6 +656,7 @@ SPEC REPOS:
     - OneSignalXCFramework
     - SDWebImage
     - SDWebImageWebPCoder
+    - Sentry
     - SSZipArchive
     - TikTokOpenSDK
     - TOCropViewController
@@ -787,6 +794,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  RNSentry:
+    :path: "../node_modules/@sentry/react-native"
   RNShare:
     :path: "../node_modules/react-native-share"
   RNSound:
@@ -884,12 +893,14 @@ SPEC CHECKSUMS:
   RNPermissions: 7938b2a48a952a4316cfdc86df9a54485b930173
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: 0bd9eec783bed1032e02a4db9976dae1664a5c7b
+  RNSentry: 4b27970d8ec02cb1d78ad26d62105c5ce8b17577
   RNShare: 859ff710211285676b0bcedd156c12437ea1d564
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
   RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a
   RNZipArchive: ef9451b849c45a29509bf44e65b788829ab07801
   SDWebImage: 9c36e66c8ce4620b41a7407698dda44211a96764
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
+  Sentry: f8374b5415bc38dfb5645941b3ae31230fbeae57
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   TikTokOpenSDK: dc1199ba9c6d7815aee0eaca6ec80ad13f7d9c1f
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
