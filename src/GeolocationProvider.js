@@ -39,13 +39,13 @@ export const GeolocationProvider = ({ children }) => {
           ios: 'best',
         },
         enableHighAccuracy: true,
-        distanceFilter: 0,
+        distanceFilter: 1,
         interval: 5000,
         fastestInterval: 2000,
         forceRequestLocation: true,
         forceLocationManager: true,
         showLocationDialog: true,
-        // useSignificantChanges: true,
+        useSignificantChanges: true,
       }
     )
 
