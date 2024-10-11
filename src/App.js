@@ -13,14 +13,14 @@ import OneSignal from "react-native-onesignal"
 import { NotificationProvider } from "./NotificationProvider"
 import Config from "./config"
 import {GeolocationProvider} from "./GeolocationProvider";
-import * as Sentry from '@sentry/react-native';
+// import * as Sentry from '@sentry/react-native';
 
 
-if(!__DEV__) {
-  Sentry.init({
-    dsn: Config.SENTRY_DSN,
-  });
-}
+// if(!__DEV__) {
+//   Sentry.init({
+//     dsn: Config.SENTRY_DSN,
+//   });
+// }
 
 Geocoder.init(Config.GEOCODER_API_KEY)
 

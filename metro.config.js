@@ -9,11 +9,7 @@ const path = require('path')
 
 const { getDefaultConfig } = require('metro-config')
 
-const {
-  withSentryConfig
-} = require("@sentry/react-native/metro");
-
-module.exports = withSentryConfig((async () => {
+module.exports = (async () => {
   const {
     resolver: { sourceExts, assetExts }
   } = await getDefaultConfig()
@@ -34,4 +30,4 @@ module.exports = withSentryConfig((async () => {
     },
     resetCache: true
   }
-})())
+})()
