@@ -25,7 +25,7 @@ export const GeolocationProvider = ({ children }) => {
       return
     }
 
-    Geolocation.getCurrentPosition(
+    Geolocation.watchPosition(
       position => {
         const { latitude, longitude } = position.coords
         setUserLocation({ latitude, longitude })
@@ -39,14 +39,16 @@ export const GeolocationProvider = ({ children }) => {
           ios: 'best',
         },
         enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
         distanceFilter: 0,
+        interval: 5000,
+        fastestInterval: 2000,
         forceRequestLocation: true,
         forceLocationManager: true,
         showLocationDialog: true,
+        // useSignificantChanges: true,
       }
     )
+
   }
 
   const getDestinationFacts = () => {
@@ -61,9 +63,10 @@ export const GeolocationProvider = ({ children }) => {
     if (userToken) {
       getDestinationFacts()
       setTimeout(() => {
-        setInterval(() => {
-          getLocation()
-        }, 10000)
+        // setInterval(() => {
+        //   getLocation()
+        // }, 10000)
+        getLocation()
       }, 1000)
     }
   }, [])
