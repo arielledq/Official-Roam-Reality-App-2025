@@ -15,14 +15,14 @@ import Config from "./config"
 import {GeolocationProvider} from "./GeolocationProvider";
 import * as Sentry from '@sentry/react-native';
 
-Sentry.init({
-  dsn: 'https://8a0ac5dac07d4ed0b64bd75ab3c5a765@sentry.innovatica.com.py//58',
 
-  // uncomment the line below to enable Spotlight (https://spotlightjs.com)
-  // enableSpotlight: __DEV__,
-});
+if(!__DEV__) {
+  Sentry.init({
+    dsn: Config.SENTRY_DSN,
+  });
+}
 
-Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA")
+Geocoder.init(Config.GEOCODER_API_KEY)
 
 OneSignal.setAppId(Config.ONE_SIGNAL_APP_ID)
 
