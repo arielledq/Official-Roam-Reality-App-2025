@@ -63,9 +63,6 @@ export const GeolocationProvider = ({ children }) => {
     if (userToken) {
       getDestinationFacts()
       setTimeout(() => {
-        // setInterval(() => {
-        //   getLocation()
-        // }, 10000)
         getLocation()
       }, 1000)
     }
