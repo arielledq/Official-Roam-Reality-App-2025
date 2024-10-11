@@ -36,7 +36,7 @@
     android:usesCleartextTraffic="true"
     android:allowBackup="false" android:theme="@style/AppTheme">
 
-    <meta-data android:name="com.google.ar.core" android:value="optional" />
+<!--    <meta-data android:name="com.google.ar.core" android:value="optional" />-->
 
     <activity android:name=".MainActivity"
       android:label="@string/original_app_name"
@@ -63,6 +63,11 @@
         <data android:scheme="@string/fb_login_protocol_scheme" />
       </intent-filter>
     </activity>
+
+      <meta-data
+              tools:replace="android:value"
+              android:name="com.google.ar.core.min_apk_version"
+              android:value="24.0.35" />
 
     <meta-data
       android:name="com.facebook.sdk.ApplicationName"

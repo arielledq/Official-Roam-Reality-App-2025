@@ -10,21 +10,21 @@ import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg"
 import StarIcon from "../../../assets/geoar/star_icon.svg"
 import TrophyIcon from "../../../assets/geoar/trophy_icon.svg"
 import LineIcon from '../../../assets/ar/line.png';
-import {
-  ViroARScene,
-  ViroMaterials,
-  ViroTrackingStateConstants,
-  ViroARSceneNavigator,
-  Viro3DObject,
-  ViroImage,
-  ViroAmbientLight,
-  ViroDirectionalLight,
-  ViroSpotLight,
-  ViroText,
-  ViroNode,
-  ViroCamera,
-  ViroARCamera
-} from '@reactvision/react-viro';
+// import {
+//   ViroARScene,
+//   ViroMaterials,
+//   ViroTrackingStateConstants,
+//   ViroARSceneNavigator,
+//   Viro3DObject,
+//   ViroImage,
+//   ViroAmbientLight,
+//   ViroDirectionalLight,
+//   ViroSpotLight,
+//   ViroText,
+//   ViroNode,
+//   ViroCamera,
+//   ViroARCamera
+// } from '@reactvision/react-viro';
 import RNFetchBlob from 'rn-fetch-blob';
 const Sound = require('react-native-sound');
 const RNFS = require('react-native-fs');
@@ -56,7 +56,7 @@ const StarChallenge = ({
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
   const settings = useSelector(state => state.ar?.arSettings)
   const navigation = useNavigation()
-
+/*
   const ARScreen = (props) => {
     const funFactCallback = props?.arSceneNavigator.viroAppProps.funFactCallback
     const [allStarsObj, setAllStarsObj] = useState(props?.arSceneNavigator.viroAppProps.allStarsObj)
@@ -769,7 +769,8 @@ const StarChallenge = ({
 
   return (
     <ViroARNavigator />
-  )
+  )*/
+  return null
 }
 
 export default StarChallenge

@@ -18,18 +18,18 @@ import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg"
 import PinIcon from "../../../assets/geoar/pin_locationicon.svg"
 import TrophyIcon from "../../../assets/geoar/trophy_icon.svg"
 import CaptureIcon from "../../../assets/geoar/capture_icon.svg"
-import {
-  ViroARScene,
-  ViroMaterials,
-  ViroTrackingStateConstants,
-  ViroARSceneNavigator,
-  Viro3DObject,
-  ViroImage,
-  ViroAmbientLight,
-  ViroDirectionalLight,
-  ViroSpotLight,
-  ViroText
-} from "@reactvision/react-viro"
+// import {
+//   ViroARScene,
+//   ViroMaterials,
+//   ViroTrackingStateConstants,
+//   ViroARSceneNavigator,
+//   Viro3DObject,
+//   ViroImage,
+//   ViroAmbientLight,
+//   ViroDirectionalLight,
+//   ViroSpotLight,
+//   ViroText
+// } from "@reactvision/react-viro"
 const RNFS = require("react-native-fs")
 import RNFetchBlob from "rn-fetch-blob"
 const Sound = require("react-native-sound")
@@ -64,7 +64,7 @@ const PinChallenge = ({}) => {
   const challengeObjParameters = challengeObj?.parameters
   const modelFile = challengeObj.model_file
   const settings = useSelector(state => state.ar?.arSettings)
-
+/*
   const ARScreen = props => {
     const [object3dType, setObject3dType] = useState(null)
     const [isMeInsideInSite, setIsMeInsideInSite] = useState(
@@ -711,7 +711,7 @@ const PinChallenge = ({}) => {
                       }}
                       style={_styles.f1}
                     ></ViroARSceneNavigator>
-                    {/* transparancy off */}
+                    {/* transparancy off * /}
                     {this.state.capturedImage && (
                       <View
                         style={[_styles.f1, { backgroundColor: "#000" }]}
@@ -860,7 +860,7 @@ const PinChallenge = ({}) => {
     }
   })
 
-  return <ViroARNavigator />
+  return <ViroARNavigator />*/
 }
 
 export default PinChallenge

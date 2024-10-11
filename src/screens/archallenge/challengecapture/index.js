@@ -3,18 +3,18 @@ import React, { useEffect, useRef, useState } from 'react'
 import { TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView } from 'react-native'
 import { useNavigation, useRoute } from '@react-navigation/native'
 import AppHeader from '../../../components/header'
-import {
-  ViroARScene,
-  ViroMaterials,
-  ViroTrackingStateConstants,
-  ViroARSceneNavigator,
-  Viro3DObject,
-  ViroImage,
-  ViroAmbientLight,
-  ViroDirectionalLight,
-  ViroSpotLight,
-  ViroText, ViroBox,
-} from "@reactvision/react-viro";
+// import {
+//   ViroARScene,
+//   ViroMaterials,
+//   ViroTrackingStateConstants,
+//   ViroARSceneNavigator,
+//   Viro3DObject,
+//   ViroImage,
+//   ViroAmbientLight,
+//   ViroDirectionalLight,
+//   ViroSpotLight,
+//   ViroText, ViroBox,
+// } from "@reactvision/react-viro";
 import Video from 'react-native-video'
 import uuid from 'react-native-uuid'
 import { FontSizes } from '../../../util/FontUtils'
@@ -61,7 +61,7 @@ const ArChallengeCapture = ({}) => {
       })
     }
   }
-
+/*
   const ARScreen = () => {
     const [object3dType, setObject3dType] = useState(null)
     const [modelPath, setModelPath] = useState(null)
@@ -713,7 +713,7 @@ const ArChallengeCapture = ({}) => {
             {/* {console.log(
               " ===========================>> ",
               JSON.stringify(challengeObj?.ar_filters, null, 2)
-            )} */}
+            )} * /}
             {this.state.capturedImage && challengeObj?.ar_filters.length == 0 && (
               <Image
                 style={styles.imageVideoView}
@@ -850,7 +850,8 @@ const ArChallengeCapture = ({}) => {
     },
   })
 
-  return <ViroARNavigator />
+  return <ViroARNavigator />*/
+    return null
 }
 
 export default ArChallengeCapture

@@ -11,18 +11,18 @@ import {
 } from "react-native"
 import { useNavigation, useRoute } from "@react-navigation/native"
 import AppHeader from "../../../components/header"
-import {
-  ViroARScene,
-  ViroMaterials,
-  ViroTrackingStateConstants,
-  ViroARSceneNavigator,
-  Viro3DObject,
-  ViroImage,
-  ViroAmbientLight,
-  ViroDirectionalLight,
-  ViroSpotLight,
-  ViroText
-} from "@reactvision/react-viro"
+// import {
+//   ViroARScene,
+//   ViroMaterials,
+//   ViroTrackingStateConstants,
+//   ViroARSceneNavigator,
+//   Viro3DObject,
+//   ViroImage,
+//   ViroAmbientLight,
+//   ViroDirectionalLight,
+//   ViroSpotLight,
+//   ViroText
+// } from "@reactvision/react-viro"
 import Video from "react-native-video"
 import uuid from "react-native-uuid"
 import { FontSizes } from "../../../util/FontUtils"
@@ -58,7 +58,7 @@ const UniqueArChallengeCapture = ({}) => {
       captureData
     })
   }
-
+/*
   const ARScreen = () => {
     const [object3dType, setObject3dType] = useState(null)
     const [modelPath, setModelPath] = useState(null)
@@ -853,7 +853,9 @@ const UniqueArChallengeCapture = ({}) => {
     }
   })
 
-  return <ViroARNavigator />
+  return <ViroARNavigator />*/
+
+  return null
 }
 
 export default UniqueArChallengeCapture

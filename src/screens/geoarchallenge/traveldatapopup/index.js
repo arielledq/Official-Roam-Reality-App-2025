@@ -1,12 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet } from "react-native";
 import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils"
-import {
-  ViroImage,
-  ViroNode,
-  ViroText,
-  ViroFlexView
-} from '@reactvision/react-viro';
+// import {
+//   ViroImage,
+//   ViroNode,
+//   ViroText,
+//   ViroFlexView
+// } from '@reactvision/react-viro';
 import CompassHeading from 'react-native-compass-heading';
 import { getLocationDistance, transformGpsToAR } from "../../../util/LocationLib";
 import { getNearbyPlaces } from "../../../util/PlacesAPI";

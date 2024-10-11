@@ -1,204 +1,301 @@
-import React from 'react';
-import { StyleSheet, View } from 'react-native';
-import {
-  ViroARSceneNavigator,
-  ViroARScene,
-  ViroMaterials,
-  ViroBox,
-  ViroAmbientLight,
-  ViroDirectionalLight,
-  ViroTrackingStateConstants,
-  ViroSpotLight, ViroQuad, ViroSphere, ViroAnimatedImage, ViroOmniLight, ViroSkyBox, ViroScene, ViroSceneNavigator,
-} from "@reactvision/react-viro";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { StyleSheet, View, Button, TextInput, ImageBackground } from "react-native";
+import UnityView from "@azesmway/react-native-unity";
+import { unzip } from 'react-native-zip-archive'
+import RNFetchBlob from "rn-fetch-blob";
+import { useFocusEffect, useRoute } from "@react-navigation/native";
+import { getARChallenges } from "../../network";
+import { handleError } from "../../util/helpers";
+const { config, fs } = RNFetchBlob
 
-const RallyScene = () => {
-  function onInitialized(state, reason) {
-    console.log('Tracking status:', state, reason);
-    if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      // Tracking normal
-    } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-      // Handle loss of tracking
-    }
+
+const Rally = ({}) => {
+  const RNFS = require('react-native-fs')
+  const [threshold, setThreshold] = useState('');
+  const [intensity, setIntensity] = useState('');
+  const [object3dType, setObject3dType] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [modelPath, setModelPath] = useState(null)
+  const [sourcesFiles, setSourcesFiles] = useState([])
+  const unityRef = useRef(null);
+  const route = useRoute()
+  const [challengeObj, setChallengeObj] = useState(null)
+  const [progress, setProgress] = useState([0, 0, 0])
+  const [sponsoredDataAll, setSponsoredDataAll] = useState([])
+  const [sponsoredData, setSponsoredData] = useState([])
+  let [modelOBJ, setModelOBJ] = useState(null);        // Para guardar el archivo .obj
+  let [modelResource, setModelResource] = useState(null); // Para guardar el archivo .mtl
+  let [modelTextures, setModelTextures] = useState([]);   // Para guardar las texturas (.jpg, .png)
+  let [foldefile, setFoldefile] = useState([]);
+  // const challengeObj = route?.params?.challengeObj
+  const modelFile = challengeObj?.model_file
+
+  const ARSposored = () => {
+    getARChallenges()
+      .then(res => {
+        if (res.status == 1) {
+          // console.log(" obj ===>>>> ", JSON.stringify(res.data.filter(x => x.challenge_requirement == 'PHOTO'), null, 2))
+
+          // setSponsoredDataAll(res.data)
+          const obj = res.data.filter(x => x.id == 289)
+          setSponsoredData(obj)
+          setChallengeObj(obj[0])
+        } else {
+          res.message.message = 'Error in loading Challenges.'
+          handleError(res)
+        }
+      })
+  }
+  // useEffect(() => {
+  //   if (sponsoredData.length > 0) {
+  //     setChallengeObj(sponsoredData[0]);  // Obtener todo el challengeObj
+  //   }
+  // }, [sponsoredData]);
+  //
+  // useEffect(() => {
+  //   if (challengeObj && challengeObj.model_file) {
+  //     checkIfModelExist();  // Verificar model_file una vez que challengeObj esté listo
+  //   }
+  // }, [challengeObj]);
+  //
+  // useEffect(()=> {
+  //   if (sponsoredData.length > 0) {
+  //     setChallengeObj(sponsoredData[0])
+  //   }
+  //    },[sponsoredData])
+
+
+  const downloadModelFile = (sourcePath, targetPath) => {
+    config({
+      fileCache: true,
+      path: sourcePath,
+    })
+      .fetch('GET', modelFile)
+      .progress((received, total) => {
+        // console.log("progress", received / total)
+        setProgress(Math.trunc(Number((received / total) * 100)))
+      })
+      .then(res => {
+        // the temp file path
+        // console.log("The file saved to ", res.path())
+        unzipModelFile(res.path(), targetPath)
+      })
+      .catch(error => {
+        console.error(error)
+      })
   }
 
+  const unzipModelFile = (sourcePath, targetPath) => {
+    const charset = 'UTF-8';
+    unzip(sourcePath, targetPath, charset)
+      .then(path => {
+        RNFS.readDir(path).then(result => {
+          const sourcesArray = [];
+          const texturesArray = []; // Array para almacenar texturas
+          let objFile = null;
+          let mtlFile = null;
+
+          for (let i = 0; i < result.length; i++) {
+            if (result[i].isFile) {
+              const filePath = Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path;
+
+              if (result[i].name.includes('.vrx') || result[i].name.includes('.VRX')) {
+                setObject3dType('VRX');
+                setModelPath(filePath);
+              } else if (result[i].name.includes('.obj') || result[i].name.includes('.OBJ')) {
+                objFile = filePath; // Guardamos el archivo .obj
+              } else if (result[i].name.includes('.mtl') || result[i].name.includes('.MTL')) {
+                mtlFile = filePath; // Guardamos el archivo .mtl
+              } else if (result[i].name.includes('.jpg') || result[i].name.includes('.JPG') ||
+                result[i].name.includes('.png') || result[i].name.includes('.PNG')) {
+                texturesArray.push(filePath); // Guardamos las texturas en un array
+              } else if (result[i].name.includes('.glb') || result[i].name.includes('.GLB')) {
+                setObject3dType('GLB');
+                setModelPath(filePath);
+              } else if (result[i].name.includes('.gltf') || result[i].name.includes('.GLTF')) {
+                setObject3dType('GLTF');
+                setModelPath(filePath);
+              } else {
+                sourcesArray.push({ uri: filePath });
+              }
+            }
+          }
+
+          // Actualizamos los estados con los archivos clasificados
+          if (objFile) setModelOBJ(objFile);
+          if (mtlFile) setModelResource(mtlFile);
+          if (texturesArray.length > 0) setModelTextures(texturesArray);
+          if (sourcesArray.length > 0) setSourcesFiles(sourcesArray);
+
+          setFoldefile(result);
+          setLoading(false);
+
+          console.log('Contenido descomprimido:', result);
+          console.log('OBJ file:', objFile);
+          console.log('MTL file:', mtlFile);
+          console.log('Textures:', texturesArray);
+        });
+      })
+      .catch(err => {
+        console.error('Error descomprimiendo el archivo:', err);
+      });
+  };
+
+  // useEffect(() => {
+  //   if (sponsoredData.length > 0) {
+  //     setChallengeObj(sponsoredData[0]);  // Obtener todo ael challengeObj
+  //   }
+  //
+  // }, [sponsoredData]);
+  // console.log('SponsoredDATa', JSON.stringify(sponsoredData, null, 2));
+  useEffect(() => {
+    if (challengeObj && challengeObj.model_file) {
+      // Aquí solo ejecutamos si challengeObj no es null
+      checkIfModelExist();
+    }
+  }, [challengeObj]);
+console.log(challengeObj)
+  const checkIfModelExist = () => {
+    if (challengeObj && challengeObj.model_file) {
+      const modelFile = challengeObj.model_file;
+      let filename = modelFile.split('/').pop();
+      filename = filename.split('?')[0];
+      const withoutExtFilename = filename.split('.')[0];
+      const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+      const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+
+      RNFS.exists(sourcePath)
+        .then(exists => {
+          if (exists) {
+            unzipModelFile(sourcePath, targetPath);
+          } else {
+            downloadModelFile(sourcePath, targetPath);
+          }
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    }
+  };
+
+  // useEffect(() => {
+  //   if (challengeObj && challengeObj.model_file) {
+  //     checkIfModelExist();
+  //   }
+  // }, [challengeObj]);
+  useFocusEffect(
+    useCallback(() => {
+      ARSposored();
+    }, [])
+  );
+
+  console.log("modelfile",modelFile)
+//UNITY//
+
+  const sendModelDataToUnity = () => {
+    if (unityRef.current && modelOBJ) {
+      const cleanObjFile = modelOBJ.replace('file://', '');  // Elimina el prefijo 'file://'
+      const cleanMtlFile = modelResource ? modelResource.replace('file://', '') : ''; // Si existe el archivo MTL
+      const textures = modelTextures ? modelTextures.map(tex => tex.replace('file://', '')) : []; // Texturas si existen
+
+      const modelData = {
+        objFile: cleanObjFile,         // Ruta al archivo OBJ sin 'file://'
+        mtlFile: cleanMtlFile,         // Ruta al archivo MTL (puede ser null)
+        textures: textures,            // Rutas a las texturas (puede ser un array vacío)
+      };
+      console.log("Enviando a Unity:", JSON.stringify(modelData));
+      console.log("OBJ file path (clean):", cleanObjFile);
+      if (unityRef.current) {
+        console.log("unityRef Encontrado");
+        unityRef.current.postMessage('Scripts', 'LoadModelFromReact', JSON.stringify(modelData));
+      }else{
+        console.log("unityRef NO Encontrado");
+      }
+    }
+  };
+
+  const sendModelDataToUnitySpawn = () => {
+    if (unityRef.current && modelOBJ) {
+      const cleanObjFile = modelOBJ.replace('file://', '');
+      const cleanMtlFile = modelResource ? modelResource.replace('file://', '') : null;
+      const textures = modelTextures ? modelTextures.map(tex => tex.replace('file://', '')) : [];
+
+      const modelData = {
+        objFile: cleanObjFile,
+        mtlFile: cleanMtlFile,
+        textures: textures,
+      };
+
+      console.log("Enviando a Unity:", JSON.stringify(modelData));
+      unityRef.current.postMessage('Object Spawner', 'LoadModelFromReact', JSON.stringify(modelData));
+    }
+  };
+
+
+  const sendBloomValuesToUnity = () => {
+    const bloomData = {
+      threshold: parseFloat(threshold),  // Captura el valor del input
+      intensity: parseFloat(intensity),  // Captura el valor del input
+    };
+    if (unityRef.current) {
+      unityRef.current.postMessage('PostProcessing', 'UpdateBloomValues', JSON.stringify(bloomData));
+    } else {
+      console.log("UnityView no está disponible");
+    }
+  };
   return (
-    <ViroARScene onTrackingUpdated={onInitialized}>
-      {/*<ViroSkyBox*/}
-      {/*  source={{*/}
-      {/*    nx: require('../../assets/images/black.jpg'),*/}
-      {/*    px: require('../../assets/images/black.jpg'),*/}
-      {/*    ny: require('../../assets/images/black.jpg'),*/}
-      {/*    py: require('../../assets/images/black.jpg'),*/}
-      {/*    nz: require('../../assets/images/black.jpg'),*/}
-      {/*    pz: require('../../assets/images/black.jpg')*/}
-      {/*  }}*/}
-      {/*/>*/}
-      <ViroAmbientLight color="#FFFFFF" intensity={250} />
-      {/*<ViroDirectionalLight color="#FFFFFF" direction={[0, -1,  0]}/>*/}
-      {/*<ViroDirectionalLight color="#FFFFFF" direction={[0,  0, -1]}/>*/}
-
-      <ViroOmniLight
-        color="#ffffff"
-        attenuationStartDistance={0.1}
-        attenuationEndDistance={6}
-        position={[0, 0.9, -0.1]}
-        intensity={5000}
-      />
-      <ViroOmniLight
-        color="#ffffff"
-        attenuationStartDistance={0.1}
-        attenuationEndDistance={6}
-        position={[0.5, 0.5, -0.1]}
-        intensity={5000}
-      />
-
-      {/*<ViroSpotLight*/}
-      {/*  color="#ffff00"*/}
-      {/*  attenuationStartDistance={2}*/}
-      {/*  attenuationEndDistance={6}*/}
-      {/*  position={[0, -1, -1]}*/}
-      {/*  direction={[0, 1, 0]}*/}
-      {/*  innerAngle={0}*/}
-      {/*  outerAngle={45}*/}
-      {/*  intensity={25000}*/}
-      {/*/>*/}
-
-
-      <ViroAnimatedImage
-        // imageClipMode={'None'}
-        loop={true}
-        position={[0, 0.2, -1]}
-        height={1}
-        width={1}
-        placeholderSource={require('../../assets/images/texture.jpg')}
-        source={require('../../assets/images/fire.gif')}
-      />
-      {/*<ViroSphere*/}
-      {/*  facesOutward={false}*/}
-      {/*  // heightSegmentCount={20}*/}
-      {/*  // widthSegmentCount={20}*/}
-      {/*  radius={0.5}*/}
-      {/*  position={[0, 0.5, -1]}*/}
-      {/*  // scale={[.3, .3, .3]}*/}
-      {/*  materials={["glowEffect"]} />*/}
-
-      <ViroBox
-        position={[0, 0.9, -1]}
-        rotation={[0, 45, 0]}
-        scale={[.1, .3, .3]}
-        materials={["bliin3"]} />
-
-      <ViroBox
-        position={[0, 0.5, -1]}
-        rotation={[0, 45, 0]}
-        scale={[.1, .3, .3]}
-        materials={["lamber"]} />
-
-      <ViroBox
-        position={[0, 0.1, -1]}
-        rotation={[0, 45, 0]}
-        scale={[.3, .3, .1]}
-        materials={["bliin2"]} />
-
-      <ViroBox
-        position={[0, -.4, -1]}
-        rotation={[0, 45, 0]}
-        scale={[.3, .3, .1]}
-        materials={["bliin"]} />
-
-
-
-      {/*<ViroQuad*/}
-      {/*  height={2}*/}
-      {/*  width={2}*/}
-      {/*  position={[0, 0.0, -1]}*/}
-      {/*  scale={[.2, .4, .4]}*/}
-      {/*  rotation={[-90, 0, 0]}*/}
-      {/*  materials={['glowEffect']}*/}
-      {/*/>*/}
-
-
-      {/*<ViroSpotLight*/}
-      {/*  color="#ffff00"*/}
-      {/*  attenuationStartDistance={2}*/}
-      {/*  attenuationEndDistance={6}*/}
-      {/*  position={[0, 3, 0]}*/}
-      {/*  direction={[0, -1, 0]}*/}
-      {/*  innerAngle={0}*/}
-      {/*  outerAngle={90}*/}
-      {/*  intensity={25000}*/}
-      {/*/>*/}
-
-
-    </ViroARScene>
-
+    <ImageBackground source={require('../../assets/images/Background.png')} style={styles.background}>
+      <UnityView ref={unityRef} style={styles.unityView} />
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="Threshold"
+          keyboardType="numeric"
+          value={threshold}
+          onChangeText={setThreshold}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Intensity"
+          keyboardType="numeric"
+          value={intensity}
+          onChangeText={setIntensity}
+        />
+        <Button title="Enviar" onPress={sendBloomValuesToUnity} />
+        <Button title="Enviar" onPress={sendModelDataToUnitySpawn} />
+      </View>
+    </ImageBackground>
   );
 };
-
-const Rally = () => {
-  return (
-    <View style={{ flex: 1 }}>
-      <ViroARSceneNavigator
-        // hdrEnabled={false}
-        // bloomThreshold={false}
-        // bloomEnabled={false}
-
-        initialScene={{ scene: RallyScene }} // Define la escena inicial
-        style={{ flex: 1 }}
-      />
-    </View>
-  );
-};
-
-// Definición de materiales
-ViroMaterials.createMaterials({
-  lamber: {
-    diffuseTexture: require('../../assets/images/texture.jpg'),
-    lightingModel: "Lambert",
-    bloomThreshold: 0.0,
-    shininess: 10,
-    diffuseColor: "#FFFFFF",
-    // metalness: 0.5,
-    roughness: 0.1,
-    // blendMode:'Add'
-  },
-
-  glowEffect: {
-    diffuseTexture: require('../../assets/images/texture2.png'),
-    // blendMode: "Add",
-    lightingModel: "Phong",
-    diffuseColor: "#FFFFFF",
-    intensity: 0.5,
-  },
-
-  phong: {
-    // diffuseTexture: require('../../assets/images/texture2.png'),
-    lightingModel: "Phong",
-    bloomThreshold: 0.0,
-    diffuseColor: "rgba(138, 221, 45, 0.05)",
-    blendMode: 'Add',
-    diffuseIntensity: 0.1,
-  },
-  bliin: {
-    diffuseTexture: require('../../assets/images/texture.jpg'),
-    lightingModel: "Constant",
-    bloomThreshold: 1,
-    fresnelExponent: 0.0,
-  },
-  bliin2: {
-    diffuseTexture: require('../../assets/images/texture.jpg'),
-    lightingModel: "Constant",
-    bloomThreshold: 0.0,
-    fresnelExponent: 0.0,
-  },
-  bliin3: {
-    diffuseTexture: require('../../assets/images/texture.jpg'),
-    lightingModel: "Phong",
-    bloomThreshold: 0.0,
-    fresnelExponent: 0.0,
-  },
-});
 
 export default Rally;
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  background: {
+    flex: 1,
+    justifyContent: 'flex-start',
+    alignItems: 'center',
+    paddingTop: 40,
+  },
+  unityView: {
+    borderRadius: 50,
+    marginHorizontal: 20,
+    height: '60%',
+    width: '100%',
+  },
+  inputContainer: {
+    width: '80%',
+    marginTop: 10,
+    padding: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    width: '100%',
+    marginBottom: 10,
+    paddingLeft: 8,
+  },
+});
