@@ -19,7 +19,6 @@ import moment from 'moment'
 import Strings from '../../../constants/Strings'
 import mapCustomStyle from '../../../constants/MapCustomStyles'
 import { getLocationDistance, hasLocationPermission } from '../../../util/LocationLib'
-import CompassHeading from 'react-native-compass-heading'
 import { GeolocationContext } from '../../../GeolocationProvider'
 import Sound from 'react-native-sound'
 
@@ -35,7 +34,6 @@ const GeoArSiteNavigation = ({}) => {
   const compassHeading = useRef(0)
 
   const _styles = useStyles()
-  const dispatch = useDispatch()
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const { userLocation } = useContext(GeolocationContext)
@@ -45,11 +43,6 @@ const GeoArSiteNavigation = ({}) => {
   const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
-  const [forceLocation, setForceLocation] = useState(true)
-  const [highAccuracy, setHighAccuracy] = useState(true)
-  const [locationDialog, setLocationDialog] = useState(true)
-  const [significantChanges, setSignificantChanges] = useState(false)
-  const [useLocationManager, setUseLocationManager] = useState(false)
   const [estimatedTime, setEstimatedTime] = useState('')
   const [location, setLocation] = useState(null)
   const [isFirstCalculation, setIsFirstCalculation] = useState(true)
@@ -73,7 +66,6 @@ const GeoArSiteNavigation = ({}) => {
 
   useEffect(() => {
     getFirstLocation()
-    getLocationUpdates()
     return () => {
       stopLocationUpdates()
     }
@@ -143,53 +135,37 @@ const GeoArSiteNavigation = ({}) => {
   }
 
   const getLocationUpdates = async () => {
+
     const hasPermission = await hasLocationPermission()
     if (!hasPermission) {
       return
     }
-    // TODO: Move this to GeolocationProvider
 
-    watchId.current = Geolocation.watchPosition(
-      position => {
-        const dis = getLocationDistance(position.coords, {
-          latitude: selectedGeoSite.lat_long.coordinates[1],
-          longitude: selectedGeoSite.lat_long.coordinates[0],
-        })
-        if (dis < selectedGeoSite.check_in_site_radius) {
-          navigation.replace('GeoArSiteArrived')
-          stopLocationUpdates()
-          return
-        }
+    const position = {
+      coords: {
+        latitude,
+        longitude,
+      },
+    }
 
-        if (!location) {
-          setLocation(position)
-          // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
-        } else if (location && location.coords) {
-          const lastLocationDistance = getLocationDistance(position.coords, location.coords)
-          if (lastLocationDistance > 10) {
-            setLocation(position)
-            // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
-          }
-        }
-      },
-      error => {
-        console.error(error)
-      },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: highAccuracy,
-        distanceFilter: 1,
-        interval: 5000,
-        fastestInterval: 2000,
-        forceRequestLocation: forceLocation,
-        forceLocationManager: useLocationManager,
-        showLocationDialog: locationDialog,
-        useSignificantChanges: significantChanges,
+    const dis = getLocationDistance(position.coords, {
+      latitude: selectedGeoSite.lat_long.coordinates[1],
+      longitude: selectedGeoSite.lat_long.coordinates[0],
+    })
+
+    if (dis < selectedGeoSite.check_in_site_radius) {
+      navigation.replace('GeoArSiteArrived')
+      stopLocationUpdates()
+      return
+    }
+
+    if (location && location.coords) {
+      const lastLocationDistance = getLocationDistance(position.coords, location.coords)
+      if (lastLocationDistance > 10) {
+        setLocation(position)
+        // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
       }
-    )
+    }
   }
 
   const minOrHoursWalkDriving = walkDurationMins => {
@@ -219,6 +195,12 @@ const GeoArSiteNavigation = ({}) => {
       }
     })
   }
+
+  useEffect(() => {
+    if (userLocation) {
+      getLocationUpdates()
+    }
+  }, [userLocation])
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
