@@ -306,9 +306,9 @@ const PinChallenge = ({}) => {
 
     findNearPoint = position => {
       let arrayPoints = []
-      for (i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
+      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
         const points = selectedGeoSite.geo_site_border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
