@@ -466,7 +466,7 @@ const StarChallenge = ({}) => {
     }
 
     isStarIsCollected = point => {
-      for (i = 0; i < this.state.collectedStars.length; i++) {
+      for (let i = 0; i < this.state.collectedStars.length; i++) {
         const cPoint = this.state.collectedStars[i]
         if (point.latitude == cPoint.latitude && point.longitude == cPoint.longitude) {
           return true
@@ -477,9 +477,9 @@ const StarChallenge = ({}) => {
 
     findNearPoint = position => {
       let arrayPoints = []
-      for (i = 0; i < selectedGeoARSiteStars.length; i++) {
+      for (let i = 0; i < selectedGeoARSiteStars.length; i++) {
         const starObj = selectedGeoARSiteStars[i]
-        for (j = 0; j < starObj.star_location.coordinates.length; j++) {
+        for (let j = 0; j < starObj.star_location.coordinates.length; j++) {
           const point = starObj.star_location.coordinates[j]
           const pushPoint = { latitude: point[1], longitude: point[0], starObj }
           if (!this.isStarIsCollected(pushPoint)) {

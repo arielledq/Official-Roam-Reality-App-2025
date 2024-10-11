@@ -165,9 +165,9 @@ const ScoreBoard = ({}) => {
   const getAllPoints = destination => {
     const arrayPoints = []
     if (destination?.border?.coordinates) {
-      for (i = 0; i < destination.border.coordinates.length; i++) {
+      for (let i = 0; i < destination.border.coordinates.length; i++) {
         const points = destination.border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }

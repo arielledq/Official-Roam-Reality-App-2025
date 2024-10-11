@@ -150,9 +150,9 @@ const GeoArChallengeDetails = ({}) => {
           const facts = res.data[i]
           const arrayPoints = []
           if (facts?.border?.coordinates) {
-            for (i = 0; i < facts.border.coordinates.length; i++) {
+            for (let i = 0; i < facts.border.coordinates.length; i++) {
               const points = facts.border.coordinates[i]
-              for (j = 0; j < points.length; j++) {
+              for (let j = 0; j < points.length; j++) {
                 const point = points[j]
                 arrayPoints.push({
                   latitude: point[1],
@@ -252,9 +252,9 @@ const GeoArChallengeDetails = ({}) => {
   const getFullBounds = _ => {
     if (selectedDestination.border) {
       let arrayPoints = []
-      for (i = 0; i < selectedDestination.border.coordinates.length; i++) {
+      for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
         const points = selectedDestination.border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
@@ -282,9 +282,9 @@ const GeoArChallengeDetails = ({}) => {
   const getFullCenter = _ => {
     if (selectedDestination.border) {
       let arrayPoints = []
-      for (i = 0; i < selectedDestination.border.coordinates.length; i++) {
+      for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
         const points = selectedDestination.border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
@@ -298,9 +298,9 @@ const GeoArChallengeDetails = ({}) => {
 
   const moveToRegion = r => {
     let arrayPoints = []
-    for (i = 0; i < r.geo_region.coordinates.length; i++) {
+    for (let i = 0; i < r.geo_region.coordinates.length; i++) {
       const points = r.geo_region.coordinates[i]
-      for (j = 0; j < points.length; j++) {
+      for (let j = 0; j < points.length; j++) {
         const point = points[j]
         arrayPoints.push({ latitude: point[1], longitude: point[0] })
       }
