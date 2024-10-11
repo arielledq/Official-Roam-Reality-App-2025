@@ -105,7 +105,7 @@ const GeoArSiteNavigation = ({}) => {
     setCurrentLocation(position)
     if (mapView && mapView.current) {
       setTimeout(() => {
-        mapView.current.animateCamera({
+        mapView?.current?.animateCamera({
           center: position.coords,
           heading: compassHeading.current,
           zoom: 17,
