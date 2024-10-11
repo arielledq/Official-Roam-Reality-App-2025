@@ -62,11 +62,9 @@ export const GeolocationProvider = ({ children }) => {
   useEffect(() => {
     if (userToken) {
       getDestinationFacts()
-      setTimeout(() => {
-        getLocation()
-      }, 1000)
+      getLocation()
     }
-  }, [])
+  }, [userToken])
 
   useEffect(() => {
     if (userLocation) {

@@ -24,7 +24,6 @@ import { GeolocationContext } from '../../../GeolocationProvider'
 
 const GeoArSiteRoutes = ({}) => {
   const _styles = useStyles()
-  const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
   const navigation = useNavigation()
   const mapView = useRef()
@@ -32,19 +31,10 @@ const GeoArSiteRoutes = ({}) => {
   const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
-  const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
-  const [walkMileDistance, setWalkMileDistance] = useState(0)
   const [walkDurationMins, setWalkDurationMins] = useState(0)
   const [routes, setRoutes] = useState(0)
-
-  useEffect(() => {
-    setCurrentLocation({
-      latitude,
-      longitude,
-    })
-  }, [])
 
   const getFullBounds = _ => {
     if (selectedGeoSite.geo_site_border) {
@@ -153,11 +143,11 @@ const GeoArSiteRoutes = ({}) => {
               </View>
             </Marker>
 
-            {currentLocation && (
+            {latitude && longitude && (
               <Marker
                 coordinate={{
-                  latitude: currentLocation.latitude,
-                  longitude: currentLocation.longitude,
+                  latitude: latitude,
+                  longitude: longitude,
                 }}
                 title={'Current Location'}
               >
@@ -166,11 +156,11 @@ const GeoArSiteRoutes = ({}) => {
                 </View>
               </Marker>
             )}
-            {currentLocation && (
+            {latitude && longitude && (
               <MapViewDirections
                 origin={{
-                  latitude: currentLocation.latitude,
-                  longitude: currentLocation.longitude,
+                  latitude: latitude,
+                  longitude: longitude,
                 }}
                 precision={'high'}
                 timePrecision={'now'}
@@ -195,11 +185,11 @@ const GeoArSiteRoutes = ({}) => {
                 }}
               />
             )}
-            {currentLocation && (
+            {latitude && longitude && (
               <MapViewDirections
                 origin={{
-                  latitude: currentLocation.latitude,
-                  longitude: currentLocation.longitude,
+                  latitude: latitude,
+                  longitude: longitude,
                 }}
                 precision={'high'}
                 timePrecision={'now'}
