@@ -8,7 +8,6 @@ module.exports = {
     'eslint:recommended',
     'plugin:react/recommended',
     'plugin:@typescript-eslint/recommended',
-    'plugin:vue/vue3-recommended',
     'prettier',
   ],
   parser: '@typescript-eslint/parser',
@@ -19,7 +18,7 @@ module.exports = {
     ecmaVersion: 2021,
     sourceType: 'module',
   },
-  plugins: ['react', '@typescript-eslint', 'vue'],
+  plugins: ['react', '@typescript-eslint'],
   rules: {
     // Consistent with Prettier settings
     semi: ['error', 'never'], // No semicolons
@@ -34,7 +33,5 @@ module.exports = {
     'react/jsx-closing-bracket-location': [1, 'line-aligned'], // Place closing bracket of multiline JSX element correctly
     'react/jsx-first-prop-new-line': ['error', 'multiline'], // Enforce new line for first prop in JSX if it is multiline
     'react/jsx-max-props-per-line': ['error', { maximum: 1, when: 'multiline' }], // Limit props per line in JSX
-    'vue/html-indent': ['error', 2], // 2 spaces for indentation in Vue files
-    'vue/max-attributes-per-line': ['error', { singleline: 1, multiline: 1 }], // Limit Vue attributes per line
   },
 }
