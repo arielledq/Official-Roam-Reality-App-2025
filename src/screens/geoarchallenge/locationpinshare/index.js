@@ -60,7 +60,6 @@ const ArPinChallengeShare = ({}) => {
         setImageHeight(imageHeight)
       })
     }
-    shareBtnOnPress()
   }, [])
 
   const shareBtnOnPress = () => {
