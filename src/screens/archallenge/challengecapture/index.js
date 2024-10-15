@@ -27,8 +27,8 @@ import { AppButton } from '../../../components'
 import RenderHTML from 'react-native-render-html'
 const RNFS = require('react-native-fs')
 const Sound = require('react-native-sound')
-const { config, fs } = RNFetchBlob
-import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions'
+const { config } = RNFetchBlob
+import { requestMultiple, PERMISSIONS } from 'react-native-permissions'
 import { useSelector } from 'react-redux'
 import ARFilter from '../FilterView'
 import BackgroundWithImage from '../../../components/background'
@@ -709,7 +709,6 @@ const ArChallengeCapture = ({}) => {
                 justifyContent:
                   this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center',
               },
-              challengeObj?.ar_filters.length > 0 ? styles.filterBottomContainer : {},
             ]}
           >
             {this.state.recordingStart && (
