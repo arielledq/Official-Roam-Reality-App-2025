@@ -23,7 +23,7 @@ import MapboxGL from "@rnmapbox/maps";
 //   });
 // }
 
-MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY);
+MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY)
 
 Geocoder.init(Config.GEOCODER_API_KEY)
 
