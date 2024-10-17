@@ -32,6 +32,7 @@
     "@reduxjs/toolkit": "^1.9.5",
     "@rneui/base": "^4.0.0-rc.8",
     "@rneui/themed": "^4.0.0-rc.8",
+    "@rnmapbox/maps": "^10.1.31",
     "@viro-community/react-viro": "https://github.com/shabeebhasan/viro.git",
     "@voximplant/react-native-foreground-service": "^3.0.2",
     "add": "^2.0.6",
