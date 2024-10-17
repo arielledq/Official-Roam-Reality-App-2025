@@ -13,6 +13,7 @@ import OneSignal from "react-native-onesignal"
 import { NotificationProvider } from "./NotificationProvider"
 import Config from "./config"
 import {GeolocationProvider} from "./GeolocationProvider";
+import MapboxGL from "@rnmapbox/maps";
 // import * as Sentry from '@sentry/react-native';
 
 
@@ -21,6 +22,8 @@ import {GeolocationProvider} from "./GeolocationProvider";
 //     dsn: Config.SENTRY_DSN,
 //   });
 // }
+
+MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY)
 
 Geocoder.init(Config.GEOCODER_API_KEY)
 
