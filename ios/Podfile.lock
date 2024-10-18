@@ -77,6 +77,15 @@ PODS:
   - libwebp/sharpyuv (1.3.2)
   - libwebp/webp (1.3.2):
     - libwebp/sharpyuv
+  - MapboxCommon (23.10.1)
+  - MapboxCoreMaps (10.18.0):
+    - MapboxCommon (~> 23.10)
+  - MapboxMaps (10.18.2):
+    - MapboxCommon (= 23.10.1)
+    - MapboxCoreMaps (= 10.18.0)
+    - MapboxMobileEvents (= 1.0.10)
+    - Turf (= 2.8.0)
+  - MapboxMobileEvents (1.0.10)
   - OneSignalXCFramework (3.12.9):
     - OneSignalXCFramework/OneSignalCore (= 3.12.9)
     - OneSignalXCFramework/OneSignalExtension (= 3.12.9)
@@ -489,6 +498,17 @@ PODS:
     - React-Core
     - React-RCTImage
     - TOCropViewController
+  - rnmapbox-maps (10.1.31):
+    - MapboxMaps (~> 10.18.2)
+    - React
+    - React-Core
+    - rnmapbox-maps/DynamicLibrary (= 10.1.31)
+    - Turf
+  - rnmapbox-maps/DynamicLibrary (10.1.31):
+    - MapboxMaps (~> 10.18.2)
+    - React
+    - React-Core
+    - Turf
   - RNPermissions (4.1.0):
     - React-Core
   - RNReanimated (2.14.4):
@@ -547,6 +567,7 @@ PODS:
   - SSZipArchive (2.4.3)
   - TikTokOpenSDK (5.0.15)
   - TOCropViewController (2.6.1)
+  - Turf (2.8.0)
   - ViroKit (1.0):
     - React
   - ViroReact (1.0):
@@ -619,6 +640,7 @@ DEPENDENCIES:
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - "RNGoogleSignin (from `../node_modules/@react-native-google-signin/google-signin`)"
   - RNImageCropPicker (from `../node_modules/react-native-image-crop-picker`)
+  - "rnmapbox-maps (from `../node_modules/@rnmapbox/maps`)"
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
@@ -647,12 +669,17 @@ SPEC REPOS:
     - GTMAppAuth
     - GTMSessionFetcher
     - libwebp
+    - MapboxCommon
+    - MapboxCoreMaps
+    - MapboxMaps
+    - MapboxMobileEvents
     - OneSignalXCFramework
     - SDWebImage
     - SDWebImageWebPCoder
     - SSZipArchive
     - TikTokOpenSDK
     - TOCropViewController
+    - Turf
 
 EXTERNAL SOURCES:
   boost:
@@ -781,6 +808,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@react-native-google-signin/google-signin"
   RNImageCropPicker:
     :path: "../node_modules/react-native-image-crop-picker"
+  rnmapbox-maps:
+    :path: "../node_modules/@rnmapbox/maps"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
   RNReanimated:
@@ -823,6 +852,10 @@ SPEC CHECKSUMS:
   GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
   GTMSessionFetcher: 8a1b34ad97ebe6f909fb8b9b77fba99943007556
   libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
+  MapboxCommon: 0ff437e44988da6856e280d00ffb266564ed0487
+  MapboxCoreMaps: f1bd9405f5b9d3e343f2fe4138775299699a22fb
+  MapboxMaps: e76b14f52c54c40b76ddecd04f40448e6f35a864
+  MapboxMobileEvents: de50b3a4de180dd129c326e09cd12c8adaaa46d6
   OneSignalXCFramework: 3c3ef25ecca5eae1bf80a3272c49fd1dbab96b35
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: f6187ec763637e6a57f5728dd9a3bdabc6d6b4e0
@@ -881,6 +914,7 @@ SPEC CHECKSUMS:
   RNGestureHandler: 42ec7c28dd02d540ed6c9159c57a98ff016492dc
   RNGoogleSignin: fc408799f1990a12497a32f64280c0fe353ffcc1
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
+  rnmapbox-maps: 86b215fe77632a897b34a2dbf0c3ad4e9e8c3570
   RNPermissions: 7938b2a48a952a4316cfdc86df9a54485b930173
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: 0bd9eec783bed1032e02a4db9976dae1664a5c7b
@@ -893,6 +927,7 @@ SPEC CHECKSUMS:
   SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
   TikTokOpenSDK: dc1199ba9c6d7815aee0eaca6ec80ad13f7d9c1f
   TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
+  Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   ViroKit: 700d3d4ca086368d06224de1cbbc19781aea2094
   ViroReact: f4980e6b04918c4340637f9cbaae22a6bb7ea440
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
