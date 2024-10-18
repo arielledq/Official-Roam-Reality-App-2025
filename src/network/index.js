@@ -567,3 +567,12 @@ export const getCountryCount = payload =>
     },
     logoutFunc
   )
+export const sendRoamingNotification = payload =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}notifications/send_roaming_notifications/`,
+      method: 'POST',
+      data: payload,
+    },
+    logoutFunc
+  )
