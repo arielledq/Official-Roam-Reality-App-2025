@@ -356,7 +356,7 @@ class NotificationViewset(viewsets.ModelViewSet):
         if not friends:
             return Response({"message": "User has no friends to notify."}, status=status.HTTP_400_BAD_REQUEST)
 
-        metadata = request.body.get('metadata')
+        metadata = request.data.get('metadata')
         if not metadata:
             return Response({"error": "Metadata is required."}, status=status.HTTP_400_BAD_REQUEST)
 
