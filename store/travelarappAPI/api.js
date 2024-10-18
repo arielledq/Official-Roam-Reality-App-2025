@@ -1,6 +1,6 @@
 import axios from 'axios'
 const travelarappAPI = axios.create({
-  baseURL: 'https://travel-ar-app-42706.botics.co',
+  baseURL: '',
   headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
 })
 function api_docs_schema_retrieve(payload) {
@@ -122,9 +122,6 @@ function rest_auth_user_update(payload) {
 function rest_auth_user_partial_update(payload) {
   return travelarappAPI.patch(`/rest-auth/user/`, payload)
 }
-function api_v1_send_roaming_notification(payload) {
-  return travelarappAPI.post(`/api/v1/notifications/send_roaming_notifications/`, payload)
-}
 export const apiService = {
   api_docs_schema_retrieve,
   api_v1_login_create,
@@ -164,5 +161,4 @@ export const apiService = {
   rest_auth_user_retrieve,
   rest_auth_user_update,
   rest_auth_user_partial_update,
-  api_v1_send_roaming_notification,
 }
