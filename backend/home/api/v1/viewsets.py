@@ -325,7 +325,7 @@ class NotificationViewset(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = NotificationSerializer
-    http_method_names = ["get", "patch"]
+    http_method_names = ["get", "patch", "post"]
 
     def get_queryset(self):
         return Notification.objects.filter(receiver=self.request.user).order_by('-created_at')
@@ -356,7 +356,7 @@ class NotificationViewset(viewsets.ModelViewSet):
         if not friends:
             return Response({"message": "User has no friends to notify."}, status=status.HTTP_400_BAD_REQUEST)
 
-        metadata = request.query_params.get('metadata')
+        metadata = request.body.get('metadata')
         if not metadata:
             return Response({"error": "Metadata is required."}, status=status.HTTP_400_BAD_REQUEST)
 
