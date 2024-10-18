@@ -53,6 +53,7 @@ const userLocationHook = () => {
     if (locationEnabled) {
       getLocation()
     } else {
+      stopLocationUpdates()
     }
   }, [locationEnabled])
 
