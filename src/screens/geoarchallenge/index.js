@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native'
-import { handleError, isPointInPolygon } from '../../util/helpers'
+import { handleError } from '../../util/helpers'
 import {
   getGeoARDestinations,
   getARProfile,
@@ -26,7 +26,7 @@ import {
   updateAnyWhereChallenges,
 } from '../../redux/AR'
 
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import useStyles from './styles'
 import { MenuIcon } from '../../assets/svg'
 import PanicPopUp from './panicpopup'
@@ -40,6 +40,37 @@ const GeoArChallenge = ({}) => {
   const [starSitesCount, setStarSitesCount] = useState({})
   const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
+
+  useEffect(() => {
+    OneSignal.setNotificationOpenedHandler(notification => {
+      const { additionalData } = notification.notification
+
+      if (additionalData) {
+        navigateToGeoChanllenge(additionalData)
+      }
+    })
+
+    return () => {
+      OneSignal.clearHandlers()
+    }
+  }, [])
+
+  const navigateToGeoChanllenge = additionalData => {
+    const { destinationId } = additionalData
+    if (destinationId && destinationData?.length) {
+      const selectedDestination = destinationData.find(
+        destination => destination?.id === destinationId
+      )
+
+      if (selectedDestination) {
+        dispatch(updateSelectedDestination(selectedDestination))
+
+        setTimeout(() => {
+          navigation.navigate('GeoArChallengeDetails')
+        }, 500)
+      }
+    }
+  }
 
   const setOnesignalDevice = () => {
     OneSignal.getDeviceState().then(deviceData => {
