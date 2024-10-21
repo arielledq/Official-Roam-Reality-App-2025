@@ -22,6 +22,10 @@ const WATCH_POSITION_CONFIG = {
 
 const userLocationHook = () => {
   const [loading, setLoading] = useState(false)
+  const [initialUserLocation, setInitialUserLocation] = useState({
+    latitude: null,
+    longitude: null,
+  })
 
   const userData = useSelector(state => state?.login?.data)
 
@@ -30,7 +34,25 @@ const userLocationHook = () => {
   const userLocation = userData?.user?.user_ar_profile?.current_location?.coordinates
   const locationIsEnabled = !!userLocation?.length
 
-  const getLocation = async () => {
+  const getLocation = () => {
+    Geolocation.watchPosition(
+      position => {
+        const coords = {
+          latitude: position?.coords?.latitude,
+          longitude: position?.coords?.longitude,
+        }
+        setInitialUserLocation(coords)
+      },
+      error => {
+        console.error('[location.hook] Geolocation watchPosition error', error)
+        setLoading(false)
+        clearLocation()
+      },
+      WATCH_POSITION_CONFIG
+    )
+  }
+
+  const watchLocation = async () => {
     const hasPermission = await hasLocationPermission()
     if (!hasPermission) {
       return
@@ -59,7 +81,7 @@ const userLocationHook = () => {
     if (locationIsEnabled) {
       clearLocation()
     } else {
-      getLocation()
+      watchLocation()
     }
   }
 
@@ -85,10 +107,12 @@ const userLocationHook = () => {
   }
 
   return {
+    initialUserLocation,
     loading,
     userLocation,
     locationIsEnabled,
     toggleUserLocation,
+    getLocation,
   }
 }
 

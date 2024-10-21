@@ -16,7 +16,7 @@ export const GeolocationProvider = ({ children }) => {
   const [openDestinationFactModal, setOpenDestinationFactModal] = useState(false)
   const [destinationFact, setDestinationFact] = useState(null)
 
-  const { userLocation } = userLocationHook()
+  const { initialUserLocation: userLocation, getLocation } = userLocationHook()
 
   const getDestinationFacts = () => {
     getDestinationFactsAll().then(res => {
@@ -29,6 +29,7 @@ export const GeolocationProvider = ({ children }) => {
   useEffect(() => {
     if (userToken) {
       getDestinationFacts()
+      getLocation()
     }
   }, [userToken])
 
