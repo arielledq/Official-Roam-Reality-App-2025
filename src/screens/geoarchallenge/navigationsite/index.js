@@ -7,6 +7,7 @@ import HomeIcon from '../../../assets/geoar/home.svg'
 import CloseBIcon from '../../../assets/geoar/close-square.svg'
 import SkipIcon from '../../../assets/geoar/skip.svg'
 import MarkerIcon from '../../../assets/geoar/marker_img.svg'
+import CenterIcon from '../../../assets/Icons/CenterIcon.svg'
 
 import { useSelector } from 'react-redux'
 import useStyles from './styles'
@@ -39,6 +40,7 @@ const GeoArSiteNavigation = () => {
   const [mapHeading, setMapHeading] = useState(0)
   const [rerouting, setRerouting] = useState(false)
   const [nextCoordinateS, setNextCoordinateS] = useState(null)
+  const mapView = useRef(null)
 
   const calculatedEstimatedTime = duration => {
     const now = new Date()
@@ -247,14 +249,10 @@ const GeoArSiteNavigation = () => {
     const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}`
     const MBUrl = `${MBUrlBase}${mapType}/${origin};${destination}${MBUrlParams}`
 
-    console.log("mapBoxGetRoute origin", origin)
-    console.log("mapBoxGetRoute des", destination)
-
     // Fetch route data from Mapbox Directions API
     fetch(MBUrl)
       .then(response => response.json())
       .then(data => {
-        console.log("mapBoxGetRoute data", data)
         if (data?.routes?.length) {
           const distance = data.routes[0].distance
           const duration = data.routes[0].duration
@@ -350,9 +348,27 @@ const GeoArSiteNavigation = () => {
             marginHorizontal: 30,
           }}
         >
+          <TouchableOpacity
+            onPress={() => mapView.current?.setCamera({ centerCoordinate: [longitude, latitude], heading: currentHeading })}
+            style={{
+              position: 'absolute',
+              bottom: 5,
+              right:5,
+              zIndex: 1000,
+              backgroundColor: 'rgba(0, 0, 0, 0.7)',
+              borderRadius: 25,
+              width: 40,
+              height: 40,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <CenterIcon  />
+          </TouchableOpacity>
           {originMap && destinationMap && (
             <MapboxGL.MapView style={{ flex: 1 }} compassEnabled scaleBarEnabled={false}>
               <MapboxGL.Camera
+                ref={mapView}
                 zoomLevel={18}
                 centerCoordinate={[longitude, latitude]}
                 pitch={60} // Sets the 3D pitch angle

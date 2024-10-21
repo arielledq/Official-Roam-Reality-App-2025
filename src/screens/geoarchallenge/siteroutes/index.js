@@ -164,7 +164,7 @@ const GeoArSiteRoutes = ({}) => {
                 }}
                 precision={'high'}
                 timePrecision={'now'}
-                mode={'DRIVING'}
+                mode={'driving'}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0],
@@ -193,7 +193,7 @@ const GeoArSiteRoutes = ({}) => {
                 }}
                 precision={'high'}
                 timePrecision={'now'}
-                mode={'WALKING'}
+                mode={'walking'}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0],
@@ -261,7 +261,7 @@ const GeoArSiteRoutes = ({}) => {
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
-              onPress={() => navigation.navigate('GeoArSiteNavigation', { mapMode: 'DRIVING' })}
+              onPress={() => navigation.navigate('GeoArSiteNavigation', { mapMode: 'driving' })}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
               title={'Drive To Location'}
@@ -270,7 +270,7 @@ const GeoArSiteRoutes = ({}) => {
           </View>
           <View style={{ justifyContent: 'space-between', width: '100%', marginTop: 20 }}>
             <AppButton
-              onPress={() => navigation.navigate('GeoArSiteNavigation', { mapMode: 'WALKING' })}
+              onPress={() => navigation.navigate('GeoArSiteNavigation', { mapMode: 'walking' })}
               buttonStyle={_styles.buttonStyle}
               containerStyle={_styles.buttonContainerStyle}
               title={'Walk to Location'}
