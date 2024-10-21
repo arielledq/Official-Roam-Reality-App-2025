@@ -265,7 +265,6 @@ const GeoArChallengeDetails = ({}) => {
   const getFriends = () => {
     getUserFriendList()
       .then(response => {
-        console.log('getUserFriendList', JSON.stringify(response, null, 2))
         if (response) {
           setFriendList(response?.data[0]?.friends || [])
           setFilteredUsers(response?.data[0]?.friends || [])
