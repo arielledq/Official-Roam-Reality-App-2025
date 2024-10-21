@@ -1,6 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
 
-import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native'
+import {
+  FlatList,
+  Image,
+  ImageBackground,
+  PermissionsAndroid,
+  Platform,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native'
 import { handleError, isPointInPolygon } from '../../util/helpers'
 import {
   getGeoARDestinations,
