@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import Geolocation from 'react-native-geolocation-service'
 import { hasLocationPermission } from '../../util/LocationLib'
-import { updateUserData } from '../../redux/Login'
+import { updateUserLocationData } from '../../redux/Login'
 import { updateUserLocation } from '../../network'
 
 const WATCH_POSITION_CONFIG = {
@@ -67,7 +67,7 @@ const userLocationHook = () => {
     if (!isNaN(latitude) && !isNaN(longitude)) {
       try {
         await updateUserLocation({ latitude, longitude })
-        dispatch(updateUserData({ latitude, longitude }))
+        dispatch(updateUserLocationData({ latitude, longitude }))
       } catch (error) {
         clearLocation()
         console.error('[location.hook] updateUserLocationAPI error', error)
@@ -80,7 +80,7 @@ const userLocationHook = () => {
 
   const clearLocation = () => {
     updateUserLocation({ latitude: null, longitude: null })
-    dispatch(updateUserData())
+    dispatch(updateUserLocationData())
     Geolocation.stopObserving()
   }
 

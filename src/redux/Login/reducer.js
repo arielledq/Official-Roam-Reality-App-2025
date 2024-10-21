@@ -10,6 +10,9 @@ export const sliceLogin = createSlice({
   reducers: {
     resetState: () => initialState,
     updateUserData: (state, action) => {
+      state.data = action.payload
+    },
+    updateUserLocationData: (state, action) => {
       let coordinates = []
       if (!isNaN(action.payload?.longitude) && !isNaN(action.payload?.latitude)) {
         coordinates = [action.payload.longitude, action.payload.latitude]
@@ -31,5 +34,11 @@ export const sliceLogin = createSlice({
   },
 })
 
-export const { resetState, updateUserData, updateName, updateAccountFlag, updateVerified } =
-  sliceLogin.actions
+export const {
+  resetState,
+  updateUserData,
+  updateUserLocationData,
+  updateName,
+  updateAccountFlag,
+  updateVerified,
+} = sliceLogin.actions
