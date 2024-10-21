@@ -1,68 +1,94 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { useSelector } from 'react-redux'
-import { showMessage } from '../../util/helpers'
+import { useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import Geolocation from 'react-native-geolocation-service'
 import { hasLocationPermission } from '../../util/LocationLib'
+import { updateUserData } from '../../redux/Login'
+import { updateUserLocation } from '../../network'
+
+const WATCH_POSITION_CONFIG = {
+  accuracy: {
+    android: 'high',
+    ios: 'best',
+  },
+  enableHighAccuracy: true,
+  distanceFilter: 5,
+  interval: 5000,
+  fastestInterval: 2000,
+  forceRequestLocation: true,
+  forceLocationManager: false,
+  showLocationDialog: true,
+  useSignificantChanges: false,
+}
 
 const userLocationHook = () => {
-  const initalLocationEnabled = useSelector(state => state?.login?.data?.locationEnabled)
-  const watchId = useRef(null)
+  const [loading, setLoading] = useState(false)
 
-  const [location, setLocation] = useState({})
-  const [locationEnabled, setLocationEnabled] = useState(false)
+  const userData = useSelector(state => state?.login?.data)
+
+  const dispatch = useDispatch()
+
+  const userLocation = userData?.user?.user_ar_profile?.current_location?.coordinates
+  const locationIsEnabled = !!userLocation?.length
 
   const getLocation = async () => {
     const hasPermission = await hasLocationPermission()
     if (!hasPermission) {
       return
     }
-    watchId.current = Geolocation.watchPosition(
+    setLoading(true)
+
+    Geolocation.watchPosition(
       position => {
-        setLocation(position)
+        const coords = {
+          latitude: position?.coords?.latitude,
+          longitude: position?.coords?.longitude,
+        }
+        updateUserLocationAPI(coords)
+        setLoading(false)
       },
       error => {
-        setLocation(null)
-        console.error(error)
+        console.error('[location.hook] Geolocation watchPosition error', error)
+        setLoading(false)
+        clearLocation()
       },
-      {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: true,
-        distanceFilter: 5,
-        interval: 5000,
-        fastestInterval: 2000,
-        forceRequestLocation: true,
-        forceLocationManager: false,
-        showLocationDialog: true,
-        useSignificantChanges: false,
-      }
+      WATCH_POSITION_CONFIG
     )
   }
 
-  const stopLocationUpdates = () => {
-    if (watchId.current !== null) {
-      Geolocation.clearWatch(watchId.current)
-      watchId.current = null
-      Geolocation.stopObserving()
+  const toggleUserLocation = () => {
+    if (locationIsEnabled) {
+      clearLocation()
+    } else {
+      getLocation()
     }
   }
 
-  useEffect(() => {
-    if (locationEnabled) {
-      getLocation()
+  const updateUserLocationAPI = async ({ latitude, longitude }) => {
+    if (!isNaN(latitude) && !isNaN(longitude)) {
+      try {
+        await updateUserLocation({ latitude, longitude })
+        dispatch(updateUserData({ latitude, longitude }))
+      } catch (error) {
+        clearLocation()
+        console.error('[location.hook] updateUserLocationAPI error', error)
+      }
     } else {
-      stopLocationUpdates()
+      clearLocation()
+      console.error('[location.hook] location is not a number', { latitude, longitude })
     }
-  }, [locationEnabled])
+  }
 
-  useEffect(() => {
-    if (initalLocationEnabled) getLocation()
-  }, [])
+  const clearLocation = () => {
+    updateUserLocation({ latitude: null, longitude: null })
+    dispatch(updateUserData())
+    Geolocation.stopObserving()
+  }
 
   return {
-    setLocationEnabled,
+    loading,
+    userLocation,
+    locationIsEnabled,
+    toggleUserLocation,
   }
 }
 
