@@ -169,7 +169,10 @@ const GeoArChallengeDetails = ({}) => {
   }
 
   const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location) {
+    if (
+      o?.user_ar_profile?.current_location &&
+      o?.user_ar_profile?.current_location?.coordinates?.length
+    ) {
       return (
         <Marker
           key={o.id}
