@@ -349,7 +349,7 @@ const GeoArSiteNavigation = () => {
           }}
         >
           <TouchableOpacity
-            onPress={() => mapView.current?.setCamera({ centerCoordinate: [longitude, latitude], heading: currentHeading })}
+            onPress={() => mapView.current?.setCamera({ centerCoordinate: [longitude, latitude], heading: currentHeading, animationDuration:500 })}
             style={{
               position: 'absolute',
               bottom: 5,
