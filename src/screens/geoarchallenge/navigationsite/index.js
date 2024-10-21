@@ -247,12 +247,15 @@ const GeoArSiteNavigation = () => {
     const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}`
     const MBUrl = `${MBUrlBase}${mapType}/${origin};${destination}${MBUrlParams}`
 
+    console.log("mapBoxGetRoute origin", origin)
+    console.log("mapBoxGetRoute des", destination)
+
     // Fetch route data from Mapbox Directions API
     fetch(MBUrl)
       .then(response => response.json())
       .then(data => {
-        // console.log("mapBoxGetRoute data", data)
-        if (data.routes.length) {
+        console.log("mapBoxGetRoute data", data)
+        if (data?.routes?.length) {
           const distance = data.routes[0].distance
           const duration = data.routes[0].duration
           setMileDistance(convertKilometersToMiles(distance / 1000))

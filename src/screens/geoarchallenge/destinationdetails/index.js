@@ -35,6 +35,7 @@ const GeoArChallengeDetails = ({}) => {
   const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
+  console.log('userLocation', userLocation)
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
   const [starsSites, setStarsSites] = useState(0)
@@ -136,7 +137,7 @@ const GeoArChallengeDetails = ({}) => {
   }
 
   const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location) {
+    if (o?.user_ar_profile?.current_location?.length > 0) {
       return (
         <Marker
           key={o.id}
