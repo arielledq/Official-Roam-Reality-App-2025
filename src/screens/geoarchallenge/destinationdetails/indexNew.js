@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react"
 
-import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native"
+import {ActivityIndicator, Platform, Pressable, ScrollView, Text, TouchableOpacity, View} from "react-native"
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
 import { useNavigation } from "@react-navigation/native"
@@ -44,8 +44,9 @@ const GeoArChallengeDetails = ({}) => {
   const navigation = useNavigation()
   const mapView = useRef()
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const [selectedPoint, setSelectedPoint] = useState(null);
+  const [selectedPoint, setSelectedPoint] = useState(null)
 
+  console.log("selectedDestination ", selectedDestination)
   const regions = selectedDestination?.regions
   const [fullRegion, setFullRegion] = useState(null)
   const [friendList, setFriendList] = useState([])
@@ -136,7 +137,7 @@ const GeoArChallengeDetails = ({}) => {
   }
 
   const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location?.length > 0) {
+    if (o?.user_ar_profile?.current_location) {
       return (
         <Marker
           key={o.id}
@@ -171,43 +172,77 @@ const GeoArChallengeDetails = ({}) => {
     }
   }
 
-  const _markerView = o => {
+  const _markerView = (o) => {
+
     if (o.lat_long) {
+      const coordinates = [o.lat_long.coordinates[0], o.lat_long.coordinates[1]]
+
       return (
-        <Marker
-          key={o.id}
-          coordinate={{
-            latitude: o.lat_long.coordinates[1],
-            longitude: o.lat_long.coordinates[0],
-          }}
-          title={o.name}
-          onCalloutPress={() => {
-            dispatch(updateSelectedSites(o))
-            navigation.navigate('GeoArSiteDetails')
-          }}
-        >
-          {Platform.OS == 'ios' && (
-            <Callout
-              onPress={() => {
-                dispatch(updateSelectedSites(o))
-                navigation.navigate('GeoArSiteDetails')
-              }}
+        <>
+          {/* MarkerView allows us to fully customize the marker and its interactivity */}
+          <MapboxGL.MarkerView
+            id={o.id + "-coordinates"}
+            coordinate={coordinates}
+          >
+            <View
               style={{
-                backgroundColor: '#fff',
-                minWidth: 100,
-                alignItems: 'center',
+                alignItems: "center",
+                width: 120,
+                height: 120,
+                justifyContent: "center",
+                position: "relative",
               }}
             >
-              <Text>{o.name}</Text>
-            </Callout>
-          )}
-          <View style={{ width: 30, height: 30 }}>
-            <MarkerIcon />
-          </View>
-        </Marker>
+              {/* Custom Marker Icon */}
+              <Pressable
+                onPress={() => {
+                  console.log("Marker pressed:", o.name)
+                  setSelectedPoint(o.id)
+                }}
+                style={{ width: 30, height: 40 }}
+              >
+                <MarkerIcon />
+              </Pressable>
+
+              {/* Show callout when marker is selected */}
+              {selectedPoint === o.id && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: -5,
+                    padding: 5,
+                    backgroundColor: "white",
+                    borderRadius: 8,
+                    borderColor: "#ccc",
+                    borderWidth: 1,
+                    width: 100,
+                    marginTop: 10,
+                    alignItems: "center",
+                  }}
+                >
+                  <Pressable
+                    onPress={() => {
+                      dispatch(updateSelectedSites(o))
+                      navigation.navigate("GeoArSiteDetails")
+                    }}
+                  >
+                    <Text
+                      style={{ fontWeight: "bold", fontSize: 14 }}
+                      numberOfLines={1} // Limit to one line
+                      ellipsizeMode="tail"
+                    >
+                      {o.name}
+                    </Text>
+                  </Pressable>
+                </View>
+              )}
+            </View>
+          </MapboxGL.MarkerView>
+        </>
       )
     }
   }
+
 
 
   const getFullBounds = () => {
@@ -369,7 +404,7 @@ const GeoArChallengeDetails = ({}) => {
             onPress={moveToFullRegion}
             activeOpacity={0.5}
             style={
-              selectedRegionName == "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
+              selectedRegionName === "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
             }
           >
             <Text style={_styles.buttonSelectText}>Full</Text>
@@ -382,7 +417,7 @@ const GeoArChallengeDetails = ({}) => {
                   activeOpacity={0.5}
                   onPress={() => moveToRegion(e)}
                   style={
-                    selectedRegionName == e.name
+                    selectedRegionName === e.name
                       ? _styles.selectButtonStyle
                       : _styles.unSelectButtonStyle
                   }
@@ -424,26 +459,48 @@ const GeoArChallengeDetails = ({}) => {
           overflow: "hidden",
         }}
       >
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          ref={mapView}
+        <MapboxGL.MapView
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
-          initialRegion={initialRegion}
+          compassEnabled
+          scaleBarEnabled={false}
         >
-          {/* {
-            selectedDestination.unique_ar_sites.map((o) => {
-              return _markerView(o)
-            })
-          } */}
+          <MapboxGL.Camera
+            zoomLevel={16}
+            centerCoordinate={[initialRegion.longitude, initialRegion.latitude]}
+            pitch={0} // Sets the 3D pitch angle
+            animationMode="none"
+            animationDuration={0}
+          />
+
           {arSitesOn &&
             selectedDestination.star_ar_sites.map(o => {
               return _markerView(o)
             })}
-          {friendsLocationSitesOn &&
-            friendList.map(o => {
-              return f_markerView(o)
-            })}
-        </MapView>
+          {/*{friendsLocationSitesOn &&*/}
+          {/*  friendList.map(o => {*/}
+          {/*    return f_markerView(o)*/}
+          {/*  })}*/}
+        </MapboxGL.MapView>
+        {/*<MapView*/}
+        {/*  provider={PROVIDER_GOOGLE}*/}
+        {/*  ref={mapView}*/}
+        {/*  style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}*/}
+        {/*  initialRegion={initialRegion}*/}
+        {/*>*/}
+        {/*  /!* {*/}
+        {/*    selectedDestination.unique_ar_sites.map((o) => {*/}
+        {/*      return _markerView(o)*/}
+        {/*    })*/}
+        {/*  } *!/*/}
+        {/*  {arSitesOn &&*/}
+        {/*    selectedDestination.star_ar_sites.map(o => {*/}
+        {/*      return _markerView(o)*/}
+        {/*    })}*/}
+        {/*  {friendsLocationSitesOn &&*/}
+        {/*    friendList.map(o => {*/}
+        {/*      return f_markerView(o)*/}
+        {/*    })}*/}
+        {/*</MapView>*/}
       </View>
       <View>
         <Text style={_styles.s_list_text}>Tap the pin to see more details</Text>
