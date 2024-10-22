@@ -164,7 +164,7 @@ const GeoArSiteRoutes = ({}) => {
                 }}
                 precision={'high'}
                 timePrecision={'now'}
-                mode={'driving'}
+                mode={'DRIVING'}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0],
@@ -193,7 +193,7 @@ const GeoArSiteRoutes = ({}) => {
                 }}
                 precision={'high'}
                 timePrecision={'now'}
-                mode={'walking'}
+                mode={'WALKING'}
                 destination={{
                   latitude: selectedGeoSite.lat_long.coordinates[1],
                   longitude: selectedGeoSite.lat_long.coordinates[0],
