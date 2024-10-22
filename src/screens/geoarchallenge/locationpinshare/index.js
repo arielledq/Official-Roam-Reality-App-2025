@@ -27,6 +27,8 @@ import { share, init, events } from 'react-native-tiktok'
 import BGArShare from '../../../assets/ar/bg-ar-share.png'
 import PinShare from '../../../assets/geoar/pin_share.svg'
 import { moderateScale } from '../../../util/AppDimensions'
+import { CameraRoll } from '@react-native-camera-roll/camera-roll'
+import DownloadImg from '../../../assets/ar/download.svg'
 
 const ArPinChallengeShare = ({}) => {
   const getPathFromUrl = url => {
@@ -199,6 +201,7 @@ const ArPinChallengeShare = ({}) => {
       facebookShareAndroid()
     } else {
       facebookShareAndroid()
+      // facebookShareIOS()
     }
   }
 
@@ -229,7 +232,6 @@ const ArPinChallengeShare = ({}) => {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
         updateARSocialPoints('INSTAGRAM')
-      } else {
       }
     } catch (error) {
       console.error('Error =>', error)
@@ -248,6 +250,19 @@ const ArPinChallengeShare = ({}) => {
     }
   }
 
+  const checkPermission = () => {
+    CameraRoll.saveAsset(captureData, {
+      type: fileExt == 'mp4' ? 'video' : 'photo',
+    })
+      .then(() => {
+        showMessage('Saved to Camera Roll.')
+      })
+      .catch(err => {
+        console.error('err:', err)
+        showMessage('Not able to save, please check permission.', 'error')
+      })
+  }
+
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader
@@ -262,7 +277,7 @@ const ArPinChallengeShare = ({}) => {
         <AppText numberOfLines={3} style={[styles.headerText]}>
           Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
         </AppText>
-        <View style={styles.detailContainer}>
+        <View style={[styles.detailContainer, { minHeight: 0 }]}>
           <Image
             resizeMode={'stretch'}
             source={{ uri: captureData }}
@@ -316,6 +331,9 @@ const ArPinChallengeShare = ({}) => {
                   <Text style={styles.challengeSponsorStartDateText}>
                     Completed on : {startDate}
                   </Text>
+                  <TouchableOpacity onPress={checkPermission} style={styles.shareBtn}>
+                    <DownloadImg />
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>

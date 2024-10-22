@@ -1,11 +1,11 @@
 import React, { createContext, useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { hasLocationPermission } from './util/LocationLib'
-import Geolocation from 'react-native-geolocation-service'
 import { getDestinationFactsAll, updateUserLocation } from './network'
 import { handleError, isPointInPolygon, showMessage } from './util/helpers'
 import DestinationFactModal from './screens/DestinationFactModal/DestinationFactModal'
 import { updateDestinationVisited } from './redux/AR/reducer'
+import Geolocation from '@react-native-community/geolocation'
 
 export const GeolocationContext = createContext()
 
@@ -18,12 +18,26 @@ export const GeolocationProvider = ({ children }) => {
   const [openDestinationFactModal, setOpenDestinationFactModal] = useState(false)
   const [destinationFact, setDestinationFact] = useState(null)
 
-  const getLocation = async () => {
-    const hasPermission = await hasLocationPermission()
+  const getLocation = () => {
+    const hasPermission = hasLocationPermission()
 
     if (!hasPermission) {
       return
     }
+
+    Geolocation.setRNConfiguration({
+      authorizationLevel: 'whenInUse',
+      enableBackgroundLocationUpdates: true,
+    })
+
+    Geolocation.requestAuthorization(
+      () => {
+        console.log('Authorization success')
+      },error => {
+        console.log('Authorization error', error)
+      }
+    )
+
 
     Geolocation.watchPosition(
       position => {
@@ -31,20 +45,15 @@ export const GeolocationProvider = ({ children }) => {
         setUserLocation({ latitude, longitude })
       },
       error => {
-        console.error(error)
+        console.error('error ', error)
       },
       {
-        accuracy: {
-          android: 'high',
-          ios: 'best',
-        },
-        enableHighAccuracy: true,
-        distanceFilter: 1,
         interval: 5000,
         fastestInterval: 2000,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
+        timeout: 15000,
+        maximumAge: 10000,
+        enableHighAccuracy: true,
+        distanceFilter: 1,
         useSignificantChanges: true,
       }
     )
@@ -62,7 +71,12 @@ export const GeolocationProvider = ({ children }) => {
   useEffect(() => {
     if (userToken) {
       getDestinationFacts()
+      // setInterval(
+      //   () => getLocation(),
+      //   3000
+      // )
       getLocation()
+
     }
   }, [userToken])
 

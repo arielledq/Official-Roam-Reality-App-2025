@@ -26,7 +26,7 @@ import { AppButton } from '../../../components'
 import RenderHTML from 'react-native-render-html'
 import { FontSizes, fontGroup } from '../../../util/FontUtils'
 import { updateSelectedGeoARSiteStars } from '../../../redux/AR'
-import { getAllARSitesStars } from '../../../network'
+import { getAllARSitesStars, sendRoamingNotification } from '../../../network'
 import { getBounds, getCenterOfBounds } from '../../../util/LocationLib'
 import NumericStatItem from '../../../components/NumericStatItem'
 
@@ -178,6 +178,21 @@ const GeoArSiteDetails = ({}) => {
     } else {
       return null
     }
+  }
+
+  const letsRoamButtonHandler = async () => {
+    try {
+      const metadata = {
+        destinationId: selectedDestination?.id,
+      }
+      await sendRoamingNotification({
+        metadata: metadata,
+      })
+    } catch (error) {
+      console.error('There was an error sending the notification to friends:', error)
+    }
+
+    navigation.navigate('GeoArSiteRoutes')
   }
 
   const initialRegion = {
@@ -354,7 +369,7 @@ const GeoArSiteDetails = ({}) => {
             </TouchableOpacity>
             <View>
               <AppButton
-                onPress={() => navigation.navigate('GeoArSiteRoutes')}
+                onPress={letsRoamButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{ fontWeight: 'bold' }}
                 containerStyle={_styles.buttonContainerStyle}

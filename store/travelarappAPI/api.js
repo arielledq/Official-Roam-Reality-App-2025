@@ -1,11 +1,11 @@
-import axios from "axios"
+import axios from 'axios'
 const travelarappAPI = axios.create({
-  baseURL: "https://travel-ar-app-42706.botics.co",
-  headers: { Accept: "application/json", "Content-Type": "application/json" }
+  baseURL: '',
+  headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
 })
 function api_docs_schema_retrieve(payload) {
   return travelarappAPI.get(`/api-docs/schema/`, {
-    params: { lang: payload.lang }
+    params: { lang: payload.lang },
   })
 }
 function api_v1_login_create(payload) {
@@ -81,16 +81,10 @@ function modules_terms_and_conditions_retrieve(payload) {
   return travelarappAPI.get(`/modules/terms-and-conditions/${payload.id}/`)
 }
 function modules_terms_and_conditions_update(payload) {
-  return travelarappAPI.put(
-    `/modules/terms-and-conditions/${payload.id}/`,
-    payload
-  )
+  return travelarappAPI.put(`/modules/terms-and-conditions/${payload.id}/`, payload)
 }
 function modules_terms_and_conditions_partial_update(payload) {
-  return travelarappAPI.patch(
-    `/modules/terms-and-conditions/${payload.id}/`,
-    payload
-  )
+  return travelarappAPI.patch(`/modules/terms-and-conditions/${payload.id}/`, payload)
 }
 function modules_terms_and_conditions_destroy(payload) {
   return travelarappAPI.delete(`/modules/terms-and-conditions/${payload.id}/`)
@@ -166,5 +160,5 @@ export const apiService = {
   rest_auth_registration_verify_email_create,
   rest_auth_user_retrieve,
   rest_auth_user_update,
-  rest_auth_user_partial_update
+  rest_auth_user_partial_update,
 }
