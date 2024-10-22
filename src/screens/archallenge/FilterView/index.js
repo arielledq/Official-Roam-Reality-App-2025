@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Dimensions, View, Text, ImageBackground } from 'react-native'
+import { Dimensions, View, Text, ImageBackground, Platform } from 'react-native'
 import BackgroundWithImage from '../../../components/background'
 import useStyles from './styles'
 import LinearGradient from 'react-native-linear-gradient'
@@ -42,7 +42,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
       })
   }
 
-  getLocationText = location_option => {
+  const getLocationText = location_option => {
     var locality = null
     var sublocality = null
     var postal_town = null
@@ -116,6 +116,8 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
           return `${locality}`
         } else if (!locality && admin_area_2) {
           return `${admin_area_2}`
+        } else {
+          return `${country}`
         }
       }
     } else {
@@ -148,6 +150,8 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
           return `${locality}, ${country}`
         } else if (!locality && admin_area_2) {
           return `${admin_area_2}, ${country}`
+        } else {
+          return `${country}`
         }
       } else {
         return `${country}`
@@ -168,6 +172,17 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
       <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>
           {ar_filters.map(filter => {
+            let height = '102%'
+            if (Platform.OS === 'android' && filter?.gradient_direction === 'BOTTOM_TO_TOP') {
+              height = '100%'
+            }
+            if (Platform.OS === 'ios' && filter?.gradient_direction === 'TOP_TO_BOTTOM') {
+              height = ScreenWidth * 1.1
+            }
+            if (Platform.OS === 'ios' && filter?.gradient_direction === 'BOTTOM_TO_TOP') {
+              height = '102%'
+            }
+
             return (
               <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
                 {filter?.gradient_colors && (
@@ -202,9 +217,9 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   // image
                   <ImageBackground
                     source={{ uri: filter?.image }}
-                    resizeMode='cover'
+                    resizeMode={Platform.OS === 'android' ? 'cover' : 'contain'}
                     style={{
-                      height: ScreenWidth * 1.2,
+                      height: height,
                       width: '100%',
                       backgroundColor: 'tranparent',
                     }}
