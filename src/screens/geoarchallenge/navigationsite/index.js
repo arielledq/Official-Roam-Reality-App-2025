@@ -192,21 +192,34 @@ const GeoArSiteNavigation = () => {
 
     if (isOffRoute(position.coords, path)) {
       mapBoxGetRoute()
+      setRerouting(true)
+      setOriginMap([position.coords.longitude, position.coords.latitude])
+      const heading = calculateBearing(
+        position.coords.latitude,
+        position.coords.longitude,
+        path[0][1],
+        path[0][0]
+      )
+      setCurrentHeading(heading)
+      playProximitySound()
+      setTimeout(() => {
+        setRerouting(false)
+      }, 2000)
       const compRes = compareArrays(currentPathRef.current, path)
       if (!compRes) {
-        setRerouting(true)
-        setOriginMap([position.coords.longitude, position.coords.latitude])
-        const heading = calculateBearing(
-          position.coords.latitude,
-          position.coords.longitude,
-          path[0][1],
-          path[0][0]
-        )
-        setCurrentHeading(heading)
-        playProximitySound()
-        setTimeout(() => {
-          setRerouting(false)
-        }, 2000)
+        // setRerouting(true)
+        // setOriginMap([position.coords.longitude, position.coords.latitude])
+        // const heading = calculateBearing(
+        //   position.coords.latitude,
+        //   position.coords.longitude,
+        //   path[0][1],
+        //   path[0][0]
+        // )
+        // setCurrentHeading(heading)
+        // playProximitySound()
+        // setTimeout(() => {
+        //   setRerouting(false)
+        // }, 2000)
       }
       return
     }

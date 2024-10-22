@@ -35,7 +35,6 @@ const GeoArChallengeDetails = ({}) => {
   const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
-  console.log('userLocation', userLocation)
   const [isLoading, setIsLoading] = useState(false)
   const [hiddenStars, setHiddenStars] = useState(0)
   const [starsSites, setStarsSites] = useState(0)
