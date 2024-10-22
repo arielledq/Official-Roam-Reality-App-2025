@@ -9,8 +9,6 @@ import Geocoder from 'react-native-geocoding'
 import MarkerIcon from '../../../assets/geoar/marker_img.svg'
 import ARSiteCountBG from '../../../assets/geoar/ar_site_count_bg.svg'
 import FriendsMarkerIcon from '../../../assets/geoar/friend_marker.svg'
-import Geolocation from 'react-native-geolocation-service'
-
 import { useDispatch, useSelector } from 'react-redux'
 import useStyles from './styles'
 import { updateSelectedSites } from '../../../redux/AR'
@@ -21,12 +19,7 @@ import {
   getUserFriendList,
 } from '../../../network'
 import AppSwitch from '../../../components/Switch'
-import {
-  getBounds,
-  getCenterOfBounds,
-  hasLocationPermission,
-  isLocationPointInPolygon,
-} from '../../../util/LocationLib'
+import { getBounds, getCenterOfBounds, isLocationPointInPolygon } from '../../../util/LocationLib'
 import DestinationFactPopUp from '../destinactionfactpopup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from '../../../components/Icon'
@@ -176,7 +169,10 @@ const GeoArChallengeDetails = ({}) => {
   }
 
   const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location) {
+    if (
+      o?.user_ar_profile?.current_location &&
+      o?.user_ar_profile?.current_location?.coordinates?.length
+    ) {
       return (
         <Marker
           key={o.id}

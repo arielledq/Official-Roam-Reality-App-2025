@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit'
 
 const initialState = {
-  data: {}
+  data: {},
 }
 
 export const sliceLogin = createSlice({
@@ -12,6 +12,16 @@ export const sliceLogin = createSlice({
     updateUserData: (state, action) => {
       state.data = action.payload
     },
+    updateUserLocationData: (state, action) => {
+      let coordinates = []
+      if (!isNaN(action.payload?.longitude) && !isNaN(action.payload?.latitude)) {
+        coordinates = [action.payload.longitude, action.payload.latitude]
+      }
+      state.data.user.user_ar_profile.current_location = {
+        ...state.data.user.user_ar_profile.current_location,
+        coordinates: coordinates,
+      }
+    },
     updateName: (state, action) => {
       state.data.user.name = action.payload
     },
@@ -20,14 +30,15 @@ export const sliceLogin = createSlice({
     },
     updateVerified: (state, action) => {
       state.data.user.user_profile.is_verified = action.payload
-    }
-  }
+    },
+  },
 })
 
 export const {
   resetState,
   updateUserData,
+  updateUserLocationData,
   updateName,
   updateAccountFlag,
-  updateVerified
+  updateVerified,
 } = sliceLogin.actions
