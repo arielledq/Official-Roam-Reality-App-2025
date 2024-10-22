@@ -41,6 +41,7 @@ const GeoArSiteNavigation = () => {
   const [rerouting, setRerouting] = useState(false)
   const [nextCoordinateS, setNextCoordinateS] = useState(null)
   const mapView = useRef(null)
+  const currentPathRef = useRef(null)
 
   const calculatedEstimatedTime = duration => {
     const now = new Date()
@@ -136,7 +137,6 @@ const GeoArSiteNavigation = () => {
 
   const isOffRoute = (currentLocation, path, threshold = 25) => {
     const nextCoordinate = findNextCoordinate(currentLocation, path)
-    // console.log('isOffRoute nextCoordinate ', nextCoordinate)
     if (!nextCoordinate) return false
 
     const distanceToPath = getDistance(
@@ -145,12 +145,35 @@ const GeoArSiteNavigation = () => {
       nextCoordinate[1],
       nextCoordinate[0]
     )
-
+    //
+    // console.log('isOffRoute currentPathRef.current ', currentPathRef.current )
+    // console.log('isOffRoute path', path)
     // console.log('isOffRoute distanceToPath', distanceToPath)
     // console.log('isOffRoute threshold', threshold)
 
     return distanceToPath > threshold
   }
+
+  function compareArrays(arr1, arr2) {
+    if (arr1.length !== arr2.length) {
+      return false; // Arrays do not have the same length
+    }
+
+    for (let i = 0; i < arr1.length; i++) {
+      if (arr1[i].length !== arr2[i].length) {
+        return false; // Nested arrays do not have the same length
+      }
+
+      for (let j = 0; j < arr1[i].length; j++) {
+        if (arr1[i][j] !== arr2[i][j]) {
+          return false; // Found a difference in a nested element
+        }
+      }
+    }
+
+    return true; // Arrays are identical
+  }
+
 
   const getLocationUpdates = async () => {
     const hasPermission = await hasLocationPermission()
@@ -168,14 +191,23 @@ const GeoArSiteNavigation = () => {
     if (rerouting) return
 
     if (isOffRoute(position.coords, path)) {
-      setRerouting(true)
-      setOriginMap([position.coords.longitude, position.coords.latitude])
-      // showMessage("Route recalculated", "info", "Warning!")
-      playProximitySound()
       mapBoxGetRoute()
-      setTimeout(() => {
-        setRerouting(false)
-      }, 2000)
+      const compRes = compareArrays(currentPathRef.current, path)
+      if (!compRes) {
+        setRerouting(true)
+        setOriginMap([position.coords.longitude, position.coords.latitude])
+        const heading = calculateBearing(
+          position.coords.latitude,
+          position.coords.longitude,
+          path[0][1],
+          path[0][0]
+        )
+        setCurrentHeading(heading)
+        playProximitySound()
+        setTimeout(() => {
+          setRerouting(false)
+        }, 2000)
+      }
       return
     }
 
@@ -203,7 +235,6 @@ const GeoArSiteNavigation = () => {
       const lastLocationDistance = getLocationDistance(position.coords, location.coords)
       if (lastLocationDistance > 10) {
         setLocation(position)
-        // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
       }
     }
   }
@@ -260,7 +291,7 @@ const GeoArSiteNavigation = () => {
           setDurationMins(duration / 60)
           calculatedEstimatedTime(duration / 60)
           setPath(data.routes[0].geometry.coordinates)
-          // Set the route to a valid GeoJSON format
+          currentPathRef.current = data.routes[0].geometry.coordinates
           const routeLine = {
             type: 'Feature',
             geometry: data.routes[0].geometry,
