@@ -43,13 +43,8 @@ const UniqueArChallengeShare = ({}) => {
   const [imageHeight, setImageHeight] = useState(0)
   const dispatch = useDispatch()
 
-  console.log('challenges', challengeObj.id)
-  console.log('fileExt', fileExt)
-  console.log('captureData', captureData)
-
   useEffect(() => {
     const shareListener = events.addListener('onShareCompleted', resp => {
-      console.log('Tiktok: onShareCompleted', resp)
       // response contains returned errorCode
     })
     if (fileExt !== 'mp4') {
@@ -101,7 +96,6 @@ const UniqueArChallengeShare = ({}) => {
       social_network,
     }).then(res => {
       if (res.status == 1) {
-        console.log(res.message)
       }
     })
   }
@@ -140,20 +134,17 @@ const UniqueArChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
-        console.log('ShareResponse true =>', ShareResponse)
         updateARSocialPoints('FACEBOOK')
       } else {
-        console.log('ShareResponse false =>', ShareResponse)
       }
     } catch (error) {
-      console.log('Error =>', error)
+      console.error('Error =>', error)
     }
   }
 
   const facebookShareIOS = async () => {
     const filebase64 = await RNFS.readFile(captureData, 'base64')
-    console.log('Facebook Share', fileExt)
-    console.log('Facebook Share', captureData)
+
     ShareDialog.setMode('native')
 
     if (fileExt == 'png' || fileExt == 'jpg') {
@@ -175,22 +166,18 @@ const UniqueArChallengeShare = ({}) => {
     }
     ShareDialog.canShow(shareContent)
       .then(canShow => {
-        console.log('Facebook canShow', canShow)
         if (canShow) {
           return ShareDialog.show(shareContent)
         }
       })
       .then(result => {
-        console.log('Share : ' + result)
         if (result.isCancelled) {
-          console.log('Share cancelled')
         } else {
-          console.log('Share success with postId: ' + result.postId)
           updateARSocialPoints('FACEBOOK')
         }
       })
       .catch(e => {
-        console.log('catch', e.toString())
+        console.error('catch', e.toString())
       })
   }
 
@@ -228,13 +215,11 @@ const UniqueArChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
-        console.log('ShareResponse true =>', ShareResponse)
         updateARSocialPoints('INSTAGRAM')
       } else {
-        console.log('ShareResponse false =>', ShareResponse)
       }
     } catch (error) {
-      console.log('Error =>', error)
+      console.error('Error =>', error)
     }
   }
 
@@ -243,7 +228,6 @@ const UniqueArChallengeShare = ({}) => {
       const filebase64 = await RNFS.readFile(captureData, 'base64')
       init('aw5g4n448236v4uh')
       share(captureData, code => {
-        console.log(code)
         updateARSocialPoints('TIKTOK')
       })
     } else {
@@ -255,7 +239,7 @@ const UniqueArChallengeShare = ({}) => {
     // }).then((media) => {
     //   init('aw5g4n448236v4uh');
     //   share(media.path, (code) => {
-    //     console.log(code);
+
     //   });
     // });
 
@@ -267,11 +251,11 @@ const UniqueArChallengeShare = ({}) => {
     //     type: 'video/mp4',
     //     filename: "VideoShare"
     //   };
-    //   console.log(JSON.stringify(shareOptions, null, 2))
+
     //   try {
     //     await Share.open(shareOptions);
     //   } catch (error) {
-    //     console.log('Error =>', error);
+
     //   }
     // } else {
     //   showMessage("Only Video Supported to share.", "error", "Share Support Issue:")
@@ -302,7 +286,7 @@ const UniqueArChallengeShare = ({}) => {
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
         <AppText numberOfLines={3} style={[styles.headerText]}>
-          Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{' '}
+          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
         </AppText>
         <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
           {fileExt == 'mp4' ? (
@@ -320,13 +304,13 @@ const UniqueArChallengeShare = ({}) => {
             />
           ) : (
             <Image
-              resizeMode={'contain'}
+              resizeMode={'stretch'}
               source={{ uri: captureData }}
               style={{
                 backgroundColor: 'transparent',
                 width: '70%',
-                height: imageHeight * 0.7,
-                marginTop: Platform.OS == 'ios' ? -200 : 0,
+                height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
+                marginTop: 0,
               }}
             />
           )}

@@ -87,7 +87,7 @@ const useStyles = makeStyles(theme => ({
     marginHorizontal: 8,
   },
   heading: {
-    fontSize: FontSizes.S14,
+    fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.ns700,
     color: theme.colors.white,

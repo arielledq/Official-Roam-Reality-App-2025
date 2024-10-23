@@ -43,9 +43,7 @@ const Home: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route }) => {
   if (openBottomSheet) {
     handleLogOut()
     setOpenBottomSheet(false)
-  } else {
   }
-  console.log({ account_setup })
 
   useEffect(() => {
     if (!account_setup) {
@@ -85,7 +83,6 @@ const Home: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route }) => {
         text: 'yes',
         onPress: () => {
           deleteAccount().then(res => {
-            console.log({ res })
             if (res.status == 1) {
               showMessage('Your account has been deleted successfully')
               handleLogOutButton()

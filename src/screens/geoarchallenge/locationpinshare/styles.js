@@ -15,7 +15,7 @@ const useStyles = makeStyles(theme => ({
   container: { marginTop: '10%' },
   headerText: {
     ...fontGroup.ns900,
-    fontSize: FontSizes.S24,
+    fontSize: FontSizes.S20,
     color: theme.colors.white,
     marginTop: 10,
   },
@@ -24,6 +24,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S12,
     color: '#9CA3AF',
     marginTop: 10,
+    marginBottom: 30,
   },
   pointCount: {
     ...fontGroup.p900,
@@ -107,14 +108,16 @@ const useStyles = makeStyles(theme => ({
     marginTop: 10,
     marginBottom: 20,
     overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   detailContainer: {
     borderRadius: 12,
     width: '100%',
     backgroundColor: '#272741',
-    marginTop: 10,
-    marginBottom: 20,
+    marginVertical: 20,
     overflow: 'hidden',
+    alignItems: 'center',
   },
   pointsParentContainer: {
     width: '100%',

@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useRef, useState} from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
 import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
 import BackgroundWithImage from '../../../components/background'
@@ -9,8 +9,6 @@ import Geocoder from 'react-native-geocoding'
 import MarkerIcon from '../../../assets/geoar/marker_img.svg'
 import ARSiteCountBG from '../../../assets/geoar/ar_site_count_bg.svg'
 import FriendsMarkerIcon from '../../../assets/geoar/friend_marker.svg'
-import Geolocation from 'react-native-geolocation-service'
-
 import { useDispatch, useSelector } from 'react-redux'
 import useStyles from './styles'
 import { updateSelectedSites } from '../../../redux/AR'
@@ -21,23 +19,18 @@ import {
   getUserFriendList,
 } from '../../../network'
 import AppSwitch from '../../../components/Switch'
-import {
-  getBounds,
-  getCenterOfBounds,
-  hasLocationPermission,
-  isLocationPointInPolygon,
-} from '../../../util/LocationLib'
+import { getBounds, getCenterOfBounds, isLocationPointInPolygon } from '../../../util/LocationLib'
 import DestinationFactPopUp from '../destinactionfactpopup'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import Icon from '../../../components/Icon'
-import {GeolocationContext} from "../../../GeolocationProvider";
+import { GeolocationContext } from '../../../GeolocationProvider'
 
 const SCROLL_AMOUNT = 70
 
 const GeoArChallengeDetails = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
-  const { userLocation } = useContext(GeolocationContext);
+  const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
   const [isLoading, setIsLoading] = useState(false)
@@ -115,7 +108,6 @@ const GeoArChallengeDetails = ({}) => {
       !selectedDestination.geo_location ||
       selectedDestination.geo_location.coordinates.length == 0
     ) {
-      // console.log('setMapBounds')
       setTimeout(setMapBounds, 500)
     } else {
       const fullRegion = {
@@ -134,9 +126,6 @@ const GeoArChallengeDetails = ({}) => {
         fullRegion.latitude = Number(full_latitude_longitude.latitude)
         fullRegion.longitude = Number(full_latitude_longitude.longitude)
       }
-      // console.log('full_bounds', full_bounds)
-      // console.log('full_latitude_longitude', full_latitude_longitude)
-      // console.log('full_latitude_longitude', selectedDestination.border)
       setFullRegion(fullRegion)
     }
     getHiddenStar()
@@ -146,19 +135,17 @@ const GeoArChallengeDetails = ({}) => {
   }, [])
 
   const loadDFacts = async id => {
-
     getDestinationFacts({
       destination_id: id,
     })
       .then(async res => {
-        console.log('res', res)
         for (let i = 0; i < res.data.length; i++) {
           const facts = res.data[i]
           const arrayPoints = []
           if (facts?.border?.coordinates) {
-            for (i = 0; i < facts.border.coordinates.length; i++) {
+            for (let i = 0; i < facts.border.coordinates.length; i++) {
               const points = facts.border.coordinates[i]
-              for (j = 0; j < points.length; j++) {
+              for (let j = 0; j < points.length; j++) {
                 const point = points[j]
                 arrayPoints.push({
                   latitude: point[1],
@@ -167,7 +154,7 @@ const GeoArChallengeDetails = ({}) => {
               }
             }
           }
-          const isInsideSiteArea = isLocationPointInPolygon({latitude, longitude}, arrayPoints)
+          const isInsideSiteArea = isLocationPointInPolygon({ latitude, longitude }, arrayPoints)
           if (isInsideSiteArea) {
             const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
             // if don't want to open popup again and again
@@ -182,7 +169,10 @@ const GeoArChallengeDetails = ({}) => {
   }
 
   const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location) {
+    if (
+      o?.user_ar_profile?.current_location &&
+      o?.user_ar_profile?.current_location?.coordinates?.length
+    ) {
       return (
         <Marker
           key={o.id}
@@ -258,9 +248,9 @@ const GeoArChallengeDetails = ({}) => {
   const getFullBounds = _ => {
     if (selectedDestination.border) {
       let arrayPoints = []
-      for (i = 0; i < selectedDestination.border.coordinates.length; i++) {
+      for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
         const points = selectedDestination.border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
@@ -275,7 +265,6 @@ const GeoArChallengeDetails = ({}) => {
   const getFriends = () => {
     getUserFriendList()
       .then(response => {
-        console.log('getFriends', response?.data[0]?.friends)
         if (response) {
           setFriendList(response?.data[0]?.friends || [])
           setFilteredUsers(response?.data[0]?.friends || [])
@@ -289,9 +278,9 @@ const GeoArChallengeDetails = ({}) => {
   const getFullCenter = _ => {
     if (selectedDestination.border) {
       let arrayPoints = []
-      for (i = 0; i < selectedDestination.border.coordinates.length; i++) {
+      for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
         const points = selectedDestination.border.coordinates[i]
-        for (j = 0; j < points.length; j++) {
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
@@ -305,9 +294,9 @@ const GeoArChallengeDetails = ({}) => {
 
   const moveToRegion = r => {
     let arrayPoints = []
-    for (i = 0; i < r.geo_region.coordinates.length; i++) {
+    for (let i = 0; i < r.geo_region.coordinates.length; i++) {
       const points = r.geo_region.coordinates[i]
-      for (j = 0; j < points.length; j++) {
+      for (let j = 0; j < points.length; j++) {
         const point = points[j]
         arrayPoints.push({ latitude: point[1], longitude: point[0] })
       }

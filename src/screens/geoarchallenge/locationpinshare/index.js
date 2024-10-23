@@ -17,7 +17,7 @@ import {
   socialPointsARUpdateAPI,
   updateUserPointAPI,
 } from '../../../network'
-import { showMessage } from '../../../util/helpers'
+import { handleError, showMessage } from '../../../util/helpers'
 import { useDispatch, useSelector } from 'react-redux'
 import { updateARUserData } from '../../../redux/AR'
 import { ShareDialog } from 'react-native-fbsdk-next'
@@ -27,6 +27,8 @@ import { share, init, events } from 'react-native-tiktok'
 import BGArShare from '../../../assets/ar/bg-ar-share.png'
 import PinShare from '../../../assets/geoar/pin_share.svg'
 import { moderateScale } from '../../../util/AppDimensions'
+import { CameraRoll } from '@react-native-camera-roll/camera-roll'
+import DownloadImg from '../../../assets/ar/download.svg'
 
 const ArPinChallengeShare = ({}) => {
   const getPathFromUrl = url => {
@@ -47,13 +49,8 @@ const ArPinChallengeShare = ({}) => {
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
   const dispatch = useDispatch()
 
-  console.log('challenges', challengeObj.id)
-  console.log('fileExt', fileExt)
-  console.log('captureData', captureData)
-
   useEffect(() => {
     const shareListener = events.addListener('onShareCompleted', resp => {
-      console.log('Tiktok: onShareCompleted', resp)
       // response contains returned errorCode
     })
     if (fileExt !== 'mp4') {
@@ -65,7 +62,6 @@ const ArPinChallengeShare = ({}) => {
         setImageHeight(imageHeight)
       })
     }
-    shareBtnOnPress()
   }, [])
 
   const shareBtnOnPress = () => {
@@ -83,11 +79,20 @@ const ArPinChallengeShare = ({}) => {
       .then(res => {
         ARUserProfile()
         if (res.status == 1) {
-          console.log('Pin Check-ins!', 'Successfully, completed your pin check-ins.')
+          showMessage(
+            'Successfully, completed your challenge.',
+            'success',
+            'Location Check In Challenge Share!'
+          )
           updateUserPoint()
         } else {
-          console.log('postCheckIn:', res)
+          res.message.message =
+            'You already completed the challenge or there is some issue with completing the challenge.'
+          handleError(res)
         }
+      })
+      .catch(error => {
+        console.error('error sharing location check in', error)
       })
       .finally(() => {
         setIsLoading(false)
@@ -99,7 +104,6 @@ const ArPinChallengeShare = ({}) => {
       social_network,
     }).then(res => {
       if (res.status == 1) {
-        console.log(res.message)
       }
     })
   }
@@ -108,9 +112,7 @@ const ArPinChallengeShare = ({}) => {
     updateUserPointAPI({
       points: challengeObj.points,
     })
-      .then(res => {
-        console.log('updateUserPoint:', res)
-      })
+      .then(res => {})
       .finally(() => {})
   }
 
@@ -148,20 +150,16 @@ const ArPinChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
-        console.log('ShareResponse true =>', ShareResponse)
         updateARSocialPoints('FACEBOOK')
       } else {
-        console.log('ShareResponse false =>', ShareResponse)
       }
     } catch (error) {
-      console.log('Error =>', error)
+      console.error('Error =>', error)
     }
   }
 
   const facebookShareIOS = async () => {
     const filebase64 = await RNFS.readFile(captureData, 'base64')
-    console.log('Facebook Share', fileExt)
-    console.log('Facebook Share', captureData)
     ShareDialog.setMode('native')
 
     if (fileExt == 'png' || fileExt == 'jpg') {
@@ -183,22 +181,18 @@ const ArPinChallengeShare = ({}) => {
     }
     ShareDialog.canShow(shareContent)
       .then(canShow => {
-        console.log('Facebook canShow', canShow)
         if (canShow) {
           return ShareDialog.show(shareContent)
         }
       })
       .then(result => {
-        console.log('Share : ' + result)
         if (result.isCancelled) {
-          console.log('Share cancelled')
         } else {
-          console.log('Share success with postId: ' + result.postId)
           updateARSocialPoints('FACEBOOK')
         }
       })
       .catch(e => {
-        console.log('catch', e.toString())
+        console.error('catch', e.toString())
       })
   }
 
@@ -207,6 +201,7 @@ const ArPinChallengeShare = ({}) => {
       facebookShareAndroid()
     } else {
       facebookShareAndroid()
+      // facebookShareIOS()
     }
   }
 
@@ -236,13 +231,10 @@ const ArPinChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
-        console.log('ShareResponse true =>', ShareResponse)
         updateARSocialPoints('INSTAGRAM')
-      } else {
-        console.log('ShareResponse false =>', ShareResponse)
       }
     } catch (error) {
-      console.log('Error =>', error)
+      console.error('Error =>', error)
     }
   }
 
@@ -251,12 +243,24 @@ const ArPinChallengeShare = ({}) => {
       const filebase64 = await RNFS.readFile(captureData, 'base64')
       init('aw5g4n448236v4uh')
       share(captureData, code => {
-        console.log(code)
         updateARSocialPoints('TIKTOK')
       })
     } else {
       showMessage('Only Video Supported to share.', 'error', 'Share Support Issue:')
     }
+  }
+
+  const checkPermission = () => {
+    CameraRoll.saveAsset(captureData, {
+      type: fileExt == 'mp4' ? 'video' : 'photo',
+    })
+      .then(() => {
+        showMessage('Saved to Camera Roll.')
+      })
+      .catch(err => {
+        console.error('err:', err)
+        showMessage('Not able to save, please check permission.', 'error')
+      })
   }
 
   return (
@@ -270,18 +274,20 @@ const ArPinChallengeShare = ({}) => {
         backgroundColor='transparent'
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
-        <View style={styles.imageContainer}>
+        <AppText numberOfLines={3} style={[styles.headerText]}>
+          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
+        </AppText>
+        <View style={[styles.detailContainer, { minHeight: 0 }]}>
           <Image
-            resizeMode={'contain'}
+            resizeMode={'stretch'}
             source={{ uri: captureData }}
             style={{
-              width: '100%',
-              height: imageHeight,
-              marginTop: Platform.OS == 'ios' ? -200 : 0,
+              backgroundColor: 'transparent',
+              width: '70%',
+              height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
+              marginTop: 0,
             }}
           />
-        </View>
-        <View style={styles.detailContainer}>
           <View style={styles.pointsParentContainer}>
             <View style={styles.detailPointContainter}>
               <BackgroundWithImage
@@ -325,6 +331,9 @@ const ArPinChallengeShare = ({}) => {
                   <Text style={styles.challengeSponsorStartDateText}>
                     Completed on : {startDate}
                   </Text>
+                  <TouchableOpacity onPress={checkPermission} style={styles.shareBtn}>
+                    <DownloadImg />
+                  </TouchableOpacity>
                 </View>
               </View>
             </View>

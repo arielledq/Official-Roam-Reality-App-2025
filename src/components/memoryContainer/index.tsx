@@ -31,12 +31,7 @@ const MemoryContainer = ({
 
   let dirs = RNFetchBlob.fs.dirs
   const path = Platform.OS === 'ios' ? dirs.LibraryDir + memoryName : dirs.PictureDir + memoryName
-  //let path = Platform.OS === 'ios' ? dirs['MainBundleDir'] + memoryName : dirs.PictureDir + memoryName;
   const saveToGallery = () => {
-    console.log('path:', path)
-    console.log('fileExt:', fileExt)
-    console.log('memoryURL:', memoryURL)
-    console.log('Platform.OS:', Platform.OS)
     RNFetchBlob.config({
       fileCache: true,
       appendExt: fileExt,
@@ -53,13 +48,12 @@ const MemoryContainer = ({
       .fetch('GET', memoryURL)
       .then(res => {
         if (Platform.OS == 'ios') {
-          console.log('res.path::', res)
           CameraRoll.saveAsset(res.data, { type: fileExt == 'mp4' ? 'video' : 'photo' })
             .then(() => {
               showMessage('Saved to Camera Roll', 'success', 'AR Memories!')
             })
             .catch(err => {
-              console.log('err:', err)
+              showMessage('There was an error saving to Camera Roll', 'error', 'AR Memories!')
             })
         } else {
           showMessage('Saved to Camera Roll', 'success', 'AR Memories!')
@@ -73,7 +67,6 @@ const MemoryContainer = ({
         PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
         PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
       ]).then(response => {
-        console.log('PERMISSIONS.ANDROID:: ', response)
         saveToGallery()
       })
     } else {

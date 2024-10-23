@@ -1,204 +1,201 @@
-import React, {useContext, useEffect, useRef, useState} from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 
-import {
-  ActivityIndicator,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native"
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View, Image } from "react-native"
 import BackgroundWithImage from "../../../components/background"
 import AppHeader from "../../../components/header"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
 import HomeIcon from "../../../assets/geoar/home.svg"
 import CloseBIcon from "../../../assets/geoar/close-square.svg"
 import SkipIcon from "../../../assets/geoar/skip.svg"
 import MarkerIcon from "../../../assets/geoar/marker_img.svg"
 
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import useStyles from "./styles"
 import { useNavigation, useRoute } from "@react-navigation/native"
-import Geolocation, { GeoPosition } from "react-native-geolocation-service"
-import MapViewDirections from "react-native-maps-directions"
 import { convertKilometersToMiles, showMessage } from "../../../util/helpers"
 import moment from "moment"
-import Strings from "../../../constants/Strings"
-import mapCustomStyle from "../../../constants/MapCustomStyles"
-import {
-  getLocationDistance,
-  hasLocationPermission
-} from "../../../util/LocationLib";
-import CompassHeading from 'react-native-compass-heading';
-import {GeolocationContext} from "../../../GeolocationProvider";
+import { getLocationDistance, hasLocationPermission } from "../../../util/LocationLib"
+import { GeolocationContext } from "../../../GeolocationProvider"
+import Sound from "react-native-sound"
+import Config from "../../../config"
+import MapboxGL from "@rnmapbox/maps"
 
-const MARGIN_ARRIVAL_METERS = 50
-
-const GeoArSiteNavigation = ({ }) => {
-
-  const [mapRegion, setMapRegion] = useState({
-    longitude: 0,
-    latitude: 0,
-    longitudeDelta: 0.004,
-    latitudeDelta: 0.009
-  })
-  const compassHeading = useRef(0)
-
+const GeoArSiteNavigation = () => {
+  const route = useRoute()
   const _styles = useStyles()
-  const dispatch = useDispatch()
   const navigation = useNavigation()
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const { userLocation } = useContext(GeolocationContext);
+  const { userLocation } = useContext(GeolocationContext)
   const latitude = userLocation?.latitude
   const longitude = userLocation?.longitude
   const [isLoading, setIsLoading] = useState(false)
-  const [currentLocation, setCurrentLocation] = useState(null)
   const [mileDistance, setMileDistance] = useState(0)
   const [durationMins, setDurationMins] = useState(0)
-  const [forceLocation, setForceLocation] = useState(true)
-  const [highAccuracy, setHighAccuracy] = useState(true)
-  const [locationDialog, setLocationDialog] = useState(true)
-  const [significantChanges, setSignificantChanges] = useState(false)
-  const [useLocationManager, setUseLocationManager] = useState(false)
   const [estimatedTime, setEstimatedTime] = useState("")
   const [location, setLocation] = useState(null)
-  const mapView = useRef()
-  const watchId = useRef(null)
-  const route = useRoute()
+  const [router, setRoute] = useState(null)
+  const [originMap, setOriginMap] = useState(null)
+  const [destinationMap, setDestinationMap] = useState(null)
+  const [path, setPath] = useState(null)
+  const [currentHeading, setCurrentHeading] = useState(0)
 
-  const stopLocationUpdates = () => {
-    if (watchId.current !== null) {
-      Geolocation.clearWatch(watchId.current)
-      watchId.current = null
-      Geolocation.stopObserving()
-    }
-  }
+  const mapView = useRef()
 
   const calculatedEstimatedTime = duration => {
-    var now = new Date()
+    const now = new Date()
     const calcTime = moment(now).add(duration, "minutes").format("hh:mm A")
     setEstimatedTime(calcTime)
   }
 
-  useEffect(() => {
-    getFirstLocation()
-    getLocationUpdates()
-    return () => {
-      stopLocationUpdates()
-    }
-  }, [])
-
   const getFirstLocation = () => {
-    const position = {
-      coords: {
-        latitude,
-        longitude,
-      }
-    }
+    const position = { coords: { latitude, longitude } }
 
-    const endPosition ={
+    const endPosition = {
       latitude: selectedGeoSite.lat_long.coordinates[1],
-      longitude: selectedGeoSite.lat_long.coordinates[0]
+      longitude: selectedGeoSite.lat_long.coordinates[0],
     }
 
-    const currentRegion = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      latitudeDelta: 0.0032,
-      longitudeDelta: 0.0032
-    }
-    setMapRegion(currentRegion)
+    const initialHeading= calculateBearing(
+      position.coords.latitude,
+      position.coords.longitude,
+      endPosition.latitude,
+      endPosition.longitude
+    )
+    setCurrentHeading(initialHeading)
 
-    const headingValue = calculateBearing(position.coords.latitude, position.coords.longitude, endPosition.latitude, endPosition.longitude)
+    const origin = [position.coords.longitude, position.coords.latitude]
 
-    compassHeading.current = headingValue
+    const destination = [selectedGeoSite.lat_long.coordinates[0], selectedGeoSite.lat_long.coordinates[1]]
 
+    setOriginMap(origin)
+    setDestinationMap(destination)
     setLocation(position)
-    setCurrentLocation(position)
-    if (mapView && mapView.current) {
-      console.log('animateCamera', position.coords, compassHeading.current)
-      mapView.current.getCamera().then(camera => {
-        console.log('camera', camera)
-      })
-      mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
-    }
+
   }
 
   function calculateBearing(startLat, startLng, endLat, endLng) {
-    const startLatRad = (Math.PI / 180) * startLat;
-    const startLngRad = (Math.PI / 180) * startLng;
-    const endLatRad = (Math.PI / 180) * endLat;
-    const endLngRad = (Math.PI / 180) * endLng;
+    const startLatRad = (Math.PI / 180) * startLat
+    const startLngRad = (Math.PI / 180) * startLng
+    const endLatRad = (Math.PI / 180) * endLat
+    const endLngRad = (Math.PI / 180) * endLng
 
-    const dLng = endLngRad - startLngRad;
+    const dLng = endLngRad - startLngRad
 
-    const x = Math.sin(dLng) * Math.cos(endLatRad);
+    const x = Math.sin(dLng) * Math.cos(endLatRad)
     const y =
       Math.cos(startLatRad) * Math.sin(endLatRad) -
-      Math.sin(startLatRad) * Math.cos(endLatRad) * Math.cos(dLng);
+      Math.sin(startLatRad) * Math.cos(endLatRad) * Math.cos(dLng)
 
-    let bearing = Math.atan2(x, y);
-    bearing = (bearing * 180) / Math.PI; // Convert from radians to degrees
-    bearing = (bearing + 360) % 360; // Normalize to 0-360
+    let bearing = Math.atan2(x, y)
+    bearing = (bearing * 180) / Math.PI // Convert from radians to degrees
+    bearing = (bearing + 360) % 360 // Normalize to 0-360
 
-    return bearing;
+    return bearing
   }
 
-  const getLocationUpdates = async () => {
+  function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371 // Radius of the Earth in kilometers
+    const dLat = (lat2 - lat1) * Math.PI / 180
+    const dLon = (lon2 - lon1) * Math.PI / 180
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    const distance = R * c // Distance in kilometers
+    return distance * 1000 // Convert to meters
+  }
+
+  function findNextCoordinate(currentLocation, coordinates) {
+    if (!currentLocation || !path) return false
+    console.log("currentLocation ==> ", currentLocation)
+    console.log("coordinates==> ", coordinates)
+    let closestCoordinate = null
+    let closestDistance = Infinity
+
+    for (let i = 0; i < coordinates?.length; i++) {
+      const coord = coordinates[i]
+      const distance = getDistance(
+        currentLocation.latitude,
+        currentLocation.longitude,
+        coord[1],  // Latitude
+        coord[0]   // Longitude
+      )
+
+      if (distance < closestDistance) {
+        closestDistance = distance
+        closestCoordinate = coord
+      }
+    }
+
+    return closestCoordinate
+  }
+
+  const isOffRoute = (currentLocation, path, threshold = 20) => {
+    const nextCoordinate = findNextCoordinate(currentLocation, path)
+    if (!nextCoordinate) return false
+
+    const distanceToPath = getDistance(
+      currentLocation.latitude,
+      currentLocation.longitude,
+      nextCoordinate[1],
+      nextCoordinate[0]
+    )
+
+    return distanceToPath > threshold
+  }
+
+
+  const getLocationUpdates = async() => {
+
     const hasPermission = await hasLocationPermission()
     if (!hasPermission) {
       return
     }
-    // TODO: Move this to GeolocationProvider
 
-    watchId.current = Geolocation.watchPosition(
-      position => {
-        const dis = getLocationDistance(position.coords, {
-          latitude: selectedGeoSite.lat_long.coordinates[1],
-          longitude: selectedGeoSite.lat_long.coordinates[0]
-        })
-        if (dis < selectedGeoSite.check_in_site_radius) {
-          navigation.replace("GeoArSiteArrived")
-          stopLocationUpdates()
-          return
-        }
+    const position = { coords: { latitude, longitude } }
 
-        if (!location) {
-          setLocation(position)
-          mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
-        } else if (location && location.coords) {
-          const lastLocationDistance = getLocationDistance(position.coords, location.coords)
-          if (lastLocationDistance > 10) {
-            setLocation(position)
-            mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
-          }
-        }
-      },
-      error => {
-        console.log(error)
-      },
-      {
-        accuracy: {
-          android: "high",
-          ios: "best"
-        },
-        enableHighAccuracy: highAccuracy,
-        distanceFilter: 1,
-        interval: 5000,
-        fastestInterval: 2000,
-        forceRequestLocation: forceLocation,
-        forceLocationManager: useLocationManager,
-        showLocationDialog: locationDialog,
-        useSignificantChanges: significantChanges
+    const dis = getLocationDistance(position.coords, {
+      latitude: selectedGeoSite.lat_long.coordinates[1],
+      longitude: selectedGeoSite.lat_long.coordinates[0],
+    })
+
+    if (isOffRoute(position.coords, path)) {
+      showMessage("Route recalculated", "info", "Warning!")
+      playProximitySound()
+      mapBoxGetRoute()
+      return
+    }
+
+    const nextCoordinate = findNextCoordinate(position.coords, path)
+
+    if (nextCoordinate) {
+      const heading= calculateBearing(
+        position.coords.latitude,
+        position.coords.longitude,
+        nextCoordinate[1],
+        nextCoordinate[0]
+      )
+      setCurrentHeading(heading)
+    }
+
+    if (dis < selectedGeoSite.check_in_site_radius) {
+      navigation.replace("GeoArSiteArrived")
+      return
+    }
+
+    if (location && location.coords) {
+      const lastLocationDistance = getLocationDistance(position.coords, location.coords)
+      if (lastLocationDistance > 10) {
+        setLocation(position)
+        // mapView.current.animateCamera({ center: position.coords, heading: compassHeading.current, zoom: 17 });
       }
-    )
+    }
   }
 
   const minOrHoursWalkDriving = walkDurationMins => {
     if (walkDurationMins < 60) {
       return (
         <>
-          {Math.round(walkDurationMins)}{" "}
-          <Text style={{ fontSize: 14 }}>mins</Text>
+          {Math.round(walkDurationMins)} <Text style={{ fontSize: 14 }}>mins</Text>
         </>
       )
     } else if (walkDurationMins >= 60) {
@@ -211,13 +208,72 @@ const GeoArSiteNavigation = ({ }) => {
     }
   }
 
+  const playProximitySound = () => {
+    Sound.setCategory("Playback")
+    let proximitySound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
+      if (error) {
+        console.error("failed to load the sound", error)
+      } else {
+        proximitySound.play()
+      }
+    })
+  }
+
+  const mapBoxGetRoute = () => {
+    if (!originMap || !destinationMap) {
+      return
+    }
+
+    const origin = originMap.join(",")
+    const destination = destinationMap.join(",")
+    const mapType = route?.params?.mapMode
+    const MBUrlBase = "https://api.mapbox.com/directions/v5/mapbox/"
+    const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}`
+    const MBUrl = `${MBUrlBase}${mapType}/${origin};${destination}${MBUrlParams}`
+
+    // Fetch route data from Mapbox Directions API
+    fetch(MBUrl)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.routes.length) {
+          const distance = data.routes[0].distance
+          const duration = data.routes[0].duration
+          setMileDistance(convertKilometersToMiles(distance / 1000))
+          setDurationMins(duration / 60)
+          calculatedEstimatedTime(duration / 60)
+          setPath(data.routes[0].geometry.coordinates)
+          // Set the route to a valid GeoJSON format
+          const routeLine = {
+            type: "Feature",
+            geometry: data.routes[0].geometry,
+          }
+          setRoute(routeLine)
+        }
+      })
+      .catch((error) => console.error(error))
+  }
+
+  useEffect(() => {
+    if (userLocation) {
+      getLocationUpdates()
+    }
+  }, [userLocation, path])
+
+  useEffect(() => {
+    mapBoxGetRoute()
+  }, [originMap, destinationMap])
+
+  useEffect(() => {
+    getFirstLocation()
+  }, [])
+
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         rightComponent={() => (
           <TouchableOpacity
             onPress={() => {
-              stopLocationUpdates()
               navigation.replace("ChallengeSelection")
             }}
           >
@@ -226,16 +282,13 @@ const GeoArSiteNavigation = ({ }) => {
         )}
         centerComponent={{
           text: "Navigate to Site",
-          style: [_styles.heading]
+          style: [_styles.heading],
         }}
         backgroundColor="transparent"
       />
 
       {isLoading && <ActivityIndicator size="large" />}
-      <ScrollView
-        style={{ width: "100%" }}
-        showsVerticalScrollIndicator={false}
-      >
+      <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
         <View
           style={{
             position: "relative",
@@ -243,102 +296,49 @@ const GeoArSiteNavigation = ({ }) => {
             borderRadius: 16,
             overflow: "hidden",
             marginTop: 20,
-            marginHorizontal: 30
+            marginHorizontal: 30,
           }}
         >
-          <MapView
-            customMapStyle={mapCustomStyle}
-            provider={PROVIDER_GOOGLE}
-            showsCompass={true}
-            ref={mapView}
-            zoomControlEnabled={true}
-            showsTraffic={true}
-            // region={mapRegion}
-            style={{
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0
-            }}
-            showsMyLocationButton={true}
-            zoomEnabled={true}
-            scrollEnabled={true}
-            showsUserLocation={true}
-            initialRegion={{
-              latitude: selectedGeoSite.lat_long.coordinates[1],
-              longitude: selectedGeoSite.lat_long.coordinates[0],
-              latitudeDelta: 0.0032,
-              longitudeDelta: 0.0032
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: selectedGeoSite.lat_long.coordinates[1],
-                longitude: selectedGeoSite.lat_long.coordinates[0]
-              }}
-              title={selectedGeoSite.name}
-            >
-              <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
-              </View>
-            </Marker>
+          {originMap && destinationMap && <MapboxGL.MapView style={{ flex: 1 }}>
 
-            {currentLocation && (
-              <Marker
-                coordinate={{
-                  latitude: currentLocation.coords.latitude,
-                  longitude: currentLocation.coords.longitude
-                }}
-                title={"Start Location"}
-              >
-                <View style={{ width: 30, height: 30 }}>
-                  <MarkerIcon />
-                </View>
-              </Marker>
-            )}
-            {location && (
-              <MapViewDirections
-                origin={{
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude
-                }}
-                precision={"high"}
-                timePrecision={"now"}
-                mode={route?.params?.mapMode}
-                destination={{
-                  latitude: selectedGeoSite.lat_long.coordinates[1],
-                  longitude: selectedGeoSite.lat_long.coordinates[0]
-                }}
-                apikey={Strings.GOOGLE_PLACE_API_KEY}
-                strokeWidth={8}
-                strokeColor="#01AFFC"
-                optimizeWaypoints={true}
-                onStart={params => {
-                  // console.log(
-                  //   `Started routing between "${params.origin}" and "${params.destination}"`
-                  // )
-                }}
-                onReady={result => {
-                  setMileDistance(convertKilometersToMiles(result.distance))
-                  setDurationMins(result.duration)
-                  calculatedEstimatedTime(result.duration)
+            <MapboxGL.Camera
+              ref={mapView}
+              zoomLevel={18}
+              centerCoordinate={originMap}
+              pitch={60} // Sets the 3D pitch angle
+              animationMode="easeTo"
+              animationDuration={1000}
+              heading={currentHeading}
+            />
 
-                  // mapView.fitToCoordinates(result.coordinates, {
-                  //   edgePadding: {
-                  //     right: (width / 20),
-                  //     bottom: (height / 20),
-                  //     left: (width / 20),
-                  //     top: (height / 20),
-                  //   }
-                  // });
-                }}
-                onError={errorMessage => {
-                  // console.log('GOT AN ERROR');
-                }}
-              />
+            <MapboxGL.PointAnnotation id="currentLocation" coordinate={[longitude, latitude]}>
+              <MarkerIcon style={{width: 25, height: 40}} />
+            </MapboxGL.PointAnnotation>
+
+            {/* Origin and Destination Markers */}
+            {/*<MapboxGL.PointAnnotation id="origin" coordinate={originMap} />*/}
+            <MapboxGL.PointAnnotation id="currentLocation" coordinate={originMap}>
+              <MarkerIcon style={{width: 25, height: 40}} />
+            </MapboxGL.PointAnnotation>
+            <MapboxGL.PointAnnotation id="currentLocation" coordinate={destinationMap}>
+              <MarkerIcon style={{width: 25, height: 40}} />
+            </MapboxGL.PointAnnotation>
+
+            {/* Display Route if Available */}
+            {router && (
+              <MapboxGL.ShapeSource id="routeSource" shape={router}>
+                <MapboxGL.LineLayer
+                  id="routeLayer"
+                  style={{
+                    lineColor: "#812fac",
+                    lineWidth: 10,
+                    lineJoin: "round",
+                    lineCap: "round",
+                  }}
+                />
+              </MapboxGL.ShapeSource>
             )}
-          </MapView>
+          </MapboxGL.MapView>}
         </View>
         <View
           style={{
@@ -347,23 +347,19 @@ const GeoArSiteNavigation = ({ }) => {
             paddingHorizontal: 20,
             paddingBottom: 20,
             marginVertical: 20,
-            alignItems: "center"
+            alignItems: "center",
           }}
         >
-          <HomeIcon
-            style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }}
-          />
+          <HomeIcon style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }} />
           <View
             style={{
               width: "100%",
               flexDirection: "row",
               alignItems: "center",
-              justifyContent: "space-between"
+              justifyContent: "space-between",
             }}
           >
-            <TouchableOpacity
-              onPress={() => navigation.replace("ChallengeSelection")}
-            >
+            <TouchableOpacity onPress={() => navigation.replace("ChallengeSelection")}>
               <CloseBIcon style={{ width: 32, height: 32 }} />
             </TouchableOpacity>
             <View style={{ alignItems: "center", marginVertical: 8 }}>
@@ -374,17 +370,14 @@ const GeoArSiteNavigation = ({ }) => {
                 style={{
                   width: "100%",
                   flexDirection: "row",
-                  alignItems: "center"
+                  alignItems: "center",
                 }}
               >
                 <Text style={_styles.site_distance_time_text}>
-                  {mileDistance.toFixed(2)}{" "}
-                  <Text style={{ fontSize: 10 }}>miles</Text>
+                  {mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text>
                 </Text>
                 <Text style={_styles.site_distance_time_text}>.</Text>
-                <Text style={_styles.site_distance_time_text}>
-                  {estimatedTime}
-                </Text>
+                <Text style={_styles.site_distance_time_text}>{estimatedTime}</Text>
               </View>
             </View>
             <View></View>

@@ -36,8 +36,6 @@ const ArChallenge = ({}) => {
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          // console.log(" obj ===>>>> ", JSON.stringify(res.data, null, 2))
-
           setSponsoredDataAll(res.data)
           setSponsoredData(res.data.filter(x => x.challenge_requirement == challengeChoice))
         } else {
@@ -106,7 +104,6 @@ const ArChallenge = ({}) => {
   }, [])
 
   const navigateToChallengeDetails = obj => {
-    console.log(' obj ===>>>> ', JSON.stringify(obj, null, 2))
     // return
     navigation.navigate('ArChallengeDetails', { challengeObj: obj })
   }

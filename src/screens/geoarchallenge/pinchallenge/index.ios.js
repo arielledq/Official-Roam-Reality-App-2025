@@ -1,7 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from "react";
 
 import {
-  Alert,
   Animated,
   Dimensions,
   Image,
@@ -10,16 +9,16 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
-import BackgroundWithImage from '../../../components/background'
-import AppHeader from '../../../components/header'
-import SpeakerIcon from '../../../assets/geoar/speaker_icon.svg'
-import InfoIcon from '../../../assets/geoar/Info.svg'
-import MenIcon from '../../../assets/geoar/men_icon.svg'
-import RadarBlipIcon from '../../../assets/geoar/radar_blip.svg'
-import PinIcon from '../../../assets/geoar/pin_locationicon.svg'
-import TrophyIcon from '../../../assets/geoar/trophy_icon.svg'
-import CaptureIcon from '../../../assets/geoar/capture_icon.svg'
+} from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg";
+import InfoIcon from "../../../assets/geoar/Info.svg";
+import MenIcon from "../../../assets/geoar/men_icon.svg";
+import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg";
+import PinIcon from "../../../assets/geoar/pin_locationicon.svg";
+import TrophyIcon from "../../../assets/geoar/trophy_icon.svg";
+import CaptureIcon from "../../../assets/geoar/capture_icon.svg";
 // import {
 //   ViroARScene,
 //   ViroMaterials,
@@ -33,43 +32,43 @@ import CaptureIcon from '../../../assets/geoar/capture_icon.svg'
 //   ViroText,
 // } from '@reactvision/react-viro'
 
-const RNFS = require('react-native-fs')
-import RNFetchBlob from 'rn-fetch-blob'
+const RNFS = require("react-native-fs");
+import RNFetchBlob from "rn-fetch-blob";
 
-const Sound = require('react-native-sound')
-import uuid from 'react-native-uuid'
-import Geolocation from 'react-native-geolocation-service'
-import { unzip } from 'react-native-zip-archive'
+const Sound = require("react-native-sound");
+import uuid from "react-native-uuid";
+import Geolocation from "react-native-geolocation-service";
+import { unzip } from "react-native-zip-archive";
 
-const { config, fs } = RNFetchBlob
-import { useDispatch, useSelector } from 'react-redux'
-import useStyles from './styles'
-import { useNavigation } from '@react-navigation/native'
-import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions'
+const { config, fs } = RNFetchBlob;
+import { useSelector } from "react-redux";
+import useStyles from "./styles";
+import { useNavigation } from "@react-navigation/native";
+import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import {
   convertMetersToFeets,
   findNearestLocationPoint,
   getLocationDistance,
   hasLocationPermission,
   isLocationPointInPolygon,
-} from '../../../util/LocationLib'
-import RenderHTML from 'react-native-render-html'
-import { AppButton } from '../../../components'
+} from "../../../util/LocationLib";
+import RenderHTML from "react-native-render-html";
+import { AppButton } from "../../../components";
 
-const { width } = Dimensions.get('window')
-import { FontSizes } from '../../../util/FontUtils'
-import LineIcon from '../../../assets/ar/line.png'
-import { showMessage } from '../../../util/helpers'
+const { width } = Dimensions.get("window");
+import { FontSizes } from "../../../util/FontUtils";
+import LineIcon from "../../../assets/ar/line.png";
+import { showMessage } from "../../../util/helpers";
 
 const PinChallenge = ({}) => {
-  const _styles = useStyles()
-  const navigation = useNavigation()
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const challengeObj = selectedGeoSite.pin_challenge
-  const challengeObjParameters = challengeObj?.parameters
-  const modelFile = challengeObj.model_file
-  const settings = useSelector(state => state.ar?.arSettings)
-/*
+  const _styles = useStyles();
+  const navigation = useNavigation();
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const challengeObj = selectedGeoSite.pin_challenge;
+  const challengeObjParameters = challengeObj?.parameters;
+  const modelFile = challengeObj.model_file;
+  const settings = useSelector(state => state.ar?.arSettings);
+  /*
   const ARScreen = props => {
     const [object3dType, setObject3dType] = useState(null)
     const [isMeInsideInSite, setIsMeInsideInSite] = useState(
@@ -87,7 +86,6 @@ const PinChallenge = ({}) => {
     const [progress, setProgress] = useState([0, 0, 0])
 
     function onInitialized(state, reason) {
-      console.log('guncelleme', state, reason)
       if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
       } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
         // Handle loss of tracking
@@ -105,12 +103,11 @@ const PinChallenge = ({}) => {
       })
         .fetch('GET', modelFile)
         .progress((received, total) => {
-          console.log('progress', received / total)
           setProgress(Math.trunc(Number((received / total) * 100)))
         })
         .then(res => {
           // the temp file path
-          console.log('The file saved to ', res.path())
+
           unzipModelFile(res.path(), targetPath)
         })
         .catch(error => {
@@ -122,13 +119,10 @@ const PinChallenge = ({}) => {
       const charset = 'UTF-8'
       unzip(sourcePath, targetPath, charset)
         .then(path => {
-          console.log(`unzip completed at ${path}`)
           RNFS.readDir(path).then(result => {
-            console.log('GOT RESULT', result)
             const sourcesArray = []
             for (let i = 0; i < result.length; i++) {
               if (result[i].isFile) {
-                console.log('unzipModelFile', result[i].name)
                 if (result[i].name.includes('.vrx') || result[i].name.includes('.VRX')) {
                   const vrxFile =
                     Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
@@ -177,21 +171,18 @@ const PinChallenge = ({}) => {
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`
       RNFS.exists(sourcePath)
         .then(exists => {
-          console.log('exists:', exists)
           if (exists) {
-            console.log('File exists')
             unzipModelFile(sourcePath, targetPath)
           } else {
             downloadModelFile(sourcePath, targetPath)
           }
         })
         .catch(error => {
-          console.log(error)
+          console.error(error)
         })
     }
 
     const _onRotate = (rotateState, rotationFactor, source) => {
-      console.log('_onRotate rotateState', rotateState)
       if (rotateState == 3) {
         const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
         setRotate(rotation)
@@ -204,7 +195,6 @@ const PinChallenge = ({}) => {
     const _onDrag = (draggedToPosition, source) => {}
 
     const _onPinch = (pinchState, scaleFactor, source) => {
-      console.log('_onPinch scaleFactor', scaleFactor)
       if (scale[0] * scaleFactor <= challengeObjParameters?.min_pinch_scale) {
         return
       }
@@ -215,7 +205,6 @@ const PinChallenge = ({}) => {
 
       if (pinchState == 3) {
         setScale(newScale)
-
       }
     }
 
@@ -253,40 +242,44 @@ const PinChallenge = ({}) => {
           />
         )}
 
-        {challengeObj?.challenge_choice == '3DMODEL' && modelPath && isMeInsideInSite && (
-          <Viro3DObject
-            key='obj_3d1'
-            source={{ uri: modelPath }} /// this works
-            position={[
-              challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-              challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
-              challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
-            ]}
-            scale={scale}
-            onClick={() => {
-              console.log('TAP Viro3DObject')
-            }}
-            type={object3dType}
-            resources={sourcesFiles}
-            opacity={
-              challengeObjParameters?.image_opacity
-                ? Number(challengeObjParameters?.image_opacity_value)
-                : 1
-            }
-            materials={challengeObjParameters?.bloom ? ['mat'] : ['grid']}
-            rotation={rotate}
-            onRotate={challengeObjParameters?.rotation ? _onRotate : null}
-            chromaKeyFilteringColor={'transparent'}
-            onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
-            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            animation={{
-              name: 'Take 001',
-              run: true,
-              loop: challengeObjParameters?.loop_animations ? true : false,
-              delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000,
-            }}
-          />
-        )}
+        {challengeObj?.challenge_choice == '3DMODEL' &&
+          modelPath &&
+          isMeInsideInSite &&
+          object3dType &&
+          !loading && (
+            <Viro3DObject
+              key='obj_3d1'
+              source={{ uri: modelPath }} /// this works
+              position={[
+                challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
+                challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
+                challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
+              ]}
+              scale={scale}
+              onClick={() => {}}
+              type={object3dType}
+              resources={sourcesFiles}
+              opacity={
+                challengeObjParameters?.image_opacity
+                  ? Number(challengeObjParameters?.image_opacity_value)
+                  : 1
+              }
+              materials={challengeObjParameters?.bloom ? ['mat'] : ['grid']}
+              rotation={rotate}
+              onRotate={challengeObjParameters?.rotation ? _onRotate : null}
+              chromaKeyFilteringColor={'transparent'}
+              onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
+              onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
+              animation={{
+                name: 'Take 001',
+                run: true,
+                loop: challengeObjParameters?.loop_animations ? true : false,
+                delay: challengeObjParameters?.loop_delay
+                  ? challengeObjParameters?.loop_delay
+                  : 1000,
+              }}
+            />
+          )}
 
         {challengeObj?.challenge_choice == 'IMAGE' && isMeInsideInSite && (
           <ViroImage
@@ -311,8 +304,6 @@ const PinChallenge = ({}) => {
   }
 
   const Blink = ({ duration, style, children }) => {
-
-
     if (duration === 0) {
       return <View style={{ ...style }}>{children}</View>
     }
@@ -345,8 +336,6 @@ const PinChallenge = ({}) => {
 
   const ViroARNavigator = () => {
     const [capturedImage, setCapturedImage] = useState(null)
-    const [recordTimeInMillis, setRecordTimeInMillis] = useState(0)
-    const [challengeInformationView, setChallengeInformationView] = useState(false)
     const [isMeInsideInSite, setIsMeInsideInSite] = useState(false)
     const [distanceInFeet, setDistanceInFeet] = useState(0)
     const [detailsShow, setDetailsShow] = useState(true)
@@ -363,33 +352,26 @@ const PinChallenge = ({}) => {
           PERMISSIONS.ANDROID.RECORD_AUDIO,
           PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
           PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-        ]).then(response => {
-          console.log('PERMISSIONS.ANDROID:: ', response)
-        })
+        ]).then(response => {})
       } else if (Platform.OS === 'ios') {
         requestMultiple([
           PERMISSIONS.IOS.CAMERA,
           PERMISSIONS.IOS.MICROPHONE,
           PERMISSIONS.IOS.PHOTO_LIBRARY,
           PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-        ]).then(response => {
-          console.log('PERMISSIONS.OS', response)
-        })
+        ]).then(response => {})
       }
     }
 
     const playProximitySound = () => {
       Sound.setCategory('Playback')
-      let proximitySound = new Sound('record.mp3',
-        Sound.MAIN_BUNDLE,
-        error => {
-          if (error) {
-            console.log('failed to load the sound', error)
-          } else {
-            proximitySound.play()
-          }
+      let proximitySound = new Sound('record.mp3', Sound.MAIN_BUNDLE, error => {
+        if (error) {
+          console.error('failed to load the sound', error)
+        } else {
+          proximitySound.play()
         }
-      )
+      })
     }
 
     const playCameraSound = () => {
@@ -399,7 +381,7 @@ const PinChallenge = ({}) => {
         Sound.MAIN_BUNDLE,
         error => {
           if (error) {
-            console.log('failed to load the sound', error)
+            console.error('failed to load the sound', error)
           } else {
             cameraSound.play()
           }
@@ -410,9 +392,18 @@ const PinChallenge = ({}) => {
     const _takeScreenshot = async () => {
       if (isMeInsideInSite) {
         playCameraSound()
+
         arNavigatorRef.current._takeScreenshot(uuid.v4(), false).then(retDict => {
-          console.log('captureImage:', retDict)
-          setCapturedImage(Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url)
+          const imagePath = Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
+
+          // Resize the image to get full screen on IG
+          ImageResizer.createResizedImage(imagePath, 772, 1046, 'JPEG', 80) // Example: 1080x1920 is a taller image ratio
+            .then(resizedImage => {
+              setCapturedImage(resizedImage.uri)
+            })
+            .catch(err => {
+              console.error(err)
+            })
         })
       } else {
         showMessage('Pin Not Found.', 'error')
@@ -460,7 +451,7 @@ const PinChallenge = ({}) => {
           }
         },
         error => {
-          console.log(error)
+          console.error(error)
         },
         {
           accuracy: { android: 'high', ios: 'best' },
@@ -485,7 +476,7 @@ const PinChallenge = ({}) => {
           if (!isMeInsideInSite) findNearPoint(position)
         },
         error => {
-          console.log(error)
+          console.error(error)
         },
         {
           accuracy: { android: 'high', ios: 'best' },
@@ -510,16 +501,12 @@ const PinChallenge = ({}) => {
     useEffect(() => {
       if (distanceInFeet <= 200 && distanceInFeet > 100) {
         setBlinkTimer(3000)
-        console.log('distanceInFeet <= 200 && distanceInFeet > 100')
       } else if (distanceInFeet <= 100 && distanceInFeet >= 50) {
         setBlinkTimer(2000)
-        console.log('distanceInFeet <= 100 && distanceInFeet >= 50')
       } else if (distanceInFeet < 50 && distanceInFeet >= 25) {
         setBlinkTimer(1000)
-        console.log('distanceInFeet < 50 && distanceInFeet >= 25')
       } else if (distanceInFeet < 10) {
         setBlinkTimer(500)
-        console.log('distanceInFeet < 10')
       } else {
         setBlinkTimer(0)
       }
@@ -533,7 +520,6 @@ const PinChallenge = ({}) => {
       }, blinkTimer)
 
       if (blinkTimer > 0) {
-
       } else {
         clearInterval(setInterValSoundBlink)
       }
@@ -637,7 +623,7 @@ const PinChallenge = ({}) => {
                   {capturedImage && <Image style={_styles.f1} source={{ uri: capturedImage }} />}
                 </View>
                 <TouchableOpacity
-                  disabled={capturedImage}
+                  disabled={!!capturedImage}
                   onPress={_takeScreenshot}
                   style={{
                     width: 56,
@@ -712,8 +698,9 @@ const PinChallenge = ({}) => {
                     <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
                   </Blink>
                   <TouchableOpacity onPress={() => setMuteSound(!muteSound)}>
-                    <SpeakerIcon style={{ width: 40, height: 40, color: !muteSound ? '#fff' : '#000'
-                    }} />
+                    <SpeakerIcon
+                      style={{ width: 40, height: 40, color: !muteSound ? '#fff' : '#000' }}
+                    />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -752,6 +739,6 @@ const PinChallenge = ({}) => {
   })
 
   return <ViroARNavigator />*/
-}
+};
 
-export default PinChallenge
+export default PinChallenge;
