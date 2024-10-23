@@ -1,43 +1,52 @@
 module.exports = {
-  env: {
-    browser: true,
-    es6: true,
-    node: true,
-  },
+  root: true,
   extends: [
+    "@react-native",
     "eslint:recommended",
-    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:react/recommended",
+    "plugin:react-hooks/recommended",
     "prettier",
   ],
   parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint", "react", "react-native", "prettier"],
   parserOptions: {
     ecmaFeatures: {
       jsx: true,
     },
-    ecmaVersion: 2021,
-    sourceType: "module",
+    project: "./tsconfig.json",
   },
-  plugins: ["react", "@typescript-eslint"],
   rules: {
-    // Consistent with Prettier settings
-    semi: ["error", "never"], // No semicolons
-    quotes: ["error", "double"], // Use single quotes
-    "comma-dangle": ["error", {
-      "arrays": "always-multiline",
-      "objects": "always-multiline",
-      "imports": "never",
-      "exports": "never",
-      "functions": "never",
-    }],
-    "space-before-function-paren": ["error", "never"], // No space before function parentheses
-    "object-curly-spacing": ["error", "always"], // Spaces inside curly braces
-    "import/order": ["error", { groups: ["builtin", "external", "internal"] }],
-    indent: ["error", 2], // 2 spaces for indentation
-    "max-len": ["error", { code: 122 }], // Max line length of 100
-    "jsx-quotes": ["error", "prefer-double"], // Enforce single quotes in JSX
-    "react/jsx-closing-bracket-location": [1, "line-aligned"], // Place closing bracket of multiline JSX element correctly
-    "react/jsx-first-prop-new-line": ["error", "multiline"], // Enforce new line for first prop in JSX if it is multiline
-    "react/jsx-max-props-per-line": ["error", { maximum: 1, when: "multiline" }], // Limit props per line in JSX
+    "prettier/prettier": [
+      "error",
+      {
+        semi: true,
+        trailingComma: "es5",
+        singleQuote: false,
+        jsxSingleQuote: false,
+        printWidth: 100,
+        tabWidth: 2,
+        endOfLine: "auto",
+      },
+    ],
+    "react/react-in-jsx-scope": "off",
+    "react-native/no-inline-styles": "warn",
+    "no-console": ["warn", { allow: ["warn", "error"] }],
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "react/prop-types": "off",
+    semi: ["error", "always"],
+    quotes: ["error", "double"],
+    "object-curly-spacing": ["error", "always"],
+    "array-bracket-spacing": ["error", "never"],
   },
-}
+  settings: {
+    react: {
+      version: "detect",
+    },
+  },
+  env: {
+    "react-native/react-native": true,
+  },
+};
