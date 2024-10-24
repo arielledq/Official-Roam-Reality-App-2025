@@ -44,7 +44,7 @@ const ArChallengeShare = ({}) => {
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj
   const captureData = route?.params?.captureData
-  const correctedCaptureData = captureData.startsWith('file://') ? captureData : `file://${captureData}`;
+  const correctedCaptureData = `file://${captureData}`;
   const hideBottomTab = route?.params?.hideBottomTab
   let filePath = getPathFromUrl(correctedCaptureData)
   const fileExt = filePath.split('.').pop()

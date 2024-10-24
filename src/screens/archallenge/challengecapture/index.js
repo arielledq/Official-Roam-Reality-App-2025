@@ -8,6 +8,7 @@ import { FontSizes } from '../../../util/FontUtils';
 import RNFetchBlob from 'rn-fetch-blob';
 import useStyles from './styles';
 import CaptureImage from '../../../assets/ar/camera.png';
+import Shareds from '../../../assets/ar/bg-ar-share.png'
 import LineIcon from '../../../assets/ar/line.png';
 import { unzip } from 'react-native-zip-archive';
 import { AppButton } from '../../../components';
@@ -29,6 +30,8 @@ const ArChallengeCapture = ({}) => {
   const unityRef = useRef(null);
   const route = useRoute();
   const navigation = useNavigation();
+
+  const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
 
   const challengeObj = route?.params?.challengeObj;
   const challengeObjParameters = route?.params?.challengeObj?.parameters;
@@ -59,7 +62,11 @@ const ArChallengeCapture = ({}) => {
   const [capturedImage, setCapturedImage] = useState(fileFound);
   const [capturedVideo, setCapturedVideo] = useState(null);
 
-  const [isUnityLoaded, setIsUnityLoaded] = useState(true);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
+
+  const videoDirectory = '/storage/emulated/0/Movies/MisGrabaciones/';
+  const videoFileName = 'grabacion_video.mp4';
+  const fullVideoPath = `${videoDirectory}${videoFileName}`;
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -76,6 +83,12 @@ const ArChallengeCapture = ({}) => {
   //     };
   //   }, [isUnityLoaded])
   // );
+
+  const handleUnityViewLayout = (event) => {
+    const { width, height } = event.nativeEvent.layout;
+    setUnityViewDimensions({ width, height });
+    console.log(`UnityView dimensiones: ${width} x ${height}`);
+  };
 
   // Descargar modelo y gestionar archivos
   const downloadModelFile = (sourcePath, targetPath) => {
@@ -213,8 +226,8 @@ const ArChallengeCapture = ({}) => {
         scale,
         rotation,
         emissionIntensity: emissionValue,
-        rotationSpeed: challengeObjParameters?.rotation_sensitivity || 10, // Sensibilidad de rotación
-        scaleSpeed: challengeObjParameters?.scale_sensitivity || 0.0015// Sensibilidad de escala
+        rotationSpeed: challengeObjParameters?.loop_delay || 1,
+        scaleSpeed: challengeObjParameters?.scale_sensitivity || 0.0015
       };
 
       unityRef.current.postMessage('OBJImport', 'LoadModelFromReact', JSON.stringify(modelData));
@@ -222,7 +235,7 @@ const ArChallengeCapture = ({}) => {
       console.log("UnityView o modelOBJ no están disponibles.");
     }
   };
-
+  console.log("-----------MODELOS----------", modelOBJ, modelResource, textureBase, textureEmission);
   function enviarComandoAUnity(comando) {
     const commandData = JSON.stringify({ command: comando });
 
@@ -299,21 +312,152 @@ const ArChallengeCapture = ({}) => {
     }
   };
 
+  const eliminarVideoAnterior = async () => {
+    try {
+      const exists = await RNFS.exists(fullVideoPath);
+      if (exists) {
+        await RNFS.unlink(fullVideoPath); // Elimina el archivo si existe
+        console.log('Video anterior eliminado:', fullVideoPath);
+      }
+    } catch (error) {
+      console.error('Error al eliminar el video anterior:', error);
+    }
+  };
+
+  // Grabar Video
+  function enviarParametrosAGrabacion() {
+    const parametros = {
+      nombreDelVideo: 'grabacion_video',
+      nombreDeLaCarpeta: 'MisGrabaciones',
+      grabarAudio: true, // true para grabar audio, false para deshabilitar el audio
+      contenedorAncho: unityViewDimensions.width,
+      contenedorAlto: unityViewDimensions.height,
+    };
+
+    if (unityRef.current) {
+      unityRef.current.postMessage('Screen Recorder', 'RecibirParametros', JSON.stringify(parametros));
+    } else {
+      console.error("UnityView no está disponible.");
+    }
+  }
+
+// Función para iniciar la grabación
+//   const iniciarGrabacion = async () => {
+//     try {
+//       // Elimina el archivo de video anterior si existe
+//       await eliminarVideoAnterior();
+//       enviarParametrosAGrabacion()
+//       // Enviar mensaje a Unity para iniciar la grabación
+//       if (unityRef.current) {
+//         unityRef.current.postMessage('Screen Recorder', 'IniciarGrabacion', '');
+//         console.log('Grabación iniciada');
+//       } else {
+//         console.error('UnityView no está disponible.');
+//       }
+//     } catch (error) {
+//       console.error('Error al iniciar la grabación:', error);
+//     }
+//   };
+
+// Función para detener la grabación
+//   const detenerGrabacion = async () => {
+//     if (unityRef.current) {
+//       unityRef.current.postMessage('Screen Recorder', 'DetenerGrabacion', '');
+//
+//       // Asegurarse de que la grabación se detuvo
+//       console.log('Grabación detenida. Verificando archivo de video...');
+//
+//       // Verificar si el archivo de video existe
+//       try {
+//         const exists = await RNFS.exists(fullVideoPath); // fullVideoPath: '/storage/emulated/0/Movies/MisGrabaciones/grabacion_video.mp4'
+//
+//         if (exists) {
+//           // Si el archivo de video existe, actualiza el estado
+//           setCapturedVideo(fullVideoPath);
+//           console.log('Video guardado en:', fullVideoPath);
+//         } else {
+//           console.error('El archivo de video no se encontró:', fullVideoPath);
+//         }
+//       } catch (error) {
+//         console.error('Error verificando el archivo de video:', error);
+//       }
+//     } else {
+//       console.error('UnityView no está disponible.');
+//     }
+//   };
+
+  const iniciarGrabacion = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para iniciar la grabación
+      unityRef.current.postMessage('Video Recorder', 'IniciarGrabacion', 'iniciar');
+    }
+  };
+
+  const detenerGrabacion = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para detener la grabación
+      unityRef.current.postMessage('Video Recorder', 'DetenerGrabacion', 'detener');
+
+      // Ruta completa donde se almacenará el video (cambia esto según la ruta exacta de Android)
+      const fullVideoPath = '/storage/emulated/0/Android/data/com.roam_reality/files/videos/1.mp4';
+
+      // Esperar un pequeño retraso para asegurar que la grabación se haya detenido completamente en Unity
+      setTimeout(async () => {
+        // Verificar si el archivo de video existe
+        try {
+          const exists = await RNFS.exists(fullVideoPath);
+
+          if (exists) {
+            // Si el archivo de video existe, actualizar el estado con la ruta del archivo
+            setCapturedVideo(fullVideoPath);
+            console.log('Video guardado en:', fullVideoPath);
+
+            // Asegurarte de que UnityView se desmonte correctamente después de la grabación
+            setIsUnityLoaded(false);  // Aquí desmontamos Unity al terminar la grabación
+          } else {
+            console.error('El archivo de video no se encontró:', fullVideoPath);
+          }
+        } catch (error) {
+          console.error('Error verificando el archivo de video:', error);
+        }
+      }, 1000); // Esperar un segundo para asegurar que el archivo esté guardado antes de verificar
+    } else {
+      console.error('UnityView no está disponible.');
+    }
+  };
+
+  // Función para eliminar el video grabado manualmente (si lo necesitas)
+  const eliminarVideoGrabado = async () => {
+    try {
+      const exists = await RNFS.exists(capturedVideo);
+      if (exists) {
+        await RNFS.unlink(capturedVideo); // Elimina el video grabado
+        setVideoPath(null); // Limpia el estado
+        console.log('Video eliminado:', capturedVideo);
+      } else {
+        Alert.alert('El video no existe', 'No se encontró el video a eliminar');
+      }
+    } catch (error) {
+      console.error('Error al eliminar el video grabado:', error);
+    }
+  };
+
+
   const startRecordVideo = () => {
     if (challengeObj?.ar_filters.length > 0) return;
-
+    // enviarParametrosAGrabacion()
     setRecordingStart(true);
+    iniciarGrabacion()
     playRecordSound();
     startTimer();
-    unityRef.current.postMessage('startVideoRecording', { recording: 'recording' });
+
   };
 
   const stopRecordVideo = async () => {
+    detenerGrabacion()
     clearTimer();
-    const retDict = await unityRef.current.postMessage('stopVideoRecording');
-    setCapturedVideo(Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url);
-    setRecordingStart(false);
     playRecordSound();
+
   };
 
   const _takeScreenshot = () => {
@@ -337,10 +481,10 @@ const ArChallengeCapture = ({}) => {
   };
 
 
-  console.log(" challengeObjParameters ", challengeObjParameters);
+  // console.log(" challengeObjParameters ", challengeObj);
   // console.log("Touch End detected", );
   // console.log("Gesture detected", );
-console.log("view unity",isUnityLoaded)
+// console.log("view unity",isUnityLoaded)
   // Vistas adicionales
   const ChallengeDetailView = () => (
     <View style={styles.challengeInfoContainer}>
@@ -352,7 +496,7 @@ console.log("view unity",isUnityLoaded)
         <RenderHTML contentWidth={width} tagsStyles={{ p: { color: '#9CA3AF', fontSize: FontSizes.S14 }, strong: { color: '#fff', fontSize: FontSizes.S18 } }} source={{ html: challengeObj.description.replaceAll('#000000', '#fff') }} />
       </ScrollView>
       <View style={{ width: '100%', paddingHorizontal: 24, marginBottom: 20 }}>
-        <TouchableOpacity activeOpacity={0.6} onPress={() => setChallengeInformationView(false)}>
+        <TouchableOpacity activeOpacity={0.6} onPress={() => {setChallengeInformationView(false); setIsUnityLoaded(true)}}>
           <Text style={styles.bottomText}>Close</Text>
         </TouchableOpacity>
       </View>
@@ -369,7 +513,7 @@ console.log("view unity",isUnityLoaded)
         <RenderHTML contentWidth={width} tagsStyles={{ p: { color: '#9CA3AF', fontSize: FontSizes.S14 }, strong: { color: '#fff', fontSize: FontSizes.S18 } }} source={{ html: settings?.waiver_details.replaceAll('#000000', '#fff') }} />
       </ScrollView>
       <View style={{ width: '100%', paddingHorizontal: 24 }}>
-        <AppButton onPress={() => setDetailsShow(false)} buttonStyle={styles.buttonStyle} containerStyle={styles.buttonContainerStyle} title={'Accept and Continue'} />
+        <AppButton onPress={() => {setDetailsShow(false); setIsUnityLoaded(true)}} buttonStyle={styles.buttonStyle} containerStyle={styles.buttonContainerStyle} title={'Accept and Continue'} />
         <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
           <Text style={styles.bottomText}>Cancel</Text>
         </TouchableOpacity>
@@ -379,22 +523,58 @@ console.log("view unity",isUnityLoaded)
 
   const startTimer = () => {
     setTimer('00:00');
+    setRecordTimeInMillis(0);
+
     const interval = setInterval(() => {
-      setRecordTimeInMillis(prev => prev + 1);
-      const seconds = `0${recordTimeInMillis % 60}`.slice(-2);
-      const minutes = `0${Math.floor(recordTimeInMillis / 60)}`.slice(-2);
-      setTimer(`${minutes}:${seconds}`);
-      if (seconds >= VIDEO_RECORD_TIME) stopRecordVideo();
+      setRecordTimeInMillis(prevTime => {
+        const newTimeInMillis = prevTime + 1;
+        const seconds = `0${newTimeInMillis % 60}`.slice(-2);
+        const minutes = `0${Math.floor(newTimeInMillis / 60)}`.slice(-2);
+        setTimer(`${minutes}:${seconds}`);
+
+        // Si se alcanza el tiempo máximo, detener el video.
+        if (newTimeInMillis >= VIDEO_RECORD_TIME * 60) {
+          stopRecordVideo();
+        }
+
+        return newTimeInMillis; // Actualiza el tiempo total en milisegundos
+      });
     }, 1000);
-  };
 
+    this.intervalId = interval;
+  };
   const clearTimer = () => {
-    clearInterval(timer);
+    clearInterval(this.intervalId);
   };
 
+  const doneButtonHandler = async () => {
+    const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
+    let updatedData = capturedImage ? capturedImage : capturedVideo;
+
+    if (hasFilters) {
+      try {
+        // Capturar la vista dentro de ViewShot
+        const capturedUri = await viewShotRef.current.capture();
+        console.log('Imagen capturada con filtro:', capturedUri);
+        updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
+      } catch (error) {
+        console.error('Error capturando la imagen con filtros:', error);
+      }
+    }
+
+    // Navegar y pasar la captura actualizada
+    navigation.replace('ArChallengeShare', {
+      challengeObj: challengeObj,
+      captureData: updatedData,
+      isImage: !!capturedImage,
+    });
+  };
+
+console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo",viewShotRef)
   useEffect(() => {
     requestMultiple([PERMISSIONS.ANDROID.CAMERA, PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE, PERMISSIONS.ANDROID.RECORD_AUDIO, PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION, PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE]).then(console.log);
   }, []);
+  console.log('capturedVideo:', capturedVideo);
 
   return (
     <View style={styles.mainContainer}>
@@ -439,7 +619,10 @@ console.log("view unity",isUnityLoaded)
               <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
             </View>
             <TouchableOpacity
-              onPress={() => setChallengeInformationView(true)}
+              onPress={() => {
+                setChallengeInformationView(true);
+                setIsUnityLoaded(false)
+              }}
               style={styles.viewDetailBtn}
             >
               <Text style={styles.btnText}>View Details</Text>
@@ -456,16 +639,18 @@ console.log("view unity",isUnityLoaded)
           challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 },
         ]}
       >
-        {modelOBJ &&  (
-
-
+        {/*{modelOBJ && (*/}
           <BackgroundWithImage>
             {isUnityLoaded && (
-            <UnityView ref={unityRef} style={{width: "100%", flex: 1, zIndex: -1 }}/>
+              <View
+                style={{ flex: 1 }}
+                onLayout={handleUnityViewLayout} // Obtener las dimensiones del contenedor
+              >
+            <UnityView ref={unityRef} style={{width: "100%", flex: 1, zIndex: -1  }}/>
+              </View>
             )}
           </BackgroundWithImage>
-
-        )}
+        {/*)}*/}
         {capturedImage && challengeObj?.ar_filters.length == 0 && (
           <Image
             style={styles.imageVideoView}
@@ -477,7 +662,7 @@ console.log("view unity",isUnityLoaded)
             repeat={true}
             style={styles.imageVideoView}
             source={{
-              uri: capturedVideo,
+              uri: `file://${capturedVideo}`
             }}
           />
         )}
@@ -557,23 +742,16 @@ console.log("view unity",isUnityLoaded)
             } else {
               _takeScreenshot();
               setIsUnityLoaded(false)
-
-
             }
           }}
           activeOpacity={0.6}
         >
           <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
         </TouchableOpacity>
+
         {(capturedImage || capturedVideo) && (
           <TouchableOpacity
-            onPress={() => {
-              navigation.replace('ArChallengeShare', {
-                challengeObj: challengeObj,
-                captureData: capturedImage ? capturedImage : capturedVideo,
-                isImage: !!capturedImage,
-              });
-            }}
+            onPress={doneButtonHandler}
             activeOpacity={0.6}
             style={styles.bottomButtonContainer}
           >
@@ -581,7 +759,7 @@ console.log("view unity",isUnityLoaded)
           </TouchableOpacity>
         )}
       </View>
-      {detailsShow && <InfoView />}
+      {detailsShow &&  <InfoView />}
       {challengeInformationView && <ChallengeDetailView />}
     </View>
   );

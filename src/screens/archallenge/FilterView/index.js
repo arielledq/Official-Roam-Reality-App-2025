@@ -25,6 +25,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
   const navigation = useNavigation()
   const ar_filters = challengeObj?.ar_filters
   const [location, setLocation] = useState(null)
+  const correctedCaptureData = captureData.startsWith('file://') ? captureData : `file://${captureData}`;
   const [fullLocation, setFullLocation] = useState(null)
   const [imageHeight, setImageHeight] = useState(0)
 
@@ -72,7 +73,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
       })
   }
 
-  getLocationText = location_option => {
+  const getLocationText = location_option => {
     var locality = null
     var sublocality = null
     var postal_town = null
@@ -198,22 +199,22 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
 
   useEffect(() => {
     getLocation()
-    Image.getSize(captureData, (width, height) => {
-      // calculate image width and height
-      const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
-      const scaleFactor = width / screenWidth
-      const imageHeight = height / scaleFactor
-      setImageHeight(imageHeight)
-    })
+    // Image.getSize(captureData, (width, height) => {
+    //   // calculate image width and height
+    //   const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
+    //   const scaleFactor = width / screenWidth
+    //   const imageHeight = height / scaleFactor
+    //   setImageHeight(imageHeight)
+    // })
   }, [])
-
+console.log("AAAAAAAAAAAAAAAAAAAAAACAPTUREDATAAAAAAAAAAAAAAA",captureData)
   return (
     <ViewShot
       ref={viewShotRef}
       style={styles.mainContainer}
       options={{ fileName: 'filtered_share', format: 'jpg', quality: 0.9 }}
     >
-      <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
+      <BackgroundWithImage source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>
           {ar_filters.map(filter => {
             return (
