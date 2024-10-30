@@ -82,4 +82,5 @@ yarn.lock
 # Configurations
 config.dev.ts
 
-/unity/builds/android/*
+# Unity builds
+unity/builds/android/*
