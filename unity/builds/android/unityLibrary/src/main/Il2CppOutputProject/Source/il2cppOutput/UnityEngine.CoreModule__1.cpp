@@ -332,6 +332,9 @@ struct CultureInfo_t9BA817D41AD55AC8BD07480DD8AC22F8FFA378E0_marshaled_com
 struct Cursor_t7E6B5D20DD5FBA63DB2F216E18280B92B5101DC4  : public RuntimeObject
 {
 };
+struct Handheld_tD0463F933E6DBCDBCC1147383C488C9E99FCA0D3  : public RuntimeObject
+{
+};
 struct HashUnsafeUtilities_tE1EA99E00D552FC2A9F713691D7723EFB64F8C18  : public RuntimeObject
 {
 };
@@ -763,6 +766,14 @@ struct Exception_t_marshaled_com
 	int32_t ___caught_in_unmanaged;
 };
 struct FormatUsage_tF45FA49B7572B22E10ABD248EEE906A4605C7BD2 
+{
+	int32_t ___value__;
+};
+struct FullScreenMovieControlMode_t07431BBA71A92FF7121F59DBBF19701198E64B84 
+{
+	int32_t ___value__;
+};
+struct FullScreenMovieScalingMode_tF79E3529CAA3DEDB013FFD67C3C5824086E9C1F7 
 {
 	int32_t ___value__;
 };
@@ -1413,6 +1424,9 @@ IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderTextureDescriptor_set_enableRandom
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool RenderTextureDescriptor_get_bindMS_mBDC0CE7325E5619AD8CFF213BB0EFBBBC328808A (RenderTextureDescriptor_t69845881CE6437E4E61F92074F2F84079F23FA46* __this, const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void RenderTextureDescriptor_set_bindMS_m40A5B13ECDCA2A5E916047DACD10A7B04068AB83 (RenderTextureDescriptor_t69845881CE6437E4E61F92074F2F84079F23FA46* __this, bool ___0_value, const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool RenderTextureDescriptor_get_useDynamicScale_m84AB51F1599AB6641C254F06EE7431AFBACEF60A (RenderTextureDescriptor_t69845881CE6437E4E61F92074F2F84079F23FA46* __this, const RuntimeMethod* method) ;
+IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Color_tD001788D726C3A7F1379BEED0260B9591F440C1F Color_get_black_mB50217951591A045844C61E7FF31EEE3FEF16737_inline (const RuntimeMethod* method) ;
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Handheld_PlayFullScreenMovie_Bindings_mD72DCBF72EB5A6E97FD7799D7D6F54FF9DC03F19 (String_t* ___0_path, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F ___1_bgColor, int32_t ___2_controlMode, int32_t ___3_scalingMode, const RuntimeMethod* method) ;
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Handheld_PlayFullScreenMovie_Bindings_Injected_mD42A6B9E7B3F403E32E669A04259E6719F528E4C (String_t* ___0_path, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F* ___1_bgColor, int32_t ___2_controlMode, int32_t ___3_scalingMode, const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Hash128__ctor_m4C7478EE2EED2085265B895E483B128CCAA6D011 (Hash128_t93367F504B687578F893CDBCD13FB95AC8A87A40* __this, uint32_t ___0_u32_0, uint32_t ___1_u32_1, uint32_t ___2_u32_2, uint32_t ___3_u32_3, const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR void Hash128__ctor_m0B61E717B3FF7D7BBD8FF12C8C8327C18A2AAAF3 (Hash128_t93367F504B687578F893CDBCD13FB95AC8A87A40* __this, uint64_t ___0_u64_0, uint64_t ___1_u64_1, const RuntimeMethod* method) ;
 IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Hash128_op_LessThan_mD2B90720E6C871528BB20F19FED34883A5BC8A43 (Hash128_t93367F504B687578F893CDBCD13FB95AC8A87A40 ___0_x, Hash128_t93367F504B687578F893CDBCD13FB95AC8A87A40 ___1_y, const RuntimeMethod* method) ;
@@ -6015,6 +6029,79 @@ IL2CPP_EXTERN_C  void RenderTextureDescriptor_set_useDynamicScale_m9335866C8754D
 	int32_t _offset = 1;
 	_thisAdjusted = reinterpret_cast<RenderTextureDescriptor_t69845881CE6437E4E61F92074F2F84079F23FA46*>(__this + _offset);
 	RenderTextureDescriptor_set_useDynamicScale_m9335866C8754D51235D391E84F8972C4C518844A(_thisAdjusted, ___0_value, method);
+}
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winvalid-offsetof"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winvalid-offsetof"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+#ifdef __clang__
+#pragma clang diagnostic pop
+#endif
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Winvalid-offsetof"
+#pragma clang diagnostic ignored "-Wunused-variable"
+#endif
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Handheld_PlayFullScreenMovie_m35284F5349FBB6F79D55572E2411D6DB88927FE5 (String_t* ___0_path, const RuntimeMethod* method) 
+{
+	int32_t V_0 = 0;
+	int32_t V_1 = 0;
+	Color_tD001788D726C3A7F1379BEED0260B9591F440C1F V_2;
+	memset((&V_2), 0, sizeof(V_2));
+	bool V_3 = false;
+	{
+		V_0 = 1;
+		V_1 = 0;
+		Color_tD001788D726C3A7F1379BEED0260B9591F440C1F L_0;
+		L_0 = Color_get_black_mB50217951591A045844C61E7FF31EEE3FEF16737_inline(NULL);
+		V_2 = L_0;
+		String_t* L_1 = ___0_path;
+		Color_tD001788D726C3A7F1379BEED0260B9591F440C1F L_2 = V_2;
+		int32_t L_3 = V_1;
+		int32_t L_4 = V_0;
+		bool L_5;
+		L_5 = Handheld_PlayFullScreenMovie_Bindings_mD72DCBF72EB5A6E97FD7799D7D6F54FF9DC03F19(L_1, L_2, L_3, L_4, NULL);
+		V_3 = L_5;
+		goto IL_0017;
+	}
+
+IL_0017:
+	{
+		bool L_6 = V_3;
+		return L_6;
+	}
+}
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Handheld_PlayFullScreenMovie_Bindings_mD72DCBF72EB5A6E97FD7799D7D6F54FF9DC03F19 (String_t* ___0_path, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F ___1_bgColor, int32_t ___2_controlMode, int32_t ___3_scalingMode, const RuntimeMethod* method) 
+{
+	{
+		String_t* L_0 = ___0_path;
+		int32_t L_1 = ___2_controlMode;
+		int32_t L_2 = ___3_scalingMode;
+		bool L_3;
+		L_3 = Handheld_PlayFullScreenMovie_Bindings_Injected_mD42A6B9E7B3F403E32E669A04259E6719F528E4C(L_0, (&___1_bgColor), L_1, L_2, NULL);
+		return L_3;
+	}
+}
+IL2CPP_EXTERN_C IL2CPP_METHOD_ATTR bool Handheld_PlayFullScreenMovie_Bindings_Injected_mD42A6B9E7B3F403E32E669A04259E6719F528E4C (String_t* ___0_path, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F* ___1_bgColor, int32_t ___2_controlMode, int32_t ___3_scalingMode, const RuntimeMethod* method) 
+{
+	typedef bool (*Handheld_PlayFullScreenMovie_Bindings_Injected_mD42A6B9E7B3F403E32E669A04259E6719F528E4C_ftn) (String_t*, Color_tD001788D726C3A7F1379BEED0260B9591F440C1F*, int32_t, int32_t);
+	static Handheld_PlayFullScreenMovie_Bindings_Injected_mD42A6B9E7B3F403E32E669A04259E6719F528E4C_ftn _il2cpp_icall_func;
+	if (!_il2cpp_icall_func)
+	_il2cpp_icall_func = (Handheld_PlayFullScreenMovie_Bindings_Injected_mD42A6B9E7B3F403E32E669A04259E6719F528E4C_ftn)il2cpp_codegen_resolve_icall ("UnityEngine.Handheld::PlayFullScreenMovie_Bindings_Injected(System.String,UnityEngine.Color&,UnityEngine.FullScreenMovieControlMode,UnityEngine.FullScreenMovieScalingMode)");
+	bool icallRetVal = _il2cpp_icall_func(___0_path, ___1_bgColor, ___2_controlMode, ___3_scalingMode);
+	return icallRetVal;
 }
 #ifdef __clang__
 #pragma clang diagnostic pop
@@ -22723,6 +22810,24 @@ IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR int32_t RenderTextureDescriptor_g
 	{
 		int32_t L_0 = __this->___U3CmemorylessU3Ek__BackingField;
 		return L_0;
+	}
+}
+IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR Color_tD001788D726C3A7F1379BEED0260B9591F440C1F Color_get_black_mB50217951591A045844C61E7FF31EEE3FEF16737_inline (const RuntimeMethod* method) 
+{
+	Color_tD001788D726C3A7F1379BEED0260B9591F440C1F V_0;
+	memset((&V_0), 0, sizeof(V_0));
+	{
+		Color_tD001788D726C3A7F1379BEED0260B9591F440C1F L_0;
+		memset((&L_0), 0, sizeof(L_0));
+		Color__ctor_m3786F0D6E510D9CFA544523A955870BD2A514C8C_inline((&L_0), (0.0f), (0.0f), (0.0f), (1.0f), NULL);
+		V_0 = L_0;
+		goto IL_001d;
+	}
+
+IL_001d:
+	{
+		Color_tD001788D726C3A7F1379BEED0260B9591F440C1F L_1 = V_0;
+		return L_1;
 	}
 }
 IL2CPP_MANAGED_FORCE_INLINE IL2CPP_METHOD_ATTR void Logger_set_logHandler_mD2A80ADC7D4155C91B68EAE1FDBD7ECBF6DB49D3_inline (Logger_t608FFEA1E140B6BE2CCB01C86ACB219533C172A0* __this, RuntimeObject* ___0_value, const RuntimeMethod* method) 
