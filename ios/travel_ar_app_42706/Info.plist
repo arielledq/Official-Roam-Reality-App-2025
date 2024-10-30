@@ -174,5 +174,7 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+  <key>LSMinimumSystemVersion</key>
+  <string>12.0.0</string>
 </dict>
 </plist>
