@@ -343,9 +343,6 @@ PODS:
     - FBSDKGamingServicesKit (~> 16.1.3)
     - FBSDKShareKit (~> 16.1.3)
     - React-Core
-  - react-native-geolocation (3.4.0):
-    - RCT-Folly (= 2021.07.22.00)
-    - React-Core
   - react-native-geolocation-service (5.3.1):
     - React
   - react-native-get-random-values (1.10.0):
@@ -356,6 +353,8 @@ PODS:
     - React-Core
   - react-native-image-picker (7.1.0):
     - RCT-Folly (= 2021.07.22.00)
+    - React-Core
+  - react-native-image-resizer (1.4.5):
     - React-Core
   - react-native-maps (1.14.0):
     - React-Core
@@ -605,11 +604,11 @@ DEPENDENCIES:
   - react-native-compass-heading (from `../node_modules/react-native-compass-heading`)
   - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
-  - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-google-maps (from `../node_modules/react-native-maps`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
+  - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
   - react-native-maps (from `../node_modules/react-native-maps`)
   - react-native-onesignal (from `../node_modules/react-native-onesignal`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
@@ -736,8 +735,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-contacts"
   react-native-fbsdk-next:
     :path: "../node_modules/react-native-fbsdk-next"
-  react-native-geolocation:
-    :path: "../node_modules/@react-native-community/geolocation"
   react-native-geolocation-service:
     :path: "../node_modules/react-native-geolocation-service"
   react-native-get-random-values:
@@ -746,6 +743,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-maps"
   react-native-image-picker:
     :path: "../node_modules/react-native-image-picker"
+  react-native-image-resizer:
+    :path: "../node_modules/react-native-image-resizer"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
   react-native-onesignal:
@@ -882,11 +881,11 @@ SPEC CHECKSUMS:
   react-native-compass-heading: 1b4403d1c99dfd8311073ca8fc52bfc8e365cfac
   react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
   react-native-fbsdk-next: 9c40664b1501be29572795c2e4c8e347f39f556f
-  react-native-geolocation: 2d8f71eb7d0c9a0c52f336d4634444488669371d
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-get-random-values: 384787fd76976f5aec9465aff6fa9e9129af1e74
   react-native-google-maps: 94df984b1647973baffe17c0b7b52828d6b69d94
   react-native-image-picker: 5e076db26cd81660cfb6db5bcf517cfa12054d45
+  react-native-image-resizer: d9fb629a867335bdc13230ac2a58702bb8c8828f
   react-native-maps: cbf2f03bfeebfd7ec45966b066db13a075fd2af3
   react-native-onesignal: 55ecc835638c7ee860583e080762cd9b7512671c
   react-native-pager-view: 712081434052f3af89ef00e8a353a7d351e62eeb
@@ -922,7 +921,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: fc408799f1990a12497a32f64280c0fe353ffcc1
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   rnmapbox-maps: 86b215fe77632a897b34a2dbf0c3ad4e9e8c3570
-  RNPermissions: 7938b2a48a952a4316cfdc86df9a54485b930173
+  RNPermissions: 6ec857b1b6cdb480faf4135082acdb181abf1f09
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: 0bd9eec783bed1032e02a4db9976dae1664a5c7b
   RNShare: 859ff710211285676b0bcedd156c12437ea1d564
@@ -939,6 +938,6 @@ SPEC CHECKSUMS:
   ViroReact: f4980e6b04918c4340637f9cbaae22a6bb7ea440
   Yoga: f7decafdc5e8c125e6fa0da38a687e35238420fa
 
-PODFILE CHECKSUM: d16e02fd537dd910d1e5f3ef681e620417f8a51c
+PODFILE CHECKSUM: 18fb42f9f1f9a7ce22c69ac1ee7f4f95eadfa88b
 
 COCOAPODS: 1.15.2

@@ -1,7 +1,8 @@
 export {
   resetState,
   updateUserData,
+  updateUserLocationData,
   updateName,
   updateAccountFlag,
-  updateVerified
+  updateVerified,
 } from './reducer'

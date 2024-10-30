@@ -110,55 +110,110 @@ class Sponsor(models.Model):
 
 class ARChallengeParameterSettings(models.Model):
     name = models.CharField(
-        _("Settings Name"), default=None, null=False, blank=False, max_length=255
+        _("Settings Name"), max_length=255, default=None, blank=False, null=False
     )
-    loop_animations = models.BooleanField(_("Loop Animation"), default=False)
-    loop_delay = models.IntegerField(_("Loop Delay"), validators=[MinValueValidator(0)], default=1000, null=False,
-                                     blank=False)
-    pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
-    min_pinch_scale = models.DecimalField(_("Minimum Zoom Scaling"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                 MaxValueValidator(Decimal('1.00'))],
-                                          max_digits=3, decimal_places=2, default=0.02)
-    max_pinch_scale = models.DecimalField(_("Maximum Zoom Scaling"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                 MaxValueValidator(Decimal('1.00'))],
-                                          max_digits=3, decimal_places=2, default=0.8)
-    rotation = models.BooleanField(_("Rotation"), default=False)
-    bloom = models.BooleanField(_("Bloom"), default=False)
-    bloom_threshold = models.DecimalField(_("Bloom Threshold"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                            MaxValueValidator(Decimal('1.00'))],
-                                          max_digits=3, decimal_places=2, default=1.00)
-    diffuse_text_color = models.CharField(_("Diffuse Color"), max_length=10, blank=True, null=True, default='#ffffff')
-    diffuse_intensity = models.DecimalField(_("Diffuse Intensity"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                MaxValueValidator(Decimal('1.00'))],
-                                            max_digits=3, decimal_places=2, default=1.00)
+
+    bloom_threshold = models.DecimalField(
+        _("Bloom Threshold"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00
+    )
+    bloom_intensity = models.DecimalField(
+        _("Bloom Intensity"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00
+    )
+    positionX = models.IntegerField(_("Position X"), default=0)
+    positionY = models.IntegerField(_("Position Y"), default=0)
+    positionZ = models.IntegerField(_("Position Z"), default=-25)
+
+    scale_object = models.DecimalField(
+        _("Object Scale"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('8.00'))],
+        max_digits=8,
+        decimal_places=5,
+        default=1.00  # Asignado según el valor proporcionado
+    )
+    emission_value = models.DecimalField(
+        _("Emission Value"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00
+    )
+    rotation_speed = models.IntegerField(
+        _("Rotation Speed"),
+        validators=[MinValueValidator(0)],
+        default=1
+    )
+    scale_speed = models.DecimalField(
+        _("Scale Speed"),
+        validators=[MinValueValidator(Decimal('0.0001')), MaxValueValidator(Decimal('1.0000'))],
+        max_digits=6,
+        decimal_places=4,
+        default=0.0015
+    )
+    min_pinch_scale = models.DecimalField(
+        _("Minimum Zoom Scaling"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=0.01
+    )
+    max_pinch_scale = models.DecimalField(
+        _("Maximum Zoom Scaling"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('3.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=3.00
+    )
+
+
+    isRotationEnabled = models.BooleanField(_("Rotation Enabled"), default=True)
+
+
+    loop_animations = models.BooleanField(_("Loop Animation"), default=False, editable=False)
+    loop_delay = models.IntegerField(_("Loop Delay"), validators=[MinValueValidator(0)], default=1000, editable=False)
+    diffuse_text_color = models.CharField(_("Diffuse Color"), max_length=10, blank=True, null=True, default='#ffffff', editable=False)
+    diffuse_intensity = models.DecimalField(
+        _("Diffuse Intensity"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00,
+        editable=False
+    )
     sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
-    image_opacity = models.BooleanField(_("Image Opacity"), default=False)
-    image_opacity_value = models.DecimalField(_("Image Opacity Value"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                    MaxValueValidator(Decimal('1.00'))],
-                                              max_digits=3, decimal_places=2, default=1.00)
-    tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
-    scale_object = models.DecimalField(_("Object Scale"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                      MaxValueValidator(Decimal('8.00'))], max_digits=8,
-                                       decimal_places=5, default=0.05)
-    positionX = models.IntegerField(_("Position X"), default=0, null=False, blank=False)
-    positionY = models.IntegerField(_("Position Y"), default=0, null=False, blank=False)
-    positionZ = models.IntegerField(_("Position Z"), default=-25, null=False, blank=False)
-    ar_portals = models.BooleanField(_("AR Portals"), default=False)
-    image_recognition = models.BooleanField(_("Image Recognition"), default=False)
+    image_opacity = models.BooleanField(_("Image Opacity"), default=False, editable=False)
+    image_opacity_value = models.DecimalField(
+        _("Image Opacity Value"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00,
+        editable=False
+    )
+    tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False, editable=False)
+    ar_portals = models.BooleanField(_("AR Portals"), default=False, editable=False)
+    image_recognition = models.BooleanField(_("Image Recognition"), default=False, editable=False)
     image_recognition_file = models.FileField(
         _("Image Recognition File"),
         upload_to="ar_ir/img/",
         blank=True,
         null=True,
+        editable=False
     )
 
     class Meta:
-        verbose_name_plural = "AR Challenge Parameter Settings"
         verbose_name = "AR Challenge Parameter Settings"
+        verbose_name_plural = "AR Challenge Parameter Settings"
 
     def __str__(self):
         return self.name
-
 
 class ARChallengeFilters(models.Model):
     name = models.CharField(
