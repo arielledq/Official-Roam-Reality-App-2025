@@ -1,31 +1,29 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from 'react'
 
-import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native"
-import BackgroundWithImage from "../../../components/background"
-import AppHeader from "../../../components/header"
-import { useNavigation } from "@react-navigation/native"
-import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import Geocoder from "react-native-geocoding"
-import MapboxGL from "@rnmapbox/maps"
-import MarkerIcon from "../../../assets/geoar/marker_img.svg"
-import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg"
-import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg"
-
-import { useDispatch, useSelector } from "react-redux"
-import useStyles from "./styles"
-import { updateSelectedSites } from "../../../redux/AR"
+import { ActivityIndicator, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
+import BackgroundWithImage from '../../../components/background'
+import AppHeader from '../../../components/header'
+import { useNavigation } from '@react-navigation/native'
+import MapView, { Marker, PROVIDER_GOOGLE, Callout } from 'react-native-maps'
+import Geocoder from 'react-native-geocoding'
+import MarkerIcon from '../../../assets/geoar/marker_img.svg'
+import ARSiteCountBG from '../../../assets/geoar/ar_site_count_bg.svg'
+import FriendsMarkerIcon from '../../../assets/geoar/friend_marker.svg'
+import { useDispatch, useSelector } from 'react-redux'
+import useStyles from './styles'
+import { updateSelectedSites } from '../../../redux/AR'
 import {
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
-  getUserFriendList
-} from "../../../network"
-import AppSwitch from "../../../components/Switch"
-import { getBounds, getCenterOfBounds, isLocationPointInPolygon } from "../../../util/LocationLib"
-import DestinationFactPopUp from "../destinactionfactpopup"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import Icon from "../../../components/Icon"
-import { GeolocationContext } from "../../../GeolocationProvider"
+  getUserFriendList,
+} from '../../../network'
+import AppSwitch from '../../../components/Switch'
+import { getBounds, getCenterOfBounds, isLocationPointInPolygon } from '../../../util/LocationLib'
+import DestinationFactPopUp from '../destinactionfactpopup'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import Icon from '../../../components/Icon'
+import { GeolocationContext } from '../../../GeolocationProvider'
 
 const SCROLL_AMOUNT = 70
 
@@ -39,13 +37,11 @@ const GeoArChallengeDetails = ({}) => {
   const [hiddenStars, setHiddenStars] = useState(0)
   const [starsSites, setStarsSites] = useState(0)
   const [arSitesOn, setARSitesOnSwitch] = useState(true)
-  const [selectedRegionName, setSelectedRegionName] = useState("Full")
+  const [selectedRegionName, setSelectedRegionName] = useState('Full')
   const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true)
   const navigation = useNavigation()
   const mapView = useRef()
   const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const [selectedPoint, setSelectedPoint] = useState(null);
-
   const regions = selectedDestination?.regions
   const [fullRegion, setFullRegion] = useState(null)
   const [friendList, setFriendList] = useState([])
@@ -88,55 +84,95 @@ const GeoArChallengeDetails = ({}) => {
     if (mapView && mapView.current) {
       mapView.current.animateToRegion(fullRegion)
     }
-    setSelectedRegionName("Full")
+    setSelectedRegionName('Full')
   }
 
   const getHiddenStar = () => {
-    getARSitesHiddenStars({ id: selectedDestination.id }).then(res => {
-      setHiddenStars(res.data[0])
-    })
+    getARSitesHiddenStars({ id: selectedDestination.id })
+      .then(res => {
+        setHiddenStars(res.data[0])
+      })
+      .finally(() => {})
   }
 
   const getARStarSites = () => {
-    getARSitesStars({ id: selectedDestination.id }).then(res => {
-      setStarsSites(res.data[0])
-    })
+    getARSitesStars({ id: selectedDestination.id })
+      .then(res => {
+        setStarsSites(res.data[0])
+      })
+      .finally(() => {})
   }
+
+  useEffect(() => {
+    if (
+      !selectedDestination.geo_location ||
+      selectedDestination.geo_location.coordinates.length == 0
+    ) {
+      setTimeout(setMapBounds, 500)
+    } else {
+      const fullRegion = {
+        latitude: selectedDestination.geo_location?.coordinates[1],
+        longitude: selectedDestination.geo_location?.coordinates[0],
+        latitudeDelta: Number(selectedDestination.map_latitude_delta),
+        longitudeDelta: Number(selectedDestination.map_longitude_delta),
+      }
+      const full_latitude_longitude = getFullCenter()
+      const full_bounds = getFullBounds()
+      if (full_bounds) {
+        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat)
+        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng)
+      }
+      if (full_latitude_longitude) {
+        fullRegion.latitude = Number(full_latitude_longitude.latitude)
+        fullRegion.longitude = Number(full_latitude_longitude.longitude)
+      }
+      setFullRegion(fullRegion)
+    }
+    getHiddenStar()
+    getFriends()
+    loadDFacts(selectedDestination?.id)
+    getARStarSites()
+  }, [])
 
   const loadDFacts = async id => {
     getDestinationFacts({
       destination_id: id,
-    }).then(async res => {
-      for (let i = 0; i < res.data.length; i++) {
-        const facts = res.data[i]
-        const arrayPoints = []
-        if (facts?.border?.coordinates) {
-          for (let i = 0; i < facts.border.coordinates.length; i++) {
-            const points = facts.border.coordinates[i]
-            for (let j = 0; j < points.length; j++) {
-              const point = points[j]
-              arrayPoints.push({
-                latitude: point[1],
-                longitude: point[0],
-              })
+    })
+      .then(async res => {
+        for (let i = 0; i < res.data.length; i++) {
+          const facts = res.data[i]
+          const arrayPoints = []
+          if (facts?.border?.coordinates) {
+            for (let i = 0; i < facts.border.coordinates.length; i++) {
+              const points = facts.border.coordinates[i]
+              for (let j = 0; j < points.length; j++) {
+                const point = points[j]
+                arrayPoints.push({
+                  latitude: point[1],
+                  longitude: point[0],
+                })
+              }
             }
           }
-        }
-        const isInsideSiteArea = isLocationPointInPolygon({ latitude, longitude }, arrayPoints)
-        if (isInsideSiteArea) {
-          const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
-          // if don't want to open popup again and again
-          if (!isOpened || isOpened !== "opened") {
-            setPopUpFacts(facts)
+          const isInsideSiteArea = isLocationPointInPolygon({ latitude, longitude }, arrayPoints)
+          if (isInsideSiteArea) {
+            const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
+            // if don't want to open popup again and again
+            if (!isOpened || isOpened !== 'opened') {
+              setPopUpFacts(facts)
+            }
+            break
           }
-          break
         }
-      }
-    })
+      })
+      .finally(() => {})
   }
 
   const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location?.length > 0) {
+    if (
+      o?.user_ar_profile?.current_location &&
+      o?.user_ar_profile?.current_location?.coordinates?.length
+    ) {
       return (
         <Marker
           key={o.id}
@@ -146,18 +182,18 @@ const GeoArChallengeDetails = ({}) => {
           }}
           title={o.name}
           onCalloutPress={() => {
-            navigation.navigate("PublicProfile", { userData: o })
+            navigation.navigate('PublicProfile', { userData: o })
           }}
         >
-          {Platform.OS === "ios" && (
+          {Platform.OS == 'ios' && (
             <Callout
               onPress={() => {
-                navigation.navigate("PublicProfile", { userData: o })
+                navigation.navigate('PublicProfile', { userData: o })
               }}
               style={{
-                backgroundColor: "#fff",
+                backgroundColor: '#fff',
                 minWidth: 100,
-                alignItems: "center",
+                alignItems: 'center',
               }}
             >
               <Text>{o.name}</Text>
@@ -209,8 +245,7 @@ const GeoArChallengeDetails = ({}) => {
     }
   }
 
-
-  const getFullBounds = () => {
+  const getFullBounds = _ => {
     if (selectedDestination.border) {
       let arrayPoints = []
       for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
@@ -240,7 +275,7 @@ const GeoArChallengeDetails = ({}) => {
       })
   }
 
-  const getFullCenter = () => {
+  const getFullCenter = _ => {
     if (selectedDestination.border) {
       let arrayPoints = []
       for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
@@ -305,37 +340,6 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude)
   }
 
-  useEffect(() => {
-    if (
-      !selectedDestination.geo_location ||
-      selectedDestination.geo_location.coordinates.length == 0
-    ) {
-      setTimeout(setMapBounds, 500)
-    } else {
-      const fullRegion = {
-        latitude: selectedDestination.geo_location?.coordinates[1],
-        longitude: selectedDestination.geo_location?.coordinates[0],
-        latitudeDelta: Number(selectedDestination.map_latitude_delta),
-        longitudeDelta: Number(selectedDestination.map_longitude_delta),
-      }
-      const full_latitude_longitude = getFullCenter()
-      const full_bounds = getFullBounds()
-      if (full_bounds) {
-        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat)
-        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng)
-      }
-      if (full_latitude_longitude) {
-        fullRegion.latitude = Number(full_latitude_longitude.latitude)
-        fullRegion.longitude = Number(full_latitude_longitude.longitude)
-      }
-      setFullRegion(fullRegion)
-    }
-    getHiddenStar()
-    loadDFacts(selectedDestination?.id)
-    getFriends()
-    getARStarSites()
-  }, [])
-
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -343,33 +347,33 @@ const GeoArChallengeDetails = ({}) => {
           text: selectedDestination.name,
           style: [_styles.heading],
         }}
-        backgroundColor="transparent"
+        backgroundColor='transparent'
       />
 
-      {isLoading && <ActivityIndicator size="large" />}
+      {isLoading && <ActivityIndicator size='large' />}
       <View
         style={{
           marginBottom: 10,
-          alignItems: "flex-end",
+          alignItems: 'flex-end',
           gap: 10,
         }}
       >
         <TouchableOpacity onPress={scrollRegionsPressHandler}>
-          <Icon name={"angle-double-right"} family="font-awesome" size={25} color="gray" />
+          <Icon name={'angle-double-right'} family='font-awesome' size={25} color='gray' />
         </TouchableOpacity>
         <ScrollView
           ref={scrollViewRef}
           horizontal={true}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          style={{ width: "100%", height: 50 }}
+          style={{ width: '100%', height: 50 }}
           contentContainerStyle={_styles.rowView}
         >
           <TouchableOpacity
             onPress={moveToFullRegion}
             activeOpacity={0.5}
             style={
-              selectedRegionName == "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
+              selectedRegionName == 'Full' ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
             }
           >
             <Text style={_styles.buttonSelectText}>Full</Text>
@@ -395,9 +399,9 @@ const GeoArChallengeDetails = ({}) => {
       </View>
       <View
         style={{
-          flexDirection: "row",
+          flexDirection: 'row',
           marginBottom: 20,
-          justifyContent: "space-between",
+          justifyContent: 'space-between',
         }}
       >
         <View style={_styles.selectionsContainer}>
@@ -417,17 +421,17 @@ const GeoArChallengeDetails = ({}) => {
       </View>
       <View
         style={{
-          width: "100%",
-          position: "relative",
+          width: '100%',
+          position: 'relative',
           flex: 1,
           borderRadius: 16,
-          overflow: "hidden",
+          overflow: 'hidden',
         }}
       >
         <MapView
           provider={PROVIDER_GOOGLE}
           ref={mapView}
-          style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
+          style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
           {/* {
@@ -450,18 +454,18 @@ const GeoArChallengeDetails = ({}) => {
       </View>
       <View
         style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%",
-          alignItems: "flex-start",
+          flexDirection: 'row',
+          justifyContent: 'space-between',
+          width: '100%',
+          alignItems: 'flex-start',
           marginTop: 20,
           marginBottom: 30,
         }}
       >
         <View
           style={{
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
             width: 80,
           }}
         >
@@ -471,8 +475,8 @@ const GeoArChallengeDetails = ({}) => {
         </View>
         <View
           style={{
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
             width: 80,
           }}
         >
@@ -482,8 +486,8 @@ const GeoArChallengeDetails = ({}) => {
         </View>
         <View
           style={{
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
             width: 80,
           }}
         >
@@ -493,8 +497,8 @@ const GeoArChallengeDetails = ({}) => {
         </View>
         <View
           style={{
-            alignItems: "center",
-            justifyContent: "center",
+            alignItems: 'center',
+            justifyContent: 'center',
             width: 80,
           }}
         >
@@ -504,12 +508,12 @@ const GeoArChallengeDetails = ({}) => {
         </View>
       </View>
       {popUpFacts && (
-        <View style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
+        <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
           <DestinationFactPopUp
             facts={popUpFacts}
-            onClose={async() => {
+            onClose={async () => {
               setPopUpFacts(null)
-              await AsyncStorage.setItem(`open_${popUpFacts.id}`, "opened")
+              await AsyncStorage.setItem(`open_${popUpFacts.id}`, 'opened')
             }}
           />
         </View>

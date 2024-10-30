@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 
 import {
-  Alert,
   Animated,
   Dimensions,
   Image,
@@ -32,6 +31,7 @@ import {
   ViroSpotLight,
   ViroText,
 } from '@viro-community/react-viro'
+import ImageResizer from 'react-native-image-resizer'
 
 const RNFS = require('react-native-fs')
 import RNFetchBlob from 'rn-fetch-blob'
@@ -42,10 +42,10 @@ import Geolocation from 'react-native-geolocation-service'
 import { unzip } from 'react-native-zip-archive'
 
 const { config, fs } = RNFetchBlob
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 import useStyles from './styles'
 import { useNavigation } from '@react-navigation/native'
-import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions'
+import { requestMultiple, PERMISSIONS } from 'react-native-permissions'
 import {
   convertMetersToFeets,
   findNearestLocationPoint,
@@ -337,8 +337,6 @@ const PinChallenge = ({}) => {
 
   const ViroARNavigator = () => {
     const [capturedImage, setCapturedImage] = useState(null)
-    const [recordTimeInMillis, setRecordTimeInMillis] = useState(0)
-    const [challengeInformationView, setChallengeInformationView] = useState(false)
     const [isMeInsideInSite, setIsMeInsideInSite] = useState(false)
     const [distanceInFeet, setDistanceInFeet] = useState(0)
     const [detailsShow, setDetailsShow] = useState(true)
@@ -395,8 +393,18 @@ const PinChallenge = ({}) => {
     const _takeScreenshot = async () => {
       if (isMeInsideInSite) {
         playCameraSound()
+
         arNavigatorRef.current._takeScreenshot(uuid.v4(), false).then(retDict => {
-          setCapturedImage(Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url)
+          const imagePath = Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url
+
+          // Resize the image to get full screen on IG
+          ImageResizer.createResizedImage(imagePath, 772, 1046, 'JPEG', 80) // Example: 1080x1920 is a taller image ratio
+            .then(resizedImage => {
+              setCapturedImage(resizedImage.uri)
+            })
+            .catch(err => {
+              console.error(err)
+            })
         })
       } else {
         showMessage('Pin Not Found.', 'error')
