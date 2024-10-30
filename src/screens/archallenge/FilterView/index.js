@@ -1,21 +1,25 @@
-import React, { useEffect, useState } from 'react'
-import { Dimensions, View, Text, ImageBackground, Platform } from 'react-native'
-import BackgroundWithImage from '../../../components/background'
-import useStyles from './styles'
-import LinearGradient from 'react-native-linear-gradient'
-import ViewShot from 'react-native-view-shot'
-import GetLocation from 'react-native-get-location'
-import PagerView from 'react-native-pager-view'
-import Geocoder from 'react-native-geocoding'
+import React, { useEffect, useState } from "react";
+import { Dimensions, View, Text, ImageBackground, Platform } from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import useStyles from "./styles";
+import LinearGradient from "react-native-linear-gradient";
+import ViewShot from "react-native-view-shot";
+import GetLocation from "react-native-get-location";
+import PagerView from "react-native-pager-view";
+import Geocoder from "react-native-geocoding";
 
-Geocoder.init('AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA')
+Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
-let ScreenWidth = Dimensions.get('window').width
+let ScreenWidth = Dimensions.get("window").width;
 
 const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
-  const styles = useStyles()
-  const ar_filters = challengeObj?.ar_filters
-  const [fullLocation, setFullLocation] = useState(null)
+  const styles = useStyles();
+  const ar_filters = challengeObj?.ar_filters;
+  const [location, setLocation] = useState(null);
+  const correctedCaptureData = captureData.startsWith("file://")
+    ? captureData
+    : `file://${captureData}`;
+  const [fullLocation, setFullLocation] = useState(null);
 
   const getLocation = () => {
     GetLocation.getCurrentPosition({
@@ -29,167 +33,174 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
         })
           .then(json => {
             try {
-              setFullLocation(json)
+              setFullLocation(json);
             } catch (ex) {
-              setFullLocation(null)
+              setFullLocation(null);
             }
           })
-          .catch(error => console.warn(error))
+          .catch(error => console.warn(error));
       })
       .catch(error => {
-        const { code, message } = error
-        console.warn(code, message)
-      })
-  }
+        const { code, message } = error;
+        console.warn(code, message);
+      });
+  };
 
   const getLocationText = location_option => {
-    var locality = null
-    var sublocality = null
-    var postal_town = null
-    var neighborhood = null
-    var country = null
-    var route = null
-    var admin_area_2 = null
-    var sublocality_level_2 = null
-    var sublocality_level_1 = null
-    var details = fullLocation.results[0].address_components
+    var locality = null;
+    var sublocality = null;
+    var postal_town = null;
+    var neighborhood = null;
+    var country = null;
+    var route = null;
+    var admin_area_2 = null;
+    var sublocality_level_2 = null;
+    var sublocality_level_1 = null;
+    var details = fullLocation.results[0].address_components;
 
     for (var i = details.length - 1; i >= 0; i--) {
       for (var j = 0; j < details[i].types.length; j++) {
-        if (details[i].types[j] == 'sublocality_level_2') {
-          sublocality_level_2 = details[i].long_name
+        if (details[i].types[j] == "sublocality_level_2") {
+          sublocality_level_2 = details[i].long_name;
         }
-        if (details[i].types[j] == 'route') {
-          route = details[i].long_name
+        if (details[i].types[j] == "route") {
+          route = details[i].long_name;
         }
-        if (details[i].types[j] == 'sublocality_level_1') {
-          sublocality_level_1 = details[i].long_name
+        if (details[i].types[j] == "sublocality_level_1") {
+          sublocality_level_1 = details[i].long_name;
         }
-        if (details[i].types[j] == 'locality') {
-          locality = details[i].long_name
-        } else if (details[i].types[j] == 'sublocality') {
-          sublocality = details[i].long_name
-        } else if (details[i].types[j] == 'neighborhood') {
-          neighborhood = details[i].long_name
-        } else if (details[i].types[j] == 'postal_town') {
-          postal_town = details[i].long_name
-        } else if (details[i].types[j] == 'administrative_area_level_2') {
-          admin_area_2 = details[i].long_name
+        if (details[i].types[j] == "locality") {
+          locality = details[i].long_name;
+        } else if (details[i].types[j] == "sublocality") {
+          sublocality = details[i].long_name;
+        } else if (details[i].types[j] == "neighborhood") {
+          neighborhood = details[i].long_name;
+        } else if (details[i].types[j] == "postal_town") {
+          postal_town = details[i].long_name;
+        } else if (details[i].types[j] == "administrative_area_level_2") {
+          admin_area_2 = details[i].long_name;
         }
         // from "google maps API geocoding get address components"
         // https://stackoverflow.com/questions/50225907/google-maps-api-geocoding-get-address-components
-        if (details[i].types[j] == 'country') {
-          country = details[i].long_name
+        if (details[i].types[j] == "country") {
+          country = details[i].long_name;
         }
       }
     }
 
-    if (location_option == 'COUNTRY_ONLY') {
-      return country
-    } else if (location_option == 'SITE_ONLY') {
+    if (location_option == "COUNTRY_ONLY") {
+      return country;
+    } else if (location_option == "SITE_ONLY") {
       if (admin_area_2 || locality) {
         if (sublocality && neighborhood && postal_town) {
-          return `${postal_town}, ${admin_area_2}`
+          return `${postal_town}, ${admin_area_2}`;
         } else if (!locality && sublocality && neighborhood && postal_town) {
-          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}`
+          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}`;
         } else if (!locality && !sublocality && neighborhood && postal_town) {
-          return `${neighborhood} ${postal_town}, ${admin_area_2}`
+          return `${neighborhood} ${postal_town}, ${admin_area_2}`;
         } else if (!locality && !sublocality && !neighborhood && postal_town) {
-          return `${postal_town}, ${admin_area_2}}`
+          return `${postal_town}, ${admin_area_2}}`;
         } else if (neighborhood && postal_town && sublocality) {
-          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}`
+          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}`;
         } else if (neighborhood && sublocality) {
-          return `${neighborhood} ${sublocality}, ${admin_area_2}`
+          return `${neighborhood} ${sublocality}, ${admin_area_2}`;
         } else if (postal_town && sublocality) {
-          return `${postal_town} ${sublocality}, ${admin_area_2}`
+          return `${postal_town} ${sublocality}, ${admin_area_2}`;
         } else if (route && sublocality_level_1 && sublocality) {
-          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`;
         } else if (route && sublocality_level_1 && sublocality) {
-          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}`;
         } else if (route && sublocality_level_1) {
-          return `${route}, ${sublocality_level_1}, ${locality}`
+          return `${route}, ${sublocality_level_1}, ${locality}`;
         } else if (route) {
-          return `${route}, ${locality}`
+          return `${route}, ${locality}`;
         } else if (sublocality) {
-          return `${sublocality}, ${locality}`
+          return `${sublocality}, ${locality}`;
         } else if (!admin_area_2 && locality) {
-          return `${locality}`
+          return `${locality}`;
         } else if (!locality && admin_area_2) {
-          return `${admin_area_2}`
+          return `${admin_area_2}`;
         } else {
-          return `${country}`
+          return `${country}`;
         }
       }
     } else {
       if (admin_area_2 || locality) {
         if (sublocality && neighborhood && postal_town) {
-          return `${postal_town}, ${admin_area_2}, ${country}`
+          return `${postal_town}, ${admin_area_2}, ${country}`;
         } else if (!locality && sublocality && neighborhood && postal_town) {
-          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}, ${country}`
+          return `${locality} ${neighborhood} ${postal_town}, ${admin_area_2}, ${country}`;
         } else if (!locality && !sublocality && neighborhood && postal_town) {
-          return `${neighborhood} ${postal_town}, ${admin_area_2}, ${country}`
+          return `${neighborhood} ${postal_town}, ${admin_area_2}, ${country}`;
         } else if (!locality && !sublocality && !neighborhood && postal_town) {
-          return `${postal_town}, ${admin_area_2}, ${country}`
+          return `${postal_town}, ${admin_area_2}, ${country}`;
         } else if (neighborhood && postal_town && sublocality) {
-          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}, ${country}`
+          return `${neighborhood} ${sublocality} ${postal_town}, ${admin_area_2}, ${country}`;
         } else if (neighborhood && sublocality) {
-          return `${neighborhood} ${sublocality}, ${admin_area_2}, ${country}`
+          return `${neighborhood} ${sublocality}, ${admin_area_2}, ${country}`;
         } else if (postal_town && sublocality) {
-          return `${postal_town} ${sublocality}, ${admin_area_2}, ${country}`
+          return `${postal_town} ${sublocality}, ${admin_area_2}, ${country}`;
         } else if (route && sublocality_level_1 && sublocality) {
-          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (route && sublocality_level_1 && sublocality) {
-          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`
+          return `${route}, ${sublocality}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (route && sublocality_level_1) {
-          return `${route}, ${sublocality_level_1}, ${locality}, ${country}`
+          return `${route}, ${sublocality_level_1}, ${locality}, ${country}`;
         } else if (route) {
-          return `${route}, ${locality}, ${country}`
+          return `${route}, ${locality}, ${country}`;
         } else if (sublocality) {
-          return `${sublocality}, ${locality}, ${country}`
+          return `${sublocality}, ${locality}, ${country}`;
         } else if (!admin_area_2 && locality) {
-          return `${locality}, ${country}`
+          return `${locality}, ${country}`;
         } else if (!locality && admin_area_2) {
-          return `${admin_area_2}, ${country}`
+          return `${admin_area_2}, ${country}`;
         } else {
-          return `${country}`
+          return `${country}`;
         }
       } else {
-        return `${country}`
+        return `${country}`;
       }
     }
-  }
+  };
 
   useEffect(() => {
-    getLocation()
-  }, [])
-
+    getLocation();
+    // Image.getSize(captureData, (width, height) => {
+    //   // calculate image width and height
+    //   const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
+    //   const scaleFactor = width / screenWidth
+    //   const imageHeight = height / scaleFactor
+    //   setImageHeight(imageHeight)
+    // })
+  }, []);
+  console.log("AAAAAAAAAAAAAAAAAAAAAACAPTUREDATAAAAAAAAAAAAAAA", captureData);
   return (
     <ViewShot
       ref={viewShotRef}
       style={styles.mainContainer}
-      options={{ fileName: 'filtered_share', format: 'png', quality: 0.9 }}
+      options={{ fileName: "filtered_share", format: "png", quality: 0.9 }}
     >
-      <BackgroundWithImage source={{ uri: captureData }} style={styles.mainContainer}>
+      <BackgroundWithImage source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>
           {ar_filters.map(filter => {
-            let height = '102%'
-            if (Platform.OS === 'android' && filter?.gradient_direction === 'BOTTOM_TO_TOP') {
-              height = '100%'
+            let height = "102%";
+            if (Platform.OS === "android" && filter?.gradient_direction === "BOTTOM_TO_TOP") {
+              height = "100%";
             }
-            if (Platform.OS === 'ios' && filter?.gradient_direction === 'TOP_TO_BOTTOM') {
-              height = ScreenWidth * 1.1
+            if (Platform.OS === "ios" && filter?.gradient_direction === "TOP_TO_BOTTOM") {
+              height = ScreenWidth * 1.1;
             }
-            if (Platform.OS === 'ios' && filter?.gradient_direction === 'BOTTOM_TO_TOP') {
-              height = '102%'
+            if (Platform.OS === "ios" && filter?.gradient_direction === "BOTTOM_TO_TOP") {
+              height = "102%";
             }
 
             return (
-              <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
+              <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
                 {filter?.gradient_colors && (
                   // grandient
                   <View
                     style={{
-                      position: 'absolute',
+                      position: "absolute",
                       top: 0,
                       bottom: 0,
                       left: 0,
@@ -202,13 +213,13 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                         transform: [
                           {
                             rotate:
-                              filter?.gradient_direction === 'TOP_TO_BOTTOM' ? '0deg' : '180deg',
+                              filter?.gradient_direction === "TOP_TO_BOTTOM" ? "0deg" : "180deg",
                           },
                         ],
                       }}
                       colors={[
                         ...filter?.gradient_colors.sort((a, b) => a.length - b.length),
-                        'transparent',
+                        "transparent",
                       ]}
                     />
                   </View>
@@ -217,20 +228,20 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   // image
                   <ImageBackground
                     source={{ uri: filter?.image }}
-                    resizeMode={Platform.OS === 'android' ? 'cover' : 'contain'}
+                    resizeMode={Platform.OS === "android" ? "cover" : "contain"}
                     style={{
                       height: height,
-                      width: '100%',
-                      backgroundColor: 'tranparent',
+                      width: "100%",
+                      backgroundColor: "tranparent",
                     }}
                   />
                 )}
-                {filter?.gradient_direction === 'BOTTOM_TO_TOP' && (
+                {filter?.gradient_direction === "BOTTOM_TO_TOP" && (
                   <View
                     style={[
                       styles.textFilterView,
                       {
-                        justifyContent: 'flex-end',
+                        justifyContent: "flex-end",
                         paddingBottom: 10,
                       },
                     ]}
@@ -276,8 +287,8 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     )}
                   </View>
                 )}
-                {filter.gradient_direction === 'TOP_TO_BOTTOM' && (
-                  <View style={[styles.textFilterView, { justifyContent: 'flex-start' }]}>
+                {filter.gradient_direction === "TOP_TO_BOTTOM" && (
+                  <View style={[styles.textFilterView, { justifyContent: "flex-start" }]}>
                     {!filter?.text_form_image && (
                       <Text
                         style={[
@@ -320,12 +331,12 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   </View>
                 )}
               </View>
-            )
+            );
           })}
         </PagerView>
       </BackgroundWithImage>
     </ViewShot>
-  )
-}
+  );
+};
 
-export default ARFilter
+export default ARFilter;
