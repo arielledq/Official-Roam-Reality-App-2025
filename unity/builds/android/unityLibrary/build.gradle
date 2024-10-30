@@ -3,17 +3,21 @@ apply plugin: 'com.android.library'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "androidx.appcompat:appcompat:1.6.1"
+    implementation(name: 'MvnCorder', ext:'aar')
     implementation(name: 'arcore_client', ext:'aar')
     implementation(name: 'ARPresto', ext:'aar')
-    implementation(name: 'UnityARCore', ext:'aar')
+    implementation(name: 'SmileSoft_Recorder_Plugin', ext:'aar')
     implementation(name: 'unityandroidpermissions', ext:'aar')
+    implementation(name: 'UnityARCore', ext:'aar')
     implementation project('xrmanifest.androidlib')
 
 }
 
 android {
-    namespace "com.unity3d.player"
+	namespace "com.unity3d.player"
     ndkPath "/home/innovatica/extra/Unity/2022.3.49f1/Editor/Data/PlaybackEngines/AndroidPlayer/NDK"
+
     compileSdkVersion 35
     buildToolsVersion '34.0.0'
 
@@ -29,7 +33,7 @@ android {
             abiFilters 'armeabi-v7a', 'arm64-v8a'
         }
         versionCode 1
-        versionName '1.0.0'
+        versionName '1.0.1'
         consumerProguardFiles 'proguard-unity.txt'
     }
 
