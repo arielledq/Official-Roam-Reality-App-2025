@@ -13,7 +13,8 @@ import OneSignal from "react-native-onesignal"
 import { NotificationProvider } from "./NotificationProvider"
 import Config from "./config"
 import {GeolocationProvider} from "./GeolocationProvider";
-import MapboxGL from "@rnmapbox/maps";
+import MapboxGL from "@rnmapbox/maps"
+import Geolocation from "@react-native-community/geolocation";
 // import * as Sentry from '@sentry/react-native';
 
 
