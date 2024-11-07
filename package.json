@@ -13,7 +13,8 @@
     "postinstall": "patch-package",
     "fix-deps": "bash ./scripts/fix-dependencies.sh",
     "reinstall-pods": "cd ios && pod install && wait; cd .. && yarn fix deps && wait;",
-    "build-apk": "bash ./scripts/build-apk.sh"
+    "build-apk": "bash ./scripts/build-apk.sh",
+    "build-aab": "bash ./scripts/build-aab.sh"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.10",
