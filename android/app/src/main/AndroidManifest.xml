@@ -28,7 +28,7 @@
 
 
   <application android:name=".MainApplication"
-    tools:replace="android:label"
+    tools:replace="android:icon, android:label"
     android:label="@string/original_app_name"
     android:icon="@mipmap/ic_launcher"
     android:roundIcon="@mipmap/ic_launcher_round"
