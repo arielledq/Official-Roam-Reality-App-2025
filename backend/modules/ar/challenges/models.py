@@ -115,33 +115,33 @@ class ARChallengeParameterSettings(models.Model):
 
     bloom_threshold = models.DecimalField(
         _("Bloom Threshold"),
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
-        max_digits=3,
+        validators=[MinValueValidator(Decimal('-1.00')), MaxValueValidator(Decimal('5.00'))],
+        max_digits=4,
         decimal_places=2,
         default=1.00
     )
     bloom_intensity = models.DecimalField(
         _("Bloom Intensity"),
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
-        max_digits=3,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('99.00'))],
+        max_digits=5,
         decimal_places=2,
         default=1.00
     )
-    positionX = models.IntegerField(_("Position X"), default=0)
-    positionY = models.IntegerField(_("Position Y"), default=0)
-    positionZ = models.IntegerField(_("Position Z"), default=-25)
+    positionX = models.DecimalField(_("Position X"), default=0, decimal_places=3, max_digits=6)
+    positionY = models.DecimalField(_("Position Y"), default=0, decimal_places=3, max_digits=6)
+    positionZ = models.DecimalField(_("Position Z"), default=-0.4, decimal_places=3, max_digits=6)
 
     scale_object = models.DecimalField(
         _("Object Scale"),
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('8.00'))],
+        validators=[MinValueValidator(Decimal('0.000')), MaxValueValidator(Decimal('8.000'))],
         max_digits=8,
         decimal_places=5,
         default=1.00  # Asignado según el valor proporcionado
     )
     emission_value = models.DecimalField(
         _("Emission Value"),
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
-        max_digits=3,
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('99.00'))],
+        max_digits=5,
         decimal_places=2,
         default=1.00
     )
@@ -152,23 +152,23 @@ class ARChallengeParameterSettings(models.Model):
     )
     scale_speed = models.DecimalField(
         _("Scale Speed"),
-        validators=[MinValueValidator(Decimal('0.0001')), MaxValueValidator(Decimal('1.0000'))],
-        max_digits=6,
+        validators=[MinValueValidator(Decimal('0.0001')), MaxValueValidator(Decimal('10.0000'))],
+        max_digits=7,
         decimal_places=4,
         default=0.0015
     )
     min_pinch_scale = models.DecimalField(
         _("Minimum Zoom Scaling"),
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
-        max_digits=3,
-        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.000')), MaxValueValidator(Decimal('1.000'))],
+        max_digits=5,
+        decimal_places=4,
         default=0.01
     )
     max_pinch_scale = models.DecimalField(
         _("Maximum Zoom Scaling"),
-        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('3.00'))],
-        max_digits=3,
-        decimal_places=2,
+        validators=[MinValueValidator(Decimal('0.000')), MaxValueValidator(Decimal('3.000'))],
+        max_digits=4,
+        decimal_places=3,
         default=3.00
     )
 
