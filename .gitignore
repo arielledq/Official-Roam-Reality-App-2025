@@ -34,6 +34,7 @@ local.properties
 *.keystore
 !debug.keystore
 *.apk
+*.aab
 android/app/src/main/res/
 android/app/src/main/assets/
 

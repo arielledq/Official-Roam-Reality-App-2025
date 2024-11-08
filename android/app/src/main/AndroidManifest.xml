@@ -64,11 +64,6 @@
       </intent-filter>
     </activity>
 
-      <meta-data
-              tools:replace="android:value"
-              android:name="com.google.ar.core.min_apk_version"
-              android:value="24.0.35" />
-
     <meta-data
       android:name="com.facebook.sdk.ApplicationName"
       android:value="@string/app_name" />
