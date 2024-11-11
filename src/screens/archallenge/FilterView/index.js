@@ -219,7 +219,7 @@ console.log("AAAAAAAAAAAAAAAAAAAAAACAPTUREDATAAAAAAAAAAAAAAA",captureData)
           {ar_filters.map(filter => {
             return (
               <View key={filter?.id} style={{ position: 'relative', flex: 1 }}>
-                {console.log(' filter ======>>>> ', JSON.stringify(filter, null, 2))}
+                {/* {console.log(' filter ======>>>> ', JSON.stringify(filter, null, 2))} */}
                 {filter.gradient_colors && (
                   // grandient
                   <View
@@ -250,13 +250,16 @@ console.log("AAAAAAAAAAAAAAAAAAAAAACAPTUREDATAAAAAAAAAAAAAAA",captureData)
                 )}
                 {filter.image && (
                   // image
+                  
                   <ImageBackground
                     source={{ uri: filter.image }}
-                    resizeMode='cover'
+                    resizeMode='contain'
                     style={{
-                      height: ScreenWidth * 1.2,
+                      alignItems:'flex-end',
+                      // paddingTop: 20,
+                      height: filter.gradient_direction === 'TOP_TO_BOTTOM' ? ScreenWidth * 1.3 : ScreenWidth * 1.2, 
                       width: '100%',
-                      backgroundColor: 'tranparent',
+                      // backgroundColor: 'tranparent',
                     }}
                   />
                 )}

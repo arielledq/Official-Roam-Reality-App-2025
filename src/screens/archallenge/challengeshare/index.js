@@ -317,15 +317,17 @@ console.log(correctedCaptureData)
         <AppText numberOfLines={3} style={[styles.headerText]}>
           Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{' '}
         </AppText>
-        <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : '50%' }]}>
+        <View style={[styles.detailContainer, { width:"100%", height: 420 }]}>
           {fileExt == 'mp4' ? (
             <Video
-              resizeMode={'cover'}
+              resizeMode={'contain'}
               repeat={true}
               style={{
-                width: '70%',
                 flex: 1,
-                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
+                justifyContent: 'flex-end',
+                alignItems: 'flex-end',
+                width: '100%',
+                // marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
               }}
               source={{
                 uri: correctedCaptureData,
@@ -339,7 +341,7 @@ console.log(correctedCaptureData)
                 backgroundColor: 'transparent',
                 width: '70%',
                 flex:1,
-                marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
+                // marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters?.length == 0 ? -200 : 0,
               }}
             />
           )}

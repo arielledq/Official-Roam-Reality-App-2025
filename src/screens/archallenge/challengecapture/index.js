@@ -264,23 +264,30 @@ const ArChallengeCapture = ({}) => {
   const captureScreenshot = async () => {
     if (unityRef.current) {
       unityRef.current.postMessage('ScreenCapture', 'CaptureScreenshotFromReact', '');
-
-      const path = "/storage/emulated/0/Android/data/com.roam_reality/files/";
-
+  
+      // Obtén la ruta base según la plataforma
+      const basePath = Platform.OS === 'android'
+        ? '/storage/emulated/0/Android/data/com.roam_reality/files/'
+        : RNFS.DocumentDirectoryPath; // Ruta de Documentos en iOS
+  
       // Agregar un retraso para asegurarse de que la captura se ha guardado
       setTimeout(() => {
-        RNFS.readDir(path)
+        RNFS.readDir(basePath)
           .then((files) => {
             console.log("Archivos encontrados en el directorio:", files);
-
+  
             if (Array.isArray(files) && files.length > 0) {
-              const foundFile = files.find(file => file.isFile() && file.name.includes(".png"));
+              // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
+              const foundFile = files.find(
+                (file) => file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
+              );
+  
               if (foundFile) {
                 console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
                 setFileFound(foundFile.path);
                 setCaptureData(foundFile.path);
-                setCapturedImage(foundFile.path);  // Actualiza capturedImage
-                setIsUnityLoaded(false);  // Desmonta UnityView al capturar la imagen
+                setCapturedImage(foundFile.path); // Actualiza capturedImage
+                setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
               } else {
                 console.error("No se encontró ningún archivo .png en el directorio.");
               }
@@ -291,7 +298,7 @@ const ArChallengeCapture = ({}) => {
           .catch((err) => {
             console.error("Error leyendo el directorio:", err);
           });
-      }, 1000);  // Asegurarse que el archivo esté listo
+      }, 2000); // Asegúrate de que el archivo esté listo
     }
   };
 
@@ -397,35 +404,51 @@ const ArChallengeCapture = ({}) => {
     if (unityRef.current) {
       // Enviar mensaje a Unity para detener la grabación
       unityRef.current.postMessage('Video Recorder', 'DetenerGrabacion', 'detener');
-
-      // Ruta completa donde se almacenará el video (cambia esto según la ruta exacta de Android)
-      const fullVideoPath = '/storage/emulated/0/Android/data/com.roam_reality/files/videos/1.mp4';
-
-      // Esperar un pequeño retraso para asegurar que la grabación se haya detenido completamente en Unity
+  
+      // Definir las rutas dependiendo de la plataforma (Android e iOS)
+      const basePath = Platform.OS === 'android'
+        ? '/storage/emulated/0/Android/data/com.roam_reality/files/video' // Ruta en Android
+        : RNFS.DocumentDirectoryPath + '/videos'; // Ruta en iOS
+        console.log("aaaaaaafiles")
+      // Esperar un pequeño retraso para asegurarse de que la grabación se haya detenido completamente
       setTimeout(async () => {
-        // Verificar si el archivo de video existe
         try {
-          const exists = await RNFS.exists(fullVideoPath);
-
-          if (exists) {
-            // Si el archivo de video existe, actualizar el estado con la ruta del archivo
-            setCapturedVideo(fullVideoPath);
-            console.log('Video guardado en:', fullVideoPath);
-
-            // Asegurarte de que UnityView se desmonte correctamente después de la grabación
-            setIsUnityLoaded(false);  // Aquí desmontamos Unity al terminar la grabación
+          // Leer el directorio de la carpeta 'videos'
+          const files = await RNFS.readDir(basePath);
+         
+  
+          // Filtrar archivos .mp4
+          const videoFiles = files.filter((file) => file.isFile() && file.name.endsWith('.mp4'));
+  
+          if (videoFiles.length > 0) {
+            // Ordenar los archivos por fecha de modificación (más reciente primero)
+            videoFiles.sort((a, b) => b.mtime - a.mtime); // Ordena de más reciente a más antiguo
+  
+            // Seleccionar el archivo más reciente
+            const latestFile = videoFiles[0];
+            const latestFilePath = latestFile.path;
+  
+            // Actualizar el estado con la ruta del archivo más reciente
+            setCapturedVideo(latestFilePath);
+            console.log('Video guardado en:', latestFilePath);
+  
+            // Desmontar UnityView después de la grabación
+            setIsUnityLoaded(false); // Desmontar UnityView
+  
           } else {
-            console.error('El archivo de video no se encontró:', fullVideoPath);
+            console.error('No se encontraron archivos .mp4 en la carpeta de videos:', basePath);
           }
         } catch (error) {
-          console.error('Error verificando el archivo de video:', error);
+          console.error('Error verificando los archivos de video:', error);
         }
-      }, 1000); // Esperar un segundo para asegurar que el archivo esté guardado antes de verificar
+      }, 1000); // Espera 1 segundo para asegurarse de que el archivo esté guardado antes de verificar
     } else {
       console.error('UnityView no está disponible.');
     }
   };
-
+  
+  
+    
   // Función para eliminar el video grabado manualmente (si lo necesitas)
   const eliminarVideoGrabado = async () => {
     try {
@@ -633,9 +656,10 @@ console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo",viewSh
       <View
         style={[
           styles.f1,
-          {
-            marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0,
-          },
+          // {
+          //   marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0,
+          // },
+          // {flex:1,} 
           challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 },
         ]}
       >
@@ -643,10 +667,10 @@ console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo",viewSh
           <BackgroundWithImage>
             {isUnityLoaded && (
               <View
-                style={{ flex: 1 }}
+                style={{ flex: 1, justifyContent: 'flex-end', alignItems: 'flex-end', alignContent:'flex-end' }}
                 onLayout={handleUnityViewLayout} // Obtener las dimensiones del contenedor
               >
-            <UnityView ref={unityRef} style={{width: "100%", flex: 1, zIndex: -1  }}/>
+            <UnityView ref={unityRef} style={{width: '100%', flex: 1, zIndex: -1  }}/>
               </View>
             )}
           </BackgroundWithImage>
@@ -677,14 +701,14 @@ console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo",viewSh
         )}
       </View>
       <View style={styles.holdTextContainer}>
-        {!capturedImage &&
+        {/* {!capturedImage &&
           !capturedVideo &&
           !recordingStart &&
-          challengeObj?.ar_filters.length == 0 && (
+          challengeObj?.ar_filters.length == 0 && ( */}
             <Text style={styles.holdText}>
-              Press and hold the capture button to start recording. Release to stop
+              Press aaaand hold the capture button to start recording. Release to stop
             </Text>
-          )}
+          {/* )} */}
         {(capturedImage || capturedVideo) &&
           route?.params?.challengeObj?.ar_filters.length > 0 && (
             <Text style={styles.holdText}>Swipe Left or Right for Filters</Text>
