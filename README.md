@@ -29,6 +29,17 @@ yarn fix-deps
 yarn start
 ```
 
+### iOS Additional Setup
+
+#### iOS Add frameworks
+
+1.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`
+2.  Add `New Copy Files PHase`
+3.  Select the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
+4.  Move the added files into the `Frameworks`
+5.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`
+6.  Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields
+
 ## Unity Configuration
 
 ### Opening the Project
