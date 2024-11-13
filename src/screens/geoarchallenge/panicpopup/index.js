@@ -61,8 +61,7 @@ const PanicPopUp = ({ onClose }) => {
             <View style={_styles.container}>
               <Text style={_styles.emergencyText}>Emergency Procedure</Text>
               <Text style={_styles.emergencyTextDes}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi ullamcorper erat nec
-                blandit pharetra. Quisque mattis elit semper sem mattis, a commodo nisi mattis.
+              In case of an emergency, please send us details immediately, and a Roam representative will reach out as soon as possible. If cell service is limited and we cannot reach you, we may contact the nearest police station or search and rescue team using your latest location data to help ensure your safety.
               </Text>
               <View style={_styles.chidlView}>
                 <AppInput
