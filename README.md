@@ -71,6 +71,14 @@ yarn start
    - Set the following frameworks to 'Embed & Sign':
      - `MvnCorder.framework`
      - `NativeScreenRecorder.framework`
+3. Add a `Run script` with the following code:
+
+```
+   cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/"
+   if [[ -d "Frameworks" ]]; then
+      rm -fr Frameworks
+   fi
+```
 
 ## Release Builds
 
