@@ -20,6 +20,8 @@
 		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */; };
+		DC0976672CE67A4C0061481F /* NativeScreenRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC0976652CE67A4C0061481F /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DC0976682CE67A4C0061481F /* MvnCorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC0976662CE67A4C0061481F /* MvnCorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DC09B16D2CA3547D0068EB4F /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26452B5039E300872709 /* Fontisto.ttf */; };
 		DC09B16E2CA3547D0068EB4F /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26462B5039E300872709 /* Octicons.ttf */; };
 		DC09B16F2CA3547D0068EB4F /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26472B5039E300872709 /* Feather.ttf */; };
@@ -36,8 +38,6 @@
 		DC09B17A2CA3547D0068EB4F /* EvilIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26522B5039E300872709 /* EvilIcons.ttf */; };
 		DC09B17B2CA3547D0068EB4F /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26532B5039E300872709 /* SimpleLineIcons.ttf */; };
 		DC09B17C2CA3547D0068EB4F /* MaterialIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26542B5039E300872709 /* MaterialIcons.ttf */; };
-		DC6B81C92CE3CE2200B3906A /* NativeScreenRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC6B81C72CE3CE2200B3906A /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DC6B81CA2CE3CE2200B3906A /* MvnCorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC6B81C82CE3CE2200B3906A /* MvnCorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DCB5011C2CA49EAD000B3F37 /* NunitoSans10ptRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCB501002CA49EAA000B3F37 /* NunitoSans10ptRegular.ttf */; };
 		DCB5011D2CA49EAD000B3F37 /* PoppinsBlack.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCB501012CA49EAA000B3F37 /* PoppinsBlack.ttf */; };
 		DCB5011E2CA49EAD000B3F37 /* PoppinsExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCB501022CA49EAA000B3F37 /* PoppinsExtraLight.ttf */; };
@@ -97,14 +97,14 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		DC6B81BE2CE3CD8100B3906A /* CopyFiles */ = {
+		DC0976642CE679A50061481F /* CopyFiles */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				DC6B81C92CE3CE2200B3906A /* NativeScreenRecorder.framework in CopyFiles */,
-				DC6B81CA2CE3CE2200B3906A /* MvnCorder.framework in CopyFiles */,
+				DC0976672CE67A4C0061481F /* NativeScreenRecorder.framework in CopyFiles */,
+				DC0976682CE67A4C0061481F /* MvnCorder.framework in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,8 +152,8 @@
 		9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
 		CD42C8902BDBCB100036610F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
-		DC6B81C72CE3CE2200B3906A /* NativeScreenRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NativeScreenRecorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/NativeScreenRecorder.framework; sourceTree = "<group>"; };
-		DC6B81C82CE3CE2200B3906A /* MvnCorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MvnCorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/MvnCorder.framework; sourceTree = "<group>"; };
+		DC0976652CE67A4C0061481F /* NativeScreenRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NativeScreenRecorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/NativeScreenRecorder.framework; sourceTree = "<group>"; };
+		DC0976662CE67A4C0061481F /* MvnCorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MvnCorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/MvnCorder.framework; sourceTree = "<group>"; };
 		DCB501002CA49EAA000B3F37 /* NunitoSans10ptRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptRegular.ttf; path = ../src/assets/fonts/NunitoSans10ptRegular.ttf; sourceTree = "<group>"; };
 		DCB501012CA49EAA000B3F37 /* PoppinsBlack.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = PoppinsBlack.ttf; path = ../src/assets/fonts/PoppinsBlack.ttf; sourceTree = "<group>"; };
 		DCB501022CA49EAA000B3F37 /* PoppinsExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = PoppinsExtraLight.ttf; path = ../src/assets/fonts/PoppinsExtraLight.ttf; sourceTree = "<group>"; };
@@ -250,8 +250,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				DC6B81C82CE3CE2200B3906A /* MvnCorder.framework */,
-				DC6B81C72CE3CE2200B3906A /* NativeScreenRecorder.framework */,
+				DC0976662CE67A4C0061481F /* MvnCorder.framework */,
+				DC0976652CE67A4C0061481F /* NativeScreenRecorder.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */,
 				2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
@@ -412,14 +412,15 @@
 			buildPhases = (
 				8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
-				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				53F7E1A02C8F7227007954D6 /* Embed Foundation Extensions */,
 				14D7E42D0C5B1038644775CA /* [CP] Embed Pods Frameworks */,
 				C883D88DD3D2C2EE6CE9E21C /* [CP] Copy Pods Resources */,
-				DC6B81BE2CE3CD8100B3906A /* CopyFiles */,
+				DC0976642CE679A50061481F /* CopyFiles */,
+				DC09765E2CE675330061481F /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -692,6 +693,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		DC09765E2CE675330061481F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/\"\nif [[ -d \"Frameworks\" ]]; then\n    rm -fr Frameworks\nfi\n";
+		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -959,6 +977,7 @@
 		53F7E1A12C8F7227007954D6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1001,6 +1020,7 @@
 		53F7E1A22C8F7227007954D6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
