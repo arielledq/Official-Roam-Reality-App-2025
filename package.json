@@ -13,9 +13,11 @@
     "postinstall": "patch-package",
     "fix-deps": "bash ./scripts/fix-dependencies.sh",
     "reinstall-pods": "cd ios && pod install && wait; cd .. && yarn fix deps && wait;",
-    "build-apk": "bash ./scripts/build-apk.sh"
+    "build-apk": "bash ./scripts/build-apk.sh",
+    "build-aab": "bash ./scripts/build-aab.sh"
   },
   "dependencies": {
+    "@azesmway/react-native-unity": "^1.0.10",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@babel/polyfill": "^7.12.1",
     "@gorhom/bottom-sheet": "^4.6.0",
@@ -51,7 +53,7 @@
     "postinstall-postinstall": "^2.1.0",
     "react": "18.2.0",
     "react-dom": "^18.2.0",
-    "react-native": "0.71.11",
+    "react-native": "0.71.19",
     "react-native-compass-heading": "^1.5.0",
     "react-native-contacts": "^7.0.8",
     "react-native-devsettings": "^1.0.5",
@@ -74,7 +76,7 @@
     "react-native-instagram-login": "^2.0.6",
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
-    "react-native-maps": "^1.14.0",
+    "react-native-maps": "1.7.1",
     "react-native-maps-directions": "^1.9.0",
     "react-native-modal": "^13.0.1",
     "react-native-modal-datetime-picker": "^17.1.0",

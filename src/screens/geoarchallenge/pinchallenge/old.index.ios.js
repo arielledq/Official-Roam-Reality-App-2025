@@ -1,62 +1,62 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
-import { Alert, Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import BackgroundWithImage from '../../../components/background'
-import AppHeader from '../../../components/header'
-import SpeakerIcon from '../../../assets/geoar/speaker_icon.svg'
-import InfoIcon from '../../../assets/geoar/Info.svg'
-import MenIcon from '../../../assets/geoar/men_icon.svg'
-import RadarBlipIcon from '../../../assets/geoar/radar_blip.svg'
-import PinIcon from '../../../assets/geoar/pin_locationicon.svg'
-import TrophyIcon from '../../../assets/geoar/trophy_icon.svg'
-import CaptureIcon from '../../../assets/geoar/capture_icon.svg'
-import {
-  ViroARScene,
-  ViroMaterials,
-  ViroTrackingStateConstants,
-  ViroARSceneNavigator,
-  Viro3DObject,
-  ViroImage,
-  ViroAmbientLight,
-  ViroDirectionalLight,
-  ViroSpotLight,
-  ViroText,
-} from '@viro-community/react-viro'
-const RNFS = require('react-native-fs')
-import RNFetchBlob from 'rn-fetch-blob'
-const Sound = require('react-native-sound')
-import uuid from 'react-native-uuid'
-import Geolocation from 'react-native-geolocation-service'
-import { unzip } from 'react-native-zip-archive'
+import { Alert, Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg";
+import InfoIcon from "../../../assets/geoar/Info.svg";
+import MenIcon from "../../../assets/geoar/men_icon.svg";
+import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg";
+import PinIcon from "../../../assets/geoar/pin_locationicon.svg";
+import TrophyIcon from "../../../assets/geoar/trophy_icon.svg";
+import CaptureIcon from "../../../assets/geoar/capture_icon.svg";
+// import {
+//   ViroARScene,
+//   ViroMaterials,
+//   ViroTrackingStateConstants,
+//   ViroARSceneNavigator,
+//   Viro3DObject,
+//   ViroImage,
+//   ViroAmbientLight,
+//   ViroDirectionalLight,
+//   ViroSpotLight,
+//   ViroText
+// } from "@reactvision/react-viro"
+const RNFS = require("react-native-fs");
+import RNFetchBlob from "rn-fetch-blob";
+const Sound = require("react-native-sound");
+import uuid from "react-native-uuid";
+import Geolocation from "react-native-geolocation-service";
+import { unzip } from "react-native-zip-archive";
 
-const { config, fs } = RNFetchBlob
-import { useDispatch, useSelector } from 'react-redux'
-import useStyles from './styles'
-import { useNavigation } from '@react-navigation/native'
-import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions'
+const { config, fs } = RNFetchBlob;
+import { useDispatch, useSelector } from "react-redux";
+import useStyles from "./styles";
+import { useNavigation } from "@react-navigation/native";
+import { request, requestMultiple, PERMISSIONS } from "react-native-permissions";
 import {
   convertMetersToFeets,
   findNearestLocationPoint,
   getLocationDistance,
   hasLocationPermission,
   isLocationPointInPolygon,
-} from '../../../util/LocationLib'
-import RenderHTML from 'react-native-render-html'
-import { AppButton } from '../../../components'
-const { width } = Dimensions.get('window')
-import { FontSizes } from '../../../util/FontUtils'
-import LineIcon from '../../../assets/ar/line.png'
-import { showMessage } from '../../../util/helpers'
+} from "../../../util/LocationLib";
+import RenderHTML from "react-native-render-html";
+import { AppButton } from "../../../components";
+const { width } = Dimensions.get("window");
+import { FontSizes } from "../../../util/FontUtils";
+import LineIcon from "../../../assets/ar/line.png";
+import { showMessage } from "../../../util/helpers";
 
 const PinChallenge = ({}) => {
-  const _styles = useStyles()
-  const navigation = useNavigation()
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const challengeObj = selectedGeoSite.pin_challenge
-  const challengeObjParameters = challengeObj?.parameters
-  const modelFile = challengeObj.model_file
-  const settings = useSelector(state => state.ar?.arSettings)
-
+  const _styles = useStyles();
+  const navigation = useNavigation();
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const challengeObj = selectedGeoSite.pin_challenge;
+  const challengeObjParameters = challengeObj?.parameters;
+  const modelFile = challengeObj.model_file;
+  const settings = useSelector(state => state.ar?.arSettings);
+  /*
   const ARScreen = props => {
     const [object3dType, setObject3dType] = useState(null)
     const [isMeInsideInSite, setIsMeInsideInSite] = useState(
@@ -614,7 +614,7 @@ const PinChallenge = ({}) => {
                       }}
                       style={_styles.f1}
                     ></ViroARSceneNavigator>
-                    {/* transparancy off */}
+                    {/* transparancy off * /}
                     {this.state.capturedImage && (
                       <View
                         style={[_styles.f1, { backgroundColor: '#000' }]}
@@ -758,7 +758,7 @@ const PinChallenge = ({}) => {
     },
   })
 
-  return <ViroARNavigator />
-}
+  return <ViroARNavigator />*/
+};
 
-export default PinChallenge
+export default PinChallenge;

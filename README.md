@@ -1,167 +1,119 @@
-# travel_ar_app_42706
+# AR React Native Project Setup
 
-Welcome to your new Crowdbotics app.
+## Prerequisites
 
-## What is Crowdbotics?
+- Node.js and Yarn installed
+- Unity Editor
+- Xcode (for iOS development)
+- Android Studio (for Android development)
 
-Crowdbotics is an easy way to build software applications of all kinds. You can build production, high-caliber software applications in minutes, rather than weeks or months, even if you're not a software developer.
+## Getting Started
 
-The reason this works is that most software applications and features we want to build are similar to applications that have been built before. We've crawled hundreds of thousands of public code repositories to teach the Crowdbotics engine how to create software.
+### Initial Setup
 
-As a result, Crowdbotics can generate new applications automatically in a standardized way.
+1. Install dependencies:
 
-### Useful Links
-
-[App Dashboard](https://app.crowdbotics.com/)
-·
-[Knowledgebase](https://knowledge.crowdbotics.com/)
-·
-[Developer Training](https://knowledge.crowdbotics.com/crowdbotics-developer-training)
-·
-[Forum](https://discuss.crowdbotics.com/)
-·
-[Tech Support](https://crowdbotics.slack.com/archives/CGSAV319V)
-
-## Table of Contents
-
-1. [Project Description](#project-description)
-2. [Project Structure](#project-structure)
-3. [Modules](#modules)
-4. [Getting Started: Frontend](#getting-started-frontend)
-   - [Installation](#installation)
-   - [Running with Fastlane](#running-with-fastlane)
-     - [Android](#android-1)
-     - [iOS](#ios-1)
-     - [React Native Web](#react-native-web)
-5. [Getting Started: Backend](backend#readme)
-6. [License](#license)
-
-## Project Description
-
-This react_native application was built with Crowdbotics www.crowdbotics.com
-
-## Project Structure
-
-    .
-    ├── ...
-    ├── android                 # Android native files
-    ├── backend                 # Django backend REST API
-    ├── ios                     # iOS native files
-    ├── modules                 # Modules
-    ├── public
-    ├── screens
-    ├── store                   # Application state storage
-    ├── ...
-    ├── README.md
-    └── ...
-
-## Modules (THIS SECTION IS AUTO-GENERATED, PLEASE DO NOT EDIT)
-
-This section will show any installed modules you add from the Storyboard Modules section.
-- [react-native-terms-and-conditions-webview](modules/terms-and-conditions-webview)
-- [react-native-user-profile](modules/user-profile)
-- [camera]()
-- [django-contact-us](backend/modules)
-- [terms-and-conditions]()
-- [privacy-policy]()
-
-# Getting started: Frontend
-
-This section outlines instructions on setting up a local development environment for the frontend of your application.
-
-## Installation
-
-### Metro
-
-After cloning the repo, install the dependencies locally with [Yarn](https://yarnpkg.com/):
-
-```sh
+```bash
 yarn install
 ```
 
-Start your [Metro](https://facebook.github.io/metro/) server:
+2. Fix dependencies:
 
-```sh
-npx react-native start
+```bash
+yarn fix-deps
 ```
 
-### Android
+3. Start the development server:
 
-```sh
-npx react-native run-android
+```bash
+yarn start
 ```
 
-### iOS
+### iOS Additional Setup
 
-```sh
-pod install --repo-update --project-directory=ios
-npx react-native run-ios
+#### iOS Add frameworks
+
+1.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`
+2.  Add `New Copy Files PHase`
+3.  Select the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
+4.  Move the added files into the `Frameworks`
+5.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`
+6.  Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields
+
+## Unity Configuration
+
+### Opening the Project
+
+1. Open the `ARReactNative` folder with Unity
+2. Navigate to the `Scenes` folder in the Project tab
+3. Open `ArReactNativeUnity.unity` scene
+
+### Building for Android
+
+1. In Unity, go to `File > Build Settings`
+2. Follow the integration guide [here](https://medium.com/@selvaannies/integrating-unity-into-react-native-android-using-azesmway-react-native-unity-2905f47aa14d)
+
+### Building for iOS
+
+1. In Unity, go to `File > Build Settings`
+2. Follow the integration steps from the [official documentation](https://github.com/azesmway/react-native-unity?tab=readme-ov-file#export-ios-unity-project)
+3. Important: Add required descriptions for:
+   - Microphone usage
+   - Location usage in Player Settings
+
+### iOS Additional Setup
+
+1. In Xcode, configure the Marevo framework:
+   - Navigate to `Unity-iPhone > Frameworks > Marevo`
+   - Set the full path to the appropriate folder
+2. Configure framework embedding:
+   - Navigate to `Unity-iPhone > Targets > UnityFramework > General > Frameworks and Libraries`
+   - Set the following frameworks to 'Embed & Sign':
+     - `MvnCorder.framework`
+     - `NativeScreenRecorder.framework`
+3. Add a `Run script` with the following code:
+
+```
+   cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/"
+   if [[ -d "Frameworks" ]]; then
+      rm -fr Frameworks
+   fi
 ```
 
-### Setup react-native-vector-icons
+## Release Builds
 
-Follow instructions at their [README.md](https://github.com/oblador/react-native-vector-icons/blob/master/README.md#installation)
+### Android Release
 
-## Running with Fastlane
+#### Debug APK
 
-[Fastlane](https://fastlane.tools/) makes testing, building, and deploying apps
-easier.
-
-Install fastlane globally (`npm i -g fastlane` or `yarn i -g fastlane`).
-Android and iOS dependencies are the same as React Native CLI.
-
-All fastlane commands are run from the platform directory. For example, Android
-commands must be run from `android/`. Fastlane should be executed using `bundle exec` to ensure dependencies are managed correctly.
-
-The commands for Android and iOS are the same:
-
-- Run tests: `bundle exec fastlane tests`
-- Local build: `bundle exec fastlane build`
-- Build and upload a beta (requires signing): `bundle exec fastlane beta`
-- Build or promote a release: `bundle exec fastlane deploy`
-
-### Android
-
-Publish an Android app you must first create an app in the Play Console and
-manually upload an APK. After the first upload run `bundle exec fastlane supply init` from `android/` to sync with the Play store. All future releases will be
-uploaded automatically.
-
-Android uses tracks. A beta release will build the app and upload to the beta
-track. Deploying will promote from beta to production.
-
-### iOS
-
-CB developers must follow fastlane's [codesigning guide](https://codesigning.guide/) for using match.
-Match will automatically sign iOS builds.
-
-New CB developers should get access to the codesigning repo and run `bundle exec fastlane match development` from `ios/`.
-
-Not a CB developer? Create an [Apple developer](https://developer.apple.com)
-and follow the instructions on [codesigning guide](https://codesigning.guide/)
-to setup your certificates.
-
-## React Native Web
-
-You can build and deploy your React Native app in the web too!
-
-To get started run:
-
-```sh
-yarn run web
+```bash
+yarn build-apk
 ```
 
-This will start a local development server so that you can iterate and preview your changes. Visit it at [localhost:8080](http://localhost:8080).
+#### Production AAB
 
-To build the web version of the project you can run:
+1. Ensure the keystore file is present at `android/app/rooamar.keystore`
+2. Configure Gradle variables for signing:
+   - Follow the [React Native documentation](https://reactnative.dev/docs/signed-apk-android#setting-up-gradle-variables)
+3. Build the AAB:
 
-```sh
-yarn run web:build
+```bash
+yarn build-aab
 ```
 
-And then commit/push the output created at `backend/web_build` to the git repository.
+### iOS Release
 
-# License
+Follow standard iOS release procedures through Xcode.
 
-The use of code in this repository is governed by Crowdbotics [Terms and Conditions](https://www.crowdbotics.com/terms-of-service).
+## Troubleshooting
 
-Created with ❤️ by [Crowdbotics](https://www.crowdbotics.com/)
+If you encounter any issues during setup or building, please check the following:
+
+- Ensure all dependencies are correctly installed
+- Verify Unity version compatibility
+- Check that all required frameworks are properly linked
+- Confirm signing certificates are properly configured
+
+## Contributing
+
+Please follow the project's coding standards and submit PRs for any improvements.

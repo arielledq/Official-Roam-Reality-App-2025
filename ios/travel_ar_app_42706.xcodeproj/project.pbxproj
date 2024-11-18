@@ -20,6 +20,8 @@
 		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */; };
+		DC0976672CE67A4C0061481F /* NativeScreenRecorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC0976652CE67A4C0061481F /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DC0976682CE67A4C0061481F /* MvnCorder.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = DC0976662CE67A4C0061481F /* MvnCorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DC09B16D2CA3547D0068EB4F /* Fontisto.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26452B5039E300872709 /* Fontisto.ttf */; };
 		DC09B16E2CA3547D0068EB4F /* Octicons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26462B5039E300872709 /* Octicons.ttf */; };
 		DC09B16F2CA3547D0068EB4F /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 90EF26472B5039E300872709 /* Feather.ttf */; };
@@ -95,6 +97,17 @@
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DC0976642CE679A50061481F /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DC0976672CE67A4C0061481F /* NativeScreenRecorder.framework in CopyFiles */,
+				DC0976682CE67A4C0061481F /* MvnCorder.framework in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
@@ -138,6 +151,9 @@
 		9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
+		CD42C8902BDBCB100036610F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
+		DC0976652CE67A4C0061481F /* NativeScreenRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NativeScreenRecorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/NativeScreenRecorder.framework; sourceTree = "<group>"; };
+		DC0976662CE67A4C0061481F /* MvnCorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MvnCorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/MvnCorder.framework; sourceTree = "<group>"; };
 		DCB501002CA49EAA000B3F37 /* NunitoSans10ptRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptRegular.ttf; path = ../src/assets/fonts/NunitoSans10ptRegular.ttf; sourceTree = "<group>"; };
 		DCB501012CA49EAA000B3F37 /* PoppinsBlack.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = PoppinsBlack.ttf; path = ../src/assets/fonts/PoppinsBlack.ttf; sourceTree = "<group>"; };
 		DCB501022CA49EAA000B3F37 /* PoppinsExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = PoppinsExtraLight.ttf; path = ../src/assets/fonts/PoppinsExtraLight.ttf; sourceTree = "<group>"; };
@@ -216,6 +232,7 @@
 		13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */ = {
 			isa = PBXGroup;
 			children = (
+				CD42C8902BDBCB100036610F /* PrivacyInfo.xcprivacy */,
 				7A0A2F1F2B7FA24600E778AF /* Sounds */,
 				8CCC01DE2B5FC55A0037DD56 /* GoogleService-Info.plist */,
 				90AF16A32B55A98F007514E1 /* travel_ar_app_42706.entitlements */,
@@ -233,6 +250,8 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DC0976662CE67A4C0061481F /* MvnCorder.framework */,
+				DC0976652CE67A4C0061481F /* NativeScreenRecorder.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */,
 				2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
@@ -393,13 +412,15 @@
 			buildPhases = (
 				8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
-				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
+				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				53F7E1A02C8F7227007954D6 /* Embed Foundation Extensions */,
 				14D7E42D0C5B1038644775CA /* [CP] Embed Pods Frameworks */,
 				C883D88DD3D2C2EE6CE9E21C /* [CP] Copy Pods Resources */,
+				DC0976642CE679A50061481F /* CopyFiles */,
+				DC09765E2CE675330061481F /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -672,6 +693,23 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
+		DC09765E2CE675330061481F /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/\"\nif [[ -d \"Frameworks\" ]]; then\n    rm -fr Frameworks\nfi\n";
+		};
 		FD10A7F022414F080027D42C /* Start Packager */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -799,6 +837,46 @@
 				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/MapboxMaps\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Turf\"",
+					"\"${PODS_ROOT}/../../node_modules/@azesmway/react-native-unity/ios\"",
+					"\"${PODS_ROOT}/../../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer\"",
+					"\"${PODS_ROOT}/FBAEMKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit_Basics/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKGamingServicesKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKLoginKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKShareKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Base/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Maps/Frameworks\"",
+					"\"${PODS_ROOT}/MapboxCommon\"",
+					"\"${PODS_ROOT}/MapboxCoreMaps\"",
+					"\"${PODS_ROOT}/MapboxMobileEvents\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Core\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Outcomes\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_XCFramework\"",
+					"\"${PODS_ROOT}/TikTokOpenSDK\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKGamingServicesKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Base\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Maps\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCommon\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCoreMaps\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxMobileEvents\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOutcomes\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/TikTokOpenSDK\"",
+					"/Users/rod/development/GitInnovatica/room-reality/unity/builds/ios/UnityFramework.framework/Frameworks/**",
+				);
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
@@ -834,6 +912,46 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 48;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/MapboxMaps\"",
+					"\"${PODS_CONFIGURATION_BUILD_DIR}/Turf\"",
+					"\"${PODS_ROOT}/../../node_modules/@azesmway/react-native-unity/ios\"",
+					"\"${PODS_ROOT}/../../node_modules/@viro-community/react-viro/ios/dist/ViroRenderer\"",
+					"\"${PODS_ROOT}/FBAEMKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit_Basics/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKGamingServicesKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKLoginKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKShareKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Base/Frameworks\"",
+					"\"${PODS_ROOT}/GoogleMaps/Maps/Frameworks\"",
+					"\"${PODS_ROOT}/MapboxCommon\"",
+					"\"${PODS_ROOT}/MapboxCoreMaps\"",
+					"\"${PODS_ROOT}/MapboxMobileEvents\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Core\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Outcomes\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_XCFramework\"",
+					"\"${PODS_ROOT}/TikTokOpenSDK\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKGamingServicesKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Base\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/GoogleMaps/Maps\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCommon\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCoreMaps\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxMobileEvents\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOutcomes\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/TikTokOpenSDK\"",
+					"/Users/rod/development/GitInnovatica/room-reality/unity/builds/ios/UnityFramework.framework/Frameworks/**",
+				);
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
@@ -859,6 +977,7 @@
 		53F7E1A12C8F7227007954D6 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -901,6 +1020,7 @@
 		53F7E1A22C8F7227007954D6 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -980,6 +1100,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
+					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
 				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1006,6 +1127,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -1047,6 +1169,10 @@
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					_LIBCPP_ENABLE_CXX17_REMOVED_UNARY_BINARY_FUNCTION,
+				);
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
 				GCC_WARN_UNDECLARED_SELECTOR = YES;
@@ -1070,6 +1196,7 @@
 					"-DFOLLY_MOBILE=1",
 					"-DFOLLY_USE_LIBCPP=1",
 				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
