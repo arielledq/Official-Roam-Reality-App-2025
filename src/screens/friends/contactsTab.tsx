@@ -96,10 +96,18 @@ const ContactsTab = () => {
         if (Array.isArray(emailAddresses) && emailAddresses.length) {
           emailAddresses.forEach(email => {
             if (email && typeof email === "object" && email.email) {
+              let name = "";
+              if (contact.displayName) {
+                name = contact.displayName;
+              } else if (contact.givenName) {
+                name = contact?.givenName + " " + contact?.familyName;
+              } else {
+                name = email.email;
+              }
               const newContact = {
                 id: `${contact.recordID || Math.random().toString()}-${email.email}`,
                 user_profile: { image: null },
-                name: contact.displayName || "Unknown",
+                name: name,
                 email: email.email,
               };
               contactsList.push(newContact);
