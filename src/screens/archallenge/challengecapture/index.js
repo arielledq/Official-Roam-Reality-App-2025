@@ -46,7 +46,7 @@ const ArChallengeCapture = ({}) => {
   const settings = useSelector(state => state.ar?.arSettings);
   const modelFile = route?.params?.challengeObj?.model_file;
   const viewShotRef = useRef();
-  console.log("challengeObj", JSON.stringify(challengeObj, null, 2));
+  const challengeIsPhoto = challengeObj?.challenge_requirement === "PHOTO";
 
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
@@ -782,7 +782,9 @@ const ArChallengeCapture = ({}) => {
           !recordingStart &&
           challengeObj?.ar_filters.length == 0 && ( */}
         <Text style={styles.holdText}>
-          Press and hold the capture button to start recording. Release to stop
+          {challengeIsPhoto
+            ? "Tap the button to take a picture"
+            : "Press and hold the button to record a video"}
         </Text>
         {/* )} */}
         {(capturedImage || capturedVideo) && route?.params?.challengeObj?.ar_filters.length > 0 && (
