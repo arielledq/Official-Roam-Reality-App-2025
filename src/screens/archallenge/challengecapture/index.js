@@ -46,6 +46,7 @@ const ArChallengeCapture = ({}) => {
   const settings = useSelector(state => state.ar?.arSettings);
   const modelFile = route?.params?.challengeObj?.model_file;
   const viewShotRef = useRef();
+  console.log("challengeObj", JSON.stringify(challengeObj, null, 2));
 
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
@@ -69,6 +70,7 @@ const ArChallengeCapture = ({}) => {
   const [challengeInformationView, setChallengeInformationView] = useState(false);
   const [capturedImage, setCapturedImage] = useState(fileFound);
   const [capturedVideo, setCapturedVideo] = useState(null);
+  const [processingMedia, setProcessingMedia] = useState(false);
 
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
 
@@ -285,6 +287,8 @@ const ArChallengeCapture = ({}) => {
           ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
           : RNFS.DocumentDirectoryPath; // Ruta de Documentos en iOS
 
+      setProcessingMedia(true);
+
       // Agregar un retraso para asegurarse de que la captura se ha guardado
       setTimeout(() => {
         RNFS.readDir(basePath)
@@ -313,6 +317,9 @@ const ArChallengeCapture = ({}) => {
           })
           .catch(err => {
             console.error("Error leyendo el directorio:", err);
+          })
+          .finally(() => {
+            setProcessingMedia(false);
           });
       }, 2000); // Asegúrate de que el archivo esté listo
     }
@@ -718,43 +725,55 @@ const ArChallengeCapture = ({}) => {
           challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 },
         ]}
       >
-        {/*{modelOBJ && (*/}
-        <BackgroundWithImage>
-          {isUnityLoaded && (
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "flex-end",
-                alignItems: "flex-end",
-                alignContent: "flex-end",
-              }}
-              onLayout={handleUnityViewLayout} // Obtener las dimensiones del contenedor
-            >
-              <UnityView ref={unityRef} style={{ width: "100%", flex: 1, zIndex: -1 }} />
-            </View>
-          )}
-        </BackgroundWithImage>
-        {/*)}*/}
-        {capturedImage && challengeObj?.ar_filters.length == 0 && (
-          <Image style={styles.imageVideoView} source={{ uri: `file://${capturedImage}` }} />
-        )}
-        {capturedVideo && challengeObj?.ar_filters.length == 0 && (
-          <Video
-            repeat={true}
-            style={styles.imageVideoView}
-            source={{
-              uri: `file://${capturedVideo}`,
+        {processingMedia ? (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
             }}
-          />
-        )}
-        {capturedImage && challengeObj?.ar_filters.length > 0 && (
-          <View style={styles.imageVideoView}>
-            <ARFilter
-              challengeObj={challengeObj}
-              viewShotRef={viewShotRef}
-              captureData={capturedImage}
-            />
+          >
+            <Text style={{ color: "white" }}>Processing your content...</Text>
           </View>
+        ) : (
+          <>
+            <BackgroundWithImage>
+              {isUnityLoaded && (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: "flex-end",
+                    alignItems: "flex-end",
+                    alignContent: "flex-end",
+                  }}
+                  onLayout={handleUnityViewLayout} // Obtener las dimensiones del contenedor
+                >
+                  <UnityView ref={unityRef} style={{ width: "100%", flex: 1, zIndex: -1 }} />
+                </View>
+              )}
+            </BackgroundWithImage>
+            {capturedImage && challengeObj?.ar_filters.length == 0 && (
+              <Image style={styles.imageVideoView} source={{ uri: `file://${capturedImage}` }} />
+            )}
+            {capturedVideo && challengeObj?.ar_filters.length == 0 && (
+              <Video
+                repeat={true}
+                style={styles.imageVideoView}
+                source={{
+                  uri: `file://${capturedVideo}`,
+                }}
+              />
+            )}
+            {capturedImage && challengeObj?.ar_filters.length > 0 && (
+              <View style={styles.imageVideoView}>
+                <ARFilter
+                  challengeObj={challengeObj}
+                  viewShotRef={viewShotRef}
+                  captureData={capturedImage}
+                />
+              </View>
+            )}
+          </>
         )}
       </View>
       <View style={styles.holdTextContainer}>
@@ -763,7 +782,7 @@ const ArChallengeCapture = ({}) => {
           !recordingStart &&
           challengeObj?.ar_filters.length == 0 && ( */}
         <Text style={styles.holdText}>
-          Press aaaand hold the capture button to start recording. Release to stop
+          Press and hold the capture button to start recording. Release to stop
         </Text>
         {/* )} */}
         {(capturedImage || capturedVideo) && route?.params?.challengeObj?.ar_filters.length > 0 && (
