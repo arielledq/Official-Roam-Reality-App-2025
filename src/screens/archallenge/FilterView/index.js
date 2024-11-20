@@ -15,7 +15,6 @@ let ScreenWidth = Dimensions.get("window").width;
 const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
   const styles = useStyles();
   const ar_filters = challengeObj?.ar_filters;
-  const [location, setLocation] = useState(null);
   const correctedCaptureData = captureData.startsWith("file://")
     ? captureData
     : `file://${captureData}`;
@@ -165,15 +164,8 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
 
   useEffect(() => {
     getLocation();
-    // Image.getSize(captureData, (width, height) => {
-    //   // calculate image width and height
-    //   const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
-    //   const scaleFactor = width / screenWidth
-    //   const imageHeight = height / scaleFactor
-    //   setImageHeight(imageHeight)
-    // })
   }, []);
-  console.log("AAAAAAAAAAAAAAAAAAAAAACAPTUREDATAAAAAAAAAAAAAAA", captureData);
+
   return (
     <ViewShot
       ref={viewShotRef}
@@ -196,7 +188,6 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
 
             return (
               <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
-                {/* {console.log(' filter ======>>>> ', JSON.stringify(filter, null, 2))} */}
                 {filter.gradient_colors && (
                   // grandient
                   <View
@@ -226,20 +217,16 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   </View>
                 )}
                 {filter?.image && (
-                  // image
-
                   <ImageBackground
                     source={{ uri: filter.image }}
                     resizeMode="contain"
                     style={{
                       alignItems: "flex-end",
-                      // paddingTop: 20,
                       height:
                         filter.gradient_direction === "TOP_TO_BOTTOM"
                           ? ScreenWidth * 1.3
                           : ScreenWidth * 1.2,
                       width: "100%",
-                      // backgroundColor: 'tranparent',
                     }}
                   />
                 )}

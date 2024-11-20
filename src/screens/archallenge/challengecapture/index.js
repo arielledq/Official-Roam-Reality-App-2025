@@ -777,16 +777,16 @@ const ArChallengeCapture = ({}) => {
         )}
       </View>
       <View style={styles.holdTextContainer}>
-        {/* {!capturedImage &&
+        {!capturedImage &&
           !capturedVideo &&
           !recordingStart &&
-          challengeObj?.ar_filters.length == 0 && ( */}
-        <Text style={styles.holdText}>
-          {challengeIsPhoto
-            ? "Tap the button to take a picture"
-            : "Press and hold the button to record a video"}
-        </Text>
-        {/* )} */}
+          challengeObj?.ar_filters.length == 0 && (
+            <Text style={styles.holdText}>
+              {challengeIsPhoto
+                ? "Tap the button to take a picture"
+                : "Press and hold the button to record a video"}
+            </Text>
+          )}
         {(capturedImage || capturedVideo) && route?.params?.challengeObj?.ar_filters.length > 0 && (
           <Text style={styles.holdText}>Swipe Left or Right for Filters</Text>
         )}
