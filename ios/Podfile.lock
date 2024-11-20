@@ -86,12 +86,12 @@ PODS:
     - MapboxMobileEvents (= 2.0.0)
     - Turf (= 2.8.0)
   - MapboxMobileEvents (2.0.0)
-  - OneSignalXCFramework (3.12.10):
-    - OneSignalXCFramework/OneSignalCore (= 3.12.10)
-    - OneSignalXCFramework/OneSignalExtension (= 3.12.10)
-    - OneSignalXCFramework/OneSignalOutcomes (= 3.12.10)
-  - OneSignalXCFramework/OneSignalCore (3.12.10)
-  - OneSignalXCFramework/OneSignalExtension (3.12.10):
+  - OneSignalXCFramework (3.12.9):
+    - OneSignalXCFramework/OneSignalCore (= 3.12.9)
+    - OneSignalXCFramework/OneSignalExtension (= 3.12.9)
+    - OneSignalXCFramework/OneSignalOutcomes (= 3.12.9)
+  - OneSignalXCFramework/OneSignalCore (3.12.9)
+  - OneSignalXCFramework/OneSignalExtension (3.12.9):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalOutcomes
   - OneSignalXCFramework/OneSignalOutcomes (3.12.10):
@@ -860,7 +860,7 @@ SPEC CHECKSUMS:
   MapboxCoreMaps: ca17f67baced23f8c952166ac6314c35bad3f66c
   MapboxMaps: b7f29ec7c33f7dc6d2947c1148edce6db81db9a7
   MapboxMobileEvents: d044b9edbe0ec7df60f6c2c9634fe9a7f449266b
-  OneSignalXCFramework: e458f7a374192598a1d66418e1b61481c3cdf0e9
+  OneSignalXCFramework: 3c3ef25ecca5eae1bf80a3272c49fd1dbab96b35
   RCT-Folly: 424b8c9a7a0b9ab2886ffe9c3b041ef628fd4fb1
   RCTRequired: 79b5f823c2b4b865451ba9ddb33c676786760ea8
   RCTTypeSafety: 4f6d5414413d8848923ccd448c4cef4b6ffcd403
@@ -922,7 +922,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   rnmapbox-maps: 334654168efcdc29584a9af1519d890a07a4a28e
-  RNPermissions: 44af63c2760ca4fd466b5b2841a5cd516ce52319
+  RNPermissions: 6ec857b1b6cdb480faf4135082acdb181abf1f09
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: 50ad6e3dbea9023272b3aa753e3ee2720b0c9b8f
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c

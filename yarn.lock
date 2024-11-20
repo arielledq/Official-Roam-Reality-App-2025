@@ -1922,7 +1922,7 @@
   resolved "https://registry.yarnpkg.com/@rneui/themed/-/themed-4.0.0-rc.8.tgz#5c0e1aaa3d190ead88936693c5cef50ec404cd05"
   integrity sha512-8L/XOrL9OK/r+/iBLvx63TbIdZOXF8SIjN9eArMYm6kRbMr8m4BitXllDN8nBhBsSPNYvL6EAgjk+i2MfY4sBA==
 
-"@rnmapbox/maps@10.1.33":
+"@rnmapbox/maps@^10.1.33":
   version "10.1.33"
   resolved "https://registry.yarnpkg.com/@rnmapbox/maps/-/maps-10.1.33.tgz#ef2bbe4b4d7af8c1822d1d5840b8b9b4ffa4ba57"
   integrity sha512-+J1aJnZ6q0N3044doCb6To/Eftpsn3Eq78AYPMa/Ig9x/u1eWpmbt5WbXJCehkOltGsjvTCenn+/gZKsXMZfww==
