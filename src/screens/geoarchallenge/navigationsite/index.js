@@ -148,16 +148,13 @@ const GeoArSiteNavigation = () => {
       nextCoordinate[1],
       nextCoordinate[0]
     )
-    //
-    // console.log('isOffRoute currentPathRef.current ', currentPathRef.current )
-    // console.log('isOffRoute path', path)
-    console.log('isOffRoute distanceToPath', distanceToPath)
-    // console.log('isOffRoute threshold', threshold)
 
     return distanceToPath > threshold
   }
 
-  const compareArrays = (arr1, arr2) => JSON.stringify(arr1) === JSON.stringify(arr2);
+  const compareArrays = (arr1, arr2) => {
+    return JSON.stringify(arr1) === JSON.stringify(arr2)
+  };
 
   const getLocationUpdates = async () => {
 
@@ -175,12 +172,10 @@ const GeoArSiteNavigation = () => {
 
     if (rerouting) return
 
-    const threshold = Platform.OS === 'ios' ? 30 : 25
+    const threshold = Platform.OS === 'ios' ? 35 : 30
 
     if (isOffRoute(position.coords, currentPathRef.current, threshold)) {
-      mapBoxGetRoute()
-      if (!compareArrays(currentPathRef.current, currentPathCheckRef.current)) {
-        setRerouting(true)
+      // if (!compareArrays(currentPathRef.current, currentPathCheckRef.current)) {
         setOriginMap([position.coords.longitude, position.coords.latitude])
         const heading = calculateBearing(
           position.coords.latitude,
@@ -189,14 +184,13 @@ const GeoArSiteNavigation = () => {
           currentPathRef.current[0][0]
         )
         setCurrentHeading(heading)
+        setRerouting(true)
         playProximitySound()
         setTimeout(() => {
           setRerouting(false)
         }, 2000)
         return
-      } else {
-      }
-
+      // }
     }
 
     const nextCoordinate = findNextCoordinate(position.coords, currentPathRef.current)
@@ -278,7 +272,7 @@ const GeoArSiteNavigation = () => {
           setDurationMins(duration / 60)
           calculatedEstimatedTime(duration / 60)
           const calculatedPath = data.routes[0].geometry.coordinates
-          if (!compareArrays(currentPathRef.current, calculatedPath)) {
+          if (currentPathRef.current !== null && !compareArrays(currentPathRef.current, calculatedPath)) {
             currentPathCheckRef.current = calculatedPath
             setPath(calculatedPath)
           }
