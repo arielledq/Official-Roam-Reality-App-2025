@@ -1,26 +1,32 @@
-import React, { useState } from "react"
+import React, { useState } from "react";
 
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native"
-import BackgroundWithImage from "../../../components/background"
-import AppHeader from "../../../components/header"
-import MoveForwardIcon from "../../../assets/geoar/large-step.svg"
-import { useSelector } from "react-redux"
-import useStyles from "./styles"
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import { useNavigation } from "@react-navigation/native"
-import MarkerIcon from "../../../assets/geoar/marker_img.svg"
-import mapCustomStyle from "../../../constants/MapCustomStyles"
+import {
+  ActivityIndicator,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import MoveForwardIcon from "../../../assets/geoar/large-step.svg";
+import { useSelector } from "react-redux";
+import useStyles from "./styles";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import { useNavigation } from "@react-navigation/native";
+import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+import mapCustomStyle from "../../../constants/MapCustomStyles";
 
 const GeoArSiteArrived = ({}) => {
-  const _styles = useStyles()
-  const [isLoading, setIsLoading] = useState(false)
-  const navigation = useNavigation()
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
+  const _styles = useStyles();
+  const [isLoading, setIsLoading] = useState(false);
+  const navigation = useNavigation();
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
-        // rightComponent={() => <TouchableOpacity><CloseBIcon style={{ width: 48, height: 36 }} /></TouchableOpacity>}
         centerComponent={{
           text: "You have Arrived",
           style: [_styles.heading],
@@ -46,7 +52,7 @@ const GeoArSiteArrived = ({}) => {
             style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
             scrollEnabled={true}
-            showsUserLocation={true}
+            showsUserLocation={Platform.OS === "ios"}
             initialRegion={{
               latitude: selectedGeoSite.lat_long.coordinates[1],
               longitude: selectedGeoSite.lat_long.coordinates[0],
@@ -92,9 +98,7 @@ const GeoArSiteArrived = ({}) => {
         </View>
       </ScrollView>
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-
-
-export default GeoArSiteArrived
+export default GeoArSiteArrived;
