@@ -35,6 +35,7 @@ const GeoArSiteNavigation = () => {
   const [location, setLocation] = useState(null)
   const [router, setRoute] = useState(null)
   const [originMap, setOriginMap] = useState(null)
+  const [originMapPoint, setOriginMapPoint] = useState(null)
   const [destinationMap, setDestinationMap] = useState(null)
   const [path, setPath] = useState(null)
   const [currentHeading, setCurrentHeading] = useState(0)
@@ -43,7 +44,8 @@ const GeoArSiteNavigation = () => {
   const [nextCoordinateS, setNextCoordinateS] = useState(null)
   const mapView = useRef(null)
   const currentPathRef = useRef(null)
-  const currentPathCheckRef = useRef(null)
+  const nextCoordinateDistance = useRef(0)
+  const nextCoordinateRef = useRef(null)
 
   const calculatedEstimatedTime = duration => {
     const now = new Date()
@@ -75,6 +77,7 @@ const GeoArSiteNavigation = () => {
     ]
 
     setOriginMap(origin)
+    setOriginMapPoint(origin)
     setDestinationMap(destination)
     setLocation(position)
   }
@@ -120,13 +123,16 @@ const GeoArSiteNavigation = () => {
     let closestCoordinate = null
     let closestDistance = Infinity
 
-    for (let i = 0; i < coordinates?.length; i++) {
-      const coord = coordinates[i]
+
+    const filteredCoordinates = coordinates.filter(coord => !coord.visited)
+
+    for (let i = 0; i < filteredCoordinates?.length; i++) {
+      const coord = filteredCoordinates[i]
       const distance = getDistance(
         currentLocation.latitude,
         currentLocation.longitude,
-        coord[1], // Latitude
-        coord[0] // Longitude
+        coord['coordinates'][1], // Latitude
+        coord['coordinates'][0] // Longitude
       )
 
       if (distance < closestDistance) {
@@ -135,26 +141,46 @@ const GeoArSiteNavigation = () => {
       }
     }
 
+    if (closestCoordinate && closestDistance <= 10) {
+      closestCoordinate.visited = true
+    }
+
     return closestCoordinate
   }
 
   const isOffRoute = (currentLocation, path, threshold) => {
     const nextCoordinate = findNextCoordinate(currentLocation, path)
-    if (!nextCoordinate) return false
+    if (!nextCoordinate || rerouting || nextCoordinate.visited) return false
 
     const distanceToPath = getDistance(
       currentLocation.latitude,
       currentLocation.longitude,
-      nextCoordinate[1],
-      nextCoordinate[0]
+      nextCoordinate['coordinates'][1],
+      nextCoordinate['coordinates'][0]
     )
 
-    return distanceToPath > threshold
-  }
+    if (nextCoordinateRef.current === null || nextCoordinateRef.current !== nextCoordinate) {
+      nextCoordinateDistance.current = 0
+    }
 
-  const compareArrays = (arr1, arr2) => {
-    return JSON.stringify(arr1) === JSON.stringify(arr2)
-  };
+    if (nextCoordinateDistance.current === 0) {
+      nextCoordinateDistance.current = distanceToPath
+      nextCoordinateRef.current = nextCoordinate
+      return false
+    }
+
+    if (distanceToPath < nextCoordinateDistance.current) {
+      nextCoordinateDistance.current = distanceToPath
+      nextCoordinateRef.current = nextCoordinate
+      return false
+    }
+    if (distanceToPath > nextCoordinateDistance.current && (distanceToPath - nextCoordinateDistance.current) > threshold) {
+      nextCoordinateDistance.current = 0
+      nextCoordinateRef.current = null
+      return true
+    }
+    return false
+  }
 
   const getLocationUpdates = async () => {
 
@@ -172,36 +198,37 @@ const GeoArSiteNavigation = () => {
 
     if (rerouting) return
 
-    const threshold = Platform.OS === 'ios' ? 35 : 30
+    const threshold = Platform.OS === 'ios' ? 30 : 20
 
     if (isOffRoute(position.coords, currentPathRef.current, threshold)) {
-      // if (!compareArrays(currentPathRef.current, currentPathCheckRef.current)) {
-        setOriginMap([position.coords.longitude, position.coords.latitude])
-        const heading = calculateBearing(
-          position.coords.latitude,
-          position.coords.longitude,
-          currentPathRef.current[0][1],
-          currentPathRef.current[0][0]
-        )
-        setCurrentHeading(heading)
-        setRerouting(true)
-        playProximitySound()
-        setTimeout(() => {
-          setRerouting(false)
-        }, 2000)
-        return
-      // }
+      console.log('=========> Off route')
+      setOriginMap([position.coords.longitude, position.coords.latitude])
+      const heading = calculateBearing(
+        position.coords.latitude,
+        position.coords.longitude,
+        currentPathRef.current[0]['coordinates'][1],
+        currentPathRef.current[0]['coordinates'][0]
+      )
+      setCurrentHeading(heading)
+      setRerouting(true)
+      playProximitySound()
+      setTimeout(() => {
+        setRerouting(false)
+      }, 2000)
+      return
     }
 
     const nextCoordinate = findNextCoordinate(position.coords, currentPathRef.current)
+
+    // console.log('nextCoordinate ==> ', nextCoordinate)
 
     if (nextCoordinate && nextCoordinateS !== nextCoordinate) {
       setNextCoordinateS(nextCoordinate)
       const heading = calculateBearing(
         position.coords.latitude,
         position.coords.longitude,
-        nextCoordinate[1],
-        nextCoordinate[0]
+        nextCoordinate['coordinates'][1],
+        nextCoordinate['coordinates'][0]
       )
       setCurrentHeading(heading)
     } else {
@@ -249,6 +276,7 @@ const GeoArSiteNavigation = () => {
     })
   }
 
+
   const mapBoxGetRoute = () => {
 
     if (!originMap || !destinationMap) {
@@ -272,11 +300,11 @@ const GeoArSiteNavigation = () => {
           setDurationMins(duration / 60)
           calculatedEstimatedTime(duration / 60)
           const calculatedPath = data.routes[0].geometry.coordinates
-          if (currentPathRef.current !== null && !compareArrays(currentPathRef.current, calculatedPath)) {
-            currentPathCheckRef.current = calculatedPath
-            setPath(calculatedPath)
-          }
-          currentPathRef.current = calculatedPath
+          currentPathRef.current = calculatedPath.map((coord, index) => ({
+            coordinates: coord,
+            visited: index === 0,
+          }));
+
           const routeLine = {
             type: 'Feature',
             geometry: data.routes[0].geometry,
@@ -291,7 +319,7 @@ const GeoArSiteNavigation = () => {
     if (userLocation) {
       getLocationUpdates()
     }
-  }, [userLocation, path, latitude, longitude])
+  }, [userLocation])
 
   useEffect(() => {
     mapBoxGetRoute()
@@ -381,7 +409,7 @@ const GeoArSiteNavigation = () => {
           >
             <CenterIcon  />
           </TouchableOpacity>
-          {originMap && destinationMap && (
+          {originMapPoint && destinationMap && (
             <MapboxGL.MapView style={{ flex: 1 }} compassEnabled scaleBarEnabled={false}>
               <MapboxGL.Camera
                 ref={mapView}
@@ -417,7 +445,7 @@ const GeoArSiteNavigation = () => {
 
               {/* Origin and Destination Markers */}
               {/*<MapboxGL.PointAnnotation id="origin" coordinate={originMap} />*/}
-              <MapboxGL.PointAnnotation id='currentLocation' coordinate={originMap}>
+              <MapboxGL.PointAnnotation id='currentLocation' coordinate={originMapPoint}>
                 <MarkerIcon style={{ width: 25, height: 40 }} />
               </MapboxGL.PointAnnotation>
               <MapboxGL.PointAnnotation id='currentLocation' coordinate={destinationMap}>
