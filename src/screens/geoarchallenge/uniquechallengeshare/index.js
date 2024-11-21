@@ -35,34 +35,40 @@ const UniqueArChallengeShare = ({}) => {
   const navigation = useNavigation()
   const challengeObj = route?.params?.challengeObj
   const captureData = route?.params?.captureData
+  const correctedCaptureData = `file://${captureData}`;
   const hideBottomTab = route?.params?.hideBottomTab
-  let filePath = getPathFromUrl(captureData)
+  let filePath = getPathFromUrl(correctedCaptureData)
   const fileExt = filePath.split('.').pop()
   const startDate = moment(new Date()).format('DD-MM-YYYY')
   const [isLoading, setIsLoading] = useState(false)
   const [imageHeight, setImageHeight] = useState(0)
   const dispatch = useDispatch()
 
-  useEffect(() => {
-    const shareListener = events.addListener('onShareCompleted', resp => {
-      // response contains returned errorCode
-    })
-    if (fileExt !== 'mp4') {
-      Image.getSize(captureData, (width, height) => {
-        // calculate image width and height
-        const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
-        const scaleFactor = width / screenWidth
-        const imageHeight = height / scaleFactor
-        setImageHeight(imageHeight)
-      })
-    }
-  }, [])
+  console.log('challenges', challengeObj.id)
+  console.log('fileExt', fileExt)
+  console.log('captureData', correctedCaptureData)
+
+  // useEffect(() => {
+  //   const shareListener = events.addListener('onShareCompleted', resp => {
+  //     console.log('Tiktok: onShareCompleted', resp)
+  //     // response contains returned errorCode
+  //   })
+  //   if (fileExt !== 'mp4') {
+  //     Image.getSize(correctedCaptureData, (width, height) => {
+  //       // calculate image width and height
+  //       const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
+  //       const scaleFactor = width / screenWidth
+  //       const imageHeight = height / scaleFactor
+  //       setImageHeight(imageHeight)
+  //     })
+  //   }
+  // }, [])
 
   const shareBtnOnPress = () => {
     setIsLoading(true)
-    let filename = captureData.split('/').pop()
+    let filename = correctedCaptureData.split('/').pop()
     let shareFile = {
-      uri: captureData,
+      uri: correctedCaptureData,
       type: fileExt == 'mp4' ? 'video/mp4' : `image/{${fileExt}}`,
       name: filename,
     }
@@ -96,6 +102,7 @@ const UniqueArChallengeShare = ({}) => {
       social_network,
     }).then(res => {
       if (res.status == 1) {
+        console.log(res.message)
       }
     })
   }
@@ -113,7 +120,7 @@ const UniqueArChallengeShare = ({}) => {
   }
 
   const facebookShareAndroid = async () => {
-    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
     let shareContent = {}
     if (fileExt == 'mp4') {
       shareContent = {
@@ -134,17 +141,20 @@ const UniqueArChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
+        console.log('ShareResponse true =>', ShareResponse)
         updateARSocialPoints('FACEBOOK')
       } else {
+        console.log('ShareResponse false =>', ShareResponse)
       }
     } catch (error) {
-      console.error('Error =>', error)
+      console.log('Error =>', error)
     }
   }
 
   const facebookShareIOS = async () => {
-    const filebase64 = await RNFS.readFile(captureData, 'base64')
-
+    const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
+    console.log('Facebook Share', fileExt)
+    console.log('Facebook Share', correctedCaptureData)
     ShareDialog.setMode('native')
 
     if (fileExt == 'png' || fileExt == 'jpg') {
@@ -152,7 +162,7 @@ const UniqueArChallengeShare = ({}) => {
         contentType: 'photo',
         photos: [
           {
-            imageUrl: captureData,
+            imageUrl: correctedCaptureData,
           },
         ],
       }
@@ -166,18 +176,22 @@ const UniqueArChallengeShare = ({}) => {
     }
     ShareDialog.canShow(shareContent)
       .then(canShow => {
+        console.log('Facebook canShow', canShow)
         if (canShow) {
           return ShareDialog.show(shareContent)
         }
       })
       .then(result => {
+        console.log('Share : ' + result)
         if (result.isCancelled) {
+          console.log('Share cancelled')
         } else {
+          console.log('Share success with postId: ' + result.postId)
           updateARSocialPoints('FACEBOOK')
         }
       })
       .catch(e => {
-        console.error('catch', e.toString())
+        console.log('catch', e.toString())
       })
   }
 
@@ -190,7 +204,7 @@ const UniqueArChallengeShare = ({}) => {
   }
 
   const InstagramShareImgOnPress = async () => {
-    const filebase64 = await RNFS.readFile(captureData, 'base64')
+    const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
 
     let shareContent = {}
     if (fileExt == 'mp4') {
@@ -215,19 +229,22 @@ const UniqueArChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent)
       if (ShareResponse.success == true) {
+        console.log('ShareResponse true =>', ShareResponse)
         updateARSocialPoints('INSTAGRAM')
       } else {
+        console.log('ShareResponse false =>', ShareResponse)
       }
     } catch (error) {
-      console.error('Error =>', error)
+      console.log('Error =>', error)
     }
   }
 
   const TiktokShareImgOnPress = async () => {
     if (fileExt == 'mp4') {
-      const filebase64 = await RNFS.readFile(captureData, 'base64')
+      const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
       init('aw5g4n448236v4uh')
-      share(captureData, code => {
+      share(correctedCaptureData, code => {
+        console.log(code)
         updateARSocialPoints('TIKTOK')
       })
     } else {
@@ -239,7 +256,7 @@ const UniqueArChallengeShare = ({}) => {
     // }).then((media) => {
     //   init('aw5g4n448236v4uh');
     //   share(media.path, (code) => {
-
+    //     console.log(code);
     //   });
     // });
 
@@ -251,11 +268,11 @@ const UniqueArChallengeShare = ({}) => {
     //     type: 'video/mp4',
     //     filename: "VideoShare"
     //   };
-
+    //   console.log(JSON.stringify(shareOptions, null, 2))
     //   try {
     //     await Share.open(shareOptions);
     //   } catch (error) {
-
+    //     console.log('Error =>', error);
     //   }
     // } else {
     //   showMessage("Only Video Supported to share.", "error", "Share Support Issue:")
@@ -263,7 +280,7 @@ const UniqueArChallengeShare = ({}) => {
   }
 
   const checkPermission = () => {
-    CameraRoll.saveAsset(captureData, {
+    CameraRoll.saveAsset(correctedCaptureData, {
       type: fileExt == 'mp4' ? 'video' : 'photo',
     })
       .then(() => {
@@ -286,7 +303,7 @@ const UniqueArChallengeShare = ({}) => {
       />
       <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
         <AppText numberOfLines={3} style={[styles.headerText]}>
-          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!{' '}
+          Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{' '}
         </AppText>
         <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
           {fileExt == 'mp4' ? (
@@ -299,18 +316,18 @@ const UniqueArChallengeShare = ({}) => {
                 marginTop: Platform.OS == 'ios' ? -200 : 0,
               }}
               source={{
-                uri: captureData,
+                uri: correctedCaptureData,
               }}
             />
           ) : (
             <Image
-              resizeMode={'stretch'}
-              source={{ uri: captureData }}
+              resizeMode={'contain'}
+              source={{ uri: correctedCaptureData }}
               style={{
                 backgroundColor: 'transparent',
                 width: '70%',
-                height: Platform.OS === 'ios' ? imageHeight * 0.6 : imageHeight * 0.7,
-                marginTop: 0,
+                // height: imageHeight * 0.7,
+                marginTop: Platform.OS == 'ios' ? -200 : 0,
               }}
             />
           )}
