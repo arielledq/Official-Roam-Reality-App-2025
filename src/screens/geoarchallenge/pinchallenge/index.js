@@ -376,9 +376,6 @@ const PinChallenge = ({}) => {
             });
         }, 2000); // Asegúrate de que el archivo esté listo
       }
-
-      // Handle screenshot capture and resizing
-      // Similar to ArChallengeCapture
     } else {
       showMessage("Pin Not Found.", "error");
     }
