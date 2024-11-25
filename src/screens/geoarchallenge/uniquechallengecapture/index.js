@@ -6,7 +6,7 @@ import {
   Text,
   Platform,
   Dimensions,
-  ScrollView
+  ScrollView,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AppHeader from "../../../components/header";
@@ -54,11 +54,10 @@ const UniqueArChallengeCapture = () => {
   const [challengeInformationView, setChallengeInformationView] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
-  const [isUnityLoaded, setIsUnityLoaded] = useState(false);  // Initial state for Unity loading
+  const [isUnityLoaded, setIsUnityLoaded] = useState(false); // Initial state for Unity loading
   const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
   const [isPhotoAllowed, setIsPhotoAllowed] = useState(false);
   const [isVideoAllowed, setIsVideoAllowed] = useState(false);
-
 
   useEffect(() => {
     // Actualizar permisos de captura según el challenge_requirement
@@ -75,8 +74,7 @@ const UniqueArChallengeCapture = () => {
     }
   }, [challengeObj]);
 
-
-  const handleUnityViewLayout = (event) => {
+  const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
     setUnityViewDimensions({ width, height });
   };
@@ -86,7 +84,7 @@ const UniqueArChallengeCapture = () => {
     setRecordTimeInMillis(0);
 
     const interval = setInterval(() => {
-      setRecordTimeInMillis((prevTime) => {
+      setRecordTimeInMillis(prevTime => {
         const newTimeInMillis = prevTime + 1;
         const seconds = `0${newTimeInMillis % 60}`.slice(-2);
         const minutes = `0${Math.floor(newTimeInMillis / 60)}`.slice(-2);
@@ -103,9 +101,9 @@ const UniqueArChallengeCapture = () => {
     clearInterval(this.intervalId);
   };
 
-  const playSound = (filename) => {
+  const playSound = filename => {
     Sound.setCategory("Playback");
-    const sound = new Sound(filename, Sound.MAIN_BUNDLE, (error) => {
+    const sound = new Sound(filename, Sound.MAIN_BUNDLE, error => {
       if (!error) sound.play();
     });
   };
@@ -162,14 +160,14 @@ const UniqueArChallengeCapture = () => {
 
       const path = "/storage/emulated/0/Android/data/com.roam_reality/files/";
       setTimeout(() => {
-        RNFS.readDir(path).then((files) => {
+        RNFS.readDir(path).then(files => {
           if (Array.isArray(files) && files.length > 0) {
-            const foundFile = files.find((file) => file.isFile() && file.name.includes(".png"));
+            const foundFile = files.find(file => file.isFile() && file.name.includes(".png"));
             if (foundFile) {
               setFileFound(foundFile.path);
               setCaptureData(foundFile.path);
               setCapturedImage(foundFile.path);
-              setIsUnityLoaded(false);  // Disable Unity to display the image capture
+              setIsUnityLoaded(false); // Disable Unity to display the image capture
             }
           }
         });
@@ -181,7 +179,7 @@ const UniqueArChallengeCapture = () => {
     navigation.replace("UniqueArChallengeShare", {
       challengeObj: challengeObj,
       captureData,
-      isImage
+      isImage,
     });
   };
   const handlePressUnityButton = () => {
@@ -191,16 +189,17 @@ const UniqueArChallengeCapture = () => {
         "ReceiveMessageFromReact", // Nombre del método en Unity
         "pressButton" // Mensaje que quieres enviar
       );
-    }else{"NOOOOO NEEEEEE"}
+    } else {
+      ("NOOOOO NEEEEEE");
+    }
     console.log("NADA DE NADA onUnityMessages {", unityRef?.current?.onUnityMessage, "}");
   };
 
   // Función para manejar el mensaje de Unity
-  const handleUnityMessage = (result) => {
+  const handleUnityMessage = result => {
     console.log("Mensaje recibido desde Unity:", result.nativeEvent.message);
     Alert.alert("Mensaje de Unity", result.nativeEvent.message);
   };
-
 
   const ChallengeDetailView = () => (
     <View style={styles.challengeInfoContainer}>
@@ -210,7 +209,11 @@ const UniqueArChallengeCapture = () => {
       </ScrollView>
       <TouchableOpacity
         activeOpacity={0.6}
-        onPress={() => { setChallengeInformationView(false); setIsUnityLoaded(true); }}>
+        onPress={() => {
+          setChallengeInformationView(false);
+          setIsUnityLoaded(true);
+        }}
+      >
         <Text style={styles.bottomText}>Close</Text>
       </TouchableOpacity>
     </View>
@@ -233,21 +236,21 @@ const UniqueArChallengeCapture = () => {
             tagsStyles={{
               p: {
                 color: "#9CA3AF",
-                fontSize: FontSizes.S14
+                fontSize: FontSizes.S14,
               },
               strong: {
                 color: "#fff",
-                fontSize: FontSizes.S18
+                fontSize: FontSizes.S18,
               },
               ol: {
-                color: "#fff"
+                color: "#fff",
               },
               li: {
-                color: "#fff"
-              }
+                color: "#fff",
+              },
             }}
             source={{
-              html: `${settings?.waiver_details?.toString().replaceAll("#000000", "#fff")}`
+              html: `${settings?.waiver_details?.toString().replaceAll("#000000", "#fff")}`,
             }}
           />
         </ScrollView>
@@ -261,10 +264,7 @@ const UniqueArChallengeCapture = () => {
             containerStyle={styles.buttonContainerStyle}
             title={"Accept and Continue"}
           />
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => navigation.goBack()}
-          >
+          <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
             <Text style={styles.bottomText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -277,14 +277,14 @@ const UniqueArChallengeCapture = () => {
       <View
         style={[
           styles.mainHeaderContainer,
-          Platform.OS == "ios" ? styles.mainHeaderContainerIOS : {}
+          Platform.OS == "ios" ? styles.mainHeaderContainerIOS : {},
         ]}
       >
         <AppHeader
           centerComponent={{
             text: "Unique Site AR",
             numberOfLines: 2,
-            style: [styles.heading]
+            style: [styles.heading],
           }}
           backgroundColor="transparent"
         />
@@ -292,7 +292,7 @@ const UniqueArChallengeCapture = () => {
       <View
         style={[
           styles.detailsViewContainer,
-          Platform.OS == "ios" ? styles.detailsViewContainerIOS : {}
+          Platform.OS == "ios" ? styles.detailsViewContainerIOS : {},
         ]}
       >
         <View style={styles.viewDetailsIconContainer}>
@@ -302,23 +302,20 @@ const UniqueArChallengeCapture = () => {
                 style={styles.viewDetailsIcon}
                 source={{ uri: challengeObj?.sponsored?.image }}
               />
-              <Text style={styles.challengeSponsorName}>
-                {challengeObj?.sponsored?.name}
-              </Text>
+              <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
             </View>
           </View>
         </View>
       </View>
-      <View
-        style={[
-          styles.f1,
-          { marginTop: Platform.OS == "ios" ? -220 : 0, flex: 1 }
-        ]}
-      >
+      <View style={[styles.f1, { marginTop: Platform.OS == "ios" ? -220 : 0, flex: 1 }]}>
         <BackgroundWithImage>
           {isUnityLoaded && (
-            <UnityView ref={unityRef} style={{ flex: 1 }} onLayout={handleUnityViewLayout}
-                       onUnityMessage={handleUnityMessage} />
+            <UnityView
+              ref={unityRef}
+              style={{ flex: 1 }}
+              onLayout={handleUnityViewLayout}
+              onUnityMessage={handleUnityMessage}
+            />
           )}
         </BackgroundWithImage>
         {capturedImage && (
@@ -337,8 +334,8 @@ const UniqueArChallengeCapture = () => {
         style={[
           styles.bottomContainer,
           {
-            justifyContent: capturedImage || capturedVideo ? "space-between" : "center"
-          }
+            justifyContent: capturedImage || capturedVideo ? "space-between" : "center",
+          },
         ]}
       >
         {recordingStart && (
@@ -362,7 +359,10 @@ const UniqueArChallengeCapture = () => {
 
         {isPhotoAllowed && !recordingStart && !capturedVideo && (
           <TouchableOpacity
-            onPress={() => {_takeScreenshot(); handlePressUnityButton()}}
+            onPress={() => {
+              _takeScreenshot();
+              handlePressUnityButton();
+            }}
             activeOpacity={0.6}
           >
             <Image style={{ width: 56, height: 56 }} source={CaptureImage} />

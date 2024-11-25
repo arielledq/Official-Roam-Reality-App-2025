@@ -55,6 +55,13 @@ const PinChallenge = ({}) => {
   const settings = useSelector(state => state.ar?.arSettings);
   const watchIdRef = useRef(null);
 
+  let siteLatitude = 0;
+  let siteLongitude = 0;
+  if (selectedGeoSite?.lat_long?.coordinates?.length === 2) {
+    siteLatitude = selectedGeoSite.lat_long.coordinates[1];
+    siteLongitude = selectedGeoSite.lat_long.coordinates[0];
+  }
+
   const unityRef = useRef(null); // Unity reference
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
@@ -86,13 +93,6 @@ const PinChallenge = ({}) => {
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
   const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    checkPermission();
-    getLocation();
-    getLocationUpdates();
-    return () => stopLocationUpdates();
-  }, []);
 
   const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
@@ -175,22 +175,44 @@ const PinChallenge = ({}) => {
 
   const sendModelDataToUnitySpawn = () => {
     if (unityRef.current && modelOBJ && textureBase) {
+      console.log(siteLatitude, siteLongitude);
       const modelData = {
-        objFile: modelOBJ.replace("file://", ""),
-        mtlFile: modelResource ? modelResource.replace("file://", "") : null,
-        textureBase: textureBase ? textureBase.replace("file://", "") : "",
-        textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
-        position,
-        scale,
-        rotation,
-        emissionIntensity: emissionValue,
-        rotationSpeed: challengeObjParameters?.loop_delay || 1,
-        scaleSpeed: challengeObjParameters?.scale_sensitivity || 0.0015,
+        objFile: modelOBJ.replace("file://", ""), // Ruta del archivo OBJ
+        mtlFile: modelResource ? modelResource.replace("file://", "") : null, // Ruta del archivo MTL
+        textureBase: textureBase ? textureBase.replace("file://", "") : "", // Ruta de la textura base
+        textureEmission: textureEmission ? textureEmission.replace("file://", "") : "", // Ruta de la textura de emisión
+        scale, // Escala del modelo
+        rotation, // Rotación del modelo
+        emissionIntensity: emissionValue, // Intensidad de la emisión (float)
+        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1, // Velocidad de rotación
+        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01, // Velocidad de escalado
+        minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
+        maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
+        isRotationEnabled: true,
+        useGPS: true, // Activar GPS
+        gpsLatitude: siteLatitude || 0, // Latitud del GPS
+        gpsLongitude: siteLongitude || 0, // Longitud del GPS
       };
-
+      console.log("AAAAAASITEEEEEEEEE", selectedGeoSite);
+      console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+      if (modelData.useGPS) {
+        const gpsConfig = {
+          smoothingFactor: 0.1, // Factor de suavizado del GPS
+          minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
+          scaleFactor: 50.0, // Factor de escala para las coordenadas GPS
+          maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
+          isVisibleObject: true, // Controlar visibilidad inicial
+        };
+        console.log("Enviando configuración de GPS a Unity:", gpsConfig);
+        unityRef.current.postMessage(
+          "OBJImport", // GameObject que contiene el script
+          "ConfigureGPSFromReact", // Método del script
+          JSON.stringify(gpsConfig)
+        );
+      }
     } else {
-      console.info("UnityView o modelOBJ no están disponibles.");
+      console.log("UnityView o modelOBJ no están disponibles.");
     }
   };
 
@@ -328,6 +350,7 @@ const PinChallenge = ({}) => {
   };
 
   const _takeScreenshot = async () => {
+    // if (true) {
     if (isMeInsideInSite) {
       playCameraSound();
 
@@ -389,6 +412,13 @@ const PinChallenge = ({}) => {
   };
 
   useEffect(() => {
+    checkPermission();
+    getLocation();
+    getLocationUpdates();
+    return () => stopLocationUpdates();
+  }, []);
+
+  useEffect(() => {
     if (challengeObj && modelFile) {
       checkIfModelExist();
     }
@@ -396,19 +426,19 @@ const PinChallenge = ({}) => {
 
   useEffect(() => {
     if (challengeObjParameters) {
-      setThreshold(challengeObjParameters?.bloom_threshold || 1);
-      setIntensity(challengeObjParameters?.image_opacity_value || 1);
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
       setPosition({
-        x: challengeObjParameters?.positionX || 0,
-        y: challengeObjParameters?.positionY || 0,
-        z: challengeObjParameters?.positionZ || 0,
+        x: parseFloat(challengeObjParameters?.positionX) || 0,
+        y: parseFloat(challengeObjParameters?.positionY) || 0,
+        z: parseFloat(challengeObjParameters?.positionZ) || 0,
       });
       setScale({
-        x: challengeObjParameters?.scale_object || 1,
-        y: challengeObjParameters?.scale_object || 1,
-        z: challengeObjParameters?.scale_object || 1,
+        x: parseFloat(challengeObjParameters?.scale_object) || 1,
+        y: parseFloat(challengeObjParameters?.scale_object) || 1,
+        z: parseFloat(challengeObjParameters?.scale_object) || 1,
       });
-      setEmissionValue(challengeObjParameters?.diffuse_intensity || 1);
+      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
     }
   }, [challengeObjParameters]);
 
@@ -584,52 +614,55 @@ const PinChallenge = ({}) => {
                       </View>
                     )}
                   </BackgroundWithImage>
-                  {capturedImage && <Image style={_styles.f1} source={{ uri: capturedImage }} />}
-                </>
-              )}
-              <TouchableOpacity
-                disabled={!!capturedImage}
-                onPress={_takeScreenshot}
-                style={{
-                  width: 56,
-                  height: 56,
-                  position: "absolute",
-                  bottom: -28,
-                  alignSelf: "center",
-                }}
-              >
-                <CaptureIcon />
-              </TouchableOpacity>
-              {capturedImage && (
-                <View
-                  style={{
-                    paddingHorizontal: 15,
-                    position: "absolute",
-                    bottom: 15,
-                    justifyContent: "space-between",
-                    flexDirection: "row",
-                    width: "100%",
-                  }}
-                >
+                  {capturedImage && (
+                    <Image style={_styles.f1} source={{ uri: `file://${capturedImage}` }} />
+                  )}
+
                   <TouchableOpacity
-                    onPress={() => {
-                      setCapturedImage(null);
-                      setCapturedVideo(null);
-                      setIsUnityLoaded(true);
+                    disabled={!!capturedImage}
+                    onPress={_takeScreenshot}
+                    style={{
+                      width: 56,
+                      height: 56,
+                      position: "absolute",
+                      bottom: -28,
+                      alignSelf: "center",
                     }}
-                    activeOpacity={0.8}
-                    style={_styles.bottomButtonContainer}
                   >
-                    <Text style={_styles.bottomButtonText}>Retake</Text>
+                    <CaptureIcon />
                   </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={onDonePress}
-                    activeOpacity={0.8}
-                    style={_styles.bottomButtonContainer}
-                  >
-                    <Text style={_styles.bottomButtonText}>Done</Text>
-                  </TouchableOpacity>
-                </View>
+                  {capturedImage && (
+                    <View
+                      style={{
+                        paddingHorizontal: 15,
+                        position: "absolute",
+                        bottom: 15,
+                        justifyContent: "space-between",
+                        flexDirection: "row",
+                        width: "100%",
+                      }}
+                    >
+                      <TouchableOpacity
+                        onPress={() => {
+                          setCapturedImage(null);
+                          setCapturedVideo(null);
+                          setIsUnityLoaded(true);
+                        }}
+                        activeOpacity={0.8}
+                        style={_styles.bottomButtonContainer}
+                      >
+                        <Text style={_styles.bottomButtonText}>Retake</Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity
+                        onPress={onDonePress}
+                        activeOpacity={0.8}
+                        style={_styles.bottomButtonContainer}
+                      >
+                        <Text style={_styles.bottomButtonText}>Done</Text>
+                      </TouchableOpacity>
+                    </View>
+                  )}
+                </>
               )}
             </View>
           </View>
