@@ -200,7 +200,7 @@ const PinChallenge = ({}) => {
         const gpsConfig = {
           smoothingFactor: 0.1, // Factor de suavizado del GPS
           minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
-          scaleFactor: 50.0, // Factor de escala para las coordenadas GPS
+          scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
           maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
           isVisibleObject: true, // Controlar visibilidad inicial
         };
