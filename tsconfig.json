@@ -12,9 +12,9 @@
     "baseUrl": "./",
     "paths": {
       "*": ["src/*"],
-      "@components/*": ["src/components/*"],
-      "@screens/*": ["src/screens/*"],
-      "@utils/*": ["src/utils/*"]
+      "components/*": ["src/components/*"],
+      "screens/*": ["src/screens/*"],
+      "utils/*": ["src/utils/*"]
     },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
