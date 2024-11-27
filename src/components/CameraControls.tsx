@@ -8,20 +8,33 @@ import theme from "../assets/theme";
 import CaptureIcon from "../assets/geoar/capture_icon.svg";
 
 interface CameraControlsProps {
-  hasCapturedImage: boolean;
+  hasCapturedContent: boolean;
   onRetake?: () => void;
   onDone?: () => void;
   onCameraPress?: () => void;
-  onCameraHold?: () => void;
+  startRecordVideo?: () => void;
+  stopRecordVideo?: () => void;
+  hideInstructions?: boolean;
+  isRecording?: boolean;
+  timer?: string;
+  isVideo?: boolean;
 }
 
 const CameraControls = ({
-  hasCapturedImage,
+  hasCapturedContent,
   onRetake,
   onDone,
   onCameraPress,
-  onCameraHold,
+  startRecordVideo,
+  stopRecordVideo,
+  hideInstructions,
+  isRecording,
+  timer,
+  isVideo,
 }: CameraControlsProps) => {
+  const videoInstructionText = isRecording ? timer : "Press and hold the button to record a video";
+  const photoInstructionText = "Tap the button to take a picture";
+  const instructionText = isVideo ? videoInstructionText : photoInstructionText;
   return (
     <View
       style={{
@@ -29,28 +42,46 @@ const CameraControls = ({
         borderRadius: 16,
         paddingVertical: 12,
         paddingHorizontal: 16,
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-evenly",
       }}
     >
-      {hasCapturedImage && !!onRetake && (
-        <TouchableOpacity onPress={onRetake} activeOpacity={0.8} style={$actionButtons}>
-          <Text style={$bottomButtonText}>Retake</Text>
-        </TouchableOpacity>
+      {!hideInstructions && (
+        <View style={$holdTextContainer}>
+          <Text style={$holdText}>{!hasCapturedContent ? instructionText : ""}</Text>
+        </View>
       )}
+      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+        {hasCapturedContent && !!onRetake && (
+          <TouchableOpacity onPress={onRetake} activeOpacity={0.8} style={$actionButtons}>
+            <Text style={$bottomButtonText}>Retake</Text>
+          </TouchableOpacity>
+        )}
 
-      {!hasCapturedImage && (!!onCameraPress || !!onCameraHold) && (
-        <TouchableOpacity onPress={onCameraPress} style={$cameraButton}>
-          <CaptureIcon />
-        </TouchableOpacity>
-      )}
+        {!hasCapturedContent && (
+          <TouchableOpacity
+            onPress={() => {
+              if (isVideo || !onCameraPress) return;
+              onCameraPress();
+            }}
+            onLongPress={() => {
+              if (!isVideo || !startRecordVideo) return;
+              startRecordVideo();
+            }}
+            onPressOut={() => {
+              if (!isVideo || !stopRecordVideo) return;
+              stopRecordVideo();
+            }}
+            style={$cameraButton}
+          >
+            <CaptureIcon />
+          </TouchableOpacity>
+        )}
 
-      {hasCapturedImage && !!onDone && (
-        <TouchableOpacity onPress={onDone} activeOpacity={0.8} style={$actionButtons}>
-          <Text style={$bottomButtonText}>Done</Text>
-        </TouchableOpacity>
-      )}
+        {hasCapturedContent && !!onDone && (
+          <TouchableOpacity onPress={onDone} activeOpacity={0.8} style={$actionButtons}>
+            <Text style={$bottomButtonText}>Done</Text>
+          </TouchableOpacity>
+        )}
+      </View>
     </View>
   );
 };
@@ -69,6 +100,7 @@ const $actionButtons: ViewStyle = {
   justifyContent: "center",
   width: 96,
   height: 42,
+  marginVertical: 8,
 };
 
 // @ts-ignore
@@ -76,4 +108,23 @@ const $bottomButtonText: TextStyle = {
   ...fontGroup.p700,
   color: theme.lightColors?.white,
   fontSize: FontSizes.S16,
+};
+
+// @ts-ignore
+const $holdText: TextStyle = {
+  ...fontGroup.p600,
+  fontSize: FontSizes.S10,
+  textAlign: "center",
+  color: theme.lightColors?.white,
+};
+
+const $holdTextContainer: ViewStyle = {
+  // backgroundColor: "#090A1620",
+  alignItems: "center",
+  justifyContent: "center",
+  paddingTop: 4,
+  paddingBottom: 16,
+  // borderRadius: 4,
+  // marginVertical: 20,
+  // height: 25,
 };
