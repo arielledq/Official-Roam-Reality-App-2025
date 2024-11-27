@@ -18,6 +18,7 @@ interface CameraControlsProps {
   isRecording?: boolean;
   timer?: string;
   isVideo?: boolean;
+  challengeHasFilters?: boolean;
 }
 
 const CameraControls = ({
@@ -31,10 +32,12 @@ const CameraControls = ({
   isRecording,
   timer,
   isVideo,
+  challengeHasFilters,
 }: CameraControlsProps) => {
   const videoInstructionText = isRecording ? timer : "Press and hold the button to record a video";
   const photoInstructionText = "Tap the button to take a picture";
   const instructionText = isVideo ? videoInstructionText : photoInstructionText;
+
   return (
     <View
       style={{
@@ -46,6 +49,7 @@ const CameraControls = ({
     >
       {!hideInstructions && (
         <View style={$holdTextContainer}>
+          {challengeHasFilters && <Text style={$holdText}>Swipe Left or Right for Filters</Text>}
           <Text style={$holdText}>{!hasCapturedContent ? instructionText : ""}</Text>
         </View>
       )}
@@ -119,12 +123,9 @@ const $holdText: TextStyle = {
 };
 
 const $holdTextContainer: ViewStyle = {
-  // backgroundColor: "#090A1620",
   alignItems: "center",
   justifyContent: "center",
   paddingTop: 4,
   paddingBottom: 16,
-  // borderRadius: 4,
-  // marginVertical: 20,
-  // height: 25,
+  gap: 8,
 };
