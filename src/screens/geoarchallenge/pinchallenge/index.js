@@ -31,7 +31,6 @@ import MenIcon from "../../../assets/geoar/men_icon.svg";
 import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg";
 import PinIcon from "../../../assets/geoar/pin_locationicon.svg";
 import TrophyIcon from "../../../assets/geoar/trophy_icon.svg";
-import CaptureIcon from "../../../assets/geoar/capture_icon.svg";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import RenderHTML from "react-native-render-html";
@@ -42,6 +41,7 @@ import ImageResizer from "react-native-image-resizer";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
+import CameraControls from "../../../components/CameraControls";
 
 const { width } = Dimensions.get("window");
 
@@ -411,6 +411,12 @@ const PinChallenge = ({}) => {
     });
   };
 
+  const retakeButtonHandler = () => {
+    setCapturedImage(null);
+    setCapturedVideo(null);
+    setIsUnityLoaded(true);
+  };
+
   useEffect(() => {
     checkPermission();
     getLocation();
@@ -550,7 +556,7 @@ const PinChallenge = ({}) => {
   );
 
   return (
-    <View style={{ flex: 1 }}>
+    <>
       <BackgroundWithImage style={_styles.mainContainer}>
         <AppHeader
           centerComponent={{
@@ -560,7 +566,7 @@ const PinChallenge = ({}) => {
           }}
           backgroundColor="transparent"
         />
-        <View style={{ width: "100%", flex: 1 }}>
+        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: "hidden" }}>
           <View
             style={{
               backgroundColor: "#131422",
@@ -587,7 +593,7 @@ const PinChallenge = ({}) => {
               <TrophyIcon style={{ width: 48, height: 48 }} />
             </View>
           </View>
-          <View style={{ flex: 1, marginVertical: 20 }}>
+          <View style={{ marginVertical: 20, minHeight: 512 }}>
             <View style={{ flex: 1 }}>
               {processingMedia ? (
                 <View
@@ -617,55 +623,19 @@ const PinChallenge = ({}) => {
                   {capturedImage && (
                     <Image style={_styles.f1} source={{ uri: `file://${capturedImage}` }} />
                   )}
-
-                  <TouchableOpacity
-                    disabled={!!capturedImage}
-                    onPress={_takeScreenshot}
-                    style={{
-                      width: 56,
-                      height: 56,
-                      position: "absolute",
-                      bottom: -28,
-                      alignSelf: "center",
-                    }}
-                  >
-                    <CaptureIcon />
-                  </TouchableOpacity>
-                  {capturedImage && (
-                    <View
-                      style={{
-                        paddingHorizontal: 15,
-                        position: "absolute",
-                        bottom: 15,
-                        justifyContent: "space-between",
-                        flexDirection: "row",
-                        width: "100%",
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => {
-                          setCapturedImage(null);
-                          setCapturedVideo(null);
-                          setIsUnityLoaded(true);
-                        }}
-                        activeOpacity={0.8}
-                        style={_styles.bottomButtonContainer}
-                      >
-                        <Text style={_styles.bottomButtonText}>Retake</Text>
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        onPress={onDonePress}
-                        activeOpacity={0.8}
-                        style={_styles.bottomButtonContainer}
-                      >
-                        <Text style={_styles.bottomButtonText}>Done</Text>
-                      </TouchableOpacity>
-                    </View>
-                  )}
                 </>
               )}
             </View>
           </View>
+          {/* Camera controls box */}
+          <CameraControls
+            onRetake={retakeButtonHandler}
+            onDone={onDonePress}
+            onCameraPress={_takeScreenshot}
+            hasCapturedImage={!!capturedImage}
+          />
+
+          {/* Footer Info box */}
           <View
             style={{
               backgroundColor: "#131422",
@@ -714,10 +684,10 @@ const PinChallenge = ({}) => {
               </Text>
             </View>
           </View>
-        </View>
+        </ScrollView>
       </BackgroundWithImage>
       {detailsShow && InfoView()}
-    </View>
+    </>
   );
 };
 
