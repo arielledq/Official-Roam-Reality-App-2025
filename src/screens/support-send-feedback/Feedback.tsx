@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
-import { Alert, Image, Keyboard, Linking, Pressable, View } from 'react-native'
-import { Formik } from 'formik'
-import { AppButton, AppHeader, AppInput, AppText } from '../../src/components'
-import theme from '../../src/assets/theme'
-import { feedbackSchema } from '../../src/util/ValidationSchemas'
-import BackgroundWithImage from '../../src/components/background'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import useStyles from './styles'
-import { sendFeedback } from '../../src/network'
-import Images from '../../src/assets/images'
-import { showMessage } from '../../src/util/helpers'
+import React, { useState } from "react";
+import { Alert, Image, Keyboard, Linking, Pressable, View } from "react-native";
+import { Formik } from "formik";
+import { AppButton, AppHeader, AppInput, AppText } from "../../components";
+import theme from "../../assets/theme";
+import { feedbackSchema } from "../../util/ValidationSchemas";
+import BackgroundWithImage from "../../components/background";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import useStyles from "./styles";
+import { sendFeedback } from "../../network";
+import Images from "../../assets/images";
+import { showMessage } from "../../util/helpers";
 
 const Feedback = () => {
-  const _styles = useStyles()
-  const [loading, setLoading] = React.useState(false)
-  const [isTitleFocused, setTitleFocused] = useState(false)
-  const [isDescInputFocused, setDescInputFocused] = useState(false)
+  const _styles = useStyles();
+  const [loading, setLoading] = React.useState(false);
+  const [isTitleFocused, setTitleFocused] = useState(false);
+  const [isDescInputFocused, setDescInputFocused] = useState(false);
 
   const SupportOptionsData = [
     // {
@@ -25,13 +25,13 @@ const Feedback = () => {
     // },
     {
       icon: Images.Facebook,
-      text: 'Facebook',
-      link: 'https://www.facebook.com/RoamReality',
+      text: "Facebook",
+      link: "https://www.facebook.com/RoamReality",
     },
     {
       icon: Images.Instagram,
-      text: 'Instagram',
-      link: 'https://www.instagram.com/roamreality',
+      text: "Instagram",
+      link: "https://www.instagram.com/roamreality",
     },
     // {
     //   icon: Images.TikTok,
@@ -40,44 +40,44 @@ const Feedback = () => {
     // },
     {
       icon: Images.YouTube,
-      text: 'YouTube',
-      link: 'https://www.youtube.com/@roamreality',
+      text: "YouTube",
+      link: "https://www.youtube.com/@roamreality",
     },
-  ]
+  ];
 
   /**
    * Method to handle form data
    * @param values Feedback form data (Title and Description)
    */
   const handleFormData = (values: any, resetForm: any) => {
-    setLoading(true)
+    setLoading(true);
     const data = {
       title: values.title?.trim(),
       message: values.description?.trim(),
-    }
+    };
     sendFeedback(data)
       .then(response => {
-        setLoading(false)
-        Keyboard.dismiss()
+        setLoading(false);
+        Keyboard.dismiss();
         if (response.status === 1) {
-          resetForm() // Reset form after successful submission
-          showMessage('Thank you for your feedback', 'success', 'Feedback Submitted')
+          resetForm(); // Reset form after successful submission
+          showMessage("Thank you for your feedback", "success", "Feedback Submitted");
         } else {
-          showMessage('Something went wrong', 'error')
+          showMessage("Something went wrong", "error");
         }
       })
       .catch(error => {
-        setLoading(false)
-        console.error('error', JSON.stringify(error))
-        showMessage('Something went wrong', 'error')
-      })
-  }
+        setLoading(false);
+        console.error("error", JSON.stringify(error));
+        showMessage("Something went wrong", "error");
+      });
+  };
 
   return (
     <BackgroundWithImage>
-      <AppHeader title={'Support & Feedback'} backgroundColor='transparent' />
+      <AppHeader title={"Support & Feedback"} backgroundColor="transparent" />
       <KeyboardAwareScrollView
-        keyboardShouldPersistTaps='always'
+        keyboardShouldPersistTaps="always"
         nestedScrollEnabled
         contentContainerStyle={[_styles.scroll, { paddingHorizontal: 25 }]}
         enableOnAndroid={true}
@@ -93,13 +93,13 @@ const Feedback = () => {
           <AppText style={_styles.subHeaderText}>Write To Us</AppText>
           <Formik
             initialValues={{
-              title: '',
-              description: '',
+              title: "",
+              description: "",
             }}
             validateOnChange={true}
             validationSchema={feedbackSchema}
             onSubmit={(values, { resetForm }) => {
-              handleFormData(values, resetForm)
+              handleFormData(values, resetForm);
             }}
           >
             {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => {
@@ -111,10 +111,10 @@ const Feedback = () => {
                       isTitleFocused ? _styles.focusedInput : {},
                       touched.title && errors?.title ? _styles.inputError : {},
                     ]}
-                    selectionColor={'white'}
+                    selectionColor={"white"}
                     onFocus={() => setTitleFocused(true)}
                     onBlur={() => setTitleFocused(false)}
-                    placeholder='Title'
+                    placeholder="Title"
                     onSubmitEditing={Keyboard.dismiss}
                     placeholderTextColor={
                       (touched.title && errors?.title) || isTitleFocused
@@ -122,10 +122,10 @@ const Feedback = () => {
                         : theme.darkColors?.grey
                     }
                     value={values.title}
-                    onChangeText={handleChange('title')}
+                    onChangeText={handleChange("title")}
                     errorMessage={touched.title && errors?.title ? errors.title : undefined}
                     maxLength={250}
-                    autoCapitalize='none'
+                    autoCapitalize="none"
                   />
                   <AppInput
                     style={[
@@ -134,10 +134,10 @@ const Feedback = () => {
                       isDescInputFocused ? _styles.focusedInput : {},
                       touched.description && errors?.message ? _styles.inputError : {},
                     ]}
-                    selectionColor={'white'}
+                    selectionColor={"white"}
                     onFocus={() => setDescInputFocused(true)}
                     onBlur={() => setDescInputFocused(false)}
-                    placeholder='Description'
+                    placeholder="Description"
                     onSubmitEditing={Keyboard.dismiss}
                     maxLength={500}
                     placeholderTextColor={
@@ -146,18 +146,18 @@ const Feedback = () => {
                         : theme.darkColors?.grey
                     }
                     value={values.description}
-                    onChangeText={handleChange('description')}
+                    onChangeText={handleChange("description")}
                     errorMessage={
                       touched.description && errors?.description ? errors.description : undefined
                     }
-                    autoCapitalize='none'
-                    textAlignVertical='top'
+                    autoCapitalize="none"
+                    textAlignVertical="top"
                     multiline={true}
                   />
                   <AppButton
                     buttonStyle={_styles.buttonStyle}
                     containerStyle={_styles.buttonContainer}
-                    title={'Submit'}
+                    title={"Submit"}
                     onPress={handleSubmit}
                     loading={loading}
                     disabled={
@@ -165,27 +165,27 @@ const Feedback = () => {
                     }
                   />
                 </View>
-              )
+              );
             }}
           </Formik>
         </>
       </KeyboardAwareScrollView>
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
 interface SupportOptionsProps {
-  icon: any
-  text: string
-  link: string
+  icon: any;
+  text: string;
+  link: string;
 }
 
 const SupportOptions = (props: SupportOptionsProps) => {
-  const _styles = useStyles()
+  const _styles = useStyles();
 
   const onLinkClick = () => {
-    Linking.openURL(props.link)
-  }
+    Linking.openURL(props.link);
+  };
 
   return (
     <View style={[_styles.row, _styles.rowSpaceBetween, _styles.contactOption]}>
@@ -197,7 +197,7 @@ const SupportOptions = (props: SupportOptionsProps) => {
         <AppText style={[_styles.text, _styles.link]}>Visit</AppText>
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
-export default Feedback
+export default Feedback;
