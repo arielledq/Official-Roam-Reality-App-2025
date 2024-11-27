@@ -597,7 +597,7 @@ const PinChallenge = ({}) => {
 
           <UnityARCamera
             unityRef={unityRef}
-            isProcessingMedia={!!processingMedia}
+            isProcessingMedia={processingMedia}
             isUnityLoaded={isUnityLoaded}
             onUnityLayout={handleUnityViewLayout}
             capturedImage={capturedImage}

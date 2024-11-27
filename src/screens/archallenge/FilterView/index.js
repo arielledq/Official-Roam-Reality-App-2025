@@ -222,10 +222,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     resizeMode="contain"
                     style={{
                       alignItems: "flex-end",
-                      height:
-                        filter.gradient_direction === "TOP_TO_BOTTOM"
-                          ? ScreenWidth * 1.3
-                          : ScreenWidth * 1.2,
+                      height: "100%",
                       width: "100%",
                     }}
                   />
