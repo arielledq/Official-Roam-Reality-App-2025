@@ -42,6 +42,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import CameraControls from "../../../components/CameraControls";
+import UnityARCamera from "components/UnityArView";
 
 const { width } = Dimensions.get("window");
 
@@ -593,46 +594,22 @@ const PinChallenge = ({}) => {
               <TrophyIcon style={{ width: 48, height: 48 }} />
             </View>
           </View>
-          <View style={{ marginVertical: 20, minHeight: 512 }}>
-            <View style={{ flex: 1 }}>
-              {processingMedia ? (
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "center",
-                    alignItems: "center",
-                  }}
-                >
-                  <Text style={{ color: "white" }}>Processing your content...</Text>
-                </View>
-              ) : (
-                <>
-                  <BackgroundWithImage>
-                    {isUnityLoaded && (
-                      <View style={_styles.ARMainContainer} onLayout={handleUnityViewLayout}>
-                        <UnityView
-                          ref={unityRef}
-                          style={{ width: "100%", flex: 1, zIndex: -1 }}
-                          onUnityMessage={message => {
-                            // Handle messages from Unity
-                          }}
-                        />
-                      </View>
-                    )}
-                  </BackgroundWithImage>
-                  {capturedImage && (
-                    <Image style={_styles.f1} source={{ uri: `file://${capturedImage}` }} />
-                  )}
-                </>
-              )}
-            </View>
-          </View>
-          {/* Camera controls box */}
+
+          <UnityARCamera
+            unityRef={unityRef}
+            isProcessingMedia={!!processingMedia}
+            isUnityLoaded={isUnityLoaded}
+            onUnityLayout={handleUnityViewLayout}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
+          />
+
           <CameraControls
             onRetake={retakeButtonHandler}
             onDone={onDonePress}
             onCameraPress={_takeScreenshot}
-            hasCapturedImage={!!capturedImage}
+            hasCapturedContent={!!capturedImage}
+            hideInstructions
           />
 
           {/* Footer Info box */}
