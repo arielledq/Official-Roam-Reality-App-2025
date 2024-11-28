@@ -13,8 +13,9 @@
     "paths": {
       "*": ["src/*"],
       "components/*": ["src/components/*"],
+      "assets/*": ["src/assets/*"],
       "screens/*": ["src/screens/*"],
-      "utils/*": ["src/utils/*"]
+      "util/*": ["src/util/*"]
     },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
