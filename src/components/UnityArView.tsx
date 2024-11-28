@@ -1,6 +1,5 @@
 import * as React from "react";
 import { Image, LayoutChangeEvent, Text, View } from "react-native";
-import BackgroundWithImage from "./background";
 import UnityView from "@azesmway/react-native-unity/src";
 import Video from "react-native-video";
 import ARFilter from "screens/archallenge/FilterView";
@@ -46,7 +45,7 @@ const UnityARCamera = ({
           </View>
         ) : (
           <>
-            <BackgroundWithImage>
+            <View style={{ flex: 1 }}>
               {isUnityLoaded && (
                 <View
                   style={{
@@ -62,7 +61,7 @@ const UnityARCamera = ({
                   <UnityView ref={unityRef} style={{ flex: 1 }} onUnityMessage={onUnityMessage} />
                 </View>
               )}
-            </BackgroundWithImage>
+            </View>
             {capturedImage && !imageHasFilters && (
               <Image
                 style={{

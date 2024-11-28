@@ -27,6 +27,7 @@ import BackgroundWithImage from "../../../components/background";
 import Share from "react-native-share";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
+import CaptureInfoView from "components/CaptureInfoView";
 const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;
@@ -240,9 +241,12 @@ const ArChallengeCapture = ({}) => {
         position,
         scale,
         rotation,
-        emissionIntensity: emissionValue,
-        rotationSpeed: challengeObjParameters?.loop_delay || 1,
-        scaleSpeed: challengeObjParameters?.scale_sensitivity || 0.0015,
+        emissionIntensity: emissionValue, // Intensidad de la emisión (float)
+        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1, // Velocidad de rotación
+        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01, // Velocidad de escalado
+        minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
+        maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
+        isRotationEnabled: true,
       };
 
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
@@ -568,42 +572,10 @@ const ArChallengeCapture = ({}) => {
     </View>
   );
 
-  const InfoView = () => (
-    <View style={styles.challengeInfoContainer}>
-      <View style={styles.challengeInfoHeaderContainer}>
-        <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-        <Text style={styles.challengeInfoHeader}>Waiver Details</Text>
-      </View>
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, width: "100%", padding: 24 }}
-      >
-        <RenderHTML
-          contentWidth={width}
-          tagsStyles={{
-            p: { color: "#9CA3AF", fontSize: FontSizes.S14 },
-            strong: { color: "#fff", fontSize: FontSizes.S18 },
-          }}
-          source={{ html: settings?.waiver_details.replaceAll("#000000", "#fff") }}
-        />
-      </ScrollView>
-      <View style={{ width: "100%", paddingHorizontal: 24 }}>
-        <AppButton
-          onPress={() => {
-            setDetailsShow(false);
-            setIsUnityLoaded(true);
-          }}
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainerStyle}
-          title={"Accept and Continue"}
-        />
-        <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
-          <Text style={styles.bottomText}>Cancel</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
+  const acceptWaiverButtonHandler = () => {
+    setDetailsShow(false);
+    setIsUnityLoaded(true);
+  };
 
   const startTimer = () => {
     setTimer("00:00");
@@ -721,11 +693,7 @@ const ArChallengeCapture = ({}) => {
           backgroundColor="transparent"
         />
       </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, overflow: "hidden" }}
-        contentContainerStyle={styles.innerContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.innerContent}>
         <View style={styles.viewDetailsIconContainer}>
           <View style={styles.viewDetailsIconContainerWrapper}>
             <View
@@ -776,7 +744,12 @@ const ArChallengeCapture = ({}) => {
           challengeHasFilters={challengeHasFilters}
         />
       </ScrollView>
-      {detailsShow && <InfoView />}
+
+      <CaptureInfoView
+        isVisible={detailsShow}
+        content={settings?.waiver_details}
+        onAccept={acceptWaiverButtonHandler}
+      />
       {challengeInformationView && <ChallengeDetailView />}
     </BackgroundWithImage>
   );

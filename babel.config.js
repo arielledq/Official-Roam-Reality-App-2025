@@ -27,6 +27,9 @@ module.exports = {
         root: ["./src"],
         alias: {
           components: "./src/components",
+          assets: "./src/assets",
+          screens: "./src/screens",
+          util: "./src/util",
         },
       },
     ],

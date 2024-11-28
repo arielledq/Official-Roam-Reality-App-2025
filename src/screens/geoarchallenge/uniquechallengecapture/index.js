@@ -29,6 +29,7 @@ import UnityView from "@azesmway/react-native-unity/src";
 import Share from "react-native-share";
 import CameraControls from "components/CameraControls";
 import UnityARCamera from "components/UnityArView";
+import CaptureInfoView from "components/CaptureInfoView";
 
 const { width } = Dimensions.get("window");
 const VIDEO_RECORD_TIME = 10;
@@ -214,57 +215,9 @@ const UniqueArChallengeCapture = () => {
     </View>
   );
 
-  const InfoView = () => {
-    return (
-      <View style={styles.challengeInfoContainer}>
-        <View style={styles.challengeInfoHeaderContainer}>
-          <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-          <Text style={styles.challengeInfoHeader}>Waiver Details</Text>
-        </View>
-        <ScrollView
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1, width: "100%", padding: 24 }}
-        >
-          <RenderHTML
-            contentWidth={width}
-            tagsStyles={{
-              p: {
-                color: "#9CA3AF",
-                fontSize: FontSizes.S14,
-              },
-              strong: {
-                color: "#fff",
-                fontSize: FontSizes.S18,
-              },
-              ol: {
-                color: "#fff",
-              },
-              li: {
-                color: "#fff",
-              },
-            }}
-            source={{
-              html: `${settings?.waiver_details?.toString().replaceAll("#000000", "#fff")}`,
-            }}
-          />
-        </ScrollView>
-        <View style={{ width: "100%", paddingHorizontal: 24 }}>
-          <AppButton
-            onPress={() => {
-              setDetailsShow(false);
-              setIsUnityLoaded(true); // Enable Unity after accepting
-            }}
-            buttonStyle={styles.buttonStyle}
-            containerStyle={styles.buttonContainerStyle}
-            title={"Accept and Continue"}
-          />
-          <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
-            <Text style={styles.bottomText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  const acceptWaiverButtonHandler = () => {
+    setDetailsShow(false);
+    setIsUnityLoaded(true);
   };
 
   const retakeButtonHandler = () => {
@@ -297,7 +250,7 @@ const UniqueArChallengeCapture = () => {
           backgroundColor="transparent"
         />
       </View>
-      <View style={[{ flex: 1 }, styles.innerContainer]}>
+      <ScrollView contentContainerStyle={styles.innerContainer}>
         <View style={styles.viewDetailsIconContainer}>
           <View style={styles.viewDetailsIconContainerWrapper}>
             <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
@@ -331,9 +284,14 @@ const UniqueArChallengeCapture = () => {
           timer={timer}
           isVideo={!isPhotoChallenge}
         />
-      </View>
+      </ScrollView>
 
-      {detailsShow && <InfoView />}
+      <CaptureInfoView
+        isVisible={detailsShow}
+        content={settings?.waiver_details}
+        onAccept={acceptWaiverButtonHandler}
+      />
+
       {challengeInformationView && <ChallengeDetailView />}
     </BackgroundWithImage>
   );
