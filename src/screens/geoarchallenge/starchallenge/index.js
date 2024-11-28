@@ -44,6 +44,7 @@ import StarIcon from "../../../assets/geoar/star_icon.svg";
 import TrophyIcon from "../../../assets/geoar/trophy_icon.svg";
 import LineIcon from "../../../assets/ar/line.png";
 import Sound from "react-native-sound";
+import CaptureInfoView from "components/CaptureInfoView";
 
 const { width } = Dimensions.get("window");
 

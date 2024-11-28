@@ -29,6 +29,7 @@ import UnityView from "@azesmway/react-native-unity/src";
 import Share from "react-native-share";
 import CameraControls from "components/CameraControls";
 import UnityARCamera from "components/UnityArView";
+import CaptureInfoView from "components/CaptureInfoView";
 
 const { width } = Dimensions.get("window");
 const VIDEO_RECORD_TIME = 10;

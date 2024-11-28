@@ -43,6 +43,7 @@ import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
+import CaptureInfoView from "components/CaptureInfoView";
 
 const { width } = Dimensions.get("window");
 
