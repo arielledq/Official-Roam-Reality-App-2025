@@ -10,8 +10,6 @@ import {
 } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
 import AppHeader from "../../../components/header";
-import Video from "react-native-video";
-import uuid from "react-native-uuid";
 import { FontSizes } from "../../../util/FontUtils";
 import RNFetchBlob from "rn-fetch-blob";
 import useStyles from "./styles";
@@ -25,10 +23,10 @@ const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import { useSelector } from "react-redux";
-import ARFilter from "../FilterView";
 import BackgroundWithImage from "../../../components/background";
-import UnityView from "@azesmway/react-native-unity/src";
 import Share from "react-native-share";
+import UnityARCamera from "components/UnityArView";
+import CameraControls from "components/CameraControls";
 const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;
@@ -78,6 +76,8 @@ const ArChallengeCapture = ({}) => {
   const videoFileName = "grabacion_video.mp4";
   const fullVideoPath = `${videoDirectory}${videoFileName}`;
 
+  const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
+
   // useFocusEffect(
   //   useCallback(() => {
   //     if (!isUnityLoaded) {
@@ -115,6 +115,8 @@ const ArChallengeCapture = ({}) => {
 
   const unzipModelFile = (sourcePath, targetPath) => {
     const charset = "UTF-8";
+    setProcessingMedia(true);
+
     unzip(sourcePath, targetPath, charset)
       .then(path => {
         RNFS.readDir(path).then(result => {
@@ -150,6 +152,9 @@ const ArChallengeCapture = ({}) => {
       })
       .catch(err => {
         console.error("Error descomprimiendo el archivo:", err);
+      })
+      .finally(() => {
+        setProcessingMedia(false);
       });
   };
 
@@ -661,8 +666,44 @@ const ArChallengeCapture = ({}) => {
   }, []);
   console.log("capturedVideo:", capturedVideo);
 
+  const retakeButtonHandler = () => {
+    setCapturedImage(null);
+    setCapturedVideo(null);
+    setIsUnityLoaded(true);
+    // enviarComandoAUnity('restart'); TODO VERIFICAR SI ES NECESARIO
+  };
+
+  const startRecordVideoHandler = () => {
+    if (capturedImage || capturedVideo) {
+      return;
+    }
+    startRecordVideo();
+  };
+
+  const stopRecordVideoHandler = () => {
+    if (recordingStart) {
+      stopRecordVideo();
+    }
+  };
+
+  const cameraPressHandler = () => {
+    if (capturedImage || capturedVideo) {
+      return;
+    }
+    if (recordingStart) {
+      stopRecordVideo();
+    } else {
+      _takeScreenshot();
+      setIsUnityLoaded(false);
+    }
+  };
+
+  const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
+
+  console.log("isUnityLoaded", isUnityLoaded);
+
   return (
-    <View style={styles.mainContainer}>
+    <BackgroundWithImage style={styles.mainContainer}>
       <View
         style={[
           styles.mainHeaderContainer,
@@ -680,13 +721,10 @@ const ArChallengeCapture = ({}) => {
           backgroundColor="transparent"
         />
       </View>
-      <View
-        style={[
-          styles.detailsViewContainer,
-          Platform.OS == "ios" && challengeObj?.ar_filters.length == 0
-            ? styles.detailsViewContainerIOS
-            : {},
-        ]}
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ flex: 1, overflow: "hidden" }}
+        contentContainerStyle={styles.innerContent}
       >
         <View style={styles.viewDetailsIconContainer}>
           <View style={styles.viewDetailsIconContainerWrapper}>
@@ -714,154 +752,33 @@ const ArChallengeCapture = ({}) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
-      <View
-        style={[
-          styles.f1,
-          // {
-          //   marginTop: Platform.OS == 'ios' && challengeObj?.ar_filters.length == 0 ? -220 : 0,
-          // },
-          // {flex:1,}
-          challengeObj?.ar_filters.length > 0 ? styles.filterHeight : { flex: 1 },
-        ]}
-      >
-        {processingMedia ? (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text style={{ color: "white" }}>Processing your content...</Text>
-          </View>
-        ) : (
-          <>
-            <BackgroundWithImage>
-              {isUnityLoaded && (
-                <View
-                  style={{
-                    flex: 1,
-                    justifyContent: "flex-end",
-                    alignItems: "flex-end",
-                    alignContent: "flex-end",
-                  }}
-                  onLayout={handleUnityViewLayout} // Obtener las dimensiones del contenedor
-                >
-                  <UnityView ref={unityRef} style={{ width: "100%", flex: 1, zIndex: -1 }} />
-                </View>
-              )}
-            </BackgroundWithImage>
-            {capturedImage && challengeObj?.ar_filters.length == 0 && (
-              <Image style={styles.imageVideoView} source={{ uri: `file://${capturedImage}` }} />
-            )}
-            {capturedVideo && challengeObj?.ar_filters.length == 0 && (
-              <Video
-                repeat={true}
-                style={styles.imageVideoView}
-                source={{
-                  uri: `file://${capturedVideo}`,
-                }}
-              />
-            )}
-            {capturedImage && challengeObj?.ar_filters.length > 0 && (
-              <View style={styles.imageVideoView}>
-                <ARFilter
-                  challengeObj={challengeObj}
-                  viewShotRef={viewShotRef}
-                  captureData={capturedImage}
-                />
-              </View>
-            )}
-          </>
-        )}
-      </View>
-      <View style={styles.holdTextContainer}>
-        {!capturedImage &&
-          !capturedVideo &&
-          !recordingStart &&
-          challengeObj?.ar_filters.length == 0 && (
-            <Text style={styles.holdText}>
-              {challengeIsPhoto
-                ? "Tap the button to take a picture"
-                : "Press and hold the button to record a video"}
-            </Text>
-          )}
-        {(capturedImage || capturedVideo) && route?.params?.challengeObj?.ar_filters.length > 0 && (
-          <Text style={styles.holdText}>Swipe Left or Right for Filters</Text>
-        )}
-      </View>
-      <View
-        style={[
-          styles.bottomContainer,
-          {
-            justifyContent: capturedImage || capturedVideo ? "space-between" : "center",
-          },
-          challengeObj?.ar_filters.length > 0 ? styles.filterBottomContainer : {},
-        ]}
-      >
-        {recordingStart && (
-          <View style={styles.timerTextContainer}>
-            <Text style={styles.timerText}>{timer}</Text>
-          </View>
-        )}
-        {(capturedImage || capturedVideo) && (
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={() => {
-              setCapturedImage(null);
-              setCapturedVideo(null);
-              setIsUnityLoaded(true);
-              // enviarComandoAUnity('restart'); TODO VERIFICAR SI ES NECESARIO
-            }}
-            style={styles.bottomButtonContainer}
-          >
-            <Text style={styles.bottomButtonText}>Retake</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity
-          onLongPress={() => {
-            if (capturedImage || capturedVideo) {
-              return;
-            }
-            startRecordVideo();
-          }}
-          onPressIn={() => {}}
-          onPressOut={() => {
-            if (recordingStart) {
-              stopRecordVideo();
-            }
-          }}
-          delayLongPress={800}
-          onPress={() => {
-            if (capturedImage || capturedVideo) {
-              return;
-            }
-            if (recordingStart) {
-              stopRecordVideo();
-            } else {
-              _takeScreenshot();
-              setIsUnityLoaded(false);
-            }
-          }}
-          activeOpacity={0.6}
-        >
-          <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
-        </TouchableOpacity>
 
-        {(capturedImage || capturedVideo) && (
-          <TouchableOpacity
-            onPress={doneButtonHandler}
-            activeOpacity={0.6}
-            style={styles.bottomButtonContainer}
-          >
-            <Text style={styles.bottomButtonText}>Done</Text>
-          </TouchableOpacity>
-        )}
-      </View>
+        <UnityARCamera
+          unityRef={unityRef}
+          isProcessingMedia={processingMedia}
+          isUnityLoaded={isUnityLoaded}
+          onUnityLayout={handleUnityViewLayout}
+          capturedImage={capturedImage}
+          imageFilter={{ challengeObj: challengeObj, viewShotRef: viewShotRef }}
+          capturedVideo={capturedVideo}
+        />
+
+        <CameraControls
+          hasCapturedContent={!!capturedImage || !!capturedVideo}
+          onRetake={retakeButtonHandler}
+          onDone={doneButtonHandler}
+          onCameraPress={cameraPressHandler}
+          startRecordVideo={startRecordVideoHandler}
+          stopRecordVideo={stopRecordVideoHandler}
+          isRecording={!!recordingStart}
+          timer={timer}
+          isVideo={!isPhotoChallenge}
+          challengeHasFilters={challengeHasFilters}
+        />
+      </ScrollView>
       {detailsShow && <InfoView />}
       {challengeInformationView && <ChallengeDetailView />}
-    </View>
+    </BackgroundWithImage>
   );
 };
 

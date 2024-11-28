@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Node.js and Yarn installed
-- Unity Editor
+- Unity Hub
 - Xcode (for iOS development)
 - Android Studio (for Android development)
 
@@ -33,12 +33,22 @@ yarn start
 
 #### iOS Add frameworks
 
-1.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`
-2.  Add `New Copy Files PHase`
-3.  Select the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
-4.  Move the added files into the `Frameworks`
-5.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`
-6.  Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields
+1.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`.
+2.  Add `New Copy Files Phase`.
+3.  Select `Add Other...` and then the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
+4.  Choose the `Frameworks` option.
+5.  Move the added files into the `Frameworks`.
+6.  Add a `Run script` with the following code:
+
+```
+   cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/"
+   if [[ -d "Frameworks" ]]; then
+      rm -fr Frameworks
+   fi
+```
+
+7.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`.
+8.  Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields.
 
 ## Unity Configuration
 
@@ -71,14 +81,6 @@ yarn start
    - Set the following frameworks to 'Embed & Sign':
      - `MvnCorder.framework`
      - `NativeScreenRecorder.framework`
-3. Add a `Run script` with the following code:
-
-```
-   cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/"
-   if [[ -d "Frameworks" ]]; then
-      rm -fr Frameworks
-   fi
-```
 
 ## Release Builds
 

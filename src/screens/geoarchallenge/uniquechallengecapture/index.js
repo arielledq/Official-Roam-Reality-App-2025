@@ -1,758 +1,342 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import {
+  TouchableOpacity,
+  View,
+  Image,
+  Text,
+  Platform,
+  Dimensions,
+  ScrollView,
+} from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import AppHeader from "../../../components/header";
+import Video from "react-native-video";
+import uuid from "react-native-uuid";
+import { FontSizes } from "../../../util/FontUtils";
+import RNFetchBlob from "rn-fetch-blob";
+import useStyles from "./styles";
+import CaptureImage from "../../../assets/ar/camera.png";
+import LineIcon from "../../../assets/ar/line.png";
+import { unzip } from "react-native-zip-archive";
+import { AppButton } from "../../../components";
+import RenderHTML from "react-native-render-html";
+import RNFS from "react-native-fs";
+import Sound from "react-native-sound";
+import { requestMultiple, PERMISSIONS } from "react-native-permissions";
+import { useSelector } from "react-redux";
+import BackgroundWithImage from "../../../components/background";
+import UnityView from "@azesmway/react-native-unity/src";
+import Share from "react-native-share";
+import CameraControls from "components/CameraControls";
+import UnityARCamera from "components/UnityArView";
 
-import { TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView } from 'react-native'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import AppHeader from '../../../components/header'
-// import {
-//   ViroARScene,
-//   ViroMaterials,
-//   ViroTrackingStateConstants,
-//   ViroARSceneNavigator,
-//   Viro3DObject,
-//   ViroImage,
-//   ViroAmbientLight,
-//   ViroDirectionalLight,
-//   ViroSpotLight,
-//   ViroText,
-// } from '@viro-community/react-viro'
-import Video from 'react-native-video'
-import uuid from 'react-native-uuid'
-import { FontSizes } from '../../../util/FontUtils'
-import RNFetchBlob from 'rn-fetch-blob'
-import useStyles from './styles'
-import CaptureImage from '../../../assets/ar/camera.png'
-import LineIcon from '../../../assets/ar/line.png'
-import { unzip } from 'react-native-zip-archive'
-import { AppButton } from '../../../components'
-import RenderHTML from 'react-native-render-html'
-const RNFS = require('react-native-fs')
-const Sound = require('react-native-sound')
-const { config, fs } = RNFetchBlob
-import { request, requestMultiple, PERMISSIONS } from 'react-native-permissions'
-import { useSelector } from 'react-redux'
-import BackgroundWithImage from '../../../components/background'
-const { width } = Dimensions.get('window')
+const { width } = Dimensions.get("window");
+const VIDEO_RECORD_TIME = 10;
 
-const VIDEO_RECORD_TIME = 10
+const UniqueArChallengeCapture = () => {
+  const styles = useStyles();
+  const route = useRoute();
+  const navigation = useNavigation();
+  const challengeObj = route?.params?.challengeObj;
+  const unityRef = useRef(null);
+  const viewShotRef = useRef();
+  const settings = useSelector(state => state.ar?.arSettings);
 
-const UniqueArChallengeCapture = ({}) => {
-  const styles = useStyles()
-  const route = useRoute()
-  const navigation = useNavigation()
-  const challengeObj = route?.params?.challengeObj
-  const challengeObjParameters = route?.params?.challengeObj?.parameters
-  const settings = useSelector(state => state.ar?.arSettings)
-  const modelFile = challengeObj.model_file
+  const [fileFound, setFileFound] = useState(null);
+  const [captureData, setCaptureData] = useState("");
+  const [modelOBJ, setModelOBJ] = useState(null);
+  const [modelResource, setModelResource] = useState(null);
+  const [textureBase, setTextureBase] = useState(null);
+  const [textureEmission, setTextureEmission] = useState(null);
+  const [sourcesFiles, setSourcesFiles] = useState([]);
+  const [detailsShow, setDetailsShow] = useState(true);
+  const [recordingStart, setRecordingStart] = useState(false);
+  const [timer, setTimer] = useState("00:00");
+  const [recordTimeInMillis, setRecordTimeInMillis] = useState(0);
+  const [challengeInformationView, setChallengeInformationView] = useState(false);
+  const [capturedImage, setCapturedImage] = useState(null);
+  const [capturedVideo, setCapturedVideo] = useState(null);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(false); // Initial state for Unity loading
+  const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
+  const [processingMedia, setProcessingMedia] = useState(false);
 
-  const navigateToShare = (captureData, ifImage) => {
-    navigation.replace('UniqueArChallengeShare', {
-      challengeObj: challengeObj,
-      captureData,
-    })
-  }
-/*
-  const ARScreen = () => {
-    const [object3dType, setObject3dType] = useState(null)
-    const [modelPath, setModelPath] = useState(null)
-    const [sourcesFiles, setSourcesFiles] = useState([])
-    const [loading, setLoading] = useState(false)
-    const [scale, setScale] = useState([
-      challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
-      challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
-      challengeObjParameters?.scale_object ? Number(challengeObjParameters?.scale_object) : 0.05,
-    ])
-    const [rotate, setRotate] = useState([0, 0, 0])
-    const [progress, setProgress] = useState([0, 0, 0])
+  const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
 
-    function onInitialized(state, reason) {
-      if (state === ViroTrackingStateConstants.TRACKING_NORMAL) {
-      } else if (state === ViroTrackingStateConstants.TRACKING_UNAVAILABLE) {
-        // Handle loss of tracking
-      }
+  const handleUnityViewLayout = event => {
+    const { width, height } = event.nativeEvent.layout;
+    setUnityViewDimensions({ width, height });
+  };
+
+  const startTimer = () => {
+    setTimer("00:00");
+    setRecordTimeInMillis(0);
+
+    const interval = setInterval(() => {
+      setRecordTimeInMillis(prevTime => {
+        const newTimeInMillis = prevTime + 1;
+        const seconds = `0${newTimeInMillis % 60}`.slice(-2);
+        const minutes = `0${Math.floor(newTimeInMillis / 60)}`.slice(-2);
+        setTimer(`${minutes}:${seconds}`);
+
+        if (newTimeInMillis >= VIDEO_RECORD_TIME * 60) stopRecordVideo();
+        return newTimeInMillis;
+      });
+    }, 1000);
+    this.intervalId = interval;
+  };
+
+  const clearTimer = () => {
+    clearInterval(this.intervalId);
+  };
+
+  const playSound = filename => {
+    Sound.setCategory("Playback");
+    const sound = new Sound(filename, Sound.MAIN_BUNDLE, error => {
+      if (!error) sound.play();
+    });
+  };
+
+  const iniciarGrabacion = () => {
+    if (unityRef.current) {
+      unityRef.current.postMessage("Video Recorder", "IniciarGrabacion", "iniciar");
     }
+  };
 
-    const downloadModelFile = (sourcePath, targetPath) => {
-      config({
-        fileCache: true,
-        path: sourcePath,
-      })
-        .fetch('GET', modelFile)
-        .progress((received, total) => {
-          setProgress(Math.trunc(Number((received / total) * 100)))
-        })
-        .then(res => {
-          // the temp file path
+  const detenerGrabacion = async () => {
+    if (unityRef.current) {
+      unityRef.current.postMessage("Video Recorder", "DetenerGrabacion", "detener");
 
-          unzipModelFile(res.path(), targetPath)
-        })
-        .catch(error => {
-          console.error(error)
-        })
+      const fullVideoPath = "/storage/emulated/0/Android/data/com.roam_reality/files/videos/1.mp4";
+      setTimeout(async () => {
+        try {
+          const exists = await RNFS.exists(fullVideoPath);
+          if (exists) {
+            setCapturedVideo(fullVideoPath);
+            setIsUnityLoaded(false); // Set to false to display the video capture
+          } else {
+            console.error("El archivo de video no se encontró:", fullVideoPath);
+          }
+        } catch (error) {
+          console.error("Error verificando el archivo de video:", error);
+        }
+      }, 1000);
     }
+  };
 
-    const unzipModelFile = (sourcePath, targetPath) => {
-      const charset = 'UTF-8'
-      unzip(sourcePath, targetPath, charset)
-        .then(path => {
-          RNFS.readDir(path).then(result => {
-            const sourcesArray = []
-            for (let i = 0; i < result.length; i++) {
-              if (result[i].isFile) {
-                if (result[i].name.includes('.vrx') || result[i].name.includes('.VRX')) {
-                  const vrxFile =
-                    Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                  setObject3dType('VRX')
-                  setModelPath(vrxFile)
-                } else if (result[i].name.includes('.obj') || result[i].name.includes('.OBJ')) {
-                  const objFile =
-                    Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                  setModelPath(objFile)
-                  setObject3dType('OBJ')
-                } else if (result[i].name.includes('.glb') || result[i].name.includes('.GLB')) {
-                  const glbFile =
-                    Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                  setModelPath(glbFile)
-                  setObject3dType('GLB')
-                } else if (result[i].name.includes('.gltf') || result[i].name.includes('.GLTF')) {
-                  const glbFile =
-                    Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                  setModelPath(glbFile)
-                  setObject3dType('GLTF')
-                } else {
-                  const sourceFile =
-                    Platform.OS === 'android' ? `file://${result[i].path}` : result[i].path
-                  sourcesArray.push({ uri: sourceFile })
-                }
+  const startRecordVideo = () => {
+    setRecordingStart(true);
+    iniciarGrabacion();
+    playSound("record.mp3");
+    startTimer();
+  };
+
+  const stopRecordVideo = async () => {
+    detenerGrabacion();
+    clearTimer();
+    playSound("record.mp3");
+    setRecordingStart(false);
+  };
+
+  const _takeScreenshot = () => {
+    playSound("camera-sound.mp3");
+    captureScreenshot();
+  };
+
+  const captureScreenshot = async () => {
+    if (unityRef.current) {
+      unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
+
+      const path = "/storage/emulated/0/Android/data/com.roam_reality/files/";
+
+      setProcessingMedia(true);
+
+      setTimeout(() => {
+        RNFS.readDir(path)
+          .then(files => {
+            if (Array.isArray(files) && files.length > 0) {
+              const foundFile = files.find(file => file.isFile() && file.name.includes(".png"));
+              if (foundFile) {
+                setFileFound(foundFile.path);
+                setCaptureData(foundFile.path);
+                setCapturedImage(foundFile.path);
+                setIsUnityLoaded(false); // Disable Unity to display the image capture
               }
             }
-            if (sourcesArray.length > 0) {
-              setSourcesFiles(sourcesArray)
-            }
-
-            setLoading(false)
           })
-        })
-        .catch(error => {
-          console.error(error)
-          setLoading(true)
-          downloadModelFile(sourcePath, targetPath)
-        })
+          .finally(() => {
+            setProcessingMedia(false);
+          });
+      }, 1000);
     }
+  };
 
-    const checkIfModelExist = () => {
-      let filename = modelFile.split('/').pop()
-      filename = filename.split('?')[0]
-      withoutExtFilename = filename.split('.')[0]
-      const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`
-      const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`
-      RNFS.exists(sourcePath)
-        .then(exists => {
-          if (exists) {
-            unzipModelFile(sourcePath, targetPath)
-          } else {
-            downloadModelFile(sourcePath, targetPath)
-          }
-        })
-        .catch(error => {
-          console.error(error)
-        })
+  const navigateToShare = (captureData, isImage) => {
+    navigation.replace("UniqueArChallengeShare", {
+      challengeObj: challengeObj,
+      captureData,
+      isImage,
+    });
+  };
+  const handlePressUnityButton = () => {
+    if (unityRef.current) {
+      unityRef.current.postMessage(
+        "TestReact", // Nombre del GameObject en Unity
+        "ReceiveMessageFromReact", // Nombre del método en Unity
+        "pressButton" // Mensaje que quieres enviar
+      );
+    } else {
+      ("NOOOOO NEEEEEE");
     }
-    useEffect(() => {
-      if (challengeObj.challenge_choice == '3DMODEL') {
-        setLoading(true)
-        checkIfModelExist()
-      }
-    }, [])
+    console.log("NADA DE NADA onUnityMessages {", unityRef?.current?.onUnityMessage, "}");
+  };
 
-    const _onRotate = (rotateState, rotationFactor, source) => {
-      if (rotateState == 3) {
-        const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
-        setRotate(rotation)
-        return
-      }
-      const rotation = [rotate[0], rotate[1] + rotationFactor, rotate[2]]
-      setRotate(rotation)
-    }
+  // Función para manejar el mensaje de Unity
+  const handleUnityMessage = result => {
+    console.log("Mensaje recibido desde Unity:", result.nativeEvent.message);
+    Alert.alert("Mensaje de Unity", result.nativeEvent.message);
+  };
 
-    const _onDrag = (draggedToPosition, source) => {
-      //   "Dragged to: x" +
-      //   draggedToPosition[0] +
-      //   " y:" +
-      //   draggedToPosition[1] +
-      //   " z: " +
-      //   draggedToPosition[2]
-      // );
-    }
+  const ChallengeDetailView = () => (
+    <View style={styles.challengeInfoContainer}>
+      <Text style={styles.challengeInfoHeader}>Challenge Details</Text>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <RenderHTML contentWidth={width} source={{ html: challengeObj.description }} />
+      </ScrollView>
+      <TouchableOpacity
+        activeOpacity={0.6}
+        onPress={() => {
+          setChallengeInformationView(false);
+          setIsUnityLoaded(true);
+        }}
+      >
+        <Text style={styles.bottomText}>Close</Text>
+      </TouchableOpacity>
+    </View>
+  );
 
-    const _onPinch = (pinchState, scaleFactor, source) => {
-      if (scale[0] * scaleFactor <= challengeObjParameters?.min_pinch_scale) {
-        return
-      }
-      if (scale[0] * scaleFactor >= challengeObjParameters?.max_pinch_scale) {
-        return
-      }
-      let newScale = [scale[0] * scaleFactor, scale[1] * scaleFactor, scale[2] * scaleFactor]
-
-      if (pinchState == 3) {
-        setScale(newScale)
-        return
-      }
-    }
-
+  const InfoView = () => {
     return (
-      <ViroARScene onTrackingUpdated={onInitialized}>
-        <ViroAmbientLight color='#FFFFFF' intensity={250} />
-        <ViroDirectionalLight color='#FFFFFF' direction={[0, -1, 0]} />
-        <ViroDirectionalLight color='#FFFFFF' direction={[0, 0, -1]} />
-        <ViroDirectionalLight color='#FFFFFF' direction={[-1, 0, 0]} />
-
-        <ViroSpotLight
-          innerAngle={5}
-          outerAngle={90}
-          direction={[0, 1, 0]}
-          position={[0, -7, 0]}
-          color='#ffffff'
-          intensity={250}
-        />
-
-        {loading && (
-          <ViroText
-            text={`${progress}% Loading Challenge Completed`}
-            color='#ff0000'
-            width={2}
-            height={2}
-            style={styles.loadingText}
-            position={[0, 0, -5]}
-          />
-        )}
-
-        {challengeObj.challenge_choice == '3DMODEL' && modelPath && object3dType && (
-          <Viro3DObject
-            key='obj_3d1'
-            source={{ uri: modelPath }} /// this works
-            position={[
-              challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-              challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
-              challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
-            ]}
-            scale={scale}
-            resources={sourcesFiles}
-            type={object3dType}
-            opacity={
-              challengeObjParameters?.image_opacity
-                ? Number(challengeObjParameters?.image_opacity_value)
-                : 1
-            }
-            materials={challengeObjParameters?.bloom ? ['mat'] : ['grid']}
-            rotation={rotate}
-            onRotate={challengeObjParameters?.rotation ? _onRotate : null}
-            chromaKeyFilteringColor={'transparent'}
-            onPinch={challengeObjParameters?.pinch_to_zoom ? _onPinch : null}
-            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            animation={{
-              name: 'Take 001',
-              run: true,
-              loop: challengeObjParameters?.loop_animations ? true : false,
-              delay: challengeObjParameters?.loop_delay ? challengeObjParameters?.loop_delay : 1000,
+      <View style={styles.challengeInfoContainer}>
+        <View style={styles.challengeInfoHeaderContainer}>
+          <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
+          <Text style={styles.challengeInfoHeader}>Waiver Details</Text>
+        </View>
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1, width: "100%", padding: 24 }}
+        >
+          <RenderHTML
+            contentWidth={width}
+            tagsStyles={{
+              p: {
+                color: "#9CA3AF",
+                fontSize: FontSizes.S14,
+              },
+              strong: {
+                color: "#fff",
+                fontSize: FontSizes.S18,
+              },
+              ol: {
+                color: "#fff",
+              },
+              li: {
+                color: "#fff",
+              },
+            }}
+            source={{
+              html: `${settings?.waiver_details?.toString().replaceAll("#000000", "#fff")}`,
             }}
           />
-        )}
-
-        {challengeObj.challenge_choice == 'IMAGE' && (
-          <ViroImage
-            height={1}
-            width={1}
-            opacity={
-              challengeObjParameters?.image_opacity
-                ? Number(challengeObjParameters?.image_opacity_value)
-                : 1
-            }
-            onDrag={challengeObjParameters?.tracking_and_anchors ? _onDrag : null}
-            source={{ uri: challengeObj.image }}
-            position={[
-              challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-              challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : 0,
-              challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -5,
-            ]}
+        </ScrollView>
+        <View style={{ width: "100%", paddingHorizontal: 24 }}>
+          <AppButton
+            onPress={() => {
+              setDetailsShow(false);
+              setIsUnityLoaded(true); // Enable Unity after accepting
+            }}
+            buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            title={"Accept and Continue"}
           />
-        )}
-      </ViroARScene>
-    )
-  }
-
-  class ViroARNavigator extends React.Component {
-    state = {
-      capturedImage: null,
-      capturedVideo: null,
-      detailsShow: true,
-      recordingStart: false,
-      timer: '00:00',
-      recordTimeInMillis: 0,
-      isLoadVR: false,
-      challengeInformationView: false,
-    }
-
-    constructor() {
-      super()
-      this._setARNavigatorRef = this._setARNavigatorRef.bind(this)
-      this._takeScreenshot = this._takeScreenshot.bind(this)
-      this.startRecordVideo = this.startRecordVideo.bind(this)
-      this.stopRecordVideo = this.stopRecordVideo.bind(this)
-      this.playRecordSound = this.playRecordSound.bind(this)
-      this.playCameraSound = this.playCameraSound.bind(this)
-      this.checkPermission = this.checkPermission.bind(this)
-      this.startTimer = this.startTimer.bind(this)
-      this.clearTimer = this.clearTimer.bind(this)
-    }
-
-    pad(val) {
-      var valString = val + ''
-      if (valString.length < 2) {
-        return '0' + valString
-      } else {
-        return valString
-      }
-    }
-
-    startTimer = () => {
-      _this = this
-      _this.setState({
-        recordTimeInMillis: 0,
-        timer: `00:00`,
-      })
-      const timeInterval = setInterval(function () {
-        ++_this.state.recordTimeInMillis
-        const seconds = _this.pad(_this.state.recordTimeInMillis % 60)
-        const minutes = _this.pad(parseInt(_this.state.recordTimeInMillis / 60))
-        _this.setState({
-          recordTimeInMillis: _this.state.recordTimeInMillis,
-          timer: `${minutes}:${seconds}`,
-        })
-        if (seconds >= VIDEO_RECORD_TIME) {
-          _this.stopRecordVideo()
-        }
-      }, 1000)
-      this.setState({
-        timeInterval: timeInterval,
-      })
-    }
-
-    clearTimer = () => {
-      clearInterval(this.state.timeInterval)
-    }
-
-    componentDidMount() {
-      this.checkPermission()
-      this.setState({ isLoadVR: true })
-    }
-
-    _setARNavigatorRef(ARNavigator) {
-      this._arNavigator = ARNavigator
-    }
-
-    componentWillUnmount() {
-      if (this.state.recordingStart) {
-        this.stopRecordVideo()
-      }
-      this._arNavigator = null
-      this.clearTimer()
-      this.setState({ isLoadVR: false })
-    }
-
-    playCameraSound() {
-      Sound.setCategory('Playback')
-      let cameraSound = new Sound(
-        Platform.OS == 'android' ? 'camerasound.mp3' : 'camera-sound.mp3',
-        Sound.MAIN_BUNDLE,
-        error => {
-          if (error) {
-          } else {
-            cameraSound.play() // have to put the call to play() in the onload callback
-          }
-        }
-      )
-    }
-
-    playRecordSound() {
-      Sound.setCategory('Playback')
-      let cameraSound = new Sound('record.mp3', Sound.MAIN_BUNDLE, error => {
-        if (error) {
-        } else {
-          cameraSound.play() // have to put the call to play() in the onload callback
-        }
-      })
-    }
-
-    async startRecordVideo() {
-      this.setState(
-        {
-          capturedImage: null,
-          recordingStart: true,
-        },
-        () => {
-          const onError = error => {}
-          this.playRecordSound()
-          this.startTimer()
-          this._arNavigator._startVideoRecording('recording', false, onError)
-        }
-      )
-    }
-
-    async stopRecordVideo() {
-      this.clearTimer()
-      const retDict = await this._arNavigator._stopVideoRecording()
-
-      this.setState({
-        capturedVideo: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url,
-        capturedImage: null,
-        recordingStart: false,
-      })
-      this.playRecordSound()
-    }
-
-    async _takeScreenshot() {
-      this.setState({
-        capturedVideo: null,
-      })
-      this.playCameraSound()
-      this._arNavigator._takeScreenshot(uuid.v4(), false).then(retDict => {
-        this.setState({
-          capturedImage: Platform.OS === 'android' ? `file://${retDict.url}` : retDict.url,
-        })
-      })
-    }
-
-    challengeDetailView = () => {
-      return (
-        <View style={styles.challengeInfoContainer}>
-          <View style={styles.challengeInfoHeaderContainer}>
-            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-            <Text style={styles.challengeInfoHeader}>Challenge Details</Text>
-          </View>
-          <ScrollView
-            contentContainerStyle={{ paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-            style={{ flex: 1, width: '100%', padding: 24 }}
-          >
-            <RenderHTML
-              contentWidth={width}
-              tagsStyles={{
-                p: {
-                  color: '#9CA3AF',
-                  fontSize: FontSizes.S14,
-                },
-                strong: {
-                  color: '#fff',
-                  fontSize: FontSizes.S18,
-                },
-                ol: {
-                  color: '#fff',
-                },
-                li: {
-                  color: '#fff',
-                },
-              }}
-              source={{
-                html: `${challengeObj.description.toString().replaceAll('#000000', '#fff')}`,
-              }}
-            />
-          </ScrollView>
-          <View style={{ width: '100%', paddingHorizontal: 24 }}>
-            <TouchableOpacity
-              activeOpacity={0.6}
-              onPress={() => this.setState({ challengeInformationView: false })}
-            >
-              <Text style={styles.bottomText}>Close</Text>
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
+            <Text style={styles.bottomText}>Cancel</Text>
+          </TouchableOpacity>
         </View>
-      )
-    }
+      </View>
+    );
+  };
 
-    InfoView = () => {
-      return (
-        <View style={styles.challengeInfoContainer}>
-          <View style={styles.challengeInfoHeaderContainer}>
-            <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-            <Text style={styles.challengeInfoHeader}>Waiver Details</Text>
-          </View>
-          <ScrollView
-            contentContainerStyle={{ paddingBottom: 100 }}
-            showsVerticalScrollIndicator={false}
-            style={{ flex: 1, width: '100%', padding: 24 }}
-          >
-            <RenderHTML
-              contentWidth={width}
-              tagsStyles={{
-                p: {
-                  color: '#9CA3AF',
-                  fontSize: FontSizes.S14,
-                },
-                strong: {
-                  color: '#fff',
-                  fontSize: FontSizes.S18,
-                },
-                ol: {
-                  color: '#fff',
-                },
-                li: {
-                  color: '#fff',
-                },
-              }}
-              source={{
-                html: `${settings?.waiver_details.toString().replaceAll('#000000', '#fff')}}`,
-              }}
-            />
-          </ScrollView>
-          <View style={{ width: '100%', paddingHorizontal: 24 }}>
-            <AppButton
-              onPress={() => this.setState({ detailsShow: false })}
-              buttonStyle={styles.buttonStyle}
-              containerStyle={styles.buttonContainerStyle}
-              title={'Accept and Continue'}
-            />
-            <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
-              <Text style={styles.bottomText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      )
-    }
+  const retakeButtonHandler = () => {
+    setCapturedImage(null);
+    setCapturedVideo(null);
+    setIsUnityLoaded(true);
+  };
 
-    checkPermission() {
-      if (Platform.OS == 'android') {
-        requestMultiple([
-          PERMISSIONS.ANDROID.CAMERA,
-          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-          PERMISSIONS.ANDROID.RECORD_AUDIO,
-          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-        ]).then(response => {})
-      }
-      if (Platform.OS == 'ios') {
-        requestMultiple([
-          PERMISSIONS.IOS.CAMERA,
-          PERMISSIONS.IOS.MICROPHONE,
-          PERMISSIONS.IOS.PHOTO_LIBRARY,
-          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-        ]).then(response => {})
-      }
-    }
+  const doneButtonHandler = () =>
+    navigateToShare(capturedImage || capturedVideo, Boolean(capturedImage));
 
-    render() {
-      const viewComponent = () => <View style={styles.cornerStyles} />
-
-      const _cornerComponent = [
-        {
-          side: 'TR',
-          customCornerComponent: () => viewComponent(),
-        },
-      ]
-
-      const _rotateComponent = {
-        side: 'bottom',
-        customRotationComponent: () => viewComponent(),
-      }
-
-      const _resizerSnapPoints = ['right', 'left']
-
-      return (
-        <View style={styles.mainContainer}>
-          <View
-            style={[
-              styles.mainHeaderContainer,
-              Platform.OS == 'ios' ? styles.mainHeaderContainerIOS : {},
-            ]}
-          >
-            <AppHeader
-              centerComponent={{
-                text: 'Unique Site AR',
-                numberOfLines: 2,
-                style: [styles.heading],
-              }}
-              backgroundColor='transparent'
-            />
-          </View>
-          <View
-            style={[
-              styles.detailsViewContainer,
-              Platform.OS == 'ios' ? styles.detailsViewContainerIOS : {},
-            ]}
-          >
-            <View style={styles.viewDetailsIconContainer}>
-              <View style={styles.viewDetailsIconContainerWrapper}>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    flex: 1,
-                  }}
-                >
-                  <Image
-                    style={styles.viewDetailsIcon}
-                    source={{ uri: challengeObj.sponsored.image }}
-                  />
-                  <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
-                </View>
-                <TouchableOpacity
-                  onPress={() => this.setState({ challengeInformationView: true })}
-                  style={styles.viewDetailBtn}
-                >
-                  <Text style={styles.btnText}>View Details</Text>
-                </TouchableOpacity>
-              </View>
+  const cameraButtonHandler = () => {
+    _takeScreenshot();
+    handlePressUnityButton();
+  };
+  return (
+    <BackgroundWithImage style={styles.mainContainer}>
+      <View
+        style={[
+          styles.mainHeaderContainer,
+          Platform.OS == "ios" ? styles.mainHeaderContainerIOS : {},
+        ]}
+      >
+        <AppHeader
+          centerComponent={{
+            text: "Unique Site AR",
+            numberOfLines: 2,
+            style: [styles.heading],
+          }}
+          backgroundColor="transparent"
+        />
+      </View>
+      <View style={[{ flex: 1 }, styles.innerContainer]}>
+        <View style={styles.viewDetailsIconContainer}>
+          <View style={styles.viewDetailsIconContainerWrapper}>
+            <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+              <Image
+                style={styles.viewDetailsIcon}
+                source={{ uri: challengeObj?.sponsored?.image }}
+              />
+              <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
             </View>
           </View>
-          <View
-            style={[
-              styles.f1,
-              {
-                marginTop: Platform.OS == 'ios' ? -220 : 0,
-              },
-              { flex: 1 },
-            ]}
-          >
-            {
-              <BackgroundWithImage>
-                <ViroARSceneNavigator
-                  videoQuality={'High'}
-                  autofocus={true}
-                  pbrEnabled={true}
-                  hdrEnabled={true}
-                  bloomEnabled={true}
-                  ref={this._setARNavigatorRef}
-                  initialScene={{
-                    scene: ARScreen,
-                  }}
-                  style={styles.navigatorView}
-                ></ViroARSceneNavigator>
-              </BackgroundWithImage>
-            }
-            {this.state.capturedImage && (
-              <Image
-                style={styles.imageVideoView}
-                source={{
-                  uri: this.state.capturedImage,
-                }}
-              />
-            )}
-            {this.state.capturedVideo && (
-              <Video
-                repeat={true}
-                style={styles.imageVideoView}
-                source={{
-                  uri: this.state.capturedVideo,
-                }}
-              />
-            )}
-          </View>
-          <View style={styles.holdTextContainer}>
-            {!this.state.capturedImage &&
-              !this.state.capturedVideo &&
-              !this.state.recordingStart && (
-                <Text style={styles.holdText}>
-                  Press and hold the capture button to start recording. Release to stop
-                </Text>
-              )}
-          </View>
-          <View
-            style={[
-              styles.bottomContainer,
-              {
-                justifyContent:
-                  this.state.capturedImage || this.state.capturedVideo ? 'space-between' : 'center',
-              },
-            ]}
-          >
-            {this.state.recordingStart && (
-              <View style={styles.timerTextContainer}>
-                <Text style={styles.timerText}>{this.state.timer}</Text>
-              </View>
-            )}
-
-            {(this.state.capturedImage || this.state.capturedVideo) && (
-              <TouchableOpacity
-                activeOpacity={0.6}
-                onPress={() => {
-                  this.setState({ capturedImage: null, capturedVideo: null })
-                }}
-                style={styles.bottomButtonContainer}
-              >
-                <Text style={styles.bottomButtonText}>Retake</Text>
-              </TouchableOpacity>
-            )}
-            <TouchableOpacity
-              onLongPress={() => {
-                if (this.state.capturedImage || this.state.capturedVideo) {
-                  return
-                }
-                this.startRecordVideo()
-              }}
-              onPressIn={() => {}}
-              onPressOut={() => {
-                if (this.state.recordingStart) {
-                  this.stopRecordVideo()
-                }
-              }}
-              delayLongPress={800}
-              onPress={() => {
-                if (this.state.capturedImage || this.state.capturedVideo) {
-                  return
-                }
-                if (this.state.recordingStart) {
-                  this.stopRecordVideo()
-                } else {
-                  this._takeScreenshot()
-                }
-              }}
-              activeOpacity={0.6}
-            >
-              <Image style={{ width: 56, height: 56 }} source={CaptureImage} />
-            </TouchableOpacity>
-            {(this.state.capturedImage || this.state.capturedVideo) && (
-              <TouchableOpacity
-                onPress={() => {
-                  navigateToShare(
-                    this.state.capturedImage ? this.state.capturedImage : this.state.capturedVideo,
-                    this.state.capturedImage ? true : false
-                  )
-                }}
-                activeOpacity={0.6}
-                style={styles.bottomButtonContainer}
-              >
-                <Text style={styles.bottomButtonText}>Done</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-          {this.state.detailsShow && this.InfoView()}
-          {this.state.challengeInformationView && this.challengeDetailView()}
         </View>
-      )
-    }
-  }
 
-  ViroMaterials.createMaterials({
-    mat: {
-      shininess: 0.6,
-      blendMode: 'Add',
-      lightingModel: 'Lambert',
-      bloomThreshold: challengeObjParameters
-        ? Number(challengeObjParameters?.bloom_threshold)
-        : 0.5,
-      diffuseColor: challengeObjParameters ? challengeObjParameters?.diffuse_text_color : '#fff',
-      diffuseIntensity: challengeObjParameters
-        ? Number(challengeObjParameters?.diffuse_intensity)
-        : 1,
-    },
-    grid: {
-      lightingModel: 'Lambert',
-      shininess: 0.6,
-    },
-  })
+        <UnityARCamera
+          unityRef={unityRef}
+          isProcessingMedia={!!processingMedia}
+          isUnityLoaded={isUnityLoaded}
+          onUnityMessage={handleUnityMessage}
+          onUnityLayout={handleUnityViewLayout}
+          capturedImage={capturedImage}
+          capturedVideo={capturedVideo}
+        />
 
-  return <ViroARNavigator />*/
+        <CameraControls
+          hasCapturedContent={!!capturedImage || !!capturedVideo}
+          onRetake={retakeButtonHandler}
+          onDone={doneButtonHandler}
+          onCameraPress={cameraButtonHandler}
+          startRecordVideo={startRecordVideo}
+          stopRecordVideo={stopRecordVideo}
+          isRecording={!!recordingStart}
+          timer={timer}
+          isVideo={!isPhotoChallenge}
+        />
+      </View>
 
-  return null
-}
+      {detailsShow && <InfoView />}
+      {challengeInformationView && <ChallengeDetailView />}
+    </BackgroundWithImage>
+  );
+};
 
-export default UniqueArChallengeCapture
+export default UniqueArChallengeCapture;

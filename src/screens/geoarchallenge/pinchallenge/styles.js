@@ -19,15 +19,11 @@ const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,
-    justifyContent: "flex-start",
-    alignItems: "center",
-    backgroundColor: "#1f2236",
   },
   ARMainContainer: {
     flex: 1,
     width: "100%",
     position: "relative",
-    backgroundColor: "#000",
     overflow: "hidden",
     borderRadius: 16,
   },
@@ -192,19 +188,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     lineHeight: 13.64,
   },
-  bottomButtonContainer: {
-    width: 96,
-    height: 42,
-    borderRadius: 4,
-    backgroundColor: "#00000090",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  bottomButtonText: {
-    ...fontGroup.p700,
-    color: theme.colors.white,
-    fontSize: FontSizes.S16,
-  },
   loadingText: {
     fontSize: FontSizes.S24,
     color: theme.colors.black,
@@ -214,11 +197,13 @@ const useStyles = makeStyles(theme => ({
   challengeInfoContainer: {
     width: "100%",
     backgroundColor: "#131422",
-    height: 420,
-    borderRadius: 30,
+    height: 440,
+    borderTopRightRadius: 30,
+    borderTopLeftRadius: 30,
     position: "absolute",
     bottom: 0,
     alignItems: "center",
+    paddingBottom: 20,
   },
   challengeInfoHeaderContainer: {
     paddingVertical: 20,
