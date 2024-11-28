@@ -45,7 +45,7 @@ const UnityARCamera = ({
           </View>
         ) : (
           <>
-            <View>
+            <View style={{ flex: 1 }}>
               {isUnityLoaded && (
                 <View
                   style={{
