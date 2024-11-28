@@ -123,6 +123,25 @@ const GeoArSiteNavigation = () => {
     let closestCoordinate = null
     let closestDistance = Infinity
 
+    let lastVisitedIndex = -1;
+
+// Find the last index where `visited` is `true`
+    for (let i = coordinates.length - 1; i >= 0; i--) {
+      if (coordinates[i].visited === true) {
+        lastVisitedIndex = i;
+        break;
+      }
+    }
+
+// Mark all items before `lastVisitedIndex` where `visited` is `false` as `true`
+    if (lastVisitedIndex !== -1) {
+      for (let i = 0; i < lastVisitedIndex; i++) {
+        if (coordinates[i].visited === false) {
+          coordinates[i].visited = true;
+        }
+      }
+    }
+
 
     const filteredCoordinates = coordinates.filter(coord => !coord.visited)
 
@@ -140,6 +159,9 @@ const GeoArSiteNavigation = () => {
         closestCoordinate = coord
       }
     }
+
+    // console.log('closestCoordinate ==> ', closestCoordinate['coordinates'])
+    // console.log('closestDistance ==> ', closestDistance)
 
     if (closestCoordinate && closestDistance <= 10) {
       closestCoordinate.visited = true
@@ -159,6 +181,9 @@ const GeoArSiteNavigation = () => {
       nextCoordinate['coordinates'][0]
     )
 
+
+    // console.log('distanceToPath ==> ', distanceToPath)
+
     if (nextCoordinateRef.current === null || nextCoordinateRef.current !== nextCoordinate) {
       nextCoordinateDistance.current = 0
     }
@@ -169,6 +194,9 @@ const GeoArSiteNavigation = () => {
       return false
     }
 
+    // console.log('d - n ==> ', distanceToPath - nextCoordinateDistance.current)
+
+
     if (distanceToPath < nextCoordinateDistance.current) {
       nextCoordinateDistance.current = distanceToPath
       nextCoordinateRef.current = nextCoordinate
@@ -177,6 +205,8 @@ const GeoArSiteNavigation = () => {
     if (distanceToPath > nextCoordinateDistance.current && (distanceToPath - nextCoordinateDistance.current) > threshold) {
       nextCoordinateDistance.current = 0
       nextCoordinateRef.current = null
+      // console.log('nextCoordinate ==> ', nextCoordinate['coordinates'])
+      // console.log('path ==> ', path)
       return true
     }
     return false
@@ -198,10 +228,16 @@ const GeoArSiteNavigation = () => {
 
     if (rerouting) return
 
-    const threshold = Platform.OS === 'ios' ? 30 : 20
+    // Platform.OS === 'ios' ? 30 : 20
+
+    let threshold = 10
+
+    if (mapMode === 'driving') {
+      threshold = 25
+    }
 
     if (isOffRoute(position.coords, currentPathRef.current, threshold)) {
-      console.log('=========> Off route')
+      // console.log('=========> Off route')
       setOriginMap([position.coords.longitude, position.coords.latitude])
       const heading = calculateBearing(
         position.coords.latitude,
@@ -214,7 +250,7 @@ const GeoArSiteNavigation = () => {
       playProximitySound()
       setTimeout(() => {
         setRerouting(false)
-      }, 2000)
+      }, 1000)
       return
     }
 
@@ -286,7 +322,7 @@ const GeoArSiteNavigation = () => {
     const origin = originMap.join(',')
     const destination = destinationMap.join(',')
     const MBUrlBase = 'https://api.mapbox.com/directions/v5/mapbox/'
-    const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}`
+    const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}&overview=full`
     const MBUrl = `${MBUrlBase}${mapMode}/${origin};${destination}${MBUrlParams}`
 
     // Fetch route data from Mapbox Directions API
@@ -300,10 +336,21 @@ const GeoArSiteNavigation = () => {
           setDurationMins(duration / 60)
           calculatedEstimatedTime(duration / 60)
           const calculatedPath = data.routes[0].geometry.coordinates
-          currentPathRef.current = calculatedPath.map((coord, index) => ({
-            coordinates: coord,
-            visited: index === 0,
-          }));
+          const position = { coords: { latitude, longitude } }
+          currentPathRef.current = calculatedPath.map((coord, index) => {
+            if (index === 0) {
+              const firstCoordinateDis = getLocationDistance(coord, position.coords)
+              return {
+                coordinates: coord,
+                visited: firstCoordinateDis < 10,
+              }
+            } else {
+              return {
+                coordinates: coord,
+                visited: false,
+              }
+            }
+          });
 
           const routeLine = {
             type: 'Feature',
@@ -440,6 +487,14 @@ const GeoArSiteNavigation = () => {
                   }
                 }}
               />
+
+              {router && router.geometry.coordinates.length > 0 && router.geometry.coordinates.map((coord, index) => (
+                <MapboxGL.PointAnnotation key={index} id={`pointAnnotation${index}`} coordinate={coord}>
+                  <View style={{ width: 50, height: 50, backgroundColor: '#000' }} >
+                  <Text style={{ color: '#fff', fontSize: 10 }}>{coord[0]},{coord[1]}</Text>
+                  </View>
+                </MapboxGL.PointAnnotation>
+              ))}
 
               {/*<MapboxGL.PointAnnotation id='currentLocation' coordinate={[longitude, latitude]} />*/}
 
