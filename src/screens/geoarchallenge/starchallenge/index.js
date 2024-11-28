@@ -383,58 +383,9 @@ const StarChallenge = () => {
     setStarObjE(starObjE);
   };
 
-  // Info View component
-  const InfoView = () => {
-    return (
-      <View style={_styles.challengeInfoContainer}>
-        <View style={_styles.challengeInfoHeaderContainer}>
-          <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-          <Text style={_styles.challengeInfoHeader}>Waiver Details</Text>
-        </View>
-        <ScrollView
-          contentContainerStyle={{ paddingBottom: 100 }}
-          showsVerticalScrollIndicator={false}
-          style={{ flex: 1, width: "100%", padding: 24 }}
-        >
-          <RenderHTML
-            contentWidth={width}
-            tagsStyles={{
-              p: {
-                color: "#9CA3AF",
-                fontSize: FontSizes.S14,
-              },
-              strong: {
-                color: "#fff",
-                fontSize: FontSizes.S18,
-              },
-              ol: {
-                color: "#fff",
-              },
-              li: {
-                color: "#fff",
-              },
-            }}
-            source={{
-              html: `${settings?.waiver_details.toString().replaceAll("#000000", "#fff")}}`,
-            }}
-          />
-        </ScrollView>
-        <View style={{ width: "100%", paddingHorizontal: 24 }}>
-          <AppButton
-            onPress={() => {
-              setDetailsShow(false);
-              setIsUnityLoaded(true);
-            }}
-            buttonStyle={_styles.buttonStyle}
-            containerStyle={_styles.buttonContainerStyle}
-            title={"Accept and Continue"}
-          />
-          <TouchableOpacity activeOpacity={0.6} onPress={() => navigation.goBack()}>
-            <Text style={_styles.bottomText}>Cancel</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    );
+  const acceptWaiverButtonHandler = () => {
+    setDetailsShow(false);
+    setIsUnityLoaded(true);
   };
 
   // Take screenshot (if needed)
@@ -600,7 +551,13 @@ const StarChallenge = () => {
           </View>
         </View>
       </BackgroundWithImage>
-      {detailsShow && InfoView()}
+
+      <CaptureInfoView
+        isVisible={detailsShow}
+        content={settings?.waiver_details}
+        onAccept={acceptWaiverButtonHandler}
+      />
+
       {factsShow && (
         <View
           style={{

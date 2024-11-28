@@ -193,45 +193,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.black,
     marginTop: 10,
   },
-  //information view
-  challengeInfoContainer: {
-    width: "100%",
-    backgroundColor: "#131422",
-    height: 440,
-    borderTopRightRadius: 30,
-    borderTopLeftRadius: 30,
-    position: "absolute",
-    bottom: 0,
-    alignItems: "center",
-    paddingBottom: 20,
-  },
-  challengeInfoHeaderContainer: {
-    paddingVertical: 20,
-    alignItems: "center",
-    borderBottomColor: "#2C2D41",
-    borderBottomWidth: 1,
-    width: "100%",
-  },
-  challengeInfoHeader: {
-    ...fontGroup.ns700,
-    fontSize: FontSizes.S18,
-    color: theme.colors.white,
-    marginTop: 10,
-  },
-  buttonStyle: {
-    height: 50,
-  },
-  buttonContainerStyle: {
-    marginTop: 20,
-  },
-  bottomText: {
-    ...fontGroup.p700,
-    fontSize: FontSizes.S19,
-    textAlign: "center",
-    color: "#1158F4",
-    marginVertical: 15,
-    fontWeight: "700",
-  },
 }));
 
 export default useStyles;
