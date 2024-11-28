@@ -49,8 +49,10 @@ const CameraControls = ({
     >
       {!hideInstructions && (
         <View style={$holdTextContainer}>
-          {challengeHasFilters && <Text style={$holdText}>Swipe Left or Right for Filters</Text>}
-          <Text style={$holdText}>{!hasCapturedContent ? instructionText : ""}</Text>
+          {challengeHasFilters && hasCapturedContent && (
+            <Text style={$holdText}>Swipe Left or Right for Filters</Text>
+          )}
+          {!hasCapturedContent && <Text style={$holdText}>{instructionText}</Text>}
         </View>
       )}
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
