@@ -19,6 +19,7 @@ const useStyles = makeStyles(theme => ({
   },
   innerContent: {
     paddingHorizontal: screenHorizontalPadding,
+    paddingBottom: 40,
   },
   heading: {
     fontSize: FontSizes.S14,
