@@ -6,6 +6,7 @@ import {
   Text,
   TextStyle,
   TouchableOpacity,
+  useWindowDimensions,
   View,
   ViewStyle,
 } from "react-native";
@@ -28,10 +29,12 @@ const CaptureInfoView = ({ isVisible, content = "", onAccept, onCancel }: Captur
   if (!isVisible) return null;
 
   const navigation = useNavigation();
+  const { width } = useWindowDimensions();
+
   const htmlContent = content?.replace(/#000000/g, "#fff");
 
   return (
-    <View style={$challengeInfoContainer}>
+    <View style={{ ...$challengeInfoContainer, width: width }}>
       <View style={$challengeInfoHeaderContainer}>
         <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
         <Text style={$challengeInfoHeader}>Waiver Details</Text>
@@ -74,7 +77,6 @@ const CaptureInfoView = ({ isVisible, content = "", onAccept, onCancel }: Captur
 export default CaptureInfoView;
 
 const $challengeInfoContainer: ViewStyle = {
-  width: "100%",
   backgroundColor: "#131422",
   height: 440,
   borderTopLeftRadius: 30,

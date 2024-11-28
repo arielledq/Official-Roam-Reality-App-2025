@@ -442,116 +442,123 @@ const StarChallenge = () => {
   }, [starModels]);
 
   return (
-    <View style={{ flex: 1 }}>
-      <BackgroundWithImage style={_styles.mainContainer}>
-        <AppHeader
-          centerComponent={{
-            text: starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
-            numberOfLines: 2,
-            style: [_styles.heading],
-          }}
-          backgroundColor="transparent"
-        />
+    <BackgroundWithImage style={_styles.mainContainer}>
+      <AppHeader
+        centerComponent={{
+          text: starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
+          numberOfLines: 2,
+          style: [_styles.heading],
+        }}
+        backgroundColor="transparent"
+      />
 
-        <View style={{ width: "100%", flex: 1 }} showsVerticalScrollIndicator={false}>
-          <View
-            style={{
-              backgroundColor: "#131422",
-              borderRadius: 100,
-              paddingHorizontal: 8,
-              alignItems: "center",
-              height: 65,
-              flexDirection: "row",
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
-              <View>
-                <Text style={_styles.exploringText}>Stars Collected</Text>
-                <Text style={_styles.arrivedText}>
-                  {collectedStars.length} / {starsCount}
-                </Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ marginEnd: 10 }}>
-                <Text style={_styles.exploringText}>Points</Text>
-                <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
-              </View>
-              <TrophyIcon style={{ width: 48, height: 48 }} />
-            </View>
-          </View>
-          <View
-            style={{
-              flex: 1,
-              marginVertical: 20,
-              overflow: "hidden",
-              borderRadius: 16,
-            }}
-          >
-            <UnityARCamera
-              unityRef={unityRef}
-              isProcessingMedia={processingMedia}
-              isUnityLoaded={isUnityLoaded}
-              capturedImage={capturedImage}
-              capturedVideo={capturedVideo}
-              starModels={starModels}
-              currentLocation={currentLocation}
-              compassHeading={compassHeading}
-              collectedStars={collectedStars}
-            />
-          </View>
-          <View
-            style={{
-              backgroundColor: "#131422",
-              borderRadius: 16,
-              padding: 20,
-              paddingBottom: 20,
-              marginVertical: 20,
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 15,
-              }}
-            >
-              <View style={{ flexDirection: "row", flex: 1 }}>
-                <MenIcon style={{ width: 40, height: 40 }} />
-                <View style={{ flex: 1 }}>
-                  <Text style={_styles.exploringText}>Nearest Star</Text>
-                  {allStarsCollected ? (
-                    <Text style={_styles.arrivedText}>{"You have found all the stars!"}</Text>
-                  ) : (
-                    <Text style={_styles.arrivedText}>
-                      {starShouldVisible ? "You found a star!" : `${distanceInFeet} feet away`}
-                    </Text>
-                  )}
-                </View>
-              </View>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}
-              >
-                <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-                <TouchableOpacity>
-                  <SpeakerIcon style={{ width: 40, height: 40 }} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-              <Text style={_styles.infoText}>
-                The dot pulsates quicker and the chime beeps faster when you get closer to a Star.
-                You can mute the sound by clicking on the speaker.
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={{ width: "100%" }}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
+        {/* First View (Stars Collected and Points) */}
+        <View
+          style={{
+            backgroundColor: "#131422",
+            borderRadius: 100,
+            paddingHorizontal: 8,
+            alignItems: "center",
+            height: 65,
+            flexDirection: "row",
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+            <View>
+              <Text style={_styles.exploringText}>Stars Collected</Text>
+              <Text style={_styles.arrivedText}>
+                {collectedStars.length} / {starsCount}
               </Text>
             </View>
           </View>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
+            <View style={{ marginEnd: 10 }}>
+              <Text style={_styles.exploringText}>Points</Text>
+              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
+            </View>
+            <TrophyIcon style={{ width: 48, height: 48 }} />
+          </View>
         </View>
-      </BackgroundWithImage>
+
+        {/* Unity AR Camera */}
+        <View
+          style={{
+            width: "100%", // Add this line
+            marginVertical: 20,
+            overflow: "hidden",
+            borderRadius: 16,
+          }}
+        >
+          <UnityARCamera
+            unityRef={unityRef}
+            isProcessingMedia={processingMedia}
+            isUnityLoaded={isUnityLoaded}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
+            starModels={starModels}
+            currentLocation={currentLocation}
+            compassHeading={compassHeading}
+            collectedStars={collectedStars}
+          />
+        </View>
+
+        {/* Footer Info Box */}
+        <View
+          style={{
+            width: "100%",
+            backgroundColor: "#131422",
+            borderRadius: 16,
+            padding: 20,
+            paddingBottom: 20,
+            marginVertical: 20,
+            alignItems: "center",
+          }}
+        >
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginBottom: 15,
+            }}
+          >
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <MenIcon style={{ width: 40, height: 40 }} />
+              <View style={{ marginLeft: 10 }}>
+                <Text style={_styles.exploringText}>Nearest Star</Text>
+                {allStarsCollected ? (
+                  <Text style={_styles.arrivedText}>{"You have found all the stars!"}</Text>
+                ) : (
+                  <Text style={_styles.arrivedText}>
+                    {starShouldVisible ? "You found a star!" : `${distanceInFeet} feet away`}
+                  </Text>
+                )}
+              </View>
+            </View>
+            <View style={{ flexDirection: "row", alignItems: "center" }}>
+              <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
+              <TouchableOpacity>
+                <SpeakerIcon style={{ width: 40, height: 40 }} />
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <View style={{ flexDirection: "row", alignItems: "center", width: "100%" }}>
+            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
+            <Text style={_styles.infoText}>
+              The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You
+              can mute the sound by clicking on the speaker.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
 
       <CaptureInfoView
         isVisible={detailsShow}
@@ -578,7 +585,7 @@ const StarChallenge = () => {
           />
         </View>
       )}
-    </View>
+    </BackgroundWithImage>
   );
 };
 

@@ -250,7 +250,7 @@ const UniqueArChallengeCapture = () => {
           backgroundColor="transparent"
         />
       </View>
-      <View style={[{ flex: 1 }, styles.innerContainer]}>
+      <ScrollView contentContainerStyle={styles.innerContainer}>
         <View style={styles.viewDetailsIconContainer}>
           <View style={styles.viewDetailsIconContainerWrapper}>
             <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
@@ -284,7 +284,7 @@ const UniqueArChallengeCapture = () => {
           timer={timer}
           isVideo={!isPhotoChallenge}
         />
-      </View>
+      </ScrollView>
 
       <CaptureInfoView
         isVisible={detailsShow}

@@ -690,11 +690,7 @@ const ArChallengeCapture = ({}) => {
           backgroundColor="transparent"
         />
       </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, overflow: "hidden" }}
-        contentContainerStyle={styles.innerContent}
-      >
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.innerContent}>
         <View style={styles.viewDetailsIconContainer}>
           <View style={styles.viewDetailsIconContainerWrapper}>
             <View

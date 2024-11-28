@@ -177,7 +177,7 @@ const useStyles = makeStyles(theme => ({
   },
   arrivedText: {
     ...fontGroup.ns600,
-    fontSize: FontSizes.S16,
+    fontSize: FontSizes.S14,
     color: "#C881F0",
   },
   exploringText: {

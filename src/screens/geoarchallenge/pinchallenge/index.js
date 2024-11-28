@@ -527,119 +527,120 @@ const PinChallenge = ({}) => {
   };
 
   return (
-    <>
-      <BackgroundWithImage style={_styles.mainContainer}>
-        <AppHeader
-          centerComponent={{
-            text: `Location Check In\n${selectedGeoSite.name}`,
-            numberOfLines: 2,
-            style: _styles.heading,
+    <BackgroundWithImage style={_styles.mainContainer}>
+      <AppHeader
+        centerComponent={{
+          text: `Location Check In\n${selectedGeoSite.name}`,
+          numberOfLines: 2,
+          style: _styles.heading,
+        }}
+        backgroundColor="transparent"
+      />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 40,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: "#131422",
+            borderRadius: 100,
+            paddingHorizontal: 8,
+            alignItems: "center",
+            height: 65,
+            flexDirection: "row",
+            justifyContent: "space-between",
           }}
-          backgroundColor="transparent"
+        >
+          <View style={{ flexDirection: "row" }}>
+            <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+            <View>
+              <Text style={_styles.exploringText}>Pin Found</Text>
+              <Text style={_styles.arrivedText}>{isMeInsideInSite ? 1 : 0} / 1</Text>
+            </View>
+          </View>
+          <View style={{ flexDirection: "row" }}>
+            <View style={{ marginEnd: 10 }}>
+              <Text style={_styles.exploringText}>Points</Text>
+              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
+            </View>
+            <TrophyIcon style={{ width: 48, height: 48 }} />
+          </View>
+        </View>
+
+        <UnityARCamera
+          unityRef={unityRef}
+          isProcessingMedia={processingMedia}
+          isUnityLoaded={isUnityLoaded}
+          onUnityLayout={handleUnityViewLayout}
+          capturedImage={capturedImage}
+          capturedVideo={capturedVideo}
         />
-        <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: "hidden" }}>
+
+        <CameraControls
+          onRetake={retakeButtonHandler}
+          onDone={onDonePress}
+          onCameraPress={_takeScreenshot}
+          hasCapturedContent={!!capturedImage}
+          hideInstructions
+        />
+
+        {/* Footer Info box */}
+        <View
+          style={{
+            backgroundColor: "#131422",
+            borderRadius: 16,
+            padding: 20,
+            paddingBottom: 20,
+            marginVertical: 20,
+            alignItems: "center",
+          }}
+        >
           <View
             style={{
-              backgroundColor: "#131422",
-              borderRadius: 100,
-              paddingHorizontal: 8,
-              alignItems: "center",
-              height: 65,
+              width: "100%",
               flexDirection: "row",
               justifyContent: "space-between",
+              marginBottom: 15,
             }}
           >
             <View style={{ flexDirection: "row" }}>
-              <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
+              <MenIcon style={{ width: 40, height: 40 }} />
               <View>
-                <Text style={_styles.exploringText}>Pin Found</Text>
-                <Text style={_styles.arrivedText}>{isMeInsideInSite ? 1 : 0} / 1</Text>
+                <Text style={_styles.exploringText}>Pin</Text>
+                <Text style={_styles.arrivedText}>
+                  {isMeInsideInSite ? "Pin Found" : `${distanceInFeet} feet away`}
+                </Text>
               </View>
             </View>
-            <View style={{ flexDirection: "row" }}>
-              <View style={{ marginEnd: 10 }}>
-                <Text style={_styles.exploringText}>Points</Text>
-                <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
-              </View>
-              <TrophyIcon style={{ width: 48, height: 48 }} />
-            </View>
-          </View>
-
-          <UnityARCamera
-            unityRef={unityRef}
-            isProcessingMedia={processingMedia}
-            isUnityLoaded={isUnityLoaded}
-            onUnityLayout={handleUnityViewLayout}
-            capturedImage={capturedImage}
-            capturedVideo={capturedVideo}
-          />
-
-          <CameraControls
-            onRetake={retakeButtonHandler}
-            onDone={onDonePress}
-            onCameraPress={_takeScreenshot}
-            hasCapturedContent={!!capturedImage}
-            hideInstructions
-          />
-
-          {/* Footer Info box */}
-          <View
-            style={{
-              backgroundColor: "#131422",
-              borderRadius: 16,
-              padding: 20,
-              paddingBottom: 20,
-              marginVertical: 20,
-              alignItems: "center",
-            }}
-          >
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                justifyContent: "space-between",
-                marginBottom: 15,
-              }}
-            >
-              <View style={{ flexDirection: "row" }}>
-                <MenIcon style={{ width: 40, height: 40 }} />
-                <View>
-                  <Text style={_styles.exploringText}>Pin</Text>
-                  <Text style={_styles.arrivedText}>
-                    {isMeInsideInSite ? "Pin Found" : `${distanceInFeet} feet away`}
-                  </Text>
-                </View>
-              </View>
-              <View
-                style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}
-              >
-                <Blink duration={blinkTimer} style={{ marginEnd: 10 }}>
-                  <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-                </Blink>
-                <TouchableOpacity onPress={() => setMuteSound(!muteSound)}>
-                  <SpeakerIcon
-                    style={{ width: 40, height: 40, color: !muteSound ? "#fff" : "#000" }}
-                  />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={{ flexDirection: "row" }}>
-              <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-              <Text style={_styles.infoText}>
-                The closer you get to the Pin faster the chime beeps and quicker the dot pulsates.
-                You can switch off the Sound by clicking on the speaker.
-              </Text>
+            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
+              <Blink duration={blinkTimer} style={{ marginEnd: 10 }}>
+                <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
+              </Blink>
+              <TouchableOpacity onPress={() => setMuteSound(!muteSound)}>
+                <SpeakerIcon
+                  style={{ width: 40, height: 40, color: !muteSound ? "#fff" : "#000" }}
+                />
+              </TouchableOpacity>
             </View>
           </View>
-        </ScrollView>
+          <View style={{ flexDirection: "row" }}>
+            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
+            <Text style={_styles.infoText}>
+              The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You
+              can switch off the Sound by clicking on the speaker.
+            </Text>
+          </View>
+        </View>
+      </ScrollView>
 
-        <CaptureInfoView
-          isVisible={detailsShow}
-          content={settings?.waiver_details}
-          onAccept={acceptWaiverButtonHandler}
-        />
-      </BackgroundWithImage>
-    </>
+      <CaptureInfoView
+        isVisible={detailsShow}
+        content={settings?.waiver_details}
+        onAccept={acceptWaiverButtonHandler}
+      />
+    </BackgroundWithImage>
   );
 };
 
