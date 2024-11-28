@@ -241,9 +241,12 @@ const ArChallengeCapture = ({}) => {
         position,
         scale,
         rotation,
-        emissionIntensity: emissionValue,
-        rotationSpeed: challengeObjParameters?.loop_delay || 1,
-        scaleSpeed: challengeObjParameters?.scale_sensitivity || 0.0015,
+        emissionIntensity: emissionValue, // Intensidad de la emisión (float)
+        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1, // Velocidad de rotación
+        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01, // Velocidad de escalado
+        minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
+        maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
+        isRotationEnabled: true,
       };
 
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
