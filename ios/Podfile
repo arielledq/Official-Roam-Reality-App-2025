@@ -3,7 +3,7 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 require_relative '../node_modules/react-native-permissions/scripts/setup'
 
 
-platform :ios, '14'
+platform :ios, '15.5'
 prepare_react_native_project!
 
   setup_permissions([

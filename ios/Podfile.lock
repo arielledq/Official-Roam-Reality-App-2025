@@ -1,9 +1,9 @@
 PODS:
-  - AppAuth (1.7.6):
-    - AppAuth/Core (= 1.7.6)
-    - AppAuth/ExternalUserAgent (= 1.7.6)
-  - AppAuth/Core (1.7.6)
-  - AppAuth/ExternalUserAgent (1.7.6):
+  - AppAuth (1.7.5):
+    - AppAuth/Core (= 1.7.5)
+    - AppAuth/ExternalUserAgent (= 1.7.5)
+  - AppAuth/Core (1.7.5)
+  - AppAuth/ExternalUserAgent (1.7.5):
     - AppAuth/Core
   - boost (1.76.0)
   - BVLinearGradient (2.8.3):
@@ -57,13 +57,13 @@ PODS:
   - GoogleMaps/Base (7.4.0)
   - GoogleMaps/Maps (7.4.0):
     - GoogleMaps/Base
-  - GoogleSignIn (7.0.0):
-    - AppAuth (~> 1.5)
-    - GTMAppAuth (< 3.0, >= 1.3)
-    - GTMSessionFetcher/Core (< 4.0, >= 1.1)
-  - GTMAppAuth (2.0.0):
-    - AppAuth/Core (~> 1.6)
-    - GTMSessionFetcher/Core (< 4.0, >= 1.5)
+  - GoogleSignIn (7.1.0):
+    - AppAuth (< 2.0, >= 1.7.3)
+    - GTMAppAuth (< 5.0, >= 4.1.1)
+    - GTMSessionFetcher/Core (~> 3.3)
+  - GTMAppAuth (4.1.1):
+    - AppAuth/Core (~> 1.7)
+    - GTMSessionFetcher/Core (< 4.0, >= 3.3)
   - GTMSessionFetcher/Core (3.5.0)
   - libwebp (1.3.2):
     - libwebp/demux (= 1.3.2)
@@ -339,9 +339,9 @@ PODS:
   - react-native-fbsdk-next/Login (12.2.0):
     - FBSDKLoginKit (~> 16.3.1)
     - React-Core
-  - react-native-fbsdk-next/Share (12.2.0):
-    - FBSDKGamingServicesKit (~> 16.3.1)
-    - FBSDKShareKit (~> 16.3.1)
+  - react-native-fbsdk-next/Share (12.1.2):
+    - FBSDKGamingServicesKit (~> 16.1.3)
+    - FBSDKShareKit (~> 16.1.3)
     - React-Core
   - react-native-geolocation (3.4.0):
     - RCT-Folly (= 2021.07.22.00)
@@ -556,20 +556,20 @@ PODS:
     - React-Core
   - RNSVG (14.2.0):
     - React-Core
-  - RNZipArchive (6.0.9):
+  - RNZipArchive (7.0.1):
     - React-Core
-    - RNZipArchive/Core (= 6.0.9)
-    - SSZipArchive (~> 2.2)
-  - RNZipArchive/Core (6.0.9):
+    - RNZipArchive/Core (= 7.0.1)
+    - SSZipArchive (~> 2.5.5)
+  - RNZipArchive/Core (7.0.1):
     - React-Core
-    - SSZipArchive (~> 2.2)
+    - SSZipArchive (~> 2.5.5)
   - SDWebImage (5.14.3):
     - SDWebImage/Core (= 5.14.3)
   - SDWebImage/Core (5.14.3)
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
-  - SSZipArchive (2.4.3)
+  - SSZipArchive (2.5.5)
   - TikTokOpenSDK (5.0.15)
   - TOCropViewController (2.7.4)
   - Turf (2.8.0)
@@ -836,8 +836,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
-  boost: 7dcd2de282d72e344012f7d6564d024930a6a440
+  AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
+  boost: 57d2868c099736d80fcd648bf211b4431e51a558
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
   FBAEMKit: 6c7b5eb77c96861bb59e040842c6e55bf39512ce
@@ -852,8 +852,8 @@ SPEC CHECKSUMS:
   glog: 04b94705f318337d7ead9e6d17c019bd9b1f6b1b
   Google-Maps-iOS-Utils: 3343332b18dfd5be8f1f44edd7d481ace3da4d9a
   GoogleMaps: 032f676450ba0779bd8ce16840690915f84e57ac
-  GoogleSignIn: b232380cf495a429b8095d3178a8d5855b42e842
-  GTMAppAuth: 99fb010047ba3973b7026e45393f51f27ab965ae
+  GoogleSignIn: d4281ab6cf21542b1cfaff85c191f230b399d2db
+  GTMAppAuth: f69bd07d68cd3b766125f7e072c45d7340dea0de
   GTMSessionFetcher: 5aea5ba6bd522a239e236100971f10cb71b96ab6
   libwebp: 1786c9f4ff8a279e4dac1e8f385004d5fc253009
   MapboxCommon: 119f3759f7dc9457f0695848108ab323eb643cb4
@@ -879,7 +879,7 @@ SPEC CHECKSUMS:
   react-native-cameraroll: 6d252600d122f6bc10d99d6ab82cdfd2c8bef70a
   react-native-compass-heading: 1b4403d1c99dfd8311073ca8fc52bfc8e365cfac
   react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
-  react-native-fbsdk-next: fcecfa33c37ce63bcda9cd24766ee9d345463230
+  react-native-fbsdk-next: 9c40664b1501be29572795c2e4c8e347f39f556f
   react-native-geolocation: 2d8f71eb7d0c9a0c52f336d4634444488669371d
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
@@ -927,16 +927,16 @@ SPEC CHECKSUMS:
   RNScreens: 50ad6e3dbea9023272b3aa753e3ee2720b0c9b8f
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
-  RNSVG: 963a95f1f5d512a13d11ffd50d351c87fb5c6890
-  RNZipArchive: 68a0c6db4b1c103f846f1559622050df254a3ade
+  RNSVG: ba3e7232f45e34b7b47e74472386cf4e1a676d0a
+  RNZipArchive: 7bb4c70d6aa2dd235212c0a4a3de0a4e237e2569
   SDWebImage: 9c36e66c8ce4620b41a7407698dda44211a96764
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
-  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
+  SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   TikTokOpenSDK: dc1199ba9c6d7815aee0eaca6ec80ad13f7d9c1f
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: d4f5b037672e6b68ba484c7cf7fe6790122df792
 
-PODFILE CHECKSUM: 4a658dd0abee7bf89ad2b9ac79fb1db3211a6420
+PODFILE CHECKSUM: d852a00b37f23e905152555c93ad84bb3aa43a2e
 
 COCOAPODS: 1.15.2

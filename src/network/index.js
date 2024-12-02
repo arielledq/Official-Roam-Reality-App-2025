@@ -266,6 +266,14 @@ export const postGeoPinCheckIn = payload =>
     },
     logoutFunc
   )
+export const getGeoPinCheckInAPI = payload =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/check-in/`,
+      method: 'GET',
+    },
+    logoutFunc
+  )
 export const checkARChallengeDoneAPI = payload =>
   Request.callWithToken(
     {
