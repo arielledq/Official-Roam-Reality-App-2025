@@ -8279,10 +8279,10 @@ react-native-image-crop-picker@0.36.2:
   resolved "https://registry.yarnpkg.com/react-native-image-crop-picker/-/react-native-image-crop-picker-0.36.2.tgz#fcb35c1a12d805bedbb6d94a87078e86a6c9b49f"
   integrity sha512-cTauoEHHzx14ZHA7Pt65e7RVnbn1WRYQz2ufTZp9/05EtNDrdsXwNhgtXdWVFbOhYB8qgUFQjy2NelkBOHIH3g==
 
-react-native-image-picker@^7.1.0:
-  version "7.2.2"
-  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-7.2.2.tgz#6f6e92458c29fa4857d4c8033f2266ab4f006a7e"
-  integrity sha512-hcSaD/ohDac1ooDbZyKltfmOEAWrQOrPbusKEfbJQ7EfGveBEIF5wfmZsCjXRc0HNpGdQ71P1x2JZckkqu7IRw==
+react-native-image-picker@7.0.3:
+  version "7.0.3"
+  resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-7.0.3.tgz#3d0ab6965a6150e724e3c66cac8fe397097e26e7"
+  integrity sha512-mFbu8AzZ8tysO7xHsQ+TmxYYJYaBCL66s4AujjgCBEAyTufm2nhjhVOw2uq1zvMDVtGoyekzCJfH3JqVmXK/3w==
 
 react-native-image-resizer@^1.4.5:
   version "1.4.5"
@@ -8352,10 +8352,10 @@ react-native-onesignal@^4.5.1:
   dependencies:
     invariant "^2.2.2"
 
-react-native-pager-view@^6.3.1:
-  version "6.6.0"
-  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.6.0.tgz#5bf04ed469e635c3a9f95fed46d17b93bdad1a86"
-  integrity sha512-LmgZs9ihypMEot82u22n98nKGP4E3ixg6Q/VwS7lbrpVZw7pmC9cdplh10PqlyGMBwPHYt875y5n+3sIzQvUkg==
+react-native-pager-view@^6.2.3:
+  version "6.2.3"
+  resolved "https://registry.yarnpkg.com/react-native-pager-view/-/react-native-pager-view-6.2.3.tgz#698f6387fdf06cecc3d8d4792604419cb89cb775"
+  integrity sha512-dqVpXWFtPNfD3D2QQQr8BP+ullS5MhjRJuF8Z/qml4QTILcrWaW8F5iAxKkQR3Jl0ikcEryG/+SQlNcwlo0Ggg==
 
 react-native-paper@^5.9.1:
   version "5.12.5"
