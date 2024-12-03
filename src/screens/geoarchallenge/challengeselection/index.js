@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 import {
   Alert,
   StyleSheet,
@@ -6,27 +6,27 @@ import {
   View,
   ActivityIndicator,
   FlatList,
-} from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import { FontLineHeights, FontSizes, fontGroup } from '../../../util/FontUtils'
-import theme from '../../../assets/theme'
-import Images from '../../../assets/images'
-import useStyles from './styles'
-import RightArrowIcon from '../../../assets/svg/RightArrowIcon'
-import { handleError, showMessage } from '../../../util/helpers'
-import { BlurView } from '@react-native-community/blur'
-import SiteIcon from '../../../assets/geoar/siteicon.svg'
-import StarSiteIcon from '../../../assets/geoar/starsite.svg'
-import ArIcon from '../../../assets/geoar/aricon.svg'
-import { screenHorizontalPadding } from '../../../util/AppDimensions'
-import { useIsFocused, useNavigation } from '@react-navigation/native'
-import { AppHeader, AppText } from '../../../components'
+} from "react-native";
+import { useDispatch, useSelector } from "react-redux";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
+import theme from "../../../assets/theme";
+import Images from "../../../assets/images";
+import useStyles from "./styles";
+import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
+import { handleError, showMessage } from "../../../util/helpers";
+import { BlurView } from "@react-native-community/blur";
+import SiteIcon from "../../../assets/geoar/siteicon.svg";
+import StarSiteIcon from "../../../assets/geoar/starsite.svg";
+import ArIcon from "../../../assets/geoar/aricon.svg";
+import { screenHorizontalPadding } from "../../../util/AppDimensions";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { AppHeader, AppText } from "../../../components";
 import {
   checkGeoPinCheckInDoneAPI,
   getARChallenges,
   getCheckInCount,
   getCollectedStarCount,
-} from '../../../network'
+} from "../../../network";
 
 const HomeScreenData = [
   {
@@ -35,59 +35,59 @@ const HomeScreenData = [
   },
   {
     id: 1,
-    title: 'Check in with our ',
-    title1: 'Roam Pin!',
+    title: "Check in with our ",
+    title1: "Roam Pin!",
     subtitle:
-      'Snap a fun and creative picture standing next to our location pin as proof of your arrival.',
+      "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
     image: Images.Home,
     Icon: SiteIcon,
-    navigation: 'PinChallenge',
+    navigation: "PinChallenge",
   },
   {
     id: 2,
     title: "Let's go chase the ",
-    title1: 'stars!',
-    subtitle: 'Use our GPS navigation to find all our hidden stars located at this site!',
+    title1: "stars!",
+    subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
     image: Images.Home1,
     Icon: StarSiteIcon,
-    navigation: 'StarChallenge',
+    navigation: "StarChallenge",
   },
   {
     id: 3,
-    title: 'Engage in unique  ',
-    title1: 'AR Experiences!',
-    subtitle: 'Participate in some extra fun AR experiences found at this site for extra points.',
+    title: "Engage in unique ",
+    title1: "AR Experiences!",
+    subtitle: "Participate in some extra fun AR experiences found at this site for extra points.",
     image: Images.Home1,
     Icon: ArIcon,
-    navigation: 'UniqueArChallenge',
+    navigation: "UniqueArChallenge",
   },
   {
     id: 4,
-    title: 'AR Photo',
-    title1: 'Challenges',
-    subtitle: 'These are AR Photo Challenges that you can do anytime & anywhere',
+    title: "AR Photo ",
+    title1: "Challenges",
+    subtitle: "These are AR Photo Challenges that you can do anytime & anywhere",
     image: Images.Home1,
     Icon: ArIcon,
-    navigation: 'ARChallenge',
+    navigation: "ARChallenge",
   },
-]
+];
 
 const ChallengeSelection = ({ route }) => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
+  const [isLoading, setIsLoading] = useState(false);
+  const [numberOfChallenges, setNumberOfChallenges] = useState(0);
 
-  const dispatch = useDispatch()
-  const navigation = useNavigation()
-  const styles = useStyles()
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const [starsCount, setStarsCount] = useState(0)
-  const [collectedStars, setCollectedStars] = useState(0)
-  const [myCheckIns, setMyCheckIns] = useState(0)
-  const [uniqueExperiences, setUniqueExperiences] = useState(0)
-  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false)
-  const isFocused = useIsFocused()
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const styles = useStyles();
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination);
+  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const [starsCount, setStarsCount] = useState(0);
+  const [collectedStars, setCollectedStars] = useState(0);
+  const [myCheckIns, setMyCheckIns] = useState(0);
+  const [uniqueExperiences, setUniqueExperiences] = useState(0);
+  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
+  const isFocused = useIsFocused();
 
   const checkIfPinCheckIsDone = () => {
     checkGeoPinCheckInDoneAPI({
@@ -95,23 +95,23 @@ const ChallengeSelection = ({ route }) => {
     })
       .then(res => {
         if (res.errorStatus === 403) {
-          setIsPinCheckIsDone(true)
+          setIsPinCheckIsDone(true);
         } else {
-          setIsPinCheckIsDone(false)
+          setIsPinCheckIsDone(false);
         }
       })
-      .finally(() => {})
-  }
+      .finally(() => {});
+  };
 
   const getMyCheckInsCount = () => {
     getCheckInCount({})
       .then(res => {
         if (res.status === 1) {
-          setMyCheckIns(res.count)
+          setMyCheckIns(res.count);
         }
       })
-      .finally(() => {})
-  }
+      .finally(() => {});
+  };
 
   const getStarsCollectCount = () => {
     getCollectedStarCount({
@@ -119,60 +119,60 @@ const ChallengeSelection = ({ route }) => {
     })
       .then(res => {
         if (res.status == 1) {
-          setCollectedStars(res.count)
+          setCollectedStars(res.count);
         }
       })
-      .finally(() => {})
-  }
+      .finally(() => {});
+  };
 
   useEffect(() => {
     if (isFocused) {
-      checkIfPinCheckIsDone()
-      getStarsCollectCount()
-      getMyCheckInsCount()
+      checkIfPinCheckIsDone();
+      getStarsCollectCount();
+      getMyCheckInsCount();
     }
-  }, [isFocused])
+  }, [isFocused]);
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          setNumberOfChallenges(res?.data?.length)
+          setNumberOfChallenges(res?.data?.length);
         } else {
-          res.message.message = 'Error in loading Challenges.'
-          handleError(res)
+          res.message.message = "Error in loading Challenges.";
+          handleError(res);
         }
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }, [])
+        setIsLoading(false);
+      });
+  }, []);
 
   const goToRoute = route => {
-    if (route === 'PinChallenge' && !selectedGeoSite.pin_challenge) {
-      showMessage('Pin Challenge is unavailable right now', 'error')
+    if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
+      showMessage("Pin Challenge is unavailable right now", "error");
     }
-    if (route === 'StarChallenge' && selectedGeoARSiteStars.length == 0) {
-      showMessage('Stars Challenges are unavailable right now', 'error')
+    if (route === "StarChallenge" && selectedGeoARSiteStars.length == 0) {
+      showMessage("Stars Challenges are unavailable right now", "error");
     } else {
-      navigation.navigate(route)
+      navigation.navigate(route);
     }
-  }
+  };
 
   const setStarCounts = () => {
-    let count = 0
+    let count = 0;
     for (const stars_site of selectedGeoARSiteStars) {
       if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length
+        count += stars_site.star_location.coordinates.length;
       }
     }
-    setStarsCount(count)
-  }
+    setStarsCount(count);
+  };
 
   useEffect(() => {
-    setStarCounts()
-  }, [selectedGeoARSiteStars])
+    setStarCounts();
+  }, [selectedGeoARSiteStars]);
 
   const HomeScreenARItem = item => {
     return (
@@ -181,9 +181,9 @@ const ChallengeSelection = ({ route }) => {
           <View style={styles.innerView}>
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: '100%',
+                flexDirection: "row",
+                alignItems: "center",
+                width: "100%",
               }}
             >
               <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />
@@ -194,9 +194,9 @@ const ChallengeSelection = ({ route }) => {
             </View>
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
                 flex: 1,
               }}
             >
@@ -209,7 +209,7 @@ const ChallengeSelection = ({ route }) => {
                 )}
                 {item?.id == 2 && (
                   <AppText style={styles.challengesText}>
-                    {' '}
+                    {" "}
                     Stars collected: {collectedStars}/{starsCount}
                   </AppText>
                 )}
@@ -229,14 +229,14 @@ const ChallengeSelection = ({ route }) => {
           </View>
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
         {isLoading ? (
-          <ActivityIndicator size='large' />
+          <ActivityIndicator size="large" />
         ) : (
           <FlatList
             style={styles.list}
@@ -252,18 +252,18 @@ const ChallengeSelection = ({ route }) => {
       </View>
       <View style={styles.blurView}>
         <BlurView
-          blurType='regular'
-          overlayColor='transparent'
-          style={{ backgroundColor: 'transparent' }}
+          blurType="regular"
+          overlayColor="transparent"
+          style={{ backgroundColor: "transparent" }}
         >
-          <AppHeader title={'Explore The Site'} containerStyle={styles.headerContainer} />
+          <AppHeader title={"Explore The Site"} containerStyle={styles.headerContainer} />
         </BlurView>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default ChallengeSelection
+export default ChallengeSelection;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -271,14 +271,14 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    height: '100%',
+    height: "100%",
     marginVertical: 10,
     paddingHorizontal: screenHorizontalPadding + 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 12,
   },
   headerText: {
@@ -294,15 +294,15 @@ const styles = StyleSheet.create({
   },
   horizontalLine: {
     height: 1,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     backgroundColor: theme.darkColors?.dividerGrey,
     opacity: 0.4,
     marginVertical: 8,
   },
   cancelButton: {
     marginTop: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 50,
   },
   cancelButtonText: {
@@ -313,7 +313,7 @@ const styles = StyleSheet.create({
   },
   buttonheaderContainer: {
     paddingHorizontal: screenHorizontalPadding + 5,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 15,
     marginTop: 7,
   },
@@ -322,8 +322,8 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainerStyle: {
     marginTop: 10,
@@ -332,4 +332,4 @@ const styles = StyleSheet.create({
     ...fontGroup.p600,
     fontSize: FontSizes.S16,
   },
-})
+});

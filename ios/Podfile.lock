@@ -1,9 +1,9 @@
 PODS:
-  - AppAuth (1.7.5):
-    - AppAuth/Core (= 1.7.5)
-    - AppAuth/ExternalUserAgent (= 1.7.5)
-  - AppAuth/Core (1.7.5)
-  - AppAuth/ExternalUserAgent (1.7.5):
+  - AppAuth (1.7.6):
+    - AppAuth/Core (= 1.7.6)
+    - AppAuth/ExternalUserAgent (= 1.7.6)
+  - AppAuth/Core (1.7.6)
+  - AppAuth/ExternalUserAgent (1.7.6):
     - AppAuth/Core
   - boost (1.76.0)
   - BVLinearGradient (2.8.3):
@@ -321,7 +321,7 @@ PODS:
   - react-native-blur (4.4.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
-  - react-native-cameraroll (7.8.3):
+  - react-native-cameraroll (7.9.0):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-compass-heading (1.5.0):
@@ -354,8 +354,7 @@ PODS:
     - Google-Maps-iOS-Utils (= 4.1.0)
     - GoogleMaps (= 7.4.0)
     - React-Core
-  - react-native-image-picker (7.1.2):
-    - RCT-Folly (= 2021.07.22.00)
+  - react-native-image-picker (7.0.3):
     - React-Core
   - react-native-image-resizer (1.4.5):
     - React-Core
@@ -364,7 +363,7 @@ PODS:
   - react-native-onesignal (4.5.4):
     - OneSignalXCFramework (= 3.12.10)
     - React (< 1.0.0, >= 0.13.0)
-  - react-native-pager-view (6.4.1):
+  - react-native-pager-view (6.2.3):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-render-html (6.3.4):
@@ -386,7 +385,7 @@ PODS:
     - React-Core
   - react-native-view-shot (3.8.0):
     - React-Core
-  - react-native-webview (13.12.3):
+  - react-native-webview (13.12.4):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-perflogger (0.71.19)
@@ -480,7 +479,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.2.9):
     - React-Core
-  - RNDateTimePicker (7.7.0):
+  - RNDateTimePicker (7.6.4):
     - React-Core
   - RNFastImage (8.6.3):
     - React-Core
@@ -488,7 +487,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.8.4)
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.20.2):
+  - RNGestureHandler (2.21.2):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - RNGoogleSignin (11.0.1):
@@ -556,20 +555,20 @@ PODS:
     - React-Core
   - RNSVG (14.2.0):
     - React-Core
-  - RNZipArchive (6.1.2):
+  - RNZipArchive (7.0.1):
     - React-Core
-    - RNZipArchive/Core (= 6.1.2)
-    - SSZipArchive (~> 2.2)
-  - RNZipArchive/Core (6.1.2):
+    - RNZipArchive/Core (= 7.0.1)
+    - SSZipArchive (~> 2.5.5)
+  - RNZipArchive/Core (7.0.1):
     - React-Core
-    - SSZipArchive (~> 2.2)
+    - SSZipArchive (~> 2.5.5)
   - SDWebImage (5.14.3):
     - SDWebImage/Core (= 5.14.3)
   - SDWebImage/Core (5.14.3)
   - SDWebImageWebPCoder (0.8.5):
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
-  - SSZipArchive (2.4.3)
+  - SSZipArchive (2.5.5)
   - TikTokOpenSDK (5.0.15)
   - TOCropViewController (2.7.4)
   - Turf (2.8.0)
@@ -836,7 +835,7 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
 SPEC CHECKSUMS:
-  AppAuth: 501c04eda8a8d11f179dbe8637b7a91bb7e5d2fa
+  AppAuth: d4f13a8fe0baf391b2108511793e4b479691fb73
   boost: 7dcd2de282d72e344012f7d6564d024930a6a440
   BVLinearGradient: 880f91a7854faff2df62518f0281afb1c60d49a3
   DoubleConversion: 5189b271737e1565bdce30deb4a08d647e3f5f54
@@ -876,7 +875,7 @@ SPEC CHECKSUMS:
   React-jsinspector: e591d9ecb571456fc929ee10409d8847a442d6a7
   React-logger: 70ddbe0e07179c8adb94c4bffc36c6abc952d3d4
   react-native-blur: 4c25fdccf6dc16b0935baa58d9d0fccb0683742b
-  react-native-cameraroll: 6d252600d122f6bc10d99d6ab82cdfd2c8bef70a
+  react-native-cameraroll: 0789488d9f5e79caed73c078daaf58f79ed3c61c
   react-native-compass-heading: 1b4403d1c99dfd8311073ca8fc52bfc8e365cfac
   react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
   react-native-fbsdk-next: fcecfa33c37ce63bcda9cd24766ee9d345463230
@@ -884,11 +883,11 @@ SPEC CHECKSUMS:
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
   react-native-get-random-values: 21325b2244dfa6b58878f51f9aa42821e7ba3d06
   react-native-google-maps: dd12cdd86b8e3fedbbb671676aedaa2f656e2ccd
-  react-native-image-picker: 51fdb07f7ef722988c8a219e1416153760a25e4d
+  react-native-image-picker: 2381c008bbb09e72395a2d043c147b11bd1523d9
   react-native-image-resizer: d9fb629a867335bdc13230ac2a58702bb8c8828f
   react-native-maps: 667f9b975549c6fa9b1631bf859440f68ebd3b8f
   react-native-onesignal: 8d8f7d5e2cc44239fc0ec72fe9c6d27b939870fc
-  react-native-pager-view: d1e43158dd108b1b7377d7972157317e06dcc579
+  react-native-pager-view: e26d35e382d86950c936f8917e3beb9188115ccc
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
@@ -896,7 +895,7 @@ SPEC CHECKSUMS:
   react-native-unity: b8caa8540a952542c759cee1e7ee19bf74166c4f
   react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
   react-native-view-shot: 6b7ed61d77d88580fed10954d45fad0eb2d47688
-  react-native-webview: 849250e66239f661c802a879c59e019da8a08736
+  react-native-webview: 60611cd20936609c63914d8927f12b583ac60d0c
   React-perflogger: 0ba097528e325435aca94b32b5330f58f6acb6fb
   React-RCTActionSheet: 805b3a83f3dd7ae5a1213ea9df0ed748eeb74b85
   React-RCTAnimation: 2a0233681dee47e468302b8233652b35b68329cb
@@ -915,10 +914,10 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: e00c76acb03351f5544373c78fa7f359bef6d5d3
   RNCAsyncStorage: ec53e44dc3e75b44aa2a9f37618a49c3bc080a7a
   RNCMaskedView: 949696f25ec596bfc697fc88e6f95cf0c79669b6
-  RNDateTimePicker: 4f3c4dbd4f908be32ec8c93f086e8924bd4a2e07
+  RNDateTimePicker: 08f00a2c341bf96e4b30da15799fbdd4c5fa48a3
   RNFastImage: 8c1b576a014ab4a22769222522a1e398f888b8f8
   RNFS: 4ac0f0ea233904cb798630b3c077808c06931688
-  RNGestureHandler: 89b845775188bcda3cd2662c46f85c3575586843
+  RNGestureHandler: 0972b77a2cab0f1a61ca1a3ce348a424614f65c2
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   rnmapbox-maps: 334654168efcdc29584a9af1519d890a07a4a28e
@@ -928,15 +927,15 @@ SPEC CHECKSUMS:
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
   RNSound: 6c156f925295bdc83e8e422e7d8b38d33bc71852
   RNSVG: 963a95f1f5d512a13d11ffd50d351c87fb5c6890
-  RNZipArchive: 6d736ee4e286dbbd9d81206b7a4da355596ca04a
+  RNZipArchive: 7bb4c70d6aa2dd235212c0a4a3de0a4e237e2569
   SDWebImage: 9c36e66c8ce4620b41a7407698dda44211a96764
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
-  SSZipArchive: fe6a26b2a54d5a0890f2567b5cc6de5caa600aef
+  SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
   TikTokOpenSDK: dc1199ba9c6d7815aee0eaca6ec80ad13f7d9c1f
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: d4f5b037672e6b68ba484c7cf7fe6790122df792
 
-PODFILE CHECKSUM: 4a658dd0abee7bf89ad2b9ac79fb1db3211a6420
+PODFILE CHECKSUM: 8283f20cbcbcf0fc6f4199d9bc5cf2f1e3a74570
 
 COCOAPODS: 1.15.2
