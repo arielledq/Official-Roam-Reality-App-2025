@@ -583,7 +583,7 @@ const PinChallenge = ({}) => {
           onDone={onDonePress}
           onCameraPress={_takeScreenshot}
           hasCapturedContent={!!capturedImage}
-          hideInstructions
+          customInstructions="Stand in frame next to the pin, resize and shift as needed, snap your photo"
         />
 
         {/* Footer Info box */}

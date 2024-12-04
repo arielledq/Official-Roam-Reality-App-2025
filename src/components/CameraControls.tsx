@@ -14,7 +14,7 @@ interface CameraControlsProps {
   onCameraPress?: () => void;
   startRecordVideo?: () => void;
   stopRecordVideo?: () => void;
-  hideInstructions?: boolean;
+  customInstructions?: string;
   isRecording?: boolean;
   timer?: string;
   isVideo?: boolean;
@@ -28,14 +28,14 @@ const CameraControls = ({
   onCameraPress,
   startRecordVideo,
   stopRecordVideo,
-  hideInstructions,
+  customInstructions = "",
   isRecording,
   timer,
   isVideo,
   challengeHasFilters,
 }: CameraControlsProps) => {
   const videoInstructionText = isRecording ? timer : "Press and hold the button to record a video";
-  const photoInstructionText = "Tap the button to take a picture";
+  const photoInstructionText = customInstructions || "Tap the button to take a picture";
   const instructionText = isVideo ? videoInstructionText : photoInstructionText;
 
   return (
@@ -47,14 +47,13 @@ const CameraControls = ({
         paddingHorizontal: 16,
       }}
     >
-      {!hideInstructions && (
-        <View style={$holdTextContainer}>
-          {challengeHasFilters && hasCapturedContent && (
-            <Text style={$holdText}>Swipe Left or Right for Filters</Text>
-          )}
-          {!hasCapturedContent && <Text style={$holdText}>{instructionText}</Text>}
-        </View>
-      )}
+      <View style={$holdTextContainer}>
+        {challengeHasFilters && hasCapturedContent && (
+          <Text style={$holdText}>Swipe Left or Right for Filters</Text>
+        )}
+        {!hasCapturedContent && <Text style={$holdText}>{instructionText}</Text>}
+      </View>
+
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
         {hasCapturedContent && !!onRetake && (
           <TouchableOpacity onPress={onRetake} activeOpacity={0.8} style={$actionButtons}>
@@ -129,5 +128,6 @@ const $holdTextContainer: ViewStyle = {
   justifyContent: "center",
   paddingTop: 4,
   paddingBottom: 16,
+  paddingHorizontal: 32,
   gap: 8,
 };
