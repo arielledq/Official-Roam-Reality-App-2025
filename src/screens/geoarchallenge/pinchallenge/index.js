@@ -1,18 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Image,
-  Platform,
-  ScrollView,
-  Dimensions,
-  Animated,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { Platform } from "react-native";
+import { useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import UnityView from "@azesmway/react-native-unity/src"; // Import UnityView
-import useStyles from "./styles";
 import { showMessage } from "../../../util/helpers";
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
@@ -23,32 +12,20 @@ import {
   hasLocationPermission,
   isLocationPointInPolygon,
 } from "../../../util/LocationLib";
-import { AppButton } from "../../../components";
-import LineIcon from "../../../assets/ar/line.png";
-import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg";
-import InfoIcon from "../../../assets/geoar/Info.svg";
-import MenIcon from "../../../assets/geoar/men_icon.svg";
-import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg";
-import PinIcon from "../../../assets/geoar/pin_locationicon.svg";
-import TrophyIcon from "../../../assets/geoar/trophy_icon.svg";
-import BackgroundWithImage from "../../../components/background";
-import AppHeader from "../../../components/header";
-import RenderHTML from "react-native-render-html";
-import { FontSizes } from "../../../util/FontUtils";
-import uuid from "react-native-uuid";
+
 import Sound from "react-native-sound";
-import ImageResizer from "react-native-image-resizer";
+
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
 import CaptureInfoView from "components/CaptureInfoView";
+import CaptureChallengeScreen from "components/CaptureChallengeScreen";
+import PinFoundCaptureHeader from "components/PinFoundCaptureHeader";
+import PinInfoCaptureFooter from "components/PinInfoCaptureFooter";
 
-const { width } = Dimensions.get("window");
-
-const PinChallenge = ({}) => {
-  const _styles = useStyles();
+const PinChallenge = () => {
   const navigation = useNavigation();
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const challengeObj = selectedGeoSite.pin_challenge;
@@ -70,8 +47,6 @@ const PinChallenge = ({}) => {
   const [distanceInFeet, setDistanceInFeet] = useState(0);
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false);
   const [detailsShow, setDetailsShow] = useState(true);
-  const [muteSound, setMuteSound] = useState(false);
-  const [blinkTimer, setBlinkTimer] = useState(0);
 
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
@@ -325,17 +300,6 @@ const PinChallenge = ({}) => {
     setDistanceInFeet(convertMetersToFeets(distance));
   };
 
-  const playProximitySound = () => {
-    Sound.setCategory("Playback");
-    let proximitySound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
-      if (error) {
-        console.error("failed to load the sound", error);
-      } else {
-        proximitySound.play();
-      }
-    });
-  };
-
   const playCameraSound = () => {
     Sound.setCategory("Playback");
     let cameraSound = new Sound(
@@ -459,188 +423,45 @@ const PinChallenge = ({}) => {
     }, [modelOBJ, textureBase, isUnityLoaded])
   );
 
-  useEffect(() => {
-    if (distanceInFeet <= 200 && distanceInFeet > 100) {
-      setBlinkTimer(3000);
-    } else if (distanceInFeet <= 100 && distanceInFeet >= 50) {
-      setBlinkTimer(2000);
-    } else if (distanceInFeet < 50 && distanceInFeet >= 25) {
-      setBlinkTimer(1000);
-    } else if (distanceInFeet < 10) {
-      setBlinkTimer(500);
-    } else {
-      setBlinkTimer(0);
-    }
-  }, [distanceInFeet]);
-
-  useEffect(() => {
-    const setInterValSoundBlink = setInterval(() => {
-      if (!muteSound) {
-        playProximitySound();
-      }
-    }, blinkTimer);
-
-    if (blinkTimer > 0) {
-    } else {
-      clearInterval(setInterValSoundBlink);
-    }
-
-    return () => {
-      clearInterval(setInterValSoundBlink);
-    };
-  }, [blinkTimer, muteSound]);
-
-  const Blink = ({ duration, style, children }) => {
-    if (duration === 0) {
-      return <View style={{ ...style }}>{children}</View>;
-    }
-
-    const fadeAnimation = useRef(new Animated.Value(0)).current;
-
-    useEffect(() => {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(fadeAnimation, {
-            toValue: 0,
-            duration: duration / 2,
-            useNativeDriver: true,
-          }),
-          Animated.timing(fadeAnimation, {
-            toValue: 1,
-            duration: duration / 2,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }, [duration]);
-
-    return (
-      <View style={{ ...style }}>
-        <Animated.View style={{ opacity: fadeAnimation }}>{children}</Animated.View>
-      </View>
-    );
-  };
-
   const acceptWaiverButtonHandler = () => {
     setDetailsShow(false);
     setIsUnityLoaded(true);
   };
 
-  return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        centerComponent={{
-          text: `Location Check In\n${selectedGeoSite.name}`,
-          numberOfLines: 2,
-          style: _styles.heading,
-        }}
-        backgroundColor="transparent"
-      />
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 40,
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: "#131422",
-            borderRadius: 100,
-            paddingHorizontal: 8,
-            alignItems: "center",
-            height: 65,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flexDirection: "row" }}>
-            <PinIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
-            <View>
-              <Text style={_styles.exploringText}>Pin Found</Text>
-              <Text style={_styles.arrivedText}>{isMeInsideInSite ? 1 : 0} / 1</Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <View style={{ marginEnd: 10 }}>
-              <Text style={_styles.exploringText}>Points</Text>
-              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
-            </View>
-            <TrophyIcon style={{ width: 48, height: 48 }} />
-          </View>
-        </View>
-
-        <UnityARCamera
-          unityRef={unityRef}
-          isProcessingMedia={processingMedia}
-          isUnityLoaded={isUnityLoaded}
-          onUnityLayout={handleUnityViewLayout}
-          capturedImage={capturedImage}
-          capturedVideo={capturedVideo}
-        />
-
-        <CameraControls
-          onRetake={retakeButtonHandler}
-          onDone={onDonePress}
-          onCameraPress={_takeScreenshot}
-          hasCapturedContent={!!capturedImage}
-          customInstructions="Stand in frame next to the pin, resize and shift as needed, snap your photo"
-        />
-
-        {/* Footer Info box */}
-        <View
-          style={{
-            backgroundColor: "#131422",
-            borderRadius: 16,
-            padding: 20,
-            paddingBottom: 20,
-            marginVertical: 20,
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 15,
-            }}
-          >
-            <View style={{ flexDirection: "row" }}>
-              <MenIcon style={{ width: 40, height: 40 }} />
-              <View>
-                <Text style={_styles.exploringText}>Pin</Text>
-                <Text style={_styles.arrivedText}>
-                  {isMeInsideInSite ? "Pin Found" : `${distanceInFeet} feet away`}
-                </Text>
-              </View>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "center" }}>
-              <Blink duration={blinkTimer} style={{ marginEnd: 10 }}>
-                <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-              </Blink>
-              <TouchableOpacity onPress={() => setMuteSound(!muteSound)}>
-                <SpeakerIcon
-                  style={{ width: 40, height: 40, color: !muteSound ? "#fff" : "#000" }}
-                />
-              </TouchableOpacity>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row" }}>
-            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-            <Text style={_styles.infoText}>
-              The closer you get to the Pin faster the chime beeps and quicker the dot pulsates. You
-              can switch off the Sound by clicking on the speaker.
-            </Text>
-          </View>
-        </View>
-      </ScrollView>
-
+  const modals = (
+    <>
       <CaptureInfoView
         isVisible={detailsShow}
         content={settings?.waiver_details}
         onAccept={acceptWaiverButtonHandler}
       />
-    </BackgroundWithImage>
+    </>
+  );
+
+  return (
+    <CaptureChallengeScreen title={`Location Check In\n${selectedGeoSite.name}`} modals={modals}>
+      <PinFoundCaptureHeader pinFound={!!isMeInsideInSite} points={challengeObj?.points} />
+
+      <UnityARCamera
+        unityRef={unityRef}
+        isProcessingMedia={processingMedia}
+        isUnityLoaded={isUnityLoaded}
+        onUnityLayout={handleUnityViewLayout}
+        capturedImage={capturedImage}
+        capturedVideo={capturedVideo}
+      />
+
+      <CameraControls
+        onRetake={retakeButtonHandler}
+        onDone={onDonePress}
+        onCameraPress={_takeScreenshot}
+        hasCapturedContent={!!capturedImage}
+        // customInstructions="Stand in frame next to the pin, resize and shift as needed, snap your photo"
+        customInstructions="Stand next to the pin, resize as needed, snap your photo"
+      />
+
+      <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} />
+    </CaptureChallengeScreen>
   );
 };
 

@@ -43,15 +43,15 @@ const CameraControls = ({
       style={{
         backgroundColor: "#131422",
         borderRadius: 16,
-        paddingVertical: 12,
+        paddingVertical: 8,
         paddingHorizontal: 16,
       }}
     >
-      <View style={$holdTextContainer}>
+      <View style={$instructionsContainer}>
         {challengeHasFilters && hasCapturedContent && (
-          <Text style={$holdText}>Swipe Left or Right for Filters</Text>
+          <Text style={$instructionsText}>Swipe Left or Right for Filters</Text>
         )}
-        {!hasCapturedContent && <Text style={$holdText}>{instructionText}</Text>}
+        {!hasCapturedContent && <Text style={$instructionsText}>{instructionText}</Text>}
       </View>
 
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
@@ -94,8 +94,8 @@ const CameraControls = ({
 export default CameraControls;
 
 const $cameraButton: ViewStyle = {
-  width: 56,
-  height: 56,
+  width: 52,
+  height: 52,
 };
 
 const $actionButtons: ViewStyle = {
@@ -116,18 +116,18 @@ const $bottomButtonText: TextStyle = {
 };
 
 // @ts-ignore
-const $holdText: TextStyle = {
+const $instructionsText: TextStyle = {
   ...fontGroup.p600,
   fontSize: FontSizes.S10,
   textAlign: "center",
   color: theme.lightColors?.white,
 };
 
-const $holdTextContainer: ViewStyle = {
+const $instructionsContainer: ViewStyle = {
   alignItems: "center",
   justifyContent: "center",
   paddingTop: 4,
-  paddingBottom: 16,
+  paddingBottom: 10,
   paddingHorizontal: 32,
   gap: 8,
 };

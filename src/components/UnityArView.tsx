@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Image, LayoutChangeEvent, Text, View } from "react-native";
 import UnityView from "@azesmway/react-native-unity/src";
+// @ts-expect-error
 import Video from "react-native-video";
 import ARFilter from "screens/archallenge/FilterView";
 
@@ -31,7 +32,7 @@ const UnityARCamera = ({
 }: UnityARCameraProps) => {
   const imageHasFilters = imageFilter?.challengeObj?.ar_filters?.length > 0;
   return (
-    <View style={{ marginVertical: 20, minHeight: 512 }}>
+    <View style={{ marginVertical: 10, minHeight: 512 }}>
       <View style={{ flex: 1 }}>
         {isProcessingMedia ? (
           <View

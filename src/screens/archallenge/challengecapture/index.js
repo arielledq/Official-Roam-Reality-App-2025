@@ -9,30 +9,27 @@ import {
   ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
-import AppHeader from "../../../components/header";
 import { FontSizes } from "../../../util/FontUtils";
 import RNFetchBlob from "rn-fetch-blob";
 import useStyles from "./styles";
-import CaptureImage from "../../../assets/ar/camera.png";
-import Shareds from "../../../assets/ar/bg-ar-share.png";
 import LineIcon from "../../../assets/ar/line.png";
 import { unzip } from "react-native-zip-archive";
-import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import { useSelector } from "react-redux";
-import BackgroundWithImage from "../../../components/background";
 import Share from "react-native-share";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import CaptureInfoView from "components/CaptureInfoView";
+import CaptureChallengeScreen from "components/CaptureChallengeScreen";
+import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
 const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;
 
-const ArChallengeCapture = ({}) => {
+const ArChallengeCapture = () => {
   const styles = useStyles();
   const unityRef = useRef(null);
   const route = useRoute();
@@ -45,7 +42,6 @@ const ArChallengeCapture = ({}) => {
   const settings = useSelector(state => state.ar?.arSettings);
   const modelFile = route?.params?.challengeObj?.model_file;
   const viewShotRef = useRef();
-  const challengeIsPhoto = challengeObj?.challenge_requirement === "PHOTO";
 
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
@@ -552,10 +548,10 @@ const ArChallengeCapture = ({}) => {
         <RenderHTML
           contentWidth={width}
           tagsStyles={{
-            p: { color: "#9CA3AF", fontSize: FontSizes.S14 },
-            strong: { color: "#fff", fontSize: FontSizes.S18 },
+            p: { color: "#FFF", fontSize: FontSizes.S14 },
+            strong: { color: "#FFF", fontSize: FontSizes.S18 },
           }}
-          source={{ html: challengeObj.description.replaceAll("#000000", "#fff") }}
+          source={{ html: challengeObj.description }}
         />
       </ScrollView>
       <View style={{ width: "100%", paddingHorizontal: 24, marginBottom: 20 }}>
@@ -674,84 +670,53 @@ const ArChallengeCapture = ({}) => {
 
   console.log("isUnityLoaded", isUnityLoaded);
 
-  return (
-    <BackgroundWithImage style={styles.mainContainer}>
-      <View
-        style={[
-          styles.mainHeaderContainer,
-          Platform.OS == "ios" && challengeObj?.ar_filters.length == 0
-            ? styles.mainHeaderContainerIOS
-            : {},
-        ]}
-      >
-        <AppHeader
-          centerComponent={{
-            text: "AR Photo Challenges",
-            numberOfLines: 2,
-            style: [styles.heading],
-          }}
-          backgroundColor="transparent"
-        />
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.innerContent}>
-        <View style={styles.viewDetailsIconContainer}>
-          <View style={styles.viewDetailsIconContainerWrapper}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                flex: 1,
-              }}
-            >
-              <Image
-                style={styles.viewDetailsIcon}
-                source={{ uri: challengeObj?.sponsored?.image }}
-              />
-              <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                setChallengeInformationView(true);
-                setIsUnityLoaded(false);
-              }}
-              style={styles.viewDetailBtn}
-            >
-              <Text style={styles.btnText}>View Details</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+  const sponsorButtonPressHandler = () => {
+    setChallengeInformationView(true);
+    setIsUnityLoaded(false);
+  };
 
-        <UnityARCamera
-          unityRef={unityRef}
-          isProcessingMedia={processingMedia}
-          isUnityLoaded={isUnityLoaded}
-          onUnityLayout={handleUnityViewLayout}
-          capturedImage={capturedImage}
-          imageFilter={{ challengeObj: challengeObj, viewShotRef: viewShotRef }}
-          capturedVideo={capturedVideo}
-        />
-
-        <CameraControls
-          hasCapturedContent={!!capturedImage || !!capturedVideo}
-          onRetake={retakeButtonHandler}
-          onDone={doneButtonHandler}
-          onCameraPress={cameraPressHandler}
-          startRecordVideo={startRecordVideoHandler}
-          stopRecordVideo={stopRecordVideoHandler}
-          isRecording={!!recordingStart}
-          timer={timer}
-          isVideo={!isPhotoChallenge}
-          challengeHasFilters={challengeHasFilters}
-        />
-      </ScrollView>
-
+  const modals = (
+    <>
       <CaptureInfoView
         isVisible={detailsShow}
         content={settings?.waiver_details}
         onAccept={acceptWaiverButtonHandler}
       />
       {challengeInformationView && <ChallengeDetailView />}
-    </BackgroundWithImage>
+    </>
+  );
+
+  return (
+    <CaptureChallengeScreen title="AR Photo Challenges" modals={modals}>
+      <SponsorBannerCaptureHeader
+        imageUri={challengeObj?.sponsored?.image}
+        sponsorName={challengeObj?.sponsored?.name}
+        onPress={sponsorButtonPressHandler}
+      />
+
+      <UnityARCamera
+        unityRef={unityRef}
+        isProcessingMedia={processingMedia}
+        isUnityLoaded={isUnityLoaded}
+        onUnityLayout={handleUnityViewLayout}
+        capturedImage={capturedImage}
+        imageFilter={{ challengeObj: challengeObj, viewShotRef: viewShotRef }}
+        capturedVideo={capturedVideo}
+      />
+
+      <CameraControls
+        hasCapturedContent={!!capturedImage || !!capturedVideo}
+        onRetake={retakeButtonHandler}
+        onDone={doneButtonHandler}
+        onCameraPress={cameraPressHandler}
+        startRecordVideo={startRecordVideoHandler}
+        stopRecordVideo={stopRecordVideoHandler}
+        isRecording={!!recordingStart}
+        timer={timer}
+        isVideo={!isPhotoChallenge}
+        challengeHasFilters={challengeHasFilters}
+      />
+    </CaptureChallengeScreen>
   );
 };
 
