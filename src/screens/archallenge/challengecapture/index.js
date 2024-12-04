@@ -94,7 +94,7 @@ const ArChallengeCapture = () => {
   const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
     setUnityViewDimensions({ width, height });
-    console.log(`UnityView dimensiones: ${width} x ${height}`);
+    // console.log(`UnityView dimensiones: ${width} x ${height}`);
   };
 
   // Descargar modelo y gestionar archivos
@@ -250,13 +250,13 @@ const ArChallengeCapture = () => {
       console.log("UnityView o modelOBJ no están disponibles.");
     }
   };
-  console.log(
-    "-----------MODELOS----------",
-    modelOBJ,
-    modelResource,
-    textureBase,
-    textureEmission
-  );
+  // console.log(
+  //   "-----------MODELOS----------",
+  //   modelOBJ,
+  //   modelResource,
+  //   textureBase,
+  //   textureEmission
+  // );
   function enviarComandoAUnity(comando) {
     const commandData = JSON.stringify({ command: comando });
 
@@ -298,7 +298,7 @@ const ArChallengeCapture = () => {
       setTimeout(() => {
         RNFS.readDir(basePath)
           .then(files => {
-            console.log("Archivos encontrados en el directorio:", files);
+            // console.log("Archivos encontrados en el directorio:", files);
 
             if (Array.isArray(files) && files.length > 0) {
               // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
@@ -308,7 +308,7 @@ const ArChallengeCapture = () => {
               );
 
               if (foundFile) {
-                console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                // console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
                 setFileFound(foundFile.path);
                 setCaptureData(foundFile.path);
                 setCapturedImage(foundFile.path); // Actualiza capturedImage
@@ -333,7 +333,7 @@ const ArChallengeCapture = () => {
   // Compartir captura
   const shareScreenshot = async () => {
     if (!fileFound) {
-      console.log("Primero captura una imagen antes de compartir.");
+      console.info("Primero captura una imagen antes de compartir.");
       return;
     }
     try {
@@ -352,7 +352,7 @@ const ArChallengeCapture = () => {
       const exists = await RNFS.exists(fullVideoPath);
       if (exists) {
         await RNFS.unlink(fullVideoPath); // Elimina el archivo si existe
-        console.log("Video anterior eliminado:", fullVideoPath);
+        // console.log("Video anterior eliminado:", fullVideoPath);
       }
     } catch (error) {
       console.error("Error al eliminar el video anterior:", error);
@@ -432,7 +432,7 @@ const ArChallengeCapture = () => {
     }
   };
 
-  const detenerGrabacion = async () => {
+  const detenerGrabacion = () => {
     if (unityRef.current) {
       // Enviar mensaje a Unity para detener la grabación
       unityRef.current.postMessage("Video Recorder", "DetenerGrabacion", "detener");
@@ -441,13 +441,26 @@ const ArChallengeCapture = () => {
       const basePath =
         Platform.OS === "android"
           ? "/storage/emulated/0/Android/data/com.roam_reality/files/video" // Ruta en Android
-          : RNFS.DocumentDirectoryPath + "/videos"; // Ruta en iOS
-      console.log("aaaaaaafiles");
+          : RNFS.DocumentDirectoryPath + "/video"; // Ruta en iOS
+      // console.log("aaaaaaafiles");
+      console.log("detenerGrabacion, basepath", basePath);
       // Esperar un pequeño retraso para asegurarse de que la grabación se haya detenido completamente
-      setTimeout(async () => {
+
+      const saveVideo = async () => {
         try {
           // Leer el directorio de la carpeta 'videos'
-          const files = await RNFS.readDir(basePath);
+          const exists = await RNFS.exists(basePath);
+          console.log("Videos directory exists:", exists);
+          if (!exists) {
+            console.error("Videos directory does not exist.");
+          }
+
+          let files = "";
+          try {
+            files = await RNFS.readDir(basePath);
+          } catch (error) {
+            console.error(error);
+          }
 
           // Filtrar archivos .mp4
           const videoFiles = files.filter(file => file.isFile() && file.name.endsWith(".mp4"));
@@ -462,7 +475,7 @@ const ArChallengeCapture = () => {
 
             // Actualizar el estado con la ruta del archivo más reciente
             setCapturedVideo(latestFilePath);
-            console.log("Video guardado en:", latestFilePath);
+            // console.log("Video guardado en:", latestFilePath);
 
             // Desmontar UnityView después de la grabación
             setIsUnityLoaded(false); // Desmontar UnityView
@@ -472,6 +485,10 @@ const ArChallengeCapture = () => {
         } catch (error) {
           console.error("Error verificando los archivos de video:", error);
         }
+      };
+
+      setTimeout(() => {
+        saveVideo();
       }, 1000); // Espera 1 segundo para asegurarse de que el archivo esté guardado antes de verificar
     } else {
       console.error("UnityView no está disponible.");
@@ -485,7 +502,7 @@ const ArChallengeCapture = () => {
       if (exists) {
         await RNFS.unlink(capturedVideo); // Elimina el video grabado
         setVideoPath(null); // Limpia el estado
-        console.log("Video eliminado:", capturedVideo);
+        // console.log("Video eliminado:", capturedVideo);
       } else {
         Alert.alert("El video no existe", "No se encontró el video a eliminar");
       }
@@ -593,7 +610,7 @@ const ArChallengeCapture = () => {
       });
     }, 1000);
 
-    this.intervalId = interval;
+    // this.intervalId = interval;
   };
   const clearTimer = () => {
     clearInterval(this.intervalId);
@@ -607,7 +624,7 @@ const ArChallengeCapture = () => {
       try {
         // Capturar la vista dentro de ViewShot
         const capturedUri = await viewShotRef.current.capture();
-        console.log("Imagen capturada con filtro:", capturedUri);
+        // console.log("Imagen capturada con filtro:", capturedUri);
         updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
       } catch (error) {
         console.error("Error capturando la imagen con filtros:", error);
@@ -622,7 +639,7 @@ const ArChallengeCapture = () => {
     });
   };
 
-  console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo", viewShotRef);
+  // console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo", viewShotRef);
   useEffect(() => {
     requestMultiple([
       PERMISSIONS.ANDROID.CAMERA,
@@ -630,9 +647,10 @@ const ArChallengeCapture = () => {
       PERMISSIONS.ANDROID.RECORD_AUDIO,
       PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
       PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    ]).then(console.log);
+    ]);
+    // .then(console.log);
   }, []);
-  console.log("capturedVideo:", capturedVideo);
+  // console.log("capturedVideo:", capturedVideo);
 
   const retakeButtonHandler = () => {
     setCapturedImage(null);
