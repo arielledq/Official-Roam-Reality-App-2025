@@ -63,7 +63,7 @@ const UnityARCamera = ({
                   onLayout={onUnityLayout}
                 >
                   {/* @ts-ignore */}
-                  {/* <UnityView ref={unityRef} style={{ flex: 1 }} onUnityMessage={onUnityMessage} /> */}
+                  <UnityView ref={unityRef} style={{ flex: 1 }} onUnityMessage={onUnityMessage} />
                 </View>
               )}
             </View>
