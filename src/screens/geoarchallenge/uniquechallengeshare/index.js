@@ -1,52 +1,60 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
-import { Dimensions, Image, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native'
-import BackgroundWithImage from '../../../components/background'
-import { useNavigation, useRoute } from '@react-navigation/native'
-import AppHeader from '../../../components/header'
-import AppText from '../../../components/text'
-import useStyles from './styles'
-import AppButton from '../../../components/button'
-import moment from 'moment'
-import FacebookShareImg from '../../../assets/ar/facebook.svg'
-import InstagramShareImg from '../../../assets/ar/insta.svg'
-import TiktokShareImg from '../../../assets/ar/tiktok.svg'
-import { getARProfile, postGeoArMemory, socialPointsARUpdateAPI } from '../../../network'
-import { handleError, showMessage } from '../../../util/helpers'
-import Video from 'react-native-video'
-import { useDispatch } from 'react-redux'
-import { updateARUserData } from '../../../redux/AR'
-import { ShareDialog } from 'react-native-fbsdk-next'
-import Share from 'react-native-share'
-import RNFS from 'react-native-fs'
-import { share, init, events } from 'react-native-tiktok'
-import BGArShare from '../../../assets/ar/bg-ar-share.png'
-import DownloadImg from '../../../assets/ar/download.svg'
-import { CameraRoll } from '@react-native-camera-roll/camera-roll'
-import { moderateScale } from '../../../util/AppDimensions'
+import {
+  Dimensions,
+  Image,
+  Platform,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import AppHeader from "../../../components/header";
+import AppText from "../../../components/text";
+import useStyles from "./styles";
+import AppButton from "../../../components/button";
+import moment from "moment";
+// import FacebookShareImg from '../../../assets/ar/facebook.svg'
+// import InstagramShareImg from '../../../assets/ar/insta.svg'
+// import TiktokShareImg from '../../../assets/ar/tiktok.svg'
+import { getARProfile, postGeoArMemory, socialPointsARUpdateAPI } from "../../../network";
+import { handleError, showMessage } from "../../../util/helpers";
+import Video from "react-native-video";
+import { useDispatch } from "react-redux";
+import { updateARUserData } from "../../../redux/AR";
+// import { ShareDialog } from 'react-native-fbsdk-next'
+import Share from "react-native-share";
+import RNFS from "react-native-fs";
+// import { share, init, events } from 'react-native-tiktok'
+import BGArShare from "../../../assets/ar/bg-ar-share.png";
+import DownloadImg from "../../../assets/ar/download.svg";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+// import { moderateScale } from '../../../util/AppDimensions'
 
 const UniqueArChallengeShare = ({}) => {
   const getPathFromUrl = url => {
-    return url.split('?')[0]
-  }
+    return url.split("?")[0];
+  };
 
-  const styles = useStyles()
-  const route = useRoute()
-  const navigation = useNavigation()
-  const challengeObj = route?.params?.challengeObj
-  const captureData = route?.params?.captureData
+  const styles = useStyles();
+  const route = useRoute();
+  const navigation = useNavigation();
+  const challengeObj = route?.params?.challengeObj;
+  const captureData = route?.params?.captureData;
   const correctedCaptureData = `file://${captureData}`;
-  const hideBottomTab = route?.params?.hideBottomTab
-  let filePath = getPathFromUrl(correctedCaptureData)
-  const fileExt = filePath.split('.').pop()
-  const startDate = moment(new Date()).format('DD-MM-YYYY')
-  const [isLoading, setIsLoading] = useState(false)
-  const [imageHeight, setImageHeight] = useState(0)
-  const dispatch = useDispatch()
+  const hideBottomTab = route?.params?.hideBottomTab;
+  let filePath = getPathFromUrl(correctedCaptureData);
+  const fileExt = filePath.split(".").pop();
+  const startDate = moment(new Date()).format("DD-MM-YYYY");
+  const [isLoading, setIsLoading] = useState(false);
+  const [imageHeight, setImageHeight] = useState(0);
+  const dispatch = useDispatch();
 
-  console.log('challenges', challengeObj.id)
-  console.log('fileExt', fileExt)
-  console.log('captureData', correctedCaptureData)
+  console.log("challenges", challengeObj.id);
+  console.log("fileExt", fileExt);
+  console.log("captureData", correctedCaptureData);
 
   // useEffect(() => {
   //   const shareListener = events.addListener('onShareCompleted', resp => {
@@ -65,255 +73,255 @@ const UniqueArChallengeShare = ({}) => {
   // }, [])
 
   const shareBtnOnPress = () => {
-    setIsLoading(true)
-    let filename = correctedCaptureData.split('/').pop()
+    setIsLoading(true);
+    let filename = correctedCaptureData.split("/").pop();
     let shareFile = {
       uri: correctedCaptureData,
-      type: fileExt == 'mp4' ? 'video/mp4' : `image/{${fileExt}}`,
+      type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
       name: filename,
-    }
-    const formData = new FormData()
-    formData.append('geo_challenge', challengeObj.id)
-    formData.append('memory_file', shareFile)
-    formData.append('description', 'Geo Unique AR Memory')
-    formData.append('memory_type', fileExt == 'mp4' ? 'VIDEO' : 'PHOTO')
+    };
+    const formData = new FormData();
+    formData.append("geo_challenge", challengeObj.id);
+    formData.append("memory_file", shareFile);
+    formData.append("description", "Geo Unique AR Memory");
+    formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
     postGeoArMemory(formData)
       .then(res => {
-        ARUserProfile()
+        ARUserProfile();
         if (res.status == 1) {
           showMessage(
-            'Successfully, completed your challenge.',
-            'success',
-            'AR Photo Challenge Share!'
-          )
+            "Successfully, completed your challenge.",
+            "success",
+            "AR Photo Challenge Share!"
+          );
         } else {
           res.message.message =
-            'You already completed the challenge or there is some issue with completing the challenge.'
-          handleError(res)
+            "You already completed the challenge or there is some issue with completing the challenge.";
+          handleError(res);
         }
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }
+        setIsLoading(false);
+      });
+  };
 
   const updateARSocialPoints = social_network => {
     socialPointsARUpdateAPI({
       social_network,
     }).then(res => {
       if (res.status == 1) {
-        console.log(res.message)
+        console.log(res.message);
       }
-    })
-  }
+    });
+  };
 
   const ARUserProfile = () => {
     getARProfile()
       .then(res => {
         if (res.status == 1) {
-          dispatch(updateARUserData(res))
+          dispatch(updateARUserData(res));
         }
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }
+        setIsLoading(false);
+      });
+  };
 
   const facebookShareAndroid = async () => {
-    const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
-    let shareContent = {}
-    if (fileExt == 'mp4') {
+    const filebase64 = await RNFS.readFile(correctedCaptureData, "base64");
+    let shareContent = {};
+    if (fileExt == "mp4") {
       shareContent = {
-        appId: '746185200437639',
+        appId: "746185200437639",
         backgroundVideo: `data:video/mp4;base64,${filebase64}`,
         url: `data:video/mp4;base64,${filebase64}`,
-        social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
-      }
+        social: Platform.OS == "android" ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
+      };
     }
-    if (fileExt == 'png' || fileExt == 'jpg') {
+    if (fileExt == "png" || fileExt == "jpg") {
       shareContent = {
-        social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
+        social: Platform.OS == "android" ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
         backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
         type: `image/*`,
-        appId: '746185200437639',
-      }
+        appId: "746185200437639",
+      };
     }
     try {
-      const ShareResponse = await Share.shareSingle(shareContent)
+      const ShareResponse = await Share.shareSingle(shareContent);
       if (ShareResponse.success == true) {
-        console.log('ShareResponse true =>', ShareResponse)
-        updateARSocialPoints('FACEBOOK')
+        console.log("ShareResponse true =>", ShareResponse);
+        updateARSocialPoints("FACEBOOK");
       } else {
-        console.log('ShareResponse false =>', ShareResponse)
+        console.log("ShareResponse false =>", ShareResponse);
       }
     } catch (error) {
-      console.log('Error =>', error)
+      console.log("Error =>", error);
     }
-  }
+  };
 
-  const facebookShareIOS = async () => {
-    const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
-    console.log('Facebook Share', fileExt)
-    console.log('Facebook Share', correctedCaptureData)
-    ShareDialog.setMode('native')
+  // const facebookShareIOS = async () => {
+  //   const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
+  //   console.log('Facebook Share', fileExt)
+  //   console.log('Facebook Share', correctedCaptureData)
+  //   ShareDialog.setMode('native')
 
-    if (fileExt == 'png' || fileExt == 'jpg') {
-      shareContent = {
-        contentType: 'photo',
-        photos: [
-          {
-            imageUrl: correctedCaptureData,
-          },
-        ],
-      }
-    }
-    if (fileExt == 'mp4') {
-      shareContent = {
-        contentType: 'link',
-        contentUrl: `data:video/mp4;base64,${filebase64}`,
-        contentDescription: 'Wow, check out this great site!',
-      }
-    }
-    ShareDialog.canShow(shareContent)
-      .then(canShow => {
-        console.log('Facebook canShow', canShow)
-        if (canShow) {
-          return ShareDialog.show(shareContent)
-        }
-      })
-      .then(result => {
-        console.log('Share : ' + result)
-        if (result.isCancelled) {
-          console.log('Share cancelled')
-        } else {
-          console.log('Share success with postId: ' + result.postId)
-          updateARSocialPoints('FACEBOOK')
-        }
-      })
-      .catch(e => {
-        console.log('catch', e.toString())
-      })
-  }
+  //   if (fileExt == 'png' || fileExt == 'jpg') {
+  //     shareContent = {
+  //       contentType: 'photo',
+  //       photos: [
+  //         {
+  //           imageUrl: correctedCaptureData,
+  //         },
+  //       ],
+  //     }
+  //   }
+  //   if (fileExt == 'mp4') {
+  //     shareContent = {
+  //       contentType: 'link',
+  //       contentUrl: `data:video/mp4;base64,${filebase64}`,
+  //       contentDescription: 'Wow, check out this great site!',
+  //     }
+  //   }
+  //   ShareDialog.canShow(shareContent)
+  //     .then(canShow => {
+  //       console.log('Facebook canShow', canShow)
+  //       if (canShow) {
+  //         return ShareDialog.show(shareContent)
+  //       }
+  //     })
+  //     .then(result => {
+  //       console.log('Share : ' + result)
+  //       if (result.isCancelled) {
+  //         console.log('Share cancelled')
+  //       } else {
+  //         console.log('Share success with postId: ' + result.postId)
+  //         updateARSocialPoints('FACEBOOK')
+  //       }
+  //     })
+  //     .catch(e => {
+  //       console.log('catch', e.toString())
+  //     })
+  // }
 
-  const FacebookShareImgOnPress = async () => {
-    if (Platform.OS == 'android') {
-      facebookShareAndroid()
-    } else {
-      facebookShareAndroid()
-    }
-  }
+  // const FacebookShareImgOnPress = async () => {
+  //   if (Platform.OS == 'android') {
+  //     facebookShareAndroid()
+  //   } else {
+  //     facebookShareAndroid()
+  //   }
+  // }
 
-  const InstagramShareImgOnPress = async () => {
-    const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
+  // const InstagramShareImgOnPress = async () => {
+  //   const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
 
-    let shareContent = {}
-    if (fileExt == 'mp4') {
-      shareContent = {
-        type: 'video/mp4',
-        backgroundVideo: `data:video/mp4;base64,${filebase64}`,
-        url: `data:video/${fileExt};base64,${filebase64}`,
-        social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
-        appId: '746185200437639',
-      }
-    }
-    if (fileExt == 'png' || fileExt == 'jpg') {
-      shareContent = {
-        type: `image/*`,
-        url: `data:image/${fileExt};base64,${filebase64}`,
-        backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
-        social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
-        appId: '746185200437639',
-        BackgroundAndStickerImage: `data:image/${fileExt};base64,${filebase64}`,
-      }
-    }
-    try {
-      const ShareResponse = await Share.shareSingle(shareContent)
-      if (ShareResponse.success == true) {
-        console.log('ShareResponse true =>', ShareResponse)
-        updateARSocialPoints('INSTAGRAM')
-      } else {
-        console.log('ShareResponse false =>', ShareResponse)
-      }
-    } catch (error) {
-      console.log('Error =>', error)
-    }
-  }
+  //   let shareContent = {}
+  //   if (fileExt == 'mp4') {
+  //     shareContent = {
+  //       type: 'video/mp4',
+  //       backgroundVideo: `data:video/mp4;base64,${filebase64}`,
+  //       url: `data:video/${fileExt};base64,${filebase64}`,
+  //       social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
+  //       appId: '746185200437639',
+  //     }
+  //   }
+  //   if (fileExt == 'png' || fileExt == 'jpg') {
+  //     shareContent = {
+  //       type: `image/*`,
+  //       url: `data:image/${fileExt};base64,${filebase64}`,
+  //       backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
+  //       social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
+  //       appId: '746185200437639',
+  //       BackgroundAndStickerImage: `data:image/${fileExt};base64,${filebase64}`,
+  //     }
+  //   }
+  //   try {
+  //     const ShareResponse = await Share.shareSingle(shareContent)
+  //     if (ShareResponse.success == true) {
+  //       console.log('ShareResponse true =>', ShareResponse)
+  //       updateARSocialPoints('INSTAGRAM')
+  //     } else {
+  //       console.log('ShareResponse false =>', ShareResponse)
+  //     }
+  //   } catch (error) {
+  //     console.log('Error =>', error)
+  //   }
+  // }
 
-  const TiktokShareImgOnPress = async () => {
-    if (fileExt == 'mp4') {
-      const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
-      init('aw5g4n448236v4uh')
-      share(correctedCaptureData, code => {
-        console.log(code)
-        updateARSocialPoints('TIKTOK')
-      })
-    } else {
-      showMessage('Only Video Supported to share.', 'error', 'Share Support Issue:')
-    }
+  // const TiktokShareImgOnPress = async () => {
+  //   if (fileExt == 'mp4') {
+  //     const filebase64 = await RNFS.readFile(correctedCaptureData, 'base64')
+  //     init('aw5g4n448236v4uh')
+  //     share(correctedCaptureData, code => {
+  //       console.log(code)
+  //       updateARSocialPoints('TIKTOK')
+  //     })
+  //   } else {
+  //     showMessage('Only Video Supported to share.', 'error', 'Share Support Issue:')
+  //   }
 
-    // Picker.openPicker({
-    //   mediaType: 'video',
-    // }).then((media) => {
-    //   init('aw5g4n448236v4uh');
-    //   share(media.path, (code) => {
-    //     console.log(code);
-    //   });
-    // });
+  //   // Picker.openPicker({
+  //   //   mediaType: 'video',
+  //   // }).then((media) => {
+  //   //   init('aw5g4n448236v4uh');
+  //   //   share(media.path, (code) => {
+  //   //     console.log(code);
+  //   //   });
+  //   // });
 
-    // return;
+  //   // return;
 
-    // if (fileExt == 'mp4') {
-    //   const shareOptions = {
-    //     url: `data:image/${fileExt};base64,${filebase64}`,
-    //     type: 'video/mp4',
-    //     filename: "VideoShare"
-    //   };
-    //   console.log(JSON.stringify(shareOptions, null, 2))
-    //   try {
-    //     await Share.open(shareOptions);
-    //   } catch (error) {
-    //     console.log('Error =>', error);
-    //   }
-    // } else {
-    //   showMessage("Only Video Supported to share.", "error", "Share Support Issue:")
-    // }
-  }
+  //   // if (fileExt == 'mp4') {
+  //   //   const shareOptions = {
+  //   //     url: `data:image/${fileExt};base64,${filebase64}`,
+  //   //     type: 'video/mp4',
+  //   //     filename: "VideoShare"
+  //   //   };
+  //   //   console.log(JSON.stringify(shareOptions, null, 2))
+  //   //   try {
+  //   //     await Share.open(shareOptions);
+  //   //   } catch (error) {
+  //   //     console.log('Error =>', error);
+  //   //   }
+  //   // } else {
+  //   //   showMessage("Only Video Supported to share.", "error", "Share Support Issue:")
+  //   // }
+  // }
 
   const checkPermission = () => {
     CameraRoll.saveAsset(correctedCaptureData, {
-      type: fileExt == 'mp4' ? 'video' : 'photo',
+      type: fileExt == "mp4" ? "video" : "photo",
     })
       .then(() => {
-        showMessage('Saved to Camera Roll.')
+        showMessage("Saved to Camera Roll.");
       })
       .catch(err => {
-        showMessage('Not able to save, please check permission.', 'error')
-      })
-  }
+        showMessage("Not able to save, please check permission.", "error");
+      });
+  };
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: 'Unique Site AR',
+          text: "Unique Site AR",
           numberOfLines: 2,
           style: [styles.heading],
         }}
-        backgroundColor='transparent'
+        backgroundColor="transparent"
       />
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: 'hidden' }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: "hidden" }}>
         <AppText numberOfLines={3} style={[styles.headerText]}>
-          Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{' '}
+          Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{" "}
         </AppText>
-        <View style={[styles.detailContainer, { minHeight: fileExt == 'mp4' ? 500 : 0 }]}>
-          {fileExt == 'mp4' ? (
+        <View style={[styles.detailContainer, { minHeight: fileExt == "mp4" ? 500 : 0 }]}>
+          {fileExt == "mp4" ? (
             <Video
-              resizeMode={'cover'}
+              resizeMode={"cover"}
               repeat={true}
               style={{
-                width: '70%',
+                width: "70%",
                 flex: 1,
-                marginTop: Platform.OS == 'ios' ? -200 : 0,
+                marginTop: Platform.OS == "ios" ? -200 : 0,
               }}
               source={{
                 uri: correctedCaptureData,
@@ -321,13 +329,13 @@ const UniqueArChallengeShare = ({}) => {
             />
           ) : (
             <Image
-              resizeMode={'contain'}
+              resizeMode={"contain"}
               source={{ uri: correctedCaptureData }}
               style={{
-                backgroundColor: 'transparent',
-                width: '70%',
+                backgroundColor: "transparent",
+                width: "70%",
                 // height: imageHeight * 0.7,
-                marginTop: Platform.OS == 'ios' ? -200 : 0,
+                marginTop: Platform.OS == "ios" ? -200 : 0,
               }}
             />
           )}
@@ -336,8 +344,8 @@ const UniqueArChallengeShare = ({}) => {
               <BackgroundWithImage
                 imageSource={BGArShare}
                 style={{
-                  backgroundColor: 'transparent',
-                  position: 'absolute',
+                  backgroundColor: "transparent",
+                  position: "absolute",
                   top: 0,
                   bottom: 0,
                   left: 0,
@@ -350,9 +358,9 @@ const UniqueArChallengeShare = ({}) => {
             <View style={{ paddingHorizontal: 10, flex: 1 }}>
               <View
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  width: '100%',
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
                 }}
               >
                 <Image
@@ -361,16 +369,16 @@ const UniqueArChallengeShare = ({}) => {
                 />
                 <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
               </View>
-              <View style={{ width: '100%' }}>
+              <View style={{ width: "100%" }}>
                 <Text style={styles.challengeSponsorTipText}>
                   Share your content to earn points!
                 </Text>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    width: '100%',
-                    justifyContent: 'space-between',
+                    flexDirection: "row",
+                    alignItems: "center",
+                    width: "100%",
+                    justifyContent: "space-between",
                     marginTop: 2,
                   }}
                 >
@@ -386,8 +394,8 @@ const UniqueArChallengeShare = ({}) => {
           </View>
         </View>
         <View style={styles.socialShareContainer}>
-          <View style={{ flexDirection: 'row' }}>
-            <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
+          <View style={{ flexDirection: "row" }}>
+            {/* <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
               <FacebookShareImg />
             </TouchableOpacity>
             <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
@@ -397,15 +405,15 @@ const UniqueArChallengeShare = ({}) => {
               <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
                 <TiktokShareImg />
               </TouchableOpacity>
-            )}
+            )} */}
           </View>
           <Text style={styles.shareText}>Tap the icons to share and earn points</Text>
         </View>
         {!hideBottomTab && (
-          <View style={{ justifyContent: 'flex-end' }}>
+          <View style={{ justifyContent: "flex-end" }}>
             <TouchableOpacity
               onPress={() => {
-                navigation.navigate('Settings')
+                navigation.navigate("Settings");
               }}
             >
               <Text style={styles.bottomText}>Link My Profiles</Text>
@@ -415,19 +423,19 @@ const UniqueArChallengeShare = ({}) => {
               onPress={() => shareBtnOnPress()}
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
-              title={'Share Please!'}
+              title={"Share Please!"}
               loading={isLoading}
             />
             <AppButton
               onPress={() => {
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: 'TabNavigator', params: { screen: 'GeoArChallenge' } }],
-                })
+                  routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+                });
               }}
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
-              title={'End Experience'}
+              title={"End Experience"}
               loading={isLoading}
             />
           </View>
@@ -438,7 +446,7 @@ const UniqueArChallengeShare = ({}) => {
         </AppText>
       </ScrollView>
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default UniqueArChallengeShare
+export default UniqueArChallengeShare;

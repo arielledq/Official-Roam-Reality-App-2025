@@ -363,7 +363,7 @@ PODS:
   - react-native-onesignal (4.5.4):
     - OneSignalXCFramework (= 3.12.10)
     - React (< 1.0.0, >= 0.13.0)
-  - react-native-pager-view (6.2.3):
+  - react-native-pager-view (6.6.1):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - react-native-render-html (6.3.4):
@@ -372,9 +372,6 @@ PODS:
     - React-Core
   - react-native-splash-screen (3.3.0):
     - React-Core
-  - react-native-tiktok (1.0.1):
-    - React-Core
-    - TikTokOpenSDK (= 5.0.15)
   - react-native-unity (1.0.10):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
@@ -385,7 +382,7 @@ PODS:
     - React-Core
   - react-native-view-shot (3.8.0):
     - React-Core
-  - react-native-webview (13.12.4):
+  - react-native-webview (13.12.5):
     - RCT-Folly (= 2021.07.22.00)
     - React-Core
   - React-perflogger (0.71.19)
@@ -569,7 +566,6 @@ PODS:
     - libwebp (~> 1.0)
     - SDWebImage/Core (~> 5.10)
   - SSZipArchive (2.5.5)
-  - TikTokOpenSDK (5.0.15)
   - TOCropViewController (2.7.4)
   - Turf (2.8.0)
   - Yoga (1.14.0)
@@ -614,7 +610,6 @@ DEPENDENCIES:
   - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
-  - react-native-tiktok (from `../node_modules/react-native-tiktok`)
   - "react-native-unity (from `../node_modules/@azesmway/react-native-unity`)"
   - react-native-video (from `../node_modules/react-native-video`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
@@ -651,7 +646,6 @@ DEPENDENCIES:
   - RNSound (from `../node_modules/react-native-sound`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNZipArchive (from `../node_modules/react-native-zip-archive`)
-  - TikTokOpenSDK (~> 5.0.15)
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
 SPEC REPOS:
@@ -678,7 +672,6 @@ SPEC REPOS:
     - SDWebImage
     - SDWebImageWebPCoder
     - SSZipArchive
-    - TikTokOpenSDK
     - TOCropViewController
     - Turf
 
@@ -757,8 +750,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-splash-screen:
     :path: "../node_modules/react-native-splash-screen"
-  react-native-tiktok:
-    :path: "../node_modules/react-native-tiktok"
   react-native-unity:
     :path: "../node_modules/@azesmway/react-native-unity"
   react-native-video:
@@ -887,15 +878,14 @@ SPEC CHECKSUMS:
   react-native-image-resizer: d9fb629a867335bdc13230ac2a58702bb8c8828f
   react-native-maps: 667f9b975549c6fa9b1631bf859440f68ebd3b8f
   react-native-onesignal: 8d8f7d5e2cc44239fc0ec72fe9c6d27b939870fc
-  react-native-pager-view: e26d35e382d86950c936f8917e3beb9188115ccc
+  react-native-pager-view: c2121f83e960d4bfff95b35fb779ab09c8b65657
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
   react-native-safe-area-context: 4532f1a0c5d34a46b9324ccaaedcb5582a302b7d
   react-native-splash-screen: 4312f786b13a81b5169ef346d76d33bc0c6dc457
-  react-native-tiktok: 7daefc5ab8c024fdd077e12e3429bee7e75dc385
   react-native-unity: b8caa8540a952542c759cee1e7ee19bf74166c4f
   react-native-video: c26780b224543c62d5e1b2a7244a5cd1b50e8253
   react-native-view-shot: 6b7ed61d77d88580fed10954d45fad0eb2d47688
-  react-native-webview: 60611cd20936609c63914d8927f12b583ac60d0c
+  react-native-webview: 22b1df0ae5c60abf7ea63c18eabe72b238c7f999
   React-perflogger: 0ba097528e325435aca94b32b5330f58f6acb6fb
   React-RCTActionSheet: 805b3a83f3dd7ae5a1213ea9df0ed748eeb74b85
   React-RCTAnimation: 2a0233681dee47e468302b8233652b35b68329cb
@@ -931,11 +921,10 @@ SPEC CHECKSUMS:
   SDWebImage: 9c36e66c8ce4620b41a7407698dda44211a96764
   SDWebImageWebPCoder: 908b83b6adda48effe7667cd2b7f78c897e5111d
   SSZipArchive: c69881e8ac5521f0e622291387add5f60f30f3c4
-  TikTokOpenSDK: dc1199ba9c6d7815aee0eaca6ec80ad13f7d9c1f
   TOCropViewController: 80b8985ad794298fb69d3341de183f33d1853654
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: d4f5b037672e6b68ba484c7cf7fe6790122df792
 
-PODFILE CHECKSUM: 8283f20cbcbcf0fc6f4199d9bc5cf2f1e3a74570
+PODFILE CHECKSUM: e1f44d3b30eb4d3b837adbe5587d96c6706eca9c
 
 COCOAPODS: 1.15.2
