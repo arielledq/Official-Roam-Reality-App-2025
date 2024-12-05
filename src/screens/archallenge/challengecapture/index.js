@@ -25,6 +25,7 @@ import CameraControls from "components/CameraControls";
 import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
 import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
+import { CHALLENGES_TYPE } from "constants";
 const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;

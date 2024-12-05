@@ -7,10 +7,15 @@ import AppText from "../../../components/text";
 import AppButton from "../../../components/button";
 import moment from "moment";
 
-import { getARProfile, postArMemory, socialPointsARUpdateAPI } from "../../../network";
+import {
+  getARProfile,
+  postArMemory,
+  postGeoPinCheckIn,
+  socialPointsARUpdateAPI,
+} from "../../../network";
 import { handleError, showMessage } from "../../../util/helpers";
 import Video from "react-native-video";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateARUserData } from "../../../redux/AR";
 
 import Share from "react-native-share";
@@ -30,18 +35,20 @@ const ArChallengeShare = () => {
   const challengeType = route?.params?.challengeType;
 
   let screenTitle = "";
-  let selectedGeoSite = null;
+  let selectedGeoSite;
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
+      selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
       break;
 
     default:
       break;
   }
+  // console.log("selectedGeoSite", selectedGeoSite?.id);
   const startDate = moment().format("MM-DD-YYYY");
 
   const navigation = useNavigation();
@@ -77,7 +84,7 @@ const ArChallengeShare = () => {
     });
   };
 
-  const endShareProfileButtonHandler = () => {
+  const endShareProfileButtonHandler = async () => {
     setIsLoading(true);
     let filename = correctedCaptureData.split("/").pop();
     let shareFile = {
@@ -85,45 +92,49 @@ const ArChallengeShare = () => {
       type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
       name: filename,
     };
+
     const formData = new FormData();
-    switch (challengeType) {
-      case CHALLENGES_TYPE.PHOTO_VIDEO:
-        formData.append("challenges", challengeObj.id);
-        formData.append("memory_file", shareFile);
-        formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+    let res;
 
-        break;
+    try {
+      switch (challengeType) {
+        case CHALLENGES_TYPE.PHOTO_VIDEO:
+          formData.append("challenges", challengeObj.id);
+          formData.append("memory_file", shareFile);
+          formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
 
-      case CHALLENGES_TYPE.PIN_CHECK_IN:
-        formData.append("geo_site", selectedGeoSite.id);
-        formData.append("check_in_image", shareFile);
+          res = await postArMemory(formData);
+          break;
 
-        break;
+        case CHALLENGES_TYPE.PIN_CHECK_IN:
+          formData.append("geo_site", selectedGeoSite?.id);
+          formData.append("check_in_image", shareFile);
 
-      default:
-        return;
+          res = await postGeoPinCheckIn(formData);
+          break;
+
+        default:
+          break;
+      }
+
+      ARUserProfile();
+
+      if (res.status === 1) {
+        showMessage("Successfully, completed your challenge.", "success", `${screenTitle} Share!`);
+        endExperience();
+      } else {
+        handleError(res.message);
+      }
+    } catch (error) {
+      console.error("Error al compartir el desafío:", error);
+      handleError(error);
+    } finally {
+      setIsLoading(false);
     }
     postArMemory(formData)
-      .then(res => {
-        ARUserProfile();
-        if (res.status === 1) {
-          showMessage(
-            "Successfully, completed your challenge.",
-            "success",
-            `${screenTitle} Share!`
-          );
-          endExperience();
-        } else {
-          handleError(res.message);
-        }
-      })
-      .catch(error => {
-        console.error("Error al compartir el desafío:", error);
-        handleError(error);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+      .then(res => {})
+      .catch(error => {})
+      .finally(() => {});
   };
 
   const shareToSocialMedia = async () => {
