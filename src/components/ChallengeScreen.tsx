@@ -8,11 +8,17 @@ import { ScrollView } from "react-native";
 
 interface CaptureChallengeScreenProps {
   title?: string;
+  headerRightComponent?: React.ReactNode;
   modals?: React.ReactNode;
   children: React.ReactNode;
 }
 
-const ChallengeScreen = ({ title = "", modals, children }: CaptureChallengeScreenProps) => {
+const ChallengeScreen = ({
+  title = "",
+  headerRightComponent,
+  modals,
+  children,
+}: CaptureChallengeScreenProps) => {
   return (
     <BackgroundWithImage
       style={{
@@ -32,7 +38,10 @@ const ChallengeScreen = ({ title = "", modals, children }: CaptureChallengeScree
             ...fontGroup.ns700,
           },
         }}
+        centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}
         backgroundColor="transparent"
+        // @ts-expect-error
+        rightComponent={headerRightComponent}
       />
 
       <ScrollView

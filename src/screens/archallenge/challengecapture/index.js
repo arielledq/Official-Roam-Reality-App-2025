@@ -26,6 +26,7 @@ import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
 import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
 import { CHALLENGES_TYPE } from "constants";
+import { AppButton } from "components";
 const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;
@@ -705,13 +706,27 @@ const ArChallengeCapture = () => {
     </>
   );
 
+  const viewInfoButton = (
+    <AppButton
+      onPress={sponsorButtonPressHandler}
+      buttonStyle={{ height: 40, width: 100 }}
+      // containerStyle={{}}
+      title={"VIEW INFO"}
+      titleStyle={{ fontSize: FontSizes.S14, fontWeight: 700 }}
+    />
+  );
+
   return (
-    <ChallengeScreen title="AR Photo Challenges" modals={modals}>
-      <SponsorBannerCaptureHeader
+    <ChallengeScreen
+      title="AR Photo Challenges"
+      headerRightComponent={viewInfoButton}
+      modals={modals}
+    >
+      {/* <SponsorBannerCaptureHeader
         imageUri={challengeObj?.sponsored?.image}
         sponsorName={challengeObj?.sponsored?.name}
         onPress={sponsorButtonPressHandler}
-      />
+      /> */}
 
       <UnityARCamera
         unityRef={unityRef}
