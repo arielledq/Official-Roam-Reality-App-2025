@@ -7,9 +7,9 @@
 #import <SafariServices/SafariServices.h>
 #import <FBSDKCoreKit/FBSDKCoreKit-Swift.h>
 #import <FBSDKCoreKit/FBSDKCoreKit.h>
-#import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
+// #import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
 #import "RNSplashScreen.h" 
-#import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
+// #import <TikTokOpenSDK/TikTokOpenSDKApplicationDelegate.h>
 #import "GoogleMaps/GoogleMaps.h"
 
 @implementation AppDelegate
@@ -23,9 +23,9 @@
     return YES;
   }
   
-  if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:app openURL:url sourceApplication:nil annotation:nil]) {
-         return YES;
-    }
+  // if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:app openURL:url sourceApplication:nil annotation:nil]) {
+  //        return YES;
+  //   }
 
   if ([GIDSignIn.sharedInstance handleURL:url]) {
     return YES;
@@ -35,10 +35,10 @@
     return YES;
   }
   
-  if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:app openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]]
-         ) {
-         return YES;
-     }
+  // if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:app openURL:url sourceApplication:options[UIApplicationOpenURLOptionsSourceApplicationKey] annotation:options[UIApplicationOpenURLOptionsAnnotationKey]]
+  //        ) {
+  //        return YES;
+  //    }
 
   return NO;
 }
@@ -48,34 +48,34 @@
   [[FBSDKApplicationDelegate sharedInstance] application:application
                        didFinishLaunchingWithOptions:launchOptions];
   
-  [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
+  // [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
   self.moduleName = @"travel_ar_app_42706";
   // You can add your custom initial props in the dictionary below.
   // They will be passed down to the ViewController used by React Native.
   self.initialProps = @{};
 
   //[RNSplashScreen show]; // Add RNSplashScreen show method call here
-  [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
+  // [[TikTokOpenSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
 
   [GMSServices provideAPIKey:@"AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA"];
   return [super application:application didFinishLaunchingWithOptions:launchOptions];
 }
 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
-{
-    if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:sourceApplication annotation:annotation]) {
-        return YES;
-    }
-    return NO;
-}
+// - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation
+// {
+//     if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:sourceApplication annotation:annotation]) {
+//         return YES;
+//     }
+//     return NO;
+// }
 
-- (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
-{
-    if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:nil annotation:nil]) {
-        return YES;
-    }
-    return NO;
-}
+// - (BOOL)application:(UIApplication *)application handleOpenURL:(NSURL *)url
+// {
+//     if ([[TikTokOpenSDKApplicationDelegate sharedInstance] application:application openURL:url sourceApplication:nil annotation:nil]) {
+//         return YES;
+//     }
+//     return NO;
+// }
 
 - (NSURL *)sourceURLForBridge:(RCTBridge *)bridge
 {

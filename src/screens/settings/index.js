@@ -1,20 +1,22 @@
-import React, { useState, useEffect, useRef } from 'react'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
-import InstagramLogin from 'react-native-instagram-login'
-import { init, auth, share, events } from 'react-native-tiktok'
-import BackgroundWithImage from '../../components/background'
-import theme from '../../assets/theme'
-import { AppHeader, AppText } from '../../components'
-import Icon from '../../components/Icon'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import { useNavigation } from '@react-navigation/native'
-import {
-  AccessToken,
-  GraphRequest,
-  GraphRequestManager,
-  LoginManager,
-} from 'react-native-fbsdk-next'
-import { setItem, getItem } from '../../util/helpers'
+import React from "react";
+// import React, { useState, useEffect, useRef } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+// import InstagramLogin from 'react-native-instagram-login'
+// import { init, auth, share, events } from 'react-native-tiktok'
+import BackgroundWithImage from "../../components/background";
+import theme from "../../assets/theme";
+import { AppHeader } from "../../components";
+// import { AppHeader, AppText } from '../../components'
+import Icon from "../../components/Icon";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import { useNavigation } from "@react-navigation/native";
+// import {
+//   AccessToken,
+//   GraphRequest,
+//   GraphRequestManager,
+//   LoginManager,
+// } from 'react-native-fbsdk-next'
+// import { setItem, getItem } from '../../util/helpers'
 
 function SettingsItem({ label, onPress, icon }) {
   return (
@@ -22,9 +24,9 @@ function SettingsItem({ label, onPress, icon }) {
       activeOpacity={0.8}
       onPress={onPress}
       style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
         backgroundColor: theme.darkColors?.inputBlue,
         paddingHorizontal: 15,
         paddingVertical: 12,
@@ -35,159 +37,159 @@ function SettingsItem({ label, onPress, icon }) {
     >
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
+          flexDirection: "row",
+          alignItems: "center",
         }}
       >
-        <Icon name={icon} family='custom' size={24} />
+        <Icon name={icon} family="custom" size={24} />
         <Text style={styles.text}>{label}</Text>
       </View>
-      <Icon name='chevron-right' family='entypo' color={theme.darkColors?.white} size={24} />
+      <Icon name="chevron-right" family="entypo" color={theme.darkColors?.white} size={24} />
     </TouchableOpacity>
-  )
+  );
 }
 
-function SocialAccountItem({ label, onPress, icon, isLinked = false }) {
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: theme.darkColors?.statBG,
-        paddingHorizontal: 15,
-        paddingVertical: 12,
-        marginHorizontal: 25,
-        marginVertical: 10,
-        borderRadius: 8,
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}
-      >
-        <Icon name={icon} family='custom' size={24} />
-        <Text style={styles.text}>{label}</Text>
-      </View>
-      <TouchableOpacity
-        onPress={onPress}
-        name='chevron-right'
-        family='entypo'
-        color={theme.darkColors?.white}
-        size={24}
-      >
-        <AppText style={styles.linkNow}>{isLinked ? 'Linked' : 'Link now'}</AppText>
-      </TouchableOpacity>
-    </View>
-  )
-}
+// function SocialAccountItem({ label, onPress, icon, isLinked = false }) {
+//   return (
+//     <View
+//       style={{
+//         flexDirection: 'row',
+//         alignItems: 'center',
+//         justifyContent: 'space-between',
+//         backgroundColor: theme.darkColors?.statBG,
+//         paddingHorizontal: 15,
+//         paddingVertical: 12,
+//         marginHorizontal: 25,
+//         marginVertical: 10,
+//         borderRadius: 8,
+//       }}
+//     >
+//       <View
+//         style={{
+//           flexDirection: 'row',
+//           alignItems: 'center',
+//         }}
+//       >
+//         <Icon name={icon} family='custom' size={24} />
+//         <Text style={styles.text}>{label}</Text>
+//       </View>
+//       <TouchableOpacity
+//         onPress={onPress}
+//         name='chevron-right'
+//         family='entypo'
+//         color={theme.darkColors?.white}
+//         size={24}
+//       >
+//         <AppText style={styles.linkNow}>{isLinked ? 'Linked' : 'Link now'}</AppText>
+//       </TouchableOpacity>
+//     </View>
+//   )
+// }
 
 const Settings = () => {
-  const navigation = useNavigation()
-  const [isFbLinked, setIsFbLinked] = useState(false)
-  const [isInstaLinked, setIsInstaLinked] = useState(false)
-  const [isTiktokLinked, setIsTiktokLinked] = useState(false)
-  const insRef = useRef()
+  const navigation = useNavigation();
+  // const [isFbLinked, setIsFbLinked] = useState(false)
+  // const [isInstaLinked, setIsInstaLinked] = useState(false)
+  // const [isTiktokLinked, setIsTiktokLinked] = useState(false)
+  // const insRef = useRef()
 
   const handleChangePassword = () => {
-    navigation.navigate('ChangePassword')
-  }
+    navigation.navigate("ChangePassword");
+  };
   const handlePrivacy = () => {
-    navigation.navigate('Privacy')
-  }
+    navigation.navigate("Privacy");
+  };
 
-  useEffect(() => {
-    init('awx8jb1brvngfo5m')
-  }, [])
+  // useEffect(() => {
+  //   // init('awx8jb1brvngfo5m')
+  // }, [])
 
-  useEffect(() => {
-    const getToken = async () => {
-      const fbtoken = await getItem('fbToken')
-      const instatoken = await getItem('instaToken')
-      const tiktokToken = await getItem('tiktokToken')
+  // useEffect(() => {
+  //   const getToken = async () => {
+  //     const fbtoken = await getItem('fbToken')
+  //     const instatoken = await getItem('instaToken')
+  //     const tiktokToken = await getItem('tiktokToken')
 
-      if (fbtoken) {
-        setIsFbLinked(true)
-      }
-      if (instatoken) {
-        setIsInstaLinked(true)
-      }
-      if (tiktokToken) {
-        setIsTiktokLinked(true)
-      }
-    }
+  //     if (fbtoken) {
+  //       setIsFbLinked(true)
+  //     }
+  //     if (instatoken) {
+  //       setIsInstaLinked(true)
+  //     }
+  //     if (tiktokToken) {
+  //       setIsTiktokLinked(true)
+  //     }
+  //   }
 
-    getToken()
-  }, [])
+  //   getToken()
+  // }, [])
 
-  const fbLink = resCallBack => {
-    LoginManager.logOut()
-    return LoginManager.logInWithPermissions(['public_profile', 'email']).then(
-      result => {
-        if (result.declinedPermissions && result.declinedPermissions.includes('email')) {
-          resCallBack({ message: 'Email is required' })
-        } else if (result.isCancelled) {
-          console.error('error')
-        } else {
-          const infoRequest = new GraphRequest(
-            '/me?fields=id,name,email,picture',
-            null,
-            resCallBack
-          )
-          new GraphRequestManager().addRequest(infoRequest).start()
-          AccessToken.getCurrentAccessToken().then(async data => {
-            const accessToken = data.accessToken.toString()
-            setIsFbLinked(true)
-            await setItem('fbToken', accessToken)
-          })
-        }
-      },
-      function (error) {
-        console.error('Login fail with error: ' + error)
-      }
-    )
-  }
+  // const fbLink = resCallBack => {
+  //   LoginManager.logOut()
+  //   return LoginManager.logInWithPermissions(['public_profile', 'email']).then(
+  //     result => {
+  //       if (result.declinedPermissions && result.declinedPermissions.includes('email')) {
+  //         resCallBack({ message: 'Email is required' })
+  //       } else if (result.isCancelled) {
+  //         console.error('error')
+  //       } else {
+  //         const infoRequest = new GraphRequest(
+  //           '/me?fields=id,name,email,picture',
+  //           null,
+  //           resCallBack
+  //         )
+  //         new GraphRequestManager().addRequest(infoRequest).start()
+  //         AccessToken.getCurrentAccessToken().then(async data => {
+  //           const accessToken = data.accessToken.toString()
+  //           setIsFbLinked(true)
+  //           await setItem('fbToken', accessToken)
+  //         })
+  //       }
+  //     },
+  //     function (error) {
+  //       console.error('Login fail with error: ' + error)
+  //     }
+  //   )
+  // }
 
-  const onFbLink = async () => {
-    try {
-      await fbLink(_resInfoCallback)
-    } catch (e) {
-      console.error('error raised', e)
-    }
-  }
+  // const onFbLink = async () => {
+  //   try {
+  //     await fbLink(_resInfoCallback)
+  //   } catch (e) {
+  //     console.error('error raised', e)
+  //   }
+  // }
 
-  const _resInfoCallback = (error, result) => {
-    if (error) {
-      console.error('login has error: ' + error)
-      return
-    } else {
-      const userdata = result
-    }
-  }
+  // const _resInfoCallback = (error, result) => {
+  //   if (error) {
+  //     console.error('login has error: ' + error)
+  //     return
+  //   } else {
+  //     const userdata = result
+  //   }
+  // }
 
-  const onSuccess = async token => {
-    if (token) {
-      setIsInstaLinked(true)
-      await setItem('instaToken', token.toString())
-    }
-  }
+  // const onSuccess = async token => {
+  //   if (token) {
+  //     setIsInstaLinked(true)
+  //     await setItem('instaToken', token.toString())
+  //   }
+  // }
 
-  const onTiktokLink = () => {
-    auth(code => {
-      if (code) {
-        setIsTiktokLinked(true)
-        setItem('tiktokToken', code)
-      }
-    })
-  }
+  // const onTiktokLink = () => {
+  //   auth(code => {
+  //     if (code) {
+  //       setIsTiktokLinked(true)
+  //       setItem('tiktokToken', code)
+  //     }
+  //   })
+  // }
   return (
     <BackgroundWithImage style={styles.mainContainer}>
-      <AppHeader title={'Settings'} backgroundColor='transparent' />
-      <SettingsItem icon='lock' label={'Change password'} onPress={handleChangePassword} />
-      <SettingsItem icon='privacy' label={'Privacy'} onPress={handlePrivacy} />
-      <AppText style={styles.socialAccount}>Social Accounts</AppText>
+      <AppHeader title={"Settings"} backgroundColor="transparent" />
+      <SettingsItem icon="lock" label={"Change password"} onPress={handleChangePassword} />
+      <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
+      {/* <AppText style={styles.socialAccount}>Social Accounts</AppText>
       <SocialAccountItem
         icon='FacebookIcon'
         label={'Facebook'}
@@ -214,12 +216,12 @@ const Settings = () => {
         scopes={['user_profile', 'user_media']}
         onLoginSuccess={token => onSuccess(token)}
         onLoginFailure={data => console.error(data)}
-      />
+      /> */}
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -246,4 +248,4 @@ const styles = StyleSheet.create({
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.inputBlue,
   },
-})
+});

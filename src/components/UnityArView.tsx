@@ -1,8 +1,13 @@
 import * as React from "react";
-import { Image, LayoutChangeEvent, Text, View } from "react-native";
+import { Image, LayoutChangeEvent, Text, View, Dimensions } from "react-native";
 import UnityView from "@azesmway/react-native-unity/src";
+// @ts-expect-error
 import Video from "react-native-video";
 import ARFilter from "screens/archallenge/FilterView";
+
+const offset = 120;
+const { width: screenWidth } = Dimensions.get("window"); // Get screen width
+const aspectHeight = ((screenWidth - offset) * 16) / 9; // Calculate height based on 9:16 aspect ratio
 
 interface ImageFilter {
   challengeObj: any;
@@ -31,8 +36,8 @@ const UnityARCamera = ({
 }: UnityARCameraProps) => {
   const imageHasFilters = imageFilter?.challengeObj?.ar_filters?.length > 0;
   return (
-    <View style={{ marginVertical: 20, minHeight: 512 }}>
-      <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, alignItems: "center", marginVertical: 20 }}>
+      <View style={{ flex: 1, minHeight: aspectHeight, width: screenWidth - offset }}>
         {isProcessingMedia ? (
           <View
             style={{
@@ -58,7 +63,7 @@ const UnityARCamera = ({
                   onLayout={onUnityLayout}
                 >
                   {/* @ts-ignore */}
-                  <UnityView ref={unityRef} style={{ flex: 1 }} onUnityMessage={onUnityMessage} />
+                  {/* <UnityView ref={unityRef} style={{ flex: 1 }} onUnityMessage={onUnityMessage} /> */}
                 </View>
               )}
             </View>

@@ -9,30 +9,29 @@ import {
   ScrollView,
 } from "react-native";
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
-import AppHeader from "../../../components/header";
 import { FontSizes } from "../../../util/FontUtils";
 import RNFetchBlob from "rn-fetch-blob";
 import useStyles from "./styles";
-import CaptureImage from "../../../assets/ar/camera.png";
-import Shareds from "../../../assets/ar/bg-ar-share.png";
 import LineIcon from "../../../assets/ar/line.png";
 import { unzip } from "react-native-zip-archive";
-import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import { useSelector } from "react-redux";
-import BackgroundWithImage from "../../../components/background";
 import Share from "react-native-share";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import CaptureInfoView from "components/CaptureInfoView";
+import ChallengeScreen from "components/ChallengeScreen";
+import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
+import { CHALLENGES_TYPE } from "constants";
+import { AppButton } from "components";
 const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;
 
-const ArChallengeCapture = ({}) => {
+const ArChallengeCapture = () => {
   const styles = useStyles();
   const unityRef = useRef(null);
   const route = useRoute();
@@ -45,7 +44,6 @@ const ArChallengeCapture = ({}) => {
   const settings = useSelector(state => state.ar?.arSettings);
   const modelFile = route?.params?.challengeObj?.model_file;
   const viewShotRef = useRef();
-  const challengeIsPhoto = challengeObj?.challenge_requirement === "PHOTO";
 
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
@@ -98,7 +96,7 @@ const ArChallengeCapture = ({}) => {
   const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
     setUnityViewDimensions({ width, height });
-    console.log(`UnityView dimensiones: ${width} x ${height}`);
+    // console.log(`UnityView dimensiones: ${width} x ${height}`);
   };
 
   // Descargar modelo y gestionar archivos
@@ -254,13 +252,13 @@ const ArChallengeCapture = ({}) => {
       console.log("UnityView o modelOBJ no están disponibles.");
     }
   };
-  console.log(
-    "-----------MODELOS----------",
-    modelOBJ,
-    modelResource,
-    textureBase,
-    textureEmission
-  );
+  // console.log(
+  //   "-----------MODELOS----------",
+  //   modelOBJ,
+  //   modelResource,
+  //   textureBase,
+  //   textureEmission
+  // );
   function enviarComandoAUnity(comando) {
     const commandData = JSON.stringify({ command: comando });
 
@@ -302,7 +300,7 @@ const ArChallengeCapture = ({}) => {
       setTimeout(() => {
         RNFS.readDir(basePath)
           .then(files => {
-            console.log("Archivos encontrados en el directorio:", files);
+            // console.log("Archivos encontrados en el directorio:", files);
 
             if (Array.isArray(files) && files.length > 0) {
               // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
@@ -312,7 +310,7 @@ const ArChallengeCapture = ({}) => {
               );
 
               if (foundFile) {
-                console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                // console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
                 setFileFound(foundFile.path);
                 setCaptureData(foundFile.path);
                 setCapturedImage(foundFile.path); // Actualiza capturedImage
@@ -337,7 +335,7 @@ const ArChallengeCapture = ({}) => {
   // Compartir captura
   const shareScreenshot = async () => {
     if (!fileFound) {
-      console.log("Primero captura una imagen antes de compartir.");
+      console.info("Primero captura una imagen antes de compartir.");
       return;
     }
     try {
@@ -356,7 +354,7 @@ const ArChallengeCapture = ({}) => {
       const exists = await RNFS.exists(fullVideoPath);
       if (exists) {
         await RNFS.unlink(fullVideoPath); // Elimina el archivo si existe
-        console.log("Video anterior eliminado:", fullVideoPath);
+        // console.log("Video anterior eliminado:", fullVideoPath);
       }
     } catch (error) {
       console.error("Error al eliminar el video anterior:", error);
@@ -436,7 +434,7 @@ const ArChallengeCapture = ({}) => {
     }
   };
 
-  const detenerGrabacion = async () => {
+  const detenerGrabacion = () => {
     if (unityRef.current) {
       // Enviar mensaje a Unity para detener la grabación
       unityRef.current.postMessage("Video Recorder", "DetenerGrabacion", "detener");
@@ -445,13 +443,26 @@ const ArChallengeCapture = ({}) => {
       const basePath =
         Platform.OS === "android"
           ? "/storage/emulated/0/Android/data/com.roam_reality/files/video" // Ruta en Android
-          : RNFS.DocumentDirectoryPath + "/videos"; // Ruta en iOS
-      console.log("aaaaaaafiles");
+          : RNFS.DocumentDirectoryPath + "/video"; // Ruta en iOS
+      // console.log("aaaaaaafiles");
+      console.log("detenerGrabacion, basepath", basePath);
       // Esperar un pequeño retraso para asegurarse de que la grabación se haya detenido completamente
-      setTimeout(async () => {
+
+      const saveVideo = async () => {
         try {
           // Leer el directorio de la carpeta 'videos'
-          const files = await RNFS.readDir(basePath);
+          const exists = await RNFS.exists(basePath);
+          console.log("Videos directory exists:", exists);
+          if (!exists) {
+            console.error("Videos directory does not exist.");
+          }
+
+          let files = "";
+          try {
+            files = await RNFS.readDir(basePath);
+          } catch (error) {
+            console.error(error);
+          }
 
           // Filtrar archivos .mp4
           const videoFiles = files.filter(file => file.isFile() && file.name.endsWith(".mp4"));
@@ -466,7 +477,7 @@ const ArChallengeCapture = ({}) => {
 
             // Actualizar el estado con la ruta del archivo más reciente
             setCapturedVideo(latestFilePath);
-            console.log("Video guardado en:", latestFilePath);
+            // console.log("Video guardado en:", latestFilePath);
 
             // Desmontar UnityView después de la grabación
             setIsUnityLoaded(false); // Desmontar UnityView
@@ -476,6 +487,10 @@ const ArChallengeCapture = ({}) => {
         } catch (error) {
           console.error("Error verificando los archivos de video:", error);
         }
+      };
+
+      setTimeout(() => {
+        saveVideo();
       }, 1000); // Espera 1 segundo para asegurarse de que el archivo esté guardado antes de verificar
     } else {
       console.error("UnityView no está disponible.");
@@ -489,7 +504,7 @@ const ArChallengeCapture = ({}) => {
       if (exists) {
         await RNFS.unlink(capturedVideo); // Elimina el video grabado
         setVideoPath(null); // Limpia el estado
-        console.log("Video eliminado:", capturedVideo);
+        // console.log("Video eliminado:", capturedVideo);
       } else {
         Alert.alert("El video no existe", "No se encontró el video a eliminar");
       }
@@ -552,10 +567,10 @@ const ArChallengeCapture = ({}) => {
         <RenderHTML
           contentWidth={width}
           tagsStyles={{
-            p: { color: "#9CA3AF", fontSize: FontSizes.S14 },
-            strong: { color: "#fff", fontSize: FontSizes.S18 },
+            p: { color: "#FFF", fontSize: FontSizes.S14 },
+            strong: { color: "#FFF", fontSize: FontSizes.S18 },
           }}
-          source={{ html: challengeObj.description.replaceAll("#000000", "#fff") }}
+          source={{ html: challengeObj.description }}
         />
       </ScrollView>
       <View style={{ width: "100%", paddingHorizontal: 24, marginBottom: 20 }}>
@@ -597,7 +612,7 @@ const ArChallengeCapture = ({}) => {
       });
     }, 1000);
 
-    this.intervalId = interval;
+    // this.intervalId = interval;
   };
   const clearTimer = () => {
     clearInterval(this.intervalId);
@@ -611,7 +626,7 @@ const ArChallengeCapture = ({}) => {
       try {
         // Capturar la vista dentro de ViewShot
         const capturedUri = await viewShotRef.current.capture();
-        console.log("Imagen capturada con filtro:", capturedUri);
+        // console.log("Imagen capturada con filtro:", capturedUri);
         updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
       } catch (error) {
         console.error("Error capturando la imagen con filtros:", error);
@@ -622,11 +637,11 @@ const ArChallengeCapture = ({}) => {
     navigation.replace("ArChallengeShare", {
       challengeObj: challengeObj,
       captureData: updatedData,
-      isImage: !!capturedImage,
+      challengeType: CHALLENGES_TYPE.PHOTO_VIDEO,
     });
   };
 
-  console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo", viewShotRef);
+  // console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo", viewShotRef);
   useEffect(() => {
     requestMultiple([
       PERMISSIONS.ANDROID.CAMERA,
@@ -634,9 +649,10 @@ const ArChallengeCapture = ({}) => {
       PERMISSIONS.ANDROID.RECORD_AUDIO,
       PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
       PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    ]).then(console.log);
+    ]);
+    // .then(console.log);
   }, []);
-  console.log("capturedVideo:", capturedVideo);
+  // console.log("capturedVideo:", capturedVideo);
 
   const retakeButtonHandler = () => {
     setCapturedImage(null);
@@ -674,84 +690,67 @@ const ArChallengeCapture = ({}) => {
 
   console.log("isUnityLoaded", isUnityLoaded);
 
-  return (
-    <BackgroundWithImage style={styles.mainContainer}>
-      <View
-        style={[
-          styles.mainHeaderContainer,
-          Platform.OS == "ios" && challengeObj?.ar_filters.length == 0
-            ? styles.mainHeaderContainerIOS
-            : {},
-        ]}
-      >
-        <AppHeader
-          centerComponent={{
-            text: "AR Photo Challenges",
-            numberOfLines: 2,
-            style: [styles.heading],
-          }}
-          backgroundColor="transparent"
-        />
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.innerContent}>
-        <View style={styles.viewDetailsIconContainer}>
-          <View style={styles.viewDetailsIconContainerWrapper}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                flex: 1,
-              }}
-            >
-              <Image
-                style={styles.viewDetailsIcon}
-                source={{ uri: challengeObj?.sponsored?.image }}
-              />
-              <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => {
-                setChallengeInformationView(true);
-                setIsUnityLoaded(false);
-              }}
-              style={styles.viewDetailBtn}
-            >
-              <Text style={styles.btnText}>View Details</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+  const sponsorButtonPressHandler = () => {
+    setChallengeInformationView(true);
+    setIsUnityLoaded(false);
+  };
 
-        <UnityARCamera
-          unityRef={unityRef}
-          isProcessingMedia={processingMedia}
-          isUnityLoaded={isUnityLoaded}
-          onUnityLayout={handleUnityViewLayout}
-          capturedImage={capturedImage}
-          imageFilter={{ challengeObj: challengeObj, viewShotRef: viewShotRef }}
-          capturedVideo={capturedVideo}
-        />
-
-        <CameraControls
-          hasCapturedContent={!!capturedImage || !!capturedVideo}
-          onRetake={retakeButtonHandler}
-          onDone={doneButtonHandler}
-          onCameraPress={cameraPressHandler}
-          startRecordVideo={startRecordVideoHandler}
-          stopRecordVideo={stopRecordVideoHandler}
-          isRecording={!!recordingStart}
-          timer={timer}
-          isVideo={!isPhotoChallenge}
-          challengeHasFilters={challengeHasFilters}
-        />
-      </ScrollView>
-
+  const modals = (
+    <>
       <CaptureInfoView
         isVisible={detailsShow}
         content={settings?.waiver_details}
         onAccept={acceptWaiverButtonHandler}
       />
       {challengeInformationView && <ChallengeDetailView />}
-    </BackgroundWithImage>
+    </>
+  );
+
+  const viewInfoButton = (
+    <AppButton
+      onPress={sponsorButtonPressHandler}
+      buttonStyle={{ height: 40, width: 100 }}
+      // containerStyle={{}}
+      title={"VIEW INFO"}
+      titleStyle={{ fontSize: FontSizes.S14, fontWeight: 700 }}
+    />
+  );
+
+  return (
+    <ChallengeScreen
+      title="AR Photo Challenges"
+      headerRightComponent={viewInfoButton}
+      modals={modals}
+    >
+      {/* <SponsorBannerCaptureHeader
+        imageUri={challengeObj?.sponsored?.image}
+        sponsorName={challengeObj?.sponsored?.name}
+        onPress={sponsorButtonPressHandler}
+      /> */}
+
+      <UnityARCamera
+        unityRef={unityRef}
+        isProcessingMedia={processingMedia}
+        isUnityLoaded={isUnityLoaded}
+        onUnityLayout={handleUnityViewLayout}
+        capturedImage={capturedImage}
+        imageFilter={{ challengeObj: challengeObj, viewShotRef: viewShotRef }}
+        capturedVideo={capturedVideo}
+      />
+
+      <CameraControls
+        hasCapturedContent={!!capturedImage || !!capturedVideo}
+        onRetake={retakeButtonHandler}
+        onDone={doneButtonHandler}
+        onCameraPress={cameraPressHandler}
+        startRecordVideo={startRecordVideoHandler}
+        stopRecordVideo={stopRecordVideoHandler}
+        isRecording={!!recordingStart}
+        timer={timer}
+        isVideo={!isPhotoChallenge}
+        challengeHasFilters={challengeHasFilters}
+      />
+    </ChallengeScreen>
   );
 };
 

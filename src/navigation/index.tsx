@@ -46,7 +46,6 @@ import ChallengeSelection from "../screens/geoarchallenge/challengeselection";
 import UniqueArChallenge from "../screens/geoarchallenge/uniquechallenge";
 import PinChallenge from "../screens/geoarchallenge/pinchallenge";
 import StarChallenge from "../screens/geoarchallenge/starchallenge";
-import ArPinChallengeShare from "../screens/geoarchallenge/locationpinshare";
 import GeoUniqueArChallengeDetails from "../screens/geoarchallenge/geouniquechallengedetails";
 import UniqueArChallengeCapture from "../screens/geoarchallenge/uniquechallengecapture";
 import UniqueArChallengeShare from "../screens/geoarchallenge/uniquechallengeshare";
@@ -161,7 +160,6 @@ const Navigation = () => {
         <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
         <Stack.Screen name="PinChallenge" component={PinChallenge} />
         <Stack.Screen name="StarChallenge" component={StarChallenge} />
-        <Stack.Screen name="ArPinChallengeShare" component={ArPinChallengeShare} />
         <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
         <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
         <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
