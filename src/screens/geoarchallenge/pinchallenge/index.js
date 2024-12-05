@@ -21,9 +21,10 @@ import RNFS from "react-native-fs";
 import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
 import CaptureInfoView from "components/CaptureInfoView";
-import CaptureChallengeScreen from "components/CaptureChallengeScreen";
+import ChallengeScreen from "components/ChallengeScreen";
 import PinFoundCaptureHeader from "components/PinFoundCaptureHeader";
 import PinInfoCaptureFooter from "components/PinInfoCaptureFooter";
+import { CHALLENGES_TYPE } from "constants";
 
 const PinChallenge = () => {
   const navigation = useNavigation();
@@ -371,9 +372,10 @@ const PinChallenge = () => {
   };
 
   const onDonePress = () => {
-    navigation.replace("ArPinChallengeShare", {
-      challengeObj,
+    navigation.replace("ArChallengeShare", {
+      challengeObj: challengeObj,
       captureData: capturedImage,
+      challengeType: CHALLENGES_TYPE.PIN_CHECK_IN,
     });
   };
 
@@ -439,7 +441,7 @@ const PinChallenge = () => {
   );
 
   return (
-    <CaptureChallengeScreen title={`Location Check In\n${selectedGeoSite.name}`} modals={modals}>
+    <ChallengeScreen title={`Location Check In\n${selectedGeoSite.name}`} modals={modals}>
       <PinFoundCaptureHeader pinFound={!!isMeInsideInSite} points={challengeObj?.points} />
 
       <UnityARCamera
@@ -461,7 +463,7 @@ const PinChallenge = () => {
       />
 
       <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} />
-    </CaptureChallengeScreen>
+    </ChallengeScreen>
   );
 };
 

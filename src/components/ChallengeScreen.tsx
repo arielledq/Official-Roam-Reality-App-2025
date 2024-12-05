@@ -12,7 +12,7 @@ interface CaptureChallengeScreenProps {
   children: React.ReactNode;
 }
 
-const CaptureChallengeScreen = ({ title = "", modals, children }: CaptureChallengeScreenProps) => {
+const ChallengeScreen = ({ title = "", modals, children }: CaptureChallengeScreenProps) => {
   return (
     <BackgroundWithImage
       style={{
@@ -50,4 +50,4 @@ const CaptureChallengeScreen = ({ title = "", modals, children }: CaptureChallen
   );
 };
 
-export default CaptureChallengeScreen;
+export default ChallengeScreen;

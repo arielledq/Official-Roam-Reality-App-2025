@@ -23,7 +23,7 @@ import Share from "react-native-share";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import CaptureInfoView from "components/CaptureInfoView";
-import CaptureChallengeScreen from "components/CaptureChallengeScreen";
+import ChallengeScreen from "components/ChallengeScreen";
 import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
 const { width } = Dimensions.get("window");
 
@@ -635,7 +635,7 @@ const ArChallengeCapture = () => {
     navigation.replace("ArChallengeShare", {
       challengeObj: challengeObj,
       captureData: updatedData,
-      isImage: !!capturedImage,
+      challengeType: CHALLENGES_TYPE.PHOTO_VIDEO,
     });
   };
 
@@ -705,7 +705,7 @@ const ArChallengeCapture = () => {
   );
 
   return (
-    <CaptureChallengeScreen title="AR Photo Challenges" modals={modals}>
+    <ChallengeScreen title="AR Photo Challenges" modals={modals}>
       <SponsorBannerCaptureHeader
         imageUri={challengeObj?.sponsored?.image}
         sponsorName={challengeObj?.sponsored?.name}
@@ -734,7 +734,7 @@ const ArChallengeCapture = () => {
         isVideo={!isPhotoChallenge}
         challengeHasFilters={challengeHasFilters}
       />
-    </CaptureChallengeScreen>
+    </ChallengeScreen>
   );
 };
 

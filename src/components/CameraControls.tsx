@@ -94,8 +94,8 @@ const CameraControls = ({
 export default CameraControls;
 
 const $cameraButton: ViewStyle = {
-  width: 52,
-  height: 52,
+  width: 48,
+  height: 48,
 };
 
 const $actionButtons: ViewStyle = {
