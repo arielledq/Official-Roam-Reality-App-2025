@@ -302,7 +302,7 @@ const ArChallengeShare = () => {
               color: theme.lightColors.grey,
             }}
           >
-            Must share you content to at least 1 social media platform to earn any points
+            Must share your content to at least 1 social media platform to earn any points
           </Text>
 
           <TouchableOpacity
