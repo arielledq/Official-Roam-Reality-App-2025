@@ -121,7 +121,12 @@ const ArChallengeShare = () => {
 
       if (res.status === 1) {
         showMessage("Successfully, completed your challenge.", "success", `${screenTitle} Share!`);
-        endExperience();
+        try {
+          await postArMemory(formData);
+          endExperience();
+        } catch (error) {
+          console.error("Error al compartir compartir la memoria:", error);
+        }
       } else {
         handleError(res.message);
       }
@@ -131,10 +136,6 @@ const ArChallengeShare = () => {
     } finally {
       setIsLoading(false);
     }
-    postArMemory(formData)
-      .then(res => {})
-      .catch(error => {})
-      .finally(() => {});
   };
 
   const shareToSocialMedia = async () => {
