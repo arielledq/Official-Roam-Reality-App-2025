@@ -390,20 +390,6 @@ const ArChallengeShare = () => {
         title={"End & Share to Roam Profile"}
         loading={isLoading}
       />
-
-      <AppText
-        numberOfLines={3}
-        style={{
-          ...fontGroup.p400,
-          fontSize: FontSizes.S12,
-          color: "#9CA3AF",
-          marginTop: 10,
-          marginBottom: 30,
-        }}
-      >
-        Please note you must share your experience to at least one social platform to earn all your
-        points.
-      </AppText>
     </ChallengeScreen>
   );
 };
