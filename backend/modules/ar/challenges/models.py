@@ -625,7 +625,7 @@ class ARSitePinCheckIn(models.Model):
         User, on_delete=models.CASCADE, related_name="user_ar_site_checkin"
     )
     check_in_image = models.ImageField(upload_to="geoar/checkinimg/", null=True, blank=True)
-    approval = models.CharField(
+    challenge_approval = models.CharField(
         max_length=50,
         choices=CHALLENGE_APPROVAL_CHOICES,
         default="UNAPPROVED",
@@ -635,6 +635,14 @@ class ARSitePinCheckIn(models.Model):
     declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
+    challenges = models.ForeignKey(
+        Challenges,
+        verbose_name="Challenge",
+        on_delete=models.CASCADE,
+        related_name="challenges_ar_check_in",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name_plural = "AR Site Pin Check-ins"
