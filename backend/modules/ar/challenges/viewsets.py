@@ -5,7 +5,7 @@ from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
-    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer
+    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -523,3 +523,18 @@ class DestinationFactsViewSet(ViewSet):
         objs = self.queryset.all()
         serializer = DestinationFactsSerializer(objs, many=True)
         return Response(serializer.data)
+
+
+class MemoryCheckinViewSet(ViewSet):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def list(self, request):
+        try:
+            all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
+            all_user_memories = ARMemories.objects.filter(user=request.user.id)
+            serializer = ARAllMemories([*all_user_check_in, *all_user_memories], many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

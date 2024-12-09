@@ -131,7 +131,8 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "challenge_approval",
             "challenges",
             "thumbnail_memory_video_file",
-            "memory_type"
+            "memory_type",
+            "created_at",
         )
 
 class ARMemoriesSerializer(serializers.ModelSerializer):
@@ -236,6 +237,7 @@ class StarCollectionSerializer(serializers.ModelSerializer):
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     check_in_image = serializers.FileField()
+    # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:
         model = ARSitePinCheckIn
@@ -268,4 +270,12 @@ class PanicMessageSerializer(GeoModelSerializer):
         fields = (
             "__all__"
         )
-        
+
+
+class ARAllMemories(serializers.Serializer):
+    def to_representation(self, instance):
+        if isinstance(instance, ARMemories):
+            return ARMemoriesSerializerGet(instance).data
+        elif isinstance(instance, ARSitePinCheckIn):
+            return ARMemoriesSerializerGet(instance).data
+        return {}

@@ -170,8 +170,9 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     search_fields = (
         "user__name",
         "geo_site__name",
+        "challenges__name",
     )
-    list_display = ('user_name', 'geo_site', 'approval','check_in_image')
+    list_display = ('user_name', 'geo_site', 'challenges', 'challenge_approval', 'check_in_image')
     list_select_related = ['user']  # To avoid extra queries
 
     def user_name(self, obj):
