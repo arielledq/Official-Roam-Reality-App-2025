@@ -121,7 +121,12 @@ const ArChallengeShare = () => {
 
       if (res.status === 1) {
         showMessage("Successfully, completed your challenge.", "success", `${screenTitle} Share!`);
-        endExperience();
+        try {
+          await postArMemory(formData);
+          endExperience();
+        } catch (error) {
+          console.error("Error al compartir compartir la memoria:", error);
+        }
       } else {
         handleError(res.message);
       }
@@ -131,10 +136,6 @@ const ArChallengeShare = () => {
     } finally {
       setIsLoading(false);
     }
-    postArMemory(formData)
-      .then(res => {})
-      .catch(error => {})
-      .finally(() => {});
   };
 
   const shareToSocialMedia = async () => {
@@ -302,7 +303,7 @@ const ArChallengeShare = () => {
               color: theme.lightColors.grey,
             }}
           >
-            Must share you content to at least 1 social media platform to earn any points
+            Must share your content to at least 1 social media platform to earn any points
           </Text>
 
           <TouchableOpacity
@@ -390,20 +391,6 @@ const ArChallengeShare = () => {
         title={"End & Share to Roam Profile"}
         loading={isLoading}
       />
-
-      <AppText
-        numberOfLines={3}
-        style={{
-          ...fontGroup.p400,
-          fontSize: FontSizes.S12,
-          color: "#9CA3AF",
-          marginTop: 10,
-          marginBottom: 30,
-        }}
-      >
-        Please note you must share your experience to at least one social platform to earn all your
-        points.
-      </AppText>
     </ChallengeScreen>
   );
 };

@@ -688,8 +688,6 @@ const ArChallengeCapture = () => {
 
   const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
 
-  console.log("isUnityLoaded", isUnityLoaded);
-
   const sponsorButtonPressHandler = () => {
     setChallengeInformationView(true);
     setIsUnityLoaded(false);
@@ -707,13 +705,14 @@ const ArChallengeCapture = () => {
   );
 
   const viewInfoButton = (
-    <AppButton
-      onPress={sponsorButtonPressHandler}
-      buttonStyle={{ height: 40, width: 100 }}
-      // containerStyle={{}}
-      title={"VIEW INFO"}
-      titleStyle={{ fontSize: FontSizes.S14, fontWeight: 700 }}
-    />
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <AppButton
+        onPress={sponsorButtonPressHandler}
+        buttonStyle={{ height: 40, width: 90 }}
+        title={"VIEW INFO"}
+        titleStyle={{ fontSize: FontSizes.S12, fontWeight: 700 }}
+      />
+    </View>
   );
 
   return (
@@ -722,12 +721,6 @@ const ArChallengeCapture = () => {
       headerRightComponent={viewInfoButton}
       modals={modals}
     >
-      {/* <SponsorBannerCaptureHeader
-        imageUri={challengeObj?.sponsored?.image}
-        sponsorName={challengeObj?.sponsored?.name}
-        onPress={sponsorButtonPressHandler}
-      /> */}
-
       <UnityARCamera
         unityRef={unityRef}
         isProcessingMedia={processingMedia}
