@@ -31,7 +31,7 @@ const { width } = Dimensions.get("window");
 
 const VIDEO_RECORD_TIME = 10;
 
-const ArChallengeCapture = () => {
+const ArChallengeCapture = ({}) => {
   const styles = useStyles();
   const unityRef = useRef(null);
   const route = useRoute();
@@ -114,7 +114,7 @@ const ArChallengeCapture = () => {
 
   const unzipModelFile = (sourcePath, targetPath) => {
     const charset = "UTF-8";
-    setProcessingMedia(true);
+    // setProcessingMedia(true);
 
     unzip(sourcePath, targetPath, charset)
       .then(path => {
@@ -153,7 +153,7 @@ const ArChallengeCapture = () => {
         console.error("Error descomprimiendo el archivo:", err);
       })
       .finally(() => {
-        setProcessingMedia(false);
+        // setProcessingMedia(false);
       });
   };
 
@@ -184,19 +184,19 @@ const ArChallengeCapture = () => {
 
   useEffect(() => {
     if (challengeObjParameters) {
-      setThreshold(challengeObjParameters?.bloom_threshold || 1);
-      setIntensity(challengeObjParameters?.image_opacity_value || 1);
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
       setPosition({
-        x: challengeObjParameters?.positionX || 0,
-        y: challengeObjParameters?.positionY || 0,
-        z: challengeObjParameters?.positionZ || 0,
+        x: parseFloat(challengeObjParameters?.positionX) || 0,
+        y: parseFloat(challengeObjParameters?.positionY) || 0,
+        z: parseFloat(challengeObjParameters?.positionZ) || 0,
       });
       setScale({
-        x: challengeObjParameters?.scale_object || 1,
-        y: challengeObjParameters?.scale_object || 1,
-        z: challengeObjParameters?.scale_object || 1,
+        x: parseFloat(challengeObjParameters?.scale_object) || 1,
+        y: parseFloat(challengeObjParameters?.scale_object )|| 1,
+        z: parseFloat(challengeObjParameters?.scale_object) || 1,
       });
-      setEmissionValue(challengeObjParameters?.diffuse_intensity || 1);
+      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
     }
   }, [challengeObjParameters]);
 
@@ -208,6 +208,14 @@ const ArChallengeCapture = () => {
       }
     }, [modelOBJ, textureBase, isUnityLoaded])
   );
+
+  useEffect(()=>{
+    if (unityRef.current && challengeHasFilters)
+    {
+      loadingFalse()
+    }
+  },[isUnityLoaded])
+
   // useFocusEffect(
   //   useCallback(() => {
   //     // Montar UnityView cuando la pantalla está enfocada
@@ -230,35 +238,56 @@ const ArChallengeCapture = () => {
   // );
 
   const sendModelDataToUnitySpawn = () => {
+    console.log("Validando referencias antes de enviar...");
+  
     if (unityRef.current && modelOBJ && textureBase) {
+      console.log("Entró al bloque IF: Enviando datos a Unity...");
+  
+      // Datos del modelo 3D
       const modelData = {
         objFile: modelOBJ.replace("file://", ""),
         mtlFile: modelResource ? modelResource.replace("file://", "") : null,
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
-        position,
         scale,
         rotation,
-        emissionIntensity: emissionValue, // Intensidad de la emisión (float)
-        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1, // Velocidad de rotación
-        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01, // Velocidad de escalado
+        position, 
+        isRotationEnabled: true,
+        emissionIntensity: emissionValue,
+        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1,
+        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
-        isRotationEnabled: true,
       };
-
-      unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+  
+      console.log("Datos del modelo a enviar:", modelData);
+  
+      // Enviar datos del modelo a Unity
+      unityRef.current.postMessage(
+        "OBJImport", "LoadModelFromReact", JSON.stringify(modelData)
+      );
+  
+      const visibilityConfig = {
+        isVisible: true,
+      };
+     
+      unityRef.current.postMessage(
+        "OBJImport", // Nombre del script en Unity
+        "SetVisibilityFromReact", // Método que se llamará
+        JSON.stringify(visibilityConfig)
+      );
+      console.log("Todos los datos fueron enviados a Unity.");
     } else {
-      console.log("UnityView o modelOBJ no están disponibles.");
+      console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
   };
-  // console.log(
-  //   "-----------MODELOS----------",
-  //   modelOBJ,
-  //   modelResource,
-  //   textureBase,
-  //   textureEmission
-  // );
+  console.log(
+    "-----------MODELOS----------",
+    modelOBJ,
+    modelResource,
+    textureBase,
+    textureEmission
+  );
   function enviarComandoAUnity(comando) {
     const commandData = JSON.stringify({ command: comando });
 
@@ -617,7 +646,10 @@ const ArChallengeCapture = () => {
   const clearTimer = () => {
     clearInterval(this.intervalId);
   };
-
+  const loadingFalse = () => {
+  if (challengeHasFilters){
+    unityRef.current.postMessage("OBJImport", "SetLoadingVisibility" , JSON.stringify({isVisible : false}))}
+  }
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
     let updatedData = capturedImage ? capturedImage : capturedVideo;
