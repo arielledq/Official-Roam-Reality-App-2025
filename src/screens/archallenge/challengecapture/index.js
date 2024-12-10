@@ -24,7 +24,6 @@ import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
-import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
 import { CHALLENGES_TYPE } from "constants";
 import { AppButton } from "components";
 const { width } = Dimensions.get("window");
@@ -184,8 +183,8 @@ const ArChallengeCapture = () => {
 
   useEffect(() => {
     if (challengeObjParameters) {
-      setThreshold(challengeObjParameters?.bloom_threshold || 1);
-      setIntensity(challengeObjParameters?.image_opacity_value || 1);
+      setThreshold(challengeObjParameters?.bloom_threshold || 0.9);
+      setIntensity(challengeObjParameters?.bloom_intensity || 5);
       setPosition({
         x: challengeObjParameters?.positionX || 0,
         y: challengeObjParameters?.positionY || 0,
@@ -196,7 +195,7 @@ const ArChallengeCapture = () => {
         y: challengeObjParameters?.scale_object || 1,
         z: challengeObjParameters?.scale_object || 1,
       });
-      setEmissionValue(challengeObjParameters?.diffuse_intensity || 1);
+      setEmissionValue(challengeObjParameters?.emission_value || 1);
     }
   }, [challengeObjParameters]);
 

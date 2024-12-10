@@ -400,8 +400,8 @@ const PinChallenge = () => {
 
   useEffect(() => {
     if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.9);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 5);
       setPosition({
         x: parseFloat(challengeObjParameters?.positionX) || 0,
         y: parseFloat(challengeObjParameters?.positionY) || 0,
