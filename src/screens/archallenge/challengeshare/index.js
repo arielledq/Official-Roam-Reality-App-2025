@@ -48,7 +48,6 @@ const ArChallengeShare = () => {
     default:
       break;
   }
-  // console.log("selectedGeoSite", selectedGeoSite?.id);
   const startDate = moment().format("MM-DD-YYYY");
 
   const navigation = useNavigation();
@@ -107,6 +106,7 @@ const ArChallengeShare = () => {
           break;
 
         case CHALLENGES_TYPE.PIN_CHECK_IN:
+          formData.append("challenges", challengeObj.id);
           formData.append("geo_site", selectedGeoSite?.id);
           formData.append("check_in_image", shareFile);
 
