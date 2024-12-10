@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useFocusEffect, useCallback, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -54,6 +54,7 @@ const StarChallenge = () => {
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
   const settings = useSelector(state => state.ar?.arSettings);
+  const challengeObjParameters = useSelector(state => state.ar?.parameters);
   const navigation = useNavigation();
 
   const unityRef = useRef(null); // Unity reference
@@ -85,7 +86,13 @@ const StarChallenge = () => {
   const [starModels, setStarModels] = useState([]);
   const [starObjE, setStarObjE] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
-
+  const [textureBase, setTextureBase] = useState();
+  const [textureEmission, setTextureEmission] = useState();
+  const [fFoldefile, setFoldefile] = useState();
+  const [modelResource, setModelResource] = useState();
+  const [threshold, setThreshold] = useState(0);
+  const [intensity, setIntensity] = useState(1);
+  
   // Check and request permissions
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -106,6 +113,7 @@ const StarChallenge = () => {
     }
   };
 
+  console.warn = () => {};
   // Set the total number of stars to collect
   const setStarCounts = () => {
     let count = 0;
@@ -229,6 +237,15 @@ const StarChallenge = () => {
     }
   };
 
+  useEffect(() => {
+    if (challengeObjParameters) {
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
+    }
+  }, [challengeObjParameters]);
+
+
+
   // Check if a star is already collected
   const isStarIsCollected = point => {
     return collectedStars.some(
@@ -278,16 +295,16 @@ const StarChallenge = () => {
     }
   };
 
-  // Start compass heading updates
-  useEffect(() => {
-    const degree_update_rate = 3;
-    CompassHeading.start(degree_update_rate, heading => {
-      setCompassHeading(heading);
-    });
-    return () => {
-      CompassHeading.stop();
-    };
-  }, []);
+  // Start compass heading updates PEDIENTE LENTO
+  // useEffect(() => {
+  //   const degree_update_rate = 3;
+  //   CompassHeading.start(degree_update_rate, heading => {
+  //     setCompassHeading(heading);
+  //   });
+  //   return () => {
+  //     CompassHeading.stop();
+  //   };
+  // }, []);
 
   // ComponentDidMount equivalent
   useEffect(() => {
@@ -303,75 +320,103 @@ const StarChallenge = () => {
   const downloadAndPrepareModels = () => {
     if (selectedGeoARSiteStars.length > 0) {
       setLoading(true);
-      selectedGeoARSiteStars.forEach((starObj, index) => {
+      selectedGeoARSiteStars.forEach((starObj) => {
         const challengeObj = starObj.challenges;
         const modelFile = challengeObj?.model_file;
-
         if (challengeObj?.challenge_choice === "3DMODEL" && modelFile) {
           const filename = modelFile.split("/").pop().split("?")[0];
           const withoutExtFilename = filename.split(".")[0];
           const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
           const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-
-          const downloadModelFile = () => {
+          const downloadModelFile = (sourcePath, targetPath, modelFile) => {
             RNFetchBlob.config({
               fileCache: true,
               path: sourcePath,
             })
               .fetch("GET", modelFile)
               .progress((received, total) => {
-                setProgress(Math.trunc(Number((received / total) * 100)));
+                const progress = Math.trunc((received / total) * 100);
+                setProgress(progress);
+                console.log("Progreso de descarga:", progress, "%");
               })
-              .then(res => {
-                unzipModelFile(res.path());
+              .then((res) => {
+                unzipModelFile(res.path(), targetPath);
               })
-              .catch(error => {
-                console.error(error);
+              .catch((error) => {
               });
           };
-
-          const unzipModelFile = sourcePath => {
-            const charset = "UTF-8";
-            unzip(sourcePath, targetPath, charset)
-              .then(path => {
-                RNFS.readDir(path).then(result => {
-                  let objFile = null;
-                  result.forEach(file => {
-                    if (file.name.includes(".obj")) {
-                      objFile = Platform.OS === "android" ? `file://${file.path}` : file.path;
+          const unzipModelFile = (sourcePath, targetPath) => {
+            unzip(sourcePath, targetPath, "UTF-8")
+              .then((path) => {
+                RNFS.readDir(path)
+                  .then((result) => {
+                    if (!result || !Array.isArray(result)) {
+                      return;
                     }
+                    const sourcesArray = [];
+                    let objFile = null;
+                    let mtlFile = null;
+                    let baseTexture = null;
+                    let emissionTexture = null;
+          
+                    result.forEach((file) => {
+                     
+                      if (!file.name || !file.path) {
+                        console.warn("Archivo inválido encontrado:", file);
+                        return;
+                      }
+          
+                      const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
+          
+                      // Procesar cada tipo de archivo
+                      if (file.name.includes(".obj")) {
+                        objFile = filePath;
+                      } else if (file.name.includes(".mtl")) {
+                        mtlFile = filePath;
+                      } else if (file.name.toLowerCase().includes("diffuse")) {
+                        baseTexture = filePath;
+                      } else if (file.name.toLowerCase().includes("emission")) {
+                        emissionTexture = filePath;
+                      } else {
+                        sourcesArray.push({ uri: filePath });
+                      }
+                      setStarModels(objFile || ""); // Manejar valores nulos
+                    setModelResource(mtlFile);
+                    setTextureBase(baseTexture);
+                    setTextureEmission(emissionTexture);
+                    setSourcesFiles(sourcesArray);
+                    setFoldefile(result);
+                    });
+                    setLoading(false);
+                  })
+                  .catch((error) => {
+                    console.error("Error leyendo el directorio descomprimido:", error);
                   });
-                  if (objFile) {
-                    setStarModels(prevModels => [
-                      ...prevModels,
-                      { starId: starObj.id, modelPath: objFile },
-                    ]);
-                  }
-                  setLoading(false);
-                  setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
-                });
               })
-              .catch(error => {
-                console.error(error);
-                setLoading(true);
+              .catch((error) => {
+                console.error("Error durante la descompresión:", error);
               });
           };
-
+          
+  
           RNFS.exists(sourcePath)
-            .then(exists => {
+            .then((exists) => {
+              console.log("Archivo existe:", exists);
               if (exists) {
-                unzipModelFile(sourcePath);
+                unzipModelFile(sourcePath, targetPath);
               } else {
-                downloadModelFile();
+                downloadModelFile(sourcePath, targetPath, modelFile);
               }
             })
-            .catch(error => {
-              console.error(error);
+            .catch((error) => {
+              console.error("Error verificando existencia del archivo:", error);
             });
         }
       });
+    } else {
+      console.log("No hay modelos seleccionados.");
     }
-  };
+  };  
 
   // Download models when component mounts
   useEffect(() => {
@@ -400,46 +445,112 @@ const StarChallenge = () => {
     // Handle messages from Unity
   };
 
-  // Send model data to Unity
   const sendModelDataToUnity = () => {
-    if (unityRef.current && starModels.length > 0) {
-      starModels.forEach(starModel => {
-        const starObj = selectedGeoARSiteStars.find(star => star.id === starModel.starId);
-        const challengeObj = starObj?.challenges;
-        const challengeObjParameters = challengeObj?.parameters;
+    console.log('Entro en modeldata')
+    if (unityRef.current && textureBase && starModels) {
+console.log("Datos Enviados:", modelData)
+      // Datos del modelo 3D
+      const modelData = {
+        objFile: starModels.replace("file://", ""),
+        mtlFile: modelResource ? modelResource.replace("file://", "") : null,
+        textureBase: textureBase ? textureBase.replace("file://", "") : "",
+        textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
+        scale: {
+                    x: challengeObjParameters?.scale_object
+                      ? Number(challengeObjParameters?.scale_object)
+                      : 0.05,
+                    y: challengeObjParameters?.scale_object
+                      ? Number(challengeObjParameters?.scale_object)
+                      : 0.05,
+                    z: challengeObjParameters?.scale_object
+                      ? Number(challengeObjParameters?.scale_object)
+                      : 0.05,
+                  },
+        // position : {
+        //   x: parseFloat(challengeObjParameters?.positionX) || 0,
+        //   y: parseFloat(challengeObjParameters?.positionY) || 0,
+        //   z: parseFloat(challengeObjParameters?.positionZ) || 0,
+        // },
+        emissionIntensity: parseFloat(challengeObjParameters?.emission_value) || 1,
+        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1,
+        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
+        minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
+        maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
+      };
+      // console.log("Datos del modelo a enviar:", modelData);
+      // Enviar datos del modelo a Unity
+      unityRef.current.postMessage(
+        "OBJImport", "LoadModelFromReact", JSON.stringify(modelData)
+      );
+   
+      // Parámetros adicionales para el GPSHandler en Unity
+      const parameters = {
+        smoothing: 0.5,      // Factor de suavizado
+        scale: 1,        // Factor de escala
+        autoUpdate: false     // Control de actualización automática
+      };
+      
+      unityRef.current.postMessage(
+        "ObjectSpawner",
+        "ConfigureParameters",
+        JSON.stringify(parameters)
+      );
+  
+      // Datos de los objetos GPS
+      const start_site = starObj.star_location.coordinates
+      console.log("----", start_site, "----", starObj.star_location)
+      const objects = {
+        objects: start_site.map(coord => ({
+          latitude: coord[1], // Índice 1 corresponde a la latitud
+          longitude: coord[0], // Índice 0 corresponde a la longitud
+          isVisible: true,
+          scale: 1,
+          height: 0,
+          updateRadius: 30.0,
+        })),
+      };
+  
+      console.log("Datos de los objetos GPS a enviar:", objects);
+  
+      // Enviar datos de objetos a Unity
+      unityRef.current.postMessage(
+        "ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(objects)
+      );
+      const visibilityConfig = {
+        isVisible: true,
+      };
+     
+      unityRef.current.postMessage(
+        "OBJImport", // Nombre del script en Unity
+        "SetVisibilityFromReact", // Método que se llamará
+        JSON.stringify(visibilityConfig)
+      );
 
-        const modelData = {
-          objFile: starModel.modelPath.replace("file://", ""),
-          scale: {
-            x: challengeObjParameters?.scale_object
-              ? Number(challengeObjParameters?.scale_object)
-              : 0.05,
-            y: challengeObjParameters?.scale_object
-              ? Number(challengeObjParameters?.scale_object)
-              : 0.05,
-            z: challengeObjParameters?.scale_object
-              ? Number(challengeObjParameters?.scale_object)
-              : 0.05,
-          },
-          rotation: { x: 0, y: 0, z: 0 },
-          position: {
-            x: challengeObjParameters?.positionX ? Number(challengeObjParameters?.positionX) : 0,
-            y: challengeObjParameters?.positionY ? Number(challengeObjParameters?.positionY) : -5,
-            z: challengeObjParameters?.positionZ ? Number(challengeObjParameters?.positionZ) : -25,
-          },
-        };
-
-        unityRef.current.postMessage("StarManager", "AddStar", JSON.stringify(modelData));
-      });
+      // console.log("Todos los datos fueron enviados a Unity.");
+    } else {
+      // console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
   };
 
-  // Send model data to Unity when models are ready
-  useEffect(() => {
-    if (starModels.length > 0) {
-      sendModelDataToUnity();
+  const sendBloomValuesToUnity = () => {
+    const bloomData = { threshold, intensity };
+    if (unityRef.current) {
+      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
     }
-  }, [starModels]);
+  };
+
+  useEffect(() => {
+    if (!unityRef.current) {
+      // console.log("UnityRef not ready, waiting...");
+      return;
+    }
+  
+    if (starModels && textureBase && unityRef.current) {
+      // console.log("Sending data to Unity...");
+      sendModelDataToUnity();
+       sendBloomValuesToUnity();
+    }
+  }, [isUnityLoaded]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -502,10 +613,9 @@ const StarChallenge = () => {
             isUnityLoaded={isUnityLoaded}
             capturedImage={capturedImage}
             capturedVideo={capturedVideo}
-            starModels={starModels}
-            currentLocation={currentLocation}
-            compassHeading={compassHeading}
-            collectedStars={collectedStars}
+            // currentLocation={currentLocation}
+            // compassHeading={compassHeading}
+            // collectedStars={collectedStars}
           />
         </View>
 
@@ -590,3 +700,4 @@ const StarChallenge = () => {
 };
 
 export default StarChallenge;
+
