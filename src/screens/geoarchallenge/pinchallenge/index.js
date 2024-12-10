@@ -167,31 +167,47 @@ const PinChallenge = () => {
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
         isRotationEnabled: true,
-        useGPS: true, // Activar GPS
-        gpsLatitude: siteLatitude || 0, // Latitud del GPS
-        gpsLongitude: siteLongitude || 0, // Longitud del GPS
+        // useGPS: true, // Activar GPS
+        // gpsLatitude: siteLatitude || 0, // Latitud del GPS
+        // gpsLongitude: siteLongitude || 0, // Longitud del GPS
+        position : {
+          x: parseFloat(challengeObjParameters?.positionX) || 0,
+          y: parseFloat(challengeObjParameters?.positionY) || 0,
+          z: parseFloat(challengeObjParameters?.positionZ) || 1,
+        }
       };
-      console.log("AAAAAASITEEEEEEEEE", selectedGeoSite);
+      // console.log("AAAAAASITEEEEEEEEE", selectedGeoSite);
       console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
-      if (modelData.useGPS) {
-        const gpsConfig = {
-          smoothingFactor: 0.1, // Factor de suavizado del GPS
-          minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
-          scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
-          maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
-          isVisibleObject: true, // Controlar visibilidad inicial
-        };
-        console.log("Enviando configuración de GPS a Unity:", gpsConfig);
-        unityRef.current.postMessage(
-          "OBJImport", // GameObject que contiene el script
-          "ConfigureGPSFromReact", // Método del script
-          JSON.stringify(gpsConfig)
-        );
-      }
+      const visibilityConfig = {
+        isVisible: true,
+      };
+     
+      unityRef.current.postMessage(
+        "OBJImport", // Nombre del script en Unity
+        "SetVisibilityFromReact", // Método que se llamará
+        JSON.stringify(visibilityConfig)
+      );
+      console.log("Todos los datos fueron enviados a Unity.");
     } else {
-      console.log("UnityView o modelOBJ no están disponibles.");
+      console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
+      // if (modelData.useGPS) {
+      //   const gpsConfig = {
+      //     smoothingFactor: 0.1, // Factor de suavizado del GPS
+      //     minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
+      //     scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
+      //     maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
+      //     isVisibleObject: true, // Controlar visibilidad inicial
+      //   };
+      //   console.log("Enviando configuración de GPS a Unity:", gpsConfig);
+      //   unityRef.current.postMessage(
+      //     "OBJImport", // GameObject que contiene el script
+      //     "ConfigureGPSFromReact", // Método del script
+      //     JSON.stringify(gpsConfig)
+      //   );
+      // }
+    
   };
 
   const sendBloomValuesToUnity = () => {
