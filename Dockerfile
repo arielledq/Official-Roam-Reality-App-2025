@@ -36,6 +36,10 @@ ENV PATH="/.venv/bin:$PATH"
 # Copy app source
 COPY --chown=django:django ./backend .
 
+# Copy and set up the startup script
+COPY --chown=django:django ./backend/scripts/startup.sh /scripts/startup.sh
+RUN chmod +x /scripts/startup.sh
+
 RUN pip install ffmpeg-downloader
 RUN ffdl install -y
 # Copy web build from  rn_web_build stage
