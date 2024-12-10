@@ -10,8 +10,6 @@ import Geocoder from "react-native-geocoding";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
-let ScreenWidth = Dimensions.get("window").width;
-
 const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
   const styles = useStyles();
   const ar_filters = challengeObj?.ar_filters;
@@ -175,17 +173,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
       <BackgroundWithImage source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>
           {ar_filters.map(filter => {
-            let height = "102%";
-            if (Platform.OS === "android" && filter?.gradient_direction === "BOTTOM_TO_TOP") {
-              height = "100%";
-            }
-            if (Platform.OS === "ios" && filter?.gradient_direction === "TOP_TO_BOTTOM") {
-              height = ScreenWidth * 1.1;
-            }
-            if (Platform.OS === "ios" && filter?.gradient_direction === "BOTTOM_TO_TOP") {
-              height = "102%";
-            }
-
+            const isTopToBottom = filter?.gradient_direction === "TOP_TO_BOTTOM";
             return (
               <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
                 {filter.gradient_colors && (
@@ -204,10 +192,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                         flex: 1,
                         transform: [
                           {
-                            rotate:
-                              filter?.gradient_direction === "TOP_TO_BOTTOM" ? "0deg" : "180deg",
+                            rotate: isTopToBottom ? "0deg" : "180deg",
                           },
                         ],
+                        marginBottom: isTopToBottom ? "75%" : 0,
+                        marginTop: !isTopToBottom ? "75%" : 0,
                       }}
                       colors={[
                         ...filter?.gradient_colors.sort((a, b) => a.length - b.length),
