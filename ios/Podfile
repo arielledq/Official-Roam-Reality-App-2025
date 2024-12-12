@@ -2,9 +2,17 @@ require_relative '../node_modules/react-native/scripts/react_native_pods'
 require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 require_relative '../node_modules/react-native-permissions/scripts/setup'
 
+require_relative '../node_modules/react-native-permissions/scripts/setup'
+
 
 platform :ios, '15.5'
 prepare_react_native_project!
+
+  setup_permissions([
+    'Camera',
+    'Microphone',
+    'LocationWhenInUse'
+  ])
 
   setup_permissions([
     'Camera',
@@ -42,10 +50,13 @@ target 'travel_ar_app_42706' do
     # we make it explicit here to aid in the React Native upgrade process.
     :hermes_enabled => false, #flags[:hermes_enabled],
     :fabric_enabled => false,
+    :hermes_enabled => false, #flags[:hermes_enabled],
+    :fabric_enabled => false,
     # Enables Flipper.
     #
     # Note that if you have use_frameworks! enabled, Flipper will not work and
     # you should disable the next line.
+#    :flipper_configuration => flipper_config,
 #    :flipper_configuration => flipper_config,
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
@@ -66,7 +77,14 @@ target 'travel_ar_app_42706' do
 
 
 
+    pre_install do |installer|
+      $RNMapboxMaps.pre_install(installer)
+    end
+
+
+
   post_install do |installer|
+      $RNMapboxMaps.post_install(installer)
       $RNMapboxMaps.post_install(installer)
     react_native_post_install(
       installer,

@@ -8,11 +8,18 @@
 
 /* Begin PBXBuildFile section */
 		00C5DAB9E74228F680399FAA /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */; };
+		00C5DAB9E74228F680399FAA /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */; };
 		00E356F31AD99517003FC87E /* travel_ar_app_42706Tests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */; };
+		06180FBCD8B1C674F82B3D87 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
 		06180FBCD8B1C674F82B3D87 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */; };
 		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		53F7E19B2C8F7226007954D6 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F7E19A2C8F7226007954D6 /* NotificationService.swift */; };
+		53F7E19F2C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		6A35CD164AA24AC38B40103B /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 4997716CFFB9458BBC41B850 /* index.js */; };
+		7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */; };
+		7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = 7A0A2F212B7FA27000E778AF /* record.mp3 */; };
 		53F7E19B2C8F7226007954D6 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 53F7E19A2C8F7226007954D6 /* NotificationService.swift */; };
 		53F7E19F2C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		6A35CD164AA24AC38B40103B /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 4997716CFFB9458BBC41B850 /* index.js */; };
@@ -83,6 +90,13 @@
 			remoteGlobalIDString = 53F7E1972C8F7226007954D6;
 			remoteInfo = OneSignalNotificationServiceExtension;
 		};
+		53F7E19D2C8F7226007954D6 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 83CBB9F71A601CBA00E9B192 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 53F7E1972C8F7226007954D6;
+			remoteInfo = OneSignalNotificationServiceExtension;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -116,11 +130,20 @@
 		00E356F21AD99517003FC87E /* travel_ar_app_42706Tests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = travel_ar_app_42706Tests.m; sourceTree = "<group>"; };
 		09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* Roam Reality.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Roam Reality.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig"; sourceTree = "<group>"; };
+		13B07F961A680F5B00A75B9A /* Roam Reality.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Roam Reality.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = travel_ar_app_42706/AppDelegate.h; sourceTree = "<group>"; };
 		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = travel_ar_app_42706/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = travel_ar_app_42706/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = travel_ar_app_42706/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = travel_ar_app_42706/main.m; sourceTree = "<group>"; };
+		2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		4997716CFFB9458BBC41B850 /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
+		53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		53F7E19A2C8F7226007954D6 /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		53F7E19C2C8F7226007954D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
+		7A0A2F212B7FA27000E778AF /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../../src/assets/ar/record.mp3; sourceTree = "<group>"; };
 		2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4997716CFFB9458BBC41B850 /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
 		53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -191,10 +214,19 @@
 			buildActionMask = 2147483647;
 			files = (
 				06180FBCD8B1C674F82B3D87 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
+				06180FBCD8B1C674F82B3D87 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		13B07F8C1A680F5B00A75B9A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				00C5DAB9E74228F680399FAA /* libPods-travel_ar_app_42706.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53F7E1952C8F7226007954D6 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -255,8 +287,64 @@
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */,
 				2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
+				9268EABDB381BAB96E47BE4D /* libPods-travel_ar_app_42706.a */,
+				2A898882CD59C43EEA66EF14 /* libPods-travel_ar_app_42706-travel_ar_app_42706Tests.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		53F7E1992C8F7226007954D6 /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				53F7E19A2C8F7226007954D6 /* NotificationService.swift */,
+				53F7E19C2C8F7226007954D6 /* Info.plist */,
+			);
+			path = OneSignalNotificationServiceExtension;
+			sourceTree = "<group>";
+		};
+		7A0A2F1F2B7FA24600E778AF /* Sounds */ = {
+			isa = PBXGroup;
+			children = (
+				7A0A2F202B7FA27000E778AF /* camera-sound.mp3 */,
+				7A0A2F212B7FA27000E778AF /* record.mp3 */,
+			);
+			path = Sounds;
+			sourceTree = "<group>";
+		};
+		7C8964729316417391B79D39 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				DCB501122CA49EAC000B3F37 /* GlacialIndifferenceBold.otf */,
+				DCB5010C2CA49EAB000B3F37 /* GlacialIndifferenceItalic.otf */,
+				DCB501042CA49EAA000B3F37 /* GlacialIndifferenceRegular.otf */,
+				DCB501092CA49EAB000B3F37 /* NunitoSans10ptBlack.ttf */,
+				DCB5010D2CA49EAB000B3F37 /* NunitoSans10ptBold.ttf */,
+				DCB501052CA49EAB000B3F37 /* NunitoSans10ptExtraBold.ttf */,
+				DCB501112CA49EAC000B3F37 /* NunitoSans10ptExtraLight.ttf */,
+				DCB5010E2CA49EAB000B3F37 /* NunitoSans10ptLight.ttf */,
+				DCB501152CA49EAC000B3F37 /* NunitoSans10ptMedium.ttf */,
+				DCB501002CA49EAA000B3F37 /* NunitoSans10ptRegular.ttf */,
+				DCB501062CA49EAB000B3F37 /* NunitoSans10ptSemiBold.ttf */,
+				DCB501012CA49EAA000B3F37 /* PoppinsBlack.ttf */,
+				DCB5011B2CA49EAC000B3F37 /* PoppinsBold.ttf */,
+				DCB5010A2CA49EAB000B3F37 /* PoppinsExtraBold.ttf */,
+				DCB501022CA49EAA000B3F37 /* PoppinsExtraLight.ttf */,
+				DCB501032CA49EAA000B3F37 /* PoppinsLight.ttf */,
+				DCB501072CA49EAB000B3F37 /* PoppinsMedium.ttf */,
+				DCB501172CA49EAC000B3F37 /* PoppinsRegular.ttf */,
+				DCB5011A2CA49EAC000B3F37 /* PoppinsSemiBold.ttf */,
+				DCB501182CA49EAC000B3F37 /* PoppinsThin.ttf */,
+				DCB501082CA49EAB000B3F37 /* SFUIDisplayBlack.otf */,
+				DCB501132CA49EAC000B3F37 /* SFUIDisplayBold.otf */,
+				DCB501162CA49EAC000B3F37 /* SFUIDisplayLight.otf */,
+				DCB5010B2CA49EAB000B3F37 /* SFUIDisplayMedium.otf */,
+				DCB501142CA49EAC000B3F37 /* SFUIDisplayRegular.ttf */,
+				DCB501102CA49EAB000B3F37 /* SFUIDisplaySemibold.otf */,
+				DCB501192CA49EAC000B3F37 /* SFUIDisplayThin.otf */,
+				DCB5010F2CA49EAB000B3F37 /* SFUIDisplayUltralight.otf */,
+				4997716CFFB9458BBC41B850 /* index.js */,
+			);
+			name = Resources;
 			sourceTree = "<group>";
 		};
 		53F7E1992C8F7226007954D6 /* OneSignalNotificationServiceExtension */ = {
@@ -327,9 +415,11 @@
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* travel_ar_app_42706Tests */,
 				53F7E1992C8F7226007954D6 /* OneSignalNotificationServiceExtension */,
+				53F7E1992C8F7226007954D6 /* OneSignalNotificationServiceExtension */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				7C8964729316417391B79D39 /* Resources */,
 				7C8964729316417391B79D39 /* Resources */,
 			);
 			indentWidth = 2;
@@ -341,10 +431,36 @@
 			isa = PBXGroup;
 			children = (
 				13B07F961A680F5B00A75B9A /* Roam Reality.app */,
+				13B07F961A680F5B00A75B9A /* Roam Reality.app */,
 				00E356EE1AD99517003FC87E /* travel_ar_app_42706Tests.xctest */,
+				53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */,
 				53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		90EF26442B5039E300872709 /* Fonts */ = {
+			isa = PBXGroup;
+			children = (
+				90EF26452B5039E300872709 /* Fontisto.ttf */,
+				90EF26462B5039E300872709 /* Octicons.ttf */,
+				90EF26472B5039E300872709 /* Feather.ttf */,
+				90EF26482B5039E300872709 /* Entypo.ttf */,
+				90EF26492B5039E300872709 /* FontAwesome5_Brands.ttf */,
+				90EF264A2B5039E300872709 /* MaterialCommunityIcons.ttf */,
+				90EF264B2B5039E300872709 /* AntDesign.ttf */,
+				90EF264C2B5039E300872709 /* Foundation.ttf */,
+				90EF264D2B5039E300872709 /* Ionicons.ttf */,
+				90EF264E2B5039E300872709 /* FontAwesome5_Solid.ttf */,
+				90EF264F2B5039E300872709 /* FontAwesome5_Regular.ttf */,
+				90EF26502B5039E300872709 /* FontAwesome.ttf */,
+				90EF26512B5039E300872709 /* Zocial.ttf */,
+				90EF26522B5039E300872709 /* EvilIcons.ttf */,
+				90EF26532B5039E300872709 /* SimpleLineIcons.ttf */,
+				90EF26542B5039E300872709 /* MaterialIcons.ttf */,
+			);
+			name = Fonts;
+			path = "../node_modules/react-native-vector-icons/Fonts";
 			sourceTree = "<group>";
 		};
 		90EF26442B5039E300872709 /* Fonts */ = {
@@ -378,6 +494,10 @@
 				B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */,
 				09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
 				9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
+				9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */,
+				B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */,
+				09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */,
+				9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -390,9 +510,12 @@
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "travel_ar_app_42706Tests" */;
 			buildPhases = (
 				6F58A6FCF8200117B4ED943C /* [CP] Check Pods Manifest.lock */,
+				6F58A6FCF8200117B4ED943C /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
+				D045E593F7392C51344A1915 /* [CP] Embed Pods Frameworks */,
+				34F22EAC672971E8CE2BD7C1 /* [CP] Copy Pods Resources */,
 				D045E593F7392C51344A1915 /* [CP] Embed Pods Frameworks */,
 				34F22EAC672971E8CE2BD7C1 /* [CP] Copy Pods Resources */,
 			);
@@ -411,6 +534,7 @@
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "travel_ar_app_42706" */;
 			buildPhases = (
 				8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */,
+				8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F871A680F5B00A75B9A /* Sources */,
@@ -426,11 +550,30 @@
 			);
 			dependencies = (
 				53F7E19E2C8F7226007954D6 /* PBXTargetDependency */,
+				53F7E19E2C8F7226007954D6 /* PBXTargetDependency */,
 			);
 			name = travel_ar_app_42706;
 			productName = travel_ar_app_42706;
 			productReference = 13B07F961A680F5B00A75B9A /* Roam Reality.app */;
+			productReference = 13B07F961A680F5B00A75B9A /* Roam Reality.app */;
 			productType = "com.apple.product-type.application";
+		};
+		53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 53F7E1A32C8F7227007954D6 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */;
+			buildPhases = (
+				53F7E1942C8F7226007954D6 /* Sources */,
+				53F7E1952C8F7226007954D6 /* Frameworks */,
+				53F7E1962C8F7226007954D6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = OneSignalNotificationServiceExtension;
+			productName = OneSignalNotificationServiceExtension;
+			productReference = 53F7E1982C8F7226007954D6 /* OneSignalNotificationServiceExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
 		};
 		53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */ = {
 			isa = PBXNativeTarget;
@@ -456,6 +599,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 1500;
+				LastSwiftUpdateCheck = 1500;
 				LastUpgradeCheck = 1210;
 				TargetAttributes = {
 					00E356ED1AD99517003FC87E = {
@@ -464,6 +608,9 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						LastSwiftMigration = 1120;
+					};
+					53F7E1972C8F7226007954D6 = {
+						CreatedOnToolsVersion = 15.0.1;
 					};
 					53F7E1972C8F7226007954D6 = {
 						CreatedOnToolsVersion = 15.0.1;
@@ -485,6 +632,7 @@
 			targets = (
 				13B07F861A680F5B00A75B9A /* travel_ar_app_42706 */,
 				00E356ED1AD99517003FC87E /* travel_ar_app_42706Tests */,
+				53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */,
 				53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */,
 			);
 		};
@@ -545,8 +693,63 @@
 				DCB501262CA49EAD000B3F37 /* PoppinsExtraBold.ttf in Resources */,
 				DCB5012E2CA49EAD000B3F37 /* GlacialIndifferenceBold.otf in Resources */,
 				DCB501252CA49EAD000B3F37 /* NunitoSans10ptBlack.ttf in Resources */,
+				DC09B16D2CA3547D0068EB4F /* Fontisto.ttf in Resources */,
+				DCB5011F2CA49EAD000B3F37 /* PoppinsLight.ttf in Resources */,
+				DCB501222CA49EAD000B3F37 /* NunitoSans10ptSemiBold.ttf in Resources */,
+				DCB5012D2CA49EAD000B3F37 /* NunitoSans10ptExtraLight.ttf in Resources */,
+				DC09B16E2CA3547D0068EB4F /* Octicons.ttf in Resources */,
+				DCB501342CA49EAD000B3F37 /* PoppinsThin.ttf in Resources */,
+				DC09B16F2CA3547D0068EB4F /* Feather.ttf in Resources */,
+				DC09B1702CA3547D0068EB4F /* Entypo.ttf in Resources */,
+				DC09B1712CA3547D0068EB4F /* FontAwesome5_Brands.ttf in Resources */,
+				DCB501242CA49EAD000B3F37 /* SFUIDisplayBlack.otf in Resources */,
+				DCB501332CA49EAD000B3F37 /* PoppinsRegular.ttf in Resources */,
+				DC09B1722CA3547D0068EB4F /* MaterialCommunityIcons.ttf in Resources */,
+				DC09B1732CA3547D0068EB4F /* AntDesign.ttf in Resources */,
+				DCB501362CA49EAD000B3F37 /* PoppinsSemiBold.ttf in Resources */,
+				DCB501282CA49EAD000B3F37 /* GlacialIndifferenceItalic.otf in Resources */,
+				DCB501312CA49EAD000B3F37 /* NunitoSans10ptMedium.ttf in Resources */,
+				DC09B1742CA3547D0068EB4F /* Foundation.ttf in Resources */,
+				DCB501372CA49EAD000B3F37 /* PoppinsBold.ttf in Resources */,
+				DCB501212CA49EAD000B3F37 /* NunitoSans10ptExtraBold.ttf in Resources */,
+				DC09B1752CA3547D0068EB4F /* Ionicons.ttf in Resources */,
+				DC09B1762CA3547D0068EB4F /* FontAwesome5_Solid.ttf in Resources */,
+				DCB501272CA49EAD000B3F37 /* SFUIDisplayMedium.otf in Resources */,
+				DCB5011C2CA49EAD000B3F37 /* NunitoSans10ptRegular.ttf in Resources */,
+				DCB501322CA49EAD000B3F37 /* SFUIDisplayLight.otf in Resources */,
+				DCB501352CA49EAD000B3F37 /* SFUIDisplayThin.otf in Resources */,
+				DC09B1772CA3547D0068EB4F /* FontAwesome5_Regular.ttf in Resources */,
+				DCB5011D2CA49EAD000B3F37 /* PoppinsBlack.ttf in Resources */,
+				DCB5012F2CA49EAD000B3F37 /* SFUIDisplayBold.otf in Resources */,
+				DC09B1782CA3547D0068EB4F /* FontAwesome.ttf in Resources */,
+				DCB5011E2CA49EAD000B3F37 /* PoppinsExtraLight.ttf in Resources */,
+				DCB5012B2CA49EAD000B3F37 /* SFUIDisplayUltralight.otf in Resources */,
+				DC09B1792CA3547D0068EB4F /* Zocial.ttf in Resources */,
+				DC09B17A2CA3547D0068EB4F /* EvilIcons.ttf in Resources */,
+				DC09B17B2CA3547D0068EB4F /* SimpleLineIcons.ttf in Resources */,
+				DCB501202CA49EAD000B3F37 /* GlacialIndifferenceRegular.otf in Resources */,
+				DC09B17C2CA3547D0068EB4F /* MaterialIcons.ttf in Resources */,
+				DCB501232CA49EAD000B3F37 /* PoppinsMedium.ttf in Resources */,
+				DCB5012A2CA49EAD000B3F37 /* NunitoSans10ptLight.ttf in Resources */,
+				7A0A2F232B7FA27000E778AF /* record.mp3 in Resources */,
+				DCB501302CA49EAD000B3F37 /* SFUIDisplayRegular.ttf in Resources */,
+				DCB501262CA49EAD000B3F37 /* PoppinsExtraBold.ttf in Resources */,
+				DCB5012E2CA49EAD000B3F37 /* GlacialIndifferenceBold.otf in Resources */,
+				DCB501252CA49EAD000B3F37 /* NunitoSans10ptBlack.ttf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */,
+				DCB501292CA49EAD000B3F37 /* NunitoSans10ptBold.ttf in Resources */,
+				DCB5012C2CA49EAD000B3F37 /* SFUIDisplaySemibold.otf in Resources */,
+				7A0A2F222B7FA27000E778AF /* camera-sound.mp3 in Resources */,
+				6A35CD164AA24AC38B40103B /* index.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		53F7E1962C8F7226007954D6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 				8CCC01DF2B5FC55A0037DD56 /* GoogleService-Info.plist in Resources */,
 				DCB501292CA49EAD000B3F37 /* NunitoSans10ptBold.ttf in Resources */,
 				DCB5012C2CA49EAD000B3F37 /* SFUIDisplaySemibold.otf in Resources */,
@@ -581,6 +784,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nWITH_ENVIRONMENT=\"../node_modules/react-native/scripts/xcode/with-environment.sh\"\nREACT_NATIVE_XCODE=\"../node_modules/react-native/scripts/react-native-xcode.sh\"\n\n/bin/sh -c \"$WITH_ENVIRONMENT $REACT_NATIVE_XCODE\"\n";
 		};
+		14D7E42D0C5B1038644775CA /* [CP] Embed Pods Frameworks */ = {
 		14D7E42D0C5B1038644775CA /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -621,20 +825,15 @@
 			files = (
 			);
 			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
+			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-checkManifestLockResult.txt",
+				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706-travel_ar_app_42706Tests/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		8A4EAE818293E7BEBCAE9B28 /* [CP] Check Pods Manifest.lock */ = {
@@ -652,7 +851,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-travel_ar_app_42706-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-travel_ar_app_42706-travel_ar_app_42706Tests-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -757,6 +956,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		53F7E1942C8F7226007954D6 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				53F7E19B2C8F7226007954D6 /* NotificationService.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -770,11 +977,17 @@
 			target = 53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */;
 			targetProxy = 53F7E19D2C8F7226007954D6 /* PBXContainerItemProxy */;
 		};
+		53F7E19E2C8F7226007954D6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 53F7E1972C8F7226007954D6 /* OneSignalNotificationServiceExtension */;
+			targetProxy = 53F7E19D2C8F7226007954D6 /* PBXContainerItemProxy */;
+		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */;
 			baseConfigurationReference = 09EDC4647D59DCB0BB69727D /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
@@ -803,6 +1016,7 @@
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */;
+			baseConfigurationReference = 9152BEC3A240207ADE589109 /* Pods-travel_ar_app_42706-travel_ar_app_42706Tests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -827,7 +1041,9 @@
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */;
+			baseConfigurationReference = 9BD084F4221B48D53016FE8E /* Pods-travel_ar_app_42706.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -881,6 +1097,9 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -894,6 +1113,9 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
 				PRODUCT_NAME = "Roam Reality";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
+				PRODUCT_NAME = "Roam Reality";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -903,7 +1125,9 @@
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */;
+			baseConfigurationReference = B5051414C2C1741688BC86B0 /* Pods-travel_ar_app_42706.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -956,6 +1180,9 @@
 				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -966,6 +1193,9 @@
 					"-ObjC",
 					"-lc++",
 				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
+				PRODUCT_NAME = "Roam Reality";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
 				PRODUCT_NAME = "Roam Reality";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1093,6 +1323,7 @@
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1109,6 +1340,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
@@ -1170,6 +1402,7 @@
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -1182,6 +1415,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
@@ -1226,6 +1460,15 @@
 			buildConfigurations = (
 				13B07F941A680F5B00A75B9A /* Debug */,
 				13B07F951A680F5B00A75B9A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		53F7E1A32C8F7227007954D6 /* Build configuration list for PBXNativeTarget "OneSignalNotificationServiceExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				53F7E1A12C8F7227007954D6 /* Debug */,
+				53F7E1A22C8F7227007954D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
