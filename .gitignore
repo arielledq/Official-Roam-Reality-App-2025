@@ -69,7 +69,6 @@ yarn-error.log
 .metro-health-check*
 
 
-
 #VS Code
 .vscode/
 
@@ -87,6 +86,3 @@ config.dev.ts
 # Unity builds
 unity/builds/android/*
 unity/builds/ios/*
-
-# Configurations
-config.dev.ts

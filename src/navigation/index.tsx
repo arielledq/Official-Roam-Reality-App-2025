@@ -215,11 +215,8 @@ const Navigation = () => {
       <ThemeProvider theme={theme}>
         <StackNav />
       </ThemeProvider>
-      <ThemeProvider theme={theme}>
-        <StackNav />
-      </ThemeProvider>
     </NavigationContainer>
-  )
-}
+  );
+};
 
-export default Navigation
+export default Navigation;

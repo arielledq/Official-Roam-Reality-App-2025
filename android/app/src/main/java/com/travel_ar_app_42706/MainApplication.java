@@ -1,10 +1,8 @@
 package com.roam_reality;
-package com.roam_reality;
 
 import android.app.Application;
 import com.facebook.react.PackageList;
 import com.facebook.react.ReactApplication;
-import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import org.devio.rn.splashscreen.SplashScreenReactPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;

@@ -1,7 +1,6 @@
 apply plugin: "com.android.application"
 apply plugin: "com.facebook.react"
 apply plugin: 'com.google.gms.google-services'
-apply plugin: 'com.google.gms.google-services'
 
 import com.android.build.OutputFile
 
@@ -91,22 +90,18 @@ def reactNativeArchitectures() {
 }
 
 // apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
-// apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
 android {
     ndkVersion rootProject.ext.ndkVersion
 
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     namespace "com.roam_reality"
-    namespace "com.roam_reality"
     defaultConfig {
-        applicationId "com.roam_reality"
         applicationId "com.roam_reality"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 4
         versionName "1.0"
-        multiDexEnabled true
         multiDexEnabled true
     }
 
@@ -202,5 +197,4 @@ dependencies {
 }
 
 apply from: file("../../node_modules/@react-native-community/cli-platform-android/native_modules.gradle"); applyNativeModulesAppBuildGradle(project)
-apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
