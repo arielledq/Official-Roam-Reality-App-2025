@@ -25,7 +25,6 @@ import ArChallengeShare from "../screens/archallenge/challengeshare";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import DrawerContent from "../screens/drawerContent/DrawerContent";
 import Onboarding from "../screens/onboarding/onboarding";
-import DrawerNavigator from "./DrawerNavigator";
 import BottomTabNavigator from "./BottomTabNavigator";
 import Settings from "../screens/settings";
 import Privacy from "../screens/privacy";
@@ -61,7 +60,6 @@ import { subscribeToStorageChanges, unsubscribeFromStorageChanges } from "../uti
 import { resetState } from "../redux/Login";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { removeItem } from "../util/helpers";
-import { logout } from "../network";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -86,7 +84,6 @@ const Navigation = () => {
         await removeItem("fbToken");
         await removeItem("instaToken");
         await removeItem("tiktokToken");
-        // await logout()
         dispatch(resetState());
       }
     };

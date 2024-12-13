@@ -1,14 +1,14 @@
-import { useNavigation } from '@react-navigation/native';
-import { Header } from '@rneui/base';
-import React, { FC } from 'react';
-import { AppHeaderProps } from './type';
-import { TouchableOpacity } from 'react-native';
-import useStyles from './styles';
-import theme from '../../assets/theme';
-import { getHitSlop } from '../../util/buttonUtil';
-import { BackArrowIcon } from '../../assets/svg';
+import { useNavigation } from "@react-navigation/native";
+import { Header } from "@rneui/base";
+import React, { FC } from "react";
+import { AppHeaderProps } from "./type";
+import { Platform, TouchableOpacity } from "react-native";
+import useStyles from "./styles";
+import theme from "../../assets/theme";
+import { getHitSlop } from "../../util/buttonUtil";
+import { BackArrowIcon } from "../../assets/svg";
 
-const AppHeader: FC<AppHeaderProps> = (props) => {
+const AppHeader: FC<AppHeaderProps> = props => {
   const navigation = useNavigation();
   const styles = useStyles();
   const backIcon = () => {
@@ -16,7 +16,8 @@ const AppHeader: FC<AppHeaderProps> = (props) => {
       <TouchableOpacity
         style={styles.backIcon}
         hitSlop={getHitSlop(5)}
-        onPress={() => navigation?.goBack()}>
+        onPress={() => navigation?.goBack()}
+      >
         <BackArrowIcon />
       </TouchableOpacity>
     );
@@ -28,19 +29,22 @@ const AppHeader: FC<AppHeaderProps> = (props) => {
     }
   }
 
+  const isIOS = Platform.OS === "ios";
+  const isBottomTab = !!props?.isBottomTab;
+  const edges = isBottomTab && isIOS ? [""] : ["top"];
+
   return (
     <Header
-      leftComponent={
-        props?.leftComponent ?? (!!props?.hideBackButton ? <></> : backIcon())
-      }
+      leftComponent={props?.leftComponent ?? (!!props?.hideBackButton ? <></> : backIcon())}
       centerComponent={{
         text: props?.title,
         style: [styles.heading, props?.titleStyle ?? {}],
         onPress: () => onTitlePress(),
       }}
-      rightComponent={props?.rightComponent ? props?.rightComponent : <></> }
+      rightComponent={props?.rightComponent ? props?.rightComponent : <></>}
       backgroundColor={theme.darkColors?.inputBG}
       containerStyle={styles.containerStyle}
+      edges={edges}
       {...props}
     />
   );
