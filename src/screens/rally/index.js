@@ -5,7 +5,7 @@ const Rally = ({}) => {
   return (
     <ImageBackground
       source={require("../../assets/images/ROAM_RALLY.png")}
-      style={{ flex: 1 }}
+      style={{ flex: 1, marginBottom: 50 }}
       resizeMode="cover"
     />
   );
