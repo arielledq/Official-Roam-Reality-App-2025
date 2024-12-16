@@ -1,10 +1,23 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { Platform } from "react-native";
+
 import { useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { showMessage } from "../../../util/helpers";
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
+import Sound from "react-native-sound";
+import RNFetchBlob from "rn-fetch-blob";
+import { unzip } from "react-native-zip-archive";
+import RNFS from "react-native-fs";
+
+import CameraControls from "../../../components/CameraControls";
+import UnityARCamera from "components/UnityArView";
+import CaptureInfoView from "components/CaptureInfoView";
+import ChallengeScreen from "components/ChallengeScreen";
+import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
+import PinInfoCaptureFooter from "components/PinInfoCaptureFooter";
+
+import { showMessage } from "../../../util/helpers";
 import {
   convertMetersToFeets,
   findNearestLocationPoint,
@@ -12,43 +25,14 @@ import {
   hasLocationPermission,
   isLocationPointInPolygon,
 } from "../../../util/LocationLib";
-
-import Sound from "react-native-sound";
-
-import RNFetchBlob from "rn-fetch-blob";
-import { unzip } from "react-native-zip-archive";
-import RNFS from "react-native-fs";
-import CameraControls from "../../../components/CameraControls";
-import UnityARCamera from "components/UnityArView";
-import CaptureInfoView from "components/CaptureInfoView";
-import ChallengeScreen from "components/ChallengeScreen";
-import PinFoundCaptureHeader from "components/PinFoundCaptureHeader";
-import PinInfoCaptureFooter from "components/PinInfoCaptureFooter";
 import { CHALLENGES_TYPE } from "constants";
 
 const PinChallenge = () => {
-  const navigation = useNavigation();
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  const challengeObj = selectedGeoSite.pin_challenge;
-  const challengeObjParameters = challengeObj?.parameters;
-  const modelFile = challengeObj.model_file;
-  const settings = useSelector(state => state.ar?.arSettings);
-  const watchIdRef = useRef(null);
-
-  let siteLatitude = 0;
-  let siteLongitude = 0;
-  if (selectedGeoSite?.lat_long?.coordinates?.length === 2) {
-    siteLatitude = selectedGeoSite.lat_long.coordinates[1];
-    siteLongitude = selectedGeoSite.lat_long.coordinates[0];
-  }
-
-  const unityRef = useRef(null); // Unity reference
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [distanceInFeet, setDistanceInFeet] = useState(0);
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false);
   const [detailsShow, setDetailsShow] = useState(true);
-
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
   const [modelOBJ, setModelOBJ] = useState(null);
@@ -71,6 +55,26 @@ const PinChallenge = () => {
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
   const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
+
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const settings = useSelector(state => state.ar?.arSettings);
+
+  const unityRef = useRef(null); // Unity reference
+  const watchIdRef = useRef(null);
+
+  const navigation = useNavigation();
+
+  const challengeObj = selectedGeoSite.pin_challenge;
+  const challengeObjParameters = challengeObj?.parameters;
+  const modelFile = challengeObj.model_file;
+  const viewInfoModalContent = challengeObj?.description;
+
+  let siteLatitude = 0;
+  let siteLongitude = 0;
+  if (selectedGeoSite?.lat_long?.coordinates?.length === 2) {
+    siteLatitude = selectedGeoSite.lat_long.coordinates[1];
+    siteLongitude = selectedGeoSite.lat_long.coordinates[0];
+  }
 
   const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
@@ -170,11 +174,11 @@ const PinChallenge = () => {
         // useGPS: true, // Activar GPS
         // gpsLatitude: siteLatitude || 0, // Latitud del GPS
         // gpsLongitude: siteLongitude || 0, // Longitud del GPS
-        position : {
+        position: {
           x: parseFloat(challengeObjParameters?.positionX) || 0,
           y: parseFloat(challengeObjParameters?.positionY) || 0,
           z: parseFloat(challengeObjParameters?.positionZ) || 1,
-        }
+        },
       };
       // console.log("AAAAAASITEEEEEEEEE", selectedGeoSite);
       console.log("Enviando datos del modelo a Unity:", modelData);
@@ -182,7 +186,7 @@ const PinChallenge = () => {
       const visibilityConfig = {
         isVisible: true,
       };
-     
+
       unityRef.current.postMessage(
         "OBJImport", // Nombre del script en Unity
         "SetVisibilityFromReact", // Método que se llamará
@@ -192,22 +196,21 @@ const PinChallenge = () => {
     } else {
       console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
-      // if (modelData.useGPS) {
-      //   const gpsConfig = {
-      //     smoothingFactor: 0.1, // Factor de suavizado del GPS
-      //     minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
-      //     scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
-      //     maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
-      //     isVisibleObject: true, // Controlar visibilidad inicial
-      //   };
-      //   console.log("Enviando configuración de GPS a Unity:", gpsConfig);
-      //   unityRef.current.postMessage(
-      //     "OBJImport", // GameObject que contiene el script
-      //     "ConfigureGPSFromReact", // Método del script
-      //     JSON.stringify(gpsConfig)
-      //   );
-      // }
-    
+    // if (modelData.useGPS) {
+    //   const gpsConfig = {
+    //     smoothingFactor: 0.1, // Factor de suavizado del GPS
+    //     minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
+    //     scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
+    //     maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
+    //     isVisibleObject: true, // Controlar visibilidad inicial
+    //   };
+    //   console.log("Enviando configuración de GPS a Unity:", gpsConfig);
+    //   unityRef.current.postMessage(
+    //     "OBJImport", // GameObject que contiene el script
+    //     "ConfigureGPSFromReact", // Método del script
+    //     JSON.stringify(gpsConfig)
+    //   );
+    // }
   };
 
   const sendBloomValuesToUnity = () => {
@@ -446,6 +449,16 @@ const PinChallenge = () => {
     setIsUnityLoaded(true);
   };
 
+  const viewInfoButtonHandler = () => {
+    setChallengeInformationView(true);
+    setIsUnityLoaded(false);
+  };
+
+  const closeViewInfoButtonHandler = () => {
+    setChallengeInformationView(false);
+    setIsUnityLoaded(true);
+  };
+
   const modals = (
     <>
       <CaptureInfoView
@@ -453,12 +466,21 @@ const PinChallenge = () => {
         content={settings?.waiver_details}
         onAccept={acceptWaiverButtonHandler}
       />
+      <ViewInfoModal
+        isVisible={challengeInformationView}
+        onClose={closeViewInfoButtonHandler}
+        content={viewInfoModalContent}
+      />
     </>
   );
 
   return (
     <ChallengeScreen title={`Location Check In\n${selectedGeoSite.name}`} modals={modals}>
-      <PinFoundCaptureHeader pinFound={!!isMeInsideInSite} points={challengeObj?.points} />
+      <ChallengeFoundCaptureHeader
+        leftTitle="Pin Found"
+        challengeFound={!!isMeInsideInSite}
+        points={challengeObj?.points}
+      />
 
       <UnityARCamera
         unityRef={unityRef}
@@ -479,6 +501,8 @@ const PinChallenge = () => {
       />
 
       <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} />
+
+      <ViewInfoButton onPress={viewInfoButtonHandler} />
     </ChallengeScreen>
   );
 };

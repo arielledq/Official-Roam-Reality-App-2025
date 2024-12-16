@@ -1,50 +1,30 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  TouchableOpacity,
-  View,
-  Image,
-  Text,
-  Platform,
-  Dimensions,
-  ScrollView,
-} from "react-native";
+import { Platform } from "react-native";
+
 import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
-import { FontSizes } from "../../../util/FontUtils";
 import RNFetchBlob from "rn-fetch-blob";
-import useStyles from "./styles";
-import LineIcon from "../../../assets/ar/line.png";
 import { unzip } from "react-native-zip-archive";
-import RenderHTML from "react-native-render-html";
-const RNFS = require("react-native-fs");
-const Sound = require("react-native-sound");
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import { useSelector } from "react-redux";
 import Share from "react-native-share";
+
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
-import SponsorBannerCaptureHeader from "components/SponsorBannerCaptureHeader";
+import ViewInfoButton from "components/ViewInfoButton";
+import ViewInfoModal from "components/ViewInfoModal";
+
 import { CHALLENGES_TYPE } from "constants";
-import { AppButton } from "components";
-const { width } = Dimensions.get("window");
+import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
+
+const RNFS = require("react-native-fs");
+const Sound = require("react-native-sound");
 
 const VIDEO_RECORD_TIME = 10;
 
 const ArChallengeCapture = ({}) => {
-  const styles = useStyles();
-  const unityRef = useRef(null);
-  const route = useRoute();
-  const navigation = useNavigation();
-
   const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
-
-  const challengeObj = route?.params?.challengeObj;
-  const challengeObjParameters = route?.params?.challengeObj?.parameters;
-  const settings = useSelector(state => state.ar?.arSettings);
-  const modelFile = route?.params?.challengeObj?.model_file;
-  const viewShotRef = useRef();
-
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
   const [modelOBJ, setModelOBJ] = useState(null);
@@ -68,14 +48,27 @@ const ArChallengeCapture = ({}) => {
   const [capturedImage, setCapturedImage] = useState(fileFound);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
-
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
+
+  const settings = useSelector(state => state.ar?.arSettings);
+
+  const unityRef = useRef(null);
+  const viewShotRef = useRef();
+
+  const route = useRoute();
+  const navigation = useNavigation();
+
+  const challengeObj = route?.params?.challengeObj;
+  const challengeObjParameters = route?.params?.challengeObj?.parameters;
+  const modelFile = route?.params?.challengeObj?.model_file;
 
   const videoDirectory = "/storage/emulated/0/Movies/MisGrabaciones/";
   const videoFileName = "grabacion_video.mp4";
   const fullVideoPath = `${videoDirectory}${videoFileName}`;
 
   const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
+  const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
+  const viewInfoModalContent = challengeObj?.description;
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -193,7 +186,7 @@ const ArChallengeCapture = ({}) => {
       });
       setScale({
         x: parseFloat(challengeObjParameters?.scale_object) || 1,
-        y: parseFloat(challengeObjParameters?.scale_object )|| 1,
+        y: parseFloat(challengeObjParameters?.scale_object) || 1,
         z: parseFloat(challengeObjParameters?.scale_object) || 1,
       });
       setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
@@ -209,12 +202,11 @@ const ArChallengeCapture = ({}) => {
     }, [modelOBJ, textureBase, isUnityLoaded])
   );
 
-  useEffect(()=>{
-    if (unityRef.current && challengeHasFilters)
-    {
-      loadingFalse()
+  useEffect(() => {
+    if (unityRef.current && challengeHasFilters) {
+      loadingFalse();
     }
-  },[isUnityLoaded])
+  }, [isUnityLoaded]);
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -239,10 +231,10 @@ const ArChallengeCapture = ({}) => {
 
   const sendModelDataToUnitySpawn = () => {
     console.log("Validando referencias antes de enviar...");
-  
+
     if (unityRef.current && modelOBJ && textureBase) {
       console.log("Entró al bloque IF: Enviando datos a Unity...");
-  
+
       // Datos del modelo 3D
       const modelData = {
         objFile: modelOBJ.replace("file://", ""),
@@ -251,7 +243,7 @@ const ArChallengeCapture = ({}) => {
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
         scale,
         rotation,
-        position, 
+        position,
         isRotationEnabled: true,
         emissionIntensity: emissionValue,
         rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1,
@@ -259,18 +251,16 @@ const ArChallengeCapture = ({}) => {
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
       };
-  
+
       console.log("Datos del modelo a enviar:", modelData);
-  
+
       // Enviar datos del modelo a Unity
-      unityRef.current.postMessage(
-        "OBJImport", "LoadModelFromReact", JSON.stringify(modelData)
-      );
-  
+      unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+
       const visibilityConfig = {
         isVisible: true,
       };
-     
+
       unityRef.current.postMessage(
         "OBJImport", // Nombre del script en Unity
         "SetVisibilityFromReact", // Método que se llamará
@@ -577,45 +567,6 @@ const ArChallengeCapture = ({}) => {
     });
   };
 
-  // console.log(" challengeObjParameters ", challengeObj);
-  // console.log("Touch End detected", );
-  // console.log("Gesture detected", );
-  // console.log("view unity",isUnityLoaded)
-  // Vistas adicionales
-  const ChallengeDetailView = () => (
-    <View style={styles.challengeInfoContainer}>
-      <View style={styles.challengeInfoHeaderContainer}>
-        <Image source={LineIcon} style={{ width: 35.63, height: 4 }} />
-        <Text style={styles.challengeInfoHeader}>Challenge Details</Text>
-      </View>
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1, width: "100%", padding: 24 }}
-      >
-        <RenderHTML
-          contentWidth={width}
-          tagsStyles={{
-            p: { color: "#FFF", fontSize: FontSizes.S14 },
-            strong: { color: "#FFF", fontSize: FontSizes.S18 },
-          }}
-          source={{ html: challengeObj.description }}
-        />
-      </ScrollView>
-      <View style={{ width: "100%", paddingHorizontal: 24, marginBottom: 20 }}>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          onPress={() => {
-            setChallengeInformationView(false);
-            setIsUnityLoaded(true);
-          }}
-        >
-          <Text style={styles.bottomText}>Close</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
-  );
-
   const acceptWaiverButtonHandler = () => {
     setDetailsShow(false);
     setIsUnityLoaded(true);
@@ -647,9 +598,14 @@ const ArChallengeCapture = ({}) => {
     clearInterval(this.intervalId);
   };
   const loadingFalse = () => {
-  if (challengeHasFilters){
-    unityRef.current.postMessage("OBJImport", "SetLoadingVisibility" , JSON.stringify({isVisible : false}))}
-  }
+    if (challengeHasFilters) {
+      unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({ isVisible: false })
+      );
+    }
+  };
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
     let updatedData = capturedImage ? capturedImage : capturedVideo;
@@ -673,7 +629,6 @@ const ArChallengeCapture = ({}) => {
     });
   };
 
-  // console.log("AAAAAAAAAAAAAAcapturedImage ? capturedImage : capturedVideo", viewShotRef);
   useEffect(() => {
     requestMultiple([
       PERMISSIONS.ANDROID.CAMERA,
@@ -684,7 +639,6 @@ const ArChallengeCapture = ({}) => {
     ]);
     // .then(console.log);
   }, []);
-  // console.log("capturedVideo:", capturedVideo);
 
   const retakeButtonHandler = () => {
     setCapturedImage(null);
@@ -718,11 +672,14 @@ const ArChallengeCapture = ({}) => {
     }
   };
 
-  const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
-
-  const sponsorButtonPressHandler = () => {
+  const viewInfoButtonHandler = () => {
     setChallengeInformationView(true);
     setIsUnityLoaded(false);
+  };
+
+  const closeViewInfoButtonHandler = () => {
+    setChallengeInformationView(false);
+    setIsUnityLoaded(true);
   };
 
   const modals = (
@@ -732,27 +689,24 @@ const ArChallengeCapture = ({}) => {
         content={settings?.waiver_details}
         onAccept={acceptWaiverButtonHandler}
       />
-      {challengeInformationView && <ChallengeDetailView />}
+      <ViewInfoModal
+        isVisible={challengeInformationView}
+        onClose={closeViewInfoButtonHandler}
+        content={viewInfoModalContent}
+      />
     </>
   );
 
-  const viewInfoButton = (
-    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
-      <AppButton
-        onPress={sponsorButtonPressHandler}
-        buttonStyle={{ height: 40, width: 90 }}
-        title={"VIEW INFO"}
-        titleStyle={{ fontSize: FontSizes.S12, fontWeight: 700 }}
-      />
-    </View>
-  );
+  console.log("challengeObj", JSON.stringify(challengeObj, null, 2));
 
   return (
-    <ChallengeScreen
-      title="AR Photo Challenges"
-      headerRightComponent={viewInfoButton}
-      modals={modals}
-    >
+    <ChallengeScreen title="AR Photo Challenges" modals={modals}>
+      <ChallengeFoundCaptureHeader
+        leftTitle="AR Challenges"
+        challengeFound
+        points={challengeObj?.points}
+      />
+
       <UnityARCamera
         unityRef={unityRef}
         isProcessingMedia={processingMedia}
@@ -775,6 +729,8 @@ const ArChallengeCapture = ({}) => {
         isVideo={!isPhotoChallenge}
         challengeHasFilters={challengeHasFilters}
       />
+
+      <ViewInfoButton onPress={viewInfoButtonHandler} />
     </ChallengeScreen>
   );
 };

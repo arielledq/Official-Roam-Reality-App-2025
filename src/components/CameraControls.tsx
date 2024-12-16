@@ -41,7 +41,7 @@ const CameraControls = ({
   return (
     <View
       style={{
-        backgroundColor: "#131422",
+        backgroundColor: theme.darkColors?.background,
         borderRadius: 16,
         paddingVertical: 8,
         paddingHorizontal: 16,
@@ -104,15 +104,15 @@ const $actionButtons: ViewStyle = {
   alignItems: "center",
   justifyContent: "center",
   width: 96,
-  height: 42,
-  marginVertical: 8,
+  height: 40,
+  marginVertical: 4,
 };
 
 // @ts-ignore
 const $bottomButtonText: TextStyle = {
   ...fontGroup.p700,
   color: theme.lightColors?.white,
-  fontSize: FontSizes.S16,
+  fontSize: FontSizes.S14,
 };
 
 // @ts-ignore

@@ -10,14 +10,19 @@ import PinIcon from "../assets/geoar/pin_locationicon.svg";
 // @ts-ignore
 import TrophyIcon from "../assets/geoar/trophy_icon.svg";
 
-interface PinFoundCaptureHeaderProps {
-  pinFound?: boolean;
+interface ChallengeFoundCaptureHeaderProps {
+  leftTitle?: string;
+  challengeFound?: boolean;
   points?: number;
 }
 
 const iconSize = 32;
 
-const PinFoundCaptureHeader = ({ pinFound, points }: PinFoundCaptureHeaderProps) => {
+const ChallengeFoundCaptureHeader = ({
+  leftTitle,
+  challengeFound,
+  points,
+}: ChallengeFoundCaptureHeaderProps) => {
   return (
     <View
       style={{
@@ -44,7 +49,7 @@ const PinFoundCaptureHeader = ({ pinFound, points }: PinFoundCaptureHeaderProps)
               textAlign: "center",
             }}
           >
-            Pin Found
+            {leftTitle}
           </Text>
           <Text
             // @ts-ignore
@@ -55,7 +60,7 @@ const PinFoundCaptureHeader = ({ pinFound, points }: PinFoundCaptureHeaderProps)
               textAlign: "center",
             }}
           >
-            {pinFound ? 1 : 0} / 1
+            {challengeFound ? 1 : 0} / 1
           </Text>
         </View>
       </View>
@@ -92,4 +97,4 @@ const PinFoundCaptureHeader = ({ pinFound, points }: PinFoundCaptureHeaderProps)
   );
 };
 
-export default PinFoundCaptureHeader;
+export default ChallengeFoundCaptureHeader;
