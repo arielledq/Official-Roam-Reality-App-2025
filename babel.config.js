@@ -31,6 +31,7 @@ module.exports = {
           assets: "./src/assets",
           screens: "./src/screens",
           util: "./src/util",
+          config: "./src/config",
         },
       },
     ],

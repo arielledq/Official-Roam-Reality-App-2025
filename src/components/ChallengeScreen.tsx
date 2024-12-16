@@ -30,7 +30,7 @@ const ChallengeScreen = ({
           imageStyle={styles.backgroundImage}
         >
           <LinearGradient
-            colors={["rgba(0, 0, 0, 0)", "rgba(0, 0, 0, 0.8)"]} // Transparent to semi-black
+            colors={["rgba(0, 0, 0, 0)", `${theme.darkColors?.inputBG}`]} // Transparent to semi-black
             style={styles.gradient}
             start={{ x: 0.5, y: 0.5 }} // Middle
             end={{ x: 0.5, y: 1 }} // Bottom

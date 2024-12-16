@@ -26,7 +26,8 @@ const Images = {
   YouTube: require("./Youtube.png"),
   ShareInvite: require("./ShareInvite.png"),
   BGBlur: require("./blurImageBg.png"),
-  CloseModal: require("./closeModal.png")
-}
+  CloseModal: require("./closeModal.png"),
+  More: require("./more.png"),
+};
 
-export default Images
+export default Images;

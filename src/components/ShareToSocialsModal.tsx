@@ -9,6 +9,8 @@ import theme from "assets/theme";
 import { FontFamily, FontSizes } from "util/FontUtils";
 import { socialPointsARUpdateAPI } from "network";
 import Images from "assets/images";
+import { showMessage } from "util/helpers";
+import Config from "config";
 
 interface ShareToSocialsModalProps {
   isVisible: boolean;
@@ -17,7 +19,11 @@ interface ShareToSocialsModalProps {
   fileExt: string;
 }
 
-type SSNN = "IG" | "FB" | "TT";
+const SSNN = {
+  INSTAGRAM: "INSTAGRAM",
+  FACEBOOK: "FACEBOOK",
+  OTHERS: "OTHERS",
+};
 
 const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   isVisible,
@@ -25,91 +31,79 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   fileUri,
   fileExt,
 }) => {
-  const share = async (ssnn: SSNN) => {
+  const share = async (selectedSSNN: string) => {
     // If correctedCaptureData doesn't already have "file://" prefix, add it
-    if (!fileUri.startsWith("file://")) {
-      fileUri = `file://${fileUri}`;
+    let updatedFileUri = "";
+    if (!updatedFileUri.startsWith("file://")) {
+      updatedFileUri = `file://${fileUri}`;
     }
 
     // Determine MIME type based on file extension
     const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
 
     // Share the file
+    let shareOptions = {};
+
+    switch (selectedSSNN) {
+      case SSNN.INSTAGRAM:
+        shareOptions = {
+          social: Share.Social.INSTAGRAM_STORIES,
+          appId: Config.FACEBOOK_APP_ID,
+        };
+        if (fileExt === "mp4") {
+          shareOptions = { ...shareOptions, backgroundVideo: updatedFileUri };
+        } else {
+          shareOptions = { ...shareOptions, backgroundImage: updatedFileUri };
+        }
+        break;
+      case SSNN.FACEBOOK:
+        shareOptions = {
+          social: Share.Social.FACEBOOK_STORIES,
+          appId: Config.FACEBOOK_APP_ID,
+        };
+        if (fileExt === "mp4") {
+          shareOptions = { ...shareOptions, backgroundImage: updatedFileUri };
+        } else {
+          shareOptions = { ...shareOptions, backgroundVideo: updatedFileUri };
+        }
+        break;
+      case SSNN.OTHERS:
+        shareOptions = {
+          url: updatedFileUri,
+          type: mimeType,
+        };
+        break;
+
+      default:
+        break;
+    }
+
+    let hasShared = false;
     try {
-      let shareOptions = {
-        // backgroundImage: "http://urlto.png",
-        // stickerImage: "data:image/png;base64,<imageInBase64>", //or you can use "data:" link
-        // backgroundBottomColor: "#fefefe",
-        // backgroundTopColor: "#906df4",
-        // attributionURL: "http://deep-link-to-app", //in beta
-        // social: Share.Social.INSTAGRAM_STORIES,
-        // appId: "your_fb_app_id",
-      };
-
-      switch (ssnn) {
-        case "IG":
-          shareOptions = {
-            ...shareOptions,
-            social: Share.Social.INSTAGRAM_STORIES,
-            appId: "your_fb_app_id",
-          };
-          if (fileExt === "mp4") {
-            shareOptions = { ...shareOptions, backgroundImage: fileUri };
-          } else {
-            shareOptions = { ...shareOptions, backgroundVideo: fileUri };
-          }
-          break;
-        case "FB":
-          shareOptions = {
-            ...shareOptions,
-            social: Share.Social.FACEBOOK_STORIES,
-            appId: "your_fb_app_id",
-          };
-          if (fileExt === "mp4") {
-            shareOptions = { ...shareOptions, backgroundImage: fileUri };
-          } else {
-            shareOptions = { ...shareOptions, backgroundVideo: fileUri };
-          }
-          break;
-        case "TT":
-          /**
-            TODO: Refer to these links
-              https://developers.tiktok.com/doc/mobile-sdk-ios-quickstart
-              https://developers.tiktok.com/doc/share-kit-ios-quickstart-v2?enter_method=left_navigation
-              https://developers.tiktok.com/doc/mobile-sdk-android-quickstart
-              https://developers.tiktok.com/doc/share-kit-android-quickstart-v2?enter_method=left_navigation
-          */
-          // shareOptions = {
-          //   ...shareOptions,
-          //   social: Share.Social.FACEBOOK_STORIES,
-          //   appId: "your_fb_app_id",
-          // };
-          // if (fileExt === "mp4") {
-          //   shareOptions = { ...shareOptions, backgroundImage: fileUri };
-          // } else {
-          //   shareOptions = { ...shareOptions, backgroundVideo: fileUri };
-          // }
-          break;
-
-        default:
-          break;
+      if (selectedSSNN === SSNN.OTHERS) {
+        await Share.open(shareOptions);
+        hasShared = true;
+      } else {
+        // @ts-ignore
+        await Share.shareSingle(shareOptions);
+        hasShared = true;
       }
-
-      await Share.open({
-        url: fileUri,
-        type: mimeType,
-      });
-
-      await socialPointsARUpdateAPI({
-        social_network: "",
-      });
-      // showMessage(
-      //   "You've been granted points for sharing to your socials",
-      //   "success",
-      //   `Socials points granted!`
-      // );
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
+    }
+    if (hasShared) {
+      try {
+        await socialPointsARUpdateAPI({
+          social_network: selectedSSNN,
+        });
+        showMessage(
+          "You've been granted points for sharing to your socials",
+          "success",
+          `Socials points granted!`
+        );
+      } catch (error: any) {
+        console.error("Error assigning points:", error?.message, error);
+      }
     }
   };
 
@@ -138,22 +132,14 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           </Text>
 
           <View style={{ flexDirection: "row", justifyContent: "center", gap: 32 }}>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
               <Image source={Images.Instagram} style={{ height: 40, width: 40 }} />
             </TouchableOpacity>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
               <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
             </TouchableOpacity>
-            <TouchableOpacity>
-              <Image
-                source={Images.TikTok}
-                style={{
-                  height: 40,
-                  width: 40,
-                  backgroundColor: "white",
-                  borderRadius: 80,
-                }}
-              />
+            <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
+              <Image source={Images.More} style={{ height: 40, width: 40 }} />
             </TouchableOpacity>
           </View>
 

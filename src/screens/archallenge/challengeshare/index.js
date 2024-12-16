@@ -12,7 +12,6 @@ import { handleError, showMessage } from "../../../util/helpers";
 import Video from "react-native-video";
 import { useDispatch, useSelector } from "react-redux";
 import { updateARUserData } from "../../../redux/AR";
-import Share from "react-native-share";
 
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
@@ -20,7 +19,7 @@ import ChallengeScreen from "components/ChallengeScreen";
 import { fontGroup, FontSizes } from "util/FontUtils";
 import theme from "assets/theme";
 import { CHALLENGES_TYPE } from "constants";
-// import ShareToSocialsModal from "components/ShareToSocialsModal";
+import ShareToSocialsModal from "components/ShareToSocialsModal";
 
 const ArChallengeShare = () => {
   const route = useRoute();
@@ -51,8 +50,7 @@ const ArChallengeShare = () => {
   const fileExt = filePath.split(".").pop();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [hasSharedToSocials, setHasSharedToSocials] = useState(false);
-  // const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
+  const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -129,47 +127,13 @@ const ArChallengeShare = () => {
     }
   };
 
-  const shareToSocialMedia = async () => {
-    // Ensure the correctedCaptureData is a file path
-    let fileUri = capturedDataUri;
-
-    // If correctedCaptureData doesn't already have "file://" prefix, add it
-    if (!fileUri.startsWith("file://")) {
-      fileUri = `file://${fileUri}`;
-    }
-
-    // Determine MIME type based on file extension
-    const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
-
-    // Share the file
-    try {
-      await Share.open({
-        url: fileUri,
-        type: mimeType,
-      });
-      if (!hasSharedToSocials) {
-        await socialPointsARUpdateAPI({
-          social_network: "",
-        });
-        showMessage(
-          "You've been granted points for sharing to your socials",
-          "success",
-          `Socials points granted!`
-        );
-      }
-      setHasSharedToSocials(true);
-    } catch (error) {
-      console.error("Error sharing media:", error?.message, error);
-    }
+  const shareToSocialMediaButtonHandler = () => {
+    setShareToSocialsIsOpen(true);
   };
 
-  // const shareToSocialMediaButtonHandler = () => {
-  //   setShareToSocialsIsOpen(true);
-  // };
-
-  // const closeShareToSocialMediaButtonHandler = () => {
-  //   setShareToSocialsIsOpen(false);
-  // };
+  const closeShareToSocialMediaButtonHandler = () => {
+    setShareToSocialsIsOpen(false);
+  };
 
   const checkPermission = () => {
     CameraRoll.saveAsset(capturedDataUri, {
@@ -354,8 +318,7 @@ const ArChallengeShare = () => {
         >
           {/* Share to socials button */}
           <AppButton
-            onPress={shareToSocialMedia}
-            // onPress={shareToSocialMediaButtonHandler}
+            onPress={shareToSocialMediaButtonHandler}
             containerStyle={{ flex: 1, justifyContent: "center" }}
             titleStyle={{ fontSize: FontSizes.S16 }}
             title={"Share To Socials"}
@@ -392,10 +355,12 @@ const ArChallengeShare = () => {
         loading={isLoading}
       />
 
-      {/* <ShareToSocialsModal
+      <ShareToSocialsModal
+        fileUri={filePath}
+        fileExt={fileExt}
         isVisible={shareToSocialsIsOpen}
         onClose={closeShareToSocialMediaButtonHandler}
-      /> */}
+      />
     </ChallengeScreen>
   );
 };
