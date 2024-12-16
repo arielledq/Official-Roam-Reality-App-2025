@@ -67,7 +67,7 @@ const PinChallenge = () => {
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
   const modelFile = challengeObj.model_file;
-  const viewInfoModalContent = challengeObj?.description;
+  const viewInfoModalContent = challengeObj?.info;
 
   let siteLatitude = 0;
   let siteLongitude = 0;

@@ -68,7 +68,7 @@ const ArChallengeCapture = ({}) => {
 
   const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
   const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
-  const viewInfoModalContent = challengeObj?.description;
+  const viewInfoModalContent = challengeObj?.info;
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -696,8 +696,6 @@ const ArChallengeCapture = ({}) => {
       />
     </>
   );
-
-  console.log("challengeObj", JSON.stringify(challengeObj, null, 2));
 
   return (
     <ChallengeScreen title="AR Photo Challenges" modals={modals}>
