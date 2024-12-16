@@ -1,3 +1,5 @@
+import logging
+
 from django.shortcuts import get_object_or_404
 from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
@@ -34,7 +36,7 @@ from functools import reduce
 from django.db.models import F, Value
 from django.db.models.functions import Replace
 
-
+logger = logging.getLogger('django')
 
 User = get_user_model()
 
@@ -74,7 +76,7 @@ class LoginViewSet(ViewSet):
             return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Here send notification to friends
-        [send_notification(NotificationTypes.FRIEND_ROAMING_ONLINE, user) for user in user.user_profile.friends.all()]
+        # [send_notification(NotificationTypes.FRIEND_ROAMING_ONLINE, user) for user in user.user_profile.friends.all()]
         user_serializer = UserSerializer(user)
         return Response({"token": token.key, "user": user_serializer.data})
 
@@ -323,7 +325,7 @@ class NotificationViewset(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = NotificationSerializer
-    http_method_names = ["get", "patch"]
+    http_method_names = ["get", "patch", "post"]
 
     def get_queryset(self):
         return Notification.objects.filter(receiver=self.request.user).order_by('-created_at')
@@ -341,3 +343,27 @@ class NotificationViewset(viewsets.ModelViewSet):
         queryset.update(is_hidden=True)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(methods=['post'], detail=False, permission_classes=[IsAuthenticated])
+    def send_roaming_notifications(self, request):
+        user = request.user
+        user_profile = getattr(user, 'user_profile', None)
+
+        if not user_profile:
+            return Response({"error": "User profile does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+
+        friends = user_profile.friends.all()
+        if not friends:
+            return Response({"message": "User has no friends to notify."}, status=status.HTTP_400_BAD_REQUEST)
+
+        metadata = request.data.get('metadata')
+        if not metadata:
+            return Response({"error": "Metadata is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        for friend in friends:
+            try:
+                send_notification(NotificationTypes.FRIEND_ROAMING_ONLINE, friend, extra_data=metadata)
+            except Exception as e:
+                logger.error(f"Could not send roaming notification to {friend.email}, original error: {e}.")
+        return Response({"message": "Roaming notifications sent."}, status=status.HTTP_200_OK)
+

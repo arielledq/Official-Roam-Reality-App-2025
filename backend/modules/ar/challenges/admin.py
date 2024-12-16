@@ -170,8 +170,9 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     search_fields = (
         "user__name",
         "geo_site__name",
+        "challenges__name",
     )
-    list_display = ('user_name', 'geo_site', 'approval','check_in_image')
+    list_display = ('user_name', 'geo_site', 'challenges', 'challenge_approval', 'check_in_image')
     list_select_related = ['user']  # To avoid extra queries
 
     def user_name(self, obj):
@@ -204,6 +205,10 @@ class ARExampleVideoInline(admin.TabularInline):
 class ARExampleAdmin(admin.ModelAdmin):
     inlines = [ARExampleImageInline, ARExampleVideoInline]
 
+@admin.register(StarCollection)
+class StarCollectionAdmin(admin.ModelAdmin):
+    pass
+
 
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
@@ -213,7 +218,7 @@ admin.site.register(ARExample, ARExampleAdmin)
 admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARGoldStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
-admin.site.register(StarCollection, GeoArChallengeAdmin)
+# admin.site.register(StarCollection, GeoArChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 admin.site.register(DestinationFacts, GeoArChallengeAdmin)
 admin.site.register(ARUserProfile, GeoArChallengeAdmin)

@@ -45,3 +45,5 @@ ffmpeg_downloader = "*"
 django-taggit = '*'
 djangorestframework-gis = '*'
 onesignal-sdk = "*"
+django-webshell = "0.4.0"
+tablib = "3.0.0"

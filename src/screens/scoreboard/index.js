@@ -1,27 +1,25 @@
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { Text, View, Pressable, ImageBackground } from 'react-native'
+import { AppHeader, AppInput } from '../../components'
+import { FlatList } from 'react-native-gesture-handler'
+import useStyles from './styles'
+import theme from '../../assets/theme'
 import {
-  Text,
-  View,
-  Pressable,
-  ImageBackground,
-} from "react-native"
-import { AppHeader, AppInput } from "../../components"
-import { FlatList } from "react-native-gesture-handler"
-import useStyles from "./styles"
-import theme from "../../assets/theme"
-import { getARProfile, getGeoARDestinations, getProfieDetails, searchUsers, sendFriendRequest } from "../../network"
-import FastImage from "react-native-fast-image"
-import Images from "../../assets/images"
-import { useDispatch, useSelector } from "react-redux"
-import BackgroundWithImage from "../../components/background"
-import { updateARUserData } from "../../redux/AR"
-import RankBG from "../../assets/geoar/rank_bg.svg"
-import { isLocationPointInPolygon } from "../../util/LocationLib"
+  getARProfile,
+  getGeoARDestinations,
+  getProfieDetails,
+  searchUsers,
+  sendFriendRequest,
+} from '../../network'
+import FastImage from 'react-native-fast-image'
+import Images from '../../assets/images'
+import { useDispatch, useSelector } from 'react-redux'
+import BackgroundWithImage from '../../components/background'
+import { updateARUserData } from '../../redux/AR'
+import RankBG from '../../assets/geoar/rank_bg.svg'
+import { isLocationPointInPolygon } from '../../util/LocationLib'
 
-
-
-const ScoreBoard = ({
-}) => {
+const ScoreBoard = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const [isLoading, setIsLoading] = useState(false)
@@ -33,11 +31,11 @@ const ScoreBoard = ({
   const [rankMine, setRankMine] = useState(null)
   const [destinationData, setDestinationData] = useState([])
   const [selectedDestination, setSelectedDestination] = useState(null)
-  const desRef = useRef();
+  const desRef = useRef()
 
   const fetchUsers = () => {
     const payload = {
-      search: ''
+      search: '',
     }
     searchUsers(payload).then(response => {
       if (response) {
@@ -48,11 +46,13 @@ const ScoreBoard = ({
             userProfile.user_ar_profile = arProfile
             arProfiles.push(userProfile)
           }
-          const aa = arProfiles.sort((a, b) => b?.user_ar_profile?.points - a?.user_ar_profile?.points)
+          const aa = arProfiles.sort(
+            (a, b) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
+          )
           for (var i = 0; i < aa.length; i++) {
-            aa[i].rank = (i + 1)
+            aa[i].rank = i + 1
             if (aa[i].id == userProfile.id) {
-              setRankMine((i + 1))
+              setRankMine(i + 1)
             }
           }
           setFilteredUsers(aa)
@@ -65,20 +65,21 @@ const ScoreBoard = ({
   const fetchProfileDetails = async () => {
     try {
       getProfieDetails({
-        id: userProfile.user_profile.id
-      }).then(res => {
-        if (res.status == 1) {
-          setProfileDetails(res)
-        } else {
-          console.error('Error', "Error fetching profile details: ")
-        }
-      }).catch(err => {
-        console.error('Error', "Error fetching profile details: ")
-      }
-      ).finally(() => setIsLoading(false))
-
+        id: userProfile.user_profile.id,
+      })
+        .then(res => {
+          if (res.status == 1) {
+            setProfileDetails(res)
+          } else {
+            console.error('Error', 'Error fetching profile details: ')
+          }
+        })
+        .catch(err => {
+          console.error('Error', 'Error fetching profile details: ')
+        })
+        .finally(() => setIsLoading(false))
     } catch (error) {
-      console.error('Error', "Error fetching profile details: ")
+      console.error('Error', 'Error fetching profile details: ')
     }
   }
 
@@ -89,7 +90,7 @@ const ScoreBoard = ({
         if (res.status == 1) {
           setDestinationData(res.data)
         } else {
-          res.message.message = "Error in loading Destinations."
+          res.message.message = 'Error in loading Destinations.'
           handleError(res)
         }
       })
@@ -99,16 +100,17 @@ const ScoreBoard = ({
   }
 
   const fetchARUserProfile = () => {
-    getARProfile().then((res) => {
-      if (res.status == 1) {
-        dispatch(updateARUserData(res))
-      }
-    }).finally(() => {
-    })
+    getARProfile()
+      .then(res => {
+        if (res.status == 1) {
+          dispatch(updateARUserData(res))
+        }
+      })
+      .finally(() => {})
   }
 
   React.useEffect(() => {
-    fetchProfileDetails();
+    fetchProfileDetails()
     fetchUsers()
     fetchARUserProfile()
     ARDestinations()
@@ -128,23 +130,25 @@ const ScoreBoard = ({
             style={{
               width: 80,
               aspectRatio: 1,
-              justifyContent: "center",
-              alignItems: "center"
+              justifyContent: 'center',
+              alignItems: 'center',
             }}
-            resizeMode="stretch"
+            resizeMode='stretch'
           >
             <FastImage
               style={{
                 width: 40,
                 aspectRatio: 1,
                 borderRadius: 5,
-                height: 40
+                height: 40,
               }}
               source={{ uri: profileDetails?.image }}
               resizeMode={FastImage.resizeMode.cover}
             />
           </ImageBackground>
-          <Text numberOfLines={2} style={_styles.nameText}>{userProfile?.name.replace(" ", "\n")}</Text>
+          <Text numberOfLines={2} style={_styles.nameText}>
+            {userProfile?.name.replace(' ', '\n')}
+          </Text>
         </View>
         <View style={{ alignItems: 'center' }}>
           <Text style={_styles.rankText}>Site Visited</Text>
@@ -154,22 +158,23 @@ const ScoreBoard = ({
           <Text style={_styles.rankText}>Points</Text>
           <Text style={_styles.rankTextNumber}>{arProfile.points}</Text>
         </View>
-      </View>)
+      </View>
+    )
   }
 
-  const getAllPoints = (destination) => {
+  const getAllPoints = destination => {
     const arrayPoints = []
     if (destination?.border?.coordinates) {
-      for (i = 0; i < destination.border.coordinates.length; i++) {
-        const points = destination.border.coordinates[i];
-        for (j = 0; j < points.length; j++) {
+      for (let i = 0; i < destination.border.coordinates.length; i++) {
+        const points = destination.border.coordinates[i]
+        for (let j = 0; j < points.length; j++) {
           const point = points[j]
           arrayPoints.push({ latitude: point[1], longitude: point[0] })
         }
       }
-      return arrayPoints;
+      return arrayPoints
     }
-    return null;
+    return null
   }
 
   const filterDestinations = (o, index) => {
@@ -177,20 +182,20 @@ const ScoreBoard = ({
     desRef?.current?.scrollToIndex({
       animated: true,
       index: index,
-    });
-    const destinationPoints = getAllPoints(o);
+    })
+    const destinationPoints = getAllPoints(o)
     if (destinationPoints) {
       const filterUserWithDes = []
-      let count = 1;
+      let count = 1
       for (let i = 0; i < allUsers.length; i++) {
-        let userCheck = allUsers[i];
+        let userCheck = allUsers[i]
         if (userCheck.user_ar_profile && userCheck.user_ar_profile?.current_location) {
           const pointUser = {
             latitude: userCheck.user_ar_profile?.current_location.coordinates[1],
-            longitude: userCheck.user_ar_profile?.current_location.coordinates[0]
+            longitude: userCheck.user_ar_profile?.current_location.coordinates[0],
           }
           const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints)
-          console.log("filterDestinations", userCheck.user_ar_profile?.current_location, isInsideSiteArea)
+
           if (isInsideSiteArea) {
             userCheck.rank = count
             filterUserWithDes.push(userCheck)
@@ -203,18 +208,21 @@ const ScoreBoard = ({
   }
 
   const DestinationItem = ({ obj, index }) => (
-    <Pressable onPress={() => filterDestinations(obj, index)} style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      height: 48,
-      borderRadius: 100,
-      backgroundColor: "",
-      borderColor: "#9003E0",
-      backgroundColor: "#323250",
-      paddingHorizontal: 8,
-      marginHorizontal: 5,
-      borderWidth: obj.id == selectedDestination?.id ? 1 : 0
-    }}>
+    <Pressable
+      onPress={() => filterDestinations(obj, index)}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 48,
+        borderRadius: 100,
+        backgroundColor: '',
+        borderColor: '#9003E0',
+        backgroundColor: '#323250',
+        paddingHorizontal: 8,
+        marginHorizontal: 5,
+        borderWidth: obj.id == selectedDestination?.id ? 1 : 0,
+      }}
+    >
       <FastImage
         style={{
           width: 40,
@@ -223,7 +231,7 @@ const ScoreBoard = ({
           height: 40,
           borderRadius: 100,
           overflow: 'hidden',
-          marginEnd: 8
+          marginEnd: 8,
         }}
         source={{ uri: obj?.flag_image }}
         resizeMode={FastImage.resizeMode.cover}
@@ -236,7 +244,16 @@ const ScoreBoard = ({
   )
 
   const Item = ({ obj }) => (
-    <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#131422', borderRadius: 12, marginVertical: 4 }}>
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        backgroundColor: '#131422',
+        borderRadius: 12,
+        marginVertical: 4,
+      }}
+    >
       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
         <View style={{ marginStart: 10, alignItems: 'center' }}>
           <Text style={_styles.rankText}>Rank</Text>
@@ -247,23 +264,25 @@ const ScoreBoard = ({
           style={{
             width: 80,
             aspectRatio: 1,
-            justifyContent: "center",
-            alignItems: "center"
+            justifyContent: 'center',
+            alignItems: 'center',
           }}
-          resizeMode="stretch"
+          resizeMode='stretch'
         >
           <FastImage
             style={{
               width: 40,
               aspectRatio: 1,
               borderRadius: 5,
-              height: 40
+              height: 40,
             }}
             source={{ uri: obj?.user_profile?.image }}
             resizeMode={FastImage.resizeMode.cover}
           />
         </ImageBackground>
-        <Text numberOfLines={2} style={_styles.nameText}>{obj?.name?.replace(" ", "\n")}</Text>
+        <Text numberOfLines={2} style={_styles.nameText}>
+          {obj?.name?.replace(' ', '\n')}
+        </Text>
       </View>
       <View style={{ alignItems: 'center' }}>
         <Text style={_styles.rankText}>Site Visited</Text>
@@ -274,7 +293,7 @@ const ScoreBoard = ({
         <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.points}</Text>
       </View>
     </View>
-  );
+  )
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -282,14 +301,18 @@ const ScoreBoard = ({
         centerComponent={{
           text: 'Scoreboard',
           style: [_styles.heading],
-        }} backgroundColor="transparent" />
+        }}
+        backgroundColor='transparent'
+      />
       <View style={{ height: 50 }}>
-        <FlatList horizontal
+        <FlatList
+          horizontal
           ref={desRef}
           data={destinationData}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />} />
+          renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />}
+        />
       </View>
       <Text style={_styles.subTitle}>Your rank</Text>
       {myRank()}

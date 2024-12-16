@@ -1,35 +1,30 @@
-import React, { useState } from "react"
+import React, { useState } from 'react'
 
-import { Keyboard, TouchableOpacity, View } from "react-native"
+import { Keyboard, View } from 'react-native'
 
-import { Formik } from "formik"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import useStyles from "./styles"
-import {
-  RootStackParamList,
-  ScreenStackComponent
-} from "../../navigation/types"
-import AppButton from "../../components/button"
-import AppInput from "../../components/input"
-import { LockIcon, MailIcon } from "../../assets/svg"
-import AppHeader from "../../components/header"
-import BackgroundWithImage from "../../components/background"
-import theme from "../../assets/theme"
-import AppText from "../../components/text"
-import { login, setDevice } from "../../network"
-import { useDispatch, useSelector } from "react-redux"
-import { updateUserData } from "../../redux/Login"
-import { useNavigation } from "@react-navigation/native"
-import { SigninSchema } from "../../util/ValidationSchemas"
-import Icon from "../../components/Icon"
-import { handleError } from "../../util/helpers"
-import SocialSignin from "../../components/socialSignin"
-import { updateAsOldUser } from "../../redux/Persist"
-import OneSignal from "react-native-onesignal"
+import { Formik } from 'formik'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import useStyles from './styles'
+import { RootStackParamList, ScreenStackComponent } from '../../navigation/types'
+import AppButton from '../../components/button'
+import AppInput from '../../components/input'
+import { LockIcon, MailIcon } from '../../assets/svg'
+import AppHeader from '../../components/header'
+import BackgroundWithImage from '../../components/background'
+import theme from '../../assets/theme'
+import AppText from '../../components/text'
+import { login, setDevice } from '../../network'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateUserData } from '../../redux/Login'
+import { SigninSchema } from '../../util/ValidationSchemas'
+import Icon from '../../components/Icon'
+import { handleError } from '../../util/helpers'
+import SocialSignin from '../../components/socialSignin'
+import { updateAsOldUser } from '../../redux/Persist'
+import OneSignal from 'react-native-onesignal'
+import { setItemWithListener } from '../../util/EventsListener'
 
-const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
-  navigation
-}) => {
+const Login: ScreenStackComponent<RootStackParamList, 'Login'> = ({ navigation }) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
   const newUser = useSelector(state => state.persist.newUser)
@@ -49,11 +44,11 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
     setIsLoading(true)
     login({
       username: v.email.toLowerCase(),
-      password: v.password
+      password: v.password,
     })
       .then(res => {
-        console.log({ res })
         if (res.status == 1) {
+          setItemWithListener('userToken', res?.token)
           dispatch(updateUserData(res))
           setOnesignalDevice()
           if (newUser) {
@@ -69,16 +64,16 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
   }
 
   const navigateToResetPassword = () => {
-    navigation.navigate("ForgotPassword")
+    navigation.navigate('ForgotPassword')
   }
 
   const navigateToSignUp = () => {
-    navigation.navigate("SignUp")
+    navigation.navigate('SignUp')
   }
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader title={""} backgroundColor="transparent" hideBackButton />
+      <AppHeader title={''} backgroundColor='transparent' hideBackButton />
       <AppText style={[_styles.headerText]}>Welcome back!</AppText>
       <AppText style={_styles.subHeaderText}>
         Login to ROAM a new dimension with captivating AR experiences.
@@ -86,40 +81,31 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
       <KeyboardAwareScrollView
         style={{ flex: 1 }}
         nestedScrollEnabled={false}
-        keyboardShouldPersistTaps="always"
+        keyboardShouldPersistTaps='always'
       >
         <Formik
           initialValues={{
-            email: "",
-            password: ""
+            email: '',
+            password: '',
           }}
           onSubmit={v => handleLogin(v)}
           validationSchema={SigninSchema}
         >
-          {({
-            handleChange,
-            handleBlur,
-            handleSubmit,
-            values,
-            errors,
-            touched
-          }) => (
+          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
             <View style={_styles.container}>
               <AppInput
                 inputContainerStyle={[_styles.input]}
                 containerStyle={{ marginBottom: -10 }}
-                placeholder={"Email Address"}
+                placeholder={'Email Address'}
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.email}
-                autoCapitalize="none"
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                errorMessage={
-                  touched.email && errors?.email ? errors.email : undefined
-                }
+                autoCapitalize='none'
+                onChangeText={handleChange('email')}
+                onBlur={handleBlur('email')}
+                errorMessage={touched.email && errors?.email ? errors.email : undefined}
                 autoCorrect={false}
-                textContentType="emailAddress"
-                autoComplete="email"
+                textContentType='emailAddress'
+                autoComplete='email'
                 leftIconContainerStyle={{ marginRight: 5 }}
                 leftIcon={<MailIcon />}
               />
@@ -127,26 +113,22 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 inputContainerStyle={[_styles.input]}
                 secureTextEntry={passwordVisibility && true}
                 onSubmitEditing={Keyboard.dismiss}
-                placeholder="Password"
+                placeholder='Password'
                 placeholderTextColor={theme.darkColors?.grey}
                 value={values.password}
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                errorMessage={
-                  touched.password && errors?.password
-                    ? errors.password
-                    : undefined
-                }
-                autoCapitalize="none"
+                onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
+                errorMessage={touched.password && errors?.password ? errors.password : undefined}
+                autoCapitalize='none'
                 leftIcon={<LockIcon />}
                 rightIcon={
                   <Icon
                     onPress={() => {
                       setPasswordVisibility(p => !p)
                     }}
-                    name={passwordVisibility ? "eye" : "eye-off"}
-                    family="feather"
-                    color={"#9CA3AF"}
+                    name={passwordVisibility ? 'eye' : 'eye-off'}
+                    family='feather'
+                    color={'#9CA3AF'}
                     size={23}
                   />
                 }
@@ -161,7 +143,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Sign In"}
+                title={'Sign In'}
                 onPress={handleSubmit}
                 loading={isLoading}
                 disabled={isLoading}
@@ -173,7 +155,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 <AppText
                   style={_styles.TandCLink}
                   onPress={() => {
-                    navigation.navigate("TermsAndConditions")
+                    navigation.navigate('TermsAndConditions')
                   }}
                 >
                   {`Terms and Conditions `}
@@ -182,7 +164,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
                 <AppText
                   style={_styles.TandCLink}
                   onPress={() => {
-                    navigation.navigate("PrivacyPolicy")
+                    navigation.navigate('PrivacyPolicy')
                   }}
                 >
                   {` Privacy Policy.`}
@@ -196,7 +178,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({
         </Formik>
       </KeyboardAwareScrollView>
       <AppText style={_styles.alreadyHaveAccount}>
-        Don’t have an account? {""}
+        Don’t have an account? {''}
         <AppText style={_styles.SignInLink} onPress={navigateToSignUp}>
           Sign Up
         </AppText>

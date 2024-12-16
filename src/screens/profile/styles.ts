@@ -28,7 +28,8 @@ const useStyles = makeStyles(theme => ({
   },
   heading: {
     ...fontGroup.ns800,
-    fontSize: FontSizes.S22,
+    fontSize: FontSizes.S24,
+    fontWeight: '800',
     lineHeight: FontLineHeights.LH30,
     color: theme.colors.white,
     flex: 1,
@@ -94,7 +95,7 @@ const useStyles = makeStyles(theme => ({
     marginVertical: 5,
   },
   container_style: {
-    paddingBottom: '50%',
+    paddingBottom: 50,
   },
   blurView: {
     overflow: 'hidden',

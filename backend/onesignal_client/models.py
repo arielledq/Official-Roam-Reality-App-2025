@@ -1,3 +1,5 @@
+from django.db.models import Q
+
 from users.models import User
 from django.db import models
 
@@ -23,12 +25,13 @@ class UserDevice(models.Model):
     def activate_device(user, device_id, device_token):
         if not device_id:
             return
-        try:
-            device = user.devices.get(device_id=device_id)
+        device = user.devices.filter(Q(device_id=device_id) | Q(device_token=device_token)).first()
+        if device:
             device.active = True
             device.device_token = device_token
+            device.device_id = device_id
             device.save()
-        except UserDevice.DoesNotExist:
+        else:
             UserDevice.objects.create(
                 user=user,
                 device_id=device_id,

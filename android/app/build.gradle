@@ -89,6 +89,7 @@ def reactNativeArchitectures() {
     return value ? value.split(",") : ["armeabi-v7a", "x86", "x86_64", "arm64-v8a"]
 }
 
+// apply from: new File(["node", "--print", "require.resolve('@sentry/react-native/package.json')"].execute().text.trim(), "../sentry.gradle")
 android {
     ndkVersion rootProject.ext.ndkVersion
 
@@ -99,7 +100,7 @@ android {
         applicationId "com.roam_reality"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
+        versionCode 4
         versionName "1.0"
         multiDexEnabled true
     }
@@ -119,14 +120,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        release
-        {
-            if (project.hasProperty('MYAPP_RELEASE_STORE_FILE'))
-            {
-                storeFile file(MYAPP_RELEASE_STORE_FILE)
-                storePassword MYAPP_RELEASE_STORE_PASSWORD
-                keyAlias MYAPP_RELEASE_KEY_ALIAS
-                keyPassword MYAPP_RELEASE_KEY_PASSWORD
+        release {
+            if (project.hasProperty('ROOM_AR_UPLOAD_STORE_FILE')) {
+                storeFile file(ROOM_AR_UPLOAD_STORE_FILE)
+                storePassword ROOM_AR_UPLOAD_STORE_PASSWORD
+                keyAlias ROOM_AR_UPLOAD_KEY_ALIAS
+                keyPassword ROOM_AR_UPLOAD_KEY_PASSWORD
             }
         }
     }
@@ -170,14 +169,12 @@ dependencies {
 
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
 
-    // Add these lines
-    implementation project(':gvr_common')
-    implementation project(':arcore_client')
-    implementation project(path: ':react_viro')
-    implementation project(path: ':viro_renderer')
-    implementation 'com.google.android.exoplayer:exoplayer:2.15.1'
-    implementation 'com.google.protobuf.nano:protobuf-javanano:3.0.0-alpha-7'
-    implementation 'com.bytedance.ies.ugc.aweme:opensdk-oversea-external:0.2.1.2'
+    implementation 'com.facebook.fresco:fresco:3.1.0'
+    implementation('com.facebook.fresco:nativeimagetranscoder') {
+            version {
+                strictly '3.1.0'
+            }
+    }
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:${FLIPPER_VERSION}") {
@@ -189,6 +186,13 @@ dependencies {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            force 'androidx.viewpager2:viewpager2:1.0.0' // Compatible with compileSdkVersion 33
+            force 'androidx.annotation:annotation-experimental:1.3.0' // Compatible with compileSdkVersion 33
+        }
     }
 }
 

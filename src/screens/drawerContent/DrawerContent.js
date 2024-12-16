@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { View, StyleSheet, Image, Alert, TouchableOpacity } from 'react-native'
-import { DrawerContentScrollView, DrawerItem } from '@react-navigation/drawer'
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native'
+import { DrawerContentScrollView } from '@react-navigation/drawer'
 import theme from '../../assets/theme'
 import { useNavigation } from '@react-navigation/native'
 import Images from '../../assets/images'
@@ -9,11 +9,11 @@ import AppText from '../../components/text'
 import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
 import ConfirmationPopUp from '../../components/confirmationPopUp'
 import { deleteAccount, logout } from '../../network'
-import { useDispatch, useSelector } from 'react-redux'
-import { resetState, updateUserData } from '../../redux/Login'
+import { useDispatch } from 'react-redux'
+import { resetState } from '../../redux/Login'
 import LinearGradient from 'react-native-linear-gradient'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import { removeItem, showMessage, setItem, getItem } from '../../util/helpers'
+import { removeItem, showMessage } from '../../util/helpers'
 import AppSwitch from '../../components/Switch'
 import userLocationHook from './location.hook'
 
@@ -34,24 +34,15 @@ const DrawerList = [
 ]
 
 const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index, onPress }) => {
-  const dispatch = useDispatch()
-  const userData = useSelector(state => state?.login?.data)
-  const { setLocationEnabled } = userLocationHook()
+  const { loading, locationIsEnabled, toggleUserLocation } = userLocationHook()
 
   function getIconFamily(icon) {
     const customIcons = ['Contact', 'Question', 'Folder', 'Invite', 'Wallet', 'pin']
     return customIcons.includes(icon) ? 'custom' : 'feather'
   }
 
-  const toggleLiveLocation = async () => {
-    const locationEnabled = !Boolean(userData?.locationEnabled)
-    dispatch(
-      updateUserData({
-        ...userData,
-        locationEnabled: locationEnabled,
-      })
-    )
-    setLocationEnabled(locationEnabled)
+  const toggleLiveLocationButtonHandler = () => {
+    toggleUserLocation()
   }
 
   const renderDrawerItem = () => {
@@ -69,7 +60,11 @@ const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index,
           {description && <AppText style={styles.Description}>{description}</AppText>}
         </View>
         {navigateTo === 'toggleLocation' ? (
-          <AppSwitch onValueChange={toggleLiveLocation} value={userData?.locationEnabled} />
+          <AppSwitch
+            onValueChange={toggleLiveLocationButtonHandler}
+            value={locationIsEnabled}
+            loading={loading}
+          />
         ) : isLastItem ? (
           <></>
         ) : (
@@ -158,8 +153,8 @@ function DrawerContent(props) {
     }
   }
   const handleLogOutButton = async () => {
-    await GoogleSignin.revokeAccess().catch(err => console.log(err))
-    await GoogleSignin.signOut().catch(err => console.log(err))
+    await GoogleSignin.revokeAccess().catch(err => console.error(err))
+    await GoogleSignin.signOut().catch(err => console.error(err))
     await removeItem('fbToken')
     await removeItem('instaToken')
     await removeItem('tiktokToken')
@@ -171,7 +166,6 @@ function DrawerContent(props) {
   }
   const handleDeleteAccount = () => {
     deleteAccount().then(res => {
-      console.log({ res })
       if (res.status == 1) {
         handleLogOutButton()
         showMessage('Your account has been deleted successfully')

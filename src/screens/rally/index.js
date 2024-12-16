@@ -1,20 +1,14 @@
-import React from 'react'
-import { StyleSheet, Text, View } from 'react-native'
+import React from "react";
+import { ImageBackground } from "react-native";
 
-const Rally = () => {
+const Rally = ({}) => {
   return (
-    <View
-      style={{
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center'
-      }}
-    >
-      <Text>Rally</Text>
-    </View>
-  )
-}
+    <ImageBackground
+      source={require("../../assets/images/ROAM_RALLY.png")}
+      style={{ flex: 1 }}
+      resizeMode="cover"
+    />
+  );
+};
 
-export default Rally
-
-const styles = StyleSheet.create({})
+export default Rally;

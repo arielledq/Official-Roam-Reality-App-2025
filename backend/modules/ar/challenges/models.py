@@ -110,55 +110,110 @@ class Sponsor(models.Model):
 
 class ARChallengeParameterSettings(models.Model):
     name = models.CharField(
-        _("Settings Name"), default=None, null=False, blank=False, max_length=255
+        _("Settings Name"), max_length=255, default=None, blank=False, null=False
     )
-    loop_animations = models.BooleanField(_("Loop Animation"), default=False)
-    loop_delay = models.IntegerField(_("Loop Delay"), validators=[MinValueValidator(0)], default=1000, null=False,
-                                     blank=False)
-    pinch_to_zoom = models.BooleanField(_("Pinch to Zoom"), default=False)
-    min_pinch_scale = models.DecimalField(_("Minimum Zoom Scaling"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                 MaxValueValidator(Decimal('1.00'))],
-                                          max_digits=3, decimal_places=2, default=0.02)
-    max_pinch_scale = models.DecimalField(_("Maximum Zoom Scaling"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                 MaxValueValidator(Decimal('1.00'))],
-                                          max_digits=3, decimal_places=2, default=0.8)
-    rotation = models.BooleanField(_("Rotation"), default=False)
-    bloom = models.BooleanField(_("Bloom"), default=False)
-    bloom_threshold = models.DecimalField(_("Bloom Threshold"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                            MaxValueValidator(Decimal('1.00'))],
-                                          max_digits=3, decimal_places=2, default=1.00)
-    diffuse_text_color = models.CharField(_("Diffuse Color"), max_length=10, blank=True, null=True, default='#ffffff')
-    diffuse_intensity = models.DecimalField(_("Diffuse Intensity"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                MaxValueValidator(Decimal('1.00'))],
-                                            max_digits=3, decimal_places=2, default=1.00)
+
+    bloom_threshold = models.DecimalField(
+        _("Bloom Threshold"),
+        validators=[MinValueValidator(Decimal('-1.00')), MaxValueValidator(Decimal('5.00'))],
+        max_digits=4,
+        decimal_places=2,
+        default=1.00
+    )
+    bloom_intensity = models.DecimalField(
+        _("Bloom Intensity"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('99.00'))],
+        max_digits=5,
+        decimal_places=2,
+        default=1.00
+    )
+    positionX = models.DecimalField(_("Position X"), default=0, decimal_places=3, max_digits=6)
+    positionY = models.DecimalField(_("Position Y"), default=0, decimal_places=3, max_digits=6)
+    positionZ = models.DecimalField(_("Position Z"), default=-0.4, decimal_places=3, max_digits=6)
+
+    scale_object = models.DecimalField(
+        _("Object Scale"),
+        validators=[MinValueValidator(Decimal('0.000')), MaxValueValidator(Decimal('8.000'))],
+        max_digits=8,
+        decimal_places=5,
+        default=1.00  # Asignado según el valor proporcionado
+    )
+    emission_value = models.DecimalField(
+        _("Emission Value"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('99.00'))],
+        max_digits=5,
+        decimal_places=2,
+        default=1.00
+    )
+    rotation_speed = models.IntegerField(
+        _("Rotation Speed"),
+        validators=[MinValueValidator(0)],
+        default=1
+    )
+    scale_speed = models.DecimalField(
+        _("Scale Speed"),
+        validators=[MinValueValidator(Decimal('0.0001')), MaxValueValidator(Decimal('10.0000'))],
+        max_digits=7,
+        decimal_places=4,
+        default=0.0015
+    )
+    min_pinch_scale = models.DecimalField(
+        _("Minimum Zoom Scaling"),
+        validators=[MinValueValidator(Decimal('0.000')), MaxValueValidator(Decimal('1.000'))],
+        max_digits=5,
+        decimal_places=4,
+        default=0.01
+    )
+    max_pinch_scale = models.DecimalField(
+        _("Maximum Zoom Scaling"),
+        validators=[MinValueValidator(Decimal('0.000')), MaxValueValidator(Decimal('3.000'))],
+        max_digits=4,
+        decimal_places=3,
+        default=3.00
+    )
+
+
+    isRotationEnabled = models.BooleanField(_("Rotation Enabled"), default=True)
+
+
+    loop_animations = models.BooleanField(_("Loop Animation"), default=False, editable=False)
+    loop_delay = models.IntegerField(_("Loop Delay"), validators=[MinValueValidator(0)], default=1000, editable=False)
+    diffuse_text_color = models.CharField(_("Diffuse Color"), max_length=10, blank=True, null=True, default='#ffffff', editable=False)
+    diffuse_intensity = models.DecimalField(
+        _("Diffuse Intensity"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00,
+        editable=False
+    )
     sound_play_and_pause = models.BooleanField(_("Sound Play and Pause"), default=False)
-    image_opacity = models.BooleanField(_("Image Opacity"), default=False)
-    image_opacity_value = models.DecimalField(_("Image Opacity Value"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                                    MaxValueValidator(Decimal('1.00'))],
-                                              max_digits=3, decimal_places=2, default=1.00)
-    tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False)
-    scale_object = models.DecimalField(_("Object Scale"), validators=[MinValueValidator(Decimal('0.00')),
-                                                                      MaxValueValidator(Decimal('8.00'))], max_digits=8,
-                                       decimal_places=5, default=0.05)
-    positionX = models.IntegerField(_("Position X"), default=0, null=False, blank=False)
-    positionY = models.IntegerField(_("Position Y"), default=0, null=False, blank=False)
-    positionZ = models.IntegerField(_("Position Z"), default=-25, null=False, blank=False)
-    ar_portals = models.BooleanField(_("AR Portals"), default=False)
-    image_recognition = models.BooleanField(_("Image Recognition"), default=False)
+    image_opacity = models.BooleanField(_("Image Opacity"), default=False, editable=False)
+    image_opacity_value = models.DecimalField(
+        _("Image Opacity Value"),
+        validators=[MinValueValidator(Decimal('0.00')), MaxValueValidator(Decimal('1.00'))],
+        max_digits=3,
+        decimal_places=2,
+        default=1.00,
+        editable=False
+    )
+    tracking_and_anchors = models.BooleanField(_("Tracking and Anchors"), default=False, editable=False)
+    ar_portals = models.BooleanField(_("AR Portals"), default=False, editable=False)
+    image_recognition = models.BooleanField(_("Image Recognition"), default=False, editable=False)
     image_recognition_file = models.FileField(
         _("Image Recognition File"),
         upload_to="ar_ir/img/",
         blank=True,
         null=True,
+        editable=False
     )
 
     class Meta:
-        verbose_name_plural = "AR Challenge Parameter Settings"
         verbose_name = "AR Challenge Parameter Settings"
+        verbose_name_plural = "AR Challenge Parameter Settings"
 
     def __str__(self):
         return self.name
-
 
 class ARChallengeFilters(models.Model):
     name = models.CharField(
@@ -230,6 +285,7 @@ class Challenges(models.Model):
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    info = RichTextField(_("Info"), blank=True, null=True)
 
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)
@@ -435,6 +491,7 @@ class GeoArSite(models.Model):
     lat_long = gis_models.PointField(_("Latitude and Longitude"), blank=True, null=True)
     geo_site_border = gis_models.MultiLineStringField(_("Geo Site Line"), blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    info = RichTextField(_("Info"), blank=True, null=True)
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
     check_in_site_radius = models.IntegerField(verbose_name="Check-in Site Radius", default=50)
@@ -453,6 +510,7 @@ class GeoARStar(models.Model):
     )
     star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
+    info = RichTextField(_("Info"), blank=True, null=True)
     visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
     geo_site = models.ForeignKey(
         GeoArSite,
@@ -570,7 +628,7 @@ class ARSitePinCheckIn(models.Model):
         User, on_delete=models.CASCADE, related_name="user_ar_site_checkin"
     )
     check_in_image = models.ImageField(upload_to="geoar/checkinimg/", null=True, blank=True)
-    approval = models.CharField(
+    challenge_approval = models.CharField(
         max_length=50,
         choices=CHALLENGE_APPROVAL_CHOICES,
         default="UNAPPROVED",
@@ -580,12 +638,20 @@ class ARSitePinCheckIn(models.Model):
     declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
+    challenges = models.ForeignKey(
+        Challenges,
+        verbose_name="Challenge",
+        on_delete=models.CASCADE,
+        related_name="challenges_ar_check_in",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name_plural = "AR Site Pin Check-ins"
 
     def clean(self):
-        if self.approval == "DECLINED":
+        if self.challenge_approval == "DECLINED":
             if self.declined_reason == "":
                 raise ValidationError(
                     "Declined Reason is mandotory, When challenge is declined!"
@@ -708,3 +774,4 @@ class PanicMessage(models.Model):
     class Meta:
         verbose_name_plural = "Panic Messages"
         verbose_name = "Panic Message"
+

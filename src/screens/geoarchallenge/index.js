@@ -1,74 +1,88 @@
-import React, {useContext, useEffect, useState} from "react"
+import React, { useEffect, useState } from 'react'
 
-import {
-  FlatList,
-  Image,
-  ImageBackground,
-  Text,
-  TouchableOpacity,
-  View
-} from "react-native"
-import {handleError, isPointInPolygon} from "../../util/helpers"
+import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from 'react-native'
+import { handleError } from '../../util/helpers'
 import {
   getGeoARDestinations,
   getARProfile,
   getARStettings,
   getARChallenges,
-  updateUserLocation,
   getARSitesStars,
-  getDestinationFactsAll, setDevice
-} from "../../network"
+  setDevice,
+} from '../../network'
 
-import BackgroundWithImage from "../../components/background"
-import AppHeader from "../../components/header"
-import { DrawerActions, useNavigation } from "@react-navigation/native"
-import SiteIcon from "../../assets/geoar/siteicon.svg"
-import StarSiteIcon from "../../assets/geoar/starsite.svg"
-import GradientDownPNG from "../../assets/geoar/gradient_down.png"
-import SOSIcon from "../../assets/Icons/sos.svg"
-import ArIcon from "../../assets/geoar/aricon.svg"
+import BackgroundWithImage from '../../components/background'
+import AppHeader from '../../components/header'
+import { DrawerActions, useNavigation } from '@react-navigation/native'
+import SiteIcon from '../../assets/geoar/siteicon.svg'
+import StarSiteIcon from '../../assets/geoar/starsite.svg'
+import GradientDownPNG from '../../assets/geoar/gradient_down.png'
+import SOSIcon from '../../assets/Icons/sos.svg'
+import ArIcon from '../../assets/geoar/aricon.svg'
 import {
   updateARUserData,
   updateARSettings,
   updateSelectedDestination,
-  updateAnyWhereChallenges
-} from "../../redux/AR"
+  updateAnyWhereChallenges,
+} from '../../redux/AR'
 
-import {useDispatch, useSelector} from "react-redux"
-import useStyles from "./styles"
-import { hasLocationPermission } from "../../util/LocationLib"
-import Geolocation from "react-native-geolocation-service"
-import { MenuIcon } from "../../assets/svg"
-import PanicPopUp from "./panicpopup"
-import {updateDestinationFactsAll} from "../../redux/AR/reducer";
-import {GeolocationContext} from "../../GeolocationProvider";
-import OneSignal from "react-native-onesignal";
+import { useDispatch } from 'react-redux'
+import useStyles from './styles'
+import { MenuIcon } from '../../assets/svg'
+import PanicPopUp from './panicpopup'
+import OneSignal from 'react-native-onesignal'
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles()
   const dispatch = useDispatch()
-  // const { userLocation } = useContext(GeolocationContext);
-  // console.log("userLocation  ==> ", userLocation)
   const [isLoading, setIsLoading] = useState(false)
   const [destinationData, setDestinationData] = useState([])
   const [starSitesCount, setStarSitesCount] = useState({})
-  // const [numberOfChallenges, setNumberOfChallenges] = useState(0)
   const [openPanicPopUp, setOpenPanicPopup] = useState(false)
   const navigation = useNavigation()
 
+  useEffect(() => {
+    OneSignal.setNotificationOpenedHandler(notification => {
+      const { additionalData } = notification.notification
+
+      if (additionalData) {
+        navigateToGeoChanllenge(additionalData)
+      }
+    })
+
+    return () => {
+      OneSignal.clearHandlers()
+    }
+  }, [])
+
+  const navigateToGeoChanllenge = additionalData => {
+    const { destinationId } = additionalData
+    if (destinationId && destinationData?.length) {
+      const selectedDestination = destinationData.find(
+        destination => destination?.id === destinationId
+      )
+
+      if (selectedDestination) {
+        dispatch(updateSelectedDestination(selectedDestination))
+
+        setTimeout(() => {
+          navigation.navigate('GeoArChallengeDetails')
+        }, 500)
+      }
+    }
+  }
+
   const setOnesignalDevice = () => {
     OneSignal.getDeviceState().then(deviceData => {
-      console.log("Device Data", deviceData)
       if (deviceData?.userId) {
-        setDevice({ ...deviceData, active: true }).then(res => {
-          console.log("Device Data Updated", res)
-        }).catch(err => {
-          console.log("Device Data Update Error", err)
-        })
+        setDevice({ ...deviceData, active: true })
+          .then(res => {})
+          .catch(err => {
+            console.error('Device Data Update Error', err)
+          })
       }
     })
   }
-
 
   const ARSposored = () => {
     setIsLoading(true)
@@ -81,7 +95,7 @@ const GeoArChallenge = ({}) => {
             getARStarSites(d.id)
           }
         } else {
-          res.message.message = "Error in loading Challenges."
+          res.message.message = 'Error in loading Challenges.'
           handleError(res)
         }
       })
@@ -97,7 +111,7 @@ const GeoArChallenge = ({}) => {
         if (res.status == 1) {
           dispatch(updateARUserData(res))
         } else {
-          res.message.message = "Error in loading Challenges."
+          res.message.message = 'Error in loading Challenges.'
           handleError(res)
         }
       })
@@ -130,7 +144,7 @@ const GeoArChallenge = ({}) => {
           // setNumberOfChallenges(res?.data?.length)
           dispatch(updateAnyWhereChallenges(res?.data))
         } else {
-          res.message.message = "Error in loading Challenges."
+          res.message.message = 'Error in loading Challenges.'
           handleError(res)
         }
       })
@@ -156,66 +170,55 @@ const GeoArChallenge = ({}) => {
 
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj))
-    navigation.navigate("GeoArOutdoor", { challengeObj: obj })
+    navigation.navigate('GeoArOutdoor', { challengeObj: obj })
   }
 
   const Item = ({ obj }) => (
-    <TouchableOpacity
-      onPress={() => navigateToChallengeDetails(obj)}
-      style={{ width: "100%" }}
-    >
-      <ImageBackground
-        style={_styles.containerView}
-        resizeMode="cover"
-        source={{ uri: obj.image }}
-      >
+    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{ width: '100%' }}>
+      <ImageBackground style={_styles.containerView} resizeMode='cover' source={{ uri: obj.image }}>
         <Image
           source={GradientDownPNG}
-          resizeMode="cover"
+          resizeMode='cover'
           style={{
-            position: "absolute",
+            position: 'absolute',
             bottom: 0,
             left: 0,
             right: 0,
             top: 0,
-            width: "110%"
+            width: '110%',
           }}
         />
-        <View style={{ width: "100%", marginBottom: 10 }}>
+        <View style={{ width: '100%', marginBottom: 10 }}>
           <Text style={_styles.list_title}>{obj.name}</Text>
           <View
             style={{
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              width: "100%",
-              alignItems: "flex-start",
-              marginTop: 20
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              width: '100%',
+              alignItems: 'flex-start',
+              marginTop: 20,
             }}
           >
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <SiteIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>
-                {obj.star_ar_sites.length}
-              </Text>
+              <Text style={_styles.s_list_count}>{obj.star_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View>
             <View
               style={{
-                alignItems: "center",
-                justifyContent: "center",
+                alignItems: 'center',
+                justifyContent: 'center',
                 marginStart: 22,
-                marginEnd: 10
+                marginEnd: 10,
               }}
             >
               <StarSiteIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
               <ArIcon style={{ width: 48, height: 48 }} />
-              <Text style={_styles.s_list_count}>
-                {obj.unique_ar_sites.length}
-              </Text>
+              <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>AR Photo Challenges</Text>
             </View>
           </View>
@@ -254,10 +257,10 @@ const GeoArChallenge = ({}) => {
         rightComponent={<MenuRightComponent />}
         leftComponent={handleMenuButton()}
         centerComponent={{
-          text: "AR Experiences",
-          style: [_styles.heading]
+          text: 'AR Experiences',
+          style: [_styles.heading],
         }}
-        backgroundColor="transparent"
+        backgroundColor='transparent'
       />
       <FlatList
         showsVerticalScrollIndicator={false}
@@ -272,9 +275,7 @@ const GeoArChallenge = ({}) => {
         keyExtractor={item => item.id}
       />
       {openPanicPopUp && (
-        <View
-          style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
-        >
+        <View style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
           <PanicPopUp
             onClose={() => {
               setOpenPanicPopup(false)

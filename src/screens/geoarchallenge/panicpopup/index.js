@@ -1,16 +1,16 @@
-import React, { useEffect, useState } from "react"
-import { View, Keyboard, Text, TouchableOpacity, Alert } from "react-native"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { AppButton, AppHeader, AppInput } from "../../../components"
-import { PanicPopUpSchema } from "../../../util/ValidationSchemas"
-import BackgroundWithImage from "../../../components/background"
-import { useSelector } from "react-redux"
-import theme from "../../../assets/theme"
-import useStyles from "./styles"
-import { Formik } from "formik"
-import { panicMessageAPI } from "../../../network"
-import { getDeviceCurrentLocation } from "../../../util/LocationLib"
-import { showMessage } from "../../../util/helpers"
+import React, { useEffect, useState } from 'react'
+import { View, Keyboard, Text, TouchableOpacity, Alert } from 'react-native'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import { AppButton, AppHeader, AppInput } from '../../../components'
+import { PanicPopUpSchema } from '../../../util/ValidationSchemas'
+import BackgroundWithImage from '../../../components/background'
+import { useSelector } from 'react-redux'
+import theme from '../../../assets/theme'
+import useStyles from './styles'
+import { Formik } from 'formik'
+import { panicMessageAPI } from '../../../network'
+import { getDeviceCurrentLocation } from '../../../util/LocationLib'
+import { showMessage } from '../../../util/helpers'
 
 const PanicPopUp = ({ onClose }) => {
   const _styles = useStyles()
@@ -23,15 +23,14 @@ const PanicPopUp = ({ onClose }) => {
       panicMessageAPI({
         message: values.message,
         latitude: position.coords.latitude,
-        longitude: position.coords.longitude
+        longitude: position.coords.longitude,
       })
         .then(res => {
-          console.log("panicMessageAPI res", res)
           if (res.status == 1) {
-            showMessage("Message submitted successfully!")
+            showMessage('Message submitted successfully!')
             onClose()
           } else {
-            showMessage(res.message.error, "error")
+            showMessage(res.message.error, 'error')
           }
         })
         .finally(() => {
@@ -42,13 +41,9 @@ const PanicPopUp = ({ onClose }) => {
 
   return (
     <BackgroundWithImage>
-      <AppHeader
-        title={"Emergency Message"}
-        leftComponent={null}
-        backgroundColor="transparent"
-      />
+      <AppHeader title={'Emergency Message'} leftComponent={null} backgroundColor='transparent' />
       <KeyboardAwareScrollView
-        keyboardShouldPersistTaps="always"
+        keyboardShouldPersistTaps='always'
         nestedScrollEnabled
         contentContainerStyle={_styles.scroll}
         enableOnAndroid={true}
@@ -56,7 +51,7 @@ const PanicPopUp = ({ onClose }) => {
       >
         <Formik
           initialValues={{
-            message: ""
+            message: '',
           }}
           onSubmit={values => submitHandler(values)}
           enableReinitialize
@@ -66,9 +61,7 @@ const PanicPopUp = ({ onClose }) => {
             <View style={_styles.container}>
               <Text style={_styles.emergencyText}>Emergency Procedure</Text>
               <Text style={_styles.emergencyTextDes}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                ullamcorper erat nec blandit pharetra. Quisque mattis elit
-                semper sem mattis, a commodo nisi mattis.
+              In case of an emergency, please send us details immediately, and a Roam representative will reach out as soon as possible. If cell service is limited and we cannot reach you, we may contact the nearest police station or search and rescue team using your latest location data to help ensure your safety.
               </Text>
               <View style={_styles.chidlView}>
                 <AppInput
@@ -76,35 +69,30 @@ const PanicPopUp = ({ onClose }) => {
                     _styles.input,
                     _styles.textbox,
                     isMessageInputFocused ? _styles.focusedInput : {},
-                    touched.message && errors?.message ? _styles.inputError : {}
+                    touched.message && errors?.message ? _styles.inputError : {},
                   ]}
-                  selectionColor={"white"}
+                  selectionColor={'white'}
                   onFocus={() => setMessageInputFocused(true)}
                   onBlur={() => setMessageInputFocused(false)}
-                  placeholder="Write your message here"
+                  placeholder='Write your message here'
                   onSubmitEditing={Keyboard.dismiss}
                   placeholderTextColor={
-                    (touched.message && errors?.message) ||
-                    isMessageInputFocused
+                    (touched.message && errors?.message) || isMessageInputFocused
                       ? theme.darkColors?.white
                       : theme.darkColors?.grey
                   }
                   value={values.message}
-                  onChangeText={handleChange("message")}
-                  errorMessage={
-                    touched.message && errors?.message
-                      ? errors.message
-                      : undefined
-                  }
-                  autoCapitalize="none"
-                  textAlignVertical="top"
+                  onChangeText={handleChange('message')}
+                  errorMessage={touched.message && errors?.message ? errors.message : undefined}
+                  autoCapitalize='none'
+                  textAlignVertical='top'
                   multiline={true}
                 />
               </View>
               <AppButton
                 buttonStyle={_styles.buttonStyle}
                 containerStyle={_styles.buttonContainer}
-                title={"Submit"}
+                title={'Submit'}
                 onPress={handleSubmit}
                 loading={isLoading}
               />

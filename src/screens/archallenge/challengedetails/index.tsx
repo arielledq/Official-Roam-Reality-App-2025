@@ -37,10 +37,8 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, 'ArChallengeD
   const [isChallengeDone, setIsChallengeDone] = useState(false)
   const challengeObj = route?.params?.challengeObj
   const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY')
-  console.log('expiry_date:', challengeObj.expiry_date)
   const expiryDate = moment(challengeObj.expiry_date).format('DD-MM-YYYY')
   const isFocused = useIsFocused()
-  console.log('challengeObj:', challengeObj)
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true)
@@ -48,12 +46,9 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, 'ArChallengeD
       challenges: challengeObj.id,
     })
       .then(res => {
-        console.log('checkIfChallengeIsDone:', res)
         if (res.errorStatus == 403) {
-          console.log('checkIfChallengeIsDone', 'true')
           setIsChallengeDone(true)
         } else {
-          console.log('checkIfChallengeIsDone', 'false')
           setIsChallengeDone(false)
         }
       })
@@ -65,7 +60,6 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, 'ArChallengeD
   const getExample = () => {
     getAnyARExamples(challengeObj.id)
       .then(res => {
-        console.log('getExample:', res)
         setExamples(res.data)
       })
       .finally(() => {})
@@ -87,25 +81,11 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, 'ArChallengeD
   }, [isFocused])
 
   const openExample = () => {
-    if (examples.length > 0) {
-      Alert.alert(
-        'AR Example!',
-        'You are about to leave the app and open a web browser. Do you want to continue?',
-        [
-          {
-            text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
-            style: 'cancel',
-          },
-          {
-            text: 'OK',
-            onPress: () =>
-              Linking.openURL(examples[0].video_file ? examples[0].video_file : examples[0].image),
-          },
-        ]
-      )
+    const examplesList = examples?.length ? examples[0] : null
+    if (examplesList) {
+      navigation.navigate('ChallengeExamples', { examples: examplesList })
     } else {
-      showMessage('No Example available.', 'info')
+      showMessage('We are working on adding examples to this challenge.', 'info')
     }
   }
 

@@ -2,7 +2,94 @@ from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
     StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo
+from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
+    ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
+    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
+    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo
 from rest_framework import serializers
+from taggit.serializers import (TagListSerializerField,
+                                TaggitSerializer)
+from django.contrib.gis.db.models import GeometryField
+from rest_framework_gis.serializers import GeoModelSerializer
+
+class ARUserProfileSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = ARUserProfile
+        fields = (
+            "__all__"
+        )
+
+class SponsorSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = Sponsor
+        fields = (
+            "__all__"
+        )
+
+class SettingsSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = ARSettings
+        fields = (
+            "__all__"
+        )
+
+
+class ExampleImageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ARExampleImage
+        fields = "__all__"
+
+
+class ExampleVideoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ARExampleVideo
+        fields = "__all__"
+
+
+class ExamplesSerializer(serializers.ModelSerializer):
+    images = ExampleImageSerializer(many=True)
+    videos = ExampleVideoSerializer(many=True)
+
+    class Meta:
+        model = ARExample
+        # fields = (
+        #     "__all__"
+        # )
+        fields = ["name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
+
+
+class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
+  
+    class Meta:
+        model = ARChallengeParameterSettings
+        fields = (
+            "__all__"
+        )
+
+class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer):
+    gradient_colors = TagListSerializerField()
+
+    class Meta:
+        model = ARChallengeFilters
+        fields = (
+            "__all__"
+        )
+
+class ChallengesSerializer(serializers.ModelSerializer):
+    
+    @staticmethod
+    def get_ar_filters_sorted(instance):
+        ar_filters = instance.ar_filters.order_by('name')
+        return ARChallengeFiltersSerializer(ar_filters, many=True).data
+    
+    image = serializers.ImageField()
+    sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
+    ar_filters = serializers.SerializerMethodField(method_name='get_ar_filters_sorted')
 from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
 from django.contrib.gis.db.models import GeometryField
@@ -106,6 +193,15 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "sponsored",
             "parameters",
             "ar_filters"
+            "description",
+            "points",
+            "challenge_choice",
+            "challenge_requirement",
+            "created_at",
+            "expiry_date",
+            "sponsored",
+            "parameters",
+            "ar_filters"
         )
 
 class ChallengesUploadSerializer(serializers.ModelSerializer):
@@ -131,7 +227,8 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "challenge_approval",
             "challenges",
             "thumbnail_memory_video_file",
-            "memory_type"
+            "memory_type",
+            "created_at",
         )
 
 class ARMemoriesSerializer(serializers.ModelSerializer):
@@ -236,6 +333,7 @@ class StarCollectionSerializer(serializers.ModelSerializer):
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     check_in_image = serializers.FileField()
+    # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:
         model = ARSitePinCheckIn
@@ -268,4 +366,12 @@ class PanicMessageSerializer(GeoModelSerializer):
         fields = (
             "__all__"
         )
-        
+
+
+class ARAllMemories(serializers.Serializer):
+    def to_representation(self, instance):
+        if isinstance(instance, ARMemories):
+            return ARMemoriesSerializerGet(instance).data
+        elif isinstance(instance, ARSitePinCheckIn):
+            return ARMemoriesSerializerGet(instance).data
+        return {}

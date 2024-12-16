@@ -1,14 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FlatList, Image, TouchableOpacity, View } from 'react-native'
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
 import useStyles from './styles'
 import { RootStackParamList, ScreenStackComponent } from '../../navigation/types'
-// import { handleErrorMessage } from '../../util/util';
 import BackgroundWithImage from '../../components/background'
 import AppHeader from '../../components/header'
 import { MenuIcon } from '../../assets/svg'
 import UserInfoCard from '../../components/userInfoCard'
-import { Avatar } from '@rneui/base'
 import { AppButton, AppText } from '../../components'
 import StatContainer from '../../components/statContainer'
 import BoxStatContainer from '../../components/boxStatContainer'
@@ -18,6 +16,7 @@ import Icon from '../../components/Icon'
 import LinearGradient from 'react-native-linear-gradient'
 import {
   getARProfile,
+  getCheckInCount,
   getCountryCount,
   getProfieARMemoriesAPI,
   getProfieDetails,
@@ -28,11 +27,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import FastImage from 'react-native-fast-image'
-import { heightPercentageToDP, widthPercentageToDP } from 'react-native-responsive-screen'
-import { height, width } from '../../util/AppDimensions'
 import ScreenLoader from '../../components/screenLoader'
 import { updateARUserData } from '../../redux/AR'
 import { BlurView } from '@react-native-community/blur'
+
+const SCROLL_AMOUNT = 150
 
 const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   const navigation = useNavigation()
@@ -48,6 +47,37 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   const [starsCount, setStarsCount] = useState(0)
   const [countryCount, setCountryCount] = useState(0)
   const [globalRank, setGlobalRank] = useState(0)
+  const [myCheckIns, setMyCheckIns] = useState(0)
+  const flatListRef = useRef(null)
+  const scrollPositionRef = useRef(0) // Ref to hold the scroll position
+
+  const handleScroll = event => {
+    const { contentOffset } = event.nativeEvent
+    const currentScrollPosition = contentOffset.x
+
+    // Update the ref directly
+    scrollPositionRef.current = currentScrollPosition
+  }
+
+  const scrollRegionsPressHandler = () => {
+    const newPosition = scrollPositionRef.current + SCROLL_AMOUNT
+
+    // Scroll to the new position
+    flatListRef.current?.scrollToOffset({ offset: newPosition, animated: true })
+
+    // Update the ref with the new position immediately
+    scrollPositionRef.current = newPosition
+  }
+
+  const getMyCheckInsCount = () => {
+    getCheckInCount({})
+      .then(res => {
+        if (res.status === 1) {
+          setMyCheckIns(res.count)
+        }
+      })
+      .finally(() => {})
+  }
 
   const fetchProfileDetails = async () => {
     try {
@@ -85,7 +115,6 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
       user_id: userProfile.id,
     })
       .then(res => {
-        console.log('getUserCollectedStarCount:', res)
         if (res.status == 1) {
           setStarsCount(res.count)
         }
@@ -101,7 +130,6 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
       user_id: userProfile.id,
     })
       .then(res => {
-        console.log('getRank:', res)
         if (res.status == 1) {
           setGlobalRank(res.rank)
         }
@@ -117,7 +145,6 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
       user_id: userProfile.id,
     })
       .then(res => {
-        console.log('getCountry:', res)
         if (res.status == 1) {
           setCountryCount(res.count)
         }
@@ -161,6 +188,7 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   )
 
   useEffect(() => {
+    getMyCheckInsCount()
     fetchProfileDetails()
   }, [isProfileUpdated, userProfile])
 
@@ -183,10 +211,10 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
   }
 
   const data = [
-    { id: 1, value: arProfile?.check_ins, property: 'Sites Visited' },
+    { id: 1, value: myCheckIns, property: 'Sites Visited' },
     { id: 2, value: starsCount, property: 'Stars' },
     { id: 3, value: arProfile?.challenge_completed, property: 'AR Photo Challenges' },
-    { id: 4, value: 0, property: 'Friends' },
+    { id: 4, value: profileDetails?.friends?.length, property: 'Friends' },
   ]
   // Split the data into chunks of 3 for each row
   const rows = []
@@ -302,15 +330,19 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
 
   const renderFooter = () => (
     <View style={_styles.scroll}>
-      <TouchableOpacity style={_styles.headingView}>
+      <View style={_styles.headingView}>
         <AppText style={_styles.heading}>Player AR Memories</AppText>
-        <View style={_styles.arrow_3}>
+        <TouchableOpacity style={_styles.arrow_3} onPress={scrollRegionsPressHandler}>
           <Image source={Images.ForwardIcon} />
-        </View>
-      </TouchableOpacity>
-      <View style={{ marginHorizontal: -22 }}>
+        </TouchableOpacity>
+      </View>
+      <View style={{ marginHorizontal: -10, marginBottom: 50 }}>
         <FlatList
-          contentContainerStyle={{ marginBottom: 50, paddingHorizontal: 20, gap: 18 }}
+          ref={flatListRef}
+          onScroll={handleScroll}
+          scrollEventThrottle={32} // Adjust this value for performance
+          style={{ width: '100%' }}
+          contentContainerStyle={{ paddingHorizontal: 20, gap: 18 }}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
@@ -338,8 +370,8 @@ const Profile: ScreenStackComponent<RootStackParamList, 'Profile'> = () => {
           renderItem={renderItem}
           ListHeaderComponent={renderHeader}
           numColumns={3}
+          nestedScrollEnabled={true}
           ListFooterComponent={renderFooter}
-          nestedScrollEnabled={false}
         />
       )}
       <View style={_styles.blurView}>
