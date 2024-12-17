@@ -16,7 +16,6 @@ RUN groupadd -r django \
   && useradd -d /opt/webapp -r -g django django \
   && chown django:django -R /opt/webapp
 
-USER django
 RUN apt update
 RUN apt-get install -y software-properties-common 
 RUN add-apt-repository ppa:ubuntugis/ppa
@@ -29,6 +28,8 @@ ENV PATH="/.venv/bin:$PATH"
 COPY --chown=django:django . .
 RUN pip install ffmpeg-downloader
 RUN ffdl install -y
+
+USER django
 # Collect static files and serve app
 RUN python3 manage.py collectstatic --no-input
 CMD waitress-serve --port=$PORT travel_ar_app_42706.wsgi:application

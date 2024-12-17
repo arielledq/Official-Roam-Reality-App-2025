@@ -192,7 +192,7 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "expiry_date",
             "sponsored",
             "parameters",
-            "ar_filters"
+            "ar_filters",
             "description",
             "points",
             "challenge_choice",
