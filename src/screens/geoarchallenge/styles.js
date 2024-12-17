@@ -8,6 +8,11 @@ import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
  */
 
 const useStyles = makeStyles(theme => ({
+  mainContainer: {
+    flex: 1,
+    paddingHorizontal: screenHorizontalPadding,
+    paddingBottom: 80,
+  },
   heading: {
     fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,
@@ -15,11 +20,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     marginTop: 5,
     textAlign: "center",
-  },
-  mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
-    paddingBottom: 80,
   },
   container: { marginTop: "10%" },
   headerText: {

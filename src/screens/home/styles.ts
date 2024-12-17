@@ -1,14 +1,26 @@
 import { makeStyles } from "@rneui/themed";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import { screenHorizontalPadding } from "util/AppDimensions";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
-    backgroundColor: "#202136",
+    paddingHorizontal: screenHorizontalPadding,
+    paddingBottom: 80,
   },
   container: {
     flex: 1,
-    paddingHorizontal: 25,
+    paddingHorizontal: screenHorizontalPadding,
+    paddingBottom: 80,
+  },
+  heading: {
+    fontSize: FontSizes.S20,
+    lineHeight: FontLineHeights.LH25,
+    ...fontGroup.ns700,
+    fontWeight: "700",
+    color: theme.colors.white,
+    marginTop: 5,
+    textAlign: "center",
   },
   imageBg: {
     width: "100%",
@@ -17,6 +29,9 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 20,
     paddingVertical: 20,
     backgroundColor: "#131422",
+  },
+  containerStyle: {
+    marginTop: 16,
   },
   row1: {
     flexDirection: "row",
@@ -37,6 +52,7 @@ const useStyles = makeStyles(theme => ({
   },
   headerText: {
     ...fontGroup.ns700,
+    fontWeight: "700",
     fontSize: FontSizes.S26,
     lineHeight: FontLineHeights.LH35,
     marginVertical: 0,
@@ -49,6 +65,7 @@ const useStyles = makeStyles(theme => ({
   },
   challengesText: {
     ...fontGroup.ns800,
+    fontWeight: "800",
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
@@ -56,13 +73,11 @@ const useStyles = makeStyles(theme => ({
   },
   subtitleText: {
     ...fontGroup.ns400,
+    fontWeight: "400",
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
     marginStart: 3,
-  },
-  containerStyle: {
-    marginTop: 10,
   },
   list: {
     marginBottom: 80,

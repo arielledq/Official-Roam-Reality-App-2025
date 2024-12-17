@@ -5,10 +5,11 @@ import { useTheme } from "react-native-paper";
 import Home from "../screens/home";
 import Profile from "../screens/profile/profile";
 import Rally from "../screens/rally";
-import Icon from "../components/Icon";
-import { Icons } from "../assets/Icons";
 import GeoArChallenge from "../screens/geoarchallenge";
 import ScoreBoard from "../screens/scoreboard";
+
+import Icon from "../components/Icon";
+import { Icons } from "../assets/Icons";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -37,6 +38,7 @@ const BottomTabNavigator = () => {
           name="GeoArChallenge"
           component={GeoArChallenge}
           options={{
+            // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
             tabBarIcon: ({ focused }) => (
               <View style={{ position: "relative" }}>
@@ -50,6 +52,7 @@ const BottomTabNavigator = () => {
           name="Scores"
           component={ScoreBoard}
           options={{
+            // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
             tabBarIcon: ({ focused }) => (
               <View style={{ position: "relative" }}>
@@ -61,6 +64,7 @@ const BottomTabNavigator = () => {
         />
         <Tab.Screen
           name="Go Navigate"
+          // @ts-ignore
           component={Home}
           options={{
             tabBarLabel: "",
@@ -78,6 +82,7 @@ const BottomTabNavigator = () => {
           name="Rally"
           component={Rally}
           options={{
+            // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
             tabBarIcon: ({ focused }) => (
               <View style={{ position: "relative" }}>
@@ -89,8 +94,10 @@ const BottomTabNavigator = () => {
         />
         <Tab.Screen
           name="Profile"
+          // @ts-ignore
           component={Profile}
           options={{
+            // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
             tabBarIcon: ({ focused }) => (
               <View style={{ position: "relative" }}>

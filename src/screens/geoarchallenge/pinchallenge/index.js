@@ -26,6 +26,8 @@ import {
   isLocationPointInPolygon,
 } from "../../../util/LocationLib";
 import { CHALLENGES_TYPE } from "constants";
+import ViewInfoModal from "components/ViewInfoModal";
+import ViewInfoButton from "components/ViewInfoButton";
 
 const PinChallenge = () => {
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);

@@ -12,20 +12,24 @@ import useStyles from "./styles";
 import RightArrowIcon from "../../assets/svg/RightArrowIcon";
 import { handleError, showMessage } from "../../util/helpers";
 import { HomeScreenData } from "../../util/HomeScreenUtils";
-import { BlurView } from "@react-native-community/blur";
+import BackgroundWithImage from "components/background";
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
-  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup);
+  const account_setup = useSelector(
+    (state: any) => state.login?.data?.user?.user_profile?.account_setup
+  );
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
 
+  // @ts-ignore
   const bottomSheetRef = useRef < BottomSheet > null;
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const styles = useStyles();
 
   const handleLogOut = () => {
+    // @ts-ignore
     bottomSheetRef.current?.expand();
   };
 
@@ -37,6 +41,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   useEffect(() => {
     if (!account_setup) {
       setTimeout(() => {
+        // @ts-ignore
         navigation.replace("EditProfile");
       }, 300);
     }
@@ -103,14 +108,16 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   };
 
   const navigateToARChanllenge = () => {
+    // @ts-ignore
     navigation.navigate("ARChallenge");
   };
 
   const navigateToGeoARChanllenge = () => {
+    // @ts-ignore
     navigation.navigate("GeoArChallenge");
   };
 
-  const HomeScreenARItem = item => {
+  const HomeScreenARItem = (item: any) => {
     return (
       <TouchableOpacity
         onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
@@ -131,37 +138,33 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   };
 
   return (
-    <View style={styles.mainContainer}>
-      <View style={styles.container}>
-        {isLoading ? (
-          <ActivityIndicator size="large" />
-        ) : (
-          <FlatList
-            style={styles.list}
-            contentContainerStyle={styles.containerStyle}
-            data={HomeScreenData}
-            renderItem={({ item }) =>
-              item.blank ? <View style={{ height: 120 }} /> : <HomeScreenARItem {...item} />
-            }
-            keyExtractor={item => item.id}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-      </View>
-      <View style={styles.blurView}>
-        <BlurView
-          blurType="regular"
-          overlayColor="transparent"
-          style={{ backgroundColor: "transparent" }}
-        >
-          <AppHeader
-            title={"AR Experiences"}
-            leftComponent={handleMenuButton()}
-            containerStyle={styles.headerContainer}
-          />
-        </BlurView>
-      </View>
-    </View>
+    <BackgroundWithImage style={styles.mainContainer}>
+      <AppHeader
+        leftComponent={handleMenuButton()}
+        centerComponent={{
+          text: "AR Experiences",
+          style: [styles.heading],
+        }}
+        backgroundColor="transparent"
+        isBottomTab
+      />
+
+      {isLoading ? (
+        <ActivityIndicator
+          size="large"
+          style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        />
+      ) : (
+        <FlatList
+          style={styles.list}
+          contentContainerStyle={styles.containerStyle}
+          data={HomeScreenData}
+          renderItem={({ item }) => <HomeScreenARItem {...item} />}
+          keyExtractor={item => item?.id?.toString()}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
+    </BackgroundWithImage>
   );
 };
 

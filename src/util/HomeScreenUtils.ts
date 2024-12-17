@@ -2,10 +2,6 @@ import Images from "../assets/images";
 
 export const HomeScreenData = [
   {
-    id: -1,
-    blank: true,
-  },
-  {
     id: 1,
     title: "AR Photo",
     title1: "Challenges",
