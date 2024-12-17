@@ -27,7 +27,7 @@ const Images = {
   ShareInvite: require("./ShareInvite.png"),
   BGBlur: require("./blurImageBg.png"),
   CloseModal: require("./closeModal.png"),
-  More: require("./more.png"),
+  TikTokShare: require("./tiktok-share.png"),
 };
 
 export default Images;

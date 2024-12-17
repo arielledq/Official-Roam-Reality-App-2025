@@ -139,7 +139,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
             </TouchableOpacity>
             <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
-              <Image source={Images.More} style={{ height: 40, width: 40 }} />
+              <Image source={Images.TikTokShare} style={{ height: 40, width: 68 }} />
             </TouchableOpacity>
           </View>
 

@@ -8,7 +8,7 @@ const Rally = () => {
 
   return (
     <ImageBackground
-      source={require("../../assets/images/ROAM_RALLY.png")}
+      source={require("../../assets/images/ROAM_RALLY.webp")}
       style={styles.imageBackground}
       resizeMode="cover"
       onLoadStart={() => setLoading(true)}
