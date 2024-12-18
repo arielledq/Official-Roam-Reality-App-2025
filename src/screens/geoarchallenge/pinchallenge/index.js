@@ -394,7 +394,7 @@ const PinChallenge = () => {
 
   const onDonePress = () => {
     navigation.replace("ArChallengeShare", {
-      challengeObj: challengeObj,
+      challengeObj: { ...challengeObj, geo_site: { ...selectedGeoSite, pin_challenge: undefined } },
       captureData: capturedImage,
       challengeType: CHALLENGES_TYPE.PIN_CHECK_IN,
     });
@@ -477,7 +477,11 @@ const PinChallenge = () => {
   );
 
   return (
-    <ChallengeScreen title={`Location Check In\n${selectedGeoSite.name}`} modals={modals}>
+    <ChallengeScreen
+      title={`Location Check In\n${selectedGeoSite.name}`}
+      modals={modals}
+      headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
+    >
       <ChallengeFoundCaptureHeader
         leftTitle="Pin Found"
         challengeFound={!!isMeInsideInSite}
@@ -503,8 +507,6 @@ const PinChallenge = () => {
       />
 
       <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} />
-
-      <ViewInfoButton onPress={viewInfoButtonHandler} />
     </ChallengeScreen>
   );
 };
