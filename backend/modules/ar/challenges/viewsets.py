@@ -19,6 +19,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import F
 from django.db.models import Q
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
+
+
 
 SOCIAL_POINTS = 1
 
@@ -304,8 +308,8 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing GeoArSite.
     """
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = GeoARStar.objects.all()
     serializer_class = GeoStarSerializer
     http_method_names = ["get"]
@@ -329,18 +333,79 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
         objs = self.queryset.filter(geo_site__geo_location=id)
         count = 0
         for o in objs:
-            if o.star_location:
-                count += len(o.star_location)
+            if o.stars:
+                count += len(o.stars.all())
         return Response({count}, status=status.HTTP_200_OK)
 
     # @action(detail=False, methods=['get'], url_path='get-star-location', name='AR Site Stars')
     # def show_star_location(self, request):
-    #     geo_site = request.GET.get("id")
-    #     user = request.user
-    #     stars = self.queryset.filter(geo_site=geo_site)
-    #     objs = StarCollection.objects.filter(user=user, geo_site=geo_site, geo_ar_star__in=stars)
-    #     serializer = GeoStarSerializer(objs, many=True)
-    #     return Response(serializer.data, status=status.HTTP_200_OK)
+    #     lat = request.GET.get("lat")
+    #     lon = request.GET.get("lon")
+    #     if not lat or not lon:
+    #         return Response(
+    #             {"error": "Lat and lon parameters are required."},
+    #             status=status.HTTP_400_BAD_REQUEST
+    #         )
+    #
+    #     user_location = Point(float(lon), float(lat), srid=4326)
+    #
+    #     ar_star_id = request.GET.get("ar_star_id")
+    #
+    #     stars = self.queryset.filter(id=ar_star_id).select_related('challenges', 'geo_site').prefetch_related(
+    #         'stars')  # 'stars' son GeoARStarPoint
+    #
+    #     results = []
+    #     for star in stars:
+    #         if star.following_mode == 'PROXIMITY':
+    #             star_points = star.stars.annotate(distance=Distance('location', user_location)) \
+    #                 .order_by('distance')
+    #             if star_points.exists():
+    #                 closest_point = star_points.first()
+    #
+    #                 dist_meters = closest_point.distance.m
+    #                 if dist_meters <= star.visibility_radius:
+    #                     results.append({
+    #                         "star_name": star.name,
+    #                         "star_location": {
+    #                             "lat": closest_point.location.y,
+    #                             "lon": closest_point.location.x
+    #                         },
+    #                         "challenge": {
+    #                             "name": star.challenges.name,
+    #                             "model_file": star.challenges.model_file.url if star.challenges.model_file else None,
+    #                             "points": star.challenges.points,
+    #                             "description": star.challenges.description
+    #                         },
+    #                         "geo_site": star.geo_site.name,
+    #                         "available_stars_in_zone": len(star.stars.all())
+    #                     })
+    #
+    #         elif star.following_mode == 'SPECIFIC ORDER':
+    #
+    #             star_points = star.stars.order_by('order')
+    #             if star_points.exists():
+    #                 next_point = star_points.first()
+    #                 dist_meters = next_point.distance(user_location).m
+    #
+    #                 if dist_meters <= star.visibility_radius:
+    #                     results.append({
+    #                         "star_name": star.name,
+    #                         "star_location": {
+    #                             "lat": next_point.location.y,
+    #                             "lon": next_point.location.x
+    #                         },
+    #                         "challenge": {
+    #                             "name": star.challenges.name,
+    #                             "model_file": star.challenges.model_file.url if star.challenges.model_file else None,
+    #                             "points": star.challenges.points,
+    #                             "description": star.challenges.description
+    #                         },
+    #                         "geo_site": star.geo_site.name,
+    #                         "available_stars_in_zone": len(star.stars.all())
+    #                     })
+    #
+    #
+    #     return Response(results, status=status.HTTP_200_OK)
 
 
 class ARSitePinCheckInViewSet(ViewSet):

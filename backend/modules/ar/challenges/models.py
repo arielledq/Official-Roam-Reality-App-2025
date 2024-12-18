@@ -49,6 +49,11 @@ GEO_CHALLENGE_CHOICES = (
     ("3DMODEL", "3D MODEL"),
 )
 
+FOLLOWING_MODE_CHOICES = [
+        ('PROXIMITY', 'BY PROXIMITY'),
+        ('SPECIFIC', 'SPECIFIC ORDER'),
+    ]
+
 
 class GeoRegion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -505,10 +510,11 @@ class GeoArSite(models.Model):
 
 
 class GeoARStar(models.Model):
+
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
-    star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
+    # star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     info = RichTextField(_("Info"), blank=True, null=True)
     visibility_radius = models.IntegerField(verbose_name="Visibility Radius in Meters", default=10)
@@ -532,12 +538,41 @@ class GeoARStar(models.Model):
         related_name="ar_stars_sponsored",
     )
 
+    following_mode = models.CharField(
+        max_length=20,
+        choices=FOLLOWING_MODE_CHOICES,
+        default='PROXIMITY',
+        verbose_name="Star Following Mode"
+    )
+
     class Meta:
         verbose_name_plural = "Geo AR Stars"
         verbose_name = "Geo AR Star"
 
     def __str__(self):
         return self.name
+
+
+class GeoARStarPoint(models.Model):
+    geo_ar_star = models.ForeignKey(
+        GeoARStar,
+        on_delete=models.CASCADE,
+        related_name='stars'
+    )
+    location = gis_models.PointField(
+        _("Star Location"), blank=True, null=True
+    )
+    order = models.PositiveIntegerField(
+        default=0,
+        help_text="Order of the star when following mode is 'SPECIFIC ORDER'"
+    )
+
+    class Meta:
+        verbose_name_plural = "Geo AR Star Points"
+        verbose_name = "Geo AR Star Point"
+
+    def __str__(self):
+        return f"{self.geo_ar_star.name} - Star #{self.order}"
 
 
 class GeoARSpecificSiteRoute(models.Model):

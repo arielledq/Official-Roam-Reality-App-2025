@@ -1,7 +1,7 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
-    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo
+    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
@@ -311,6 +311,7 @@ class GeoLocationSerializer(GeoModelSerializer):
             "__all__"
         )
 
+
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
@@ -318,10 +319,20 @@ class GeoStarSerializer(GeoModelSerializer):
 
     class Meta:
         model = GeoARStar
-        geo_field = 'star_location'
+        # geo_field = 'star_location'
         fields = (
             "__all__"
         )
+
+
+# class GeoStarPointSerializer(GeoModelSerializer):
+#     class Meta:
+#         model = GeoARStarPoint
+#         geo_field = 'location'
+#         fields = (
+#             "__all__"
+#         )
+
 
 class StarCollectionSerializer(serializers.ModelSerializer):
 
