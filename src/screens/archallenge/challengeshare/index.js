@@ -1,32 +1,25 @@
 import React, { useState } from "react";
 
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { Image, Text, View } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AppText from "../../../components/text";
 import AppButton from "../../../components/button";
 import moment from "moment";
 
-import {
-  getARProfile,
-  postArMemory,
-  postGeoPinCheckIn,
-  socialPointsARUpdateAPI,
-} from "../../../network";
+import { getARProfile, postArMemory, postGeoPinCheckIn } from "../../../network";
 import { handleError, showMessage } from "../../../util/helpers";
 import Video from "react-native-video";
 import { useDispatch, useSelector } from "react-redux";
 import { updateARUserData } from "../../../redux/AR";
 
-import Share from "react-native-share";
-
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
-import DownloadImg from "../../../assets/ar/download.svg";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import ChallengeScreen from "components/ChallengeScreen";
 import { fontGroup, FontSizes } from "util/FontUtils";
 import theme from "assets/theme";
 import { CHALLENGES_TYPE } from "constants";
+import ShareToSocialsModal from "components/ShareToSocialsModal";
 
 const ArChallengeShare = () => {
   const route = useRoute();
@@ -48,20 +41,16 @@ const ArChallengeShare = () => {
     default:
       break;
   }
-  // console.log("selectedGeoSite", selectedGeoSite?.id);
   const startDate = moment().format("MM-DD-YYYY");
 
   const navigation = useNavigation();
-  const correctedCaptureData = `file://${captureData}`;
+  const capturedDataUri = `file://${captureData}`;
 
-  const getPathFromUrl = url => {
-    return url.split("?")[0];
-  };
-  const filePath = getPathFromUrl(correctedCaptureData);
+  const filePath = capturedDataUri.split("?")[0];
   const fileExt = filePath.split(".").pop();
 
   const [isLoading, setIsLoading] = useState(false);
-  const [hasSharedToSocials, setHasSharedToSocials] = useState(false);
+  const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
 
   const dispatch = useDispatch();
 
@@ -86,9 +75,9 @@ const ArChallengeShare = () => {
 
   const endShareProfileButtonHandler = async () => {
     setIsLoading(true);
-    let filename = correctedCaptureData.split("/").pop();
+    let filename = capturedDataUri.split("/").pop();
     let shareFile = {
-      uri: correctedCaptureData,
+      uri: capturedDataUri,
       type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
       name: filename,
     };
@@ -138,42 +127,16 @@ const ArChallengeShare = () => {
     }
   };
 
-  const shareToSocialMedia = async () => {
-    // Ensure the correctedCaptureData is a file path
-    let fileUri = correctedCaptureData;
+  const shareToSocialMediaButtonHandler = () => {
+    setShareToSocialsIsOpen(true);
+  };
 
-    // If correctedCaptureData doesn't already have "file://" prefix, add it
-    if (!fileUri.startsWith("file://")) {
-      fileUri = `file://${fileUri}`;
-    }
-
-    // Determine MIME type based on file extension
-    const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
-
-    // Share the file
-    try {
-      await Share.open({
-        url: fileUri,
-        type: mimeType,
-      });
-      if (!hasSharedToSocials) {
-        await socialPointsARUpdateAPI({
-          social_network: "",
-        });
-        showMessage(
-          "You've been granted points for sharing to your socials",
-          "success",
-          `Socials points granted!`
-        );
-      }
-      setHasSharedToSocials(true);
-    } catch (error) {
-      console.error("Error sharing media:", error?.message, error);
-    }
+  const closeShareToSocialMediaButtonHandler = () => {
+    setShareToSocialsIsOpen(false);
   };
 
   const checkPermission = () => {
-    CameraRoll.saveAsset(correctedCaptureData, {
+    CameraRoll.saveAsset(capturedDataUri, {
       type: fileExt == "mp4" ? "video" : "photo",
     })
       .then(() => {
@@ -187,16 +150,63 @@ const ArChallengeShare = () => {
 
   return (
     <ChallengeScreen title={screenTitle}>
-      <AppText
-        numberOfLines={3}
-        style={{
-          ...fontGroup.ns900,
-          fontSize: FontSizes.S20,
-          color: theme.lightColors.white,
-        }}
-      >
-        Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!
-      </AppText>
+      <View style={{ flexDirection: "row", gap: 12 }}>
+        {/* Points box */}
+        <View
+          style={{
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 8,
+            backgroundColor: "transparent",
+            width: 55,
+            height: 55,
+          }}
+        >
+          <BackgroundWithImage
+            imageSource={BGArShare}
+            style={{
+              backgroundColor: "transparent",
+              position: "absolute",
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+            }}
+          ></BackgroundWithImage>
+          <AppText
+            style={{
+              ...fontGroup.p900,
+              fontSize: FontSizes.S24,
+              color: theme.lightColors.white,
+              margin: 0,
+            }}
+          >
+            {challengeObj.points}
+          </AppText>
+          <AppText
+            style={{
+              ...fontGroup.p400,
+              fontSize: FontSizes.S10,
+              color: theme.lightColors.white,
+            }}
+          >
+            Points
+          </AppText>
+        </View>
+
+        <AppText
+          numberOfLines={3}
+          style={{
+            ...fontGroup.ns900,
+            fontSize: FontSizes.S20,
+            color: theme.lightColors.white,
+            flex: 1,
+          }}
+        >
+          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!
+        </AppText>
+      </View>
 
       <View
         style={{
@@ -228,13 +238,13 @@ const ArChallengeShare = () => {
               width: "100%",
             }}
             source={{
-              uri: correctedCaptureData,
+              uri: capturedDataUri,
             }}
           />
         ) : (
           <Image
             resizeMode={"contain"}
-            source={{ uri: correctedCaptureData }}
+            source={{ uri: capturedDataUri }}
             style={{
               backgroundColor: "transparent",
               width: "70%",
@@ -283,10 +293,21 @@ const ArChallengeShare = () => {
         style={{
           width: "100%",
           flexDirection: "column",
-          gap: 8,
+          gap: 16,
           alignItems: "center",
         }}
       >
+        <Text
+          style={{
+            flex: 1,
+            fontSize: FontSizes.S12,
+            color: theme.lightColors.grey,
+          }}
+        >
+          Must share to at least one social media platform to earn any points. Users earn one
+          additional point per social platform.
+        </Text>
+
         <View
           style={{
             flexDirection: "row",
@@ -295,77 +316,19 @@ const ArChallengeShare = () => {
             gap: 16,
           }}
         >
-          <Text
-            style={{
-              flex: 1,
-
-              fontSize: FontSizes.S14,
-              color: theme.lightColors.grey,
-            }}
-          >
-            Must share your content to at least 1 social media platform to earn any points
-          </Text>
-
-          <TouchableOpacity
-            onPress={checkPermission}
-            style={{ alignItems: "center", padding: 8, gap: 8 }}
-          >
-            <Text style={{ color: theme.lightColors.white, fontSize: FontSizes.S12 }}>Save</Text>
-            <DownloadImg />
-          </TouchableOpacity>
-        </View>
-
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          {/* Points box */}
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 8,
-              backgroundColor: "transparent",
-              width: 55,
-              height: 55,
-            }}
-          >
-            <BackgroundWithImage
-              imageSource={BGArShare}
-              style={{
-                backgroundColor: "transparent",
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-              }}
-            ></BackgroundWithImage>
-            <AppText
-              style={{
-                ...fontGroup.p900,
-                fontSize: FontSizes.S24,
-                color: theme.lightColors.white,
-                margin: 0,
-              }}
-            >
-              {challengeObj.points}
-            </AppText>
-            <AppText
-              style={{
-                ...fontGroup.p400,
-                fontSize: FontSizes.S10,
-                color: theme.lightColors.white,
-              }}
-            >
-              Points
-            </AppText>
-          </View>
-
           {/* Share to socials button */}
           <AppButton
-            onPress={shareToSocialMedia}
+            onPress={shareToSocialMediaButtonHandler}
             containerStyle={{ flex: 1, justifyContent: "center" }}
             titleStyle={{ fontSize: FontSizes.S16 }}
             title={"Share To Socials"}
+          />
+
+          <AppButton
+            onPress={checkPermission}
+            containerStyle={{ flex: 1, justifyContent: "center" }}
+            titleStyle={{ fontSize: FontSizes.S16 }}
+            title={"Save Image"}
           />
         </View>
 
@@ -390,6 +353,13 @@ const ArChallengeShare = () => {
         containerStyle={{}}
         title={"End & Share to Roam Profile"}
         loading={isLoading}
+      />
+
+      <ShareToSocialsModal
+        fileUri={filePath}
+        fileExt={fileExt}
+        isVisible={shareToSocialsIsOpen}
+        onClose={closeShareToSocialMediaButtonHandler}
       />
     </ChallengeScreen>
   );

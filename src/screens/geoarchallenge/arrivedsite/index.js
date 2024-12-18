@@ -88,8 +88,8 @@ const GeoArSiteArrived = ({}) => {
             <Text style={_styles.arrivedText}>Arrived</Text>
             <Text style={_styles.exploringText}>Begin exploring</Text>
             <Text style={_styles.infoText}>
-              Explore with your camera to find hidden stars. Collect them to uncover interesting
-              facts and earn credits. Remember to take a picture with our pin for additional points.
+              Explore with your camera to find Augmented Reality Experiences at this site! Remember
+              to Geo-Check in anywhere you go!
             </Text>
           </View>
           <TouchableOpacity onPress={() => navigation.navigate("ChallengeSelection")}>

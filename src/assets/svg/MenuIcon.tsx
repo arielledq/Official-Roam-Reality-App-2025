@@ -1,25 +1,10 @@
-import * as React from "react"
-import Svg, { SvgProps, Path } from "react-native-svg"
+import * as React from "react";
+import Svg, { SvgProps, Path } from "react-native-svg";
 const MenuIcon = (props: SvgProps) => (
-  <Svg width={30} height={31} fill="none" viewBox="0 0 30 31" {...props}>
-    <Path
-      d="M11.25 15.7402C11.25 16.4305 10.6904 16.9902 10 16.9902C9.30965 16.9902 8.75 16.4305 8.75 15.7402C8.75 15.0498 9.30965 14.4902 10 14.4902C10.6904 14.4902 11.25 15.0498 11.25 15.7402Z"
-      fill="white"
-    />
-    <Path
-      d="M16.25 15.7402C16.25 16.4305 15.6904 16.9902 15 16.9902C14.3096 16.9902 13.75 16.4305 13.75 15.7402C13.75 15.0498 14.3096 14.4902 15 14.4902C15.6904 14.4902 16.25 15.0498 16.25 15.7402Z"
-      fill="white"
-    />
-    <Path
-      d="M21.25 15.7402C21.25 16.4305 20.6904 16.9902 20 16.9902C19.3096 16.9902 18.75 16.4305 18.75 15.7402C18.75 15.0498 19.3096 14.4902 20 14.4902C20.6904 14.4902 21.25 15.0498 21.25 15.7402Z"
-      fill="white"
-    />
-    <Path
-      d="M27.5 15.7402C27.5 21.6327 27.5 24.579 25.6694 26.4095C23.8389 28.2402 20.8925 28.2402 15 28.2402C9.10744 28.2402 6.16116 28.2402 4.33059 26.4095C2.5 24.579 2.5 21.6327 2.5 15.7402C2.5 9.84761 2.5 6.90134 4.33059 5.07076C6.16116 3.24017 9.10744 3.24017 15 3.24017C20.8925 3.24017 23.8389 3.24017 25.6694 5.07076C26.8866 6.28794 27.2945 7.99836 27.4311 10.7402"
-      stroke="white"
-      stroke-width="2"
-      stroke-linecap="round"
-    />
+  <Svg width={32} height={32} viewBox="0 0 24 24" fill="none" {...props}>
+    <Path d="M20 7L4 7" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+    <Path d="M20 12L4 12" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
+    <Path d="M20 17L4 17" stroke="#FFFFFF" stroke-width="1.5" stroke-linecap="round" />
   </Svg>
-)
-export default MenuIcon
+);
+export default MenuIcon;

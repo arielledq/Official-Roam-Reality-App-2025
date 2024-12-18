@@ -37,7 +37,14 @@ const UnityARCamera = ({
   const imageHasFilters = imageFilter?.challengeObj?.ar_filters?.length > 0;
   return (
     <View style={{ flex: 1, alignItems: "center", marginVertical: 12 }}>
-      <View style={{ flex: 1, minHeight: aspectHeight, width: screenWidth - offset }}>
+      <View
+        style={{
+          flex: 1,
+          minHeight: aspectHeight,
+          height: aspectHeight,
+          width: screenWidth - offset,
+        }}
+      >
         {isProcessingMedia ? (
           <View
             style={{
