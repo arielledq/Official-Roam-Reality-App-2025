@@ -152,9 +152,15 @@ const ChallengeSelection = ({ route }) => {
   const goToRoute = route => {
     if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
       showMessage("Pin Challenge is unavailable right now", "error");
+      return;
+    }
+    if (route === "PinChallenge" && !!myCheckIns) {
+      showMessage("Check-ins already submitted and can't submitted more.", "error");
+      return;
     }
     if (route === "StarChallenge" && selectedGeoARSiteStars.length == 0) {
       showMessage("Stars Challenges are unavailable right now", "error");
+      return;
     } else {
       navigation.navigate(route);
     }

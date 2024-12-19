@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { AppButton, AppHeader, AppText } from "../../../components";
 import { resetState } from "../../../redux/Login";
-import { deleteAccount, getARChallenges, logout } from "../../../network";
+import { deleteAccount, getARChallenges, logout, getGeoARDestinations } from "../../../network";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "../../../assets/svg";
@@ -29,7 +29,9 @@ import { HomeScreenData } from "../../../util/HomeScreenUtils";
 import { BlurView } from "@react-native-community/blur";
 
 const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
-  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup);
+  const account_setup = useSelector(
+    (state: any) => state.login?.data?.user?.user_profile?.account_setup
+  );
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
@@ -39,7 +41,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const styles = useStyles();
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination);
+  const selectedDestination = useSelector((state: any) => state.ar?.selectedDestination);
 
   const handleLogOut = () => {
     bottomSheetRef.current?.expand();
@@ -72,6 +74,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
+          console.log(JSON.stringify(res?.data, null, 2));
           setNumberOfChallenges(res?.data?.length);
         } else {
           res.message.message = "Error in loading Challenges.";
@@ -128,9 +131,10 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   };
 
   const HomeScreenARItem = item => {
+    const isPhotoChallenge = item?.id === 1;
     return (
       <TouchableOpacity
-        onPress={item?.id === 1 ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
+        onPress={isPhotoChallenge ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
       >
         <View style={styles.imageBg}>
           <View style={styles.row}>
@@ -139,7 +143,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
               <AppText style={styles.headerText}>{item?.title1}</AppText>
               <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
               <AppText style={styles.challengesText}>
-                {item?.id === 1 ? numberOfChallenges : selectedDestination.unique_ar_sites.length}{" "}
+                {isPhotoChallenge ? numberOfChallenges : selectedDestination.star_ar_sites.length}{" "}
                 Challenges
               </AppText>
             </View>

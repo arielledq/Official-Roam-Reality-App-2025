@@ -3,9 +3,15 @@ import { View } from "react-native";
 import AppButton from "./button";
 import { FontSizes } from "util/FontUtils";
 
-const ViewInfoButton = ({ onPress = () => {} }) => {
+const ViewInfoButton = ({ showOnHeader = false, onPress = () => {} }) => {
   return (
-    <View style={{ marginVertical: 16, alignItems: "center", justifyContent: "center" }}>
+    <View
+      style={{
+        marginVertical: showOnHeader ? 0 : 16,
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
       <AppButton
         onPress={onPress}
         buttonStyle={{ height: 40, width: 90 }}
