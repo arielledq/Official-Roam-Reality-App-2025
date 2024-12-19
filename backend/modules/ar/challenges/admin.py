@@ -3,7 +3,7 @@ from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, 
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
     GeoARSiteActivity, StarCollection, \
-    ARSitePinCheckIn, GeoARGoldStar, PanicMessage, ARExampleImage, ARExampleVideo
+    ARSitePinCheckIn, GeoARGoldStar, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint
 from .widgets import GoogleMapsOpenLayersWidget, GoogleMapsOpenLayersWidgetZoom
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
@@ -138,6 +138,13 @@ class UniqueChallengeSiteAdmin(GeoArChallengeAdmin):
     ordering = ("name",)
     search_fields = ["name"]
 
+   ###########
+# class ARExampleVideoInline(admin.TabularInline):
+#     model = ARExampleVideo
+#     extra = 1
+#     fields = ['video_file']
+
+
 @admin.register(GeoArSite)
 class GeoArSiteAdmin(GeoArChallengeAdmin):
     list_display = ("id",'name',"check_ins","geo_location","view_ar_stars","add_ar_stars",)
@@ -166,6 +173,56 @@ class GeoArSiteAdmin(GeoArChallengeAdmin):
 
     add_ar_stars.short_description = "Add AR Stars"
     add_ar_stars.short_description = "AR Stars"
+
+
+# class GeoARStarPontInline(admin.TabularInline):
+#     model = GeoARStarPoint
+#     extra = 1
+#     fields = ['location', 'order',]
+#     zoomMapFields = {
+#         PointField: {"widget": GoogleMapsOpenLayersWidgetZoom},
+#     }
+#     mapFields = {
+#         PointField: {"widget": GoogleMapsOpenLayersWidget},
+#     }
+#
+#     formfield_overrides = mapFields
+#     def get_form(self, request, obj=None, change=False, **kwargs):
+#         form_class = super().get_form(request, obj, change, **kwargs)
+#         if obj:
+#             self.formfield_overrides = self.zoomMapFields
+#         else:
+#             self.formfield_overrides = self.mapFields
+#         return form_class
+
+
+@admin.register(GeoARStar)
+class GeoArStarAdmin(GeoArChallengeAdmin):
+    list_display = ("id", 'name', "view_ar_star_points", "add_ar_star_points",)
+    # inlines = [GeoARStarPontInline]
+
+    def add_ar_star_points(self, obj):
+        info = (GeoARStarPoint._meta.app_label, GeoARStarPoint._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_add'.format(*info))
+            + "?"
+            + urlencode({"geo_ar_star": f"{obj.id}"})
+        )
+        return format_html('<a href="{}"> ADD Stars Point</a>', url)
+
+    def view_ar_star_points(self, obj):
+        count = obj.stars.count()
+        info = (GeoARStarPoint._meta.app_label, GeoARStarPoint._meta.model_name)
+        url = (
+            reverse('admin:{}_{}_changelist'.format(*info))
+            + "?"
+            + urlencode({"geo_ar_star": f"{obj.id}"})
+        )
+        return format_html('<a href="{}">{} Stars Point</a>', url, count)
+
+    add_ar_star_points.short_description = "Add AR Stars"
+    view_ar_star_points.short_description = "AR Stars"
+
 
 @admin.register(ARSitePinCheckIn)
 class ARSitePinCheckInAdmin(admin.ModelAdmin):
@@ -216,7 +273,8 @@ admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
 # admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(ARExample, ARExampleAdmin)
-admin.site.register(GeoARStar, GeoArChallengeAdmin)
+admin.site.register(GeoARStarPoint, GeoArChallengeAdmin)
+# admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARGoldStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 # admin.site.register(StarCollection, GeoArChallengeAdmin)
