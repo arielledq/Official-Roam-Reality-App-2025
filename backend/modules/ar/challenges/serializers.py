@@ -12,28 +12,38 @@ from taggit.serializers import (TagListSerializerField,
 from django.contrib.gis.db.models import GeometryField
 from rest_framework_gis.serializers import GeoModelSerializer
 
+
 class ARUserProfileSerializer(serializers.ModelSerializer):
   
     class Meta:
         model = ARUserProfile
         fields = (
-            "__all__"
+            "points",
+            "check_ins",
+            "challenge_completed",
+            "user",
+            "current_location",
+            "created_at",
         )
+
 
 class SponsorSerializer(serializers.ModelSerializer):
   
     class Meta:
         model = Sponsor
         fields = (
-            "__all__"
+            "name",
+            "image",
+            "created_at",
         )
+
 
 class SettingsSerializer(serializers.ModelSerializer):
   
     class Meta:
         model = ARSettings
         fields = (
-            "__all__"
+            "waiver_details",
         )
 
 
@@ -41,13 +51,13 @@ class ExampleImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ARExampleImage
-        fields = "__all__"
+        fields = ['ar_example', 'image',]
 
 
 class ExampleVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARExampleVideo
-        fields = "__all__"
+        fields = ["ar_example", "video_file",]
 
 
 class ExamplesSerializer(serializers.ModelSerializer):
@@ -56,9 +66,6 @@ class ExamplesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ARExample
-        # fields = (
-        #     "__all__"
-        # )
         fields = ["name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
 
 
@@ -67,8 +74,32 @@ class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARChallengeParameterSettings
         fields = (
-            "__all__"
+            "name",
+            "bloom_threshold",
+            "bloom_intensity",
+            "positionX",
+            "positionY",
+            "positionZ",
+            "scale_object",
+            "emission_value",
+            "rotation_speed",
+            "scale_speed",
+            "min_pinch_scale",
+            "max_pinch_scale",
+            "isRotationEnabled",
+            "loop_animations",
+            "loop_delay",
+            "diffuse_text_color",
+            "diffuse_intensity",
+            "sound_play_and_pause",
+            "image_opacity",
+            "image_opacity_value",
+            "tracking_and_anchors",
+            "ar_portals",
+            "image_recognition",
+            "image_recognition_file",
         )
+
 
 class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer):
     gradient_colors = TagListSerializerField()
@@ -76,91 +107,22 @@ class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer
     class Meta:
         model = ARChallengeFilters
         fields = (
-            "__all__"
+            "name",
+            "image",
+            "text_form_image",
+            "gradient_colors",
+            "gradient_direction",
+            "filter_text",
+            "filter_text_color",
+            "filter_text_size",
+            "location_option",
+            "location_text_size",
+            "location_text_color",
+            "app_name_text",
+            "app_name_text_size",
+            "app_name_text_color",
         )
 
-class ChallengesSerializer(serializers.ModelSerializer):
-    
-    @staticmethod
-    def get_ar_filters_sorted(instance):
-        ar_filters = instance.ar_filters.order_by('name')
-        return ARChallengeFiltersSerializer(ar_filters, many=True).data
-    
-    image = serializers.ImageField()
-    sponsored = SponsorSerializer(source='sponsor', read_only=True)
-    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
-    ar_filters = serializers.SerializerMethodField(method_name='get_ar_filters_sorted')
-from taggit.serializers import (TagListSerializerField,
-                                TaggitSerializer)
-from django.contrib.gis.db.models import GeometryField
-from rest_framework_gis.serializers import GeoModelSerializer
-
-class ARUserProfileSerializer(serializers.ModelSerializer):
-  
-    class Meta:
-        model = ARUserProfile
-        fields = (
-            "__all__"
-        )
-
-class SponsorSerializer(serializers.ModelSerializer):
-  
-    class Meta:
-        model = Sponsor
-        fields = (
-            "__all__"
-        )
-
-class SettingsSerializer(serializers.ModelSerializer):
-  
-    class Meta:
-        model = ARSettings
-        fields = (
-            "__all__"
-        )
-
-
-class ExampleImageSerializer(serializers.ModelSerializer):
-
-    class Meta:
-        model = ARExampleImage
-        fields = "__all__"
-
-
-class ExampleVideoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = ARExampleVideo
-        fields = "__all__"
-
-
-class ExamplesSerializer(serializers.ModelSerializer):
-    images = ExampleImageSerializer(many=True)
-    videos = ExampleVideoSerializer(many=True)
-
-    class Meta:
-        model = ARExample
-        # fields = (
-        #     "__all__"
-        # )
-        fields = ["name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
-
-
-class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
-  
-    class Meta:
-        model = ARChallengeParameterSettings
-        fields = (
-            "__all__"
-        )
-
-class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer):
-    gradient_colors = TagListSerializerField()
-
-    class Meta:
-        model = ARChallengeFilters
-        fields = (
-            "__all__"
-        )
 
 class ChallengesSerializer(serializers.ModelSerializer):
     
@@ -204,13 +166,15 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "ar_filters"
         )
 
+
 class ChallengesUploadSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
     model_file = serializers.FileField()
 
     class Meta:
         model = Challenges
-        fields = ("image","model_file")
+        fields = ("image", "model_file")
+
 
 class ARMemoriesSerializerGet(serializers.ModelSerializer):
     memory_file = serializers.FileField()
@@ -231,14 +195,26 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "created_at",
         )
 
+
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
 
     class Meta:
         model = ARMemories
         fields = (
-            "__all__"
+            "memory_file",
+            "thumbnail_memory_video_file",
+            "description",
+            "user",
+            "memory_type",
+            "challenges",
+            "geo_challenge",
+            "declined_reason",
+            "challenge_approval",
+            "created_at",
+            "points",
         )
+
 
 class GeoARChallengesSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
@@ -267,6 +243,7 @@ class GeoARChallengesSerializer(serializers.ModelSerializer):
             "ar_filters"
         )
 
+
 class UniqueChallengeSiteSerializer(GeoModelSerializer):
     
     challenge = GeoARChallengesSerializer(read_only=True, many=True)
@@ -275,8 +252,13 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
         model = UniqueChallengeSite
         geo_field = 'latitude_longitude'
         fields = (
-            "__all__"
+            "name",
+            "geo_location",
+            "challenge",
+            "latitude_longitude",
+            "visibility_radius",
         )
+
 
 class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
@@ -284,10 +266,24 @@ class GeoArSiteSerializer(GeoModelSerializer):
 
     class Meta:
         model = GeoArSite
-        geo_field = ('lat_long','geo_site_area',)
+        geo_field = ('lat_long', 'geo_site_area',)
         fields = (
-            "__all__"
+            "name",
+            "image",
+            "created_at",
+            "updated_at",
+            "geo_location",#
+            "pin_challenge",
+            "address_text",
+            "lat_long",#
+            "geo_site_border",
+            "description",
+            "info",
+            "pro_tips",
+            "check_ins",
+            "check_in_site_radius",
         )
+
 
 class GeoRegionSerializer(GeoModelSerializer):
 
@@ -295,8 +291,12 @@ class GeoRegionSerializer(GeoModelSerializer):
         model = GeoRegion
         geo_field = ('latitude_longitude',)
         fields = (
-            "__all__"
+            "created_at",
+            "updated_at",
+            "name",
+            "geo_region",
         )
+
 
 class GeoLocationSerializer(GeoModelSerializer):
     image = serializers.ImageField()
@@ -308,20 +308,37 @@ class GeoLocationSerializer(GeoModelSerializer):
         model = GeoLocation
         geo_field = 'geo_location'
         fields = (
-            "__all__"
+            "created_at",
+            "updated_at",
+            "name",
+            "image",
+            "flag_image",
+            "geo_location",#
+            "border",
+            "regions",
+            "sequence_number",
+            "map_longitude_delta",
+            "map_latitude_delta",
         )
 
 
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
-    sponsors = SponsorSerializer(read_only=True,many=True)
+    sponsors = SponsorSerializer(read_only=True, many=True)
 
     class Meta:
         model = GeoARStar
         # geo_field = 'star_location'
         fields = (
-            "__all__"
+            "name",
+            "fun_facts",
+            "info",
+            "visibility_radius",
+            "geo_site",
+            "challenges",
+            "sponsors",
+            "following_mode",
         )
 
 
@@ -335,7 +352,9 @@ class GeoStarPointSerializer(GeoModelSerializer):
         model = GeoARStarPoint
         geo_field = 'location'
         fields = (
-            "__all__"
+            "geo_ar_star",
+            "location",
+            "order",
         )
 
     def get_remaining_stars(self, instance):
@@ -362,8 +381,14 @@ class StarCollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = StarCollection
         fields = (
-            "__all__"
+            "name",
+            "geo_site",
+            "geo_ar_star",
+            "geo_ar_star_point",
+            "user",
+            "point",
         )
+
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
@@ -372,16 +397,34 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARSitePinCheckIn
         fields = (
-            "__all__"
+            "geo_site",
+            "user",
+            "memory_file",
+            "challenge_approval",
+            "declined_reason",
+            "created_at",
+            "updated_at",
+            "geo_challenge",
+            "points",
         )
+
 
 class GoldStarCollectionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = GeoARGoldStar
         fields = (
-            "__all__"
+            "name",
+            "image",
+            "star_location",
+            "fun_facts",
+            "visibility_radius",
+            "geo_location",
+            "geo_site",
+            "sponsors",
+            "price",
         )
+
 
 class DestinationFactsSerializer(serializers.ModelSerializer):
     sponsors = SponsorSerializer(read_only=True,many=True)
@@ -389,8 +432,15 @@ class DestinationFactsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DestinationFacts
         fields = (
-            "__all__"
+            "name",
+            "image",
+            "facts",
+            "sponsors",
+            "geo_location",
+            "border",
+            "points",
         )
+
 
 class PanicMessageSerializer(GeoModelSerializer):
 
@@ -398,7 +448,11 @@ class PanicMessageSerializer(GeoModelSerializer):
         model = PanicMessage
         geo_field = 'location'
         fields = (
-            "__all__"
+            "user",
+            "message",
+            "created_at",
+            "updated_at",
+            "location",
         )
 
 
