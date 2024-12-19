@@ -10,7 +10,7 @@ import moment from "moment";
 import { getARProfile, postArMemory, postGeoPinCheckIn } from "../../../network";
 import { handleError, showMessage } from "../../../util/helpers";
 import Video from "react-native-video";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { updateARUserData } from "../../../redux/AR";
 
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
@@ -35,7 +35,6 @@ const ArChallengeShare = () => {
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
-      selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
       break;
 
     default:
@@ -97,7 +96,7 @@ const ArChallengeShare = () => {
 
         case CHALLENGES_TYPE.PIN_CHECK_IN:
           formData.append("challenges", challengeObj.id);
-          formData.append("geo_site", selectedGeoSite?.id);
+          formData.append("geo_site", selectedGeoSite?.geo_site?.id);
           formData.append("check_in_image", shareFile);
 
           res = await postGeoPinCheckIn(formData);
@@ -113,11 +112,12 @@ const ArChallengeShare = () => {
         showMessage("Successfully, completed your challenge.", "success", `${screenTitle} Share!`);
         endExperience();
       } else {
-        handleError(res.message);
+        console.error("Success - Error al compartir el desafío:", res);
+        handleError("There was an error sharing your challenge: " + res?.message);
       }
     } catch (error) {
-      console.error("Error al compartir el desafío:", error);
-      handleError(error);
+      console.error("Catch - Error al compartir el desafío:", error);
+      handleError("There was an error sharing your challenge: " + error);
     } finally {
       setIsLoading(false);
     }
@@ -146,210 +146,212 @@ const ArChallengeShare = () => {
 
   return (
     <ChallengeScreen title={screenTitle}>
-      <View style={{ flexDirection: "row", gap: 12 }}>
-        {/* Points box */}
-        <View
-          style={{
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 8,
-            backgroundColor: "transparent",
-            width: 55,
-            height: 55,
-          }}
-        >
-          <BackgroundWithImage
-            imageSource={BGArShare}
+      <View style={{ flex: 1, paddingHorizontal: 32 }}>
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          {/* Points box */}
+          <View
             style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 8,
               backgroundColor: "transparent",
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            }}
-          ></BackgroundWithImage>
-          <AppText
-            style={{
-              ...fontGroup.p900,
-              fontSize: FontSizes.S24,
-              color: theme.lightColors.white,
-              margin: 0,
+              width: 55,
+              height: 55,
             }}
           >
-            {challengeObj.points}
-          </AppText>
+            <BackgroundWithImage
+              imageSource={BGArShare}
+              style={{
+                backgroundColor: "transparent",
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+              }}
+            ></BackgroundWithImage>
+            <AppText
+              style={{
+                ...fontGroup.p900,
+                fontSize: FontSizes.S24,
+                color: theme.lightColors.white,
+                margin: 0,
+              }}
+            >
+              {challengeObj.points}
+            </AppText>
+            <AppText
+              style={{
+                ...fontGroup.p400,
+                fontSize: FontSizes.S10,
+                color: theme.lightColors.white,
+              }}
+            >
+              Points
+            </AppText>
+          </View>
+
           <AppText
+            numberOfLines={3}
             style={{
-              ...fontGroup.p400,
+              ...fontGroup.ns900,
+              fontSize: FontSizes.S20,
+              color: theme.lightColors.white,
+              flex: 1,
+            }}
+          >
+            Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!
+          </AppText>
+        </View>
+
+        <View
+          style={{
+            width: "100%",
+            height: 440,
+
+            backgroundColor: "#272741",
+
+            gap: 8,
+
+            paddingVertical: 8,
+
+            marginTop: 16,
+            marginBottom: 8,
+
+            borderRadius: 12,
+
+            alignItems: "center",
+          }}
+        >
+          {fileExt == "mp4" ? (
+            <Video
+              resizeMode={"contain"}
+              repeat={true}
+              style={{
+                flex: 1,
+                justifyContent: "flex-end",
+                alignItems: "flex-end",
+                width: "100%",
+              }}
+              source={{
+                uri: capturedDataUri,
+              }}
+            />
+          ) : (
+            <Image
+              resizeMode={"contain"}
+              source={{ uri: capturedDataUri }}
+              style={{
+                backgroundColor: "transparent",
+                width: "70%",
+                flex: 1,
+              }}
+            />
+          )}
+
+          {/* Sponsor row */}
+          <View
+            style={{
+              width: "100%",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <Image
+              style={{ width: 20, height: 20, marginEnd: 8 }}
+              source={{ uri: challengeObj?.sponsored?.image }}
+            />
+            <Text
+              style={{
+                ...fontGroup.p700,
+                fontSize: FontSizes.S20,
+                color: theme.lightColors.white,
+              }}
+            >
+              {challengeObj?.sponsored?.name}
+            </Text>
+          </View>
+
+          {/* Completition date */}
+          <Text
+            style={{
+              ...fontGroup.p300,
               fontSize: FontSizes.S10,
               color: theme.lightColors.white,
             }}
           >
-            Points
-          </AppText>
-        </View>
-
-        <AppText
-          numberOfLines={3}
-          style={{
-            ...fontGroup.ns900,
-            fontSize: FontSizes.S20,
-            color: theme.lightColors.white,
-            flex: 1,
-          }}
-        >
-          Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!
-        </AppText>
-      </View>
-
-      <View
-        style={{
-          width: "100%",
-          height: 440,
-
-          backgroundColor: "#272741",
-
-          gap: 8,
-
-          paddingVertical: 8,
-
-          marginTop: 16,
-          marginBottom: 8,
-
-          borderRadius: 12,
-
-          alignItems: "center",
-        }}
-      >
-        {fileExt == "mp4" ? (
-          <Video
-            resizeMode={"contain"}
-            repeat={true}
-            style={{
-              flex: 1,
-              justifyContent: "flex-end",
-              alignItems: "flex-end",
-              width: "100%",
-            }}
-            source={{
-              uri: capturedDataUri,
-            }}
-          />
-        ) : (
-          <Image
-            resizeMode={"contain"}
-            source={{ uri: capturedDataUri }}
-            style={{
-              backgroundColor: "transparent",
-              width: "70%",
-              flex: 1,
-            }}
-          />
-        )}
-
-        {/* Sponsor row */}
-        <View
-          style={{
-            width: "100%",
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <Image
-            style={{ width: 20, height: 20, marginEnd: 8 }}
-            source={{ uri: challengeObj?.sponsored?.image }}
-          />
-          <Text
-            style={{
-              ...fontGroup.p700,
-              fontSize: FontSizes.S20,
-              color: theme.lightColors.white,
-            }}
-          >
-            {challengeObj?.sponsored?.name}
+            Completed on: {startDate}
           </Text>
         </View>
 
-        {/* Completition date */}
-        <Text
-          style={{
-            ...fontGroup.p300,
-            fontSize: FontSizes.S10,
-            color: theme.lightColors.white,
-          }}
-        >
-          Completed on: {startDate}
-        </Text>
-      </View>
-
-      <View
-        style={{
-          width: "100%",
-          flexDirection: "column",
-          gap: 16,
-          alignItems: "center",
-        }}
-      >
-        <Text
-          style={{
-            flex: 1,
-            fontSize: FontSizes.S12,
-            color: theme.lightColors.grey,
-          }}
-        >
-          Must share to at least one social media platform to earn any points. Users earn one
-          additional point per social platform.
-        </Text>
-
         <View
           style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
+            width: "100%",
+            flexDirection: "column",
             gap: 16,
+            alignItems: "center",
           }}
         >
-          {/* Share to socials button */}
-          <AppButton
-            onPress={shareToSocialMediaButtonHandler}
-            containerStyle={{ flex: 1, justifyContent: "center" }}
-            titleStyle={{ fontSize: FontSizes.S16 }}
-            title={"Share To Socials"}
-          />
+          <Text
+            style={{
+              flex: 1,
+              fontSize: FontSizes.S12,
+              color: theme.lightColors.grey,
+            }}
+          >
+            Must share to at least one social media platform to earn any points. Users earn one
+            additional point per social platform.
+          </Text>
 
-          <AppButton
-            onPress={checkPermission}
-            containerStyle={{ flex: 1, justifyContent: "center" }}
-            titleStyle={{ fontSize: FontSizes.S16 }}
-            title={"Save Image"}
-          />
-        </View>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 16,
+            }}
+          >
+            {/* Share to socials button */}
+            <AppButton
+              onPress={shareToSocialMediaButtonHandler}
+              containerStyle={{ flex: 1, justifyContent: "center" }}
+              titleStyle={{ fontSize: FontSizes.S16 }}
+              title={"Share To Socials"}
+            />
 
-        <View style={{ paddingHorizontal: 10 }}>
-          <View style={{ width: "100%" }}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-                justifyContent: "space-between",
-                marginTop: 2,
-              }}
-            ></View>
+            <AppButton
+              onPress={checkPermission}
+              containerStyle={{ flex: 1, justifyContent: "center" }}
+              titleStyle={{ fontSize: FontSizes.S16 }}
+              title={"Save Image"}
+            />
+          </View>
+
+          <View style={{ paddingHorizontal: 10 }}>
+            <View style={{ width: "100%" }}>
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  width: "100%",
+                  justifyContent: "space-between",
+                  marginTop: 2,
+                }}
+              ></View>
+            </View>
           </View>
         </View>
-      </View>
 
-      <AppButton
-        onPress={endShareProfileButtonHandler}
-        buttonStyle={{ height: 55 }}
-        containerStyle={{}}
-        title={"End & Share to Roam Profile"}
-        loading={isLoading}
-      />
+        <AppButton
+          onPress={endShareProfileButtonHandler}
+          buttonStyle={{ height: 55 }}
+          containerStyle={{}}
+          title={"End & Share to Roam Profile"}
+          loading={isLoading}
+        />
+      </View>
 
       <ShareToSocialsModal
         fileUri={filePath}
