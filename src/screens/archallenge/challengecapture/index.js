@@ -177,8 +177,8 @@ const ArChallengeCapture = ({}) => {
 
   useEffect(() => {
     if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
+      setThreshold(challengeObjParameters?.bloom_threshold || 0.9);
+      setIntensity(challengeObjParameters?.bloom_intensity || 5);
       setPosition({
         x: parseFloat(challengeObjParameters?.positionX) || 0,
         y: parseFloat(challengeObjParameters?.positionY) || 0,
@@ -271,13 +271,13 @@ const ArChallengeCapture = ({}) => {
       console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
   };
-  console.log(
-    "-----------MODELOS----------",
-    modelOBJ,
-    modelResource,
-    textureBase,
-    textureEmission
-  );
+  // console.log(
+  //   "-----------MODELOS----------",
+  //   modelOBJ,
+  //   modelResource,
+  //   textureBase,
+  //   textureEmission
+  // );
   function enviarComandoAUnity(comando) {
     const commandData = JSON.stringify({ command: comando });
 
@@ -319,7 +319,7 @@ const ArChallengeCapture = ({}) => {
       setTimeout(() => {
         RNFS.readDir(basePath)
           .then(files => {
-            // console.log("Archivos encontrados en el directorio:", files);
+            console.log("Archivos encontrados en el directorio:", JSON.stringify(files, null, 2));
 
             if (Array.isArray(files) && files.length > 0) {
               // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
@@ -329,7 +329,7 @@ const ArChallengeCapture = ({}) => {
               );
 
               if (foundFile) {
-                // console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                console.log("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
                 setFileFound(foundFile.path);
                 setCaptureData(foundFile.path);
                 setCapturedImage(foundFile.path); // Actualiza capturedImage

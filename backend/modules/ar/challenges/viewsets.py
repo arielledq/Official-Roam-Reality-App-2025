@@ -5,10 +5,9 @@ from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
-    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories
+    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories, \
+    GeoStarPointSerializer
 from rest_framework import viewsets
-from rest_framework.viewsets import ViewSet
-from rest_framework.parsers import FileUploadParser, FormParser
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
 from rest_framework.views import APIView
@@ -21,6 +20,10 @@ from rest_framework.response import Response
 from rest_framework.decorators import action
 from django.db.models import F
 from django.db.models import Q
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.geos import Point
+
+
 
 SOCIAL_POINTS = 1
 
@@ -174,251 +177,7 @@ class ARMemoriesViewSet(ViewSet):
         results = ARMemories.objects.filter(criterion1 & criterion2)
         challengeObj = Challenges.objects.get(pk=challenges_id)
         if len(results) < challengeObj.challenge_attempt:
-            serializer = ARMemoriesSerializer(data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
-
-
-class ARProfileViewSet(ViewSet):
-    """Based on rest_framework.authtoken.views.ObtainAuthToken"""
-
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = ARUserProfile.objects.all()
-    serializer_class = ARUserProfileSerializer
-
-    @action(detail=False, methods=['post'], url_path='update-user-point', name='AR POINT UPDATE')
-    def update_user_points(self, request):
-        points = request.data.get("points", 0)
-        profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        profileObj.points = F('points') + points
-        profileObj.save()
-        return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['post'], url_path='update-ar-social-points', name='AR SOCIAL POINT UPDATE')
-    def update_points_for_social(self, request):
-        social_network = request.data.get("social_network", "")
-        profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        profileObj.points = F('points') + SOCIAL_POINTS
-        profileObj.save()
-        return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['post'], url_path='update-user-location', name='Update User Location')
-    def update_user_location(self, request, *args, **kwargs):
-        user_id = self.request.user.id
-        request.data['user'] = user_id
-        profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        latitude = request.data.get("latitude")
-        longitude = request.data.get("longitude")
-        from django.contrib.gis.geos import Point
-        pnt = Point(longitude, latitude)
-        profileObj.current_location = pnt
-        profileObj.save()
-        return Response({'message': "Location Points are updated!"}, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['get'], url_path='public', name='AR Public')
-    def public(self, request):
-        obj, created = ARUserProfile.objects.get_or_create(user=request.GET.get("user_id"))
-        serializer = ARUserProfileSerializer(obj)
-        return Response(serializer.data)
-
-    def list(self, request):
-        obj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        serializer = ARUserProfileSerializer(obj)
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['post'], url_path='get-rank', name='Get User Rank')
-    def get_rank(self, request, *args, **kwargs):
-        from django.db.models import F, Window
-        from django.db.models.functions import Rank
-        user_id = request.data.get("user_id")
-        qs = ARUserProfile.objects.all(
-        ).annotate(
-            rank=Window(
-                expression=Rank(),
-                order_by=F('points').desc(),
-            )
-        )
-        for item in qs:
-            print(item.rank)
-            print(item.user.id)
-            if item.user.id == user_id:
-                return Response({"rank": item.rank}, status=status.HTTP_200_OK)
-
-        return Response({"rank": 0}, status=status.HTTP_200_OK)
-
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.queryset.get(pk=kwargs.get('pk'))
-        serializer = self.serializer_class(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-from rest_framework import authentication, permissions
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.response import Response
-from rest_framework.decorators import action
-from django.db.models import F
-from django.db.models import Q
-
-SOCIAL_POINTS = 1
-
-
-class SponsorViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing sponsors.
-    """
-    queryset = Sponsor.objects.all()
-    serializer_class = SponsorSerializer
-    http_method_names = ["get"]
-
-
-class ARSettingsViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing settings.
-    """
-    queryset = ARSettings.objects.all()
-    serializer_class = SettingsSerializer
-    http_method_names = ["get"]
-
-
-class ARExamplesViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing settings.
-    """
-    queryset = ARExample.objects.all()
-    serializer_class = ExamplesSerializer
-    http_method_names = ["get"]
-
-    @action(detail=False, methods=['get'], url_path='get-by-geo-ar-id', name='AR Geo')
-    def get_by_geoar(self, request):
-        id = request.GET.get("id")
-        objs = self.queryset.filter(geo_challenges=id)
-        serializer = ExamplesSerializer(objs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['get'], url_path='get-by-any-ar-id', name='AR AnyWhere')
-    def get_by_anywhere(self, request):
-        id = request.GET.get("id")
-        objs = self.queryset.filter(any_where_challenges=id)
-        serializer = ExamplesSerializer(objs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-class PanicMessageViewSet(ViewSet):
-    """
-    A simple ViewSet for viewing and editing settings.
-    """
-    queryset = PanicMessage.objects.all()
-    serializer_class = PanicMessageSerializer
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-
-    def create(self, request, *args, **kwargs):
-        user_id = self.request.user.id
-        request.data['user'] = user_id
-        latitude = request.data.get("latitude")
-        longitude = request.data.get("longitude")
-        if latitude and longitude:
-            from django.contrib.gis.geos import Point
-            pnt = Point(longitude, latitude)
-            request.data['location'] = pnt
-        serializer = PanicMessageSerializer(data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ARMemoriesViewSet(ViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
-    queryset = ARMemories.objects.all()
-    serializer_class = ARMemoriesSerializer
-    parser_class = (FileUploadParser,)
-
-    @action(detail=False, methods=['get'], url_path='public', name='public Memories')
-    def public(self, request, *args, **kwargs):
-        objs = self.queryset.filter(user=request.GET.get("user_id"))
-        serializer = ARMemoriesSerializerGet(objs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def get(self, request, *args, **kwargs):
-        objs = self.queryset.filter(user=request.user.id)
-        serializer = ARMemoriesSerializerGet(objs, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['post'], url_path='check-challenge-done', name='Check Challenge')
-    def check_challenge_done(self, request):
-        user_id = self.request.user.id
-        challenges_id = request.data.get("challenges")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(challenges=challenges_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = Challenges.objects.get(pk=challenges_id)
-        if len(results) < challengeObj.challenge_attempt:
-            return Response({'message': "Challenge submission can be added more."}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "Challenge experience already submitted and can't submitted more."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-    @action(detail=False, methods=['post'], url_path='check-geo-challenge-done', name='Check Geo Challenge')
-    def check_geo_challenge_done(self, request):
-        user_id = self.request.user.id
-        geo_challenge_id = request.data.get("geo_challenge")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(geo_challenge=geo_challenge_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
-        if len(results) < challengeObj.challenge_attempt:
-            return Response({'message': "Geo Challenge submission can be added more."}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "Geo Challenge experience already submitted and can't submitted more."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-    def partial_update(self, request, *args, **kwargs):
-        instance = self.queryset.get(pk=kwargs.get('pk'))
-        serializer = self.serializer_class(instance, data=request.data, partial=True)
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response(serializer.data)
-
-    @action(detail=False, methods=['post'], url_path='check-geo-challenge-create', name='Create Geo Challenge')
-    def create_geo(self, request, *args, **kwargs):
-        user_id = self.request.user.id
-        request.data['user'] = user_id
-        geo_challenge_id = request.data.get("geo_challenge")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(geo_challenge=geo_challenge_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
-        if len(results) < challengeObj.challenge_attempt:
-            serializer = ARMemoriesSerializer(data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': "Geo Challenge experience already submitted and can't submitted more."},
-                            status=403)
-
-    def create(self, request, *args, **kwargs):
-        user_id = self.request.user.id
-        request.data['user'] = user_id
-        challenges_id = request.data.get("challenges")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(challenges=challenges_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = Challenges.objects.get(pk=challenges_id)
-        if len(results) < challengeObj.challenge_attempt:
+            request.data['points'] = challengeObj.points
             serializer = ARMemoriesSerializer(data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -508,7 +267,6 @@ class ARProfileViewSet(ViewSet):
 class ChallengesViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing challenges.
-    A simple ViewSet for viewing and editing challenges.
     """
     queryset = Challenges.objects.all()
     serializer_class = ChallengesSerializer
@@ -552,6 +310,8 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing GeoArSite.
     """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = GeoARStar.objects.all()
     serializer_class = GeoStarSerializer
     http_method_names = ["get"]
@@ -575,9 +335,40 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
         objs = self.queryset.filter(geo_site__geo_location=id)
         count = 0
         for o in objs:
-            if o.star_location:
-                count += len(o.star_location)
+            if o.stars:
+                count += len(o.stars.all())
         return Response({count}, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='get-next-star', name='AR Site Stars')
+    def get_next_star(self, request):
+        lat = request.GET.get("lat")
+        lon = request.GET.get("lon")
+        geo_site_id = request.GET.get("geo_site_id")
+
+        if not lat or not lon or not geo_site_id:
+            return Response(
+                {"error": "Lat, lon and geo_site_id parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        ar_star = self.queryset.filter(geo_site=geo_site_id).first()
+
+        if not ar_star:
+            return Response({"detail": "Ar Star not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_location = Point(float(lon), float(lat), srid=4326)
+        visited_points = StarCollection.objects.filter(user=request.user).values_list('geo_ar_star_point_id', flat=True)
+        remaining_stars = ar_star.stars.exclude(id__in=visited_points)
+
+        if ar_star.following_mode == 'PROXIMITY':
+            remaining_stars = remaining_stars.annotate(distance=Distance('location', user_location)).order_by('distance')
+        elif ar_star.following_mode == 'SPECIFIC ORDER':
+            remaining_stars = remaining_stars.order_by('order')
+
+        if remaining_stars.exists():
+            selected_start = remaining_stars.first()
+            return Response(GeoStarPointSerializer(selected_start, context={'request': request}).data, status=status.HTTP_200_OK)
+
+        return Response({"detail": "No more stars available"}, status=status.HTTP_200_OK)
 
 
 class ARSitePinCheckInViewSet(ViewSet):
@@ -650,18 +441,24 @@ class ARSitePinCheckInViewSet(ViewSet):
         user_id = self.request.user.id
         request.data['user'] = user_id
         geo_site = request.data.get("geo_site")
+        geo_challenge_id = request.data.get("geo_challenge")
         criterion1 = Q(user=user_id)
         criterion2 = Q(geo_site=geo_site)
         results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
+        challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
         geosite = GeoArSite.objects.get(pk=geo_site)
-        serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            geosite.check_ins = F('check_ins') + 1
-            geosite.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if len(results) < challengeObj.challenge_attempt:
+            request.data['points'] = challengeObj.points
+            serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                geosite.check_ins = F('check_ins') + 1
+                geosite.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
         # if len(results) < 1:
         #     serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
         #     if serializer.is_valid(raise_exception=True):
@@ -724,6 +521,7 @@ class StarCollectionViewSet(ViewSet):
         request.data['user'] = user_id
         geo_site = request.data.get("geo_site")
         geo_ar_star = request.data.get("geo_ar_star")
+        geo_ar_star_point = request.data.get("geo_ar_star_point")
         latitude = request.data.get("latitude")
         longitude = request.data.get("longitude")
         from django.contrib.gis.geos import Point

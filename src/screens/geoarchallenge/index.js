@@ -141,7 +141,6 @@ const GeoArChallenge = ({}) => {
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          // setNumberOfChallenges(res?.data?.length)
           dispatch(updateAnyWhereChallenges(res?.data));
         } else {
           res.message.message = "Error in loading Challenges.";

@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Image, TouchableOpacity, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
@@ -18,7 +18,7 @@ import {
   getARProfile,
   getCheckInCount,
   getCountryCount,
-  getProfieARMemoriesAPI,
+  getAllMemories,
   getProfieDetails,
   getUserCollectedStarCount,
   getUserRankCount,
@@ -37,21 +37,21 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const navigation = useNavigation();
   const _styles = useStyles();
   const dispatch = useDispatch();
-  const userProfile = useSelector(state => state.login?.data?.user);
-  const [profileDetails, setProfileDetails] = useState(null);
+  const userProfile = useSelector((state: any) => state.login?.data?.user);
+  const [profileDetails, setProfileDetails] = useState<any>(null);
   const [arMemories, setARMemories] = useState([]);
   const [loading, setloading] = useState(true);
-  const arProfile = useSelector(state => state.ar?.arProfile);
+  const arProfile = useSelector((state: any) => state.ar?.arProfile);
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [starsCount, setStarsCount] = useState(0);
   const [countryCount, setCountryCount] = useState(0);
   const [globalRank, setGlobalRank] = useState(0);
   const [myCheckIns, setMyCheckIns] = useState(0);
-  const flatListRef = useRef(null);
   const scrollPositionRef = useRef(0); // Ref to hold the scroll position
+  const flatListRef = useRef(null);
 
-  const handleScroll = event => {
+  const handleScroll = (event: any) => {
     const { contentOffset } = event.nativeEvent;
     const currentScrollPosition = contentOffset.x;
 
@@ -63,6 +63,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     const newPosition = scrollPositionRef.current + SCROLL_AMOUNT;
 
     // Scroll to the new position
+    // @ts-ignore
     flatListRef.current?.scrollToOffset({ offset: newPosition, animated: true });
 
     // Update the ref with the new position immediately
@@ -157,16 +158,17 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   const getProfieARMemories = async () => {
     try {
-      getProfieARMemoriesAPI()
+      getAllMemories()
         .then(res => {
           if (res.status == 1) {
             setARMemories(res.data);
+            console.log("res.data", JSON.stringify(res.data, null, 2));
           } else {
             console.error("Error", "Error fetching ar memories: ");
           }
         })
         .catch(err => {
-          console.error("Error", "Error fetching ar memories: ");
+          console.error("Error", "Error fetching ar memories: ", err);
         })
         .finally(() => setloading(false));
     } catch (error) {
@@ -201,6 +203,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       <TouchableOpacity
         onPress={() => {
           setIsTransitioning(true);
+          // @ts-expect-error
           navigation.openDrawer();
         }}
         style={_styles.menuIcon}
@@ -221,9 +224,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   for (let i = 0; i < data.length; i += 3) {
     rows.push(data.slice(i, i + 3));
   }
-  const navigateToVerifyMail = email => {
+  const navigateToVerifyMail = (email: string) => {
     sendCode({ email: email.toLowerCase() });
     setIsTransitioning(true);
+    // @ts-expect-error
     navigation.navigate("EmailVerificationC", {
       email: email.toLowerCase(),
       profile: true,
@@ -252,6 +256,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
               marginTop: 80,
               aspectRatio: 1,
             }}
+            //  @ts-ignore
             source={{ uri: profileDetails?.image }}
             resizeMode={FastImage.resizeMode.cover}
           />
@@ -262,6 +267,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             containerStyle={_styles.editButtonContainer}
             onPress={() => {
               setIsTransitioning(true);
+              //  @ts-ignore
               navigation.navigate("EditProfile", {
                 edit: true,
                 profileDetails,
@@ -270,6 +276,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             }}
           >
             <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+            {/* @ts-ignore */}
             <AppText style={_styles.buttonText}>Edit Profile</AppText>
           </AppButton>
         </View>
@@ -280,6 +287,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           containerStyle={_styles.editButtonContainer}
           onPress={() => {
             setIsTransitioning(true);
+            // @ts-ignore
             navigation.navigate("EditProfile", {
               edit: true,
               profileDetails,
@@ -289,11 +297,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           // onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+          {/* @ts-ignore */}
           <AppText style={_styles.buttonText}>Edit Profile</AppText>
         </AppButton>
       )}
       <View style={_styles.scroll}>
         <UserInfoCard
+          // @ts-ignore
           image={profileDetails?.image ? true : false}
           name={profileDetails?.user.name}
           email={profileDetails?.user.email}
@@ -304,7 +314,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <AppText
             adjustsFontSizeToFit={true}
             numberOfLines={1}
+            // @ts-ignore
             onPress={() => navigation.navigate("ScoreBoard")}
+            // @ts-ignore
             style={_styles.scoreboard}
           >
             SCOREBOARD
@@ -325,6 +337,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       challengeObj: challengeObj,
       captureData,
       hideBottomTab: true,
+      isMemory: true,
     });
   };
 
@@ -348,20 +361,20 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({ item }) => <MemoryContainer item={item} onPressAction={navigateToShare} />}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item: any) => item?.id?.toString()}
         />
       </View>
     </View>
   );
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({ item }: any) => (
     <BoxStatContainer key={item.id} boxId={item.id} value={item.value} property={item.property} />
   );
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       {loading ? (
-        <ScreenLoader />
+        <ScreenLoader style={{}} />
       ) : (
         <FlatList
           data={data}
@@ -380,7 +393,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             containerStyle={_styles.headerContainer}
             title={"Profile"}
             leftComponent={handleMenuButton()}
-            isBottomTab
           />
         </BlurView>
       </View>

@@ -1,7 +1,7 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
-    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo
+    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
@@ -311,6 +311,7 @@ class GeoLocationSerializer(GeoModelSerializer):
             "__all__"
         )
 
+
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
@@ -318,10 +319,43 @@ class GeoStarSerializer(GeoModelSerializer):
 
     class Meta:
         model = GeoARStar
-        geo_field = 'star_location'
+        # geo_field = 'star_location'
         fields = (
             "__all__"
         )
+
+
+class GeoStarPointSerializer(GeoModelSerializer):
+    geo_ar_star = GeoStarSerializer()
+    remaining_stars = serializers.SerializerMethodField()
+    captured_stars = serializers.SerializerMethodField()
+    total_stars = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GeoARStarPoint
+        geo_field = 'location'
+        fields = (
+            "__all__"
+        )
+
+    def get_remaining_stars(self, instance):
+        ar_star = instance.geo_ar_star
+        visited_points = StarCollection.objects.filter(user=self.context.get('request').user).values_list(
+            'geo_ar_star_point_id', flat=True)
+        remaining = ar_star.stars.exclude(id__in=visited_points).count()
+        return remaining
+
+    def get_captured_stars(self, instance):
+        ar_star = instance.geo_ar_star
+        visited_points = StarCollection.objects.filter(user=self.context.get('request').user).values_list(
+            'geo_ar_star_point_id', flat=True)
+        remaining = ar_star.stars.filter(id__in=visited_points).count()
+        return remaining
+
+    def get_total_stars(self, instance):
+        ar_star = instance.geo_ar_star
+        return ar_star.stars.count()
+
 
 class StarCollectionSerializer(serializers.ModelSerializer):
 
@@ -332,7 +366,7 @@ class StarCollectionSerializer(serializers.ModelSerializer):
         )
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
-    check_in_image = serializers.FileField()
+    memory_file = serializers.FileField()
     # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:
