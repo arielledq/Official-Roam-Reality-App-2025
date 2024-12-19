@@ -514,6 +514,7 @@ class StarCollectionViewSet(ViewSet):
         request.data['user'] = user_id
         geo_site = request.data.get("geo_site")
         geo_ar_star = request.data.get("geo_ar_star")
+        geo_ar_star_point = request.data.get("geo_ar_star_point")
         latitude = request.data.get("latitude")
         longitude = request.data.get("longitude")
         from django.contrib.gis.geos import Point
