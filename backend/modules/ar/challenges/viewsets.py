@@ -1,3 +1,5 @@
+import json
+
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
     DestinationFacts, PanicMessage
@@ -459,17 +461,6 @@ class ARSitePinCheckInViewSet(ViewSet):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
             return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
-        # if len(results) < 1:
-        #     serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
-        #     if serializer.is_valid(raise_exception=True):
-        #         serializer.save()
-        #         geosite.check_ins = F('check_ins') + 1
-        #         geosite.save()
-        #         return Response(serializer.data, status=status.HTTP_201_CREATED)
-        #     else:
-        #         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        # else:
-        #     return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
 
 
 class StarCollectionViewSet(ViewSet):

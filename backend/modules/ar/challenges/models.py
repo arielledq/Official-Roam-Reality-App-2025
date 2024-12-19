@@ -177,9 +177,7 @@ class ARChallengeParameterSettings(models.Model):
         default=3.00
     )
 
-
     isRotationEnabled = models.BooleanField(_("Rotation Enabled"), default=True)
-
 
     loop_animations = models.BooleanField(_("Loop Animation"), default=False, editable=False)
     loop_delay = models.IntegerField(_("Loop Delay"), validators=[MinValueValidator(0)], default=1000, editable=False)
@@ -219,6 +217,7 @@ class ARChallengeParameterSettings(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class ARChallengeFilters(models.Model):
     name = models.CharField(
