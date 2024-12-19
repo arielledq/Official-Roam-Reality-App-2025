@@ -366,7 +366,7 @@ class StarCollectionSerializer(serializers.ModelSerializer):
         )
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
-    check_in_image = serializers.FileField()
+    memory_file = serializers.FileField()
     # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:

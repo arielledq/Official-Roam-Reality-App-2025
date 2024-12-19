@@ -177,6 +177,7 @@ class ARMemoriesViewSet(ViewSet):
         results = ARMemories.objects.filter(criterion1 & criterion2)
         challengeObj = Challenges.objects.get(pk=challenges_id)
         if len(results) < challengeObj.challenge_attempt:
+            request.data['points'] = challengeObj.points
             serializer = ARMemoriesSerializer(data=request.data, partial=True)
             if serializer.is_valid(raise_exception=True):
                 serializer.save()
@@ -440,18 +441,24 @@ class ARSitePinCheckInViewSet(ViewSet):
         user_id = self.request.user.id
         request.data['user'] = user_id
         geo_site = request.data.get("geo_site")
+        geo_challenge_id = request.data.get("geo_challenge")
         criterion1 = Q(user=user_id)
         criterion2 = Q(geo_site=geo_site)
         results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
+        challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
         geosite = GeoArSite.objects.get(pk=geo_site)
-        serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            geosite.check_ins = F('check_ins') + 1
-            geosite.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        if len(results) < challengeObj.challenge_attempt:
+            request.data['points'] = challengeObj.points
+            serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                geosite.check_ins = F('check_ins') + 1
+                geosite.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
         # if len(results) < 1:
         #     serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
         #     if serializer.is_valid(raise_exception=True):
