@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
   Alert,
   ScrollView,
@@ -7,107 +7,107 @@ import {
   View,
   ActivityIndicator,
   FlatList,
-} from 'react-native'
-import { AppButton, AppHeader, AppText } from '../../../components'
-import { resetState } from '../../../redux/Login'
-import { deleteAccount, getARChallenges, logout } from '../../../network'
-import { useDispatch, useSelector } from 'react-redux'
-import { DrawerActions, useNavigation } from '@react-navigation/native'
-import { MenuIcon } from '../../../assets/svg'
-import { screenHorizontalPadding } from '../../../util/AppDimensions'
-import { FontLineHeights, FontSizes, fontGroup } from '../../../util/FontUtils'
-import theme from '../../../assets/theme'
-import AppBottomSheet from '../../../components/bottomSheet'
-import BackgroundWithImage from '../../../components/background'
-import { RootStackParamList, ScreenStackComponent } from '../../../navigation/types'
-import BottomSheet from '@gorhom/bottom-sheet'
-import Images from '../../../assets/images'
-import useStyles from './styles'
-import RightArrowIcon from '../../../assets/svg/RightArrowIcon'
-import { handleError, showMessage } from '../../../util/helpers'
-import { HomeScreenData } from '../../../util/HomeScreenUtils'
-import { BlurView } from '@react-native-community/blur'
+} from "react-native";
+import { AppButton, AppHeader, AppText } from "../../../components";
+import { resetState } from "../../../redux/Login";
+import { deleteAccount, getARChallenges, logout } from "../../../network";
+import { useDispatch, useSelector } from "react-redux";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { MenuIcon } from "../../../assets/svg";
+import { screenHorizontalPadding } from "../../../util/AppDimensions";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
+import theme from "../../../assets/theme";
+import AppBottomSheet from "../../../components/bottomSheet";
+import BackgroundWithImage from "../../../components/background";
+import { RootStackParamList, ScreenStackComponent } from "../../../navigation/types";
+import BottomSheet from "@gorhom/bottom-sheet";
+import Images from "../../../assets/images";
+import useStyles from "./styles";
+import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
+import { handleError, showMessage } from "../../../util/helpers";
+import { HomeScreenData } from "../../../util/HomeScreenUtils";
+import { BlurView } from "@react-native-community/blur";
 
-const GeoArOutdoor: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route }) => {
-  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup)
-  const [openBottomSheet, setOpenBottomSheet] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [numberOfChallenges, setNumberOfChallenges] = useState(0)
+const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
+  const account_setup = useSelector(state => state.login?.data?.user?.user_profile?.account_setup);
+  const [openBottomSheet, setOpenBottomSheet] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [numberOfChallenges, setNumberOfChallenges] = useState(0);
 
-  const bottomSheetRef = useRef<BottomSheet>(null)
-  const snapPoints = useMemo(() => ['33%'], [])
-  const dispatch = useDispatch()
-  const navigation = useNavigation()
-  const styles = useStyles()
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const snapPoints = useMemo(() => ["33%"], []);
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const styles = useStyles();
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination);
 
   const handleLogOut = () => {
-    bottomSheetRef.current?.expand()
-  }
+    bottomSheetRef.current?.expand();
+  };
 
   if (openBottomSheet) {
-    handleLogOut()
-    setOpenBottomSheet(false)
+    handleLogOut();
+    setOpenBottomSheet(false);
   } else {
   }
 
   useEffect(() => {
     if (!account_setup) {
       setTimeout(() => {
-        navigation.replace('EditProfile')
-      }, 300)
+        navigation.replace("EditProfile");
+      }, 300);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (route.params?.openBottomSheet === true) {
-      setOpenBottomSheet(true)
+      setOpenBottomSheet(true);
     } else if (route.params?.deleteAccount === true) {
-      handleDeleteAccount()
+      handleDeleteAccount();
     }
-  }, [route.params])
+  }, [route.params]);
 
   useEffect(() => {
-    setIsLoading(true)
+    setIsLoading(true);
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          setNumberOfChallenges(res?.data?.length)
+          setNumberOfChallenges(res?.data?.length);
         } else {
-          res.message.message = 'Error in loading Challenges.'
-          handleError(res)
+          res.message.message = "Error in loading Challenges.";
+          handleError(res);
         }
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }, [])
+        setIsLoading(false);
+      });
+  }, []);
 
   const handleDeleteAccount = () => {
-    Alert.alert('Delete Account?', 'Are you sure you want to delete your account?', [
+    Alert.alert("Delete Account?", "Are you sure you want to delete your account?", [
       {
-        text: 'yes',
+        text: "yes",
         onPress: () => {
           deleteAccount().then(res => {
             if (res.status == 1) {
-              handleLogOutButton()
-              showMessage('Your account has been deleted successfully')
+              handleLogOutButton();
+              showMessage("Your account has been deleted successfully");
             } else {
-              showMessage(res.message.error, 'error')
+              showMessage(res.message.error, "error");
             }
-          })
+          });
         },
       },
       {
-        text: 'No',
+        text: "No",
       },
-    ])
-  }
+    ]);
+  };
 
   const handleLogOutButton = () => {
-    logout()
-    dispatch(resetState())
-  }
+    logout();
+    dispatch(resetState());
+  };
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
@@ -116,16 +116,16 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route 
       >
         <MenuIcon />
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   const navigateToARChanllenge = () => {
-    navigation.navigate('ARChallenge')
-  }
+    navigation.navigate("ARChallenge");
+  };
 
   const navigateToGeoARChanllenge = () => {
-    navigation.navigate('GeoArChallengeDetails')
-  }
+    navigation.navigate("GeoArChallengeDetails");
+  };
 
   const HomeScreenARItem = item => {
     return (
@@ -139,7 +139,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route 
               <AppText style={styles.headerText}>{item?.title1}</AppText>
               <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
               <AppText style={styles.challengesText}>
-                {item?.id === 1 ? numberOfChallenges : selectedDestination.unique_ar_sites.length}{' '}
+                {item?.id === 1 ? numberOfChallenges : selectedDestination.unique_ar_sites.length}{" "}
                 Challenges
               </AppText>
             </View>
@@ -148,41 +148,40 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, 'Home'> = ({ route 
           </View>
         </View>
       </TouchableOpacity>
-    )
-  }
+    );
+  };
 
   return (
     <View style={styles.mainContainer}>
+      <View style={styles.blurView}>
+        <BlurView
+          blurType="regular"
+          overlayColor="transparent"
+          style={{ backgroundColor: "transparent" }}
+        >
+          <AppHeader title={"AR Experiences"} containerStyle={styles.headerContainer} />
+        </BlurView>
+      </View>
+
       <View style={styles.container}>
         {isLoading ? (
-          <ActivityIndicator size='large' />
+          <ActivityIndicator size="large" />
         ) : (
           <FlatList
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
-            renderItem={({ item }) =>
-              item.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />
-            }
-            keyExtractor={item => item.id}
+            renderItem={({ item }) => <HomeScreenARItem {...item} />}
+            keyExtractor={item => item?.id?.toString()}
             showsVerticalScrollIndicator={false}
           />
         )}
       </View>
-      <View style={styles.blurView}>
-        <BlurView
-          blurType='regular'
-          overlayColor='transparent'
-          style={{ backgroundColor: 'transparent' }}
-        >
-          <AppHeader title={'AR Experiences'} containerStyle={styles.headerContainer} />
-        </BlurView>
-      </View>
     </View>
-  )
-}
+  );
+};
 
-export default GeoArOutdoor
+export default GeoArOutdoor;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -190,14 +189,14 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    height: '100%',
+    height: "100%",
     marginVertical: 10,
     paddingHorizontal: screenHorizontalPadding + 5,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   header: {
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 12,
   },
   headerText: {
@@ -213,15 +212,15 @@ const styles = StyleSheet.create({
   },
   horizontalLine: {
     height: 1,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     backgroundColor: theme.darkColors?.dividerGrey,
     opacity: 0.4,
     marginVertical: 8,
   },
   cancelButton: {
     marginTop: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     height: 50,
   },
   cancelButtonText: {
@@ -232,7 +231,7 @@ const styles = StyleSheet.create({
   },
   buttonheaderContainer: {
     paddingHorizontal: screenHorizontalPadding + 5,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 15,
     marginTop: 7,
   },
@@ -241,8 +240,8 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainerStyle: {
     marginTop: 10,
@@ -251,4 +250,4 @@ const styles = StyleSheet.create({
     ...fontGroup.p600,
     fontSize: FontSizes.S16,
   },
-})
+});

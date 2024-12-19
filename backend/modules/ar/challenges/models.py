@@ -402,6 +402,7 @@ class ARMemories(models.Model):
         null=True,
     )
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    points = models.IntegerField(verbose_name="Points", default=0)
 
     class Meta:
         verbose_name_plural = "AR Memories"
@@ -662,7 +663,7 @@ class ARSitePinCheckIn(models.Model):
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_ar_site_checkin"
     )
-    check_in_image = models.ImageField(upload_to="geoar/checkinimg/", null=True, blank=True)
+    memory_file = models.ImageField(upload_to="geoar/checkinimg/", null=True, blank=True)
     challenge_approval = models.CharField(
         max_length=50,
         choices=CHALLENGE_APPROVAL_CHOICES,
@@ -673,14 +674,16 @@ class ARSitePinCheckIn(models.Model):
     declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     updated_at = models.DateTimeField(auto_now=True)
-    challenges = models.ForeignKey(
-        Challenges,
-        verbose_name="Challenge",
+    geo_challenge = models.ForeignKey(
+        GeoARChallenges,
+        verbose_name="Geo Challenge",
         on_delete=models.CASCADE,
-        related_name="challenges_ar_check_in",
+        related_name="geo_challenges_ar_check_in",
+        default=None,
         null=True,
         blank=True,
     )
+    points = models.IntegerField(verbose_name="Points", default=0)
 
     class Meta:
         verbose_name_plural = "AR Site Pin Check-ins"

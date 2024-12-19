@@ -16,7 +16,8 @@
       "constants/*": ["src/constants/*"],
       "assets/*": ["src/assets/*"],
       "screens/*": ["src/screens/*"],
-      "util/*": ["src/util/*"]
+      "util/*": ["src/util/*"],
+      "config/*": ["src/config/*"]
     },
     "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,

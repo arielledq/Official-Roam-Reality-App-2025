@@ -17,8 +17,10 @@ class ARMemoriesAdmin(admin.ModelAdmin):
         "user__name",
         "challenges__name",
     )
-    list_display = ('user_name', 'challenges','geo_challenge', 'challenge_approval','memory_file')
+    list_display = ('user_name', 'challenges', 'challenge_approval', 'memory_file')
     list_select_related = ['user']  # To avoid extra queries
+
+    exclude = ('geo_challenge', 'description',)
 
     def user_name(self, memory):
         return memory.user.name
@@ -227,9 +229,8 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     search_fields = (
         "user__name",
         "geo_site__name",
-        "challenges__name",
     )
-    list_display = ('user_name', 'geo_site', 'challenges', 'challenge_approval', 'check_in_image')
+    list_display = ('user_name', 'geo_site', 'challenge_approval', 'memory_file')
     list_select_related = ['user']  # To avoid extra queries
 
     def user_name(self, obj):

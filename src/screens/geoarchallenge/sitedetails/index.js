@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
 import {
   ActivityIndicator,
@@ -8,43 +8,43 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
-import BackgroundWithImage from '../../../components/background'
-import AppHeader from '../../../components/header'
-import { useNavigation } from '@react-navigation/native'
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps'
-import CloseBIcon from '../../../assets/geoar/close-square.svg'
-import ProTipIcon from '../../../assets/geoar/pro-tip.svg'
-import GradientDownPNG from '../../../assets/geoar/gradient_down.png'
-import MarkerIcon from '../../../assets/geoar/marker_img.svg'
-import Geocoder from 'react-native-geocoding'
+} from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import { useNavigation } from "@react-navigation/native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import CloseBIcon from "../../../assets/geoar/close-square.svg";
+import ProTipIcon from "../../../assets/geoar/pro-tip.svg";
+import GradientDownPNG from "../../../assets/geoar/gradient_down.png";
+import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+import Geocoder from "react-native-geocoding";
 
-import { useDispatch, useSelector } from 'react-redux'
-import useStyles from './styles'
-import { width } from '../../../util/AppDimensions'
-import { AppButton } from '../../../components'
-import RenderHTML from 'react-native-render-html'
-import { FontSizes, fontGroup } from '../../../util/FontUtils'
-import { updateSelectedGeoARSiteStars } from '../../../redux/AR'
-import { getAllARSitesStars, sendRoamingNotification } from '../../../network'
-import { getBounds, getCenterOfBounds } from '../../../util/LocationLib'
-import NumericStatItem from '../../../components/NumericStatItem'
+import { useDispatch, useSelector } from "react-redux";
+import useStyles from "./styles";
+import { width } from "../../../util/AppDimensions";
+import { AppButton } from "../../../components";
+import RenderHTML from "react-native-render-html";
+import { FontSizes, fontGroup } from "../../../util/FontUtils";
+import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
+import { getAllARSitesStars, sendRoamingNotification } from "../../../network";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
+import NumericStatItem from "../../../components/NumericStatItem";
 
 const GeoArSiteDetails = ({}) => {
-  const _styles = useStyles()
-  const dispatch = useDispatch()
-  const [isLoading, setIsLoading] = useState(false)
-  const [showProTips, setShowProTips] = useState(false)
-  const navigation = useNavigation()
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite)
-  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars)
-  const [address, setAddress] = useState(null)
-  const [starsCount, setStarsCount] = useState(0)
+  const _styles = useStyles();
+  const dispatch = useDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [showProTips, setShowProTips] = useState(false);
+  const navigation = useNavigation();
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination);
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
+  const [address, setAddress] = useState(null);
+  const [starsCount, setStarsCount] = useState(0);
 
   const getAddress = () => {
-    if (selectedGeoSite.address_text != '') {
-      setAddress(selectedGeoSite.address_text)
+    if (selectedGeoSite.address_text != "") {
+      setAddress(selectedGeoSite.address_text);
     }
     Geocoder.from({
       latitude: selectedGeoSite.lat_long.coordinates[1],
@@ -52,43 +52,43 @@ const GeoArSiteDetails = ({}) => {
     })
       .then(json => {
         try {
-          var addressComponent = json.results[0].formatted_address
-          setAddress(addressComponent)
+          var addressComponent = json.results[0].formatted_address;
+          setAddress(addressComponent);
         } catch (ex) {
-          setAddress('Not found.')
+          setAddress("Not found.");
         }
       })
-      .catch(error => console.warn(error))
-  }
+      .catch(error => console.warn(error));
+  };
 
   const geoARSitesStars = () => {
     getAllARSitesStars({ id: selectedGeoSite.id })
       .then(res => {
         if (res.status == 1) {
-          dispatch(updateSelectedGeoARSiteStars(res.data))
+          dispatch(updateSelectedGeoARSiteStars(res.data));
         }
       })
-      .finally(() => {})
-  }
+      .finally(() => {});
+  };
 
   const setStarCounts = () => {
-    let count = 0
+    let count = 0;
     for (const stars_site of selectedGeoARSiteStars) {
       if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length
+        count += stars_site.star_location.coordinates.length;
       }
     }
-    setStarsCount(count)
-  }
+    setStarsCount(count);
+  };
 
   useEffect(() => {
-    getAddress()
-    geoARSitesStars()
-  }, [])
+    getAddress();
+    geoARSitesStars();
+  }, []);
 
   useEffect(() => {
-    setStarCounts()
-  }, [selectedGeoARSiteStars])
+    setStarCounts();
+  }, [selectedGeoARSiteStars]);
 
   const InfoView = () => {
     return (
@@ -97,9 +97,9 @@ const GeoArSiteDetails = ({}) => {
           <View
             onPress={() => setShowProTips(true)}
             style={{
-              justifyContent: 'center',
-              flexDirection: 'row',
-              alignItems: 'center',
+              justifyContent: "center",
+              flexDirection: "row",
+              alignItems: "center",
             }}
           >
             <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
@@ -109,107 +109,107 @@ const GeoArSiteDetails = ({}) => {
         <ScrollView
           contentContainerStyle={{ paddingBottom: 100 }}
           showsVerticalScrollIndicator={false}
-          style={{ flex: 1, width: '100%', padding: 24 }}
+          style={{ flex: 1, width: "100%", padding: 24 }}
         >
           <RenderHTML
             contentWidth={width}
             tagsStyles={{
               p: {
-                color: '#9CA3AF',
+                color: "#9CA3AF",
                 fontSize: FontSizes.S14,
               },
               strong: {
-                color: '#fff',
+                color: "#fff",
                 fontSize: FontSizes.S18,
               },
               ol: {
-                color: '#fff',
+                color: "#fff",
               },
               li: {
-                color: '#fff',
+                color: "#fff",
               },
             }}
             source={{
-              html: `${selectedGeoSite?.pro_tips.toString().replaceAll('#000000', '#fff')}}`,
+              html: `${selectedGeoSite?.pro_tips.toString().replaceAll("#000000", "#fff")}}`,
             }}
           />
         </ScrollView>
-        <View style={{ width: '100%', paddingHorizontal: 24 }}>
+        <View style={{ width: "100%", paddingHorizontal: 24 }}>
           <AppButton
             onPress={() => setShowProTips(false)}
             buttonStyle={_styles.buttonStyle}
             containerStyle={_styles.buttonContainerStyle}
-            title={'Close'}
+            title={"Close"}
           />
         </View>
       </View>
-    )
-  }
+    );
+  };
 
   const getFullBounds = _ => {
     if (selectedGeoSite.geo_site_border) {
-      let arrayPoints = []
+      let arrayPoints = [];
       for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
-        const points = selectedGeoSite.geo_site_border.coordinates[i]
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
         for (let j = 0; j < points.length; j++) {
-          const point = points[j]
-          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+          const point = points[j];
+          arrayPoints.push({ latitude: point[1], longitude: point[0] });
         }
       }
-      const bounds = getBounds(arrayPoints)
-      return bounds
+      const bounds = getBounds(arrayPoints);
+      return bounds;
     } else {
-      return null
+      return null;
     }
-  }
+  };
 
   const getFullCenter = _ => {
     if (selectedGeoSite.geo_site_border) {
-      let arrayPoints = []
+      let arrayPoints = [];
       for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
-        const points = selectedGeoSite.geo_site_border.coordinates[i]
+        const points = selectedGeoSite.geo_site_border.coordinates[i];
         for (let j = 0; j < points.length; j++) {
-          const point = points[j]
-          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+          const point = points[j];
+          arrayPoints.push({ latitude: point[1], longitude: point[0] });
         }
       }
-      const latitude_longitude = getCenterOfBounds(arrayPoints)
-      return latitude_longitude
+      const latitude_longitude = getCenterOfBounds(arrayPoints);
+      return latitude_longitude;
     } else {
-      return null
+      return null;
     }
-  }
+  };
 
   const letsRoamButtonHandler = async () => {
-    try {
-      const metadata = {
-        destinationId: selectedDestination?.id,
-      }
-      await sendRoamingNotification({
-        metadata: metadata,
-      })
-    } catch (error) {
-      console.error('There was an error sending the notification to friends:', error)
-    }
+    // try {
+    //   const metadata = {
+    //     destinationId: selectedDestination?.id,
+    //   }
+    //   await sendRoamingNotification({
+    //     metadata: metadata,
+    //   })
+    // } catch (error) {
+    //   console.error('There was an error sending the notification to friends:', error)
+    // }
 
-    navigation.navigate('GeoArSiteRoutes')
-  }
+    navigation.navigate("GeoArSiteRoutes");
+  };
 
   const initialRegion = {
     latitude: selectedGeoSite.lat_long.coordinates[1],
     longitude: selectedGeoSite.lat_long.coordinates[0],
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
-  }
-  const full_latitude_longitude = getFullCenter()
-  const full_bounds = getFullBounds()
+  };
+  const full_latitude_longitude = getFullCenter();
+  const full_bounds = getFullBounds();
   if (full_bounds) {
-    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat)
-    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng)
+    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
   }
   if (full_latitude_longitude) {
-    initialRegion.latitude = Number(full_latitude_longitude.latitude)
-    initialRegion.longitude = Number(full_latitude_longitude.longitude)
+    initialRegion.latitude = Number(full_latitude_longitude.latitude);
+    initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
   return (
@@ -219,25 +219,25 @@ const GeoArSiteDetails = ({}) => {
           text: selectedDestination.name,
           style: [_styles.heading],
         }}
-        backgroundColor='transparent'
+        backgroundColor="transparent"
       />
 
-      {isLoading && <ActivityIndicator size='large' />}
+      {isLoading && <ActivityIndicator size="large" />}
       <ScrollView showsVerticalScrollIndicator={false}>
         <View
           style={{
-            width: '100%',
-            position: 'relative',
+            width: "100%",
+            position: "relative",
             height: 160,
             borderRadius: 16,
             marginVertical: 15,
-            overflow: 'hidden',
+            overflow: "hidden",
           }}
         >
           <MapView
             provider={PROVIDER_GOOGLE}
             style={{
-              position: 'absolute',
+              position: "absolute",
               top: 0,
               bottom: 0,
               left: 0,
@@ -261,10 +261,10 @@ const GeoArSiteDetails = ({}) => {
 
         <View
           style={{
-            flexDirection: 'row',
+            flexDirection: "row",
             paddingVertical: 20,
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            justifyContent: "space-between",
+            alignItems: "center",
           }}
         >
           <Text style={_styles.site_d_header_text}>Site Details</Text>
@@ -274,7 +274,7 @@ const GeoArSiteDetails = ({}) => {
         </View>
         <View
           style={{
-            backgroundColor: '#131422',
+            backgroundColor: "#131422",
             borderRadius: 16,
             padding: 20,
             marginBottom: 30,
@@ -282,24 +282,24 @@ const GeoArSiteDetails = ({}) => {
         >
           <ImageBackground
             style={{
-              width: '100%',
+              width: "100%",
               height: 213,
               borderRadius: 12,
-              overflow: 'hidden',
+              overflow: "hidden",
             }}
             source={{ uri: selectedGeoSite.image }}
-            resizeMode='cover'
+            resizeMode="cover"
           >
             <Image
               source={GradientDownPNG}
-              resizeMode='cover'
+              resizeMode="cover"
               style={{
-                position: 'absolute',
+                position: "absolute",
                 bottom: 0,
                 left: 0,
                 right: 0,
                 top: 0,
-                width: '110%',
+                width: "110%",
               }}
             />
           </ImageBackground>
@@ -307,19 +307,19 @@ const GeoArSiteDetails = ({}) => {
           <Text style={_styles.site_d_text}>{address}</Text>
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              width: '100%',
-              alignItems: 'flex-start',
+              flexDirection: "row",
+              justifyContent: "space-between",
+              width: "100%",
+              alignItems: "flex-start",
               marginTop: 20,
               marginBottom: 30,
             }}
           >
-            <NumericStatItem count={selectedGeoSite.check_ins} label='Check-ins' />
-            <NumericStatItem count={starsCount} label='Stars' />
+            <NumericStatItem count={selectedGeoSite.check_ins} label="Check-ins" />
+            <NumericStatItem count={starsCount} label="Stars" />
             <NumericStatItem
               count={selectedDestination.unique_ar_sites.length}
-              label='AR Experiences'
+              label="AR Experiences"
             />
           </View>
           <RenderHTML
@@ -328,40 +328,40 @@ const GeoArSiteDetails = ({}) => {
               p: {
                 ...fontGroup.ns500,
                 lineHeight: 19.1,
-                color: '#fff',
+                color: "#fff",
                 fontSize: FontSizes.S12,
               },
               strong: {
                 ...fontGroup.ns500,
                 lineHeight: 19.1,
-                color: '#fff',
+                color: "#fff",
                 fontSize: FontSizes.S14,
               },
               span: {
                 ...fontGroup.ns500,
                 lineHeight: 19.1,
-                color: '#fff',
+                color: "#fff",
                 fontSize: FontSizes.S12,
               },
             }}
             source={{
-              html: `${selectedGeoSite?.description?.toString().replaceAll('#000000', '#fff')}`,
+              html: `${selectedGeoSite?.description?.toString().replaceAll("#000000", "#fff")}`,
             }}
           />
           <View
             style={{
-              justifyContent: 'space-between',
-              flexDirection: 'row',
-              alignItems: 'center',
+              justifyContent: "space-between",
+              flexDirection: "row",
+              alignItems: "center",
               marginTop: 10,
             }}
           >
             <TouchableOpacity
               onPress={() => setShowProTips(true)}
               style={{
-                justifyContent: 'center',
-                flexDirection: 'row',
-                alignItems: 'center',
+                justifyContent: "center",
+                flexDirection: "row",
+                alignItems: "center",
               }}
             >
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
@@ -371,7 +371,7 @@ const GeoArSiteDetails = ({}) => {
               <AppButton
                 onPress={letsRoamButtonHandler}
                 buttonStyle={_styles.buttonStyle}
-                titleStyle={{ fontWeight: 'bold' }}
+                titleStyle={{ fontWeight: "bold" }}
                 containerStyle={_styles.buttonContainerStyle}
                 title={"Let's Roam"}
                 loading={isLoading}
@@ -382,7 +382,7 @@ const GeoArSiteDetails = ({}) => {
       </ScrollView>
       {showProTips && InfoView()}
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default GeoArSiteDetails
+export default GeoArSiteDetails;
