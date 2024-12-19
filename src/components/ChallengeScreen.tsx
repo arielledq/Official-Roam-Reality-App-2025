@@ -23,52 +23,50 @@ const ChallengeScreen = ({
   const { height, width } = useWindowDimensions();
 
   return (
-    <>
-      <View style={{ flex: 1, backgroundColor: theme.darkColors?.inputBG }}>
-        <BackgroundWithImage
-          style={[{ width: width, height: height / 2 }, styles.backgroundStyle]}
-          imageStyle={styles.backgroundImage}
-        >
-          <LinearGradient
-            colors={["rgba(0, 0, 0, 0)", `${theme.darkColors?.inputBG}`]} // Transparent to semi-black
-            style={styles.gradient}
-            start={{ x: 0.5, y: 0.5 }} // Middle
-            end={{ x: 0.5, y: 1 }} // Bottom
-          />
-        </BackgroundWithImage>
-
-        <AppHeader
-          centerComponent={{
-            text: title,
-            numberOfLines: 2,
-            // @ts-ignore
-            style: {
-              fontSize: FontSizes.S14,
-              lineHeight: FontLineHeights.LH20,
-              color: theme.lightColors?.white,
-              textAlign: "center",
-              ...fontGroup.ns700,
-            },
-          }}
-          centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}
-          backgroundColor="transparent"
-          // @ts-expect-error
-          rightComponent={headerRightComponent}
+    <View style={{ flex: 1, backgroundColor: theme.darkColors?.inputBG }}>
+      <BackgroundWithImage
+        style={[{ width: width, height: height / 2 }, styles.backgroundStyle]}
+        imageStyle={styles.backgroundImage}
+      >
+        <LinearGradient
+          colors={["rgba(0, 0, 0, 0)", `${theme.darkColors?.inputBG}`]} // Transparent to semi-black
+          style={styles.gradient}
+          start={{ x: 0.5, y: 0.5 }} // Middle
+          end={{ x: 0.5, y: 1 }} // Bottom
         />
+      </BackgroundWithImage>
 
-        <ScrollView
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{
-            paddingBottom: 40,
-            paddingHorizontal: screenHorizontalPadding,
-          }}
-        >
-          {children}
-        </ScrollView>
+      <AppHeader
+        centerComponent={{
+          text: title,
+          numberOfLines: 2,
+          // @ts-ignore
+          style: {
+            fontSize: FontSizes.S14,
+            lineHeight: FontLineHeights.LH20,
+            color: theme.lightColors?.white,
+            textAlign: "center",
+            ...fontGroup.ns700,
+          },
+        }}
+        centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}
+        backgroundColor="transparent"
+        // @ts-expect-error
+        rightComponent={headerRightComponent}
+      />
 
-        {modals}
-      </View>
-    </>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{
+          paddingBottom: 40,
+          paddingHorizontal: screenHorizontalPadding,
+        }}
+      >
+        {children}
+      </ScrollView>
+
+      {modals}
+    </View>
   );
 };
 
