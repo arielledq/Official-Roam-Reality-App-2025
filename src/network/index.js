@@ -163,7 +163,7 @@ export const getARSposored = () =>
     logoutFunc
   );
 export const getAllARSitesStars = payload =>
-  Request.callAR(
+  Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-star/get-by-site-id/?id=${payload.id}`,
       method: "GET",
@@ -171,7 +171,7 @@ export const getAllARSitesStars = payload =>
     logoutFunc
   );
 export const getARSitesHiddenStars = payload =>
-  Request.callAR(
+  Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-star/get-hidden-stars/?id=${payload.id}`,
       method: "GET",
