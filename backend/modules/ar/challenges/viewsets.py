@@ -5,7 +5,8 @@ from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
-    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories
+    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories, \
+    GeoStarPointSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -337,75 +338,37 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
                 count += len(o.stars.all())
         return Response({count}, status=status.HTTP_200_OK)
 
-    # @action(detail=False, methods=['get'], url_path='get-star-location', name='AR Site Stars')
-    # def show_star_location(self, request):
-    #     lat = request.GET.get("lat")
-    #     lon = request.GET.get("lon")
-    #     if not lat or not lon:
-    #         return Response(
-    #             {"error": "Lat and lon parameters are required."},
-    #             status=status.HTTP_400_BAD_REQUEST
-    #         )
-    #
-    #     user_location = Point(float(lon), float(lat), srid=4326)
-    #
-    #     ar_star_id = request.GET.get("ar_star_id")
-    #
-    #     stars = self.queryset.filter(id=ar_star_id).select_related('challenges', 'geo_site').prefetch_related(
-    #         'stars')  # 'stars' son GeoARStarPoint
-    #
-    #     results = []
-    #     for star in stars:
-    #         if star.following_mode == 'PROXIMITY':
-    #             star_points = star.stars.annotate(distance=Distance('location', user_location)) \
-    #                 .order_by('distance')
-    #             if star_points.exists():
-    #                 closest_point = star_points.first()
-    #
-    #                 dist_meters = closest_point.distance.m
-    #                 if dist_meters <= star.visibility_radius:
-    #                     results.append({
-    #                         "star_name": star.name,
-    #                         "star_location": {
-    #                             "lat": closest_point.location.y,
-    #                             "lon": closest_point.location.x
-    #                         },
-    #                         "challenge": {
-    #                             "name": star.challenges.name,
-    #                             "model_file": star.challenges.model_file.url if star.challenges.model_file else None,
-    #                             "points": star.challenges.points,
-    #                             "description": star.challenges.description
-    #                         },
-    #                         "geo_site": star.geo_site.name,
-    #                         "available_stars_in_zone": len(star.stars.all())
-    #                     })
-    #
-    #         elif star.following_mode == 'SPECIFIC ORDER':
-    #
-    #             star_points = star.stars.order_by('order')
-    #             if star_points.exists():
-    #                 next_point = star_points.first()
-    #                 dist_meters = next_point.distance(user_location).m
-    #
-    #                 if dist_meters <= star.visibility_radius:
-    #                     results.append({
-    #                         "star_name": star.name,
-    #                         "star_location": {
-    #                             "lat": next_point.location.y,
-    #                             "lon": next_point.location.x
-    #                         },
-    #                         "challenge": {
-    #                             "name": star.challenges.name,
-    #                             "model_file": star.challenges.model_file.url if star.challenges.model_file else None,
-    #                             "points": star.challenges.points,
-    #                             "description": star.challenges.description
-    #                         },
-    #                         "geo_site": star.geo_site.name,
-    #                         "available_stars_in_zone": len(star.stars.all())
-    #                     })
-    #
-    #
-    #     return Response(results, status=status.HTTP_200_OK)
+    @action(detail=False, methods=['get'], url_path='get-star-location', name='AR Site Stars')
+    def show_star_location(self, request):
+        lat = request.GET.get("lat")
+        lon = request.GET.get("lon")
+        if not lat or not lon:
+            return Response(
+                {"error": "Lat and lon parameters are required."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        user_location = Point(float(lon), float(lat), srid=4326)
+
+        ar_star_id = request.GET.get("ar_star_id")
+        ar_star = self.queryset.filter(id=ar_star_id).first()
+        visited_points = StarCollection.objects.filter(user=request.user).values_list('geo_ar_star_point_id', flat=True)
+
+        if ar_star:
+            if ar_star.following_mode == 'PROXIMITY':
+                star_points = ar_star.stars.exclude(id__in=visited_points).annotate(distance=Distance('location', user_location)) \
+                    .order_by('distance')
+                if star_points.exists():
+                    closest_point = star_points.first()
+                    return Response(GeoStarPointSerializer(closest_point).data, status=status.HTTP_200_OK)
+
+            elif ar_star.following_mode == 'SPECIFIC ORDER':
+                star_points = ar_star.stars.exclude(id__in=visited_points).order_by('order')
+                if star_points.exists():
+                    next_point = star_points.first()
+                    return Response(GeoStarPointSerializer(next_point).data, status=status.HTTP_200_OK)
+
+        return Response({'Details': "Ar Start not found"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ARSitePinCheckInViewSet(ViewSet):

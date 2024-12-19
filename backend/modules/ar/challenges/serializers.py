@@ -325,13 +325,15 @@ class GeoStarSerializer(GeoModelSerializer):
         )
 
 
-# class GeoStarPointSerializer(GeoModelSerializer):
-#     class Meta:
-#         model = GeoARStarPoint
-#         geo_field = 'location'
-#         fields = (
-#             "__all__"
-#         )
+class GeoStarPointSerializer(GeoModelSerializer):
+    geo_ar_star = GeoStarSerializer()
+    class Meta:
+        model = GeoARStarPoint
+        geo_field = 'location'
+        fields = (
+            "__all__"
+        )
+
 
 
 class StarCollectionSerializer(serializers.ModelSerializer):

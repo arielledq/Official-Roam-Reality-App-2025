@@ -713,6 +713,14 @@ class StarCollection(models.Model):
         blank=True,
         related_name="geo_star_collect_ar_star",
     )
+    geo_ar_star_point = models.ForeignKey(
+        GeoARStarPoint,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_star_collect_ar_star_point",
+    )
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="user_ar_site_star"
     )
