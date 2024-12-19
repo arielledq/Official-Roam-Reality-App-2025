@@ -327,6 +327,10 @@ class GeoStarSerializer(GeoModelSerializer):
 
 class GeoStarPointSerializer(GeoModelSerializer):
     geo_ar_star = GeoStarSerializer()
+    remaining_stars = serializers.SerializerMethodField()
+    captured_stars = serializers.SerializerMethodField()
+    total_stars = serializers.SerializerMethodField()
+
     class Meta:
         model = GeoARStarPoint
         geo_field = 'location'
@@ -334,6 +338,23 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "__all__"
         )
 
+    def get_remaining_stars(self, instance):
+        ar_star = instance.geo_ar_star
+        visited_points = StarCollection.objects.filter(user=self.context.get('request').user).values_list(
+            'geo_ar_star_point_id', flat=True)
+        remaining = ar_star.stars.exclude(id__in=visited_points).count()
+        return remaining
+
+    def get_captured_stars(self, instance):
+        ar_star = instance.geo_ar_star
+        visited_points = StarCollection.objects.filter(user=self.context.get('request').user).values_list(
+            'geo_ar_star_point_id', flat=True)
+        remaining = ar_star.stars.filter(id__in=visited_points).count()
+        return remaining
+
+    def get_total_stars(self, instance):
+        ar_star = instance.geo_ar_star
+        return ar_star.stars.count()
 
 
 class StarCollectionSerializer(serializers.ModelSerializer):

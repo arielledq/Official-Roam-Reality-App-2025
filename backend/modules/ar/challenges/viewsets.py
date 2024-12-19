@@ -338,37 +338,36 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
                 count += len(o.stars.all())
         return Response({count}, status=status.HTTP_200_OK)
 
-    @action(detail=False, methods=['get'], url_path='get-star-location', name='AR Site Stars')
-    def show_star_location(self, request):
+    @action(detail=False, methods=['get'], url_path='get-next-star', name='AR Site Stars')
+    def get_next_star(self, request):
         lat = request.GET.get("lat")
         lon = request.GET.get("lon")
-        if not lat or not lon:
+        geo_site_id = request.GET.get("geo_site_id")
+
+        if not lat or not lon or not geo_site_id:
             return Response(
-                {"error": "Lat and lon parameters are required."},
+                {"error": "Lat, lon and geo_site_id parameters are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+        ar_star = self.queryset.filter(geo_site=geo_site_id).first()
+
+        if not ar_star:
+            return Response({"detail": "Ar Star not found"}, status=status.HTTP_400_BAD_REQUEST)
 
         user_location = Point(float(lon), float(lat), srid=4326)
-
-        ar_star_id = request.GET.get("ar_star_id")
-        ar_star = self.queryset.filter(id=ar_star_id).first()
         visited_points = StarCollection.objects.filter(user=request.user).values_list('geo_ar_star_point_id', flat=True)
+        remaining_stars = ar_star.stars.exclude(id__in=visited_points)
 
-        if ar_star:
-            if ar_star.following_mode == 'PROXIMITY':
-                star_points = ar_star.stars.exclude(id__in=visited_points).annotate(distance=Distance('location', user_location)) \
-                    .order_by('distance')
-                if star_points.exists():
-                    closest_point = star_points.first()
-                    return Response(GeoStarPointSerializer(closest_point).data, status=status.HTTP_200_OK)
+        if ar_star.following_mode == 'PROXIMITY':
+            remaining_stars = remaining_stars.annotate(distance=Distance('location', user_location)).order_by('distance')
+        elif ar_star.following_mode == 'SPECIFIC ORDER':
+            remaining_stars = remaining_stars.order_by('order')
 
-            elif ar_star.following_mode == 'SPECIFIC ORDER':
-                star_points = ar_star.stars.exclude(id__in=visited_points).order_by('order')
-                if star_points.exists():
-                    next_point = star_points.first()
-                    return Response(GeoStarPointSerializer(next_point).data, status=status.HTTP_200_OK)
+        if remaining_stars.exists():
+            selected_start = remaining_stars.first()
+            return Response(GeoStarPointSerializer(selected_start, context={'request': request}).data, status=status.HTTP_200_OK)
 
-        return Response({'Details': "Ar Start not found"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"detail": "No more stars available"}, status=status.HTTP_200_OK)
 
 
 class ARSitePinCheckInViewSet(ViewSet):
