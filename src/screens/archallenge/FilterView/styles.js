@@ -1,5 +1,5 @@
-import { makeStyles } from '@rneui/themed'
-import { FontLineHeights, FontSizes, fontGroup } from '../../../util/FontUtils'
+import { makeStyles } from "@rneui/themed";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -9,24 +9,24 @@ import { FontLineHeights, FontSizes, fontGroup } from '../../../util/FontUtils'
 const useStyles = makeStyles(() => ({
   mainContainer: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
   buttonStyle: {
     height: 50,
   },
   buttonContainerStyle: {
     marginTop: 20,
-    width: '100%',
+    width: "100%",
   },
   pagerView: {
     flex: 1,
   },
   borderStyles: {
-    borderStyle: 'dashed',
-    borderColor: 'gray',
+    borderStyle: "dashed",
+    borderColor: "gray",
   },
   textStyles: {
-    color: '#fff',
+    color: "#fff",
     fontSize: FontSizes.S22,
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.ns700,
@@ -35,43 +35,43 @@ const useStyles = makeStyles(() => ({
     padding: 8,
     borderWidth: 1,
     borderRadius: 8,
-    backgroundColor: 'white',
-    borderColor: '#aaa',
+    backgroundColor: "white",
+    borderColor: "#aaa",
   },
   container: {
     flex: 1,
     padding: 24,
-    backgroundColor: 'white',
+    backgroundColor: "white",
   },
   contentContainer: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: "center",
   },
   locationText: {
-    color: '#fff',
-    fontSize: FontSizes.S22,
-    maxWidth: '95%',
-    textAlign: 'center',
+    color: "#fff",
+    fontSize: FontSizes.S10,
+    maxWidth: "95%",
+    textAlign: "center",
     ...fontGroup.giRegular,
   },
   filterTitleText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: FontSizes.S30,
     ...fontGroup.giBold,
-    textAlign: 'center',
+    textAlign: "center",
   },
   filterTextView: {
-    position: 'absolute',
+    position: "absolute",
     zIndex: 20,
     right: 0,
     left: 0,
-    alignItems: 'center',
+    alignItems: "center",
   },
   locationTextView: {
-    position: 'absolute',
+    position: "absolute",
     right: 0,
     left: 0,
-    alignItems: 'center',
+    alignItems: "center",
   },
   filterTextBottom: {
     bottom: 25,
@@ -86,28 +86,28 @@ const useStyles = makeStyles(() => ({
     top: 25,
   },
   appNameText: {
-    color: '#fff',
+    color: "#fff",
     fontSize: FontSizes.S14,
     ...fontGroup.giRegular,
-    textAlign: 'center',
+    textAlign: "center",
   },
   textFilterView: {
-    justifyContent: 'flex-start',
-    position: 'absolute',
+    justifyContent: "flex-start",
+    position: "absolute",
     top: 0,
     bottom: 0,
     left: 0,
     right: 0,
     gap: 2,
-    width: '100%',
-    height: '100%',
-    alignItems: 'center',
+    width: "100%",
+    height: "100%",
+    alignItems: "center",
     paddingVertical: 10,
   },
   imageFilterView: {
     width: 100,
     height: 100,
   },
-}))
+}));
 
-export default useStyles
+export default useStyles;

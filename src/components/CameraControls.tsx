@@ -128,6 +128,6 @@ const $instructionsContainer: ViewStyle = {
   justifyContent: "center",
   paddingTop: 4,
   paddingBottom: 10,
-  paddingHorizontal: 32,
+  paddingHorizontal: 16,
   gap: 8,
 };
