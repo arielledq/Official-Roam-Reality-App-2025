@@ -17,6 +17,7 @@ interface ShareToSocialsModalProps {
   onClose: () => void;
   fileUri: string;
   fileExt: string;
+  isMemory?: boolean;
 }
 
 const SSNN = {
@@ -26,10 +27,11 @@ const SSNN = {
 };
 
 const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
-  isVisible,
+  isVisible = false,
   onClose,
   fileUri,
   fileExt,
+  isMemory = false,
 }) => {
   const share = async (selectedSSNN: string) => {
     // If correctedCaptureData doesn't already have "file://" prefix, add it
@@ -91,7 +93,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
     }
-    if (hasShared) {
+    if (!isMemory && hasShared) {
       try {
         await socialPointsARUpdateAPI({
           social_network: selectedSSNN,

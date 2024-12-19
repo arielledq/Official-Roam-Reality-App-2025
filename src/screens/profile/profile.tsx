@@ -337,6 +337,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       challengeObj: challengeObj,
       captureData,
       hideBottomTab: true,
+      isMemory: true,
     });
   };
 

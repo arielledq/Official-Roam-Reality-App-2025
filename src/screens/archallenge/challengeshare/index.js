@@ -21,14 +21,21 @@ import theme from "assets/theme";
 import { CHALLENGES_TYPE } from "constants";
 import ShareToSocialsModal from "components/ShareToSocialsModal";
 
+function getFileExtension(url) {
+  // Use a regular expression to find the file extension
+  const match = url.match(/\.([a-zA-Z0-9]+)(?=\?|$)/);
+  // Return the extension with a dot or an empty string if not found
+  return match ? `.${match[1]}` : "";
+}
+
 const ArChallengeShare = () => {
   const route = useRoute();
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
+  const isMemory = route?.params?.isMemory;
 
   let screenTitle = "";
-  let selectedGeoSite;
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
@@ -43,10 +50,10 @@ const ArChallengeShare = () => {
   const startDate = moment().format("MM-DD-YYYY");
 
   const navigation = useNavigation();
-  const capturedDataUri = `file://${captureData}`;
+  const capturedDataUri = isMemory ? captureData : `file://${captureData}`;
 
-  const filePath = capturedDataUri.split("?")[0];
-  const fileExt = filePath.split(".").pop();
+  const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
+  const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop();
 
   const [isLoading, setIsLoading] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
@@ -95,9 +102,11 @@ const ArChallengeShare = () => {
           break;
 
         case CHALLENGES_TYPE.PIN_CHECK_IN:
-          formData.append("challenges", challengeObj.id);
-          formData.append("geo_site", selectedGeoSite?.geo_site?.id);
-          formData.append("check_in_image", shareFile);
+          formData.append("geo_challenge", challengeObj.id);
+          formData.append("geo_site", challengeObj?.geo_site?.id);
+          formData.append("memory_file", shareFile);
+
+          // console.log(JSON.stringify(formData, null, 2));
 
           res = await postGeoPinCheckIn(formData);
           break;
@@ -179,7 +188,7 @@ const ArChallengeShare = () => {
                 margin: 0,
               }}
             >
-              {challengeObj.points}
+              {challengeObj?.points}
             </AppText>
             <AppText
               style={{
@@ -275,15 +284,17 @@ const ArChallengeShare = () => {
           </View>
 
           {/* Completition date */}
-          <Text
-            style={{
-              ...fontGroup.p300,
-              fontSize: FontSizes.S10,
-              color: theme.lightColors.white,
-            }}
-          >
-            Completed on: {startDate}
-          </Text>
+          {!isMemory && (
+            <Text
+              style={{
+                ...fontGroup.p300,
+                fontSize: FontSizes.S10,
+                color: theme.lightColors.white,
+              }}
+            >
+              Completed on: {startDate}
+            </Text>
+          )}
         </View>
 
         <View
@@ -294,16 +305,18 @@ const ArChallengeShare = () => {
             alignItems: "center",
           }}
         >
-          <Text
-            style={{
-              flex: 1,
-              fontSize: FontSizes.S12,
-              color: theme.lightColors.grey,
-            }}
-          >
-            Must share to at least one social media platform to earn any points. Users earn one
-            additional point per social platform.
-          </Text>
+          {!isMemory && (
+            <Text
+              style={{
+                flex: 1,
+                fontSize: FontSizes.S12,
+                color: theme.lightColors.grey,
+              }}
+            >
+              Must share to at least one social media platform to earn any points. Users earn one
+              additional point per social platform.
+            </Text>
+          )}
 
           <View
             style={{
@@ -311,6 +324,7 @@ const ArChallengeShare = () => {
               alignItems: "center",
               justifyContent: "space-between",
               gap: 16,
+              marginTop: isMemory ? 16 : 0,
             }}
           >
             {/* Share to socials button */}
@@ -344,19 +358,22 @@ const ArChallengeShare = () => {
           </View>
         </View>
 
-        <AppButton
-          onPress={endShareProfileButtonHandler}
-          buttonStyle={{ height: 55 }}
-          containerStyle={{}}
-          title={"End & Share to Roam Profile"}
-          loading={isLoading}
-        />
+        {!isMemory && (
+          <AppButton
+            onPress={endShareProfileButtonHandler}
+            buttonStyle={{ height: 55 }}
+            containerStyle={{}}
+            title={"End & Share to Roam Profile"}
+            loading={isLoading}
+          />
+        )}
       </View>
 
       <ShareToSocialsModal
         fileUri={filePath}
         fileExt={fileExt}
         isVisible={shareToSocialsIsOpen}
+        isMemory={isMemory}
         onClose={closeShareToSocialMediaButtonHandler}
       />
     </ChallengeScreen>
