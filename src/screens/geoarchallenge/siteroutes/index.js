@@ -25,16 +25,19 @@ import { GeolocationContext } from "../../../GeolocationProvider";
 
 const GeoArSiteRoutes = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
-  const navigation = useNavigation();
-  const mapView = useRef();
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  const { userLocation } = useContext(GeolocationContext);
-  const latitude = userLocation?.latitude;
-  const longitude = userLocation?.longitude;
   const [mileDistance, setMileDistance] = useState(0);
   const [durationMins, setDurationMins] = useState(0);
   const [walkDurationMins, setWalkDurationMins] = useState(0);
   const [routes, setRoutes] = useState(0);
+
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const { userLocation } = useContext(GeolocationContext);
+
+  const navigation = useNavigation();
+  const mapView = useRef();
+
+  const latitude = userLocation?.latitude;
+  const longitude = userLocation?.longitude;
 
   const starChallengeObj = route.params?.starsChallenge;
   const isStarChallenge = !!starChallengeObj?.id;
@@ -100,19 +103,19 @@ const GeoArSiteRoutes = ({ route }) => {
   };
 
   if (isStarChallenge) {
-    isStarChallenge = "Navigate to the Star";
+    screenTitle = "Navigate to the Star";
     regionCoordinates = {
-      lat: starsChallenge?.location?.coordinates[1],
-      lon: starsChallenge?.location?.coordinates[0],
+      lat: starChallengeObj?.location?.coordinates[1],
+      lon: starChallengeObj?.location?.coordinates[0],
     };
     markerSiteData = {
-      lat: starsChallenge?.location?.coordinates[1],
-      lon: starsChallenge?.location?.coordinates[0],
+      lat: starChallengeObj?.location?.coordinates[1],
+      lon: starChallengeObj?.location?.coordinates[0],
       title: "",
       icon: <MarkerIcon />, // TODO: Update to a cicle icon
     };
   } else {
-    isStarChallenge = selectedGeoSite.name;
+    screenTitle = selectedGeoSite.name;
     regionCoordinates = {
       lat: selectedGeoSite.lat_long.coordinates[1],
       lon: selectedGeoSite.lat_long.coordinates[0],
@@ -141,6 +144,42 @@ const GeoArSiteRoutes = ({ route }) => {
     initialRegion.latitude = Number(full_latitude_longitude.latitude);
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
+
+  const renderMapViewDirections = mode => {
+    return (
+      <MapViewDirections
+        origin={{
+          latitude: latitude,
+          longitude: longitude,
+        }}
+        precision={"high"}
+        timePrecision={"now"}
+        mode={mode}
+        destination={{
+          latitude: regionCoordinates.lat,
+          longitude: regionCoordinates.lon,
+        }}
+        apikey={Strings.GOOGLE_PLACE_API_KEY}
+        strokeWidth={mode === "DRIVING" ? 3 : 0}
+        strokeColor="hotpink"
+        optimizeWaypoints={true}
+        onReady={result => {
+          if (mode === "DRIVING") {
+            setMileDistance(convertKilometersToMiles(result.distance));
+            setDurationMins(result.duration);
+            setRoutes(1);
+          } else {
+            setWalkDurationMins(result.duration);
+            setRoutes(1);
+          }
+        }}
+        onError={errorMessage => {
+          console.error("GOT AN ERROR", errorMessage);
+          setRoutes(0);
+        }}
+      />
+    );
+  };
 
   useEffect(() => {
     if (!!userLocation?.latitude && !!userLocation?.longitude) setIsLoading(false);
@@ -175,74 +214,22 @@ const GeoArSiteRoutes = ({ route }) => {
             </Marker>
 
             {latitude && longitude && (
-              <Marker
-                coordinate={{
-                  latitude: latitude,
-                  longitude: longitude,
-                }}
-                title={"Current Location"}
-              >
-                <View style={styles.markerIconContainer}>
-                  <MarkerIcon />
-                </View>
-              </Marker>
-            )}
-            {latitude && longitude && (
-              <MapViewDirections
-                origin={{
-                  latitude: latitude,
-                  longitude: longitude,
-                }}
-                precision={"high"}
-                timePrecision={"now"}
-                mode={"DRIVING"}
-                destination={{
-                  latitude: regionCoordinates.lat,
-                  longitude: regionCoordinates.lon,
-                }}
-                apikey={Strings.GOOGLE_PLACE_API_KEY}
-                strokeWidth={3}
-                strokeColor="hotpink"
-                optimizeWaypoints={true}
-                onStart={params => {}}
-                onReady={result => {
-                  setMileDistance(convertKilometersToMiles(result.distance));
-                  setDurationMins(result.duration);
-                  setRoutes(1);
-                }}
-                onError={errorMessage => {
-                  console.error("GOT AN ERROR", errorMessage);
-                  setRoutes(0);
-                }}
-              />
-            )}
-            {latitude && longitude && (
-              <MapViewDirections
-                origin={{
-                  latitude: latitude,
-                  longitude: longitude,
-                }}
-                precision={"high"}
-                timePrecision={"now"}
-                mode={"WALKING"}
-                destination={{
-                  latitude: regionCoordinates.lat,
-                  longitude: regionCoordinates.lon,
-                }}
-                apikey={Strings.GOOGLE_PLACE_API_KEY}
-                strokeWidth={0}
-                strokeColor="hotpink"
-                optimizeWaypoints={true}
-                onStart={params => {}}
-                onReady={result => {
-                  setWalkDurationMins(result.duration);
-                  setRoutes(1);
-                }}
-                onError={errorMessage => {
-                  console.error("GOT AN ERROR", errorMessage);
-                  setRoutes(0);
-                }}
-              />
+              <>
+                <Marker
+                  coordinate={{
+                    latitude: latitude,
+                    longitude: longitude,
+                  }}
+                  title={"Current Location"}
+                >
+                  <View style={styles.markerIconContainer}>
+                    <MarkerIcon />
+                  </View>
+                </Marker>
+
+                {renderMapViewDirections("DRIVING")}
+                {renderMapViewDirections("WALKING")}
+              </>
             )}
           </MapView>
         </View>
@@ -281,7 +268,12 @@ const GeoArSiteRoutes = ({ route }) => {
           </View>
           <View style={styles.buttonContainer}>
             <AppButton
-              onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "driving" })}
+              onPress={() =>
+                navigation.navigate("GeoArSiteNavigation", {
+                  mapMode: "driving",
+                  starsChallenge: starsChallenge,
+                })
+              }
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
               title={"Drive To Location"}
@@ -290,7 +282,12 @@ const GeoArSiteRoutes = ({ route }) => {
           </View>
           <View style={styles.buttonContainer}>
             <AppButton
-              onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "walking" })}
+              onPress={() =>
+                navigation.navigate("GeoArSiteNavigation", {
+                  mapMode: "walking",
+                  starsChallenge: starsChallenge,
+                })
+              }
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
               title={"Walk to Location"}
