@@ -32,6 +32,7 @@ module.exports = {
           screens: "./src/screens",
           util: "./src/util",
           config: "./src/config",
+          network: "./src/network",
         },
       },
     ],
