@@ -18,6 +18,7 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARUserProfile
         fields = (
+            "id",
             "points",
             "check_ins",
             "challenge_completed",
@@ -32,6 +33,7 @@ class SponsorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Sponsor
         fields = (
+            "id",
             "name",
             "image",
             "created_at",
@@ -43,6 +45,7 @@ class SettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARSettings
         fields = (
+            "id",
             "waiver_details",
         )
 
@@ -51,13 +54,13 @@ class ExampleImageSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ARExampleImage
-        fields = ['ar_example', 'image',]
+        fields = ["id", 'ar_example', 'image',]
 
 
 class ExampleVideoSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARExampleVideo
-        fields = ["ar_example", "video_file",]
+        fields = ["id", "ar_example", "video_file",]
 
 
 class ExamplesSerializer(serializers.ModelSerializer):
@@ -66,7 +69,7 @@ class ExamplesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ARExample
-        fields = ["name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
+        fields = ["id", "name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
 
 
 class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
@@ -74,6 +77,7 @@ class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARChallengeParameterSettings
         fields = (
+            "id",
             "name",
             "bloom_threshold",
             "bloom_intensity",
@@ -107,6 +111,7 @@ class ARChallengeFiltersSerializer(TaggitSerializer, serializers.ModelSerializer
     class Meta:
         model = ARChallengeFilters
         fields = (
+            "id",
             "name",
             "image",
             "text_form_image",
@@ -173,7 +178,7 @@ class ChallengesUploadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Challenges
-        fields = ("image", "model_file")
+        fields = ("id", "image", "model_file")
 
 
 class ARMemoriesSerializerGet(serializers.ModelSerializer):
@@ -202,6 +207,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARMemories
         fields = (
+            "id",
             "memory_file",
             "thumbnail_memory_video_file",
             "description",
@@ -252,6 +258,7 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
         model = UniqueChallengeSite
         geo_field = 'latitude_longitude'
         fields = (
+            "id",
             "name",
             "geo_location",
             "challenge",
@@ -268,6 +275,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
         model = GeoArSite
         geo_field = ('lat_long', 'geo_site_area',)
         fields = (
+            "id",
             "name",
             "image",
             "created_at",
@@ -291,6 +299,7 @@ class GeoRegionSerializer(GeoModelSerializer):
         model = GeoRegion
         geo_field = ('latitude_longitude',)
         fields = (
+            "id",
             "created_at",
             "updated_at",
             "name",
@@ -308,6 +317,7 @@ class GeoLocationSerializer(GeoModelSerializer):
         model = GeoLocation
         geo_field = 'geo_location'
         fields = (
+            "id",
             "created_at",
             "updated_at",
             "name",
@@ -331,6 +341,7 @@ class GeoStarSerializer(GeoModelSerializer):
         model = GeoARStar
         # geo_field = 'star_location'
         fields = (
+            "id",
             "name",
             "fun_facts",
             "info",
@@ -352,9 +363,13 @@ class GeoStarPointSerializer(GeoModelSerializer):
         model = GeoARStarPoint
         geo_field = 'location'
         fields = (
+            "id",
             "geo_ar_star",
             "location",
             "order",
+            "remaining_stars",
+            "captured_stars",
+            "total_stars",
         )
 
     def get_remaining_stars(self, instance):
@@ -381,6 +396,7 @@ class StarCollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = StarCollection
         fields = (
+            "id",
             "name",
             "geo_site",
             "geo_ar_star",
@@ -397,6 +413,7 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     class Meta:
         model = ARSitePinCheckIn
         fields = (
+            "id",
             "geo_site",
             "user",
             "memory_file",
@@ -414,6 +431,7 @@ class GoldStarCollectionSerializer(serializers.ModelSerializer):
     class Meta:
         model = GeoARGoldStar
         fields = (
+            "id",
             "name",
             "image",
             "star_location",
@@ -432,6 +450,7 @@ class DestinationFactsSerializer(serializers.ModelSerializer):
     class Meta:
         model = DestinationFacts
         fields = (
+            "id",
             "name",
             "image",
             "facts",
@@ -448,6 +467,7 @@ class PanicMessageSerializer(GeoModelSerializer):
         model = PanicMessage
         geo_field = 'location'
         fields = (
+            "id",
             "user",
             "message",
             "created_at",
