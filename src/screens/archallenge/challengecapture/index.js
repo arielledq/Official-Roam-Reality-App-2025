@@ -698,7 +698,7 @@ const ArChallengeCapture = ({}) => {
   );
 
   return (
-    <ChallengeScreen title="AR Photo Challenges" modals={modals}>
+    <ChallengeScreen title="AR Challenges" modals={modals}>
       <ChallengeFoundCaptureHeader
         leftTitle="AR Challenges"
         challengeFound

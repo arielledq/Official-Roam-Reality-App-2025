@@ -3,7 +3,7 @@ import Images from "../assets/images";
 export const HomeScreenData = [
   {
     id: 1,
-    title: "AR Photo",
+    title: "AR",
     title1: "Challenges",
     subtitle: "Photo/Video Contests, Event Filters and other Marker-Less AR experiences.",
     image: Images.Home,

@@ -73,7 +73,8 @@ const GeoArSiteArrived = ({}) => {
             </Marker>
           </MapView>
         </View>
-        <View
+        <TouchableOpacity
+          onPress={() => navigation.navigate("ChallengeSelection")}
           style={{
             backgroundColor: "#131422",
             borderRadius: 16,
@@ -92,10 +93,10 @@ const GeoArSiteArrived = ({}) => {
               to Geo-Check in anywhere you go!
             </Text>
           </View>
-          <TouchableOpacity onPress={() => navigation.navigate("ChallengeSelection")}>
+          <View>
             <MoveForwardIcon style={{ width: 56, height: 56 }} />
-          </TouchableOpacity>
-        </View>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
     </BackgroundWithImage>
   );
