@@ -1,5 +1,12 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+} from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useNavigation } from "@react-navigation/native";
@@ -7,7 +14,6 @@ import CarIcon from "../../../assets/geoar/car.svg";
 import RoadIcon from "../../../assets/geoar/road.svg";
 import TimeIcon from "../../../assets/geoar/time.svg";
 import { useSelector } from "react-redux";
-import useStyles from "./styles";
 import { AppButton } from "../../../components";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
@@ -17,8 +23,7 @@ import Strings from "../../../constants/Strings";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import { GeolocationContext } from "../../../GeolocationProvider";
 
-const GeoArSiteRoutes = ({}) => {
-  const _styles = useStyles();
+const GeoArSiteRoutes = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const navigation = useNavigation();
   const mapView = useRef();
@@ -31,7 +36,10 @@ const GeoArSiteRoutes = ({}) => {
   const [walkDurationMins, setWalkDurationMins] = useState(0);
   const [routes, setRoutes] = useState(0);
 
-  const getFullBounds = _ => {
+  const starChallengeObj = route.params?.starsChallenge;
+  const isStarChallenge = !!starChallengeObj?.id;
+
+  const getFullBounds = () => {
     if (selectedGeoSite.geo_site_border) {
       let arrayPoints = [];
       for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
@@ -48,7 +56,7 @@ const GeoArSiteRoutes = ({}) => {
     }
   };
 
-  const getFullCenter = _ => {
+  const getFullCenter = () => {
     if (selectedGeoSite.geo_site_border) {
       let arrayPoints = [];
       for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
@@ -69,18 +77,53 @@ const GeoArSiteRoutes = ({}) => {
     if (walkDurationMins < 60) {
       return (
         <>
-          {Math.round(walkDurationMins)} <Text style={{ fontSize: 10 }}>mins ({mode})</Text>
+          {Math.round(walkDurationMins)} <Text style={styles.durationText}>mins ({mode})</Text>
         </>
       );
     } else if (walkDurationMins >= 60) {
       var hours = Math.floor(walkDurationMins / 60);
       return (
         <>
-          {Math.round(hours)} <Text style={{ fontSize: 10 }}>hours ({mode})</Text>
+          {Math.round(hours)} <Text style={styles.durationText}>hours ({mode})</Text>
         </>
       );
     }
   };
+
+  let screenTitle = "";
+  let regionCoordinates = { lat: 0, lon: 0 };
+  let markerSiteData = {
+    lat: 0,
+    lon: 0,
+    title: "",
+    icon: null,
+  };
+
+  if (isStarChallenge) {
+    isStarChallenge = "Navigate to the Star";
+    regionCoordinates = {
+      lat: starsChallenge?.location?.coordinates[1],
+      lon: starsChallenge?.location?.coordinates[0],
+    };
+    markerSiteData = {
+      lat: starsChallenge?.location?.coordinates[1],
+      lon: starsChallenge?.location?.coordinates[0],
+      title: "",
+      icon: <MarkerIcon />, // TODO: Update to a cicle icon
+    };
+  } else {
+    isStarChallenge = selectedGeoSite.name;
+    regionCoordinates = {
+      lat: selectedGeoSite.lat_long.coordinates[1],
+      lon: selectedGeoSite.lat_long.coordinates[0],
+    };
+    markerSiteData = {
+      lat: selectedGeoSite.lat_long.coordinates[1],
+      lon: selectedGeoSite.lat_long.coordinates[0],
+      title: selectedGeoSite.name,
+      icon: <MarkerIcon />,
+    };
+  }
 
   const initialRegion = {
     latitude: selectedGeoSite.lat_long.coordinates[1],
@@ -104,41 +147,31 @@ const GeoArSiteRoutes = ({}) => {
   }, [userLocation?.latitude, userLocation?.longitude]);
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
+    <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: selectedGeoSite.name,
-          style: [_styles.heading],
+          text: screenTitle,
+          style: styles.heading,
         }}
         backgroundColor="transparent"
       />
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        <View
-          style={{
-            width: "100%",
-            position: "relative",
-            height: 292,
-            borderRadius: 16,
-            overflow: "hidden",
-          }}
-        >
+        <View style={styles.mapContainer}>
           <MapView
             provider={PROVIDER_GOOGLE}
             ref={mapView}
-            style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
+            style={styles.map}
             initialRegion={initialRegion}
           >
             <Marker
               coordinate={{
-                latitude: selectedGeoSite.lat_long.coordinates[1],
-                longitude: selectedGeoSite.lat_long.coordinates[0],
+                latitude: markerSiteData.lat,
+                longitude: markerSiteData.lon,
               }}
-              title={selectedGeoSite.name}
+              title={markerSiteData.title}
             >
-              <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
-              </View>
+              <View style={styles.markerIconContainer}>{markerSiteData.icon}</View>
             </Marker>
 
             {latitude && longitude && (
@@ -149,7 +182,7 @@ const GeoArSiteRoutes = ({}) => {
                 }}
                 title={"Current Location"}
               >
-                <View style={{ width: 30, height: 30 }}>
+                <View style={styles.markerIconContainer}>
                   <MarkerIcon />
                 </View>
               </Marker>
@@ -164,8 +197,8 @@ const GeoArSiteRoutes = ({}) => {
                 timePrecision={"now"}
                 mode={"DRIVING"}
                 destination={{
-                  latitude: selectedGeoSite.lat_long.coordinates[1],
-                  longitude: selectedGeoSite.lat_long.coordinates[0],
+                  latitude: regionCoordinates.lat,
+                  longitude: regionCoordinates.lon,
                 }}
                 apikey={Strings.GOOGLE_PLACE_API_KEY}
                 strokeWidth={3}
@@ -193,8 +226,8 @@ const GeoArSiteRoutes = ({}) => {
                 timePrecision={"now"}
                 mode={"WALKING"}
                 destination={{
-                  latitude: selectedGeoSite.lat_long.coordinates[1],
-                  longitude: selectedGeoSite.lat_long.coordinates[0],
+                  latitude: regionCoordinates.lat,
+                  longitude: regionCoordinates.lon,
                 }}
                 apikey={Strings.GOOGLE_PLACE_API_KEY}
                 strokeWidth={0}
@@ -214,63 +247,52 @@ const GeoArSiteRoutes = ({}) => {
           </MapView>
         </View>
 
-        <View
-          style={{
-            flexDirection: "row",
-            paddingVertical: 20,
-            justifyContent: "space-between",
-            alignItems: "center",
-          }}
-        >
-          <Text style={_styles.site_d_header_text}>Routes</Text>
+        <View style={styles.routesContainer}>
+          <Text style={styles.siteHeader}>Routes</Text>
           <TouchableOpacity>
-            <Text style={_styles.site_d_header_number_text}>{routes}</Text>
+            <Text style={styles.routesCount}>{routes}</Text>
           </TouchableOpacity>
         </View>
 
-        <View
-          style={{ backgroundColor: "#131422", borderRadius: 16, padding: 20, marginBottom: 20 }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <CarIcon style={{ width: 32, height: 32 }} />
-            <View style={{ marginHorizontal: 20, justifyContent: "flex-start" }}>
-              <Text style={_styles.site_via_text}>Route Available</Text>
-              <Text style={_styles.site_via_des_text}>
+        <View style={styles.routeDetailsContainer}>
+          <View style={styles.routeRow}>
+            <CarIcon style={styles.icon} />
+            <View style={styles.routeTextContainer}>
+              <Text style={styles.routeTitle}>Route Available</Text>
+              <Text style={styles.routeDescription}>
                 Fastest route now due to traffic conditions
               </Text>
             </View>
           </View>
-          <View
-            style={{ flexDirection: "row", alignItems: "center", marginTop: 15, marginBottom: 10 }}
-          >
-            <RoadIcon style={{ width: 20, height: 20 }} />
-            <Text style={_styles.site_distance_time_text}>Distance</Text>
-            <Text style={_styles.site_distance_time_value_text}>
-              {mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text>
+          <View style={styles.distanceRow}>
+            <RoadIcon style={styles.smallIcon} />
+            <Text style={styles.distanceLabel}>Distance</Text>
+            <Text style={styles.distanceValue}>
+              {mileDistance.toFixed(2)} <Text style={styles.distanceUnit}>miles</Text>
             </Text>
           </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <TimeIcon style={{ width: 20, height: 20 }} />
-            <Text style={_styles.site_distance_time_text}>Est. Time</Text>
-            <Text style={_styles.site_distance_time_value_text}>
+          <View style={styles.distanceRow}>
+            <TimeIcon style={styles.smallIcon} />
+            <Text style={styles.distanceLabel}>Est. Time</Text>
+            <Text style={styles.distanceValue}>
               {minOrHoursWalkDriving(durationMins, "Drive")} /{" "}
               {minOrHoursWalkDriving(walkDurationMins, "Walk")}
             </Text>
           </View>
-          <View style={{ justifyContent: "space-between", width: "100%", marginTop: 20 }}>
+          <View style={styles.buttonContainer}>
             <AppButton
               onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "driving" })}
-              buttonStyle={_styles.buttonStyle}
-              containerStyle={_styles.buttonContainerStyle}
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
               title={"Drive To Location"}
               loading={isLoading}
             />
           </View>
-          <View style={{ justifyContent: "space-between", width: "100%", marginTop: 20 }}>
+          <View style={styles.buttonContainer}>
             <AppButton
               onPress={() => navigation.navigate("GeoArSiteNavigation", { mapMode: "walking" })}
-              buttonStyle={_styles.buttonStyle}
-              containerStyle={_styles.buttonContainerStyle}
+              buttonStyle={styles.buttonStyle}
+              containerStyle={styles.buttonContainerStyle}
               title={"Walk to Location"}
               loading={isLoading}
             />
@@ -282,3 +304,125 @@ const GeoArSiteRoutes = ({}) => {
 };
 
 export default GeoArSiteRoutes;
+
+const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+    paddingHorizontal: 20,
+    justifyContent: "flex-start",
+  },
+  heading: {
+    fontSize: 20,
+    lineHeight: 25,
+    fontWeight: "700",
+    color: "#fff",
+    marginTop: 5,
+    textAlign: "center",
+  },
+  mapContainer: {
+    width: "100%",
+    position: "relative",
+    height: 292,
+    borderRadius: 16,
+    overflow: "hidden",
+  },
+  map: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0,
+  },
+  markerIconContainer: {
+    width: 30,
+    height: 30,
+  },
+  routesContainer: {
+    flexDirection: "row",
+    paddingVertical: 20,
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  siteHeader: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#fff",
+    textAlign: "center",
+  },
+  routesCount: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: "#C881F0",
+    textAlign: "center",
+  },
+  routeDetailsContainer: {
+    backgroundColor: "#131422",
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 20,
+  },
+  routeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  routeTextContainer: {
+    marginHorizontal: 20,
+    justifyContent: "flex-start",
+  },
+  routeTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#fff",
+  },
+  routeDescription: {
+    fontSize: 10,
+    fontWeight: "400",
+    color: "#C8DFFF",
+  },
+  distanceRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginTop: 15,
+    marginBottom: 10,
+  },
+  smallIcon: {
+    width: 20,
+    height: 20,
+  },
+  distanceLabel: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: "#fff",
+    marginHorizontal: 8,
+  },
+  distanceValue: {
+    fontSize: 14,
+    fontWeight: "400",
+    color: "#C881F0",
+    marginHorizontal: 8,
+  },
+  distanceUnit: {
+    fontSize: 10,
+    fontWeight: "400",
+  },
+  buttonContainer: {
+    justifyContent: "space-between",
+    width: "100%",
+    marginTop: 20,
+  },
+  buttonStyle: {
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 10,
+  },
+  buttonContainerStyle: {
+    width: "100%",
+  },
+  durationText: {
+    fontSize: 10,
+  },
+});
