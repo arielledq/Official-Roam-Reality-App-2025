@@ -166,9 +166,6 @@ const GeoArSiteNavigation = () => {
       }
     }
 
-    // console.log('closestCoordinate ==> ', closestCoordinate['coordinates'])
-    // console.log('closestDistance ==> ', closestDistance)
-
     if (closestCoordinate && closestDistance <= 10) {
       closestCoordinate.visited = true;
     }
@@ -187,8 +184,6 @@ const GeoArSiteNavigation = () => {
       nextCoordinate["coordinates"][0]
     );
 
-    // console.log('distanceToPath ==> ', distanceToPath)
-
     if (nextCoordinateRef.current === null || nextCoordinateRef.current !== nextCoordinate) {
       nextCoordinateDistance.current = 0;
     }
@@ -198,8 +193,6 @@ const GeoArSiteNavigation = () => {
       nextCoordinateRef.current = nextCoordinate;
       return false;
     }
-
-    // console.log('d - n ==> ', distanceToPath - nextCoordinateDistance.current)
 
     if (distanceToPath < nextCoordinateDistance.current) {
       nextCoordinateDistance.current = distanceToPath;
@@ -212,8 +205,6 @@ const GeoArSiteNavigation = () => {
     ) {
       nextCoordinateDistance.current = 0;
       nextCoordinateRef.current = null;
-      // console.log('nextCoordinate ==> ', nextCoordinate['coordinates'])
-      // console.log('path ==> ', path)
       return true;
     }
     return false;
@@ -243,7 +234,6 @@ const GeoArSiteNavigation = () => {
     }
 
     if (isOffRoute(position.coords, currentPathRef.current, threshold)) {
-      // console.log('=========> Off route')
       setOriginMap([position.coords.longitude, position.coords.latitude]);
       const heading = calculateBearing(
         position.coords.latitude,
@@ -261,8 +251,6 @@ const GeoArSiteNavigation = () => {
     }
 
     const nextCoordinate = findNextCoordinate(position.coords, currentPathRef.current);
-
-    // console.log('nextCoordinate ==> ', nextCoordinate)
 
     if (nextCoordinate && nextCoordinateS !== nextCoordinate) {
       setNextCoordinateS(nextCoordinate);

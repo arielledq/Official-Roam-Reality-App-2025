@@ -74,7 +74,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     getARChallenges()
       .then(res => {
         if (res.status == 1) {
-          console.log(JSON.stringify(res?.data, null, 2));
           setNumberOfChallenges(res?.data?.length);
         } else {
           res.message.message = "Error in loading Challenges.";
