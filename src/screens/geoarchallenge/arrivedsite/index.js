@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-
 import {
   ActivityIndicator,
   Platform,
@@ -8,21 +7,37 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import BackgroundWithImage from "../../../components/background";
-import AppHeader from "../../../components/header";
-import MoveForwardIcon from "../../../assets/geoar/large-step.svg";
-import { useSelector } from "react-redux";
-import useStyles from "./styles";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
-import { useNavigation } from "@react-navigation/native";
-import MarkerIcon from "../../../assets/geoar/marker_img.svg";
-import mapCustomStyle from "../../../constants/MapCustomStyles";
 
-const GeoArSiteArrived = ({}) => {
-  const _styles = useStyles();
+import { useSelector } from "react-redux";
+import { useNavigation } from "@react-navigation/native";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+
+import AppHeader from "../../../components/header";
+import mapCustomStyle from "../../../constants/MapCustomStyles";
+import BackgroundWithImage from "../../../components/background";
+
+import MoveForwardIcon from "../../../assets/geoar/large-step.svg";
+import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+
+import useStyles from "./styles";
+
+const GeoArSiteArrived = ({ route }) => {
   const [isLoading, setIsLoading] = useState(false);
-  const navigation = useNavigation();
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+
+  const _styles = useStyles();
+  const navigation = useNavigation();
+
+  const starChallengeObj = route.params?.starsChallenge;
+  const isStarChallenge = !!starChallengeObj?.id;
+
+  const arrivedButtonHandler = () => {
+    if (isStarChallenge) {
+      navigation.navigate("StarChallenge", { starChallenge: starChallengeObj });
+    } else {
+      navigation.navigate("ChallengeSelection");
+    }
+  };
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -74,7 +89,7 @@ const GeoArSiteArrived = ({}) => {
           </MapView>
         </View>
         <TouchableOpacity
-          onPress={() => navigation.navigate("ChallengeSelection")}
+          onPress={arrivedButtonHandler}
           style={{
             backgroundColor: "#131422",
             borderRadius: 16,
@@ -88,10 +103,12 @@ const GeoArSiteArrived = ({}) => {
           <View style={{ flex: 1, marginEnd: 12 }}>
             <Text style={_styles.arrivedText}>Arrived</Text>
             <Text style={_styles.exploringText}>Begin exploring</Text>
-            <Text style={_styles.infoText}>
-              Explore with your camera to find Augmented Reality Experiences at this site! Remember
-              to Geo-Check in anywhere you go!
-            </Text>
+            {!isStarChallenge && (
+              <Text style={_styles.infoText}>
+                Explore with your camera to find Augmented Reality Experiences at this site!
+                Remember to Geo-Check in anywhere you go!
+              </Text>
+            )}
           </View>
           <View>
             <MoveForwardIcon style={{ width: 56, height: 56 }} />

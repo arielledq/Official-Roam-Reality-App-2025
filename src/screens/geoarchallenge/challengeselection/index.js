@@ -57,7 +57,7 @@ const HomeScreenData = [
   },
 ];
 
-const ChallengeSelection = ({ route }) => {
+const ChallengeSelection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
   const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
@@ -93,11 +93,6 @@ const ChallengeSelection = ({ route }) => {
   };
 
   const getNextStar = async () => {
-    // if (!selectedGeoARSiteStars?.length) {
-    //   setStarsChallenge(null);
-    //   return;
-    // }
-
     try {
       const params = {
         geo_site_id: selectedGeoSite.id,
@@ -106,7 +101,6 @@ const ChallengeSelection = ({ route }) => {
         lon: longitude,
       };
       const response = await getNextStarApi(params);
-      console.log("getNextStar", JSON.stringify(response, null, 2));
       if (response?.id) {
         setStarsChallenge(response);
       } else {
@@ -211,8 +205,6 @@ const ChallengeSelection = ({ route }) => {
       getNextStar();
     }
   }, [isFocused]);
-
-  console.log("rendering...");
 
   return (
     <View style={styles.mainContainer}>

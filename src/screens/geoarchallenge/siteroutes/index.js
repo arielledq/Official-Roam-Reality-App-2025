@@ -271,7 +271,7 @@ const GeoArSiteRoutes = ({ route }) => {
               onPress={() =>
                 navigation.navigate("GeoArSiteNavigation", {
                   mapMode: "driving",
-                  starsChallenge: starsChallenge,
+                  starsChallenge: starChallengeObj,
                 })
               }
               buttonStyle={styles.buttonStyle}
@@ -285,7 +285,7 @@ const GeoArSiteRoutes = ({ route }) => {
               onPress={() =>
                 navigation.navigate("GeoArSiteNavigation", {
                   mapMode: "walking",
-                  starsChallenge: starsChallenge,
+                  starsChallenge: starChallengeObj,
                 })
               }
               buttonStyle={styles.buttonStyle}
