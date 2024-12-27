@@ -1,53 +1,97 @@
-import React, { useState } from "react";
-
+import React, { useContext, useState } from "react";
 import { Image, Text, View } from "react-native";
-import BackgroundWithImage from "../../../components/background";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import AppText from "../../../components/text";
-import AppButton from "../../../components/button";
-import moment from "moment";
 
-import { getARProfile, postArMemory, postGeoPinCheckIn } from "../../../network";
-import { handleError, showMessage } from "../../../util/helpers";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import moment from "moment";
+// @ts-ignore
 import Video from "react-native-video";
 import { useDispatch } from "react-redux";
-import { updateARUserData } from "../../../redux/AR";
-
-import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
-import ChallengeScreen from "components/ChallengeScreen";
+import { RouteProp } from "@react-navigation/native";
+
+import {
+  getARProfile,
+  postArMemory,
+  postGeoPinCheckIn,
+  starFoundAndSaveApi,
+  getNextStar as getNextStarApi,
+} from "network";
 import { fontGroup, FontSizes } from "util/FontUtils";
-import theme from "assets/theme";
+import { handleError, showMessage } from "util/helpers";
+// @ts-ignore
 import { CHALLENGES_TYPE } from "constants";
+import { updateARUserData } from "../../redux/AR";
+
+import BackgroundWithImage from "components/background";
+import AppText from "components/text";
+import AppButton from "components/button";
+import ChallengeScreen from "components/ChallengeScreen";
 import ShareToSocialsModal from "components/ShareToSocialsModal";
 
-function getFileExtension(url) {
-  // Use a regular expression to find the file extension
+import theme from "assets/theme";
+// @ts-ignore
+import BGArShare from "assets/ar/bg-ar-share.png";
+import { GeolocationContext } from "GeolocationProvider";
+
+// Add this interface near the top of the file, after the imports
+interface ShareChallengeRouteParams {
+  challengeObj: any; // Replace 'any' with proper type if available
+  captureData: string;
+  challengeType: string;
+  isMemory: boolean;
+}
+
+function getFileExtension(url: string) {
   const match = url.match(/\.([a-zA-Z0-9]+)(?=\?|$)/);
-  // Return the extension with a dot or an empty string if not found
   return match ? `.${match[1]}` : "";
 }
 
 const ArChallengeShare = () => {
-  const route = useRoute();
+  // Update the route type
+  const route =
+    useRoute<RouteProp<{ ShareChallenge: ShareChallengeRouteParams }, "ShareChallenge">>();
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
   const isMemory = route?.params?.isMemory;
 
   let screenTitle = "";
+  let challengePoints = challengeObj?.points || 0;
+  let isStarChallenge = false;
+  let challengeTitle = `Congrats on completing the ${challengeObj?.sponsored?.name} AR Experience!`;
+  let sponsorImage = challengeObj?.sponsored?.image || "";
+  let sponsorName = challengeObj?.sponsored?.name || "";
+  let startDate = moment().format("MM-DD-YYYY");
+  let endChallengeButtonText = "End & Share to Roam Profile";
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
+      if (isMemory) startDate = "-";
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
+      if (isMemory) startDate = "-";
+      break;
+    case CHALLENGES_TYPE.STAR:
+      screenTitle = CHALLENGES_TYPE.STAR_TITLE;
+      isStarChallenge = true;
+
+      sponsorImage = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored?.image;
+      sponsorName = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored?.name;
+      if (isMemory) startDate = "-";
+      const remainingStars = challengeObj?.remaining_stars;
+      if (remainingStars > 1) {
+        challengePoints = "";
+        challengeTitle = "";
+        endChallengeButtonText = "Continue to the next Star";
+      } else {
+        challengePoints = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points;
+      }
       break;
 
     default:
       break;
   }
-  const startDate = moment().format("MM-DD-YYYY");
 
   const navigation = useNavigation();
   const capturedDataUri = isMemory ? captureData : `file://${captureData}`;
@@ -57,6 +101,8 @@ const ArChallengeShare = () => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
+
+  const { userLocation } = useContext(GeolocationContext);
 
   const dispatch = useDispatch();
 
@@ -72,11 +118,47 @@ const ArChallengeShare = () => {
       });
   };
 
-  const endExperience = () => {
+  const getNextStar = async () => {
+    try {
+      const params = {
+        geo_site_id: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+        // geo_site_id: selectedGeoARSiteStars[0]?.id,
+        lat: userLocation?.latitude,
+        lon: userLocation?.longitude,
+      };
+      const response = await getNextStarApi(params);
+      if (response?.id) {
+        return response;
+      } else {
+        return null;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const resetNavigation = () => {
     navigation.reset({
       index: 0,
+      // @ts-ignore
       routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
     });
+  };
+
+  const endExperience = async () => {
+    if (challengeType === CHALLENGES_TYPE.STAR) {
+      const remainingStars = challengeObj?.remaining_stars;
+
+      if (remainingStars > 1) {
+        const updatedChallengeObj = await getNextStar();
+        // @ts-ignore
+        navigation.navigate("GeoArSiteRoutes", { starsChallenge: updatedChallengeObj });
+      } else {
+        resetNavigation();
+      }
+    } else {
+      resetNavigation();
+    }
   };
 
   const endShareProfileButtonHandler = async () => {
@@ -92,6 +174,7 @@ const ArChallengeShare = () => {
     let res;
 
     try {
+      let successMessage = "Successfully, completed your challenge.";
       switch (challengeType) {
         case CHALLENGES_TYPE.PHOTO_VIDEO:
           formData.append("challenges", challengeObj.id);
@@ -106,9 +189,22 @@ const ArChallengeShare = () => {
           formData.append("geo_site", challengeObj?.geo_site?.id);
           formData.append("memory_file", shareFile);
 
-          // console.log(JSON.stringify(formData, null, 2));
-
           res = await postGeoPinCheckIn(formData);
+          break;
+        case CHALLENGES_TYPE.STAR:
+          res = await starFoundAndSaveApi({
+            geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+            geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
+            geo_ar_star_point: challengeObj?.id, // id de la estrella
+            latitude: userLocation?.latitude,
+            longitude: userLocation?.longitude,
+          });
+
+          const remainingStars = challengeObj?.remaining_stars;
+          if (remainingStars > 1) {
+            successMessage = "Success, continue to the next Star.";
+          }
+
           break;
 
         default:
@@ -118,7 +214,7 @@ const ArChallengeShare = () => {
       ARUserProfile();
 
       if (res.status === 1) {
-        showMessage("Successfully, completed your challenge.", "success", `${screenTitle} Share!`);
+        showMessage(successMessage, "success", `${screenTitle} Share!`);
         endExperience();
       } else {
         console.error("Success - Error al compartir el desafío:", res);
@@ -156,63 +252,68 @@ const ArChallengeShare = () => {
   return (
     <ChallengeScreen title={screenTitle}>
       <View style={{ flex: 1, paddingHorizontal: 32 }}>
-        <View style={{ flexDirection: "row", gap: 12 }}>
-          {/* Points box */}
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              borderRadius: 8,
-              backgroundColor: "transparent",
-              width: 55,
-              height: 55,
-            }}
-          >
-            <BackgroundWithImage
-              imageSource={BGArShare}
+        {challengeTitle && (
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            {/* Points box */}
+            <View
               style={{
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: 8,
                 backgroundColor: "transparent",
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-              }}
-            ></BackgroundWithImage>
-            <AppText
-              style={{
-                ...fontGroup.p900,
-                fontSize: FontSizes.S24,
-                color: theme.lightColors.white,
-                margin: 0,
+                width: 55,
+                height: 55,
               }}
             >
-              {challengeObj?.points}
-            </AppText>
+              <BackgroundWithImage
+                imageSource={BGArShare}
+                style={{
+                  backgroundColor: "transparent",
+                  position: "absolute",
+                  top: 0,
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                }}
+              ></BackgroundWithImage>
+              <AppText
+                style={{
+                  ...fontGroup.p900,
+                  fontWeight: "900",
+                  fontSize: FontSizes.S24,
+                  color: theme.lightColors?.white,
+                  margin: 0,
+                }}
+              >
+                {challengePoints}
+              </AppText>
+              <AppText
+                style={{
+                  ...fontGroup.p400,
+                  fontWeight: "400",
+                  fontSize: FontSizes.S10,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                Points
+              </AppText>
+            </View>
+
             <AppText
+              numberOfLines={3}
               style={{
-                ...fontGroup.p400,
-                fontSize: FontSizes.S10,
-                color: theme.lightColors.white,
+                ...fontGroup.ns900,
+                fontWeight: "900",
+                fontSize: FontSizes.S20,
+                color: theme.lightColors?.white,
+                flex: 1,
               }}
             >
-              Points
+              {challengeTitle}
             </AppText>
           </View>
-
-          <AppText
-            numberOfLines={3}
-            style={{
-              ...fontGroup.ns900,
-              fontSize: FontSizes.S20,
-              color: theme.lightColors.white,
-              flex: 1,
-            }}
-          >
-            Congrats on completing the {challengeObj?.sponsored?.name} AR Experience!
-          </AppText>
-        </View>
+        )}
 
         <View
           style={{
@@ -268,28 +369,27 @@ const ArChallengeShare = () => {
               justifyContent: "center",
             }}
           >
-            <Image
-              style={{ width: 20, height: 20, marginEnd: 8 }}
-              source={{ uri: challengeObj?.sponsored?.image }}
-            />
+            <Image style={{ width: 20, height: 20, marginEnd: 8 }} source={{ uri: sponsorImage }} />
             <Text
               style={{
                 ...fontGroup.p700,
+                fontWeight: "700",
                 fontSize: FontSizes.S20,
-                color: theme.lightColors.white,
+                color: theme.lightColors?.white,
               }}
             >
-              {challengeObj?.sponsored?.name}
+              {sponsorName}
             </Text>
           </View>
 
           {/* Completition date */}
-          {!isMemory && (
+          {!isMemory && challengeTitle && (
             <Text
               style={{
                 ...fontGroup.p300,
+                fontWeight: "300",
                 fontSize: FontSizes.S10,
-                color: theme.lightColors.white,
+                color: theme.lightColors?.white,
               }}
             >
               Completed on: {startDate}
@@ -310,7 +410,7 @@ const ArChallengeShare = () => {
               style={{
                 flex: 1,
                 fontSize: FontSizes.S12,
-                color: theme.lightColors.grey,
+                color: theme.lightColors?.grey,
               }}
             >
               Must share to at least one social media platform to earn any points. Users earn one
@@ -363,7 +463,7 @@ const ArChallengeShare = () => {
             onPress={endShareProfileButtonHandler}
             buttonStyle={{ height: 55 }}
             containerStyle={{}}
-            title={"End & Share to Roam Profile"}
+            title={endChallengeButtonText}
             loading={isLoading}
           />
         )}

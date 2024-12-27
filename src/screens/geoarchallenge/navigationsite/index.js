@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-
 import {
   ActivityIndicator,
   Platform,
@@ -8,34 +7,31 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+import { useSelector } from "react-redux";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import Sound from "react-native-sound";
+import MapboxGL from "@rnmapbox/maps";
+import moment from "moment";
+
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
+
+import { GeolocationContext } from "../../../GeolocationProvider";
+import Config from "../../../config";
+import { convertKilometersToMiles, showMessage } from "../../../util/helpers";
+import { getLocationDistance, hasLocationPermission } from "../../../util/LocationLib";
+
 import HomeIcon from "../../../assets/geoar/home.svg";
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
 import SkipIcon from "../../../assets/geoar/skip.svg";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
 import CenterIcon from "../../../assets/Icons/CenterIcon.svg";
 
-import { useSelector } from "react-redux";
 import useStyles from "./styles";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { convertKilometersToMiles, showMessage } from "../../../util/helpers";
-import moment from "moment";
-import { getLocationDistance, hasLocationPermission } from "../../../util/LocationLib";
-import { GeolocationContext } from "../../../GeolocationProvider";
-import Sound from "react-native-sound";
-import Config from "../../../config";
-import MapboxGL from "@rnmapbox/maps";
 
+// Navigation Step 2
 const GeoArSiteNavigation = () => {
-  const route = useRoute();
-  const _styles = useStyles();
-  const navigation = useNavigation();
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  const { userLocation } = useContext(GeolocationContext);
-  const mapMode = route?.params?.mapMode;
-  const [latitude, setLatitude] = useState(userLocation?.latitude);
-  const [longitude, setLongitude] = useState(userLocation?.longitude);
   const [mileDistance, setMileDistance] = useState(0);
   const [durationMins, setDurationMins] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState("");
@@ -49,10 +45,36 @@ const GeoArSiteNavigation = () => {
   const [mapHeading, setMapHeading] = useState(0);
   const [rerouting, setRerouting] = useState(false);
   const [nextCoordinateS, setNextCoordinateS] = useState(null);
+
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+  const { userLocation } = useContext(GeolocationContext);
+  const [latitude, setLatitude] = useState(userLocation?.latitude);
+  const [longitude, setLongitude] = useState(userLocation?.longitude);
+
   const mapView = useRef(null);
   const currentPathRef = useRef(null);
   const nextCoordinateDistance = useRef(0);
   const nextCoordinateRef = useRef(null);
+
+  const route = useRoute();
+  const _styles = useStyles();
+  const navigation = useNavigation();
+
+  const mapMode = route?.params?.mapMode;
+
+  const starChallengeObj = route.params?.starsChallenge;
+  const isStarChallenge = !!starChallengeObj?.id;
+
+  let latitudeDestination;
+  let longitudeDestination;
+
+  if (isStarChallenge) {
+    latitudeDestination = starChallengeObj?.location?.coordinates[1];
+    longitudeDestination = starChallengeObj?.location?.coordinates[0];
+  } else {
+    latitudeDestination = selectedGeoSite?.lat_long?.coordinates[1];
+    longitudeDestination = selectedGeoSite?.lat_long?.coordinates[0];
+  }
 
   const calculatedEstimatedTime = duration => {
     const now = new Date();
@@ -64,8 +86,8 @@ const GeoArSiteNavigation = () => {
     const position = { coords: { latitude, longitude } };
 
     const endPosition = {
-      latitude: selectedGeoSite.lat_long.coordinates[1],
-      longitude: selectedGeoSite.lat_long.coordinates[0],
+      latitude: latitudeDestination,
+      longitude: longitudeDestination,
     };
 
     const initialHeading = calculateBearing(
@@ -78,10 +100,7 @@ const GeoArSiteNavigation = () => {
 
     const origin = [position.coords.longitude, position.coords.latitude];
 
-    const destination = [
-      selectedGeoSite.lat_long.coordinates[0],
-      selectedGeoSite.lat_long.coordinates[1],
-    ];
+    const destination = [longitudeDestination, latitudeDestination];
 
     setOriginMap(origin);
     setOriginMapPoint(origin);
@@ -166,9 +185,6 @@ const GeoArSiteNavigation = () => {
       }
     }
 
-    // console.log('closestCoordinate ==> ', closestCoordinate['coordinates'])
-    // console.log('closestDistance ==> ', closestDistance)
-
     if (closestCoordinate && closestDistance <= 10) {
       closestCoordinate.visited = true;
     }
@@ -187,8 +203,6 @@ const GeoArSiteNavigation = () => {
       nextCoordinate["coordinates"][0]
     );
 
-    // console.log('distanceToPath ==> ', distanceToPath)
-
     if (nextCoordinateRef.current === null || nextCoordinateRef.current !== nextCoordinate) {
       nextCoordinateDistance.current = 0;
     }
@@ -198,8 +212,6 @@ const GeoArSiteNavigation = () => {
       nextCoordinateRef.current = nextCoordinate;
       return false;
     }
-
-    // console.log('d - n ==> ', distanceToPath - nextCoordinateDistance.current)
 
     if (distanceToPath < nextCoordinateDistance.current) {
       nextCoordinateDistance.current = distanceToPath;
@@ -212,11 +224,13 @@ const GeoArSiteNavigation = () => {
     ) {
       nextCoordinateDistance.current = 0;
       nextCoordinateRef.current = null;
-      // console.log('nextCoordinate ==> ', nextCoordinate['coordinates'])
-      // console.log('path ==> ', path)
       return true;
     }
     return false;
+  };
+
+  const navigateToNextScreen = () => {
+    navigation.replace("GeoArSiteArrived", { starsChallenge: starChallengeObj });
   };
 
   const getLocationUpdates = async () => {
@@ -228,8 +242,8 @@ const GeoArSiteNavigation = () => {
     const position = { coords: { latitude, longitude } };
 
     const dis = getLocationDistance(position.coords, {
-      latitude: selectedGeoSite.lat_long.coordinates[1],
-      longitude: selectedGeoSite.lat_long.coordinates[0],
+      latitude: latitudeDestination,
+      longitude: longitudeDestination,
     });
 
     if (rerouting) return;
@@ -243,7 +257,6 @@ const GeoArSiteNavigation = () => {
     }
 
     if (isOffRoute(position.coords, currentPathRef.current, threshold)) {
-      // console.log('=========> Off route')
       setOriginMap([position.coords.longitude, position.coords.latitude]);
       const heading = calculateBearing(
         position.coords.latitude,
@@ -262,8 +275,6 @@ const GeoArSiteNavigation = () => {
 
     const nextCoordinate = findNextCoordinate(position.coords, currentPathRef.current);
 
-    // console.log('nextCoordinate ==> ', nextCoordinate)
-
     if (nextCoordinate && nextCoordinateS !== nextCoordinate) {
       setNextCoordinateS(nextCoordinate);
       const heading = calculateBearing(
@@ -277,9 +288,16 @@ const GeoArSiteNavigation = () => {
       if (Platform.OS === "ios") setCurrentHeading(mapHeading);
     }
 
-    if (dis < selectedGeoSite.check_in_site_radius) {
-      navigation.replace("GeoArSiteArrived");
-      return;
+    if (isStarChallenge) {
+      if (dis < starChallengeObj?.geo_ar_star?.geo_site?.check_in_site_radius) {
+        navigateToNextScreen();
+        return;
+      }
+    } else {
+      if (dis < selectedGeoSite.check_in_site_radius) {
+        navigateToNextScreen();
+        return;
+      }
     }
 
     if (location && location.coords) {
@@ -417,11 +435,7 @@ const GeoArSiteNavigation = () => {
       )}
       <AppHeader
         rightComponent={() => (
-          <TouchableOpacity
-            onPress={() => {
-              navigation.replace("ChallengeSelection");
-            }}
-          >
+          <TouchableOpacity onPress={navigateToNextScreen}>
             <SkipIcon style={{ width: 48, height: 36 }} />
           </TouchableOpacity>
         )}
@@ -564,7 +578,7 @@ const GeoArSiteNavigation = () => {
               justifyContent: "space-between",
             }}
           >
-            <TouchableOpacity onPress={() => navigation.replace("ChallengeSelection")}>
+            <TouchableOpacity onPress={() => navigation.goBack()}>
               <CloseBIcon style={{ width: 32, height: 32 }} />
             </TouchableOpacity>
             <View style={{ alignItems: "center", marginVertical: 8 }}>

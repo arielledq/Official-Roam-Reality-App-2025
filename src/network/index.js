@@ -170,6 +170,23 @@ export const getAllARSitesStars = payload =>
     },
     logoutFunc
   );
+export const getNextStar = payload =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/geo-ar-star/get-next-star/?geo_site_id=${payload.geo_site_id}&lat=${payload.lat}&lon=${payload.lon}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+export const starFoundAndSaveApi = payload =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/geo-ar-star-collect/`,
+      method: "POST",
+      data: payload,
+    },
+    logoutFunc
+  );
 export const getARSitesHiddenStars = payload =>
   Request.callWithToken(
     {
@@ -239,15 +256,7 @@ export const getAllCollectedStars = payload =>
     },
     logoutFunc
   );
-export const starFoundAndSaveApi = payload =>
-  Request.callWithToken(
-    {
-      url: `modules/challenges/geo-ar-star-collect/`,
-      method: "POST",
-      data: payload,
-    },
-    logoutFunc
-  );
+
 export const getCheckInCount = payload =>
   Request.callWithToken(
     {

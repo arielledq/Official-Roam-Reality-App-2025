@@ -15,8 +15,8 @@ import Config from "config";
 interface ShareToSocialsModalProps {
   isVisible: boolean;
   onClose: () => void;
-  fileUri: string;
-  fileExt: string;
+  fileUri?: string | undefined;
+  fileExt?: string | undefined;
   isMemory?: boolean;
 }
 

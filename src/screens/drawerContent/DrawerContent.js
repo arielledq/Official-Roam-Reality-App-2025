@@ -1,65 +1,65 @@
-import React, { useState } from 'react'
-import { View, StyleSheet, Image, TouchableOpacity } from 'react-native'
-import { DrawerContentScrollView } from '@react-navigation/drawer'
-import theme from '../../assets/theme'
-import { useNavigation } from '@react-navigation/native'
-import Images from '../../assets/images'
-import Icon from '../../components/Icon'
-import AppText from '../../components/text'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import ConfirmationPopUp from '../../components/confirmationPopUp'
-import { deleteAccount, logout } from '../../network'
-import { useDispatch } from 'react-redux'
-import { resetState } from '../../redux/Login'
-import LinearGradient from 'react-native-linear-gradient'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import { removeItem, showMessage } from '../../util/helpers'
-import AppSwitch from '../../components/Switch'
-import userLocationHook from './location.hook'
+import React, { useState } from "react";
+import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
+import { DrawerContentScrollView } from "@react-navigation/drawer";
+import theme from "../../assets/theme";
+import { useNavigation } from "@react-navigation/native";
+import Images from "../../assets/images";
+import Icon from "../../components/Icon";
+import AppText from "../../components/text";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import ConfirmationPopUp from "../../components/confirmationPopUp";
+import { deleteAccount, logout } from "../../network";
+import { useDispatch } from "react-redux";
+import { resetState } from "../../redux/Login";
+import LinearGradient from "react-native-linear-gradient";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { removeItem, showMessage } from "../../util/helpers";
+import AppSwitch from "../../components/Switch";
+import userLocationHook from "./location.hook";
 
 const DrawerList = [
-  { icon: 'target', label: 'AR Photo Challenges', navigateTo: 'Home' },
+  { icon: "target", label: "AR Challenges", navigateTo: "Home" },
   {
-    icon: 'pin',
-    label: 'My Live Location',
-    description: 'Allows your friends to see your live location',
-    navigateTo: 'toggleLocation',
+    icon: "pin",
+    label: "My Live Location",
+    description: "Allows your friends to see your live location",
+    navigateTo: "toggleLocation",
   },
-  { icon: 'users', label: 'Friends', navigateTo: 'Friends' },
-  { icon: 'Invite', label: 'Invite Friends', navigateTo: 'InviteFriends' },
-  { icon: 'Folder', label: 'Legal', navigateTo: 'Legal' },
-  { icon: 'info', label: 'Suport & Feedback', navigateTo: 'SendFeedback' },
-  { icon: 'settings', label: 'Settings', navigateTo: 'Settings' },
-  { icon: 'log-out', label: 'Logout', navigateTo: 'logout' },
-]
+  { icon: "users", label: "Friends", navigateTo: "Friends" },
+  { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },
+  { icon: "Folder", label: "Legal", navigateTo: "Legal" },
+  { icon: "info", label: "Suport & Feedback", navigateTo: "SendFeedback" },
+  { icon: "settings", label: "Settings", navigateTo: "Settings" },
+  { icon: "log-out", label: "Logout", navigateTo: "logout" },
+];
 
 const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index, onPress }) => {
-  const { loading, locationIsEnabled, toggleUserLocation } = userLocationHook()
+  const { loading, locationIsEnabled, toggleUserLocation } = userLocationHook();
 
   function getIconFamily(icon) {
-    const customIcons = ['Contact', 'Question', 'Folder', 'Invite', 'Wallet', 'pin']
-    return customIcons.includes(icon) ? 'custom' : 'feather'
+    const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet", "pin"];
+    return customIcons.includes(icon) ? "custom" : "feather";
   }
 
   const toggleLiveLocationButtonHandler = () => {
-    toggleUserLocation()
-  }
+    toggleUserLocation();
+  };
 
   const renderDrawerItem = () => {
     return (
       <View
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
         }}
       >
-        <Icon name={icon} family={getIconFamily(icon)} color={'white'} size={20} />
+        <Icon name={icon} family={getIconFamily(icon)} color={"white"} size={20} />
         <View style={{ flex: 1 }}>
           <AppText style={styles.Text}>{label}</AppText>
           {description && <AppText style={styles.Description}>{description}</AppText>}
         </View>
-        {navigateTo === 'toggleLocation' ? (
+        {navigateTo === "toggleLocation" ? (
           <AppSwitch
             onValueChange={toggleLiveLocationButtonHandler}
             value={locationIsEnabled}
@@ -68,17 +68,17 @@ const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index,
         ) : isLastItem ? (
           <></>
         ) : (
-          <Icon name='chevron-right' family='entypo' color={theme.darkColors?.white} size={20} />
+          <Icon name="chevron-right" family="entypo" color={theme.darkColors?.white} size={20} />
         )}
       </View>
-    )
-  }
+    );
+  };
   return (
     <>
       {index === 0 ? (
         <TouchableOpacity onPress={() => onPress(navigateTo)}>
           <LinearGradient
-            colors={['#9003E0', '#1158F4', '#9003E0']}
+            colors={["#9003E0", "#1158F4", "#9003E0"]}
             style={styles.linearGradient}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -92,8 +92,8 @@ const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index,
         </TouchableOpacity>
       )}
     </>
-  )
-}
+  );
+};
 
 const DrawerItems = ({ onPress }) => {
   return DrawerList.map((el, i) => {
@@ -108,72 +108,72 @@ const DrawerItems = ({ onPress }) => {
         isLastItem={i >= DrawerList.length - 1}
         onPress={v => onPress(el.navigateTo)}
       />
-    )
-  })
-}
+    );
+  });
+};
 function DrawerContent(props) {
-  const navigation = useNavigation()
-  const dispatch = useDispatch()
-  const [popupDetails, setPopupDetails] = useState({})
-  const [isConfirmationVisible, setConfirmationVisible] = useState(false)
+  const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [popupDetails, setPopupDetails] = useState({});
+  const [isConfirmationVisible, setConfirmationVisible] = useState(false);
   const onPressHandler = navigateTo => {
     switch (navigateTo) {
-      case 'delete': {
+      case "delete": {
         setPopupDetails({
-          title: 'Delete Account',
-          description: 'Are you sure you want to delete your account?',
-          cancelText: 'Cancel',
-        })
-        setConfirmationVisible(true)
-        break
+          title: "Delete Account",
+          description: "Are you sure you want to delete your account?",
+          cancelText: "Cancel",
+        });
+        setConfirmationVisible(true);
+        break;
       }
-      case 'logout': {
+      case "logout": {
         setPopupDetails({
-          title: 'Log Out',
-          description: 'Are you sure you want to logout?',
-          cancelText: 'Cancel',
-        })
-        setConfirmationVisible(true)
-        break
+          title: "Log Out",
+          description: "Are you sure you want to logout?",
+          cancelText: "Cancel",
+        });
+        setConfirmationVisible(true);
+        break;
       }
-      case 'toggleLocation': {
-        break
+      case "toggleLocation": {
+        break;
       }
-      case 'Home': {
+      case "Home": {
         navigation.reset({
           index: 0,
-          routes: [{ name: 'TabNavigator', params: { screen: 'GeoArChallenge' } }],
-        })
-        break
+          routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+        });
+        break;
       }
 
       default:
-        navigation.navigate(navigateTo)
-        break
+        navigation.navigate(navigateTo);
+        break;
     }
-  }
+  };
   const handleLogOutButton = async () => {
-    await GoogleSignin.revokeAccess().catch(err => console.error(err))
-    await GoogleSignin.signOut().catch(err => console.error(err))
-    await removeItem('fbToken')
-    await removeItem('instaToken')
-    await removeItem('tiktokToken')
-    logout()
-    dispatch(resetState())
-  }
+    await GoogleSignin.revokeAccess().catch(err => console.error(err));
+    await GoogleSignin.signOut().catch(err => console.error(err));
+    await removeItem("fbToken");
+    await removeItem("instaToken");
+    await removeItem("tiktokToken");
+    logout();
+    dispatch(resetState());
+  };
   const closeModalHandler = () => {
-    setConfirmationVisible(false)
-  }
+    setConfirmationVisible(false);
+  };
   const handleDeleteAccount = () => {
     deleteAccount().then(res => {
       if (res.status == 1) {
-        handleLogOutButton()
-        showMessage('Your account has been deleted successfully')
+        handleLogOutButton();
+        showMessage("Your account has been deleted successfully");
       } else {
-        showMessage(res.message.error, 'error')
+        showMessage(res.message.error, "error");
       }
-    })
-  }
+    });
+  };
   return (
     <>
       <View style={{ flex: 1, backgroundColor: theme.darkColors?.drawerBG }}>
@@ -192,16 +192,16 @@ function DrawerContent(props) {
         title={popupDetails?.title}
         description={popupDetails?.description}
         confirmText={popupDetails?.title}
-        confirmHandler={popupDetails?.title == 'Log Out' ? handleLogOutButton : handleDeleteAccount}
+        confirmHandler={popupDetails?.title == "Log Out" ? handleLogOutButton : handleDeleteAccount}
         isVisible={isConfirmationVisible}
-        cancelText={'Cancel'}
+        cancelText={"Cancel"}
         cancelHandler={closeModalHandler}
       />
     </>
-  )
+  );
 }
 
-export default DrawerContent
+export default DrawerContent;
 
 const styles = StyleSheet.create({
   drawerContent: {
@@ -225,8 +225,8 @@ const styles = StyleSheet.create({
     marginLeft: 10,
   },
   checkIcon: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   linearGradient: {
     marginLeft: 20,
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     marginTop: 13,
     padding: 10,
     borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'flex-start',
+    justifyContent: "center",
+    alignItems: "flex-start",
   },
-})
+});

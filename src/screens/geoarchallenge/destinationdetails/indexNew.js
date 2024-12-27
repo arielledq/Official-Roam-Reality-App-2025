@@ -1,189 +1,157 @@
-import React, { useContext, useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react";
 
-import {ActivityIndicator, Platform, Pressable, ScrollView, Text, TouchableOpacity, View} from "react-native"
-import BackgroundWithImage from "../../../components/background"
-import AppHeader from "../../../components/header"
-import { useNavigation } from "@react-navigation/native"
-import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps"
-import Geocoder from "react-native-geocoding"
-import MapboxGL from "@rnmapbox/maps"
-import MarkerIcon from "../../../assets/geoar/marker_img.svg"
-import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg"
-import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg"
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import { useNavigation } from "@react-navigation/native";
+import MapView, { Callout, Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import Geocoder from "react-native-geocoding";
+import MapboxGL from "@rnmapbox/maps";
+import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg";
+import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg";
 
-import { useDispatch, useSelector } from "react-redux"
-import useStyles from "./styles"
-import { updateSelectedSites } from "../../../redux/AR"
+import { useDispatch, useSelector } from "react-redux";
+import useStyles from "./styles";
+import { updateSelectedSites } from "../../../redux/AR";
 import {
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
-  getUserFriendList
-} from "../../../network"
-import AppSwitch from "../../../components/Switch"
-import { getBounds, getCenterOfBounds, isLocationPointInPolygon } from "../../../util/LocationLib"
-import DestinationFactPopUp from "../destinactionfactpopup"
-import AsyncStorage from "@react-native-async-storage/async-storage"
-import Icon from "../../../components/Icon"
-import { GeolocationContext } from "../../../GeolocationProvider"
+  getUserFriendList,
+} from "../../../network";
+import AppSwitch from "../../../components/Switch";
+import { getBounds, getCenterOfBounds, isLocationPointInPolygon } from "../../../util/LocationLib";
+import DestinationFactPopUp from "../destinactionfactpopup";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import Icon from "../../../components/Icon";
+import { GeolocationContext } from "../../../GeolocationProvider";
 
-const SCROLL_AMOUNT = 70
+const SCROLL_AMOUNT = 70;
 
 const GeoArChallengeDetails = ({}) => {
-  const _styles = useStyles()
-  const dispatch = useDispatch()
-  const { userLocation } = useContext(GeolocationContext)
-  const latitude = userLocation?.latitude
-  const longitude = userLocation?.longitude
-  const [isLoading, setIsLoading] = useState(false)
-  const [hiddenStars, setHiddenStars] = useState(0)
-  const [starsSites, setStarsSites] = useState(0)
-  const [arSitesOn, setARSitesOnSwitch] = useState(true)
-  const [selectedRegionName, setSelectedRegionName] = useState("Full")
-  const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true)
-  const navigation = useNavigation()
-  const mapView = useRef()
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination)
-  const [selectedPoint, setSelectedPoint] = useState(null)
+  const _styles = useStyles();
+  const dispatch = useDispatch();
+  const { userLocation } = useContext(GeolocationContext);
+  const latitude = userLocation?.latitude;
+  const longitude = userLocation?.longitude;
+  const [isLoading, setIsLoading] = useState(false);
+  const [hiddenStars, setHiddenStars] = useState(0);
+  const [starsSites, setStarsSites] = useState(0);
+  const [arSitesOn, setARSitesOnSwitch] = useState(true);
+  const [selectedRegionName, setSelectedRegionName] = useState("Full");
+  const [friendsLocationSitesOn, setFriendsLocationSitesOn] = useState(true);
+  const navigation = useNavigation();
+  const mapView = useRef();
+  const selectedDestination = useSelector(state => state.ar?.selectedDestination);
+  const [selectedPoint, setSelectedPoint] = useState(null);
 
-  console.log("selectedDestination ", selectedDestination)
-  const regions = selectedDestination?.regions
-  const [fullRegion, setFullRegion] = useState(null)
-  const [friendList, setFriendList] = useState([])
-  const [filteredUsers, setFilteredUsers] = React.useState([])
-  const [popUpFacts, setPopUpFacts] = useState(null)
-  const scrollViewRef = useRef(null)
-  const [scrollPosition, setScrollPosition] = useState(0)
+  console.log("selectedDestination ", selectedDestination);
+  const regions = selectedDestination?.regions;
+  const [fullRegion, setFullRegion] = useState(null);
+  const [friendList, setFriendList] = useState([]);
+  const [filteredUsers, setFilteredUsers] = React.useState([]);
+  const [popUpFacts, setPopUpFacts] = useState(null);
+  const scrollViewRef = useRef(null);
+  const [scrollPosition, setScrollPosition] = useState(0);
 
   const scrollRegionsPressHandler = () => {
-    const newPosition = scrollPosition + SCROLL_AMOUNT
-    scrollViewRef.current?.scrollTo({ x: newPosition, y: 0, animated: true })
-    setScrollPosition(newPosition)
-  }
+    const newPosition = scrollPosition + SCROLL_AMOUNT;
+    scrollViewRef.current?.scrollTo({ x: newPosition, y: 0, animated: true });
+    setScrollPosition(newPosition);
+  };
 
   const setMapBounds = () => {
-    var address = selectedDestination.name
+    var address = selectedDestination.name;
     Geocoder.from(address)
       .then(json => {
-        var location = json.results[0].geometry.location
-        var bounds = json.results[0].geometry.bounds
+        var location = json.results[0].geometry.location;
+        var bounds = json.results[0].geometry.bounds;
         mapView.current.setMapBoundaries(
           { latitude: bounds.northeast.lat, longitude: bounds.northeast.lng },
           { latitude: bounds.southwest.lat, longitude: bounds.southwest.lng }
-        )
+        );
         const fullRegion = {
           latitude: location.lat,
           longitude: location.lng,
           latitudeDelta: Number(bounds.northeast.lat - bounds.southwest.lat),
           longitudeDelta: Number(bounds.northeast.lng - bounds.southwest.lng),
-        }
+        };
         if (mapView && mapView.current) {
-          mapView.current.animateToRegion(fullRegion)
-          setFullRegion(fullRegion)
+          mapView.current.animateToRegion(fullRegion);
+          setFullRegion(fullRegion);
         }
       })
-      .catch(error => console.warn(error))
-  }
+      .catch(error => console.warn(error));
+  };
 
   const moveToFullRegion = () => {
     if (mapView && mapView.current) {
-      mapView.current.animateToRegion(fullRegion)
+      mapView.current.animateToRegion(fullRegion);
     }
-    setSelectedRegionName("Full")
-  }
+    setSelectedRegionName("Full");
+  };
 
   const getHiddenStar = () => {
     getARSitesHiddenStars({ id: selectedDestination.id }).then(res => {
-      setHiddenStars(res.data[0])
-    })
-  }
+      setHiddenStars(res.data[0]);
+    });
+  };
 
   const getARStarSites = () => {
     getARSitesStars({ id: selectedDestination.id }).then(res => {
-      setStarsSites(res.data[0])
-    })
-  }
+      setStarsSites(res.data[0]);
+    });
+  };
 
   const loadDFacts = async id => {
     getDestinationFacts({
       destination_id: id,
     }).then(async res => {
       for (let i = 0; i < res.data.length; i++) {
-        const facts = res.data[i]
-        const arrayPoints = []
+        const facts = res.data[i];
+        const arrayPoints = [];
         if (facts?.border?.coordinates) {
           for (let i = 0; i < facts.border.coordinates.length; i++) {
-            const points = facts.border.coordinates[i]
+            const points = facts.border.coordinates[i];
             for (let j = 0; j < points.length; j++) {
-              const point = points[j]
+              const point = points[j];
               arrayPoints.push({
                 latitude: point[1],
                 longitude: point[0],
-              })
+              });
             }
           }
         }
-        const isInsideSiteArea = isLocationPointInPolygon({ latitude, longitude }, arrayPoints)
+        const isInsideSiteArea = isLocationPointInPolygon({ latitude, longitude }, arrayPoints);
         if (isInsideSiteArea) {
-          const isOpened = await AsyncStorage.getItem(`open_${facts.id}`)
+          const isOpened = await AsyncStorage.getItem(`open_${facts.id}`);
           // if don't want to open popup again and again
           if (!isOpened || isOpened !== "opened") {
-            setPopUpFacts(facts)
+            setPopUpFacts(facts);
           }
-          break
+          break;
         }
       }
-    })
-  }
+    });
+  };
 
-  const f_markerView = o => {
-    if (o?.user_ar_profile?.current_location) {
-      return (
-        <Marker
-          key={o.id}
-          coordinate={{
-            latitude: o?.user_ar_profile?.current_location.coordinates[1],
-            longitude: o?.user_ar_profile?.current_location.coordinates[0],
-          }}
-          title={o.name}
-          onCalloutPress={() => {
-            navigation.navigate("PublicProfile", { userData: o })
-          }}
-        >
-          {Platform.OS === "ios" && (
-            <Callout
-              onPress={() => {
-                navigation.navigate("PublicProfile", { userData: o })
-              }}
-              style={{
-                backgroundColor: "#fff",
-                minWidth: 100,
-                alignItems: "center",
-              }}
-            >
-              <Text>{o.name}</Text>
-            </Callout>
-          )}
-          <View style={{ width: 30, height: 30 }}>
-            <FriendsMarkerIcon />
-          </View>
-        </Marker>
-      )
-    }
-  }
-
-  const _markerView = (o) => {
-
+  const _markerView = o => {
     if (o.lat_long) {
-      const coordinates = [o.lat_long.coordinates[0], o.lat_long.coordinates[1]]
+      const coordinates = [o.lat_long.coordinates[0], o.lat_long.coordinates[1]];
 
       return (
         <>
           {/* MarkerView allows us to fully customize the marker and its interactivity */}
-          <MapboxGL.MarkerView
-            id={o.id + "-coordinates"}
-            coordinate={coordinates}
-          >
+          <MapboxGL.MarkerView id={o.id + "-coordinates"} coordinate={coordinates}>
             <View
               style={{
                 alignItems: "center",
@@ -196,8 +164,8 @@ const GeoArChallengeDetails = ({}) => {
               {/* Custom Marker Icon */}
               <Pressable
                 onPress={() => {
-                  console.log("Marker pressed:", o.name)
-                  setSelectedPoint(o.id)
+                  console.log("Marker pressed:", o.name);
+                  setSelectedPoint(o.id);
                 }}
                 style={{ width: 30, height: 40 }}
               >
@@ -222,8 +190,8 @@ const GeoArChallengeDetails = ({}) => {
                 >
                   <Pressable
                     onPress={() => {
-                      dispatch(updateSelectedSites(o))
-                      navigation.navigate("GeoArSiteDetails")
+                      dispatch(updateSelectedSites(o));
+                      navigation.navigate("GeoArSiteDetails");
                     }}
                   >
                     <Text
@@ -239,80 +207,78 @@ const GeoArChallengeDetails = ({}) => {
             </View>
           </MapboxGL.MarkerView>
         </>
-      )
+      );
     }
-  }
-
-
+  };
 
   const getFullBounds = () => {
     if (selectedDestination.border) {
-      let arrayPoints = []
+      let arrayPoints = [];
       for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
-        const points = selectedDestination.border.coordinates[i]
+        const points = selectedDestination.border.coordinates[i];
         for (let j = 0; j < points.length; j++) {
-          const point = points[j]
-          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+          const point = points[j];
+          arrayPoints.push({ latitude: point[1], longitude: point[0] });
         }
       }
-      const bounds = getBounds(arrayPoints)
-      return bounds
+      const bounds = getBounds(arrayPoints);
+      return bounds;
     } else {
-      return null
+      return null;
     }
-  }
+  };
 
   const getFriends = () => {
     getUserFriendList()
       .then(response => {
         if (response) {
-          setFriendList(response?.data[0]?.friends || [])
-          setFilteredUsers(response?.data[0]?.friends || [])
+          setFriendList(response?.data[0]?.friends || []);
+          setFilteredUsers(response?.data[0]?.friends || []);
         }
       })
       .catch(error => {
-        console.error(error)
-      })
-  }
+        console.error(error);
+      });
+  };
 
   const getFullCenter = () => {
     if (selectedDestination.border) {
-      let arrayPoints = []
+      let arrayPoints = [];
       for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
-        const points = selectedDestination.border.coordinates[i]
+        const points = selectedDestination.border.coordinates[i];
         for (let j = 0; j < points.length; j++) {
-          const point = points[j]
-          arrayPoints.push({ latitude: point[1], longitude: point[0] })
+          const point = points[j];
+          arrayPoints.push({ latitude: point[1], longitude: point[0] });
         }
       }
-      const latitude_longitude = getCenterOfBounds(arrayPoints)
-      return latitude_longitude
+      const latitude_longitude = getCenterOfBounds(arrayPoints);
+      return latitude_longitude;
     } else {
-      return null
+      return null;
     }
-  }
+  };
 
   const moveToRegion = r => {
-    let arrayPoints = []
+    let arrayPoints = [];
     for (let i = 0; i < r.geo_region.coordinates.length; i++) {
-      const points = r.geo_region.coordinates[i]
+      const points = r.geo_region.coordinates[i];
       for (let j = 0; j < points.length; j++) {
-        const point = points[j]
-        arrayPoints.push({ latitude: point[1], longitude: point[0] })
+        const point = points[j];
+        arrayPoints.push({ latitude: point[1], longitude: point[0] });
       }
     }
-    const latitude_longitude = getCenterOfBounds(arrayPoints)
-    const bounds = getBounds(arrayPoints)
+    const latitude_longitude = getCenterOfBounds(arrayPoints);
+    const bounds = getBounds(arrayPoints);
     if (mapView && mapView.current) {
       mapView.current.animateToRegion({
         latitude: Number(latitude_longitude.latitude),
         longitude: Number(latitude_longitude.longitude),
         latitudeDelta: Number(bounds.maxLat - bounds.minLat),
         longitudeDelta: Number(bounds.maxLng - bounds.minLng),
-      })
-      setSelectedRegionName(r.name)
+      });
+      setSelectedRegionName(r.name);
     }
-  }
+  };
   const initialRegion = {
     latitude:
       selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0
@@ -328,16 +294,16 @@ const GeoArChallengeDetails = ({}) => {
     longitudeDelta: selectedDestination.map_longitude_delta
       ? Number(selectedDestination.map_longitude_delta)
       : 0.0421,
-  }
-  const full_latitude_longitude = getFullCenter()
-  const full_bounds = getFullBounds()
+  };
+  const full_latitude_longitude = getFullCenter();
+  const full_bounds = getFullBounds();
   if (full_bounds) {
-    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat)
-    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng)
+    initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+    initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
   }
   if (full_latitude_longitude) {
-    initialRegion.latitude = Number(full_latitude_longitude.latitude)
-    initialRegion.longitude = Number(full_latitude_longitude.longitude)
+    initialRegion.latitude = Number(full_latitude_longitude.latitude);
+    initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
   useEffect(() => {
@@ -345,31 +311,31 @@ const GeoArChallengeDetails = ({}) => {
       !selectedDestination.geo_location ||
       selectedDestination.geo_location.coordinates.length == 0
     ) {
-      setTimeout(setMapBounds, 500)
+      setTimeout(setMapBounds, 500);
     } else {
       const fullRegion = {
         latitude: selectedDestination.geo_location?.coordinates[1],
         longitude: selectedDestination.geo_location?.coordinates[0],
         latitudeDelta: Number(selectedDestination.map_latitude_delta),
         longitudeDelta: Number(selectedDestination.map_longitude_delta),
-      }
-      const full_latitude_longitude = getFullCenter()
-      const full_bounds = getFullBounds()
+      };
+      const full_latitude_longitude = getFullCenter();
+      const full_bounds = getFullBounds();
       if (full_bounds) {
-        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat)
-        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng)
+        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
       }
       if (full_latitude_longitude) {
-        fullRegion.latitude = Number(full_latitude_longitude.latitude)
-        fullRegion.longitude = Number(full_latitude_longitude.longitude)
+        fullRegion.latitude = Number(full_latitude_longitude.latitude);
+        fullRegion.longitude = Number(full_latitude_longitude.longitude);
       }
-      setFullRegion(fullRegion)
+      setFullRegion(fullRegion);
     }
-    getHiddenStar()
-    loadDFacts(selectedDestination?.id)
-    getFriends()
-    getARStarSites()
-  }, [])
+    getHiddenStar();
+    loadDFacts(selectedDestination?.id);
+    getFriends();
+    getARStarSites();
+  }, []);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -404,7 +370,9 @@ const GeoArChallengeDetails = ({}) => {
             onPress={moveToFullRegion}
             activeOpacity={0.5}
             style={
-              selectedRegionName === "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
+              selectedRegionName === "Full"
+                ? _styles.selectButtonStyle
+                : _styles.unSelectButtonStyle
             }
           >
             <Text style={_styles.buttonSelectText}>Full</Text>
@@ -424,7 +392,7 @@ const GeoArChallengeDetails = ({}) => {
                 >
                   <Text style={_styles.buttonSelectText}>{e.name}</Text>
                 </TouchableOpacity>
-              )
+              );
           })}
         </ScrollView>
       </View>
@@ -474,33 +442,9 @@ const GeoArChallengeDetails = ({}) => {
 
           {arSitesOn &&
             selectedDestination.star_ar_sites.map(o => {
-              return _markerView(o)
+              return _markerView(o);
             })}
-          {/*{friendsLocationSitesOn &&*/}
-          {/*  friendList.map(o => {*/}
-          {/*    return f_markerView(o)*/}
-          {/*  })}*/}
         </MapboxGL.MapView>
-        {/*<MapView*/}
-        {/*  provider={PROVIDER_GOOGLE}*/}
-        {/*  ref={mapView}*/}
-        {/*  style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}*/}
-        {/*  initialRegion={initialRegion}*/}
-        {/*>*/}
-        {/*  /!* {*/}
-        {/*    selectedDestination.unique_ar_sites.map((o) => {*/}
-        {/*      return _markerView(o)*/}
-        {/*    })*/}
-        {/*  } *!/*/}
-        {/*  {arSitesOn &&*/}
-        {/*    selectedDestination.star_ar_sites.map(o => {*/}
-        {/*      return _markerView(o)*/}
-        {/*    })}*/}
-        {/*  {friendsLocationSitesOn &&*/}
-        {/*    friendList.map(o => {*/}
-        {/*      return f_markerView(o)*/}
-        {/*    })}*/}
-        {/*</MapView>*/}
       </View>
       <View>
         <Text style={_styles.s_list_text}>Tap the pin to see more details</Text>
@@ -545,17 +489,6 @@ const GeoArChallengeDetails = ({}) => {
           }}
         >
           <ARSiteCountBG style={{ width: 48, height: 48 }}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{hiddenStars}</Text>
-          <Text style={_styles.s_list_text}>Hidden Stars</Text>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 80,
-          }}
-        >
-          <ARSiteCountBG style={{ width: 48, height: 48 }}></ARSiteCountBG>
           <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
           <Text style={_styles.s_list_text}>AR Experiences</Text>
         </View>
@@ -564,15 +497,15 @@ const GeoArChallengeDetails = ({}) => {
         <View style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
           <DestinationFactPopUp
             facts={popUpFacts}
-            onClose={async() => {
-              setPopUpFacts(null)
-              await AsyncStorage.setItem(`open_${popUpFacts.id}`, "opened")
+            onClose={async () => {
+              setPopUpFacts(null);
+              await AsyncStorage.setItem(`open_${popUpFacts.id}`, "opened");
             }}
           />
         </View>
       )}
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default GeoArChallengeDetails
+export default GeoArChallengeDetails;

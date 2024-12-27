@@ -31,16 +31,18 @@ import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 
 const GeoArSiteDetails = ({}) => {
-  const _styles = useStyles();
-  const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [showProTips, setShowProTips] = useState(false);
-  const navigation = useNavigation();
+  const [address, setAddress] = useState(null);
+  const [starsCount, setStarsCount] = useState(0);
+
   const selectedDestination = useSelector(state => state.ar?.selectedDestination);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
-  const [address, setAddress] = useState(null);
-  const [starsCount, setStarsCount] = useState(0);
+
+  const _styles = useStyles();
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
@@ -72,23 +74,8 @@ const GeoArSiteDetails = ({}) => {
   };
 
   const setStarCounts = () => {
-    let count = 0;
-    for (const stars_site of selectedGeoARSiteStars) {
-      if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length;
-      }
-    }
-    setStarsCount(count);
+    setStarsCount(selectedGeoARSiteStars?.length);
   };
-
-  useEffect(() => {
-    getAddress();
-    geoARSitesStars();
-  }, []);
-
-  useEffect(() => {
-    setStarCounts();
-  }, [selectedGeoARSiteStars]);
 
   const InfoView = () => {
     return (
@@ -211,6 +198,15 @@ const GeoArSiteDetails = ({}) => {
     initialRegion.latitude = Number(full_latitude_longitude.latitude);
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
+
+  useEffect(() => {
+    getAddress();
+    geoARSitesStars();
+  }, []);
+
+  useEffect(() => {
+    setStarCounts();
+  }, [selectedGeoARSiteStars]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>

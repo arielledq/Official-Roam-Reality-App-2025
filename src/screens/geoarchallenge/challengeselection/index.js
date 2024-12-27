@@ -1,38 +1,32 @@
-import React, { useEffect, useState } from "react";
-import {
-  Alert,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  ActivityIndicator,
-  FlatList,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
-import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
-import theme from "../../../assets/theme";
-import Images from "../../../assets/images";
-import useStyles from "./styles";
-import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
-import { handleError, showMessage } from "../../../util/helpers";
+import React, { useContext, useEffect, useState } from "react";
+import { StyleSheet, TouchableOpacity, View, ActivityIndicator, FlatList } from "react-native";
+
 import { BlurView } from "@react-native-community/blur";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+
+import { GeolocationContext } from "GeolocationProvider";
+
+import {
+  checkGeoPinCheckInDoneAPI,
+  getARChallenges as getARChallengesApi,
+  getCheckInCount,
+  getNextStar as getNextStarApi,
+} from "../../../network";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
+import { handleError, showMessage } from "../../../util/helpers";
+
+import { AppHeader, AppText } from "../../../components";
+
 import SiteIcon from "../../../assets/geoar/siteicon.svg";
 import StarSiteIcon from "../../../assets/geoar/starsite.svg";
 import ArIcon from "../../../assets/geoar/aricon.svg";
-import { screenHorizontalPadding } from "../../../util/AppDimensions";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { AppHeader, AppText } from "../../../components";
-import {
-  checkGeoPinCheckInDoneAPI,
-  getARChallenges,
-  getCheckInCount,
-  getCollectedStarCount,
-} from "../../../network";
+import theme from "../../../assets/theme";
+import Images from "../../../assets/images";
+import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
 
 const HomeScreenData = [
-  {
-    id: -1,
-    blank: true,
-  },
+  { id: -1, blank: true },
   {
     id: 1,
     title: "Check in with our ",
@@ -43,62 +37,47 @@ const HomeScreenData = [
     Icon: SiteIcon,
     navigation: "PinChallenge",
   },
-  // {
-  //   id: 2,
-  //   title: "Let's go chase the ",
-  //   title1: "stars!",
-  //   subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
-  //   image: Images.Home1,
-  //   Icon: StarSiteIcon,
-  //   navigation: "StarChallenge",
-  // },
-  // {
-  //   id: 3,
-  //   title: "Engage in unique ",
-  //   title1: "AR Experiences!",
-  //   subtitle: "Participate in some extra fun AR experiences found at this site for extra points.",
-  //   image: Images.Home1,
-  //   Icon: ArIcon,
-  //   navigation: "UniqueArChallenge",
-  // },
+  {
+    id: 2,
+    title: "Let's go chase the ",
+    title1: "stars!",
+    subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
+    image: Images.Home1,
+    Icon: StarSiteIcon,
+    navigation: "StarChallenge",
+  },
   {
     id: 4,
-    title: "AR Photo ",
+    title: "AR ",
     title1: "Challenges",
-    subtitle: "These are AR Photo Challenges that you can do anytime & anywhere",
+    subtitle: "These are AR Challenges that you can do anytime & anywhere",
     image: Images.Home1,
     Icon: ArIcon,
     navigation: "ARChallenge",
   },
 ];
 
-const ChallengeSelection = ({ route }) => {
+const ChallengeSelection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
+  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
+  const [myCheckIns, setMyCheckIns] = useState(0);
+  const [starsChallenge, setStarsChallenge] = useState();
 
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const styles = useStyles();
-  const selectedDestination = useSelector(state => state.ar?.selectedDestination);
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  const [starsCount, setStarsCount] = useState(0);
-  const [collectedStars, setCollectedStars] = useState(0);
-  const [myCheckIns, setMyCheckIns] = useState(0);
-  const [uniqueExperiences, setUniqueExperiences] = useState(0);
-  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
+
+  const navigation = useNavigation();
   const isFocused = useIsFocused();
+  const { userLocation } = useContext(GeolocationContext);
+
+  const latitude = userLocation?.latitude;
+  const longitude = userLocation?.longitude;
 
   const checkIfPinCheckIsDone = () => {
-    checkGeoPinCheckInDoneAPI({
-      geo_site: selectedGeoSite.id,
-    })
+    checkGeoPinCheckInDoneAPI({ geo_site: selectedGeoSite.id })
       .then(res => {
-        if (res.errorStatus === 403) {
-          setIsPinCheckIsDone(true);
-        } else {
-          setIsPinCheckIsDone(false);
-        }
+        setIsPinCheckIsDone(res.errorStatus === 403);
       })
       .finally(() => {});
   };
@@ -113,29 +92,28 @@ const ChallengeSelection = ({ route }) => {
       .finally(() => {});
   };
 
-  const getStarsCollectCount = () => {
-    getCollectedStarCount({
-      geo_site: selectedGeoSite.id,
-    })
-      .then(res => {
-        if (res.status == 1) {
-          setCollectedStars(res.count);
-        }
-      })
-      .finally(() => {});
+  const getNextStar = async () => {
+    try {
+      const params = {
+        geo_site_id: selectedGeoSite.id,
+        // geo_site_id: selectedGeoARSiteStars[0]?.id,
+        lat: latitude,
+        lon: longitude,
+      };
+      const response = await getNextStarApi(params);
+      if (response?.id) {
+        setStarsChallenge(response);
+      } else {
+        setStarsChallenge(null);
+      }
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  useEffect(() => {
-    if (isFocused) {
-      checkIfPinCheckIsDone();
-      getStarsCollectCount();
-      getMyCheckInsCount();
-    }
-  }, [isFocused]);
-
-  useEffect(() => {
+  const getArChallenges = () => {
     setIsLoading(true);
-    getARChallenges()
+    getARChallengesApi()
       .then(res => {
         if (res.status == 1) {
           setNumberOfChallenges(res?.data?.length);
@@ -147,52 +125,37 @@ const ChallengeSelection = ({ route }) => {
       .finally(() => {
         setIsLoading(false);
       });
-  }, []);
+  };
 
   const goToRoute = route => {
     if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
       showMessage("Pin Challenge is unavailable right now", "error");
       return;
     }
-    if (route === "PinChallenge" && !!myCheckIns) {
-      showMessage("Check-ins already submitted and can't submitted more.", "error");
-      return;
-    }
-    if (route === "StarChallenge" && selectedGeoARSiteStars.length == 0) {
-      showMessage("Stars Challenges are unavailable right now", "error");
+    // if (route === "PinChallenge" && !!myCheckIns) {
+    //   showMessage("Check-ins already submitted and can't submitted more.", "error");
+    //   return;
+    // }
+    if (route === "StarChallenge" && selectedGeoARSiteStars.length === 0) {
+      showMessage("This Star Challenge is completed.", "error");
       return;
     } else {
-      navigation.navigate(route);
-    }
-  };
-
-  const setStarCounts = () => {
-    let count = 0;
-    for (const stars_site of selectedGeoARSiteStars) {
-      if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length;
+      if (route === "StarChallenge") {
+        if (!starsChallenge) return;
+        navigation.navigate("GeoArSiteRoutes", { starsChallenge });
+      } else {
+        navigation.navigate(route);
       }
     }
-    setStarsCount(count);
   };
-
-  useEffect(() => {
-    setStarCounts();
-  }, [selectedGeoARSiteStars]);
 
   const HomeScreenARItem = item => {
     return (
       <TouchableOpacity style={styles.imageBg} onPress={() => goToRoute(item.navigation)}>
         <View style={styles.row}>
           <View style={styles.innerView}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                width: "100%",
-              }}
-            >
-              <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />
+            <View style={{ flexDirection: "row", alignItems: "center", width: "100%" }}>
+              {item?.Icon && <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />}
               <AppText style={styles.headerText}>
                 {item?.title}
                 {item?.title1}
@@ -208,23 +171,19 @@ const ChallengeSelection = ({ route }) => {
             >
               <View style={{ flex: 1 }}>
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
-                {item?.id == 1 && (
+                {item?.id === 1 && (
                   <AppText style={styles.challengesText}>
                     Pin located: {isPinCheckIsDone ? 1 : 0}/1 • My Check-ins: {myCheckIns}
                   </AppText>
                 )}
-                {item?.id == 2 && (
+                {item?.id === 2 && (
                   <AppText style={styles.challengesText}>
-                    {" "}
-                    Stars collected: {collectedStars}/{starsCount}
+                    {starsChallenge
+                      ? `Stars collected: ${starsChallenge?.captured_stars}/${starsChallenge?.total_stars}`
+                      : "This Star Challenge is completed."}
                   </AppText>
                 )}
-                {item?.id == 3 && (
-                  <AppText style={styles.challengesText}>
-                    {selectedDestination.unique_ar_sites.length} Challenges
-                  </AppText>
-                )}
-                {item?.id == 4 && (
+                {item?.id === 4 && (
                   <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
                 )}
               </View>
@@ -238,6 +197,15 @@ const ChallengeSelection = ({ route }) => {
     );
   };
 
+  useEffect(() => {
+    if (isFocused) {
+      getArChallenges();
+      checkIfPinCheckIsDone();
+      getMyCheckInsCount();
+      getNextStar();
+    }
+  }, [isFocused]);
+
   return (
     <View style={styles.mainContainer}>
       <View style={styles.container}>
@@ -249,7 +217,7 @@ const ChallengeSelection = ({ route }) => {
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
             renderItem={({ item }) =>
-              item.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />
+              item?.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />
             }
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
@@ -274,68 +242,72 @@ export default ChallengeSelection;
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
+    backgroundColor: "#202136",
   },
   container: {
     flex: 1,
-    height: "100%",
-    marginVertical: 10,
-    paddingHorizontal: screenHorizontalPadding + 5,
-    justifyContent: "center",
-    alignItems: "center",
+    paddingHorizontal: 25,
   },
-  header: {
+  imageBg: {
+    width: "100%",
+    minHeight: 180,
+    borderRadius: 20,
+    marginBottom: 20,
+    paddingVertical: 8,
+    backgroundColor: "#131422",
+  },
+  row: {
+    flexDirection: "row",
+    justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 12,
+    paddingHorizontal: 20,
+    paddingBottom: 25,
+    flex: 1,
   },
   headerText: {
     ...fontGroup.ns700,
-    fontSize: FontSizes.S18,
-    lineHeight: FontLineHeights.LH25,
-    marginVertical: 8,
+    fontSize: FontSizes.S26,
+    lineHeight: FontLineHeights.LH35,
+    marginVertical: 0,
+    flex: 1,
+    color: theme.lightColors?.white,
   },
-  logoutText: {
-    ...fontGroup.ns400,
-    fontSize: FontSizes.S18,
-    lineHeight: FontLineHeights.LH20,
+  innerView: {
+    flex: 1,
   },
-  horizontalLine: {
-    height: 1,
-    alignSelf: "stretch",
-    backgroundColor: theme.darkColors?.dividerGrey,
-    opacity: 0.4,
-    marginVertical: 8,
-  },
-  cancelButton: {
-    marginTop: 8,
-    alignItems: "center",
-    justifyContent: "center",
-    height: 50,
-  },
-  cancelButtonText: {
+  challengesText: {
     ...fontGroup.ns800,
-    color: theme.darkColors?.inputBlue,
-    fontSize: FontSizes.S16,
-    lineHeight: FontLineHeights.LH20,
+    fontSize: FontSizes.S12,
+    lineHeight: FontLineHeights.LH15,
+    marginTop: 10,
+    marginStart: 3,
+    color: theme.lightColors?.white,
   },
-  buttonheaderContainer: {
-    paddingHorizontal: screenHorizontalPadding + 5,
-    alignItems: "center",
-    marginBottom: 15,
-    marginTop: 7,
+  subtitleText: {
+    ...fontGroup.ns400,
+    fontSize: FontSizes.S12,
+    lineHeight: FontLineHeights.LH15,
+    marginTop: 10,
+    marginStart: 3,
+    flex: 1,
+    color: theme.lightColors?.white,
   },
-  buttonContainer: {
-    paddingHorizontal: screenHorizontalPadding - 5,
-  },
-  buttonStyle: {
-    height: 50,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  buttonContainerStyle: {
+  containerStyle: {
     marginTop: 10,
   },
-  buttonTitle: {
-    ...fontGroup.p600,
-    fontSize: FontSizes.S16,
+  list: {
+    marginBottom: 20,
+    flex: 1,
+  },
+  blurView: {
+    overflow: "hidden",
+    position: "absolute",
+    top: 0,
+    zIndex: 10,
+  },
+  headerContainer: {
+    paddingVertical: 15,
+    borderBottomWidth: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.0)",
   },
 });

@@ -21,7 +21,7 @@ import ArChallengeDetails from "../screens/archallenge/challengedetails";
 import ChallengeExamples from "../screens/archallenge/ChallengeExamples";
 import ArChallengeCapture from "../screens/archallenge/challengecapture";
 import ARChallenge from "../screens/archallenge";
-import ArChallengeShare from "../screens/archallenge/challengeshare";
+import ArChallengeShare from "../screens/challenges/ShareChallengeScreen";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import DrawerContent from "../screens/drawerContent/DrawerContent";
 import Onboarding from "../screens/onboarding/onboarding";
@@ -70,9 +70,9 @@ const Drawer = createDrawerNavigator();
  * @returns JSX.Element
  */
 const Navigation = () => {
-  const splashShown = useSelector(state => state.splash?.splashShown);
-  const token = useSelector(state => state.login?.data?.token);
-  const { newUser } = useSelector(state => state.persist);
+  const splashShown = useSelector((state: any) => state.splash?.splashShown);
+  const token = useSelector((state: any) => state.login?.data?.token);
+  const { newUser } = useSelector((state: any) => state.persist);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -102,12 +102,14 @@ const Navigation = () => {
       <>
         {newUser ? (
           <>
+            {/* @ts-ignore */}
             <Stack.Screen name="Onboarding" component={Onboarding} />
             <Stack.Screen name="SignUp" component={SignUp} />
             <Stack.Screen name="Login" component={Login} />
           </>
         ) : (
           <>
+            {/* @ts-ignore */}
             <Stack.Screen name="Onboarding" component={Onboarding} />
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="SignUp" component={SignUp} />
@@ -127,17 +129,25 @@ const Navigation = () => {
   const renderCommonStack = () => {
     return (
       <>
+        {/* @ts-ignore */}
         <Stack.Screen name="TabNavigator" component={DrawerNav} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="Profile" component={Profile} />
+        {/* @ts-ignore */}
         <Stack.Screen name="PublicProfile" component={PublicProfile} />
+        {/* @ts-ignore */}
         <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
+        {/* @ts-ignore */}
         <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
+        {/* @ts-ignore */}
         <Stack.Screen name="Friends" component={Friends} />
+        {/* @ts-ignore */}
         <Stack.Screen name="AddFriend" component={AddFriendScreen} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        {/* @ts-ignore */}
         <Stack.Screen name="SendFeedback" component={Feedback} />
+        {/* @ts-ignore */}
         <Stack.Screen name="InviteFriends" component={InviteFriends} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
@@ -145,28 +155,51 @@ const Navigation = () => {
         <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
+        {/* @ts-ignore */}
         <Stack.Screen name="ARFilter" component={ARFilter} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
+        {/* @ts-ignore */}
         <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
+        {/* @ts-ignore */}
         <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
+        {/* @ts-ignore */}
         <Stack.Screen name="PinChallenge" component={PinChallenge} />
+        {/* @ts-ignore */}
         <Stack.Screen name="StarChallenge" component={StarChallenge} />
+        {/* @ts-ignore */}
         <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
+        {/* @ts-ignore */}
         <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
+        {/* @ts-ignore */}
         <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
+        {/* @ts-ignore */}
         <Stack.Screen name="Settings" component={Settings} />
+        {/* @ts-ignore */}
         <Stack.Screen name="Privacy" component={Privacy} />
+        {/* @ts-ignore */}
         <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
+        {/* @ts-ignore */}
         <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
+        {/* @ts-ignore */}
         <Stack.Screen name="ContactUs" component={ContactUs} />
+        {/* @ts-ignore */}
         <Stack.Screen name="FAQ" component={FAQ} />
+        {/* @ts-ignore */}
         <Stack.Screen name="Notifications" component={NotificationList} />
+        {/* @ts-ignore */}
         <Stack.Screen name="Legal" component={Legal} />
       </>
     );
@@ -201,7 +234,10 @@ const Navigation = () => {
             renderAuthStack()
           )
         ) : (
-          <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
+          <>
+            {/* @ts-ignore */}
+            <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
+          </>
         )}
       </Stack.Navigator>
     );

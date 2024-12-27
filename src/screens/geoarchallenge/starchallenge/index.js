@@ -1,98 +1,50 @@
-import React, { useEffect, useFocusEffect, useCallback, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  Platform,
-  Image,
-} from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useEffect, useRef, useState } from "react";
+import { ScrollView, Platform } from "react-native";
+
+import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
-import Geolocation from "react-native-geolocation-service";
-import {
-  convertMetersToFeets,
-  findNearestLocationPoint,
-  getCloseLocationDistance,
-  hasLocationPermission,
-  isLocationPointWithinRadius,
-  orderByDistanceLocationPoint,
-} from "../../../util/LocationLib";
-import BackgroundWithImage from "../../../components/background";
-import AppHeader from "../../../components/header";
-import RenderHTML from "react-native-render-html";
-import { AppButton } from "../../../components";
-import useStyles from "./styles";
-import { FontSizes } from "../../../util/FontUtils";
-import { getAllCollectedStars, starFoundAndSaveApi, updateUserPointAPI } from "../../../network";
-import CompassHeading from "react-native-compass-heading";
-import TravelDataPopUp from "../traveldatapopup";
-import ArStarChallengeShare from "../starshare";
-import UnityView from "@azesmway/react-native-unity/src";
-import UnityARCamera from "components/UnityArView";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
-import SpeakerIcon from "../../../assets/geoar/speaker_icon.svg";
-import InfoIcon from "../../../assets/geoar/Info.svg";
-import MenIcon from "../../../assets/geoar/men_icon.svg";
-import RadarBlipIcon from "../../../assets/geoar/radar_blip.svg";
-import StarIcon from "../../../assets/geoar/star_icon.svg";
-import TrophyIcon from "../../../assets/geoar/trophy_icon.svg";
-import LineIcon from "../../../assets/ar/line.png";
 import Sound from "react-native-sound";
+
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import UnityARCamera from "components/UnityArView";
 import CaptureInfoView from "components/CaptureInfoView";
+import CameraControls from "components/CameraControls";
+import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
 
-const { width } = Dimensions.get("window");
+import { CHALLENGES_TYPE } from "constants";
+import useStyles from "./styles";
 
-const StarChallenge = () => {
-  const _styles = useStyles();
-  const dispatch = useDispatch();
-  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
-  const settings = useSelector(state => state.ar?.arSettings);
-  const challengeObjParameters = useSelector(state => state.ar?.parameters);
-  const navigation = useNavigation();
-
-  const unityRef = useRef(null); // Unity reference
-  const watchId = useRef(null); // Geolocation watch ID
-
+const StarChallenge = ({ route }) => {
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [detailsShow, setDetailsShow] = useState(true);
-  const [factsShow, setFactsShow] = useState(false);
-  const [challengeInformationView, setChallengeInformationView] = useState(false);
-  const [distanceInFeet, setDistanceInFeet] = useState(0);
-  const [starShouldVisible, setStarShouldVisible] = useState(false);
-  const [challengeObj, setChallengeObj] = useState(
-    selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0]?.challenges : {}
-  );
-  const [collectedStars, setCollectedStars] = useState([]);
-  const [starsCount, setStarsCount] = useState(0);
-  const [starObj, setStarObj] = useState(
-    selectedGeoARSiteStars.length > 0 ? selectedGeoARSiteStars[0] : {}
-  );
-  const [nearestPoint, setNearestPoint] = useState({ latitude: 0, longitude: 0 });
-  const [currentLocation, setCurrentLocation] = useState({ latitude: 0, longitude: 0 });
-  const [compassHeading, setCompassHeading] = useState(0);
-  const [allStarsCollected, setAllStarsCollected] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [sourcesFiles, setSourcesFiles] = useState([]);
-  const [starModels, setStarModels] = useState([]);
-  const [starObjE, setStarObjE] = useState(null);
+  const [starModels, setStarModels] = useState();
   const [processingMedia, setProcessingMedia] = useState(false);
   const [textureBase, setTextureBase] = useState();
   const [textureEmission, setTextureEmission] = useState();
-  const [fFoldefile, setFoldefile] = useState();
   const [modelResource, setModelResource] = useState();
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
-  
+
+  const settings = useSelector(state => state.ar?.arSettings);
+
+  const _styles = useStyles();
+  const navigation = useNavigation();
+
+  const unityRef = useRef(null); // Unity reference
+
+  const starChallengeObj = route.params?.starChallenge;
+  const challengeObjParameters = route.params?.starChallenge?.geo_ar_star?.geo_site?.pin_challenge;
+  const isStarChallenge = !!starChallengeObj?.id;
+
+  console.log("[StarChallenge] isStarChallenge", isStarChallenge);
+
   // Check and request permissions
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -113,320 +65,97 @@ const StarChallenge = () => {
     }
   };
 
-  console.warn = () => {};
-  // Set the total number of stars to collect
-  const setStarCounts = () => {
-    let count = 0;
-    for (const stars_site of selectedGeoARSiteStars) {
-      if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length;
-      }
-    }
-    setStarsCount(count);
-  };
-
-  // Get collected stars from the server
-  const getCollectedStar = () => {
-    getAllCollectedStars({
-      geo_site: selectedGeoSite.id,
-    })
-      .then(res => {
-        if (res.status === 1) {
-          const stars = res.data;
-          const collectedStarsFromAPI = stars.map(s => ({
-            latitude: s.point.coordinates[1],
-            longitude: s.point.coordinates[0],
-          }));
-          const finalCollectedStars = [...collectedStarsFromAPI, ...collectedStars];
-          setCollectedStars(finalCollectedStars);
-          getLocation();
-          getLocationUpdates();
-        }
-      })
-      .finally(() => {});
-  };
-
-  // Update user points when a star is collected
-  const updateUserPoint = starObj => {
-    updateUserPointAPI({
-      points: starObj?.challenges?.points,
-    })
-      .then(res => {})
-      .finally(() => {});
-  };
-
-  // Save collected star to the server
-  const saveCollectedStar = (point, starObj) => {
-    starFoundAndSaveApi({
-      geo_site: selectedGeoSite.id,
-      geo_ar_star: starObj.id,
-      latitude: point.latitude,
-      longitude: point.longitude,
-      name: new Date().toISOString(),
-    })
-      .then(res => {})
-      .finally(() => {});
-  };
-
-  // Get current location
-  const getLocation = async () => {
-    const hasPermission = await hasLocationPermission();
-    if (!hasPermission) {
-      return;
-    }
-    Geolocation.getCurrentPosition(
-      position => {
-        findNearPoint(position);
-        setCurrentLocation(position.coords);
-      },
-      error => {
-        console.error(error);
-      },
-      {
-        accuracy: {
-          android: "high",
-          ios: "best",
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      }
-    );
-  };
-
-  // Watch for location updates
-  const getLocationUpdates = async () => {
-    const hasPermission = await hasLocationPermission();
-    if (!hasPermission) {
-      return;
-    }
-    watchId.current = Geolocation.watchPosition(
-      position => {
-        findNearPoint(position);
-        setCurrentLocation(position.coords);
-      },
-      error => {
-        console.error(error);
-      },
-      {
-        accuracy: {
-          android: "high",
-          ios: "best",
-        },
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 10000,
-        distanceFilter: 0,
-        forceRequestLocation: true,
-        forceLocationManager: true,
-        showLocationDialog: true,
-      }
-    );
-  };
-
-  // Stop location updates
-  const stopLocationUpdates = () => {
-    if (watchId.current !== null) {
-      Geolocation.clearWatch(watchId.current);
-      watchId.current = null;
-      Geolocation.stopObserving();
-    }
-  };
-
-  useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
-    }
-  }, [challengeObjParameters]);
-
-
-
-  // Check if a star is already collected
-  const isStarIsCollected = point => {
-    return collectedStars.some(
-      cPoint => point.latitude === cPoint.latitude && point.longitude === cPoint.longitude
-    );
-  };
-
-  // Find the nearest point (star) and update state accordingly
-  const findNearPoint = position => {
-    let arrayPoints = [];
-    for (let i = 0; i < selectedGeoARSiteStars.length; i++) {
-      const starObj = selectedGeoARSiteStars[i];
-      for (let j = 0; j < starObj.star_location.coordinates.length; j++) {
-        const point = starObj.star_location.coordinates[j];
-        const pushPoint = { latitude: point[1], longitude: point[0], starObj };
-        if (!isStarIsCollected(pushPoint)) {
-          arrayPoints.push(pushPoint);
-        }
-      }
-    }
-    try {
-      if (arrayPoints.length > 0) {
-        const nearestPoints = orderByDistanceLocationPoint(position.coords, arrayPoints);
-        const nearestPoint = findNearestLocationPoint(position.coords, nearestPoints);
-        const distance = getCloseLocationDistance(position.coords, nearestPoint);
-        const starShouldVisibleNow = isLocationPointWithinRadius(
-          position.coords,
-          nearestPoint,
-          Number(nearestPoint.starObj.visibility_radius)
-        );
-        if (starShouldVisibleNow && !isStarIsCollected(nearestPoint)) {
-          setCollectedStars(prevCollectedStars => [...prevCollectedStars, nearestPoint]);
-          saveCollectedStar(nearestPoint, nearestPoint.starObj);
-          updateUserPoint(nearestPoint.starObj);
-        }
-        setDistanceInFeet(convertMetersToFeets(distance));
-        setStarShouldVisible(starShouldVisibleNow);
-        setChallengeObj(nearestPoint.starObj?.challenges);
-        setStarObj(nearestPoint.starObj);
-        setNearestPoint(nearestPoint);
-        setCurrentLocation(position.coords);
-      } else {
-        setAllStarsCollected(true);
-      }
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  // Start compass heading updates PEDIENTE LENTO
-  // useEffect(() => {
-  //   const degree_update_rate = 3;
-  //   CompassHeading.start(degree_update_rate, heading => {
-  //     setCompassHeading(heading);
-  //   });
-  //   return () => {
-  //     CompassHeading.stop();
-  //   };
-  // }, []);
-
-  // ComponentDidMount equivalent
-  useEffect(() => {
-    checkPermission();
-    getCollectedStar();
-    setStarCounts();
-    return () => {
-      stopLocationUpdates();
-    };
-  }, []);
-
   // Download and unzip model files for each star
   const downloadAndPrepareModels = () => {
-    if (selectedGeoARSiteStars.length > 0) {
-      setLoading(true);
-      selectedGeoARSiteStars.forEach((starObj) => {
-        const challengeObj = starObj.challenges;
-        const modelFile = challengeObj?.model_file;
-        if (challengeObj?.challenge_choice === "3DMODEL" && modelFile) {
-          const filename = modelFile.split("/").pop().split("?")[0];
-          const withoutExtFilename = filename.split(".")[0];
-          const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-          const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-          const downloadModelFile = (sourcePath, targetPath, modelFile) => {
-            RNFetchBlob.config({
-              fileCache: true,
-              path: sourcePath,
-            })
-              .fetch("GET", modelFile)
-              .progress((received, total) => {
-                const progress = Math.trunc((received / total) * 100);
-                setProgress(progress);
-                console.log("Progreso de descarga:", progress, "%");
+    // setLoading(true);
+    const challengeObj = starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge;
+    const modelFile = challengeObj?.model_file;
+    if (challengeObj?.challenge_choice === "IMAGE" && modelFile) {
+      const filename = modelFile.split("/").pop().split("?")[0];
+      const withoutExtFilename = filename.split(".")[0];
+      const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+      const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+      const downloadModelFile = (sourcePath, targetPath, modelFile) => {
+        RNFetchBlob.config({
+          fileCache: true,
+          path: sourcePath,
+        })
+          .fetch("GET", modelFile)
+          .progress((received, total) => {
+            const progress = Math.trunc((received / total) * 100);
+            // setProgress(progress);
+            console.log("Progreso de descarga:", progress, "%");
+          })
+          .then(res => {
+            unzipModelFile(res.path(), targetPath);
+          })
+          .catch(error => {});
+      };
+      const unzipModelFile = (sourcePath, targetPath) => {
+        unzip(sourcePath, targetPath, "UTF-8")
+          .then(path => {
+            RNFS.readDir(path)
+              .then(result => {
+                if (!result || !Array.isArray(result)) {
+                  return;
+                }
+                const sourcesArray = [];
+                let objFile = null;
+                let mtlFile = null;
+                let baseTexture = null;
+                let emissionTexture = null;
+
+                result.forEach(file => {
+                  if (!file.name || !file.path) {
+                    console.warn("Archivo inválido encontrado:", file);
+                    return;
+                  }
+
+                  const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
+
+                  // Procesar cada tipo de archivo
+                  if (file.name.includes(".obj")) {
+                    objFile = filePath;
+                  } else if (file.name.includes(".mtl")) {
+                    mtlFile = filePath;
+                  } else if (file.name.toLowerCase().includes("diffuse")) {
+                    baseTexture = filePath;
+                  } else if (file.name.toLowerCase().includes("emission")) {
+                    emissionTexture = filePath;
+                  } else {
+                    sourcesArray.push({ uri: filePath });
+                  }
+                  setStarModels(objFile || ""); // Manejar valores nulos
+                  setModelResource(mtlFile);
+                  setTextureBase(baseTexture);
+                  setTextureEmission(emissionTexture);
+                  // setSourcesFiles(sourcesArray);
+                  // setFoldefile(result);
+                });
+                // setLoading(false);
               })
-              .then((res) => {
-                unzipModelFile(res.path(), targetPath);
-              })
-              .catch((error) => {
+              .catch(error => {
+                console.error("Error leyendo el directorio descomprimido:", error);
               });
-          };
-          const unzipModelFile = (sourcePath, targetPath) => {
-            unzip(sourcePath, targetPath, "UTF-8")
-              .then((path) => {
-                RNFS.readDir(path)
-                  .then((result) => {
-                    if (!result || !Array.isArray(result)) {
-                      return;
-                    }
-                    const sourcesArray = [];
-                    let objFile = null;
-                    let mtlFile = null;
-                    let baseTexture = null;
-                    let emissionTexture = null;
-          
-                    result.forEach((file) => {
-                     
-                      if (!file.name || !file.path) {
-                        console.warn("Archivo inválido encontrado:", file);
-                        return;
-                      }
-          
-                      const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-          
-                      // Procesar cada tipo de archivo
-                      if (file.name.includes(".obj")) {
-                        objFile = filePath;
-                      } else if (file.name.includes(".mtl")) {
-                        mtlFile = filePath;
-                      } else if (file.name.toLowerCase().includes("diffuse")) {
-                        baseTexture = filePath;
-                      } else if (file.name.toLowerCase().includes("emission")) {
-                        emissionTexture = filePath;
-                      } else {
-                        sourcesArray.push({ uri: filePath });
-                      }
-                      setStarModels(objFile || ""); // Manejar valores nulos
-                    setModelResource(mtlFile);
-                    setTextureBase(baseTexture);
-                    setTextureEmission(emissionTexture);
-                    setSourcesFiles(sourcesArray);
-                    setFoldefile(result);
-                    });
-                    setLoading(false);
-                  })
-                  .catch((error) => {
-                    console.error("Error leyendo el directorio descomprimido:", error);
-                  });
-              })
-              .catch((error) => {
-                console.error("Error durante la descompresión:", error);
-              });
-          };
-          
-  
-          RNFS.exists(sourcePath)
-            .then((exists) => {
-              console.log("Archivo existe:", exists);
-              if (exists) {
-                unzipModelFile(sourcePath, targetPath);
-              } else {
-                downloadModelFile(sourcePath, targetPath, modelFile);
-              }
-            })
-            .catch((error) => {
-              console.error("Error verificando existencia del archivo:", error);
-            });
-        }
-      });
-    } else {
-      console.log("No hay modelos seleccionados.");
+          })
+          .catch(error => {
+            console.error("Error durante la descompresión:", error);
+          });
+      };
+
+      RNFS.exists(sourcePath)
+        .then(exists => {
+          console.log("Archivo existe:", exists);
+          if (exists) {
+            unzipModelFile(sourcePath, targetPath);
+          } else {
+            downloadModelFile(sourcePath, targetPath, modelFile);
+          }
+        })
+        .catch(error => {
+          console.error("Error verificando existencia del archivo:", error);
+        });
     }
-  };  
-
-  // Download models when component mounts
-  useEffect(() => {
-    downloadAndPrepareModels();
-  }, []);
-
-  // Open fun facts modal
-  const openFunFacts = starObjE => {
-    setFactsShow(true);
-    setStarObjE(starObjE);
   };
 
   const acceptWaiverButtonHandler = () => {
@@ -434,21 +163,87 @@ const StarChallenge = () => {
     setIsUnityLoaded(true);
   };
 
-  // Take screenshot (if needed)
-  const takeScreenshot = () => {
-    // Implement screenshot functionality if required
+  const retakeButtonHandler = () => {
+    setCapturedImage(null);
+    setCapturedVideo(null);
+    setIsUnityLoaded(true);
   };
 
-  // Handle Unity messages
-  const onUnityMessage = event => {
-    const message = event.nativeEvent.message;
-    // Handle messages from Unity
+  const playCameraSound = () => {
+    Sound.setCategory("Playback");
+    let cameraSound = new Sound(
+      Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
+      Sound.MAIN_BUNDLE,
+      error => {
+        if (error) {
+          console.error("failed to load the sound", error);
+        } else {
+          cameraSound.play();
+        }
+      }
+    );
+  };
+
+  const takeScreenshot = async () => {
+    playCameraSound();
+
+    if (unityRef?.current) {
+      unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
+
+      // Obtén la ruta base según la plataforma
+      const basePath =
+        Platform.OS === "android"
+          ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
+          : RNFS.DocumentDirectoryPath; // Ruta de Documentos en iOS
+
+      setProcessingMedia(true);
+
+      // Agregar un retraso para asegurarse de que la captura se ha guardado
+      setTimeout(() => {
+        RNFS.readDir(basePath)
+          .then(files => {
+            console.info("Archivos encontrados en el directorio:", files);
+
+            if (Array.isArray(files) && files.length > 0) {
+              // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
+              const foundFile = files.find(
+                file =>
+                  file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
+              );
+
+              if (foundFile) {
+                console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                setCapturedImage(foundFile.path); // Actualiza capturedImage
+                setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
+              } else {
+                console.error("No se encontró ningún archivo .png en el directorio.");
+              }
+            } else {
+              console.error("El directorio está vacío o 'files' no es un array válido.");
+            }
+          })
+          .catch(err => {
+            console.error("Error leyendo el directorio:", err);
+          })
+          .finally(() => {
+            setProcessingMedia(false);
+          });
+      }, 2000); // Asegúrate de que el archivo esté listo
+    }
+  };
+
+  const onDonePress = () => {
+    navigation.replace("ArChallengeShare", {
+      challengeObj: starChallengeObj,
+      captureData: capturedImage,
+      challengeType: CHALLENGES_TYPE.STAR,
+    });
   };
 
   const sendModelDataToUnity = () => {
-    console.log('Entro en modeldata')
+    console.log("Entro en modeldata");
     if (unityRef.current && textureBase && starModels) {
-console.log("Datos Enviados:", modelData)
+      console.log("Datos Enviados:", modelData);
       // Datos del modelo 3D
       const modelData = {
         objFile: starModels.replace("file://", ""),
@@ -456,16 +251,16 @@ console.log("Datos Enviados:", modelData)
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
         scale: {
-                    x: challengeObjParameters?.scale_object
-                      ? Number(challengeObjParameters?.scale_object)
-                      : 0.05,
-                    y: challengeObjParameters?.scale_object
-                      ? Number(challengeObjParameters?.scale_object)
-                      : 0.05,
-                    z: challengeObjParameters?.scale_object
-                      ? Number(challengeObjParameters?.scale_object)
-                      : 0.05,
-                  },
+          x: challengeObjParameters?.scale_object
+            ? Number(challengeObjParameters?.scale_object)
+            : 0.05,
+          y: challengeObjParameters?.scale_object
+            ? Number(challengeObjParameters?.scale_object)
+            : 0.05,
+          z: challengeObjParameters?.scale_object
+            ? Number(challengeObjParameters?.scale_object)
+            : 0.05,
+        },
         // position : {
         //   x: parseFloat(challengeObjParameters?.positionX) || 0,
         //   y: parseFloat(challengeObjParameters?.positionY) || 0,
@@ -479,26 +274,24 @@ console.log("Datos Enviados:", modelData)
       };
       // console.log("Datos del modelo a enviar:", modelData);
       // Enviar datos del modelo a Unity
-      unityRef.current.postMessage(
-        "OBJImport", "LoadModelFromReact", JSON.stringify(modelData)
-      );
-   
+      unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+
       // Parámetros adicionales para el GPSHandler en Unity
       const parameters = {
-        smoothing: 0.5,      // Factor de suavizado
-        scale: 1,        // Factor de escala
-        autoUpdate: false     // Control de actualización automática
+        smoothing: 0.5, // Factor de suavizado
+        scale: 1, // Factor de escala
+        autoUpdate: false, // Control de actualización automática
       };
-      
+
       unityRef.current.postMessage(
         "ObjectSpawner",
         "ConfigureParameters",
         JSON.stringify(parameters)
       );
-  
+
       // Datos de los objetos GPS
-      const start_site = starObj.star_location.coordinates
-      console.log("----", start_site, "----", starObj.star_location)
+      const start_site = starChallengeObj.location.coordinates;
+      console.log("----", start_site);
       const objects = {
         objects: start_site.map(coord => ({
           latitude: coord[1], // Índice 1 corresponde a la latitud
@@ -509,17 +302,19 @@ console.log("Datos Enviados:", modelData)
           updateRadius: 30.0,
         })),
       };
-  
+
       console.log("Datos de los objetos GPS a enviar:", objects);
-  
+
       // Enviar datos de objetos a Unity
       unityRef.current.postMessage(
-        "ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(objects)
+        "ObjectSpawner",
+        "SpawnObjectsFromReact",
+        JSON.stringify(objects)
       );
       const visibilityConfig = {
         isVisible: true,
       };
-     
+
       unityRef.current.postMessage(
         "OBJImport", // Nombre del script en Unity
         "SetVisibilityFromReact", // Método que se llamará
@@ -544,19 +339,31 @@ console.log("Datos Enviados:", modelData)
       // console.log("UnityRef not ready, waiting...");
       return;
     }
-  
+
     if (starModels && textureBase && unityRef.current) {
       // console.log("Sending data to Unity...");
       sendModelDataToUnity();
-       sendBloomValuesToUnity();
+      sendBloomValuesToUnity();
     }
   }, [isUnityLoaded]);
+
+  useEffect(() => {
+    if (challengeObjParameters) {
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
+    }
+  }, [challengeObjParameters]);
+
+  useEffect(() => {
+    checkPermission();
+    downloadAndPrepareModels();
+  }, []);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: starShouldVisible ? "You found a star!" : "AR Star Hunt\n" + selectedGeoSite.name,
+          text: "AR Star Hunt " + starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.name,
           numberOfLines: 2,
           style: [_styles.heading],
         }}
@@ -569,105 +376,31 @@ console.log("Datos Enviados:", modelData)
         contentContainerStyle={{ paddingBottom: 40 }}
       >
         {/* First View (Stars Collected and Points) */}
-        <View
-          style={{
-            backgroundColor: "#131422",
-            borderRadius: 100,
-            paddingHorizontal: 8,
-            alignItems: "center",
-            height: 65,
-            flexDirection: "row",
-            justifyContent: "space-between",
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <StarIcon style={{ width: 48, height: 48, marginEnd: 10 }} />
-            <View>
-              <Text style={_styles.exploringText}>Stars Collected</Text>
-              <Text style={_styles.arrivedText}>
-                {collectedStars.length} / {starsCount}
-              </Text>
-            </View>
-          </View>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
-            <View style={{ marginEnd: 10 }}>
-              <Text style={_styles.exploringText}>Points</Text>
-              <Text style={_styles.arrivedText}>{challengeObj?.points}</Text>
-            </View>
-            <TrophyIcon style={{ width: 48, height: 48 }} />
-          </View>
-        </View>
+        <ChallengeFoundCaptureHeader
+          leftTitle="Stars Collected"
+          leftValue={`${starChallengeObj?.captured_stars} / ${starChallengeObj?.total_stars}`}
+          points={starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points}
+          isStarChallenge
+        />
 
         {/* Unity AR Camera */}
-        <View
-          style={{
-            width: "100%", // Add this line
-            marginVertical: 20,
-            overflow: "hidden",
-            borderRadius: 16,
-          }}
-        >
-          <UnityARCamera
-            unityRef={unityRef}
-            isProcessingMedia={processingMedia}
-            isUnityLoaded={isUnityLoaded}
-            capturedImage={capturedImage}
-            capturedVideo={capturedVideo}
-            // currentLocation={currentLocation}
-            // compassHeading={compassHeading}
-            // collectedStars={collectedStars}
-          />
-        </View>
+
+        <UnityARCamera
+          unityRef={unityRef}
+          isProcessingMedia={processingMedia}
+          isUnityLoaded={isUnityLoaded}
+          capturedImage={capturedImage}
+          capturedVideo={capturedVideo}
+        />
 
         {/* Footer Info Box */}
-        <View
-          style={{
-            width: "100%",
-            backgroundColor: "#131422",
-            borderRadius: 16,
-            padding: 20,
-            paddingBottom: 20,
-            marginVertical: 20,
-            alignItems: "center",
-          }}
-        >
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              justifyContent: "space-between",
-              marginBottom: 15,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <MenIcon style={{ width: 40, height: 40 }} />
-              <View style={{ marginLeft: 10 }}>
-                <Text style={_styles.exploringText}>Nearest Star</Text>
-                {allStarsCollected ? (
-                  <Text style={_styles.arrivedText}>{"You have found all the stars!"}</Text>
-                ) : (
-                  <Text style={_styles.arrivedText}>
-                    {starShouldVisible ? "You found a star!" : `${distanceInFeet} feet away`}
-                  </Text>
-                )}
-              </View>
-            </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <RadarBlipIcon style={{ width: 10, height: 10, marginEnd: 25 }} />
-              <TouchableOpacity>
-                <SpeakerIcon style={{ width: 40, height: 40 }} />
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          <View style={{ flexDirection: "row", alignItems: "center", width: "100%" }}>
-            <InfoIcon style={{ width: 20, height: 20, marginEnd: 6 }} />
-            <Text style={_styles.infoText}>
-              The dot pulsates quicker and the chime beeps faster when you get closer to a Star. You
-              can mute the sound by clicking on the speaker.
-            </Text>
-          </View>
-        </View>
+        <CameraControls
+          onRetake={retakeButtonHandler}
+          onDone={onDonePress}
+          onCameraPress={takeScreenshot}
+          hasCapturedContent={!!capturedImage}
+          customInstructions="Stand next to the Star, resize as needed, snap your photo"
+        />
       </ScrollView>
 
       <CaptureInfoView
@@ -675,29 +408,8 @@ console.log("Datos Enviados:", modelData)
         content={settings?.waiver_details}
         onAccept={acceptWaiverButtonHandler}
       />
-
-      {factsShow && (
-        <View
-          style={{
-            top: 0,
-            bottom: 0,
-            left: 0,
-            right: 0,
-            position: "absolute",
-          }}
-        >
-          <ArStarChallengeShare
-            closeCallBack={() => {
-              setFactsShow(false);
-            }}
-            challengeObj={challengeObj}
-            starObj={starObjE}
-          />
-        </View>
-      )}
     </BackgroundWithImage>
   );
 };
 
 export default StarChallenge;
-

@@ -218,7 +218,7 @@ const GeoArChallenge = ({}) => {
             <View style={{ alignItems: "center", justifyContent: "center" }}>
               <ArIcon style={{ width: 48, height: 48 }} />
               <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>AR Photo Challenges</Text>
+              <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
           </View>
         </View>

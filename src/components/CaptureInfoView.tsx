@@ -51,6 +51,7 @@ const CaptureInfoView = ({ isVisible, content = "", onAccept, onCancel }: Captur
             strong: { color: "#fff", fontSize: FontSizes.S18 },
           }}
           source={{ html: htmlContent }}
+          contentWidth={width}
         />
       </ScrollView>
       <View style={{ width: "100%", paddingHorizontal: 24 }}>

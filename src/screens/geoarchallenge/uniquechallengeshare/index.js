@@ -89,11 +89,7 @@ const UniqueArChallengeShare = ({}) => {
       .then(res => {
         ARUserProfile();
         if (res.status == 1) {
-          showMessage(
-            "Successfully, completed your challenge.",
-            "success",
-            "AR Photo Challenge Share!"
-          );
+          showMessage("Successfully, completed your challenge.", "success", "AR Challenge Share!");
         } else {
           res.message.message =
             "You already completed the challenge or there is some issue with completing the challenge.";

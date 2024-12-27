@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from "react";
 
-import { FontSizes } from '../../../util/FontUtils'
+import { FontSizes } from "../../../util/FontUtils";
 import {
   Alert,
   Dimensions,
@@ -10,104 +10,104 @@ import {
   Text,
   TouchableOpacity,
   View,
-} from 'react-native'
-import { RootStackParamList, ScreenStackComponent } from '../../../navigation/types'
-import BackgroundWithImage from '../../../components/background'
-import AppHeader from '../../../components/header'
-import { useIsFocused, useNavigation, useRoute } from '@react-navigation/native'
-import AppButton from '../../../components/button'
-import RenderHtml from 'react-native-render-html'
-import moment from 'moment'
-import { useDispatch } from 'react-redux'
-import useStyles from './styles'
-import { checkUniqueARChallengeDoneAPI, getGeoARExamples } from '../../../network'
-import BGArShare from '../../../assets/ar/bg-ar-share.png'
-import { showMessage } from '../../../util/helpers'
+} from "react-native";
+import { RootStackParamList, ScreenStackComponent } from "../../../navigation/types";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
+import AppButton from "../../../components/button";
+import RenderHtml from "react-native-render-html";
+import moment from "moment";
+import { useDispatch } from "react-redux";
+import useStyles from "./styles";
+import { checkUniqueARChallengeDoneAPI, getGeoARExamples } from "../../../network";
+import BGArShare from "../../../assets/ar/bg-ar-share.png";
+import { showMessage } from "../../../util/helpers";
 
-const { width } = Dimensions.get('window')
+const { width } = Dimensions.get("window");
 
 const GeoUniqueArChallengeDetails: ScreenStackComponent<
   RootStackParamList,
-  'ArChallengeDetails'
+  "ArChallengeDetails"
 > = ({}) => {
-  const styles = useStyles()
-  const dispatch = useDispatch()
-  const navigation = useNavigation()
-  const route = useRoute()
-  const [examples, setExamples] = useState([])
-  const [isLoading, setIsLoading] = useState(false)
-  const [isChallengeDone, setIsChallengeDone] = useState(false)
-  const challengeObj = route?.params?.challengeObj
-  const startDate = moment(challengeObj.created_at).format('DD-MM-YYYY')
+  const styles = useStyles();
+  const dispatch = useDispatch();
+  const navigation = useNavigation();
+  const route = useRoute();
+  const [examples, setExamples] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isChallengeDone, setIsChallengeDone] = useState(false);
+  const challengeObj = route?.params?.challengeObj;
+  const startDate = moment(challengeObj.created_at).format("DD-MM-YYYY");
 
-  const expiryDate = moment(challengeObj.expiry_date).format('DD-MM-YYYY')
-  const isFocused = useIsFocused()
+  const expiryDate = moment(challengeObj.expiry_date).format("DD-MM-YYYY");
+  const isFocused = useIsFocused();
 
   const checkIfChallengeIsDone = () => {
-    setIsLoading(true)
+    setIsLoading(true);
     checkUniqueARChallengeDoneAPI({
       geo_challenge: challengeObj.id,
     })
       .then(res => {
         if (res.errorStatus == 403) {
-          setIsChallengeDone(true)
+          setIsChallengeDone(true);
         } else {
-          setIsChallengeDone(false)
+          setIsChallengeDone(false);
         }
       })
       .finally(() => {
-        setIsLoading(false)
-      })
-  }
+        setIsLoading(false);
+      });
+  };
 
   const navigateToChallengeCapture = () => {
     if (!isChallengeDone) {
-      navigation.navigate('UniqueArChallengeCapture', { challengeObj })
+      navigation.navigate("UniqueArChallengeCapture", { challengeObj });
     } else {
-      showMessage('You have already completed the challenge.', 'info', 'Unique AR Photo Challenges')
+      showMessage("You have already completed the challenge.", "info", "Unique AR Challenges");
     }
-  }
+  };
 
   useEffect(() => {
     if (isFocused) {
-      checkIfChallengeIsDone()
+      checkIfChallengeIsDone();
     }
-    getExample()
-  }, [isFocused])
+    getExample();
+  }, [isFocused]);
 
   const getExample = () => {
     getGeoARExamples(challengeObj.id)
       .then(res => {
-        setExamples(res.data)
+        setExamples(res.data);
       })
-      .finally(() => {})
-  }
+      .finally(() => {});
+  };
 
   const openExample = () => {
-    const examplesList = examples?.length ? examples[0] : null
+    const examplesList = examples?.length ? examples[0] : null;
     if (examplesList) {
-      navigation.navigate('ChallengeExamples', { examples: examplesList })
+      navigation.navigate("ChallengeExamples", { examples: examplesList });
     } else {
-      showMessage('We are working on adding examples to this challenge.', 'info')
+      showMessage("We are working on adding examples to this challenge.", "info");
     }
-  }
+  };
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader
         centerComponent={{
-          text: 'Unique Site AR',
+          text: "Unique Site AR",
           numberOfLines: 2,
           style: [styles.heading],
         }}
-        backgroundColor='transparent'
+        backgroundColor="transparent"
       />
       <View style={styles.pointContainer}>
         <View
           style={{
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
             width: 73,
             height: 63,
             borderRadius: 8,
@@ -116,8 +116,8 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<
           <BackgroundWithImage
             imageSource={BGArShare}
             style={{
-              backgroundColor: 'transparent',
-              position: 'absolute',
+              backgroundColor: "transparent",
+              position: "absolute",
               top: 0,
               bottom: 0,
               left: 0,
@@ -128,21 +128,21 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<
           <Text style={styles.pointCountText}>Points</Text>
         </View>
         <View style={{ paddingHorizontal: 10, flex: 1 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ flexDirection: "row", alignItems: "center" }}>
             <Image
               style={{ width: 24, height: 24, marginEnd: 10 }}
               source={{ uri: challengeObj.sponsored.image }}
             />
             <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
           </View>
-          <View style={{ marginTop: 10, justifyContent: 'space-between', width: '100%' }}>
+          <View style={{ marginTop: 10, justifyContent: "space-between", width: "100%" }}>
             <Text style={styles.challengeSponsorStartDateText}>
               Started on: <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text>
             </Text>
             <Text style={styles.challengeSponsorStartDateText}>
-              Ends on:{' '}
+              Ends on:{" "}
               <Text style={styles.challengeSponsorStartDateTextValue}>
-                {challengeObj.expiry_date ? expiryDate : 'None'}
+                {challengeObj.expiry_date ? expiryDate : "None"}
               </Text>
             </Text>
           </View>
@@ -158,12 +158,12 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<
           tagsStyles={{
             p: {
               lineHeight: 19.1,
-              color: '#9CA3AF',
+              color: "#9CA3AF",
               fontSize: FontSizes.S14,
             },
             strong: {
               lineHeight: 19.1,
-              color: '#fff',
+              color: "#fff",
               fontSize: FontSizes.S18,
             },
           }}
@@ -180,11 +180,11 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<
           onPress={() => navigateToChallengeCapture()}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainerStyle}
-          title={'Start Challenge'}
+          title={"Start Challenge"}
         />
       </View>
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default GeoUniqueArChallengeDetails
+export default GeoUniqueArChallengeDetails;
