@@ -132,12 +132,12 @@ const ChallengeSelection = () => {
       showMessage("Pin Challenge is unavailable right now", "error");
       return;
     }
-    if (route === "PinChallenge" && !!myCheckIns) {
-      showMessage("Check-ins already submitted and can't submitted more.", "error");
-      return;
-    }
+    // if (route === "PinChallenge" && !!myCheckIns) {
+    //   showMessage("Check-ins already submitted and can't submitted more.", "error");
+    //   return;
+    // }
     if (route === "StarChallenge" && selectedGeoARSiteStars.length === 0) {
-      showMessage("Stars Challenges are unavailable right now", "error");
+      showMessage("This Star Challenge is completed.", "error");
       return;
     } else {
       if (route === "StarChallenge") {
@@ -180,7 +180,7 @@ const ChallengeSelection = () => {
                   <AppText style={styles.challengesText}>
                     {starsChallenge
                       ? `Stars collected: ${starsChallenge?.captured_stars}/${starsChallenge?.total_stars}`
-                      : "Stars are not available"}
+                      : "This Star Challenge is completed."}
                   </AppText>
                 )}
                 {item?.id === 4 && (
