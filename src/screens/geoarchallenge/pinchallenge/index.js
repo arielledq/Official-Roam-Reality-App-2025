@@ -35,8 +35,6 @@ const PinChallenge = () => {
   const [distanceInFeet, setDistanceInFeet] = useState(0);
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false);
   const [detailsShow, setDetailsShow] = useState(true);
-  const [fileFound, setFileFound] = useState(null);
-  const [captureData, setCaptureData] = useState("");
   const [modelOBJ, setModelOBJ] = useState(null);
   const [modelResource, setModelResource] = useState(null);
   const [textureBase, setTextureBase] = useState(null);
@@ -50,13 +48,9 @@ const PinChallenge = () => {
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
   const [emissionValue, setEmissionValue] = useState(1);
-  const [recordingStart, setRecordingStart] = useState(false);
-  const [timer, setTimer] = useState("00:00");
-  const [recordTimeInMillis, setRecordTimeInMillis] = useState(0);
   const [challengeInformationView, setChallengeInformationView] = useState(false);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
-  const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const settings = useSelector(state => state.ar?.arSettings);
@@ -77,12 +71,6 @@ const PinChallenge = () => {
     siteLatitude = selectedGeoSite.lat_long.coordinates[1];
     siteLongitude = selectedGeoSite.lat_long.coordinates[0];
   }
-
-  const handleUnityViewLayout = event => {
-    const { width, height } = event.nativeEvent.layout;
-    setUnityViewDimensions({ width, height });
-    console.log(`UnityView dimensiones: ${width} x ${height}`);
-  };
 
   // Descargar modelo y gestionar archivos
   const downloadModelFile = (sourcePath, targetPath) => {
@@ -368,8 +356,8 @@ const PinChallenge = () => {
 
                 if (foundFile) {
                   console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
-                  setFileFound(foundFile.path);
-                  setCaptureData(foundFile.path);
+                  // setFileFound(foundFile.path);
+                  // setCaptureData(foundFile.path);
                   setCapturedImage(foundFile.path); // Actualiza capturedImage
                   setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
                 } else {
@@ -492,7 +480,6 @@ const PinChallenge = () => {
         unityRef={unityRef}
         isProcessingMedia={processingMedia}
         isUnityLoaded={isUnityLoaded}
-        onUnityLayout={handleUnityViewLayout}
         capturedImage={capturedImage}
         capturedVideo={capturedVideo}
       />
@@ -502,7 +489,6 @@ const PinChallenge = () => {
         onDone={onDonePress}
         onCameraPress={_takeScreenshot}
         hasCapturedContent={!!capturedImage}
-        // customInstructions="Stand in frame next to the pin, resize and shift as needed, snap your photo"
         customInstructions="Stand next to the pin, resize as needed, snap your photo"
       />
 

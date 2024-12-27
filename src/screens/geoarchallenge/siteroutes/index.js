@@ -1,12 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-} from "react-native";
+import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useNavigation } from "@react-navigation/native";
@@ -17,6 +10,7 @@ import { useSelector } from "react-redux";
 import { AppButton } from "../../../components";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+import CirclePinIcon from "assets/geoar/circle_marker_img.svg";
 import MapViewDirections from "react-native-maps-directions";
 import { convertKilometersToMiles } from "../../../util/helpers";
 import Strings from "../../../constants/Strings";
@@ -112,7 +106,7 @@ const GeoArSiteRoutes = ({ route }) => {
       lat: starChallengeObj?.location?.coordinates[1],
       lon: starChallengeObj?.location?.coordinates[0],
       title: "",
-      icon: <MarkerIcon />, // TODO: Update to a cicle icon
+      icon: <CirclePinIcon />, // TODO: Update to a cicle icon
     };
   } else {
     screenTitle = selectedGeoSite.name;
@@ -215,17 +209,19 @@ const GeoArSiteRoutes = ({ route }) => {
 
             {latitude && longitude && (
               <>
-                <Marker
-                  coordinate={{
-                    latitude: latitude,
-                    longitude: longitude,
-                  }}
-                  title={"Current Location"}
-                >
-                  <View style={styles.markerIconContainer}>
-                    <MarkerIcon />
-                  </View>
-                </Marker>
+                {!isStarChallenge && (
+                  <Marker
+                    coordinate={{
+                      latitude: latitude,
+                      longitude: longitude,
+                    }}
+                    title={"Current Location"}
+                  >
+                    <View style={styles.markerIconContainer}>
+                      <MarkerIcon />
+                    </View>
+                  </Marker>
+                )}
 
                 {renderMapViewDirections("DRIVING")}
                 {renderMapViewDirections("WALKING")}

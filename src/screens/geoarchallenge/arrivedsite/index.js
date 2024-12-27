@@ -18,6 +18,7 @@ import BackgroundWithImage from "../../../components/background";
 
 import MoveForwardIcon from "../../../assets/geoar/large-step.svg";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+import CircleMarkerIcon from "../../../assets/geoar/circle_marker_img.svg";
 
 import useStyles from "./styles";
 
@@ -83,7 +84,7 @@ const GeoArSiteArrived = ({ route }) => {
               title={selectedGeoSite.name}
             >
               <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
+                {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
               </View>
             </Marker>
           </MapView>
