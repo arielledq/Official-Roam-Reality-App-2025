@@ -329,6 +329,8 @@ class GeoLocationSerializer(GeoModelSerializer):
             "sequence_number",
             "map_longitude_delta",
             "map_latitude_delta",
+            "unique_ar_sites",
+            "star_ar_sites",
         )
 
 
