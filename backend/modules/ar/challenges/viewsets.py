@@ -363,7 +363,7 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
 
         if ar_star.following_mode == 'PROXIMITY':
             remaining_stars = remaining_stars.annotate(distance=Distance('location', user_location)).order_by('distance')
-        elif ar_star.following_mode == 'SPECIFIC ORDER':
+        elif ar_star.following_mode == 'SPECIFIC':
             remaining_stars = remaining_stars.order_by('order')
 
         if remaining_stars.exists():
