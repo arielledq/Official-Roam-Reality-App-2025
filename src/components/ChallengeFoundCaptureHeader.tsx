@@ -8,20 +8,26 @@ import theme from "assets/theme";
 // @ts-ignore
 import PinIcon from "../assets/geoar/pin_locationicon.svg";
 // @ts-ignore
+import StarIcon from "../assets/geoar/star_icon.svg";
+// @ts-ignore
 import TrophyIcon from "../assets/geoar/trophy_icon.svg";
 
 interface ChallengeFoundCaptureHeaderProps {
   leftTitle?: string;
+  leftValue?: string;
   challengeFound?: boolean;
   points?: number;
+  isStarChallenge?: boolean;
 }
 
 const iconSize = 32;
 
 const ChallengeFoundCaptureHeader = ({
   leftTitle,
+  leftValue,
   challengeFound,
   points,
+  isStarChallenge,
 }: ChallengeFoundCaptureHeaderProps) => {
   return (
     <View
@@ -36,7 +42,11 @@ const ChallengeFoundCaptureHeader = ({
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <PinIcon style={{ width: iconSize, height: iconSize, marginEnd: 10 }} />
+        {isStarChallenge ? (
+          <StarIcon style={{ width: iconSize, height: iconSize, marginEnd: 10 }} />
+        ) : (
+          <PinIcon style={{ width: iconSize, height: iconSize, marginEnd: 10 }} />
+        )}
         <View>
           <Text
             // @ts-ignore
@@ -60,7 +70,7 @@ const ChallengeFoundCaptureHeader = ({
               textAlign: "center",
             }}
           >
-            {challengeFound ? 1 : 0} / 1
+            {isStarChallenge ? leftValue : `${challengeFound ? 1 : 0} / 1`}
           </Text>
         </View>
       </View>
