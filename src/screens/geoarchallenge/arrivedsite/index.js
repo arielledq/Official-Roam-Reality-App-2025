@@ -1,12 +1,5 @@
-import React, { useState } from "react";
-import {
-  ActivityIndicator,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React from "react";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
@@ -22,8 +15,8 @@ import CircleMarkerIcon from "../../../assets/geoar/circle_marker_img.svg";
 
 import useStyles from "./styles";
 
+// Navigation Step 3
 const GeoArSiteArrived = ({ route }) => {
-  const [isLoading, setIsLoading] = useState(false);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
 
   const _styles = useStyles();
@@ -31,6 +24,17 @@ const GeoArSiteArrived = ({ route }) => {
 
   const starChallengeObj = route.params?.starsChallenge;
   const isStarChallenge = !!starChallengeObj?.id;
+
+  let latitude = 0;
+  let longitude = 0;
+
+  if (isStarChallenge) {
+    latitude = starChallengeObj?.location?.coordinates[1];
+    longitude = starChallengeObj?.location?.coordinates[0];
+  } else if (selectedGeoSite) {
+    latitude = selectedGeoSite?.lat_long?.coordinates[1];
+    longitude = selectedGeoSite?.lat_long?.coordinates[0];
+  }
 
   const arrivedButtonHandler = () => {
     if (isStarChallenge) {
@@ -50,7 +54,6 @@ const GeoArSiteArrived = ({ route }) => {
         backgroundColor="transparent"
       />
 
-      {isLoading && <ActivityIndicator size="large" />}
       <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
         <View
           style={{
@@ -68,20 +71,18 @@ const GeoArSiteArrived = ({ route }) => {
             style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
             zoomEnabled={true}
             scrollEnabled={true}
-            showsUserLocation={Platform.OS === "ios"}
             initialRegion={{
-              latitude: selectedGeoSite.lat_long.coordinates[1],
-              longitude: selectedGeoSite.lat_long.coordinates[0],
+              latitude: latitude,
+              longitude: longitude,
               latitudeDelta: 0.0032,
               longitudeDelta: 0.0032,
             }}
           >
             <Marker
               coordinate={{
-                latitude: selectedGeoSite.lat_long.coordinates[1],
-                longitude: selectedGeoSite.lat_long.coordinates[0],
+                latitude: latitude,
+                longitude: longitude,
               }}
-              title={selectedGeoSite.name}
             >
               <View style={{ width: 30, height: 30 }}>
                 {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}

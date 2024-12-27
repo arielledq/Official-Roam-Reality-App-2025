@@ -74,13 +74,7 @@ const GeoArSiteDetails = ({}) => {
   };
 
   const setStarCounts = () => {
-    let count = 0;
-    for (const stars_site of selectedGeoARSiteStars) {
-      if (stars_site.star_location && stars_site.star_location.coordinates) {
-        count += stars_site.star_location.coordinates.length;
-      }
-    }
-    setStarsCount(count);
+    setStarsCount(selectedGeoARSiteStars?.length);
   };
 
   const InfoView = () => {

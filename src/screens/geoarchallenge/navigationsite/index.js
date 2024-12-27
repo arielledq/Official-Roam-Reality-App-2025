@@ -30,6 +30,7 @@ import CenterIcon from "../../../assets/Icons/CenterIcon.svg";
 
 import useStyles from "./styles";
 
+// Navigation Step 2
 const GeoArSiteNavigation = () => {
   const [mileDistance, setMileDistance] = useState(0);
   const [durationMins, setDurationMins] = useState(0);
@@ -68,11 +69,11 @@ const GeoArSiteNavigation = () => {
   let longitudeDestination;
 
   if (isStarChallenge) {
-    latitudeDestination = starChallengeObj?.location.coordinates[1];
-    longitudeDestination = starChallengeObj?.location.coordinates[0];
+    latitudeDestination = starChallengeObj?.location?.coordinates[1];
+    longitudeDestination = starChallengeObj?.location?.coordinates[0];
   } else {
-    latitudeDestination = selectedGeoSite.lat_long.coordinates[1];
-    longitudeDestination = selectedGeoSite.lat_long.coordinates[0];
+    latitudeDestination = selectedGeoSite?.lat_long?.coordinates[1];
+    longitudeDestination = selectedGeoSite?.lat_long?.coordinates[0];
   }
 
   const calculatedEstimatedTime = duration => {

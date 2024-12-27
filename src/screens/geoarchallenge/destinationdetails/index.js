@@ -495,17 +495,6 @@ const GeoArChallengeDetails = ({}) => {
           style={{
             alignItems: "center",
             justifyContent: "center",
-            width: 80,
-          }}
-        >
-          <ARSiteCountBG style={{ width: 48, height: 48 }}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{hiddenStars}</Text>
-          <Text style={_styles.s_list_text}>Hidden Stars</Text>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
             width: 100,
           }}
         >

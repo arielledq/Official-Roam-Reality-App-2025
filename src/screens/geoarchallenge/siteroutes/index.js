@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { ScrollView, Text, TouchableOpacity, View, StyleSheet } from "react-native";
+import { ScrollView, Text, TouchableOpacity, View, StyleSheet, Platform } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useNavigation } from "@react-navigation/native";
@@ -17,6 +17,7 @@ import Strings from "../../../constants/Strings";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import { GeolocationContext } from "../../../GeolocationProvider";
 
+// Navigation Step 1
 const GeoArSiteRoutes = ({ route }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [mileDistance, setMileDistance] = useState(0);
@@ -196,6 +197,7 @@ const GeoArSiteRoutes = ({ route }) => {
             ref={mapView}
             style={styles.map}
             initialRegion={initialRegion}
+            showsUserLocation={Platform.OS === "ios"}
           >
             <Marker
               coordinate={{
@@ -209,20 +211,6 @@ const GeoArSiteRoutes = ({ route }) => {
 
             {latitude && longitude && (
               <>
-                {!isStarChallenge && (
-                  <Marker
-                    coordinate={{
-                      latitude: latitude,
-                      longitude: longitude,
-                    }}
-                    title={"Current Location"}
-                  >
-                    <View style={styles.markerIconContainer}>
-                      <MarkerIcon />
-                    </View>
-                  </Marker>
-                )}
-
                 {renderMapViewDirections("DRIVING")}
                 {renderMapViewDirections("WALKING")}
               </>
