@@ -1,21 +1,25 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View, StyleSheet, Platform } from "react-native";
+
+import { useNavigation } from "@react-navigation/native";
+import { useSelector } from "react-redux";
+import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
+
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
-import { useNavigation } from "@react-navigation/native";
+import { AppButton } from "../../../components";
+
+import { convertKilometersToMiles } from "../../../util/helpers";
+import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
+import { GeolocationContext } from "../../../GeolocationProvider";
+import Config from "../../../config";
+
 import CarIcon from "../../../assets/geoar/car.svg";
 import RoadIcon from "../../../assets/geoar/road.svg";
 import TimeIcon from "../../../assets/geoar/time.svg";
-import { useSelector } from "react-redux";
-import { AppButton } from "../../../components";
-import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
 import CirclePinIcon from "assets/geoar/circle_marker_img.svg";
-import MapViewDirections from "react-native-maps-directions";
-import { convertKilometersToMiles } from "../../../util/helpers";
-import Strings from "../../../constants/Strings";
-import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
-import { GeolocationContext } from "../../../GeolocationProvider";
 
 // Navigation Step 1
 const GeoArSiteRoutes = ({ route }) => {
@@ -154,7 +158,7 @@ const GeoArSiteRoutes = ({ route }) => {
           latitude: regionCoordinates.lat,
           longitude: regionCoordinates.lon,
         }}
-        apikey={Strings.GOOGLE_PLACE_API_KEY}
+        apikey={Config.GEOCODER_API_KEY}
         strokeWidth={mode === "DRIVING" ? 3 : 0}
         strokeColor="hotpink"
         optimizeWaypoints={true}
