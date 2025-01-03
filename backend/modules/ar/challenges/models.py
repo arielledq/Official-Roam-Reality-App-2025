@@ -335,6 +335,7 @@ class GeoARChallenges(models.Model):
     )
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
+    info = RichTextField(_("Info"), blank=True, null=True)
 
     def save(self, *args, **kwargs):
         # self.clean()

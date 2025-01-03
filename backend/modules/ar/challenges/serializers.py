@@ -168,7 +168,8 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "expiry_date",
             "sponsored",
             "parameters",
-            "ar_filters"
+            "ar_filters",
+            "info",
         )
 
 
@@ -246,7 +247,8 @@ class GeoARChallengesSerializer(serializers.ModelSerializer):
             "expiry_date",
             "sponsored",
             "parameters",
-            "ar_filters"
+            "ar_filters",
+            "info",
         )
 
 
