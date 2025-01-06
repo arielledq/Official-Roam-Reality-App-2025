@@ -8,6 +8,7 @@ import Video from "react-native-video";
 import { useDispatch } from "react-redux";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { RouteProp } from "@react-navigation/native";
+import { SSNN } from "../../constants";
 
 import {
   getARProfile,
@@ -47,17 +48,38 @@ function getFileExtension(url: string) {
 }
 
 const ArChallengeShare = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
+  const [socialPointsCounter, setSocialPointsCounter] = useState({
+    facebook: 0,
+    instagram: 0,
+    others: 0,
+  });
+
+  const { userLocation } = useContext(GeolocationContext);
+  const dispatch = useDispatch();
+
   // Update the route type
   const route =
     useRoute<RouteProp<{ ShareChallenge: ShareChallengeRouteParams }, "ShareChallenge">>();
+  const navigation = useNavigation();
+
+  let isStarChallenge = false;
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
   const isMemory = route?.params?.isMemory;
 
   let screenTitle = "";
-  let challengePoints = challengeObj?.points || 0;
-  let isStarChallenge = false;
+  let challengePoints = 0;
+  if (challengeObj?.points) {
+    challengePoints =
+      challengeObj.points +
+      socialPointsCounter.facebook +
+      socialPointsCounter.instagram +
+      socialPointsCounter.others;
+  }
+
   let challengeTitle = `Congrats on completing the ${challengeObj?.sponsored?.name} AR Experience!`;
   let sponsorImage = challengeObj?.sponsored?.image || "";
   let sponsorName = challengeObj?.sponsored?.name || "";
@@ -81,7 +103,7 @@ const ArChallengeShare = () => {
       if (isMemory) startDate = "-";
       const remainingStars = challengeObj?.remaining_stars;
       if (remainingStars > 1) {
-        challengePoints = "";
+        challengePoints = 0;
         challengeTitle = "";
         endChallengeButtonText = "Continue to the next Star";
       } else {
@@ -93,18 +115,58 @@ const ArChallengeShare = () => {
       break;
   }
 
-  const navigation = useNavigation();
   const capturedDataUri = isMemory ? captureData : `file://${captureData}`;
 
   const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
   const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop();
 
-  const [isLoading, setIsLoading] = useState(false);
-  const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
+  const countSocialPoints = (
+    selectedSSNN: string,
+    grantSocialPointsHandler: (selectedSSNN: string) => {}
+  ) => {
+    switch (selectedSSNN) {
+      case SSNN.FACEBOOK:
+        setSocialPointsCounter(currCounter => {
+          let updatedCounter = currCounter.facebook;
+          if (currCounter.facebook === 0) {
+            updatedCounter = 1;
+            grantSocialPointsHandler(selectedSSNN);
+          }
+          return {
+            ...currCounter,
+            facebook: updatedCounter,
+          };
+        });
+        break;
+      case SSNN.INSTAGRAM:
+        setSocialPointsCounter(currCounter => {
+          let updatedCounter = currCounter.instagram;
+          if (currCounter.instagram === 0) {
+            updatedCounter = 1;
+            grantSocialPointsHandler(selectedSSNN);
+          }
+          return {
+            ...currCounter,
+            instagram: updatedCounter,
+          };
+        });
+        break;
+      case SSNN.OTHERS:
+        setSocialPointsCounter(currCounter => {
+          let updatedCounter = currCounter.others;
+          updatedCounter += 1;
+          grantSocialPointsHandler(selectedSSNN);
+          return {
+            ...currCounter,
+            others: updatedCounter,
+          };
+        });
+        break;
 
-  const { userLocation } = useContext(GeolocationContext);
-
-  const dispatch = useDispatch();
+      default:
+        break;
+    }
+  };
 
   const ARUserProfile = () => {
     getARProfile()
@@ -474,6 +536,7 @@ const ArChallengeShare = () => {
         fileExt={fileExt}
         isVisible={shareToSocialsIsOpen}
         isMemory={isMemory}
+        onPointsGranted={countSocialPoints}
         onClose={closeShareToSocialMediaButtonHandler}
       />
     </ChallengeScreen>

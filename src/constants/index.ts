@@ -6,3 +6,9 @@ export const CHALLENGES_TYPE = {
   STAR: "STAR",
   STAR_TITLE: "AR Star",
 };
+
+export const SSNN = {
+  INSTAGRAM: "INSTAGRAM",
+  FACEBOOK: "FACEBOOK",
+  OTHERS: "OTHERS",
+};

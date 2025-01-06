@@ -11,24 +11,24 @@ import { socialPointsARUpdateAPI } from "network";
 import Images from "assets/images";
 import { showMessage } from "util/helpers";
 import Config from "config";
+import { SSNN } from "../constants";
 
 interface ShareToSocialsModalProps {
   isVisible: boolean;
   onClose: () => void;
+  onPointsGranted: (
+    selectedSSNN: string,
+    grantSocialPointsHandler: (selectedSSNN: string) => {}
+  ) => void;
   fileUri?: string | undefined;
   fileExt?: string | undefined;
   isMemory?: boolean;
 }
 
-const SSNN = {
-  INSTAGRAM: "INSTAGRAM",
-  FACEBOOK: "FACEBOOK",
-  OTHERS: "OTHERS",
-};
-
 const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   isVisible = false,
   onClose,
+  onPointsGranted,
   fileUri,
   fileExt,
   isMemory = false,
@@ -95,14 +95,18 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     }
     if (!isMemory && hasShared) {
       try {
-        await socialPointsARUpdateAPI({
-          social_network: selectedSSNN,
-        });
-        showMessage(
-          "You've been granted points for sharing to your socials",
-          "success",
-          `Socials points granted!`
-        );
+        const grantSocialPointsHandler = async (selectedSSNN: string) => {
+          await socialPointsARUpdateAPI({
+            social_network: selectedSSNN,
+          });
+
+          showMessage(
+            "You've been granted points for sharing to your socials",
+            "success",
+            `Socials points granted!`
+          );
+        };
+        onPointsGranted(selectedSSNN, grantSocialPointsHandler);
       } catch (error: any) {
         console.error("Error assigning points:", error?.message, error);
       }
