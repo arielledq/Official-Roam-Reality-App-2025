@@ -12,6 +12,7 @@ interface CaptureChallengeScreenProps {
   headerRightComponent?: React.ReactNode;
   modals?: React.ReactNode;
   children: React.ReactNode;
+  scrollable?: boolean;
 }
 
 const ChallengeScreen = ({
@@ -19,8 +20,22 @@ const ChallengeScreen = ({
   headerRightComponent,
   modals,
   children,
+  scrollable = true,
 }: CaptureChallengeScreenProps) => {
   const { height, width } = useWindowDimensions();
+
+  const screenContainerStyle = {
+    paddingBottom: 40,
+    paddingHorizontal: screenHorizontalPadding,
+  };
+  let screenContainer = (
+    <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={screenContainerStyle}>
+      {children}
+    </ScrollView>
+  );
+  if (!scrollable) {
+    screenContainer = <View style={{ ...screenContainerStyle, flex: 1 }}>{children}</View>;
+  }
 
   return (
     <View style={{ flex: 1, backgroundColor: theme.darkColors?.inputBG }}>
@@ -55,15 +70,7 @@ const ChallengeScreen = ({
         rightComponent={headerRightComponent}
       />
 
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{
-          paddingBottom: 40,
-          paddingHorizontal: screenHorizontalPadding,
-        }}
-      >
-        {children}
-      </ScrollView>
+      {screenContainer}
 
       {modals}
     </View>
