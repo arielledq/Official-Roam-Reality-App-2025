@@ -146,8 +146,7 @@ const PinChallenge = () => {
   };
 
   const sendModelDataToUnitySpawn = () => {
-    if (unityRef.current && modelOBJ && textureBase) {
-      console.log(siteLatitude, siteLongitude);
+    if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
       const modelData = {
         objFile: modelOBJ.replace("file://", ""), // Ruta del archivo OBJ
         mtlFile: modelResource ? modelResource.replace("file://", "") : null, // Ruta del archivo MTL
@@ -427,11 +426,11 @@ const PinChallenge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (unityRef.current && modelOBJ) {
+      if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
         sendModelDataToUnitySpawn();
         sendBloomValuesToUnity();
       }
-    }, [modelOBJ, textureBase, isUnityLoaded])
+    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded])
   );
 
   const acceptWaiverButtonHandler = () => {
