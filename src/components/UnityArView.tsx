@@ -39,8 +39,6 @@ const UnityARCamera = ({
     <View style={{ flex: 1, alignItems: "center", marginVertical: 12 }}>
       <View
         style={{
-          flex: 1,
-          minHeight: aspectHeight,
           height: aspectHeight,
           width: screenWidth - offset,
         }}
