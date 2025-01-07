@@ -469,6 +469,7 @@ const PinChallenge = () => {
       title={`Location Check In\n${selectedGeoSite.name}`}
       modals={modals}
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
+      scrollable={false}
     >
       <ChallengeFoundCaptureHeader
         leftTitle="Pin Found"
@@ -492,7 +493,8 @@ const PinChallenge = () => {
         customInstructions="Stand next to the pin, resize as needed, snap your photo"
       />
 
-      <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} />
+      {/* Removing temporarily */}
+      {/* <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} /> */}
     </ChallengeScreen>
   );
 };
