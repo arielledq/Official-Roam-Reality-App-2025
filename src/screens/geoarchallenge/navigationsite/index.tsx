@@ -455,6 +455,12 @@ const GeoArSiteNavigation = () => {
     navigation.goBack();
   };
 
+  const adjustZoomLevel = (distance: number) => {
+    if (distance < 3) return 19; // Close-up for short distances
+    if (distance < 10) return 18; // Medium zoom for moderate distances
+    return 17; // Wider view for long distances
+  };
+
   const handleUserLocationChange = (event: any) => {
     // Ensure nativeEvent and coordinate are defined
     if (!event?.nativeEvent?.coordinate) {
@@ -462,7 +468,7 @@ const GeoArSiteNavigation = () => {
       return;
     }
 
-    if (hideRoute) return;
+    // if (hideRoute) return;
 
     const userCoords = {
       latitude: event.nativeEvent.coordinate.latitude,
@@ -485,19 +491,18 @@ const GeoArSiteNavigation = () => {
       console.log("Distance from route:", distanceFromRoute);
 
       if (distanceFromRoute > MARGIN_ARRIVAL_METERS) {
-        setHideRoute(true);
-        showMessage("Your route has been updated.", "info", "Route recalculated!");
+        // setHideRoute(true);
         playProximitySound();
 
         // @ts-ignore
-        mapView?.current?.animateCamera({
-          center: userCoords,
-          heading: compassHeading.current,
-          zoom: 17,
-        });
-        setTimeout(() => {
-          setHideRoute(false);
-        }, 500);
+        // mapView?.current?.animateCamera({
+        //   center: userCoords,
+        //   heading: compassHeading.current,
+        //   zoom: 17,
+        // });
+        // setTimeout(() => {
+        //   setHideRoute(false);
+        // }, 500);
         // @ts-ignore
         setRouteInitialLocation({ coords: userCoords });
       }
@@ -518,6 +523,31 @@ const GeoArSiteNavigation = () => {
         // @ts-ignore
         navigation.replace("GeoArSiteArrived");
         return;
+      }
+
+      const bearing = calculateBearing(
+        userCoords.latitude,
+        userCoords.longitude,
+        selectedGeoSite.lat_long.coordinates[1],
+        selectedGeoSite.lat_long.coordinates[0]
+      );
+
+      // const distance = getLocationDistance(userCoords, {
+      //   latitude: selectedGeoSite.lat_long.coordinates[1],
+      //   longitude: selectedGeoSite.lat_long.coordinates[0],
+      // });
+      // console.log("Distance from route outside if:", distance);
+
+      const zoom = adjustZoomLevel(distanceFromRoute);
+
+      // Animate camera to the new position
+      if (mapView.current) {
+        // @ts-ignore
+        mapView.current?.animateCamera({
+          center: userCoords,
+          zoom: zoom,
+          heading: bearing,
+        });
       }
     }
   };
