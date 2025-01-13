@@ -101,7 +101,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 11
-        versionName "1.0"
+        versionName "1.0.11"
         multiDexEnabled true
     }
 
@@ -167,6 +167,8 @@ dependencies {
 
     implementation project(':react-native-splash-screen')
 
+    implementation "com.google.android.gms:play-services-location:21.0.1"
+    
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
 
     implementation 'com.facebook.fresco:fresco:3.1.0'
