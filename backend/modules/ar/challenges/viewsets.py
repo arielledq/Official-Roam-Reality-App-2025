@@ -2,13 +2,13 @@ import json
 
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
-    DestinationFacts, PanicMessage
+    DestinationFacts, PanicMessage, ARExperience, GeoArSiteCategory
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories, \
-    GeoStarPointSerializer
+    GeoStarPointSerializer, ARExperienceSerializer, GeoArSiteCategorySerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -26,6 +26,8 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 import datetime
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 
 
@@ -338,6 +340,15 @@ class ARProfileViewSet(ViewSet):
         return Response(serializer.data)
 
 
+class ARExperienceViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for viewing and editing challenges.
+    """
+    queryset = ARExperience.objects.all()
+    serializer_class = ARExperienceSerializer
+    http_method_names = ["get"]
+
+
 class ChallengesViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing challenges.
@@ -368,6 +379,15 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     """
     queryset = GeoLocation.objects.all().order_by('sequence_number')
     serializer_class = GeoLocationSerializer
+    http_method_names = ["get"]
+
+
+class GeoArSiteCategoryViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for listing all categories for GeoArSite.
+    """
+    queryset = GeoArSiteCategory.objects.all()
+    serializer_class = GeoArSiteCategorySerializer
     http_method_names = ["get"]
 
 

@@ -16,7 +16,6 @@ import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg";
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png";
-import MarkerIcon from "../../../assets/geoar/marker_img.svg";
 import Geocoder from "react-native-geocoding";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -29,6 +28,7 @@ import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
 import { getAllARSitesStars, sendRoamingNotification } from "../../../network";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
+import MarkerIcon from "components/marker";
 
 const GeoArSiteDetails = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +90,7 @@ const GeoArSiteDetails = ({}) => {
             }}
           >
             <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
-            <Text style={_styles.protip_text}>Pro Tips</Text>
+            <Text style={_styles.protip_text}>{selectedGeoSite?.category?.id? "Useful Links" : "Pro Tips"}</Text>
           </View>
         </View>
         <ScrollView
@@ -249,7 +249,7 @@ const GeoArSiteDetails = ({}) => {
               title={selectedGeoSite.name}
             >
               <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
+                <MarkerIcon color={selectedGeoSite?.category?.color}/>
               </View>
             </Marker>
           </MapView>
@@ -361,7 +361,7 @@ const GeoArSiteDetails = ({}) => {
               }}
             >
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
-              <Text style={_styles.protip_text}>Pro Tips</Text>
+              <Text style={_styles.protip_text}>{selectedGeoSite?.category?.id? "Useful Links" : "Pro Tips"}</Text>
             </TouchableOpacity>
             <View>
               <AppButton
