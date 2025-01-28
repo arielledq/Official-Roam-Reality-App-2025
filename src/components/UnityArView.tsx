@@ -14,6 +14,8 @@ interface ImageFilter {
   viewShotRef: any;
 }
 interface UnityARCameraProps {
+  height : string;
+  width : string;
   unityRef?: any;
   isProcessingMedia?: boolean;
   isUnityLoaded?: boolean;
@@ -25,6 +27,8 @@ interface UnityARCameraProps {
 }
 
 const UnityARCamera = ({
+  height ,
+  width,
   unityRef = null,
   isProcessingMedia = false,
   isUnityLoaded = false,
@@ -39,8 +43,8 @@ const UnityARCamera = ({
     <View style={{ flex: 1, alignItems: "center", marginVertical: 12 }}>
       <View
         style={{
-          height: aspectHeight,
-          width: screenWidth - offset,
+          height: height || aspectHeight,
+          width: width || screenWidth - offset,
         }}
       >
         {isProcessingMedia ? (
