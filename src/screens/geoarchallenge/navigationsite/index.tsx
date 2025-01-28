@@ -135,7 +135,6 @@ const GeoArSiteNavigation = () => {
   const [latitude, setLatitude] = useState(userLocation?.latitude);
   const [longitude, setLongitude] = useState(userLocation?.longitude);
   const [zoomLevel, setZoomLevel] = useState(0);
-  const [offlineStatus, setOfflineStatus] = useState(null);
   const [router, setRoute] = useState<{} | null>(null);
   const [selectedStep, setSelectedStep] = useState<StepResponse | null>(null);
 
@@ -143,6 +142,7 @@ const GeoArSiteNavigation = () => {
   const mapViewRef = useRef(null);
   const watchIdRef = useRef(null);
   const compassHeading = useRef(0);
+  const navigationMessage = useRef("");
 
   const route = useRoute();
   const _styles = useStyles();
@@ -286,9 +286,12 @@ const GeoArSiteNavigation = () => {
         }
         distanceFromStep.current = 0;
 
-        if (!mute) {
-          Tts.setDucking(true);
-          Tts.speak(currentStepRes.html_instructions);
+        if (navigationMessage.current !== currentStepRes.html_instructions) {
+          navigationMessage.current = currentStepRes.html_instructions;
+          if (!mute) {
+            Tts.setDucking(true);
+            Tts.speak(navigationMessage.current);
+          }
         }
 
         if (!currentStepRes?.end_location?.lat || !currentStepRes?.end_location?.lng) return;
@@ -431,8 +434,6 @@ const GeoArSiteNavigation = () => {
           packOptions,
           // progress callback
           (offlineRegion, status: any) => {
-            setOfflineStatus(status);
-            // Optionally handle progress
             if (
               status.completedResourceCount === status.requiredResourceCount &&
               status.completedTileCount === status.requiredTileCount
@@ -498,6 +499,17 @@ const GeoArSiteNavigation = () => {
         showLocationDialog: true,
       }
     );
+  };
+
+  const handleUserHeading = (event: any) => {
+    const heading = event?.nativeEvent?.coordinate?.heading;
+    if (heading && heading !== compassHeading.current) {
+      compassHeading.current = heading;
+      // @ts-ignore
+      mapView.current.animateCamera({
+        heading: heading,
+      });
+    }
   };
 
   const stopLocationUpdates = () => {
@@ -672,6 +684,7 @@ const GeoArSiteNavigation = () => {
                 longitudeDelta: 0.01,
               }}
               onRegionChangeComplete={handleRegionChange}
+              onUserLocationChange={handleUserHeading}
             >
               <Marker
                 coordinate={{
