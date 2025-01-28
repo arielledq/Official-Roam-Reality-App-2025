@@ -3,13 +3,25 @@ from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, 
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
     GeoARSiteActivity, StarCollection, \
-    ARSitePinCheckIn, GeoARGoldStar, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint
+    ARSitePinCheckIn, GeoARGoldStar, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint, ARExperience, \
+    GeoArSiteCategory
 from .widgets import GoogleMapsOpenLayersWidget, GoogleMapsOpenLayersWidgetZoom
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.html import format_html
+
+
+@admin.register(ARExperience)
+class ARExperienceAdmin(admin.ModelAdmin):
+    list_display = ('title_1',)
+
+
+@admin.register(GeoArSiteCategory)
+class GeoArSiteCategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
 
 class ARMemoriesAdmin(admin.ModelAdmin):
     

@@ -254,6 +254,51 @@ class ARChallengeFilters(models.Model):
         return self.name
 
 
+class GeoArSiteCategory(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    color = models.CharField(_("Color"), max_length=10, blank=True, null=True,
+                                  default='#ffffff')
+
+    class Meta:
+        verbose_name_plural = "Geo AR Site Categories"
+        verbose_name = "Geo AR Site Category"
+
+    def __str__(self):
+        return self.name
+
+
+class ARExperience(models.Model):
+    title_1 = models.CharField(
+        _("Title 1"), default=None, null=False, blank=False, max_length=255
+    )
+
+    title_2 = models.CharField(
+        _("Title 2"), default=None, null=True, blank=True, max_length=255
+    )
+
+    subtitle = models.CharField(
+        _("Subtitle"), default=None, null=True, blank=True, max_length=255
+    )
+
+    image = models.ImageField(_("Image"), upload_to="ar/img/", null=True, blank=True)
+
+    order = models.PositiveIntegerField(
+        _("Order"), default=0
+    )
+
+    is_event = models.BooleanField(_("Is event"), default=False)
+
+    class Meta:
+        verbose_name_plural = "AR Experiences"
+        verbose_name = "AR Experience"
+        ordering = ['order']
+
+    def __str__(self):
+        return self.title_1
+
+
 class Challenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
@@ -290,6 +335,17 @@ class Challenges(models.Model):
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     info = RichTextField(_("Info"), blank=True, null=True)
+    cooldown_hours = models.PositiveIntegerField(
+        default=24,
+        verbose_name='Cooldown (in hours)'
+    )
+
+    ar_experience = models.ForeignKey(
+        ARExperience,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="challenges",  # _ar_experience
+    )
 
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)
@@ -336,6 +392,17 @@ class GeoARChallenges(models.Model):
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     info = RichTextField(_("Info"), blank=True, null=True)
+    cooldown_hours = models.PositiveIntegerField(
+        default=24,
+        verbose_name='Cooldown (in hours)'
+    )
+
+    ar_experience = models.ForeignKey(
+        ARExperience,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name="geo_challenges",  # _ar_experience
+    )
 
     def save(self, *args, **kwargs):
         # self.clean()
@@ -501,6 +568,14 @@ class GeoArSite(models.Model):
     pro_tips = RichTextField(_("Pro Tips"), blank=True, null=True)
     check_ins = models.IntegerField(verbose_name="Check-ins", default=0)
     check_in_site_radius = models.IntegerField(verbose_name="Check-in Site Radius", default=50)
+    category = models.ForeignKey(
+        GeoArSiteCategory,
+        verbose_name="Geo Site Category",
+        on_delete=models.SET_NULL,
+        related_name="geo_sites",
+        null=True,
+        blank=True,
+    )
 
     class Meta:
         verbose_name_plural = "Geo AR Site"

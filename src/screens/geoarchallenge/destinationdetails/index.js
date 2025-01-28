@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import {
-  ActivityIndicator,
+  ActivityIndicator, FlatList,
   Platform,
   ScrollView,
   Text,
@@ -10,16 +10,17 @@ import {
 } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import Geocoder from "react-native-geocoding";
-import MarkerIcon from "../../../assets/geoar/marker_img.svg";
 import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg";
 import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg";
 import { useDispatch, useSelector } from "react-redux";
 import useStyles from "./styles";
 import { updateSelectedSites } from "../../../redux/AR";
 import {
+  getARSiteCategories,
+  getARSiteCategory, getARSites,
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
@@ -31,10 +32,13 @@ import DestinationFactPopUp from "../destinactionfactpopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
+import MarkerIcon from "components/marker";
 
 const SCROLL_AMOUNT = 70;
 
 const GeoArChallengeDetails = ({}) => {
+  const route = useRoute();
+  const {isEvent} = route?.params;
   const _styles = useStyles();
   const dispatch = useDispatch();
   const { userLocation } = useContext(GeolocationContext);
@@ -56,6 +60,8 @@ const GeoArChallengeDetails = ({}) => {
   const [popUpFacts, setPopUpFacts] = useState(null);
   const scrollViewRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [categories, setCategories] = useState([{name: "Full"}]);
+  const [filteredSites, setFilteredSites] = useState([]);
 
   const scrollRegionsPressHandler = () => {
     const newPosition = scrollPosition + SCROLL_AMOUNT;
@@ -102,6 +108,14 @@ const GeoArChallengeDetails = ({}) => {
       .finally(() => {});
   };
 
+  const getArSiteCategories = () => {
+    getARSiteCategories()
+      .then(res => {
+        setCategories([...categories, ...res.data]);
+      })
+      .finally(() => {});
+  };
+
   const getARStarSites = () => {
     getARSitesStars({ id: selectedDestination.id })
       .then(res => {
@@ -139,6 +153,7 @@ const GeoArChallengeDetails = ({}) => {
     getFriends();
     loadDFacts(selectedDestination?.id);
     getARStarSites();
+    getArSiteCategories()
   }, []);
 
   const loadDFacts = async id => {
@@ -245,7 +260,7 @@ const GeoArChallengeDetails = ({}) => {
             </Callout>
           )}
           <View style={{ width: 30, height: 30 }}>
-            <MarkerIcon />
+            <MarkerIcon color={o?.category?.color} />
           </View>
         </Marker>
       );
@@ -320,6 +335,12 @@ const GeoArChallengeDetails = ({}) => {
       setSelectedRegionName(r.name);
     }
   };
+
+  const showFilteredList = category => {
+    if (category) return setFilteredSites(selectedDestination.ar_event_sites.filter( site => site.category?.id === category))
+    setFilteredSites([])
+  };
+
   const initialRegion = {
     latitude:
       selectedDestination.geo_location && selectedDestination.geo_location?.coordinates.length > 0
@@ -368,64 +389,89 @@ const GeoArChallengeDetails = ({}) => {
         <TouchableOpacity onPress={scrollRegionsPressHandler}>
           <Icon name={"angle-double-right"} family="font-awesome" size={25} color="gray" />
         </TouchableOpacity>
-        <ScrollView
-          ref={scrollViewRef}
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          style={{ width: "100%", height: 50 }}
-          contentContainerStyle={_styles.rowView}
-        >
-          <TouchableOpacity
-            onPress={moveToFullRegion}
-            activeOpacity={0.5}
-            style={
-              selectedRegionName == "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
-            }
+
+        { isEvent?
+          <FlatList
+            style={{ width: "100%", height: 50 }}
+            horizontal={true}
+            data={categories}
+            renderItem={({ item }) => <TouchableOpacity
+              onPress={() => showFilteredList(item.id)}
+              activeOpacity={0.5}
+              style={
+                item.name === "Full" ? _styles.selectButtonStyle : {..._styles.unSelectButtonStyle, backgroundColor: item.color}
+
+              }
+            >
+              <Text style={_styles.buttonSelectText}>{item.name}</Text>
+            </TouchableOpacity>}
+            keyExtractor={item => item?.id?.toString()}
+            showsVerticalScrollIndicator={false}
+          />
+
+          :
+          <ScrollView
+            ref={scrollViewRef}
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            style={{ width: "100%", height: 50 }}
+            contentContainerStyle={_styles.rowView}
           >
-            <Text style={_styles.buttonSelectText}>Full</Text>
-          </TouchableOpacity>
-          {regions.map(e => {
-            if (e.geo_region)
-              return (
-                <TouchableOpacity
-                  key={e.id}
-                  activeOpacity={0.5}
-                  onPress={() => moveToRegion(e)}
-                  style={
-                    selectedRegionName == e.name
-                      ? _styles.selectButtonStyle
-                      : _styles.unSelectButtonStyle
-                  }
-                >
-                  <Text style={_styles.buttonSelectText}>{e.name}</Text>
-                </TouchableOpacity>
-              );
-          })}
-        </ScrollView>
+            <TouchableOpacity
+              onPress={moveToFullRegion}
+              activeOpacity={0.5}
+              style={
+                selectedRegionName == "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
+              }
+            >
+              <Text style={_styles.buttonSelectText}>Full</Text>
+            </TouchableOpacity>
+            { regions.map(e => {
+              if (e.geo_region)
+                return (
+                  <TouchableOpacity
+                    key={e.id}
+                    activeOpacity={0.5}
+                    onPress={() => moveToRegion(e)}
+                    style={
+                      selectedRegionName == e.name
+                        ? _styles.selectButtonStyle
+                        : _styles.unSelectButtonStyle
+                    }
+                  >
+                    <Text style={_styles.buttonSelectText}>{e.name}</Text>
+                  </TouchableOpacity>
+                );
+            })}
+          </ScrollView>
+        }
       </View>
-      <View
-        style={{
-          flexDirection: "row",
-          marginBottom: 20,
-          justifyContent: "space-between",
-        }}
-      >
-        <View style={_styles.selectionsContainer}>
-          <View>
-            <Text style={_styles.selectionTextHeading}>Sites</Text>
-            <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
+
+      {!isEvent &&
+        <View
+          style={{
+            flexDirection: "row",
+            marginBottom: 20,
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={_styles.selectionsContainer}>
+            <View>
+              <Text style={_styles.selectionTextHeading}>Sites</Text>
+              <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
+            </View>
+            <AppSwitch onValueChange={setARSitesOnSwitch} value={arSitesOn} />
           </View>
-          <AppSwitch onValueChange={setARSitesOnSwitch} value={arSitesOn} />
-        </View>
-        <View style={_styles.selectionsContainer}>
-          <View>
-            <Text style={_styles.selectionTextHeading}>My Friends</Text>
-            <Text style={_styles.selectionTextDetails}>Live Location</Text>
+          <View style={_styles.selectionsContainer}>
+            <View>
+              <Text style={_styles.selectionTextHeading}>My Friends</Text>
+              <Text style={_styles.selectionTextDetails}>Live Location</Text>
+            </View>
+            <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
           </View>
-          <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
         </View>
-      </View>
+      }
       <View
         style={{
           width: "100%",
@@ -446,10 +492,19 @@ const GeoArChallengeDetails = ({}) => {
               return _markerView(o)
             })
           } */}
-          {arSitesOn &&
+          {isEvent?
+            filteredSites.length > 0?
+              filteredSites.map(o => {
+                return _markerView(o);
+              }):
+              selectedDestination.ar_event_sites.map(o => {
+                    return _markerView(o)
+              })
+            : arSitesOn &&
             selectedDestination.star_ar_sites.map(o => {
-              return _markerView(o);
-            })}
+              return _markerView(o)
+            })
+          }
           {friendsLocationSitesOn &&
             friendList.map(o => {
               return f_markerView(o);
