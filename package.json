@@ -12,9 +12,10 @@
     "web:build": "./node_modules/.bin/webpack --config ./webpack.config.js --color --mode production",
     "postinstall": "patch-package",
     "fix-deps": "bash ./scripts/fix-dependencies.sh",
-    "reinstall-pods": "cd ios && pod install && wait; cd .. && yarn fix deps && wait;",
     "build-apk": "bash ./scripts/build-apk.sh",
-    "build-aab": "bash ./scripts/build-aab.sh"
+    "build-aab": "bash ./scripts/build-aab.sh",
+    "clean-ios": "rm -rf node_modules ios/Pods ios/build ios/travel_ar_app_42706.xcodeproj/xcuserdata ios/travel_ar_app_42706.xcworkspace/xcuserdata",
+    "reinstall-ios": "yarn install && wait; cd ios && pod install && wait; cd .. && yarn fix-deps && wait; yarn start --reset-cache"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.10",

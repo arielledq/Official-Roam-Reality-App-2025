@@ -73,7 +73,6 @@ export const Icons = {
   Contact,
   Question,
   FacebookIcon,
-  TikTok,
   Instagram,
   Invite,
   Folder,
