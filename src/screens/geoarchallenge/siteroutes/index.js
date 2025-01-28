@@ -258,7 +258,7 @@ const GeoArSiteRoutes = ({ route }) => {
             <AppButton
               onPress={() =>
                 navigation.navigate("GeoArSiteNavigation", {
-                  mapMode: "driving",
+                  mapMode: "DRIVING",
                   starsChallenge: starChallengeObj,
                 })
               }
@@ -272,7 +272,7 @@ const GeoArSiteRoutes = ({ route }) => {
             <AppButton
               onPress={() =>
                 navigation.navigate("GeoArSiteNavigation", {
-                  mapMode: "walking",
+                  mapMode: "WALKING",
                   starsChallenge: starChallengeObj,
                 })
               }

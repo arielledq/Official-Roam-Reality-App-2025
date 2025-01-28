@@ -1,21 +1,27 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  // Platform,
+  Dimensions,
+  Image,
   ScrollView,
   Text,
   TouchableOpacity,
   View,
-  // PermissionsAndroid,
 } from "react-native";
 
 import { useSelector } from "react-redux";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
 import Sound from "react-native-sound";
-// import MapboxGL from "@rnmapbox/maps";
 import moment from "moment";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
+import Modal from "react-native-modal";
+import Tts from "react-native-tts";
+import { activateKeepAwake, deactivateKeepAwake } from "@sayem314/react-native-keep-awake";
+import { useNetInfo } from "@react-native-community/netinfo";
+import MapboxGL from "@rnmapbox/maps";
+import { Button } from "@rneui/themed";
+import OfflineManager from "@rnmapbox/maps/src/modules/offline/offlineManager";
 
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
@@ -34,58 +40,113 @@ import HomeIcon from "../../../assets/geoar/home.svg";
 // @ts-ignore
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
 // @ts-ignore
-import SkipIcon from "../../../assets/geoar/skip.svg";
+import SkipIcon from "../../../assets/geoar/skipButton.svg";
 // @ts-ignore
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
-// import CenterIcon from "../../../assets/Icons/CenterIcon.svg";
+// @ts-ignore
+import Mute from "../../../assets/svg/mute.svg";
+// @ts-ignore
+import Unmute from "../../../assets/svg/unmute.svg";
+// direction icons
+// @ts-ignore
+import TurnLeft from "../../../assets/svg/ManeuverMapsIcon/TurnLeft.svg";
+// @ts-ignore
+import TurnRight from "../../../assets/svg/ManeuverMapsIcon/TurnRight.svg";
+// @ts-ignore
+import TurnSlightLeft from "../../../assets/svg/ManeuverMapsIcon/TurnSlightLeft.svg";
+// @ts-ignore
+import TurnSlightRight from "../../../assets/svg/ManeuverMapsIcon/TurnSlightRight.svg";
+// @ts-ignore
+import TurnSharpLeft from "../../../assets/svg/ManeuverMapsIcon/TurnSharpLeft.svg";
+// @ts-ignore
+import TurnSharpRight from "../../../assets/svg/ManeuverMapsIcon/TurnSharpRight.svg";
+// @ts-ignore
+import CallMerge from "../../../assets/svg/ManeuverMapsIcon/CallMerge.svg";
+// @ts-ignore
+import UTurnLeft from "../../../assets/svg/ManeuverMapsIcon/UTurnLeft.svg";
+// @ts-ignore
+import UTurnRight from "../../../assets/svg/ManeuverMapsIcon/UTurnRight.svg";
+// @ts-ignore
+import Ferry from "../../../assets/svg/ManeuverMapsIcon/Ferry.svg";
+// @ts-ignore
+import ForkLeft from "../../../assets/svg/ManeuverMapsIcon/ForkLeft.svg";
+// @ts-ignore
+import ForkRight from "../../../assets/svg/ManeuverMapsIcon/ForkRight.svg";
+// @ts-ignore
+import KeepLeft from "../../../assets/svg/ManeuverMapsIcon/KeepLeft.svg";
+// @ts-ignore
+import KeepRight from "../../../assets/svg/ManeuverMapsIcon/KeepRight.svg";
+// @ts-ignore
+import Merge from "../../../assets/svg/ManeuverMapsIcon/Merge.svg";
+// @ts-ignore
+import RampLeft from "../../../assets/svg/ManeuverMapsIcon/RampLeft.svg";
+// @ts-ignore
+import RampRight from "../../../assets/svg/ManeuverMapsIcon/RampRight.svg";
+// @ts-ignore
+import RoundaboutLeft from "../../../assets/svg/ManeuverMapsIcon/RoundaboutLeft.svg";
+// @ts-ignore
+import RoundaboutRight from "../../../assets/svg/ManeuverMapsIcon/RoundaboutRight.svg";
+// @ts-ignore
+import Straight from "../../../assets/svg/ManeuverMapsIcon/Straight.svg";
+// @ts-ignore
+import MergeType from "../../../assets/svg/ManeuverMapsIcon/MergeType.svg";
+// @ts-ignore
+import Train from "../../../assets/svg/ManeuverMapsIcon/Train.svg";
 
 import useStyles from "./styles";
 
 const MARGIN_ARRIVAL_METERS = 50;
+const NEXT_STEP_DISTANCE_MAP_HEADING_CHANGE = 20;
+const NEXT_STEP_DISTANCE = 50;
+const ZOOM_LEVEL_THRESHOLD = 15;
+
+type StepResponse = {
+  reached: boolean;
+  html_instructions: string;
+  index: any;
+  end_location?: {
+    lat: number;
+    lng: number;
+  };
+  maneuver?: string;
+};
+
+type MapCoords = {
+  coords: { latitude: number; longitude: number };
+};
 
 // Navigation Step 2
 const GeoArSiteNavigation = () => {
   const [mileDistance, setMileDistance] = useState(0);
   const [durationMins, setDurationMins] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState("");
-  const [location, setLocation] = useState<{
-    coords: { latitude: number; longitude: number };
-  } | null>(null);
-  // const [router, setRoute] = useState(null);
-  // const [originMap, setOriginMap] = useState(null);
-  // const [originMapPoint, setOriginMapPoint] = useState(null);
-  // const [destinationMap, setDestinationMap] = useState(null);
-  // const [path, setPath] = useState(null);
-  // const [currentHeading, setCurrentHeading] = useState(0);
-  // const [mapHeading, setMapHeading] = useState(0);
-  // const [rerouting, setRerouting] = useState(false);
-  // const [nextCoordinateS, setNextCoordinateS] = useState(null);
-  const [hideRoute, setHideRoute] = useState(false);
-  const [currentLocation, setCurrentLocation] = useState(null);
-  const [mapRegion, setMapRegion] = useState({
-    longitude: 0,
-    latitude: 0,
-    longitudeDelta: 0.004,
-    latitudeDelta: 0.009,
-  });
-  const [routeInitialLocation, setRouteInitialLocation] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
-  const [routeCoords, setRouteCoords] = useState([]);
+  const [location, setLocation] = useState<MapCoords | null>(null);
+  const [routeInitialLocation, setRouteInitialLocation] = useState<MapCoords | null>(null);
+  const [steps, setSteps] = useState<StepResponse[]>([]);
+  const [mute, setMute] = useState(false);
+  const [currentStep, setCurrentStep] = useState<StepResponse | null>(null);
+  const [currentRouteIcon, setCurrentRouteIcon] = useState<React.ReactNode | null>(null);
+  const distanceFromStep = useRef(0);
 
   const selectedGeoSite = useSelector((state: any) => state.ar?.selectedGeoSite);
   const { userLocation } = useContext(GeolocationContext);
   const [latitude, setLatitude] = useState(userLocation?.latitude);
   const [longitude, setLongitude] = useState(userLocation?.longitude);
+  const [zoomLevel, setZoomLevel] = useState(0);
+  const [offlineStatus, setOfflineStatus] = useState(null);
+  const [router, setRoute] = useState(null);
+  const [selectedStep, setSelectedStep] = useState(null);
 
   const mapView = useRef(null);
-  // const currentPathRef = useRef(null);
-  // const nextCoordinateDistance = useRef(0);
-  // const nextCoordinateRef = useRef(null);
+  const mapViewRef = useRef(null);
   const compassHeading = useRef(0);
 
   const route = useRoute();
   const _styles = useStyles();
   const navigation = useNavigation();
+  const isFocused = useIsFocused();
+  const screenHeight = Dimensions.get("window").height;
+  const { type, isConnected } = useNetInfo();
 
   // @ts-ignore
   const mapMode = route?.params?.mapMode;
@@ -119,14 +180,6 @@ const GeoArSiteNavigation = () => {
       longitude: longitudeDestination,
     };
 
-    const currentRegion = {
-      latitude: position.coords.latitude,
-      longitude: position.coords.longitude,
-      latitudeDelta: 0.0032,
-      longitudeDelta: 0.0032,
-    };
-    setMapRegion(currentRegion);
-
     const headingValue = calculateBearing(
       position.coords.latitude,
       position.coords.longitude,
@@ -139,36 +192,7 @@ const GeoArSiteNavigation = () => {
     // @ts-ignore
     setLocation(position);
     // @ts-ignore
-    setCurrentLocation(position);
-    // @ts-ignore
     setRouteInitialLocation(position);
-    if (mapView && mapView.current) {
-      setTimeout(() => {
-        // @ts-ignore
-        mapView?.current?.animateCamera({
-          center: position.coords,
-          heading: compassHeading.current,
-          zoom: 17,
-        });
-      }, 500);
-    }
-
-    // const initialHeading = calculateBearing(
-    //   position.coords.latitude,
-    //   position.coords.longitude,
-    //   endPosition.latitude,
-    //   endPosition.longitude
-    // );
-    // setCurrentHeading(initialHeading);
-
-    // const origin = [position.coords.longitude, position.coords.latitude];
-
-    // const destination = [longitudeDestination, latitudeDestination];
-
-    // setOriginMap(origin);
-    // setOriginMapPoint(origin);
-    // setDestinationMap(destination);
-    // setLocation(position);
   };
 
   function calculateBearing(startLat: number, startLng: number, endLat: number, endLng: number) {
@@ -191,188 +215,10 @@ const GeoArSiteNavigation = () => {
     return bearing;
   }
 
-  // function getDistance(lat1, lon1, lat2, lon2) {
-  //   const R = 6371; // Radius of the Earth in kilometers
-  //   const dLat = ((lat2 - lat1) * Math.PI) / 180;
-  //   const dLon = ((lon2 - lon1) * Math.PI) / 180;
-  //   const a =
-  //     Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-  //     Math.cos((lat1 * Math.PI) / 180) *
-  //       Math.cos((lat2 * Math.PI) / 180) *
-  //       Math.sin(dLon / 2) *
-  //       Math.sin(dLon / 2);
-  //   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  //   const distance = R * c; // Distance in kilometers
-  //   return distance * 1000; // Convert to meters
-  // }
-
-  // function findNextCoordinate(currentLocation, coordinates) {
-  //   if (!currentLocation || !currentPathRef.current) return false;
-
-  //   let closestCoordinate = null;
-  //   let closestDistance = Infinity;
-
-  //   let lastVisitedIndex = -1;
-
-  //   // Find the last index where `visited` is `true`
-  //   for (let i = coordinates.length - 1; i >= 0; i--) {
-  //     if (coordinates[i].visited === true) {
-  //       lastVisitedIndex = i;
-  //       break;
-  //     }
-  //   }
-
-  //   // Mark all items before `lastVisitedIndex` where `visited` is `false` as `true`
-  //   if (lastVisitedIndex !== -1) {
-  //     for (let i = 0; i < lastVisitedIndex; i++) {
-  //       if (coordinates[i].visited === false) {
-  //         coordinates[i].visited = true;
-  //       }
-  //     }
-  //   }
-
-  //   const filteredCoordinates = coordinates.filter(coord => !coord.visited);
-
-  //   for (let i = 0; i < filteredCoordinates?.length; i++) {
-  //     const coord = filteredCoordinates[i];
-  //     const distance = getDistance(
-  //       currentLocation.latitude,
-  //       currentLocation.longitude,
-  //       coord["coordinates"][1], // Latitude
-  //       coord["coordinates"][0] // Longitude
-  //     );
-
-  //     if (distance < closestDistance) {
-  //       closestDistance = distance;
-  //       closestCoordinate = coord;
-  //     }
-  //   }
-
-  //   if (closestCoordinate && closestDistance <= 10) {
-  //     closestCoordinate.visited = true;
-  //   }
-
-  //   return closestCoordinate;
-  // }
-
-  // const isOffRoute = (currentLocation, path, threshold) => {
-  //   const nextCoordinate = findNextCoordinate(currentLocation, path);
-  //   if (!nextCoordinate || rerouting || nextCoordinate.visited) return false;
-
-  //   const distanceToPath = getDistance(
-  //     currentLocation.latitude,
-  //     currentLocation.longitude,
-  //     nextCoordinate["coordinates"][1],
-  //     nextCoordinate["coordinates"][0]
-  //   );
-
-  //   if (nextCoordinateRef.current === null || nextCoordinateRef.current !== nextCoordinate) {
-  //     nextCoordinateDistance.current = 0;
-  //   }
-
-  //   if (nextCoordinateDistance.current === 0) {
-  //     nextCoordinateDistance.current = distanceToPath;
-  //     nextCoordinateRef.current = nextCoordinate;
-  //     return false;
-  //   }
-
-  //   if (distanceToPath < nextCoordinateDistance.current) {
-  //     nextCoordinateDistance.current = distanceToPath;
-  //     nextCoordinateRef.current = nextCoordinate;
-  //     return false;
-  //   }
-  //   if (
-  //     distanceToPath > nextCoordinateDistance.current &&
-  //     distanceToPath - nextCoordinateDistance.current > threshold
-  //   ) {
-  //     nextCoordinateDistance.current = 0;
-  //     nextCoordinateRef.current = null;
-  //     return true;
-  //   }
-  //   return false;
-  // };
-
   const navigateToNextScreen = () => {
-    // stopLocationUpdates();
-    // navigation.replace('ChallengeSelection')
     //@ts-ignore
     navigation.replace("GeoArSiteArrived", { starsChallenge: starChallengeObj });
   };
-
-  // const getLocationUpdates = async () => {
-  //   const hasPermission = await hasLocationPermission();
-  //   if (!hasPermission) {
-  //     return;
-  //   }
-
-  //   const position = { coords: { latitude, longitude } };
-
-  //   const dis = getLocationDistance(position.coords, {
-  //     latitude: latitudeDestination,
-  //     longitude: longitudeDestination,
-  //   });
-
-  //   if (rerouting) return;
-
-  //   // Platform.OS === 'ios' ? 30 : 20
-
-  //   let threshold = 20;
-
-  //   if (mapMode === "driving") {
-  //     threshold = 35;
-  //   }
-
-  //   if (isOffRoute(position.coords, currentPathRef.current, threshold)) {
-  //     setOriginMap([position.coords.longitude, position.coords.latitude]);
-  //     const heading = calculateBearing(
-  //       position.coords.latitude,
-  //       position.coords.longitude,
-  //       currentPathRef.current[0]["coordinates"][1],
-  //       currentPathRef.current[0]["coordinates"][0]
-  //     );
-  //     setCurrentHeading(heading);
-  //     setRerouting(true);
-  //     playProximitySound();
-  //     setTimeout(() => {
-  //       setRerouting(false);
-  //     }, 1000);
-  //     return;
-  //   }
-
-  //   const nextCoordinate = findNextCoordinate(position.coords, currentPathRef.current);
-
-  //   if (nextCoordinate && nextCoordinateS !== nextCoordinate) {
-  //     setNextCoordinateS(nextCoordinate);
-  //     const heading = calculateBearing(
-  //       position.coords.latitude,
-  //       position.coords.longitude,
-  //       nextCoordinate["coordinates"][1],
-  //       nextCoordinate["coordinates"][0]
-  //     );
-  //     setCurrentHeading(heading);
-  //   } else {
-  //     if (Platform.OS === "ios") setCurrentHeading(mapHeading);
-  //   }
-
-  //   if (isStarChallenge) {
-  //     if (dis < starChallengeObj?.geo_ar_star?.geo_site?.check_in_site_radius) {
-  //       navigateToNextScreen();
-  //       return;
-  //     }
-  //   } else {
-  //     if (dis < selectedGeoSite.check_in_site_radius) {
-  //       navigateToNextScreen();
-  //       return;
-  //     }
-  //   }
-
-  //   if (location && location.coords) {
-  //     const lastLocationDistance = getLocationDistance(position.coords, location.coords);
-  //     if (lastLocationDistance > 10) {
-  //       setLocation(position);
-  //     }
-  //   }
-  // };
 
   const minOrHoursWalkDriving = (walkDurationMins: number) => {
     if (walkDurationMins < 60) {
@@ -392,63 +238,10 @@ const GeoArSiteNavigation = () => {
   };
 
   const playProximitySound = () => {
-    Sound.setCategory("Playback");
-    let proximitySound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
-      if (error) {
-        console.error("failed to load the sound", error);
-      } else {
-        proximitySound.play();
-      }
-    });
+    if (mute) return;
+    Tts.setDucking(true);
+    Tts.speak("Calculating new route");
   };
-
-  // const mapBoxGetRoute = () => {
-  //   if (!originMap || !destinationMap) {
-  //     return;
-  //   }
-
-  //   const origin = originMap.join(",");
-  //   const destination = destinationMap.join(",");
-  //   const MBUrlBase = "https://api.mapbox.com/directions/v5/mapbox/";
-  //   const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}&overview=full`;
-  //   const MBUrl = `${MBUrlBase}${mapMode}/${origin};${destination}${MBUrlParams}`;
-
-  //   // Fetch route data from Mapbox Directions API
-  //   fetch(MBUrl)
-  //     .then(response => response.json())
-  //     .then(data => {
-  //       if (data?.routes?.length) {
-  //         const distance = data.routes[0].distance;
-  //         const duration = data.routes[0].duration;
-  //         setMileDistance(convertKilometersToMiles(distance / 1000));
-  //         setDurationMins(duration / 60);
-  //         calculatedEstimatedTime(duration / 60);
-  //         const calculatedPath = data.routes[0].geometry.coordinates;
-  //         const position = { coords: { latitude, longitude } };
-  //         currentPathRef.current = calculatedPath.map((coord, index) => {
-  //           if (index === 0) {
-  //             const firstCoordinateDis = getLocationDistance(coord, position.coords);
-  //             return {
-  //               coordinates: coord,
-  //               visited: firstCoordinateDis < 10,
-  //             };
-  //           } else {
-  //             return {
-  //               coordinates: coord,
-  //               visited: false,
-  //             };
-  //           }
-  //         });
-
-  //         const routeLine = {
-  //           type: "Feature",
-  //           geometry: data.routes[0].geometry,
-  //         };
-  //         setRoute(routeLine);
-  //       }
-  //     })
-  //     .catch(error => console.error(error));
-  // };
 
   const closeHandler = () => {
     // navigation.replace('ChallengeSelection')
@@ -461,235 +254,475 @@ const GeoArSiteNavigation = () => {
     return 17; // Wider view for long distances
   };
 
-  const handleUserLocationChange = (event: any) => {
-    // Ensure nativeEvent and coordinate are defined
-    if (!event?.nativeEvent?.coordinate) {
-      console.error("Location event is missing coordinate data");
-      return;
+  const getCurrentStep = () => {
+    const currentStep = steps.find(step => !step.reached);
+    if (currentStep) {
+      return currentStep;
     }
+    return null;
+  };
 
-    // if (hideRoute) return;
+  const getNextStep = () => {
+    const currentStep = steps.find(step => !step.reached);
+    if (currentStep) {
+      return steps?.[currentStep.index + 1];
+    }
+    return null;
+  };
 
-    const userCoords = {
-      latitude: event.nativeEvent.coordinate.latitude,
-      longitude: event.nativeEvent.coordinate.longitude,
-    };
+  const handleUserLocationChange = () => {
+    const currentStepRes = getCurrentStep();
+    const nextStepRes = getNextStep();
 
-    // @ts-ignore
-    setCurrentLocation(userCoords);
+    if (currentStepRes) {
+      if (currentStepRes !== currentStep) {
+        setCurrentStep(currentStepRes);
+        setSelectedStep(currentStepRes);
+        if (currentStepRes.maneuver) {
+          renderManeuverIcon(currentStepRes.maneuver);
+        }
+        distanceFromStep.current = 0;
 
-    // Recalculate route if off-route
-    if (routeCoords.length > 0) {
-      const closestPoint = routeCoords.reduce((prev, curr) => {
-        return getLocationDistance(curr, userCoords) < getLocationDistance(prev, userCoords)
-          ? curr
-          : prev;
-      });
+        if (!mute) {
+          Tts.setDucking(true);
+          Tts.speak(currentStepRes.html_instructions);
+        }
 
-      const distanceFromRoute = getLocationDistance(userCoords, closestPoint);
+        if (!currentStepRes?.end_location?.lat || !currentStepRes?.end_location?.lng) return;
 
-      console.log("Distance from route:", distanceFromRoute);
-
-      if (distanceFromRoute > MARGIN_ARRIVAL_METERS) {
-        // setHideRoute(true);
-        playProximitySound();
-
-        // @ts-ignore
-        // mapView?.current?.animateCamera({
-        //   center: userCoords,
-        //   heading: compassHeading.current,
-        //   zoom: 17,
-        // });
-        // setTimeout(() => {
-        //   setHideRoute(false);
-        // }, 500);
-        // @ts-ignore
-        setRouteInitialLocation({ coords: userCoords });
-      }
-
-      const position = {
-        coords: {
+        const headingValue = calculateBearing(
           latitude,
           longitude,
-        },
-      };
+          currentStepRes?.end_location?.lat,
+          currentStepRes?.end_location?.lng
+        );
 
-      const dis = getLocationDistance(position.coords, {
-        latitude: selectedGeoSite.lat_long.coordinates[1],
-        longitude: selectedGeoSite.lat_long.coordinates[0],
-      });
-
-      if (dis < selectedGeoSite.check_in_site_radius) {
         // @ts-ignore
-        navigation.replace("GeoArSiteArrived");
-        return;
+        mapView?.current?.animateCamera({
+          center: { latitude, longitude },
+          heading: headingValue,
+          pitch: 60,
+          zoom: 19,
+        });
+
+        compassHeading.current = headingValue;
+      } else {
+        if (zoomLevel > ZOOM_LEVEL_THRESHOLD) {
+          // @ts-ignore
+          mapView?.current?.animateCamera({
+            center: {
+              latitude,
+              longitude,
+              pitch: 60,
+              zoom: 19,
+              heading: compassHeading.current,
+            },
+          });
+        }
       }
 
-      const bearing = calculateBearing(
-        userCoords.latitude,
-        userCoords.longitude,
-        selectedGeoSite.lat_long.coordinates[1],
-        selectedGeoSite.lat_long.coordinates[0]
+      if (!currentStepRes?.end_location?.lat || !currentStepRes?.end_location?.lng) return;
+
+      const distanceFromNextStep = getLocationDistance(
+        { latitude, longitude },
+        {
+          latitude: currentStepRes?.end_location?.lat,
+          longitude: currentStepRes?.end_location?.lng,
+        }
       );
 
-      // const distance = getLocationDistance(userCoords, {
-      //   latitude: selectedGeoSite.lat_long.coordinates[1],
-      //   longitude: selectedGeoSite.lat_long.coordinates[0],
-      // });
-      // console.log("Distance from route outside if:", distance);
-
-      const zoom = adjustZoomLevel(distanceFromRoute);
-
-      // Animate camera to the new position
-      if (mapView.current) {
-        // @ts-ignore
-        mapView.current?.animateCamera({
-          center: userCoords,
-          zoom: zoom,
-          heading: bearing,
-        });
+      if (distanceFromStep.current === 0) {
+        distanceFromStep.current = distanceFromNextStep;
       }
+
+      const difference = distanceFromNextStep - distanceFromStep.current;
+
+      // Check if user is off route
+      if (difference > MARGIN_ARRIVAL_METERS) {
+        playProximitySound();
+        // @ts-ignore
+        mapView.current.animateCamera({
+          center: { latitude, longitude },
+          heading: compassHeading.current,
+          pitch: 60,
+          zoom: 19,
+        });
+
+        setRouteInitialLocation({ coords: { latitude, longitude } });
+      }
+
+      // Check if user has reached next step
+      if (distanceFromNextStep <= NEXT_STEP_DISTANCE_MAP_HEADING_CHANGE) {
+        currentStepRes.reached = true;
+      }
+
+      if (nextStepRes && distanceFromNextStep <= NEXT_STEP_DISTANCE) {
+        setSelectedStep(nextStepRes);
+        if (nextStepRes.maneuver) {
+          renderManeuverIcon(nextStepRes.maneuver);
+        }
+
+        if (!mute) {
+          Tts.setDucking(true);
+          Tts.speak(nextStepRes.html_instructions);
+        }
+      }
+    }
+
+    // Check distance from selected site
+    const dis = getLocationDistance(
+      { latitude, longitude },
+      {
+        latitude: selectedGeoSite.lat_long.coordinates[1],
+        longitude: selectedGeoSite.lat_long.coordinates[0],
+      }
+    );
+
+    if (dis < selectedGeoSite.check_in_site_radius) {
+      // @ts-ignore
+      navigation.replace("GeoArSiteArrived");
+      return;
     }
   };
 
-  // useEffect(() => {
-  //   if (userLocation) {
-  //     getLocationUpdates();
-  //   }
-  // }, [userLocation]);
+  const calculateZoomLevel = (region: any) => {
+    const zoom = Math.log2(360 / region.longitudeDelta);
+    return Math.round(zoom);
+  };
 
-  // useEffect(() => {
-  //   mapBoxGetRoute();
-  // }, [originMap, destinationMap]);
+  const handleRegionChange = (region: any) => {
+    if (!region) return;
+    const zoom = calculateZoomLevel(region);
+    setZoomLevel(zoom);
+  };
+
+  const downloadOfflineRegion = async () => {
+    // Setup bounding box for offline
+    const packOptions = {
+      name: "MyOfflinePack",
+      styleURL: MapboxGL.StyleURL.Dark, // or your custom style
+      // bounding box = [westLng, southLat, eastLng, northLat]
+      bounds: [
+        [longitude, latitude],
+        [selectedGeoSite.lat_long.coordinates[0], selectedGeoSite.lat_long.coordinates[1]],
+      ], // Example bounding box near your site
+      minZoom: 12,
+      maxZoom: 18,
+    };
+
+    try {
+      await OfflineManager.createPack(
+        packOptions,
+        // progress callback
+        (offlineRegion, status) => {
+          setOfflineStatus(status);
+          // Optionally handle progress
+          if (
+            status.completedResourceCount === status.requiredResourceCount &&
+            status.completedTileCount === status.requiredTileCount
+          ) {
+            console.log("Offline download complete!");
+          }
+        },
+        // error callback
+        error => {
+          console.log("Error creating offline pack", error);
+        }
+      );
+    } catch (err) {
+      console.log("Error setting up offline pack", err);
+    }
+  };
+
+  const mapBoxGetRoute = () => {
+    const origin = `${longitude},${latitude}`;
+    const destination = `${selectedGeoSite.lat_long.coordinates[0]},${selectedGeoSite.lat_long.coordinates[1]}`;
+    const MBUrlBase = "https://api.mapbox.com/directions/v5/mapbox/";
+    const MBUrlParams = `?geometries=geojson&steps=true&access_token=${Config.MAPBOX_PUBLIC_KEY}&overview=full`;
+    const MBUrl = `${MBUrlBase}${mapMode.toLowerCase()}/${origin};${destination}${MBUrlParams}`;
+    // Fetch route data from Mapbox Directions API
+    fetch(MBUrl)
+      .then(response => response.json())
+      .then(data => {
+        console.log("Mapbox route data", data);
+        if (data?.routes?.length) {
+          const routeLine = {
+            type: "Feature",
+            geometry: data.routes[0].geometry,
+          };
+          setRoute(routeLine);
+        }
+      })
+      .catch(error => console.error(error));
+  };
 
   useEffect(() => {
-    getFirstLocation();
-  }, []);
+    handleUserLocationChange();
+  }, [latitude, longitude, steps]);
+
+  useEffect(() => {
+    if (isFocused) {
+      downloadOfflineRegion();
+      getFirstLocation();
+      activateKeepAwake();
+      mapBoxGetRoute();
+    } else {
+      deactivateKeepAwake();
+    }
+  }, [isFocused]);
+
+  useEffect(() => {
+    if (isConnected) handleRegionChange();
+  }, [isConnected]);
+
+  const renderManeuverIcon = (maneuver: string) => {
+    switch (maneuver) {
+      case "turn-left":
+        setCurrentRouteIcon(<TurnLeft style={IconWidthHeight} />);
+        break;
+      case "turn-right":
+        setCurrentRouteIcon(<TurnRight style={IconWidthHeight} />);
+        break;
+      case "turn-slight-left":
+        setCurrentRouteIcon(<TurnSlightLeft style={IconWidthHeight} />);
+        break;
+      case "turn-slight-right":
+        setCurrentRouteIcon(<TurnSlightRight style={IconWidthHeight} />);
+        break;
+      case "turn-sharp-left":
+        setCurrentRouteIcon(<TurnSharpLeft style={IconWidthHeight} />);
+        break;
+      case "turn-sharp-right":
+        setCurrentRouteIcon(<TurnSharpRight style={IconWidthHeight} />);
+        break;
+      case "uturn-left":
+        setCurrentRouteIcon(<UTurnLeft style={IconWidthHeight} />);
+        break;
+      case "uturn-right":
+        setCurrentRouteIcon(<UTurnRight style={IconWidthHeight} />);
+        break;
+      case "ferry":
+        setCurrentRouteIcon(<Ferry style={IconWidthHeight} />);
+        break;
+      case "fork-left":
+        setCurrentRouteIcon(<ForkLeft style={IconWidthHeight} />);
+        break;
+      case "fork-right":
+        setCurrentRouteIcon(<ForkRight style={IconWidthHeight} />);
+        break;
+      case "keep-left":
+        setCurrentRouteIcon(<KeepLeft style={IconWidthHeight} />);
+        break;
+      case "keep-right":
+        setCurrentRouteIcon(<KeepRight style={IconWidthHeight} />);
+        break;
+      case "merge":
+        setCurrentRouteIcon(<Merge style={IconWidthHeight} />);
+        break;
+      case "ramp-left":
+        setCurrentRouteIcon(<RampLeft style={IconWidthHeight} />);
+        break;
+      case "ramp-right":
+        setCurrentRouteIcon(<RampRight style={IconWidthHeight} />);
+        break;
+      case "roundabout-left":
+        setCurrentRouteIcon(<RoundaboutLeft style={IconWidthHeight} />);
+        break;
+      case "roundabout-right":
+        setCurrentRouteIcon(<RoundaboutRight style={IconWidthHeight} />);
+        break;
+      case "straight":
+        setCurrentRouteIcon(<Straight style={IconWidthHeight} />);
+        break;
+      case "merge-type":
+        setCurrentRouteIcon(<MergeType style={IconWidthHeight} />);
+        break;
+      case "train":
+        setCurrentRouteIcon(<Train style={IconWidthHeight} />);
+        break;
+      default:
+        setCurrentRouteIcon(null);
+        break;
+    }
+  };
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      {/* {mapMode === "walking" && rerouting && (
+    <View style={_styles.mainContainer}>
+      <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
         <View
           style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            justifyContent: "center",
-            alignItems: "center",
-            backgroundColor: "rgba(0,0,0,0.5)",
-            zIndex: 1000,
+            backgroundColor: "rgba(32, 33, 54, 0.94)",
+            flexDirection: "row",
+            flex: 1,
           }}
         >
           <View
             style={{
-              backgroundColor: "rgba(0,0,0,0.8)",
-              borderRadius: 16,
-              paddingLeft: 20,
-              paddingRight: 20,
-              paddingBottom: 5,
-              paddingTop: 5,
-              justifyContent: "center",
+              width: currentRouteIcon ? "20%" : 0,
+              height: screenHeight * 0.17,
               alignItems: "center",
-              width: 250,
-              height: 200,
+              justifyContent: "center",
             }}
           >
-            <ActivityIndicator size="large" color={"#ffffff"} />
-            <Text style={{ color: "#fff", fontSize: 20, marginTop: 20 }}>Calculating route...</Text>
+            {currentRouteIcon ? currentRouteIcon : ""}
+          </View>
+          <View
+            style={{
+              width: currentRouteIcon ? "80%" : "100%",
+              height: screenHeight * 0.17,
+              alignItems: "center",
+              justifyContent: "center",
+              paddingLeft: currentRouteIcon ? 0 : 20,
+              paddingRight: 20,
+              paddingTop: 20,
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 16,
+                color: "white",
+                lineHeight: 22,
+              }}
+            >
+              {selectedStep ? selectedStep?.html_instructions : "Loading..."}
+            </Text>
           </View>
         </View>
-      )} */}
-      <AppHeader
-        rightComponent={
-          <TouchableOpacity onPress={navigateToNextScreen}>
-            <SkipIcon style={{ width: 48, height: 36 }} />
-          </TouchableOpacity>
-        }
-        centerComponent={{
-          text: "Navigate to Site",
-          style: [_styles.heading],
-        }}
-        backgroundColor="transparent"
-      />
-
-      {isLoading && <ActivityIndicator size="large" />}
-      <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
         <View
           style={{
             position: "relative",
-            minHeight: 520,
-            borderRadius: 16,
+            height: screenHeight * 0.73,
             overflow: "hidden",
-            marginTop: 20,
-            marginHorizontal: 30,
+            flex: 1,
           }}
         >
-          {/* <TouchableOpacity
-            onPress={() =>
-              mapView.current?.setCamera({
-                centerCoordinate: [longitude, latitude],
-                heading: currentHeading,
-                animationDuration: 500,
-              })
-            }
-            style={{
-              position: "absolute",
-              bottom: 5,
-              right: 5,
-              zIndex: 1000,
-              backgroundColor: "rgba(0, 0, 0, 0.7)",
-              borderRadius: 25,
-              width: 40,
-              height: 40,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            <CenterIcon />
-          </TouchableOpacity> */}
-          {/* {originMapPoint && destinationMap && (
-            <MapboxGL.MapView style={{ flex: 1 }} compassEnabled scaleBarEnabled={false}>
+          {isConnected && (
+            <MapView
+              customMapStyle={mapCustomStyle}
+              provider={PROVIDER_GOOGLE}
+              followsUserLocation
+              showsCompass={true}
+              ref={mapView}
+              zoomControlEnabled={true}
+              style={{
+                flex: 1,
+              }}
+              showsMyLocationButton={false}
+              zoomEnabled={true}
+              scrollEnabled={true}
+              showsUserLocation
+              initialRegion={{
+                latitude: selectedGeoSite.lat_long.coordinates[1],
+                longitude: selectedGeoSite.lat_long.coordinates[0],
+                latitudeDelta: 0.01,
+                longitudeDelta: 0.01,
+              }}
+              onRegionChangeComplete={handleRegionChange}
+            >
+              <Marker
+                coordinate={{
+                  latitude: selectedGeoSite.lat_long.coordinates[1],
+                  longitude: selectedGeoSite.lat_long.coordinates[0],
+                }}
+                title={selectedGeoSite.name}
+              >
+                <View style={{ width: 30, height: 30 }}>
+                  <MarkerIcon />
+                </View>
+              </Marker>
+
+              {location && location?.coords && (
+                <Marker
+                  coordinate={{
+                    latitude: location.coords.latitude,
+                    longitude: location.coords.longitude,
+                  }}
+                  title={"Start Location"}
+                >
+                  <View style={{ width: 30, height: 30 }}>
+                    <MarkerIcon />
+                  </View>
+                </Marker>
+              )}
+              {location && (
+                <MapViewDirections
+                  mode={mapMode}
+                  // @ts-ignore
+                  origin={routeInitialLocation?.coords}
+                  destination={{
+                    latitude: selectedGeoSite.lat_long.coordinates[1],
+                    longitude: selectedGeoSite.lat_long.coordinates[0],
+                  }}
+                  apikey={Config.GEOCODER_API_KEY}
+                  strokeWidth={8}
+                  strokeColor="#C881F0"
+                  optimizeWaypoints
+                  onReady={(result: any) => {
+                    const steps = result.legs[0].steps;
+                    steps.map((step: StepResponse, index: number) => {
+                      step.html_instructions = step.html_instructions.replace(/<[^>]*>?/gm, " ");
+                      step.reached = false;
+                      step.index = index;
+                    });
+
+                    setSteps(steps);
+                    setMileDistance(convertKilometersToMiles(result.distance));
+                    setDurationMins(result.duration);
+                    calculatedEstimatedTime(result.duration);
+                  }}
+                  onStart={args => {
+                    console.log("onStart", args);
+                  }}
+                  onError={error => console.error("MapViewDirections error:", error)}
+                />
+              )}
+            </MapView>
+          )}
+          {!isConnected && (
+            <MapboxGL.MapView
+              ref={mapViewRef}
+              style={{ flex: 1 }}
+              styleURL={MapboxGL.StyleURL.Dark} // or your custom style
+              logoEnabled={false}
+              compassEnabled
+              scaleBarEnabled={false}
+              pitchEnabled
+              rotateEnabled
+            >
+              {/* Center camera on first render or as needed: */}
               <MapboxGL.Camera
-                ref={mapView}
+                ref={mapViewRef}
                 zoomLevel={18}
-                centerCoordinate={[longitude, latitude]}
                 pitch={60} // Sets the 3D pitch angle
                 animationMode="flyTo"
                 animationDuration={250}
-                heading={currentHeading}
-              />
-              <MapboxGL.UserLocation
-                visible={true}
-                minDisplacement={5}
-                onUpdate={location => {
-                  if (
-                    location.coords.latitude !== latitude ||
-                    location.coords.longitude !== longitude
-                  ) {
-                    const distance = getDistance(
-                      location.coords.latitude,
-                      location.coords.longitude,
-                      latitude,
-                      longitude
-                    );
-                    if (distance < 5) return;
-                    setLatitude(location.coords.latitude);
-                    setLongitude(location.coords.longitude);
-                    if (Platform.OS === "ios") {
-                      setMapHeading(location.coords.heading);
-                    }
-                  }
-                }}
+                centerCoordinate={[
+                  selectedGeoSite.lat_long.coordinates[0],
+                  selectedGeoSite.lat_long.coordinates[1],
+                ]}
               />
 
-              <MapboxGL.PointAnnotation id="currentLocation" coordinate={originMapPoint}>
-                <MarkerIcon style={{ width: 25, height: 40 }} />
+              {/* Marker for Destination */}
+              <MapboxGL.PointAnnotation
+                id="destinationMarker"
+                coordinate={[
+                  selectedGeoSite.lat_long.coordinates[0],
+                  selectedGeoSite.lat_long.coordinates[1],
+                ]}
+              >
+                <View style={{ width: 30, height: 30 }}>
+                  <MarkerIcon />
+                </View>
               </MapboxGL.PointAnnotation>
-              <MapboxGL.PointAnnotation id="currentLocation" coordinate={destinationMap}>
-                <MarkerIcon style={{ width: 25, height: 40 }} />
-              </MapboxGL.PointAnnotation>
+
+              {/* Marker for Current User Location (if you want to show user’s dot yourself) */}
+              {latitude && longitude && (
+                <MapboxGL.PointAnnotation id="startLocation" coordinate={[longitude, latitude]}>
+                  <View style={{ width: 30, height: 30 }}>
+                    <MarkerIcon />
+                  </View>
+                </MapboxGL.PointAnnotation>
+              )}
 
               {router && (
                 <MapboxGL.ShapeSource id="routeSource" shape={router}>
@@ -705,95 +738,41 @@ const GeoArSiteNavigation = () => {
                 </MapboxGL.ShapeSource>
               )}
             </MapboxGL.MapView>
-          )} */}
-          <MapView
-            customMapStyle={mapCustomStyle}
-            provider={PROVIDER_GOOGLE}
-            followsUserLocation
-            showsCompass={true}
-            ref={mapView}
-            zoomControlEnabled={true}
-            onUserLocationChange={handleUserLocationChange}
-            // showsTraffic={true}
-            // region={mapRegion}
-            style={{
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            }}
-            showsMyLocationButton={true}
-            zoomEnabled={true}
-            scrollEnabled={true}
-            showsUserLocation
-            initialRegion={{
-              latitude: selectedGeoSite.lat_long.coordinates[1],
-              longitude: selectedGeoSite.lat_long.coordinates[0],
-              latitudeDelta: 0.0032,
-              longitudeDelta: 0.0032,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: selectedGeoSite.lat_long.coordinates[1],
-                longitude: selectedGeoSite.lat_long.coordinates[0],
-              }}
-              title={selectedGeoSite.name}
-            >
-              <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
-              </View>
-            </Marker>
+          )}
 
-            {location && location?.coords && (
-              <Marker
-                coordinate={{
-                  latitude: location.coords.latitude,
-                  longitude: location.coords.longitude,
+          {!isConnected && (
+            <View
+              style={{
+                position: "absolute",
+                top: 20,
+                left: 0,
+                right: 0,
+                alignItems: "center",
+              }}
+            >
+              <Text
+                style={{
+                  backgroundColor: "rgba(0,0,0,0.7)",
+                  color: "#fff",
+                  padding: 10,
+                  borderRadius: 8,
+                  margin: 10,
                 }}
-                title={"Start Location"}
               >
-                <View style={{ width: 30, height: 30 }}>
-                  <MarkerIcon />
-                </View>
-              </Marker>
-            )}
-            {location && (
-              <MapViewDirections
-                mode={mapMode}
-                // @ts-ignore
-                origin={routeInitialLocation?.coords}
-                destination={{
-                  latitude: selectedGeoSite.lat_long.coordinates[1],
-                  longitude: selectedGeoSite.lat_long.coordinates[0],
-                }}
-                apikey={Config.GEOCODER_API_KEY}
-                strokeWidth={8}
-                strokeColor="#01AFFC"
-                optimizeWaypoints
-                onReady={(result: any) => {
-                  setRouteCoords(result?.coordinates);
-                  setMileDistance(convertKilometersToMiles(result.distance));
-                  setDurationMins(result.duration);
-                  calculatedEstimatedTime(result.duration);
-                }}
-                onError={error => console.error("MapViewDirections error:", error)}
-              />
-            )}
-          </MapView>
+                You are offline – using cached region.
+              </Text>
+            </View>
+          )}
         </View>
         <View
           style={{
             backgroundColor: "#131422",
-            borderRadius: 16,
             paddingHorizontal: 20,
-            paddingBottom: 20,
-            marginVertical: 20,
             alignItems: "center",
+            justifyContent: "center",
+            height: screenHeight * 0.1,
           }}
         >
-          <HomeIcon style={{ width: 42, height: 4, marginBottom: 15, marginTop: 10 }} />
           <View
             style={{
               width: "100%",
@@ -802,8 +781,26 @@ const GeoArSiteNavigation = () => {
               justifyContent: "space-between",
             }}
           >
-            <TouchableOpacity onPress={closeHandler}>
+            <TouchableOpacity onPress={navigateToNextScreen}>
               <CloseBIcon style={{ width: 32, height: 32 }} />
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setMute(currState => {
+                  const updatedState = !currState;
+                  if (updatedState) {
+                    Tts.stop();
+                  }
+
+                  return updatedState;
+                });
+              }}
+            >
+              {mute ? (
+                <Mute style={{ width: 32, height: 32 }} />
+              ) : (
+                <Unmute style={{ width: 32, height: 32 }} />
+              )}
             </TouchableOpacity>
             <View style={{ alignItems: "center", marginVertical: 8 }}>
               <Text style={_styles.site_distance_time_value_text}>
@@ -816,19 +813,26 @@ const GeoArSiteNavigation = () => {
                   alignItems: "center",
                 }}
               >
-                <Text style={_styles.site_distance_time_text}>
+                <Text style={[_styles.site_distance_time_text, { fontWeight: "bold" }]}>
                   {mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text>
                 </Text>
                 <Text style={_styles.site_distance_time_text}>.</Text>
                 <Text style={_styles.site_distance_time_text}>{estimatedTime}</Text>
               </View>
             </View>
-            <View></View>
+            <TouchableOpacity onPress={navigateToNextScreen}>
+              <SkipIcon style={{ width: 47, height: 35 }} />
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-    </BackgroundWithImage>
+    </View>
   );
+};
+
+const IconWidthHeight = {
+  width: 42,
+  height: 42,
 };
 
 export default GeoArSiteNavigation;
