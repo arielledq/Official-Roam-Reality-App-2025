@@ -545,11 +545,7 @@ const ArChallengeCapture = ({}) => {
 
   //###Captura y Graba###//
   const handleUnityMessage = result => {
-    // eraseFile()
-    console.log(result.nativeEvent.message)
-
     const data = JSON.parse(result.nativeEvent.message);
-    console.log( 'fulldata', data)
     buttonInfo = data.enableButton
     
     if (data.photoVideoButton?.isPhoto){

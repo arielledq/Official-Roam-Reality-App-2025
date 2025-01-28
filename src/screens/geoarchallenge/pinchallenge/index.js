@@ -495,10 +495,7 @@ const PinChallenge = () => {
     setIsUnityLoaded(true);
   };
   const handleUnityMessage = result => {
-    console.log(result.nativeEvent.message)
-
- const data = JSON.parse(result.nativeEvent.message);
-    console.log( 'fulldata', data)
+  const data = JSON.parse(result.nativeEvent.message);
     buttonInfo = data.enableButton
     
     if (data.photoVideoButton?.isPhoto){
