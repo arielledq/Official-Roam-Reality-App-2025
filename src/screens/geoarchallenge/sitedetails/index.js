@@ -29,6 +29,7 @@ import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
 import { getAllARSitesStars, sendRoamingNotification } from "../../../network";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
+import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
 const GeoArSiteDetails = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -247,10 +248,14 @@ const GeoArSiteDetails = ({}) => {
                 longitude: selectedGeoSite.lat_long.coordinates[0],
               }}
               title={selectedGeoSite.name}
+              pinColor={pinColor}
+              tracksViewChanges={tracksViewChanges}
             >
-              <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
-              </View>
+              {useCustomMarkers && (
+                <View style={{ width: 30, height: 30 }}>
+                  <MarkerIcon />
+                </View>
+              )}
             </Marker>
           </MapView>
         </View>

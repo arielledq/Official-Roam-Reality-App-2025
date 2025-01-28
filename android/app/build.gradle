@@ -190,6 +190,10 @@ dependencies {
         implementation jscFlavor
     }
 
+//
+//     // debugImplementation because LeakCanary should only run in debug builds.
+//     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
+
     configurations.all {
         resolutionStrategy {
             force 'androidx.viewpager2:viewpager2:1.0.0' // Compatible with compileSdkVersion 33

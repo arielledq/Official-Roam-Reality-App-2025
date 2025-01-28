@@ -29,7 +29,13 @@ import AppHeader from "../../../components/header";
 
 import { GeolocationContext } from "../../../GeolocationProvider";
 import Config from "../../../config";
-import { convertKilometersToMiles, showMessage } from "../../../util/helpers";
+import {
+  convertKilometersToMiles,
+  pinColor,
+  showMessage,
+  tracksViewChanges,
+  useCustomMarkers,
+} from "../../../util/helpers";
 import {
   getDeviceCurrentLocation,
   getLocationDistance,
@@ -690,10 +696,14 @@ const GeoArSiteNavigation = () => {
                 longitude: selectedGeoSite.lat_long.coordinates[0],
               }}
               title={selectedGeoSite.name}
+              pinColor={pinColor}
+              tracksViewChanges={tracksViewChanges}
             >
-              <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon />
-              </View>
+              {useCustomMarkers && (
+                <View style={{ width: 30, height: 30 }}>
+                  <MarkerIcon />
+                </View>
+              )}
             </Marker>
 
             {location && location?.coords && (
@@ -703,10 +713,14 @@ const GeoArSiteNavigation = () => {
                   longitude: location.coords.longitude,
                 }}
                 title={"Start Location"}
+                pinColor={pinColor}
+                tracksViewChanges={tracksViewChanges}
               >
-                <View style={{ width: 30, height: 30 }}>
-                  <MarkerIcon />
-                </View>
+                {useCustomMarkers && (
+                  <View style={{ width: 30, height: 30 }}>
+                    <MarkerIcon />
+                  </View>
+                )}
               </Marker>
             )}
             {location && (
@@ -721,6 +735,8 @@ const GeoArSiteNavigation = () => {
                 apikey={Config.GEOCODER_API_KEY}
                 strokeWidth={8}
                 strokeColor="#C881F0"
+                // @ts-ignore
+                lineDashPattern={mapMode === "DRIVING" ? null : [5, 5]}
                 optimizeWaypoints
                 onReady={(result: any) => {
                   const steps = result.legs[0].steps;

@@ -31,6 +31,7 @@ import DestinationFactPopUp from "../destinactionfactpopup";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
+import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
 const SCROLL_AMOUNT = 70;
 
@@ -191,8 +192,10 @@ const GeoArChallengeDetails = ({}) => {
           onCalloutPress={() => {
             navigation.navigate("PublicProfile", { userData: o });
           }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
         >
-          {Platform.OS == "ios" && (
+          {Platform.OS === "ios" && (
             <Callout
               onPress={() => {
                 navigation.navigate("PublicProfile", { userData: o });
@@ -206,9 +209,11 @@ const GeoArChallengeDetails = ({}) => {
               <Text>{o.name}</Text>
             </Callout>
           )}
-          <View style={{ width: 30, height: 30 }}>
-            <FriendsMarkerIcon />
-          </View>
+          {useCustomMarkers && (
+            <View style={{ width: 30, height: 30 }}>
+              <FriendsMarkerIcon />
+            </View>
+          )}
         </Marker>
       );
     }
@@ -228,8 +233,10 @@ const GeoArChallengeDetails = ({}) => {
             dispatch(updateSelectedSites(o));
             navigation.navigate("GeoArSiteDetails");
           }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
         >
-          {Platform.OS == "ios" && (
+          {Platform.OS === "ios" && (
             <Callout
               onPress={() => {
                 dispatch(updateSelectedSites(o));
@@ -244,9 +251,11 @@ const GeoArChallengeDetails = ({}) => {
               <Text>{o.name}</Text>
             </Callout>
           )}
-          <View style={{ width: 30, height: 30 }}>
-            <MarkerIcon />
-          </View>
+          {useCustomMarkers && (
+            <View style={{ width: 30, height: 30 }}>
+              <MarkerIcon />
+            </View>
+          )}
         </Marker>
       );
     }
