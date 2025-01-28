@@ -362,6 +362,8 @@ PODS:
     - React-Core
   - react-native-maps (1.7.1):
     - React-Core
+  - react-native-netinfo (11.3.2):
+    - React-Core
   - react-native-onesignal (4.5.4):
     - OneSignalXCFramework (= 3.12.10)
     - React (< 1.0.0, >= 0.13.0)
@@ -610,6 +612,7 @@ DEPENDENCIES:
   - react-native-image-resizer (from `../node_modules/react-native-image-resizer`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-maps (from `../node_modules/react-native-maps`)
+  - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-onesignal (from `../node_modules/react-native-onesignal`)
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-render-html (from `../node_modules/react-native-render-html`)
@@ -748,6 +751,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-maps:
     :path: "../node_modules/react-native-maps"
+  react-native-netinfo:
+    :path: "../node_modules/@react-native-community/netinfo"
   react-native-onesignal:
     :path: "../node_modules/react-native-onesignal"
   react-native-pager-view:
@@ -888,6 +893,7 @@ SPEC CHECKSUMS:
   react-native-image-resizer: d9fb629a867335bdc13230ac2a58702bb8c8828f
   react-native-keep-awake: ad1d67f617756b139536977a0bf06b27cec0714a
   react-native-maps: 667f9b975549c6fa9b1631bf859440f68ebd3b8f
+  react-native-netinfo: 076df4f9b07f6670acf4ce9a75aac8d34c2e2ccc
   react-native-onesignal: 8d8f7d5e2cc44239fc0ec72fe9c6d27b939870fc
   react-native-pager-view: c2121f83e960d4bfff95b35fb779ab09c8b65657
   react-native-render-html: 984dfe2294163d04bf5fe25d7c9f122e60e05ebe
