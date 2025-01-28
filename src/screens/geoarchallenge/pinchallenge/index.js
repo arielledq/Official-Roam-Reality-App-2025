@@ -9,6 +9,7 @@ import Sound from "react-native-sound";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
+import theme from "assets/theme";
 
 import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
@@ -160,16 +161,22 @@ const PinChallenge = () => {
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
         isRotationEnabled: true,
-        // useGPS: true, // Activar GPS
-        // gpsLatitude: siteLatitude || 0, // Latitud del GPS
-        // gpsLongitude: siteLongitude || 0, // Longitud del GPS
+        // ### DISTANCIA DONDE SE REPOSICIONARA NUEVAMENTE LA ESTRELLA ## //
+        distanceCamera: 2, // AGREGAR PARA RECIBIR DESDE EL BACK 
+
+        /* ###POSICIONAMIENTO MEDIANTE GPS### 
+        useGPS: true, // Activar GPS
+        gpsLatitude: siteLatitude || 0, // Latitud del GPS
+        gpsLongitude: siteLongitude || 0, // Longitud del GPS
+         */   
+        
         position: {
           x: parseFloat(challengeObjParameters?.positionX) || 0,
           y: parseFloat(challengeObjParameters?.positionY) || 0,
-          z: parseFloat(challengeObjParameters?.positionZ) || 1,
+          z: parseFloat(challengeObjParameters?.positionZ) || 0.4,
         },
       };
-      // console.log("AAAAAASITEEEEEEEEE", selectedGeoSite);
+      console.log(position, 'posiotionadsd')
       console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       const visibilityConfig = {
@@ -185,21 +192,23 @@ const PinChallenge = () => {
     } else {
       console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
-    // if (modelData.useGPS) {
-    //   const gpsConfig = {
-    //     smoothingFactor: 0.1, // Factor de suavizado del GPS
-    //     minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
-    //     scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
-    //     maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
-    //     isVisibleObject: true, // Controlar visibilidad inicial
-    //   };
-    //   console.log("Enviando configuración de GPS a Unity:", gpsConfig);
-    //   unityRef.current.postMessage(
-    //     "OBJImport", // GameObject que contiene el script
-    //     "ConfigureGPSFromReact", // Método del script
-    //     JSON.stringify(gpsConfig)
-    //   );
-    // }
+    /* ###SUAVIZAR LA NUEVA REPOSICION DEL OBJETO###
+    if (modelData.useGPS) {
+      const gpsConfig = {
+        smoothingFactor: 0.1, // Factor de suavizado del GPS
+        minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
+        scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
+        maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
+        isVisibleObject: true, // Controlar visibilidad inicial
+      };
+      console.log("Enviando configuración de GPS a Unity:", gpsConfig);
+      unityRef.current.postMessage(
+        "OBJImport", // GameObject que contiene el script
+        "ConfigureGPSFromReact", // Método del script
+        JSON.stringify(gpsConfig)
+      );
+    }*/
+
   };
 
   const sendBloomValuesToUnity = () => {
@@ -429,9 +438,47 @@ const PinChallenge = () => {
       if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
         sendModelDataToUnitySpawn();
         sendBloomValuesToUnity();
+        unityRef.current.postMessage("Scriptposition", "SetVisibleButton", JSON.stringify({
+          setVisibleButtonPosition: true
+        }));
       }
     }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded])
   );
+
+  const eraseFile = async () => {
+    try {
+      const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
+      const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
+  
+      await keepFileMostRecent(androidFilePath, '.png');
+    } catch (error) {
+      console.error(error);
+    }
+  };
+  
+ 
+  const keepFileMostRecent = async (ruta, extension = '') => {
+    try {
+      const files = await RNFS.readDir(ruta); 
+      const filteredFiles = files.filter(
+        (file) => file.isFile() && (extension === '' || file.name.endsWith(extension))
+      );
+  
+      if (filteredFiles.length <= 0) {
+        return; 
+      }
+      filteredFiles.sort((a, b) => b.mtime - a.mtime);
+  
+    
+      const archivosParaEliminar = filteredFiles.slice(1); 
+
+      for (const file of archivosParaEliminar) {
+        await RNFS.unlink(file.path);
+      }
+    } catch (error) {
+      console.error( error);
+    }
+  };
 
   const acceptWaiverButtonHandler = () => {
     setDetailsShow(false);
@@ -447,7 +494,28 @@ const PinChallenge = () => {
     setChallengeInformationView(false);
     setIsUnityLoaded(true);
   };
+  const handleUnityMessage = result => {
+    console.log(result.nativeEvent.message)
 
+ const data = JSON.parse(result.nativeEvent.message);
+    console.log( 'fulldata', data)
+    buttonInfo = data.enableButton
+    
+    if (data.photoVideoButton?.isPhoto){
+      setCapturedImage(data.photoVideoButton?.filepath);
+      setIsUnityLoaded(false)
+      eraseFile()
+    } 
+    if (data.photoVideoButton?.isPhoto == false){
+      setCapturedVideo(data.photoVideoButton?.filepath); 
+      setIsUnityLoaded(false); 
+    }
+    if(data.infoButton?.isButton)
+    {
+      setChallengeInformationView(data.infoButton?.isButton)
+      setIsUnityLoaded(false)
+    }
+  }
   const modals = (
     <>
       <CaptureInfoView
@@ -466,24 +534,34 @@ const PinChallenge = () => {
   return (
     <ChallengeScreen
       title={`Location Check In\n${selectedGeoSite.name}`}
+      appHeader = {false}
+      style={{
+        paddingHorizontal: 0,
+        paddingTop: 20,
+        height:'100%',
+        backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
+    }}
       modals={modals}
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
       scrollable={false}
     >
-      <ChallengeFoundCaptureHeader
+      {/* <ChallengeFoundCaptureHeader
         leftTitle="Pin Found"
         challengeFound={!!isMeInsideInSite}
         points={challengeObj?.points}
-      />
+      /> */}
 
       <UnityARCamera
+      width="100%"
+      height="100%"
         unityRef={unityRef}
         isProcessingMedia={processingMedia}
         isUnityLoaded={isUnityLoaded}
         capturedImage={capturedImage}
         capturedVideo={capturedVideo}
+        onUnityMessage={handleUnityMessage}
       />
-
+ {!isUnityLoaded &&
       <CameraControls
         onRetake={retakeButtonHandler}
         onDone={onDonePress}
@@ -491,7 +569,7 @@ const PinChallenge = () => {
         hasCapturedContent={!!capturedImage}
         customInstructions="Stand next to the pin, resize as needed, snap your photo"
       />
-
+ }
       {/* Removing temporarily */}
       {/* <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} /> */}
     </ChallengeScreen>

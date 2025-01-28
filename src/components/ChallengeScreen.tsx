@@ -4,15 +4,17 @@ import { screenHorizontalPadding } from "util/AppDimensions";
 import AppHeader from "./header";
 import { fontGroup, FontLineHeights, FontSizes } from "util/FontUtils";
 import theme from "assets/theme";
-import { ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { ScrollView, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
 interface CaptureChallengeScreenProps {
+  appHeader: boolean;
   title?: string;
   headerRightComponent?: React.ReactNode;
   modals?: React.ReactNode;
   children: React.ReactNode;
   scrollable?: boolean;
+  style?: ViewStyle;
 }
 
 const ChallengeScreen = ({
@@ -20,6 +22,8 @@ const ChallengeScreen = ({
   headerRightComponent,
   modals,
   children,
+  style,
+  appHeader = true,
   scrollable = true,
 }: CaptureChallengeScreenProps) => {
   const { height, width } = useWindowDimensions();
@@ -27,6 +31,7 @@ const ChallengeScreen = ({
   const screenContainerStyle = {
     paddingBottom: 40,
     paddingHorizontal: screenHorizontalPadding,
+    ...style
   };
   let screenContainer = (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={screenContainerStyle}>
@@ -50,26 +55,26 @@ const ChallengeScreen = ({
           end={{ x: 0.5, y: 1 }} // Bottom
         />
       </BackgroundWithImage>
-
-      <AppHeader
-        centerComponent={{
-          text: title,
-          numberOfLines: 2,
-          // @ts-ignore
-          style: {
-            fontSize: FontSizes.S14,
-            lineHeight: FontLineHeights.LH20,
-            color: theme.lightColors?.white,
-            textAlign: "center",
-            ...fontGroup.ns700,
-          },
-        }}
-        centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}
-        backgroundColor="transparent"
-        // @ts-expect-error
-        rightComponent={headerRightComponent}
-      />
-
+      {appHeader && (
+        <AppHeader
+          centerComponent={{
+            text: title,
+            numberOfLines: 2,
+            // @ts-ignore
+            style: {
+              fontSize: FontSizes.S14,
+              lineHeight: FontLineHeights.LH20,
+              color: theme.lightColors?.white,
+              textAlign: "center",
+              ...fontGroup.ns700,
+            },
+          }}
+          centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}
+          backgroundColor="transparent"
+          // @ts-expect-error
+          rightComponent={headerRightComponent}
+        />
+      )}
       {screenContainer}
 
       {modals}
