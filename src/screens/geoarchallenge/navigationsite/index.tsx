@@ -614,285 +614,282 @@ const GeoArSiteNavigation = () => {
 
   return (
     <View style={_styles.mainContainer}>
-      <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
+      <View
+        style={{
+          backgroundColor: "rgba(32, 33, 54, 0.94)",
+          flexDirection: "row",
+        }}
+      >
         <View
           style={{
-            backgroundColor: "rgba(32, 33, 54, 0.94)",
-            flexDirection: "row",
-            flex: 1,
+            width: currentRouteIcon ? "20%" : 0,
+            height: screenHeight * 0.17,
+            alignItems: "center",
+            justifyContent: "center",
           }}
         >
-          <View
-            style={{
-              width: currentRouteIcon ? "20%" : 0,
-              height: screenHeight * 0.17,
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {currentRouteIcon ? currentRouteIcon : ""}
-          </View>
-          <View
-            style={{
-              width: currentRouteIcon ? "80%" : "100%",
-              height: screenHeight * 0.17,
-              alignItems: "center",
-              justifyContent: "center",
-              paddingLeft: currentRouteIcon ? 0 : 20,
-              paddingRight: 20,
-              paddingTop: 20,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: 16,
-                color: "white",
-                lineHeight: 22,
-              }}
-            >
-              {selectedStep ? selectedStep?.html_instructions : "Loading..."}
-            </Text>
-          </View>
+          {currentRouteIcon ? currentRouteIcon : ""}
         </View>
         <View
           style={{
-            position: "relative",
-            height: screenHeight * 0.73,
-            overflow: "hidden",
-            flex: 1,
+            width: currentRouteIcon ? "80%" : "100%",
+            height: screenHeight * 0.17,
+            alignItems: "center",
+            justifyContent: "center",
+            paddingLeft: currentRouteIcon ? 0 : 20,
+            paddingRight: 20,
+            paddingTop: 20,
           }}
         >
-          {isConnected && (
-            <MapView
-              customMapStyle={mapCustomStyle}
-              provider={PROVIDER_GOOGLE}
-              followsUserLocation
-              showsCompass={true}
-              ref={mapView}
-              zoomControlEnabled={true}
-              style={{
-                flex: 1,
-              }}
-              showsMyLocationButton={false}
-              zoomEnabled={true}
-              scrollEnabled={true}
-              showsUserLocation
-              initialRegion={{
+          <Text
+            style={{
+              fontSize: 16,
+              color: "white",
+              lineHeight: 22,
+            }}
+          >
+            {selectedStep ? selectedStep?.html_instructions : "Loading..."}
+          </Text>
+        </View>
+      </View>
+      <View
+        style={{
+          position: "relative",
+          height: screenHeight * 0.73,
+          overflow: "hidden",
+          width: "100%",
+        }}
+      >
+        {isConnected && (
+          <MapView
+            customMapStyle={mapCustomStyle}
+            provider={PROVIDER_GOOGLE}
+            followsUserLocation
+            showsCompass={true}
+            ref={mapView}
+            zoomControlEnabled={true}
+            style={{
+              flex: 1,
+            }}
+            showsMyLocationButton={false}
+            zoomEnabled={true}
+            scrollEnabled={true}
+            showsUserLocation
+            initialRegion={{
+              latitude: selectedGeoSite.lat_long.coordinates[1],
+              longitude: selectedGeoSite.lat_long.coordinates[0],
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
+            }}
+            onRegionChangeComplete={handleRegionChange}
+            onUserLocationChange={handleUserHeading}
+          >
+            <Marker
+              coordinate={{
                 latitude: selectedGeoSite.lat_long.coordinates[1],
                 longitude: selectedGeoSite.lat_long.coordinates[0],
-                latitudeDelta: 0.01,
-                longitudeDelta: 0.01,
               }}
-              onRegionChangeComplete={handleRegionChange}
-              onUserLocationChange={handleUserHeading}
+              title={selectedGeoSite.name}
             >
+              <View style={{ width: 30, height: 30 }}>
+                <MarkerIcon />
+              </View>
+            </Marker>
+
+            {location && location?.coords && (
               <Marker
                 coordinate={{
-                  latitude: selectedGeoSite.lat_long.coordinates[1],
-                  longitude: selectedGeoSite.lat_long.coordinates[0],
+                  latitude: location.coords.latitude,
+                  longitude: location.coords.longitude,
                 }}
-                title={selectedGeoSite.name}
+                title={"Start Location"}
               >
                 <View style={{ width: 30, height: 30 }}>
                   <MarkerIcon />
                 </View>
               </Marker>
+            )}
+            {location && (
+              <MapViewDirections
+                mode={mapMode}
+                // @ts-ignore
+                origin={routeInitialLocation?.coords}
+                destination={{
+                  latitude: selectedGeoSite.lat_long.coordinates[1],
+                  longitude: selectedGeoSite.lat_long.coordinates[0],
+                }}
+                apikey={Config.GEOCODER_API_KEY}
+                strokeWidth={8}
+                strokeColor="#C881F0"
+                optimizeWaypoints
+                onReady={(result: any) => {
+                  const steps = result.legs[0].steps;
+                  steps.map((step: StepResponse, index: number) => {
+                    step.html_instructions = step.html_instructions.replace(/<[^>]*>?/gm, " ");
+                    step.reached = false;
+                    step.index = index;
+                  });
 
-              {location && location?.coords && (
-                <Marker
-                  coordinate={{
-                    latitude: location.coords.latitude,
-                    longitude: location.coords.longitude,
-                  }}
-                  title={"Start Location"}
-                >
-                  <View style={{ width: 30, height: 30 }}>
-                    <MarkerIcon />
-                  </View>
-                </Marker>
-              )}
-              {location && (
-                <MapViewDirections
-                  mode={mapMode}
-                  // @ts-ignore
-                  origin={routeInitialLocation?.coords}
-                  destination={{
-                    latitude: selectedGeoSite.lat_long.coordinates[1],
-                    longitude: selectedGeoSite.lat_long.coordinates[0],
-                  }}
-                  apikey={Config.GEOCODER_API_KEY}
-                  strokeWidth={8}
-                  strokeColor="#C881F0"
-                  optimizeWaypoints
-                  onReady={(result: any) => {
-                    const steps = result.legs[0].steps;
-                    steps.map((step: StepResponse, index: number) => {
-                      step.html_instructions = step.html_instructions.replace(/<[^>]*>?/gm, " ");
-                      step.reached = false;
-                      step.index = index;
-                    });
-
-                    setSteps(steps);
-                    setMileDistance(convertKilometersToMiles(result.distance));
-                    setDurationMins(result.duration);
-                    calculatedEstimatedTime(result.duration);
-                  }}
-                  onStart={args => {
-                    console.log("onStart", args);
-                  }}
-                  onError={error => console.error("MapViewDirections error:", error)}
-                />
-              )}
-            </MapView>
-          )}
-          {!isConnected && (
-            <MapboxGL.MapView
-              ref={mapViewRef}
-              style={{ flex: 1 }}
-              styleURL={MapboxGL.StyleURL.Dark}
-              logoEnabled={false}
-              compassEnabled
-              scaleBarEnabled={false}
-              pitchEnabled
-              rotateEnabled
-            >
-              {/* Center camera on first render or as needed: */}
-              <MapboxGL.Camera
-                // ref={mapViewRef}
-                zoomLevel={18}
-                pitch={60} // Sets the 3D pitch angle
-                animationMode="flyTo"
-                animationDuration={250}
-                centerCoordinate={[longitude, latitude]}
+                  setSteps(steps);
+                  setMileDistance(convertKilometersToMiles(result.distance));
+                  setDurationMins(result.duration);
+                  calculatedEstimatedTime(result.duration);
+                }}
+                onStart={args => {
+                  console.log("onStart", args);
+                }}
+                onError={error => console.error("MapViewDirections error:", error)}
               />
+            )}
+          </MapView>
+        )}
+        {!isConnected && (
+          <MapboxGL.MapView
+            ref={mapViewRef}
+            style={{ flex: 1 }}
+            styleURL={MapboxGL.StyleURL.Dark}
+            logoEnabled={false}
+            compassEnabled
+            scaleBarEnabled={false}
+            pitchEnabled
+            rotateEnabled
+          >
+            {/* Center camera on first render or as needed: */}
+            <MapboxGL.Camera
+              // ref={mapViewRef}
+              zoomLevel={18}
+              pitch={60} // Sets the 3D pitch angle
+              animationMode="flyTo"
+              animationDuration={250}
+              centerCoordinate={[longitude, latitude]}
+            />
 
-              {/* Marker for Destination */}
-              <MapboxGL.PointAnnotation
-                id="destinationMarker"
-                coordinate={[
-                  selectedGeoSite.lat_long.coordinates[0],
-                  selectedGeoSite.lat_long.coordinates[1],
-                ]}
-              >
+            {/* Marker for Destination */}
+            <MapboxGL.PointAnnotation
+              id="destinationMarker"
+              coordinate={[
+                selectedGeoSite.lat_long.coordinates[0],
+                selectedGeoSite.lat_long.coordinates[1],
+              ]}
+            >
+              <View style={{ width: 30, height: 30 }}>
+                <MarkerIcon />
+              </View>
+            </MapboxGL.PointAnnotation>
+
+            {/* Marker for Current User Location (if you want to show user’s dot yourself) */}
+            {latitude && longitude && (
+              <MapboxGL.PointAnnotation id="startLocation" coordinate={[longitude, latitude]}>
                 <View style={{ width: 30, height: 30 }}>
                   <MarkerIcon />
                 </View>
               </MapboxGL.PointAnnotation>
+            )}
 
-              {/* Marker for Current User Location (if you want to show user’s dot yourself) */}
-              {latitude && longitude && (
-                <MapboxGL.PointAnnotation id="startLocation" coordinate={[longitude, latitude]}>
-                  <View style={{ width: 30, height: 30 }}>
-                    <MarkerIcon />
-                  </View>
-                </MapboxGL.PointAnnotation>
-              )}
+            {router && (
+              <>
+                {/* @ts-ignore */}
+                <MapboxGL.ShapeSource id="routeSource" shape={router}>
+                  <MapboxGL.LineLayer
+                    id="routeLayer"
+                    style={{
+                      lineColor: "#812fac",
+                      lineWidth: 10,
+                      lineJoin: "round",
+                      lineCap: "round",
+                    }}
+                  />
+                </MapboxGL.ShapeSource>
+              </>
+            )}
+          </MapboxGL.MapView>
+        )}
 
-              {router && (
-                <>
-                  {/* @ts-ignore */}
-                  <MapboxGL.ShapeSource id="routeSource" shape={router}>
-                    <MapboxGL.LineLayer
-                      id="routeLayer"
-                      style={{
-                        lineColor: "#812fac",
-                        lineWidth: 10,
-                        lineJoin: "round",
-                        lineCap: "round",
-                      }}
-                    />
-                  </MapboxGL.ShapeSource>
-                </>
-              )}
-            </MapboxGL.MapView>
-          )}
+        {!isConnected && (
+          <View
+            style={{
+              position: "absolute",
+              top: 20,
+              left: 0,
+              right: 0,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                backgroundColor: "rgba(0,0,0,0.7)",
+                color: "#fff",
+                padding: 10,
+                borderRadius: 8,
+                margin: 10,
+              }}
+            >
+              You are offline – using cached region.
+            </Text>
+          </View>
+        )}
+      </View>
+      <View
+        style={{
+          backgroundColor: "#131422",
+          paddingHorizontal: 20,
+          paddingBottom: 10,
+          height: screenHeight * 0.1,
+        }}
+      >
+        <View
+          style={{
+            flex: 1,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 24,
+          }}
+        >
+          <TouchableOpacity onPress={closeHandler}>
+            <CloseBIcon style={{ width: 32, height: 32 }} />
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setMute(currState => {
+                const updatedState = !currState;
+                if (updatedState) {
+                  Tts.stop();
+                }
 
-          {!isConnected && (
+                return updatedState;
+              });
+            }}
+          >
+            {mute ? (
+              <Mute style={{ width: 32, height: 32 }} />
+            ) : (
+              <Unmute style={{ width: 32, height: 32 }} />
+            )}
+          </TouchableOpacity>
+          <View style={{ alignItems: "center", marginVertical: 8 }}>
+            <Text style={_styles.site_distance_time_value_text}>
+              {minOrHoursWalkDriving(durationMins)}
+            </Text>
             <View
               style={{
-                position: "absolute",
-                top: 20,
-                left: 0,
-                right: 0,
+                width: "100%",
+                flexDirection: "row",
                 alignItems: "center",
               }}
             >
-              <Text
-                style={{
-                  backgroundColor: "rgba(0,0,0,0.7)",
-                  color: "#fff",
-                  padding: 10,
-                  borderRadius: 8,
-                  margin: 10,
-                }}
-              >
-                You are offline – using cached region.
+              <Text style={[_styles.site_distance_time_text, { fontWeight: "bold" }]}>
+                {mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text>
               </Text>
+              <Text style={_styles.site_distance_time_text}>.</Text>
+              <Text style={_styles.site_distance_time_text}>{estimatedTime}</Text>
             </View>
-          )}
-        </View>
-        <View
-          style={{
-            backgroundColor: "#131422",
-            paddingHorizontal: 20,
-            alignItems: "center",
-            justifyContent: "center",
-            height: screenHeight * 0.1,
-          }}
-        >
-          <View
-            style={{
-              width: "100%",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <TouchableOpacity onPress={navigateToNextScreen}>
-              <CloseBIcon style={{ width: 32, height: 32 }} />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setMute(currState => {
-                  const updatedState = !currState;
-                  if (updatedState) {
-                    Tts.stop();
-                  }
-
-                  return updatedState;
-                });
-              }}
-            >
-              {mute ? (
-                <Mute style={{ width: 32, height: 32 }} />
-              ) : (
-                <Unmute style={{ width: 32, height: 32 }} />
-              )}
-            </TouchableOpacity>
-            <View style={{ alignItems: "center", marginVertical: 8 }}>
-              <Text style={_styles.site_distance_time_value_text}>
-                {minOrHoursWalkDriving(durationMins)}
-              </Text>
-              <View
-                style={{
-                  width: "100%",
-                  flexDirection: "row",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={[_styles.site_distance_time_text, { fontWeight: "bold" }]}>
-                  {mileDistance.toFixed(2)} <Text style={{ fontSize: 10 }}>miles</Text>
-                </Text>
-                <Text style={_styles.site_distance_time_text}>.</Text>
-                <Text style={_styles.site_distance_time_text}>{estimatedTime}</Text>
-              </View>
-            </View>
-            <TouchableOpacity onPress={navigateToNextScreen}>
-              <SkipIcon style={{ width: 47, height: 35 }} />
-            </TouchableOpacity>
           </View>
+          <TouchableOpacity onPress={navigateToNextScreen}>
+            <SkipIcon style={{ width: 47, height: 35 }} />
+          </TouchableOpacity>
         </View>
-      </ScrollView>
+      </View>
     </View>
   );
 };
