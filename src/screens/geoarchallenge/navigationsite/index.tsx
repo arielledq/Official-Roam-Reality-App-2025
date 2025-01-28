@@ -22,6 +22,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import MapboxGL from "@rnmapbox/maps";
 import { Button } from "@rneui/themed";
 import OfflineManager from "@rnmapbox/maps/src/modules/offline/offlineManager";
+import Geolocation from "react-native-geolocation-service";
 
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
@@ -30,8 +31,9 @@ import { GeolocationContext } from "../../../GeolocationProvider";
 import Config from "../../../config";
 import { convertKilometersToMiles, showMessage } from "../../../util/helpers";
 import {
+  getDeviceCurrentLocation,
   getLocationDistance,
-  //  hasLocationPermission
+  hasLocationPermission,
 } from "../../../util/LocationLib";
 import mapCustomStyle from "../../../constants/MapCustomStyles";
 
@@ -139,6 +141,7 @@ const GeoArSiteNavigation = () => {
 
   const mapView = useRef(null);
   const mapViewRef = useRef(null);
+  const watchIdRef = useRef(null);
   const compassHeading = useRef(0);
 
   const route = useRoute();
@@ -398,38 +401,51 @@ const GeoArSiteNavigation = () => {
 
   const downloadOfflineRegion = async () => {
     // Setup bounding box for offline
+    const lat1 = latitude;
+    const lng1 = longitude;
+    const lat2 = selectedGeoSite.lat_long.coordinates[1];
+    const lng2 = selectedGeoSite.lat_long.coordinates[0];
+
+    const south = Math.min(lat1, lat2);
+    const north = Math.max(lat1, lat2);
+    const west = Math.min(lng1, lng2);
+    const east = Math.max(lng1, lng2);
+
     const packOptions = {
-      name: "MyOfflinePack",
-      styleURL: MapboxGL.StyleURL.Dark, // or your custom style
-      // bounding box = [westLng, southLat, eastLng, northLat]
+      name: `MyOfflinePack-${selectedGeoSite.name}`,
+      styleURL: MapboxGL.StyleURL.Dark,
       bounds: [
-        [longitude, latitude],
-        [selectedGeoSite.lat_long.coordinates[0], selectedGeoSite.lat_long.coordinates[1]],
-      ], // Example bounding box near your site
+        [west, south],
+        [east, north],
+      ],
       minZoom: 12,
       maxZoom: 18,
     };
 
     try {
-      await OfflineManager.createPack(
-        // @ts-ignore
-        packOptions,
-        // progress callback
-        (_offlineRegion, status: any) => {
-          setOfflineStatus(status);
-          // Optionally handle progress
-          if (
-            status.completedResourceCount === status.requiredResourceCount &&
-            status.completedTileCount === status.requiredTileCount
-          ) {
-            console.log("Offline download complete!");
+      const existingPacks = await MapboxGL.offlineManager.getPacks();
+      const hasPack = existingPacks.find(p => p.name === `MyOfflinePack-${selectedGeoSite.name}`);
+      if (!hasPack) {
+        await OfflineManager.createPack(
+          // @ts-ignore
+          packOptions,
+          // progress callback
+          (offlineRegion, status: any) => {
+            setOfflineStatus(status);
+            // Optionally handle progress
+            if (
+              status.completedResourceCount === status.requiredResourceCount &&
+              status.completedTileCount === status.requiredTileCount
+            ) {
+              console.log("Offline download complete!");
+            }
+          },
+          // error callback
+          error => {
+            console.log("Error creating offline pack", error);
           }
-        },
-        // error callback
-        error => {
-          console.log("Error creating offline pack", error);
-        }
-      );
+        );
+      }
     } catch (err) {
       console.log("Error setting up offline pack", err);
     }
@@ -445,7 +461,6 @@ const GeoArSiteNavigation = () => {
     fetch(MBUrl)
       .then(response => response.json())
       .then(data => {
-        console.log("Mapbox route data", data);
         if (data?.routes?.length) {
           const routeLine = {
             type: "Feature",
@@ -455,6 +470,42 @@ const GeoArSiteNavigation = () => {
         }
       })
       .catch(error => console.error(error));
+  };
+
+  const getLocationUpdates = async () => {
+    const hasPermission = await hasLocationPermission();
+    if (!hasPermission) return;
+
+    // @ts-ignore
+    watchIdRef.current = Geolocation.watchPosition(
+      position => {
+        // console.log("watchPosition", position);
+        setLatitude(position.coords.latitude);
+        setLongitude(position.coords.longitude);
+      },
+      error => {
+        console.error(error);
+      },
+      {
+        accuracy: { android: "high", ios: "best" },
+        enableHighAccuracy: false,
+        // @ts-ignore
+        timeout: 15000,
+        maximumAge: 10000,
+        distanceFilter: 0,
+        forceRequestLocation: true,
+        forceLocationManager: true,
+        showLocationDialog: true,
+      }
+    );
+  };
+
+  const stopLocationUpdates = () => {
+    if (watchIdRef.current !== null) {
+      Geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+      Geolocation.stopObserving();
+    }
   };
 
   useEffect(() => {
@@ -467,8 +518,10 @@ const GeoArSiteNavigation = () => {
       getFirstLocation();
       activateKeepAwake();
       mapBoxGetRoute();
+      getLocationUpdates();
     } else {
       deactivateKeepAwake();
+      stopLocationUpdates();
     }
   }, [isFocused]);
 
@@ -683,7 +736,7 @@ const GeoArSiteNavigation = () => {
             <MapboxGL.MapView
               ref={mapViewRef}
               style={{ flex: 1 }}
-              styleURL={MapboxGL.StyleURL.Dark} // or your custom style
+              styleURL={MapboxGL.StyleURL.Dark}
               logoEnabled={false}
               compassEnabled
               scaleBarEnabled={false}
@@ -692,15 +745,12 @@ const GeoArSiteNavigation = () => {
             >
               {/* Center camera on first render or as needed: */}
               <MapboxGL.Camera
-                ref={mapViewRef}
+                // ref={mapViewRef}
                 zoomLevel={18}
                 pitch={60} // Sets the 3D pitch angle
                 animationMode="flyTo"
                 animationDuration={250}
-                centerCoordinate={[
-                  selectedGeoSite.lat_long.coordinates[0],
-                  selectedGeoSite.lat_long.coordinates[1],
-                ]}
+                centerCoordinate={[longitude, latitude]}
               />
 
               {/* Marker for Destination */}

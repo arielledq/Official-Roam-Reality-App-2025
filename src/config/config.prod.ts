@@ -14,6 +14,6 @@ export default {
   SENTRY_DSN: "https://8a0ac5dac07d4ed0b64bd75ab3c5a765@sentry.innovatica.com.py//58",
   GEOCODER_API_KEY: "AIzaSyCLsHGta-x3ABgEwr-D4XEdA92OyiSYoTU",
   MAPBOX_PUBLIC_KEY:
-    "pk.eyJ1IjoiaGJpdHRhcjIiLCJhIjoiY20yMHA5ajVrMGJ0bDJsb2oyeWkxZTlvbyJ9.AMxq1QZvEvEnydL_LIZnxw",
+    "pk.eyJ1Ijoicm9hbXJlYWxpdHkiLCJhIjoiY20ybDJpZXp6MDgxdDJxb3AwbWw0cmxqaSJ9.XS8GNE9TlK1U187fFjpk6A",
   FACEBOOK_APP_ID: "1735456000569385",
 };
