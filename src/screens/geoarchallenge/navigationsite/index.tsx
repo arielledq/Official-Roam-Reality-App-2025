@@ -134,8 +134,8 @@ const GeoArSiteNavigation = () => {
   const [longitude, setLongitude] = useState(userLocation?.longitude);
   const [zoomLevel, setZoomLevel] = useState(0);
   const [offlineStatus, setOfflineStatus] = useState(null);
-  const [router, setRoute] = useState(null);
-  const [selectedStep, setSelectedStep] = useState(null);
+  const [router, setRoute] = useState<{} | null>(null);
+  const [selectedStep, setSelectedStep] = useState<StepResponse | null>(null);
 
   const mapView = useRef(null);
   const mapViewRef = useRef(null);
@@ -390,7 +390,7 @@ const GeoArSiteNavigation = () => {
     return Math.round(zoom);
   };
 
-  const handleRegionChange = (region: any) => {
+  const handleRegionChange = (region?: any) => {
     if (!region) return;
     const zoom = calculateZoomLevel(region);
     setZoomLevel(zoom);
@@ -412,9 +412,10 @@ const GeoArSiteNavigation = () => {
 
     try {
       await OfflineManager.createPack(
+        // @ts-ignore
         packOptions,
         // progress callback
-        (offlineRegion, status) => {
+        (_offlineRegion, status: any) => {
           setOfflineStatus(status);
           // Optionally handle progress
           if (
@@ -725,17 +726,20 @@ const GeoArSiteNavigation = () => {
               )}
 
               {router && (
-                <MapboxGL.ShapeSource id="routeSource" shape={router}>
-                  <MapboxGL.LineLayer
-                    id="routeLayer"
-                    style={{
-                      lineColor: "#812fac",
-                      lineWidth: 10,
-                      lineJoin: "round",
-                      lineCap: "round",
-                    }}
-                  />
-                </MapboxGL.ShapeSource>
+                <>
+                  {/* @ts-ignore */}
+                  <MapboxGL.ShapeSource id="routeSource" shape={router}>
+                    <MapboxGL.LineLayer
+                      id="routeLayer"
+                      style={{
+                        lineColor: "#812fac",
+                        lineWidth: 10,
+                        lineJoin: "round",
+                        lineCap: "round",
+                      }}
+                    />
+                  </MapboxGL.ShapeSource>
+                </>
               )}
             </MapboxGL.MapView>
           )}
