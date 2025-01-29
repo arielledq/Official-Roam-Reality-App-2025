@@ -12,6 +12,8 @@ import UnityView from "@azesmway/react-native-unity/src";
 // @ts-expect-error
 import Video from "react-native-video";
 import ARFilter from "screens/archallenge/FilterView";
+// @ts-ignore
+import { CHALLENGES_TYPE } from "constants";
 
 const offset = 120;
 const { width: screenWidth } = Dimensions.get("window"); // Get screen width
@@ -47,6 +49,8 @@ const UnityARCamera = ({
   capturedVideo,
 }: UnityARCameraProps) => {
   const imageHasFilters = imageFilter?.challengeObj?.ar_filters?.length > 0;
+  const challenge_type = imageFilter?.challengeObj?.challenge_type;
+  const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
   return (
     <View style={{ flex: 1, alignItems: "center", marginVertical: 12 }}>
       <View
@@ -84,13 +88,13 @@ const UnityARCamera = ({
                 </View>
               )}
             </View>
-            {capturedImage && !imageHasFilters && (
+            {capturedImage && !imageHasFilters && !is_pin_challenge && (
               <Image
                 style={capturedImageContainer as ImageStyle}
                 source={{ uri: `file://${capturedImage}` }}
               />
             )}
-            {capturedImage && imageHasFilters && (
+            {capturedImage && (imageHasFilters || is_pin_challenge) && (
               <View style={capturedImageContainer}>
                 <ARFilter
                   challengeObj={imageFilter?.challengeObj}

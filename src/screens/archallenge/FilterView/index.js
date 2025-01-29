@@ -7,6 +7,8 @@ import ViewShot from "react-native-view-shot";
 import GetLocation from "react-native-get-location";
 import PagerView from "react-native-pager-view";
 import Geocoder from "react-native-geocoding";
+import { CHALLENGES_TYPE } from "constants";
+import theme from "assets/theme";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
@@ -16,6 +18,9 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
   const correctedCaptureData = captureData.startsWith("file://")
     ? captureData
     : `file://${captureData}`;
+  const challenge_type = challengeObj?.challenge_type;
+  const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
+
   const [fullLocation, setFullLocation] = useState(null);
 
   const getLocation = () => {
@@ -172,147 +177,179 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
     >
       <BackgroundWithImage source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>
-          {ar_filters.map(filter => {
-            const isTopToBottom = filter?.gradient_direction === "TOP_TO_BOTTOM";
-            return (
-              <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
-                {filter.gradient_colors && (
-                  // grandient
-                  <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      bottom: 0,
-                      left: 0,
-                      right: 0,
-                    }}
-                  >
-                    <LinearGradient
-                      style={{
-                        flex: 1,
-                        transform: [
-                          {
-                            rotate: isTopToBottom ? "0deg" : "180deg",
-                          },
-                        ],
-                        marginBottom: isTopToBottom ? "75%" : 0,
-                        marginTop: !isTopToBottom ? "75%" : 0,
-                      }}
-                      colors={[
-                        ...filter?.gradient_colors.sort((a, b) => a.length - b.length),
-                        "transparent",
-                      ]}
-                    />
-                  </View>
-                )}
-                {filter?.image && (
-                  <ImageBackground
-                    source={{ uri: filter.image }}
-                    resizeMode="contain"
-                    style={{
-                      alignItems: "flex-end",
-                      height: "100%",
-                      width: "100%",
-                    }}
-                  />
-                )}
-                {filter?.gradient_direction === "BOTTOM_TO_TOP" && (
-                  <View
+          {is_pin_challenge ? (
+            <View
+              style={[
+                styles.textFilterView,
+                {
+                  justifyContent: "flex-end",
+                  paddingBottom: 32,
+                },
+              ]}
+            >
+              {fullLocation && (
+                <View
+                  style={{ backgroundColor: theme.lightColors?.grey2, padding: 8, borderRadius: 6 }}
+                >
+                  <Text
                     style={[
-                      styles.textFilterView,
+                      styles.locationText,
                       {
-                        justifyContent: "flex-end",
-                        paddingBottom: 10,
+                        color: theme.lightColors.white,
+                        fontSize: 12,
+                        textTransform: "uppercase",
+                        fontWeight: "bold",
                       },
                     ]}
                   >
-                    {!filter?.text_form_image && (
-                      <Text
-                        style={[
-                          styles.filterTitleText,
-                          {
-                            color: filter?.filter_text_color,
-                            fontSize: Number(filter.filter_text_size),
-                          },
+                    {getLocationText(filter?.location_option)}
+                  </Text>
+                </View>
+              )}
+            </View>
+          ) : (
+            ar_filters.map(filter => {
+              const isTopToBottom = filter?.gradient_direction === "TOP_TO_BOTTOM";
+              return (
+                <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
+                  {filter.gradient_colors && (
+                    // grandient
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        bottom: 0,
+                        left: 0,
+                        right: 0,
+                      }}
+                    >
+                      <LinearGradient
+                        style={{
+                          flex: 1,
+                          transform: [
+                            {
+                              rotate: isTopToBottom ? "0deg" : "180deg",
+                            },
+                          ],
+                          marginBottom: isTopToBottom ? "75%" : 0,
+                          marginTop: !isTopToBottom ? "75%" : 0,
+                        }}
+                        colors={[
+                          ...filter?.gradient_colors.sort((a, b) => a.length - b.length),
+                          "transparent",
                         ]}
-                      >
-                        {filter?.filter_text}
-                      </Text>
-                    )}
-                    {fullLocation && !filter?.text_form_image && (
-                      <Text
-                        style={[
-                          styles.locationText,
-                          {
-                            color: filter.location_text_color,
-                            fontSize: Number(filter.location_text_size),
-                          },
-                        ]}
-                      >
-                        {getLocationText(filter?.location_option)}
-                      </Text>
-                    )}
-                    {!filter?.text_form_image && (
-                      <Text
-                        style={[
-                          styles.appNameText,
-                          {
-                            color: filter?.app_name_text_color,
-                            fontSize: Number(filter?.app_name_text_size),
-                          },
-                        ]}
-                      >
-                        {filter?.app_name_text}
-                      </Text>
-                    )}
-                  </View>
-                )}
-                {filter.gradient_direction === "TOP_TO_BOTTOM" && (
-                  <View style={[styles.textFilterView, { justifyContent: "flex-start" }]}>
-                    {!filter?.text_form_image && (
-                      <Text
-                        style={[
-                          styles.appNameText,
-                          {
-                            color: filter?.app_name_text_color,
-                            fontSize: Number(filter?.app_name_text_size),
-                          },
-                        ]}
-                      >
-                        {filter?.app_name_text}
-                      </Text>
-                    )}
-                    {fullLocation && !filter?.text_form_image && (
-                      <Text
-                        style={[
-                          styles.locationText,
-                          {
-                            color: filter?.location_text_color,
-                            fontSize: Number(filter?.location_text_size),
-                          },
-                        ]}
-                      >
-                        {getLocationText(filter?.location_option)}
-                      </Text>
-                    )}
-                    {!filter?.text_form_image && (
-                      <Text
-                        style={[
-                          styles.filterTitleText,
-                          {
-                            color: filter?.filter_text_color,
-                            fontSize: Number(filter?.filter_text_size),
-                          },
-                        ]}
-                      >
-                        {filter?.filter_text}
-                      </Text>
-                    )}
-                  </View>
-                )}
-              </View>
-            );
-          })}
+                      />
+                    </View>
+                  )}
+                  {filter?.image && (
+                    <ImageBackground
+                      source={{ uri: filter.image }}
+                      resizeMode="contain"
+                      style={{
+                        alignItems: "flex-end",
+                        height: "100%",
+                        width: "100%",
+                      }}
+                    />
+                  )}
+                  {filter?.gradient_direction === "BOTTOM_TO_TOP" && (
+                    <View
+                      style={[
+                        styles.textFilterView,
+                        {
+                          justifyContent: "flex-end",
+                          paddingBottom: 10,
+                        },
+                      ]}
+                    >
+                      {!filter?.text_form_image && (
+                        <Text
+                          style={[
+                            styles.filterTitleText,
+                            {
+                              color: filter?.filter_text_color,
+                              fontSize: Number(filter.filter_text_size),
+                            },
+                          ]}
+                        >
+                          {filter?.filter_text}
+                        </Text>
+                      )}
+                      {fullLocation && !filter?.text_form_image && (
+                        <Text
+                          style={[
+                            styles.locationText,
+                            {
+                              color: filter.location_text_color,
+                              fontSize: Number(filter.location_text_size),
+                            },
+                          ]}
+                        >
+                          {getLocationText(filter?.location_option)}
+                        </Text>
+                      )}
+                      {!filter?.text_form_image && (
+                        <Text
+                          style={[
+                            styles.appNameText,
+                            {
+                              color: filter?.app_name_text_color,
+                              fontSize: Number(filter?.app_name_text_size),
+                            },
+                          ]}
+                        >
+                          {filter?.app_name_text}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                  {filter.gradient_direction === "TOP_TO_BOTTOM" && (
+                    <View style={[styles.textFilterView, { justifyContent: "flex-start" }]}>
+                      {!filter?.text_form_image && (
+                        <Text
+                          style={[
+                            styles.appNameText,
+                            {
+                              color: filter?.app_name_text_color,
+                              fontSize: Number(filter?.app_name_text_size),
+                            },
+                          ]}
+                        >
+                          {filter?.app_name_text}
+                        </Text>
+                      )}
+                      {fullLocation && !filter?.text_form_image && (
+                        <Text
+                          style={[
+                            styles.locationText,
+                            {
+                              color: filter?.location_text_color,
+                              fontSize: Number(filter?.location_text_size),
+                            },
+                          ]}
+                        >
+                          {getLocationText(filter?.location_option)}
+                        </Text>
+                      )}
+                      {!filter?.text_form_image && (
+                        <Text
+                          style={[
+                            styles.filterTitleText,
+                            {
+                              color: filter?.filter_text_color,
+                              fontSize: Number(filter?.filter_text_size),
+                            },
+                          ]}
+                        >
+                          {filter?.filter_text}
+                        </Text>
+                      )}
+                    </View>
+                  )}
+                </View>
+              );
+            })
+          )}
         </PagerView>
       </BackgroundWithImage>
     </ViewShot>
