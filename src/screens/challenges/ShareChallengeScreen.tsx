@@ -472,7 +472,7 @@ const ArChallengeShare = () => {
               style={{
                 flex: 1,
                 fontSize: FontSizes.S12,
-                color: theme.lightColors?.grey,
+                color: theme.lightColors?.grey0,
               }}
             >
               Must share to at least one social media platform to earn any points. Users earn one

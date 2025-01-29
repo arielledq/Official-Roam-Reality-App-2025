@@ -1,12 +1,12 @@
-import React, { useState } from "react"
-import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native"
-import BackgroundWithImage from "../../components/background"
-import theme from "../../assets/theme"
-import { AppHeader, AppText } from "../../components"
-import Icon from "../../components/Icon"
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
-import { useNavigation } from "@react-navigation/native"
-import ToggleSwitch from "toggle-switch-react-native"
+import React, { useState } from "react";
+import { Linking, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import BackgroundWithImage from "../../components/background";
+import theme from "../../assets/theme";
+import { AppHeader, AppText } from "../../components";
+import Icon from "../../components/Icon";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import { useNavigation } from "@react-navigation/native";
+import ToggleSwitch from "toggle-switch-react-native";
 
 function PrivacyToggle({ label, value, setter, icon }) {
   return (
@@ -20,13 +20,13 @@ function PrivacyToggle({ label, value, setter, icon }) {
         paddingVertical: 12,
         marginHorizontal: 25,
         marginVertical: 10,
-        borderRadius: 8
+        borderRadius: 8,
       }}
     >
       <View
         style={{
           flexDirection: "row",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Icon name={icon} family="custom" size={24} />
@@ -35,48 +35,48 @@ function PrivacyToggle({ label, value, setter, icon }) {
       <ToggleSwitch
         isOn={value}
         onColor={theme?.lightColors?.purple}
-        offColor={theme?.lightColors?.toggleOff}
+        offColor={theme?.lightColors?.grey1}
         size="medium"
         onToggle={isOn => {
-          setter(isOn)
+          setter(isOn);
         }}
       />
     </View>
-  )
+  );
 }
 
 const Privacy = () => {
-  const navigation = useNavigation()
+  const navigation = useNavigation();
   const [notificationToggles, setNotificationToggles] = useState({
     newsAndUpdates: true,
     arRouteNearby: true,
     rallyEventUpdates: true,
     levelRankingUpgrades: true,
-    friendRequest: true
-  })
+    friendRequest: true,
+  });
   const [Permissions, setPermissions] = useState({
     camera: true,
-    microphone: true
-  })
+    microphone: true,
+  });
 
   const handleChangePassword = () => {
-    navigation.navigate("ChangePassword")
-  }
+    navigation.navigate("ChangePassword");
+  };
   const handlePrivacy = () => {
-    navigation.navigate("Privacy")
-  }
+    navigation.navigate("Privacy");
+  };
   const handleNotificationToggle = (key, value) => {
     setNotificationToggles({
       ...notificationToggles,
-      [key]: value
-    })
-  }
+      [key]: value,
+    });
+  };
   const handlePermissionToggle = (key, value) => {
     setPermissions({
       ...Permissions,
-      [key]: value
-    })
-  }
+      [key]: value,
+    });
+  };
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={"Privacy"} backgroundColor="transparent" />
@@ -85,7 +85,7 @@ const Privacy = () => {
           ...fontGroup.ns400,
           fontSize: FontSizes.S20,
           marginLeft: 25,
-          paddingVertical: 10
+          paddingVertical: 10,
         }}
       >
         Notification Settings
@@ -112,9 +112,7 @@ const Privacy = () => {
         icon="scores"
         label="Level/Ranking Upgrades"
         value={notificationToggles.levelRankingUpgrades}
-        setter={value =>
-          handleNotificationToggle("levelRankingUpgrades", value)
-        }
+        setter={value => handleNotificationToggle("levelRankingUpgrades", value)}
       />
       <PrivacyToggle
         icon="user"
@@ -149,21 +147,21 @@ const Privacy = () => {
         Manage your app permissions in app settings, click here
       </AppText> */}
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default Privacy
+export default Privacy;
 
 const styles = StyleSheet.create({
   mainContainer: {
     flex: 1,
-    backgroundColor: theme?.colors?.inputBG
+    backgroundColor: theme?.colors?.inputBG,
   },
   text: {
     ...fontGroup.ns600,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,
-    marginLeft: 15
-  }
-})
+    marginLeft: 15,
+  },
+});
