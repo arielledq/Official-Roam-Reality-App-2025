@@ -1,5 +1,13 @@
 import * as React from "react";
-import { Image, LayoutChangeEvent, Text, View, Dimensions } from "react-native";
+import {
+  Image,
+  LayoutChangeEvent,
+  Text,
+  View,
+  Dimensions,
+  ViewStyle,
+  ImageStyle,
+} from "react-native";
 import UnityView from "@azesmway/react-native-unity/src";
 // @ts-expect-error
 import Video from "react-native-video";
@@ -14,8 +22,8 @@ interface ImageFilter {
   viewShotRef: any;
 }
 interface UnityARCameraProps {
-  height : string;
-  width : string;
+  height: string;
+  width: string;
   unityRef?: any;
   isProcessingMedia?: boolean;
   isUnityLoaded?: boolean;
@@ -27,7 +35,7 @@ interface UnityARCameraProps {
 }
 
 const UnityARCamera = ({
-  height ,
+  height,
   width,
   unityRef = null,
   isProcessingMedia = false,
@@ -78,32 +86,12 @@ const UnityARCamera = ({
             </View>
             {capturedImage && !imageHasFilters && (
               <Image
-                style={{
-                  width: "100%",
-                  flex: 1,
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  position: "absolute",
-                  backgroundColor: "#fff",
-                }}
+                style={capturedImageContainer as ImageStyle}
                 source={{ uri: `file://${capturedImage}` }}
               />
             )}
             {capturedImage && imageHasFilters && (
-              <View
-                style={{
-                  width: "100%",
-                  flex: 1,
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  position: "absolute",
-                  backgroundColor: "#fff",
-                }}
-              >
+              <View style={capturedImageContainer}>
                 <ARFilter
                   challengeObj={imageFilter?.challengeObj}
                   viewShotRef={imageFilter?.viewShotRef}
@@ -135,3 +123,14 @@ const UnityARCamera = ({
 };
 
 export default UnityARCamera;
+
+const capturedImageContainer: ViewStyle = {
+  width: "100%",
+  flex: 1,
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  position: "absolute",
+  backgroundColor: "#fff",
+};
