@@ -677,7 +677,7 @@ const GeoArSiteNavigation = () => {
             style={{
               flex: 1,
             }}
-            showsMyLocationButton={false}
+            showsMyLocationButton={true}
             zoomEnabled={true}
             scrollEnabled={true}
             showsUserLocation
