@@ -15,7 +15,7 @@ import {
   getARChallenges,
   logout,
   getGeoARDestinations,
-  getARChallenges as getARChallengesApi, getARExperiences
+  getARChallenges as getARChallengesApi
 } from "../../../network";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
@@ -41,8 +41,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
-  const [experiences, setExperiences] = useState([]);
-
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["33%"], []);
   const dispatch = useDispatch();
@@ -50,21 +48,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   const styles = useStyles();
   const selectedDestination = useSelector((state: any) => state.ar?.selectedDestination);
 
-  const getArExperiences = () => {
-    setIsLoading(true);
-    getARExperiences()
-      .then(res => {
-        if (res.status == 1) {
-          setExperiences(res?.data);
-        } else {
-          res.message.message = "Error in loading Experiences.";
-          handleError(res);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
   const handleLogOut = () => {
     bottomSheetRef.current?.expand();
   };
@@ -81,7 +64,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
         navigation.replace("EditProfile");
       }, 300);
     }
-    getArExperiences()
   }, []);
 
   useEffect(() => {
@@ -196,7 +178,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
           <FlatList
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
-            data={experiences}
+            data={selectedDestination?.ar_experiences}
             renderItem={({ item }) => <HomeScreenARItem {...item} />}
             keyExtractor={item => item?.id?.toString()}
             showsVerticalScrollIndicator={false}

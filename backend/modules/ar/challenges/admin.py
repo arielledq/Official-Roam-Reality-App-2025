@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.core.exceptions import ValidationError
+
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
@@ -10,12 +12,26 @@ from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLin
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
 from django.urls import reverse
 from django.utils.http import urlencode
+from django import forms
 from django.utils.html import format_html
+
+
+class ARExperienceAdminForm(forms.ModelForm):
+    class Meta:
+        model = ARExperience
+        fields = '__all__'
+
+    def clean_geo_location(self):
+        geo_location = self.cleaned_data['geo_location']
+        if not geo_location:
+            raise forms.ValidationError("This field is required.")
+        return geo_location
 
 
 @admin.register(ARExperience)
 class ARExperienceAdmin(admin.ModelAdmin):
-    list_display = ('title_1',)
+    form = ARExperienceAdminForm
+    list_display = ('title_1', 'title_2', 'geo_location',)
 
 
 @admin.register(GeoArSiteCategory)

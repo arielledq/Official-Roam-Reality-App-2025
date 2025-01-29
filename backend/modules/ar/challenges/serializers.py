@@ -271,6 +271,7 @@ class ARExperienceSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ARExperience
+        geo_field = ('lat_long', 'geo_site_area',)
         fields = (
             "id",
             "title_1",
@@ -281,6 +282,7 @@ class ARExperienceSerializer(serializers.ModelSerializer):
             "challenges",
             "geo_challenges",
             "is_event",
+            "geo_location",
         )
 
     def get_image(self, obj):
@@ -353,6 +355,7 @@ class GeoLocationSerializer(GeoModelSerializer):
     star_ar_sites = serializers.SerializerMethodField()
     ar_event_sites = serializers.SerializerMethodField()
     regions = GeoRegionSerializer(read_only=True, many=True)
+    ar_experiences = ARExperienceSerializer(read_only=True, many=True)
 
     class Meta:
         model = GeoLocation
@@ -373,6 +376,7 @@ class GeoLocationSerializer(GeoModelSerializer):
             "unique_ar_sites",
             "star_ar_sites",
             "ar_event_sites",
+            "ar_experiences",
         )
 
     def get_star_ar_sites(self, instance):
