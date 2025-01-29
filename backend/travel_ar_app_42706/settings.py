@@ -122,7 +122,8 @@ THIRD_PARTY_APPS = [
     'ckeditor',
     'taggit',
     'rest_framework_gis',
-    'webshell'
+    'webshell',
+    'django_filters',
 ]
 MODULES_APPS = get_modules()
 

@@ -5,10 +5,13 @@ from . import signals  # noqa
 from .viewsets import ChallengesViewSet, ChallengesUploadView, \
     SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
     ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet, ARSitePinCheckInViewSet, \
-    StarCollectionViewSet, GoldStarCollectionViewSet, DestinationFactsViewSet, PanicMessageViewSet, MemoryCheckinViewSet
+    StarCollectionViewSet, GoldStarCollectionViewSet, DestinationFactsViewSet, PanicMessageViewSet, \
+    MemoryCheckinViewSet, ARExperienceViewSet, GeoArSiteCategoryViewSet
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
+router.register(r'experiences', ARExperienceViewSet)
+router.register(r'geo-ar-site-categories', GeoArSiteCategoryViewSet)
 router.register(r'ar-profile', ARProfileViewSet, basename="ar-profile")
 router.register(r'sponsor', SponsorViewSet)
 router.register(r'memories', ARMemoriesViewSet, basename="ar-memories")

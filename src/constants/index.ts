@@ -7,6 +7,12 @@ export const CHALLENGES_TYPE = {
   STAR_TITLE: "AR Star",
 };
 
+export const CAPTURE_CHALLENGE_TYPE = {
+  PHOTOVIDEO: "PHOTOVIDEO",
+  VIDEO: "VIDEO",
+  PHOTO: "PHOTO",
+};
+
 export const SSNN = {
   INSTAGRAM: "INSTAGRAM",
   FACEBOOK: "FACEBOOK",

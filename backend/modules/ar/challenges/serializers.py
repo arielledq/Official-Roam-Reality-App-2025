@@ -1,7 +1,8 @@
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
-    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint
+    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint, \
+    ARExperience, GeoArSiteCategory
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
@@ -252,6 +253,40 @@ class GeoARChallengesSerializer(serializers.ModelSerializer):
         )
 
 
+class GeoArSiteCategorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GeoArSiteCategory
+        fields = (
+            "id",
+            "name",
+            "color",
+        )
+
+
+class ARExperienceSerializer(serializers.ModelSerializer):
+    image = serializers.ImageField()
+    challenges = ChallengesSerializer(read_only=True, many=True)
+    geo_challenges = GeoARChallengesSerializer(read_only=True, many=True)
+
+    class Meta:
+        model = ARExperience
+        fields = (
+            "id",
+            "title_1",
+            "title_2",
+            "subtitle",
+            "image",
+            "order",
+            "challenges",
+            "geo_challenges",
+            "is_event",
+        )
+
+    def get_image(self, obj):
+        return obj.image.url
+
+
 class UniqueChallengeSiteSerializer(GeoModelSerializer):
     
     challenge = GeoARChallengesSerializer(read_only=True, many=True)
@@ -272,6 +307,7 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
     pin_challenge = GeoARChallengesSerializer(read_only=True)
+    category = GeoArSiteCategorySerializer(read_only=True)
 
     class Meta:
         model = GeoArSite
@@ -292,6 +328,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "pro_tips",
             "check_ins",
             "check_in_site_radius",
+            "category",
         )
 
 
@@ -312,7 +349,9 @@ class GeoRegionSerializer(GeoModelSerializer):
 class GeoLocationSerializer(GeoModelSerializer):
     image = serializers.ImageField()
     unique_ar_sites = UniqueChallengeSiteSerializer(source='geo_location_ar_unique_site',read_only=True, many=True)
-    star_ar_sites = GeoArSiteSerializer(source='geo_location_ar_site',read_only=True, many=True)
+    # star_ar_sites = GeoArSiteSerializer(source='geo_location_ar_site', read_only=True, many=True)
+    star_ar_sites = serializers.SerializerMethodField()
+    ar_event_sites = serializers.SerializerMethodField()
     regions = GeoRegionSerializer(read_only=True, many=True)
 
     class Meta:
@@ -333,7 +372,22 @@ class GeoLocationSerializer(GeoModelSerializer):
             "map_latitude_delta",
             "unique_ar_sites",
             "star_ar_sites",
+            "ar_event_sites",
         )
+
+    def get_star_ar_sites(self, instance):
+        star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
+            category__isnull=False
+        )
+        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True)
+        return serializer.data
+
+    def get_ar_event_sites(self, instance):
+        star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
+            category__isnull=True
+        )
+        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True)
+        return serializer.data
 
 
 class GeoStarSerializer(GeoModelSerializer):
