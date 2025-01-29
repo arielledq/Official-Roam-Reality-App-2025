@@ -1,9 +1,7 @@
 import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../../util/AppDimensions";
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
-import { Platform } from "react-native";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(_theme => ({
   mainContainer: {
     flex: 1,
     backgroundColor: "#202136",
@@ -32,8 +30,8 @@ const useStyles = makeStyles(theme => ({
   },
   headerText: {
     ...fontGroup.ns700,
-    fontSize: FontSizes.S26,
-    lineHeight: FontLineHeights.LH35,
+    fontSize: FontSizes.S22,
+    lineHeight: FontLineHeights.LH30,
     marginVertical: 0,
   },
   imageStyle: {
