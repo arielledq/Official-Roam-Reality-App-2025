@@ -290,6 +290,14 @@ class ARExperience(models.Model):
 
     is_event = models.BooleanField(_("Is event"), default=False)
 
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        null=True, blank=True,
+        verbose_name="Geo Destination",
+        related_name="ar_experiences",
+    )
+
     class Meta:
         verbose_name_plural = "AR Experiences"
         verbose_name = "AR Experience"

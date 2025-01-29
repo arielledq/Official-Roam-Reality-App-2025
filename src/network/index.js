@@ -155,15 +155,6 @@ export const getARChallenges = () =>
     logoutFunc
   );
 
-export const getARExperiences = () =>
-  Request.callAR(
-    {
-      url: `modules/challenges/experiences/`,
-      method: "GET",
-    },
-    logoutFunc
-  );
-
 export const getARSiteCategories = () =>
   Request.callAR(
     {

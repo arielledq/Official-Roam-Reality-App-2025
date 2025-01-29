@@ -2,13 +2,13 @@ import json
 
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
-    DestinationFacts, PanicMessage, ARExperience, GeoArSiteCategory
+    DestinationFacts, PanicMessage, GeoArSiteCategory
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories, \
-    GeoStarPointSerializer, ARExperienceSerializer, GeoArSiteCategorySerializer
+    GeoStarPointSerializer, GeoArSiteCategorySerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -314,15 +314,6 @@ class ARProfileViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
-
-
-class ARExperienceViewSet(viewsets.ModelViewSet):
-    """
-    A simple ViewSet for viewing and editing challenges.
-    """
-    queryset = ARExperience.objects.all()
-    serializer_class = ARExperienceSerializer
-    http_method_names = ["get"]
 
 
 class ChallengesViewSet(viewsets.ModelViewSet):
