@@ -17,21 +17,10 @@ import AppText from "../../../components/text";
 import useStyles from "./styles";
 import { FontSizes } from "../../../util/FontUtils";
 import moment from "moment";
-// import FacebookShareImg from '../../../assets/ar/facebook.svg'
-// import InstagramShareImg from '../../../assets/ar/insta.svg'
-// import TiktokShareImg from '../../../assets/ar/tiktok.svg'
 import { getARProfile, postGeoPinCheckIn, socialPointsARUpdateAPI } from "../../../network";
-// import { handleError, showMessage } from '../../../util/helpers'
 import { useDispatch, useSelector } from "react-redux";
-// import { updateARUserData } from '../../../redux/AR'
-// import { ShareDialog } from 'react-native-fbsdk-next'
-// import Share from 'react-native-share'
-// import RNFS from 'react-native-fs'
-// import { share, init, events } from 'react-native-tiktok'
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import StarShare from "../../../assets/geoar/star_share.svg";
-// import { CameraRoll } from '@react-native-camera-roll/camera-roll'
-// import { moderateScale } from '../../../util/AppDimensions'
 import RenderHTML from "react-native-render-html";
 const { width } = Dimensions.get("window");
 
@@ -49,21 +38,6 @@ const DestinationFactPopUp = ({ facts, onClose }) => {
   const dispatch = useDispatch();
   const sponsors = facts?.sponsors;
 
-  // useEffect(() => {
-  //   const shareListener = events.addListener('onShareCompleted', resp => {
-  //     // response contains returned errorCode
-  //   })
-  //   if (fileExt !== 'mp4') {
-  //     Image.getSize(captureData, (width, height) => {
-  //       // calculate image width and height
-  //       const screenWidth = Dimensions.get('window').width - 2 * moderateScale(26)
-  //       const scaleFactor = width / screenWidth
-  //       const imageHeight = height / scaleFactor
-  //       setImageHeight(imageHeight)
-  //     })
-  //   }
-  // }, [])
-
   const updateARSocialPoints = social_network => {
     socialPointsARUpdateAPI({
       social_network,
@@ -72,128 +46,6 @@ const DestinationFactPopUp = ({ facts, onClose }) => {
       }
     });
   };
-
-  // const facebookShareAndroid = async () => {
-  //   const filebase64 = await RNFS.readFile(captureData, 'base64')
-  //   let shareContent = {}
-  //   if (fileExt == 'mp4') {
-  //     shareContent = {
-  //       appId: '746185200437639',
-  //       backgroundVideo: `data:video/mp4;base64,${filebase64}`,
-  //       url: `data:video/mp4;base64,${filebase64}`,
-  //       social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
-  //     }
-  //   }
-  //   if (fileExt == 'png' || fileExt == 'jpg') {
-  //     shareContent = {
-  //       social: Platform.OS == 'android' ? Share.Social.FACEBOOK : Share.Social.FACEBOOK_STORIES,
-  //       backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
-  //       type: `image/*`,
-  //       appId: '746185200437639',
-  //     }
-  //   }
-  //   try {
-  //     const ShareResponse = await Share.shareSingle(shareContent)
-  //     if (ShareResponse.success == true) {
-  //       updateARSocialPoints('FACEBOOK')
-  //     } else {
-  //     }
-  //   } catch (error) {
-  //     console.error('Error =>', error)
-  //   }
-  // }
-
-  // const facebookShareIOS = async () => {
-  //   const filebase64 = await RNFS.readFile(captureData, 'base64')
-  //   ShareDialog.setMode('native')
-
-  //   if (fileExt == 'png' || fileExt == 'jpg') {
-  //     shareContent = {
-  //       contentType: 'photo',
-  //       photos: [
-  //         {
-  //           imageUrl: captureData,
-  //         },
-  //       ],
-  //     }
-  //   }
-  //   if (fileExt == 'mp4') {
-  //     shareContent = {
-  //       contentType: 'link',
-  //       contentUrl: `data:video/mp4;base64,${filebase64}`,
-  //       contentDescription: 'Wow, check out this great site!',
-  //     }
-  //   }
-  //   ShareDialog.canShow(shareContent)
-  //     .then(canShow => {
-  //       if (canShow) {
-  //         return ShareDialog.show(shareContent)
-  //       }
-  //     })
-  //     .then(result => {
-  //       if (result.isCancelled) {
-  //       } else {
-  //         updateARSocialPoints('FACEBOOK')
-  //       }
-  //     })
-  //     .catch(e => {
-  //       console.error('catch', e.toString())
-  //     })
-  // }
-
-  // const FacebookShareImgOnPress = async () => {
-  //   if (Platform.OS == 'android') {
-  //     facebookShareAndroid()
-  //   } else {
-  //     facebookShareAndroid()
-  //   }
-  // }
-
-  // const InstagramShareImgOnPress = async () => {
-  //   const filebase64 = await RNFS.readFile(captureData, 'base64')
-
-  //   let shareContent = {}
-  //   if (fileExt == 'mp4') {
-  //     shareContent = {
-  //       type: 'video/mp4',
-  //       backgroundVideo: `data:video/mp4;base64,${filebase64}`,
-  //       url: `data:video/${fileExt};base64,${filebase64}`,
-  //       social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
-  //       appId: '746185200437639',
-  //     }
-  //   }
-  //   if (fileExt == 'png' || fileExt == 'jpg') {
-  //     shareContent = {
-  //       type: `image/*`,
-  //       url: `data:image/${fileExt};base64,${filebase64}`,
-  //       backgroundImage: `data:image/${fileExt};base64,${filebase64}`,
-  //       social: Platform.OS == 'android' ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES,
-  //       appId: '746185200437639',
-  //       BackgroundAndStickerImage: `data:image/${fileExt};base64,${filebase64}`,
-  //     }
-  //   }
-  //   try {
-  //     const ShareResponse = await Share.shareSingle(shareContent)
-  //     if (ShareResponse.success == true) {
-  //       updateARSocialPoints('INSTAGRAM')
-  //     } else {
-  //     }
-  //   } catch (error) {
-  //     console.error('Error =>', error)
-  //   }
-  // }
-
-  // const TiktokShareImgOnPress = async () => {
-  //   if (fileExt == 'mp4') {
-  //     const filebase64 = await RNFS.readFile(captureData, 'base64')
-  //     init('aw5g4n448236v4uh')
-  //     share(captureData, code => {
-  //       updateARSocialPoints('TIKTOK')
-  //     })
-  //   } else {
-  //     showMessage('Only Video Supported to share.', 'error', 'Share Support Issue:')
-  //   }
-  // }
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -300,17 +152,6 @@ const DestinationFactPopUp = ({ facts, onClose }) => {
           </View>
         </View>
         <View style={styles.socialShareContainer}>
-          <View style={{ flexDirection: "row" }}>
-            {/* <TouchableOpacity onPress={FacebookShareImgOnPress} style={styles.shareBtn}>
-              <FacebookShareImg />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={InstagramShareImgOnPress} style={styles.shareBtn}>
-              <InstagramShareImg />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={TiktokShareImgOnPress} style={styles.shareBtn}>
-              <TiktokShareImg />
-            </TouchableOpacity> */}
-          </View>
           <Text style={styles.shareText}>1 Extra Point Per Platform</Text>
         </View>
         <TouchableOpacity

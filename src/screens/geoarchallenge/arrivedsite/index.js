@@ -14,6 +14,7 @@ import MarkerIcon from "../../../assets/geoar/marker_img.svg";
 import CircleMarkerIcon from "../../../assets/geoar/circle_marker_img.svg";
 
 import useStyles from "./styles";
+import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
 // Navigation Step 3
 const GeoArSiteArrived = ({ route }) => {
@@ -83,10 +84,14 @@ const GeoArSiteArrived = ({ route }) => {
                 latitude: latitude,
                 longitude: longitude,
               }}
+              pinColor={pinColor}
+              tracksViewChanges={tracksViewChanges}
             >
-              <View style={{ width: 30, height: 30 }}>
-                {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
-              </View>
+              {useCustomMarkers && (
+                <View style={{ width: 30, height: 30 }}>
+                  {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
+                </View>
+              )}
             </Marker>
           </MapView>
         </View>

@@ -10,7 +10,12 @@ import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { AppButton } from "../../../components";
 
-import { convertKilometersToMiles } from "../../../util/helpers";
+import {
+  convertKilometersToMiles,
+  pinColor,
+  tracksViewChanges,
+  useCustomMarkers,
+} from "../../../util/helpers";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import { GeolocationContext } from "../../../GeolocationProvider";
 import Config from "../../../config";
@@ -159,8 +164,9 @@ const GeoArSiteRoutes = ({ route }) => {
           longitude: regionCoordinates.lon,
         }}
         apikey={Config.GEOCODER_API_KEY}
-        strokeWidth={mode === "DRIVING" ? 3 : 0}
-        strokeColor="hotpink"
+        strokeWidth={mode === "DRIVING" ? 2 : 6}
+        strokeColor={"hotpink"}
+        lineDashPattern={mode === "DRIVING" ? null : [5, 5]}
         optimizeWaypoints={true}
         onReady={result => {
           if (mode === "DRIVING") {
@@ -201,7 +207,7 @@ const GeoArSiteRoutes = ({ route }) => {
             ref={mapView}
             style={styles.map}
             initialRegion={initialRegion}
-            showsUserLocation={Platform.OS === "ios"}
+            showsUserLocation={true}
           >
             <Marker
               coordinate={{
@@ -209,8 +215,12 @@ const GeoArSiteRoutes = ({ route }) => {
                 longitude: markerSiteData.lon,
               }}
               title={markerSiteData.title}
+              pinColor={pinColor}
+              tracksViewChanges={tracksViewChanges}
             >
-              <View style={styles.markerIconContainer}>{markerSiteData.icon}</View>
+              {useCustomMarkers && (
+                <View style={styles.markerIconContainer}>{markerSiteData.icon}</View>
+              )}
             </Marker>
 
             {latitude && longitude && (
@@ -258,7 +268,7 @@ const GeoArSiteRoutes = ({ route }) => {
             <AppButton
               onPress={() =>
                 navigation.navigate("GeoArSiteNavigation", {
-                  mapMode: "driving",
+                  mapMode: "DRIVING",
                   starsChallenge: starChallengeObj,
                 })
               }
@@ -272,7 +282,7 @@ const GeoArSiteRoutes = ({ route }) => {
             <AppButton
               onPress={() =>
                 navigation.navigate("GeoArSiteNavigation", {
-                  mapMode: "walking",
+                  mapMode: "WALKING",
                   starsChallenge: starChallengeObj,
                 })
               }

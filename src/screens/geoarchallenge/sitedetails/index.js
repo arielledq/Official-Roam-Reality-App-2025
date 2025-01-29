@@ -29,6 +29,7 @@ import { getAllARSitesStars, sendRoamingNotification } from "../../../network";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
+import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
 const GeoArSiteDetails = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -90,7 +91,9 @@ const GeoArSiteDetails = ({}) => {
             }}
           >
             <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
-            <Text style={_styles.protip_text}>{selectedGeoSite?.category?.id? "Useful Links" : "Pro Tips"}</Text>
+            <Text style={_styles.protip_text}>
+              {selectedGeoSite?.category?.id ? "Useful Links" : "Pro Tips"}
+            </Text>
           </View>
         </View>
         <ScrollView
@@ -247,10 +250,14 @@ const GeoArSiteDetails = ({}) => {
                 longitude: selectedGeoSite.lat_long.coordinates[0],
               }}
               title={selectedGeoSite.name}
+              pinColor={pinColor}
+              tracksViewChanges={tracksViewChanges}
             >
-              <View style={{ width: 30, height: 30 }}>
-                <MarkerIcon color={selectedGeoSite?.category?.color}/>
-              </View>
+              {useCustomMarkers && (
+                <View style={{ width: 30, height: 30 }}>
+                  <MarkerIcon color={selectedGeoSite?.category?.color} />
+                </View>
+              )}
             </Marker>
           </MapView>
         </View>
@@ -361,7 +368,9 @@ const GeoArSiteDetails = ({}) => {
               }}
             >
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
-              <Text style={_styles.protip_text}>{selectedGeoSite?.category?.id? "Useful Links" : "Pro Tips"}</Text>
+              <Text style={_styles.protip_text}>
+                {selectedGeoSite?.category?.id ? "Useful Links" : "Pro Tips"}
+              </Text>
             </TouchableOpacity>
             <View>
               <AppButton
