@@ -19,6 +19,7 @@ import RankBG from "../../assets/geoar/rank_bg.svg";
 import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "assets/svg";
+import { handleError } from "util/helpers";
 
 const ScoreBoard = ({}) => {
   const _styles = useStyles();

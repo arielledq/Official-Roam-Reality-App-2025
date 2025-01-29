@@ -1,7 +1,8 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
 import {
-  ActivityIndicator, FlatList,
+  ActivityIndicator,
+  FlatList,
   Platform,
   ScrollView,
   Text,
@@ -10,7 +11,7 @@ import {
 } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
-import {useNavigation, useRoute} from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
 import Geocoder from "react-native-geocoding";
 import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg";
@@ -20,7 +21,8 @@ import useStyles from "./styles";
 import { updateSelectedSites } from "../../../redux/AR";
 import {
   getARSiteCategories,
-  getARSiteCategory, getARSites,
+  getARSiteCategory,
+  getARSites,
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
@@ -33,12 +35,13 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
+import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
 const SCROLL_AMOUNT = 70;
 
 const GeoArChallengeDetails = ({}) => {
   const route = useRoute();
-  const {isEvent} = route?.params;
+  const { isEvent } = route?.params;
   const _styles = useStyles();
   const dispatch = useDispatch();
   const { userLocation } = useContext(GeolocationContext);
@@ -60,7 +63,7 @@ const GeoArChallengeDetails = ({}) => {
   const [popUpFacts, setPopUpFacts] = useState(null);
   const scrollViewRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [categories, setCategories] = useState([{name: "Full"}]);
+  const [categories, setCategories] = useState([{ name: "Full" }]);
   const [filteredSites, setFilteredSites] = useState([]);
 
   const scrollRegionsPressHandler = () => {
@@ -153,7 +156,7 @@ const GeoArChallengeDetails = ({}) => {
     getFriends();
     loadDFacts(selectedDestination?.id);
     getARStarSites();
-    getArSiteCategories()
+    getArSiteCategories();
   }, []);
 
   const loadDFacts = async id => {
@@ -206,8 +209,10 @@ const GeoArChallengeDetails = ({}) => {
           onCalloutPress={() => {
             navigation.navigate("PublicProfile", { userData: o });
           }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
         >
-          {Platform.OS == "ios" && (
+          {Platform.OS === "ios" && (
             <Callout
               onPress={() => {
                 navigation.navigate("PublicProfile", { userData: o });
@@ -221,9 +226,11 @@ const GeoArChallengeDetails = ({}) => {
               <Text>{o.name}</Text>
             </Callout>
           )}
-          <View style={{ width: 30, height: 30 }}>
-            <FriendsMarkerIcon />
-          </View>
+          {useCustomMarkers && (
+            <View style={{ width: 30, height: 30 }}>
+              <FriendsMarkerIcon />
+            </View>
+          )}
         </Marker>
       );
     }
@@ -243,8 +250,10 @@ const GeoArChallengeDetails = ({}) => {
             dispatch(updateSelectedSites(o));
             navigation.navigate("GeoArSiteDetails");
           }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
         >
-          {Platform.OS == "ios" && (
+          {Platform.OS === "ios" && (
             <Callout
               onPress={() => {
                 dispatch(updateSelectedSites(o));
@@ -259,9 +268,11 @@ const GeoArChallengeDetails = ({}) => {
               <Text>{o.name}</Text>
             </Callout>
           )}
-          <View style={{ width: 30, height: 30 }}>
-            <MarkerIcon color={o?.category?.color} />
-          </View>
+          {useCustomMarkers && (
+            <View style={{ width: 30, height: 30 }}>
+              <MarkerIcon color={o?.category?.color} />
+            </View>
+          )}
         </Marker>
       );
     }
@@ -337,8 +348,11 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const showFilteredList = category => {
-    if (category) return setFilteredSites(selectedDestination.ar_event_sites.filter( site => site.category?.id === category))
-    setFilteredSites([])
+    if (category)
+      return setFilteredSites(
+        selectedDestination.ar_event_sites.filter(site => site.category?.id === category)
+      );
+    setFilteredSites([]);
   };
 
   const initialRegion = {
@@ -390,26 +404,28 @@ const GeoArChallengeDetails = ({}) => {
           <Icon name={"angle-double-right"} family="font-awesome" size={25} color="gray" />
         </TouchableOpacity>
 
-        { isEvent?
+        {isEvent ? (
           <FlatList
             style={{ width: "100%", height: 50 }}
             horizontal={true}
             data={categories}
-            renderItem={({ item }) => <TouchableOpacity
-              onPress={() => showFilteredList(item.id)}
-              activeOpacity={0.5}
-              style={
-                item.name === "Full" ? _styles.selectButtonStyle : {..._styles.unSelectButtonStyle, backgroundColor: item.color}
-
-              }
-            >
-              <Text style={_styles.buttonSelectText}>{item.name}</Text>
-            </TouchableOpacity>}
+            renderItem={({ item }) => (
+              <TouchableOpacity
+                onPress={() => showFilteredList(item.id)}
+                activeOpacity={0.5}
+                style={
+                  item.name === "Full"
+                    ? _styles.selectButtonStyle
+                    : { ..._styles.unSelectButtonStyle, backgroundColor: item.color }
+                }
+              >
+                <Text style={_styles.buttonSelectText}>{item.name}</Text>
+              </TouchableOpacity>
+            )}
             keyExtractor={item => item?.id?.toString()}
             showsVerticalScrollIndicator={false}
           />
-
-          :
+        ) : (
           <ScrollView
             ref={scrollViewRef}
             horizontal={true}
@@ -422,12 +438,14 @@ const GeoArChallengeDetails = ({}) => {
               onPress={moveToFullRegion}
               activeOpacity={0.5}
               style={
-                selectedRegionName == "Full" ? _styles.selectButtonStyle : _styles.unSelectButtonStyle
+                selectedRegionName == "Full"
+                  ? _styles.selectButtonStyle
+                  : _styles.unSelectButtonStyle
               }
             >
               <Text style={_styles.buttonSelectText}>Full</Text>
             </TouchableOpacity>
-            { regions.map(e => {
+            {regions.map(e => {
               if (e.geo_region)
                 return (
                   <TouchableOpacity
@@ -445,10 +463,10 @@ const GeoArChallengeDetails = ({}) => {
                 );
             })}
           </ScrollView>
-        }
+        )}
       </View>
 
-      {!isEvent &&
+      {!isEvent && (
         <View
           style={{
             flexDirection: "row",
@@ -471,7 +489,7 @@ const GeoArChallengeDetails = ({}) => {
             <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
           </View>
         </View>
-      }
+      )}
       <View
         style={{
           width: "100%",
@@ -492,19 +510,18 @@ const GeoArChallengeDetails = ({}) => {
               return _markerView(o)
             })
           } */}
-          {isEvent?
-            filteredSites.length > 0?
-              filteredSites.map(o => {
-                return _markerView(o);
-              }):
-              selectedDestination.ar_event_sites.map(o => {
-                    return _markerView(o)
-              })
+          {isEvent
+            ? filteredSites.length > 0
+              ? filteredSites.map(o => {
+                  return _markerView(o);
+                })
+              : selectedDestination.ar_event_sites.map(o => {
+                  return _markerView(o);
+                })
             : arSitesOn &&
-            selectedDestination.star_ar_sites.map(o => {
-              return _markerView(o)
-            })
-          }
+              selectedDestination.star_ar_sites.map(o => {
+                return _markerView(o);
+              })}
           {friendsLocationSitesOn &&
             friendList.map(o => {
               return f_markerView(o);

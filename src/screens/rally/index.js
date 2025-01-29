@@ -15,7 +15,7 @@ const Rally = () => {
       onLoadEnd={() => setLoading(false)}
     >
       {loading && (
-        <View style={[styles.loadingOverlay, { backgroundColor: theme.darkColors.inputBG }]}>
+        <View style={[styles.loadingOverlay, { backgroundColor: theme.lightColors.inputBG }]}>
           <ActivityIndicator size="large" color={theme.lightColors.purple} />
         </View>
       )}
