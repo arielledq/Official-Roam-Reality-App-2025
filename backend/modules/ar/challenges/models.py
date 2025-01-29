@@ -54,6 +54,12 @@ FOLLOWING_MODE_CHOICES = [
         ('SPECIFIC', 'SPECIFIC ORDER'),
     ]
 
+EXPERIENCE_TYPE_CHOICES = [
+        ('AR_CHALLENGE', 'AR CHALLENGE'),
+        ('GEO_AR_CHALLENGE', 'GEO AR CHALLENGE'),
+        ('EVENT', 'EVENT'),
+    ]
+
 
 class GeoRegion(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
@@ -288,7 +294,12 @@ class ARExperience(models.Model):
         _("Order"), default=0
     )
 
-    is_event = models.BooleanField(_("Is event"), default=False)
+    experience_type = models.CharField(
+        max_length=20,
+        choices=EXPERIENCE_TYPE_CHOICES,
+        default='AR_CHALLENGE',
+        verbose_name="Experience type"
+    )
 
     geo_location = models.ForeignKey(
         GeoLocation,

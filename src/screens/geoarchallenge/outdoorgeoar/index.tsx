@@ -33,6 +33,7 @@ import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
 import { handleError, showMessage } from "../../../util/helpers";
 import { HomeScreenData } from "../../../util/HomeScreenUtils";
 import { BlurView } from "@react-native-community/blur";
+import {EXPERIENCE_TYPE_CHOICES} from "util/constants";
 
 const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(
@@ -135,10 +136,10 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   };
 
   const HomeScreenARItem = item => {
-    const isPhotoChallenge = item?.id === 1;
     return (
       <TouchableOpacity
-        onPress={isPhotoChallenge ? navigateToARChanllenge : () => navigateToGeoARChanllenge(item?.is_event)}
+        onPress={item?.experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE ?
+          navigateToARChanllenge : () => navigateToGeoARChanllenge(item?.experience_type === EXPERIENCE_TYPE_CHOICES.EVENT)}
       >
         <View style={styles.imageBg}>
           <View style={styles.row}>
