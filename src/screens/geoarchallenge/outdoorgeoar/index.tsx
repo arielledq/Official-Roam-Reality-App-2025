@@ -94,9 +94,9 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
       <TouchableOpacity
         onPress={
           item?.experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE
-            ? navigateToARChanllenge
+            ? navigateToARChallenge
             : () =>
-                navigateToGeoARChanllenge(item?.experience_type === EXPERIENCE_TYPE_CHOICES.EVENT)
+                navigateToGeoARChallenge(item?.experience_type === EXPERIENCE_TYPE_CHOICES.EVENT)
         }
       >
         <View style={styles.imageBg}>
