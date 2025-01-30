@@ -177,18 +177,16 @@ const PinChallenge = () => {
           z: parseFloat(challengeObjParameters?.positionZ) || 0.4,
         },
       };
-      console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       const visibilityConfig = {
         isVisible: true,
       };
 
       unityRef.current.postMessage(
-        "OBJImport", // Nombre del script en Unity
-        "SetVisibilityFromReact", // Método que se llamará
+        "OBJImport", 
+        "SetVisibilityFromReact",
         JSON.stringify(visibilityConfig)
       );
-      console.log("Todos los datos fueron enviados a Unity.");
     } else {
       console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
@@ -450,7 +448,6 @@ const PinChallenge = () => {
   useFocusEffect(
     useCallback(() => {
       if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
-        sendModelDataToUnitySpawn();
         sendBloomValuesToUnity();
         notificationView();
         PointsCount();
@@ -480,7 +477,7 @@ const PinChallenge = () => {
       // Enviar mensaje a Unity para iniciar la grabación
       const data =
       {
-        isNotification: true,
+        isNotification: !isMeInsideInSite,
         textNotification : 'esto es un texkkkto de prueba',
       }
 
@@ -502,6 +499,7 @@ const PinChallenge = () => {
             arChallenge: false,
             isLocation: true,
           }));
+          sendModelDataToUnitySpawn();
       }
     }
   }
