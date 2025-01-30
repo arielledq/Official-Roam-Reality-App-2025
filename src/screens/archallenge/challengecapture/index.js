@@ -201,7 +201,9 @@ const ArChallengeCapture = ({}) => {
       console.log('focus change', challengeType)
       if(unityRef.current && !!CAPTURE_CHALLENGE_TYPE[challengeType]){
         unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify({
-          typeChallenge: challengeType
+          typeChallenge: challengeType,
+          arChallenge: true,
+          isLocation: false
         }));
         unityRef.current.postMessage("Scriptposition", "SetVisibleButton", JSON.stringify({
           setVisibleButtonPosition: false
@@ -310,6 +312,8 @@ const ArChallengeCapture = ({}) => {
       unityRef.current.postMessage("Video Recorder", "IniciarGrabacion", "iniciar");
     }
   };
+
+
 
   const detenerGrabacion = () => {
     if (unityRef.current) {
@@ -546,8 +550,13 @@ const ArChallengeCapture = ({}) => {
   //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
+    console.log(data)
     buttonInfo = data.enableButton
+    buttonBack = data.backPress 
     
+    if (buttonBack){
+      navigation?.goBack()}
+
     if (data.photoVideoButton?.isPhoto){
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false)

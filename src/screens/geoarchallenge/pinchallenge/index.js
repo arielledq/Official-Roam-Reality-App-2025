@@ -60,7 +60,7 @@ const PinChallenge = () => {
   const watchIdRef = useRef(null);
 
   const navigation = useNavigation();
-
+  const [notificationArea, setNotificationArea] = useState(true)
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
   const modelFile = challengeObj.model_file;
@@ -438,6 +438,8 @@ const PinChallenge = () => {
       if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
         sendModelDataToUnitySpawn();
         sendBloomValuesToUnity();
+        notificationView();
+        PointsCount();
         unityRef.current.postMessage("Scriptposition", "SetVisibleButton", JSON.stringify({
           setVisibleButtonPosition: true
         }));
@@ -455,8 +457,48 @@ const PinChallenge = () => {
       console.error(error);
     }
   };
-  
- 
+  const notificationView = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para iniciar la grabación
+      const data = 
+      {
+        isNotification: true,
+        textNotification : 'esto es un texkkkto de prueba',
+      }
+
+      unityRef.current.postMessage("Scriptposition", "SetVisibleNotification",JSON.stringify(
+        data
+      ));
+
+      if (data?.isNotification)
+      {
+        unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify({
+          typeChallenge: challengeType,
+          arChallenge: false,
+          isLocation: false,
+        }));
+      }
+      else{
+          unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify({
+            typeChallenge: "PHOTO",
+            arChallenge: false,
+            isLocation: true,
+          }));
+      }
+    }
+  }
+  const PointsCount = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para iniciar la grabación
+      const pointData = {
+        points: '4',
+        isPointView: true
+      }
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint",JSON.stringify(
+        pointData
+      ));
+    }
+  };
   const keepFileMostRecent = async (ruta, extension = '') => {
     try {
       const files = await RNFS.readDir(ruta); 
@@ -496,8 +538,12 @@ const PinChallenge = () => {
   };
   const handleUnityMessage = result => {
   const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton
+    buttonInfo = data?.enableButton
+    buttonBack = data?.backPress 
     
+    if (buttonBack){
+      navigation?.goBack()}
+
     if (data.photoVideoButton?.isPhoto){
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false)
