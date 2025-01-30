@@ -30,6 +30,7 @@ const ArChallengeCapture = ({}) => {
   const [loading, setLoading] = useState(false);
   const [sourcesFiles, setSourcesFiles] = useState([]);
   const [scale, setScale] = useState({ x: 1, y: 1, z: 1 });
+  const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
@@ -58,7 +59,7 @@ const ArChallengeCapture = ({}) => {
 
   const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
   const challengeType = challengeObj?.challenge_requirement;
-  console.log("capture type ", challengeType);
+  console.log('capture type ', challengeType)
   const viewInfoModalContent = challengeObj?.info;
 
   const handleUnityViewLayout = event => {
@@ -177,6 +178,8 @@ const ArChallengeCapture = ({}) => {
           "SetTypeChallenge",
           JSON.stringify({
             typeChallenge: challengeType,
+             arChallenge: true,
+             isLocation: false
           })
         );
         unityRef.current.postMessage(
@@ -305,11 +308,11 @@ const ArChallengeCapture = ({}) => {
     try {
       const files = await RNFS.readDir(ruta);
       const filteredFiles = files.filter(
-        file => file.isFile() && (extension === "" || file.name.endsWith(extension))
+        (file) => file.isFile() && (extension === '' || file.name.endsWith(extension))
       );
 
       if (filteredFiles.length <= 0) {
-        return;
+        return; 
       }
       filteredFiles.sort((a, b) => b.mtime - a.mtime);
 
@@ -319,7 +322,7 @@ const ArChallengeCapture = ({}) => {
         await RNFS.unlink(file.path);
       }
     } catch (error) {
-      console.error(error);
+      console.error( error);
     }
   };
 
@@ -341,36 +344,40 @@ const ArChallengeCapture = ({}) => {
   //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton;
+    buttonInfo = data.enableButton
+    buttonBack = data.backPress
 
-    if (data.photoVideoButton?.isPhoto) {
+    if (buttonBack){
+      navigation?.goBack()}
+
+    if (data.photoVideoButton?.isPhoto){
       setCapturedImage(data.photoVideoButton?.filepath);
-      setIsUnityLoaded(false);
-      playCameraSound();
-      eraseFile();
+      setIsUnityLoaded(false)
+      playCameraSound()
+      eraseFile()
+    } 
+    if (data.photoVideoButton?.isPhoto == false){
+      playRecordSound()
+      setCapturedVideo(data.photoVideoButton?.filepath); 
+      setIsUnityLoaded(false); 
+      
     }
-    if (data.photoVideoButton?.isPhoto == false) {
-      playRecordSound();
-      setCapturedVideo(data.photoVideoButton?.filepath);
-      setIsUnityLoaded(false);
+    if(data.infoButton?.isButton)
+    {
+      setChallengeInformationView(data.infoButton?.isButton)
+      setIsUnityLoaded(false)
     }
-    if (data.infoButton?.isButton) {
-      setChallengeInformationView(data.infoButton?.isButton);
-      setIsUnityLoaded(false);
-    }
-  };
-
+ 
+};
   return (
-    <ChallengeScreen
-      title="AR Challenges"
-      modals={modals}
-      appHeader={false}
-      style={{
+    <ChallengeScreen title="AR Challenges" modals={modals} appHeader = {false}
+    style={{
         paddingHorizontal: 0,
         paddingTop: 20,
-        height: "100%",
+        height:"100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
-      }}
+    }}
+    // paddingH={0.1} paddingTop={20} heighContainer = '100%'
     >
       <UnityARCamera
         width="100%"

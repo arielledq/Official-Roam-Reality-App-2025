@@ -161,32 +161,30 @@ const PinChallenge = () => {
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
         isRotationEnabled: true,
         // ### DISTANCIA DONDE SE REPOSICIONARA NUEVAMENTE LA ESTRELLA ## //
-        distanceCamera: 2, // AGREGAR PARA RECIBIR DESDE EL BACK
+        distanceCamera: 2, // AGREGAR PARA RECIBIR DESDE EL BACK 
 
         /* ###POSICIONAMIENTO MEDIANTE GPS### 
         useGPS: true, // Activar GPS
         gpsLatitude: siteLatitude || 0, // Latitud del GPS
         gpsLongitude: siteLongitude || 0, // Longitud del GPS
-         */
-
+         */   
+        
         position: {
           x: parseFloat(challengeObjParameters?.positionX) || 0,
           y: parseFloat(challengeObjParameters?.positionY) || 0,
           z: parseFloat(challengeObjParameters?.positionZ) || 0.4,
         },
       };
-      console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       const visibilityConfig = {
         isVisible: true,
       };
 
       unityRef.current.postMessage(
-        "OBJImport", // Nombre del script en Unity
-        "SetVisibilityFromReact", // Método que se llamará
+        "OBJImport", 
+        "SetVisibilityFromReact",
         JSON.stringify(visibilityConfig)
       );
-      console.log("Todos los datos fueron enviados a Unity.");
     } else {
       console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
@@ -448,8 +446,9 @@ const PinChallenge = () => {
   useFocusEffect(
     useCallback(() => {
       if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
-        sendModelDataToUnitySpawn();
         sendBloomValuesToUnity();
+        notificationView();
+        PointsCount();
         unityRef.current.postMessage(
           "Scriptposition",
           "SetVisibleButton",
@@ -465,32 +464,75 @@ const PinChallenge = () => {
     try {
       const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
       const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
-
+  
       await keepFileMostRecent(androidFilePath, ".png");
     } catch (error) {
       console.error(error);
     }
   };
+  const notificationView = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para iniciar la grabación
+      const data =
+      {
+        isNotification: !isMeInsideInSite,
+        textNotification : 'esto es un texkkkto de prueba',
+      }
 
-  const keepFileMostRecent = async (ruta, extension = "") => {
+      unityRef.current.postMessage("Scriptposition", "SetVisibleNotification",JSON.stringify(
+        data
+      ));
+
+      if (data?.isNotification)
+      {
+        unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify({
+          typeChallenge: challengeType,
+          arChallenge: false,
+          isLocation: false,
+        }));
+      }
+      else{
+          unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify({
+            typeChallenge: "PHOTO",
+            arChallenge: false,
+            isLocation: true,
+          }));
+          sendModelDataToUnitySpawn();
+      }
+    }
+  }
+  const PointsCount = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para iniciar la grabación
+      const pointData = {
+        points: '4',
+        isPointView: true
+      }
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint",JSON.stringify(
+        pointData
+      ));
+    }
+  };
+  const keepFileMostRecent = async (ruta, extension = '') => {
     try {
-      const files = await RNFS.readDir(ruta);
+      const files = await RNFS.readDir(ruta); 
       const filteredFiles = files.filter(
-        file => file.isFile() && (extension === "" || file.name.endsWith(extension))
+        (file) => file.isFile() && (extension === "" || file.name.endsWith(extension))
       );
-
+  
       if (filteredFiles.length <= 0) {
-        return;
+        return; 
       }
       filteredFiles.sort((a, b) => b.mtime - a.mtime);
-
-      const archivosParaEliminar = filteredFiles.slice(1);
+  
+    
+      const archivosParaEliminar = filteredFiles.slice(1); 
 
       for (const file of archivosParaEliminar) {
         await RNFS.unlink(file.path);
       }
     } catch (error) {
-      console.error(error);
+      console.error( error);
     }
   };
 
@@ -509,23 +551,28 @@ const PinChallenge = () => {
     setIsUnityLoaded(true);
   };
   const handleUnityMessage = result => {
-    const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton;
+  const data = JSON.parse(result.nativeEvent.message);
+    buttonInfo = data?.enableButton
+    buttonBack = data?.backPress
 
-    if (data.photoVideoButton?.isPhoto) {
+    if (buttonBack){
+      navigation?.goBack()}
+
+    if (data.photoVideoButton?.isPhoto){
       setCapturedImage(data.photoVideoButton?.filepath);
-      setIsUnityLoaded(false);
-      eraseFile();
+      setIsUnityLoaded(false)
+      eraseFile()
+    } 
+    if (data.photoVideoButton?.isPhoto == false){
+      setCapturedVideo(data.photoVideoButton?.filepath); 
+      setIsUnityLoaded(false); 
     }
-    if (data.photoVideoButton?.isPhoto == false) {
-      setCapturedVideo(data.photoVideoButton?.filepath);
-      setIsUnityLoaded(false);
+    if(data.infoButton?.isButton)
+    {
+      setChallengeInformationView(data.infoButton?.isButton)
+      setIsUnityLoaded(false)
     }
-    if (data.infoButton?.isButton) {
-      setChallengeInformationView(data.infoButton?.isButton);
-      setIsUnityLoaded(false);
-    }
-  };
+  }
   const modals = (
     <>
       <CaptureInfoView
@@ -544,20 +591,26 @@ const PinChallenge = () => {
   return (
     <ChallengeScreen
       title={`Location Check In\n${selectedGeoSite.name}`}
-      appHeader={false}
+      appHeader = {false}
       style={{
         paddingHorizontal: 0,
         paddingTop: 20,
-        height: "100%",
-        backgroundColor: isUnityLoaded ? theme.lightColors?.black : theme.lightColors?.inputBG,
-      }}
+        height:'100%',
+        backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
+    }}
       modals={modals}
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
       scrollable={false}
     >
+      {/* <ChallengeFoundCaptureHeader
+        leftTitle="Pin Found"
+        challengeFound={!!isMeInsideInSite}
+        points={challengeObj?.points}
+      /> */}
+
       <UnityARCamera
-        width="100%"
-        height="100%"
+      width="100%"
+      height="100%"
         unityRef={unityRef}
         isProcessingMedia={processingMedia}
         isUnityLoaded={isUnityLoaded}

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { SafeAreaView, StyleSheet } from "react-native";
+import { SafeAreaView, StatusBar, StyleSheet, View } from "react-native";
 import { useDispatch } from "react-redux";
 import FastImage from "react-native-fast-image";
 import Images from "../../assets/images";
@@ -15,13 +15,15 @@ const AnimatedSplash = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    
+   <View style={styles.container}>
+     <StatusBar/>
       <FastImage
         style={styles.image}
         source={Images.Splash}
         resizeMode={FastImage.resizeMode.cover}
       />
-    </SafeAreaView>
+   </View>
   );
 };
 

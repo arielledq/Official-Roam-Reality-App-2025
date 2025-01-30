@@ -202,7 +202,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       },
                     ]}
                   >
-                    {getLocationText(filter?.location_option)}
+                    {getLocationText("SITE_ONLY")}
                   </Text>
                 </View>
               )}
