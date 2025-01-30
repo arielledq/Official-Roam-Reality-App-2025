@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { ThemeProvider } from "@rneui/themed";
 import React, { useEffect } from "react";
 import { navigationRef } from "../services/navigationService";
-import { RootStackParamList } from "./types";
+import { RootStackParamList } from "../constants/types";
 import theme from "../assets/theme";
 import Login from "../screens/login/login";
 import ChangePassword from "../screens/changepassword/changepassword";
@@ -17,7 +17,7 @@ import EditProfile from "../screens/editProfile/editProfile";
 import TermsAndConditions from "../screens/termsAndConditions";
 import PrivacyPolicy from "../screens/PrivacyPolicy";
 import FPChangePassword from "../screens/fpchangepassword/fpchangepassword";
-import ArChallengeDetails from "../screens/archallenge/challengedetails";
+import ChallengeDetails from "../screens/archallenge/challengedetails";
 import ChallengeExamples from "../screens/archallenge/ChallengeExamples";
 import ArChallengeCapture from "../screens/archallenge/challengecapture";
 import ARChallenge from "../screens/archallenge";
@@ -150,7 +150,7 @@ const Navigation = () => {
         <Stack.Screen name="InviteFriends" component={InviteFriends} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="ARChallenge" component={ARChallenge} />
-        <Stack.Screen name="ArChallengeDetails" component={ArChallengeDetails} />
+        <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} />
         <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
         <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
         <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />

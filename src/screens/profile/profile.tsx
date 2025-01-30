@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FlatList, Image, TouchableOpacity, View } from "react-native";
 import useStyles from "./styles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import { MenuIcon } from "../../assets/svg";

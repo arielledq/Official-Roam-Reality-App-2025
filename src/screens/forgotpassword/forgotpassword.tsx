@@ -1,97 +1,97 @@
-import React, { useState } from 'react'
+import React, { useState } from "react";
 
-import { Alert, Image, KeyboardTypeOptions, View } from 'react-native'
+import { Alert, Image, KeyboardTypeOptions, View } from "react-native";
 
-import { Formik } from 'formik'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import useStyles from './styles'
-import { RootStackParamList, ScreenStackComponent } from '../../navigation/types'
-import AppButton from '../../components/button'
-import AppInput from '../../components/input'
-import { MailIcon } from '../../assets/svg'
-import AppHeader from '../../components/header'
-import BackgroundWithImage from '../../components/background'
-import theme from '../../assets/theme'
-import AppText from '../../components/text'
-import Images from '../../assets/images'
-import fontGroup from '../../assets/fonts'
-import { confirmEmailOtp, sendCode } from '../../network'
-import { ForgotPasswordSchema, OTPSchema } from '../../util/ValidationSchemas'
-import { handleError, showMessage } from '../../util/helpers'
-import Timer from '../../components/timer'
+import { Formik } from "formik";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import useStyles from "./styles";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import AppButton from "../../components/button";
+import AppInput from "../../components/input";
+import { MailIcon } from "../../assets/svg";
+import AppHeader from "../../components/header";
+import BackgroundWithImage from "../../components/background";
+import theme from "../../assets/theme";
+import AppText from "../../components/text";
+import Images from "../../assets/images";
+import fontGroup from "../../assets/fonts";
+import { confirmEmailOtp, sendCode } from "../../network";
+import { ForgotPasswordSchema, OTPSchema } from "../../util/ValidationSchemas";
+import { handleError, showMessage } from "../../util/helpers";
+import Timer from "../../components/timer";
 
-const ForgotPassword: ScreenStackComponent<RootStackParamList, 'ForgotPassword'> = ({
+const ForgotPassword: ScreenStackComponent<RootStackParamList, "ForgotPassword"> = ({
   navigation,
 }) => {
-  const _styles = useStyles()
-  const [timerVisible, setTimerVisible] = useState(false)
-  const [emailData, setEmailData] = useState('')
-  const [sending, setSending] = useState(false)
-  const [codesent, setCodeSent] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const placeholderText = codesent ? 'Enter Code' : 'Email Address'
-  const buttonText = codesent ? 'Submit' : 'Send Code'
-  const textContentTypeText = codesent ? 'oneTimeCode' : 'emailAddress'
-  const autoCompleteType = codesent ? 'sms-otp' : 'email'
-  const keyboardType = codesent ? 'numeric' : ('default' as KeyboardTypeOptions)
+  const _styles = useStyles();
+  const [timerVisible, setTimerVisible] = useState(false);
+  const [emailData, setEmailData] = useState("");
+  const [sending, setSending] = useState(false);
+  const [codesent, setCodeSent] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const placeholderText = codesent ? "Enter Code" : "Email Address";
+  const buttonText = codesent ? "Submit" : "Send Code";
+  const textContentTypeText = codesent ? "oneTimeCode" : "emailAddress";
+  const autoCompleteType = codesent ? "sms-otp" : "email";
+  const keyboardType = codesent ? "numeric" : ("default" as KeyboardTypeOptions);
   const handleSendMail = (values, { resetForm }) => {
     if (!codesent) {
-      setSending(true)
-      const email = values.input.toLowerCase()
+      setSending(true);
+      const email = values.input.toLowerCase();
       sendCode({ email })
         .then(res => {
           if (res.status == 1) {
-            resetForm()
-            setEmailData(email)
-            setCodeSent(true)
+            resetForm();
+            setEmailData(email);
+            setCodeSent(true);
             showMessage(
               `Code has been sent to ${values.input}. Please check your email.`,
-              'success',
-              'Code Sent!'
-            )
+              "success",
+              "Code Sent!"
+            );
           } else {
-            handleError(res)
+            handleError(res);
           }
         })
         .finally(() => {
-          setSending(false)
-        })
+          setSending(false);
+        });
     } else {
-      setIsLoading(true)
+      setIsLoading(true);
       confirmEmailOtp({ email: emailData, otp: values.input })
         .then(res => {
           if (res.status == 1) {
-            navigation.replace('FPChangePassword', { token: res.token, uid: res.uid })
+            navigation.replace("FPChangePassword", { token: res.token, uid: res.uid });
           } else {
-            handleError(res)
+            handleError(res);
           }
         })
         .finally(() => {
-          setIsLoading(false)
-        })
+          setIsLoading(false);
+        });
     }
-  }
+  };
   const handleResend = () => {
     sendCode({ email: emailData }).then(res => {
       if (res.status == 1) {
-        setTimerVisible(true)
-        showMessage('Code sent successfully')
+        setTimerVisible(true);
+        showMessage("Code sent successfully");
       } else {
-        handleError(res)
+        handleError(res);
       }
-    })
-  }
+    });
+  };
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader title={''} backgroundColor='transparent' />
+      <AppHeader title={""} backgroundColor="transparent" />
       <KeyboardAwareScrollView
-        keyboardShouldPersistTaps='always'
+        keyboardShouldPersistTaps="always"
         contentContainerStyle={_styles.scroll}
       >
         <Formik
           initialValues={{
-            input: '',
+            input: "",
           }}
           onSubmit={(values, { resetForm }) => handleSendMail(values, { resetForm })}
           validationSchema={codesent ? OTPSchema : ForgotPasswordSchema}
@@ -115,9 +115,9 @@ const ForgotPassword: ScreenStackComponent<RootStackParamList, 'ForgotPassword'>
                   placeholder={placeholderText}
                   placeholderTextColor={theme.darkColors?.grey}
                   value={values.input}
-                  autoCapitalize='none'
-                  onChangeText={handleChange('input')}
-                  onBlur={handleBlur('input')}
+                  autoCapitalize="none"
+                  onChangeText={handleChange("input")}
+                  onBlur={handleBlur("input")}
                   errorMessage={touched.input && errors?.input ? errors.input : undefined}
                   autoCorrect={false}
                   textContentType={textContentTypeText}
@@ -130,7 +130,7 @@ const ForgotPassword: ScreenStackComponent<RootStackParamList, 'ForgotPassword'>
                   timerVisible ? (
                     <Timer
                       callback={() => {
-                        setTimerVisible(false)
+                        setTimerVisible(false);
                       }}
                     />
                   ) : (
@@ -158,7 +158,7 @@ const ForgotPassword: ScreenStackComponent<RootStackParamList, 'ForgotPassword'>
         </Formik>
       </KeyboardAwareScrollView>
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default ForgotPassword
+export default ForgotPassword;

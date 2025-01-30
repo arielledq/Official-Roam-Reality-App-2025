@@ -6,7 +6,7 @@ import { deleteAccount, getARChallenges, logout } from "../../network";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "../../assets/svg";
-import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import BottomSheet from "@gorhom/bottom-sheet";
 import useStyles from "./styles";
 import RightArrowIcon from "../../assets/svg/RightArrowIcon";

@@ -5,7 +5,7 @@ import { Keyboard, View } from "react-native";
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import AppButton from "../../components/button";
 import AppInput from "../../components/input";
 import { LockIcon, MailIcon } from "../../assets/svg";
