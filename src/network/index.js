@@ -154,6 +154,16 @@ export const getARChallenges = () =>
     },
     logoutFunc
   );
+
+export const getARSiteCategories = () =>
+  Request.callAR(
+    {
+      url: `modules/challenges/geo-ar-site-categories/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
 export const getARSposored = () =>
   Request.callAR(
     {

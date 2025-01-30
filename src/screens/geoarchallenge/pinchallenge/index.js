@@ -58,9 +58,10 @@ const PinChallenge = () => {
 
   const unityRef = useRef(null); // Unity reference
   const watchIdRef = useRef(null);
+  const viewShotRef = useRef();
 
   const navigation = useNavigation();
-  const [notificationArea, setNotificationArea] = useState(true)
+
   const challengeObj = selectedGeoSite.pin_challenge;
   const challengeObjParameters = challengeObj?.parameters;
   const modelFile = challengeObj.model_file;
@@ -176,7 +177,6 @@ const PinChallenge = () => {
           z: parseFloat(challengeObjParameters?.positionZ) || 0.4,
         },
       };
-      console.log(position, 'posiotionadsd')
       console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       const visibilityConfig = {
@@ -208,7 +208,6 @@ const PinChallenge = () => {
         JSON.stringify(gpsConfig)
       );
     }*/
-
   };
 
   const sendBloomValuesToUnity = () => {
@@ -388,7 +387,22 @@ const PinChallenge = () => {
     }
   };
 
-  const onDonePress = () => {
+  const onDonePress = async () => {
+    // const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
+    // let updatedData = capturedImage ? capturedImage : capturedVideo;
+    let updatedData = capturedImage;
+
+    // if (hasFilters) {
+    try {
+      // Capturar la vista dentro de ViewShot
+      const capturedUri = await viewShotRef.current.capture();
+      // console.log("Imagen capturada con filtro:", capturedUri);
+      updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
+    } catch (error) {
+      console.error("Error capturando la imagen con filtros:", error);
+    }
+    // }
+
     navigation.replace("ArChallengeShare", {
       challengeObj: { ...challengeObj, geo_site: { ...selectedGeoSite, pin_challenge: undefined } },
       captureData: capturedImage,
@@ -440,9 +454,13 @@ const PinChallenge = () => {
         sendBloomValuesToUnity();
         notificationView();
         PointsCount();
-        unityRef.current.postMessage("Scriptposition", "SetVisibleButton", JSON.stringify({
-          setVisibleButtonPosition: true
-        }));
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({
+            setVisibleButtonPosition: true,
+          })
+        );
       }
     }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded])
   );
@@ -452,7 +470,7 @@ const PinChallenge = () => {
       const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
       const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
   
-      await keepFileMostRecent(androidFilePath, '.png');
+      await keepFileMostRecent(androidFilePath, ".png");
     } catch (error) {
       console.error(error);
     }
@@ -460,7 +478,7 @@ const PinChallenge = () => {
   const notificationView = async () => {
     if (unityRef.current) {
       // Enviar mensaje a Unity para iniciar la grabación
-      const data = 
+      const data =
       {
         isNotification: true,
         textNotification : 'esto es un texkkkto de prueba',
@@ -503,7 +521,7 @@ const PinChallenge = () => {
     try {
       const files = await RNFS.readDir(ruta); 
       const filteredFiles = files.filter(
-        (file) => file.isFile() && (extension === '' || file.name.endsWith(extension))
+        (file) => file.isFile() && (extension === "" || file.name.endsWith(extension))
       );
   
       if (filteredFiles.length <= 0) {
@@ -539,8 +557,8 @@ const PinChallenge = () => {
   const handleUnityMessage = result => {
   const data = JSON.parse(result.nativeEvent.message);
     buttonInfo = data?.enableButton
-    buttonBack = data?.backPress 
-    
+    buttonBack = data?.backPress
+
     if (buttonBack){
       navigation?.goBack()}
 
@@ -603,16 +621,20 @@ const PinChallenge = () => {
         capturedImage={capturedImage}
         capturedVideo={capturedVideo}
         onUnityMessage={handleUnityMessage}
+        imageFilter={{
+          challengeObj: { ...challengeObj, challenge_type: CHALLENGES_TYPE.PIN_CHECK_IN },
+          viewShotRef: viewShotRef,
+        }}
       />
- {!isUnityLoaded &&
-      <CameraControls
-        onRetake={retakeButtonHandler}
-        onDone={onDonePress}
-        onCameraPress={_takeScreenshot}
-        hasCapturedContent={!!capturedImage}
-        customInstructions="Stand next to the pin, resize as needed, snap your photo"
-      />
- }
+      {!isUnityLoaded && (
+        <CameraControls
+          onRetake={retakeButtonHandler}
+          onDone={onDonePress}
+          onCameraPress={_takeScreenshot}
+          hasCapturedContent={!!capturedImage}
+          customInstructions="Stand next to the pin, resize as needed, snap your photo"
+        />
+      )}
       {/* Removing temporarily */}
       {/* <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} /> */}
     </ChallengeScreen>

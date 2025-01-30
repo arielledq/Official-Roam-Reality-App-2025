@@ -1,9 +1,19 @@
 import * as React from "react";
-import { Image, LayoutChangeEvent, Text, View, Dimensions } from "react-native";
+import {
+  Image,
+  LayoutChangeEvent,
+  Text,
+  View,
+  Dimensions,
+  ViewStyle,
+  ImageStyle,
+} from "react-native";
 import UnityView from "@azesmway/react-native-unity/src";
 // @ts-expect-error
 import Video from "react-native-video";
 import ARFilter from "screens/archallenge/FilterView";
+// @ts-ignore
+import { CHALLENGES_TYPE } from "constants";
 
 const offset = 120;
 const { width: screenWidth } = Dimensions.get("window"); // Get screen width
@@ -14,8 +24,8 @@ interface ImageFilter {
   viewShotRef: any;
 }
 interface UnityARCameraProps {
-  height : string;
-  width : string;
+  height: string;
+  width: string;
   unityRef?: any;
   isProcessingMedia?: boolean;
   isUnityLoaded?: boolean;
@@ -27,7 +37,7 @@ interface UnityARCameraProps {
 }
 
 const UnityARCamera = ({
-  height ,
+  height,
   width,
   unityRef = null,
   isProcessingMedia = false,
@@ -39,6 +49,8 @@ const UnityARCamera = ({
   capturedVideo,
 }: UnityARCameraProps) => {
   const imageHasFilters = imageFilter?.challengeObj?.ar_filters?.length > 0;
+  const challenge_type = imageFilter?.challengeObj?.challenge_type;
+  const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
   return (
     <View style={{ flex: 1, alignItems: "center", marginVertical: 12 }}>
       <View
@@ -76,34 +88,14 @@ const UnityARCamera = ({
                 </View>
               )}
             </View>
-            {capturedImage && !imageHasFilters && (
+            {capturedImage && !imageHasFilters && !is_pin_challenge && (
               <Image
-                style={{
-                  width: "100%",
-                  flex: 1,
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  position: "absolute",
-                  backgroundColor: "#fff",
-                }}
+                style={capturedImageContainer as ImageStyle}
                 source={{ uri: `file://${capturedImage}` }}
               />
             )}
-            {capturedImage && imageHasFilters && (
-              <View
-                style={{
-                  width: "100%",
-                  flex: 1,
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  position: "absolute",
-                  backgroundColor: "#fff",
-                }}
-              >
+            {capturedImage && (imageHasFilters || is_pin_challenge) && (
+              <View style={capturedImageContainer}>
                 <ARFilter
                   challengeObj={imageFilter?.challengeObj}
                   viewShotRef={imageFilter?.viewShotRef}
@@ -135,3 +127,14 @@ const UnityARCamera = ({
 };
 
 export default UnityARCamera;
+
+const capturedImageContainer: ViewStyle = {
+  width: "100%",
+  flex: 1,
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  position: "absolute",
+  backgroundColor: "#fff",
+};

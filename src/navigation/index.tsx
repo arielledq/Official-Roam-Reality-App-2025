@@ -83,7 +83,6 @@ const Navigation = () => {
         await GoogleSignin.signOut().catch(err => console.error(err));
         await removeItem("fbToken");
         await removeItem("instaToken");
-        await removeItem("tiktokToken");
         dispatch(resetState());
       }
     };

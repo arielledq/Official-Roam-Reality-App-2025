@@ -10,7 +10,13 @@ import {
 } from "react-native";
 import { AppButton, AppHeader, AppText } from "../../../components";
 import { resetState } from "../../../redux/Login";
-import { deleteAccount, getARChallenges, logout, getGeoARDestinations } from "../../../network";
+import {
+  deleteAccount,
+  getARChallenges,
+  logout,
+  getGeoARDestinations,
+  getARChallenges as getARChallengesApi
+} from "../../../network";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "../../../assets/svg";
@@ -27,6 +33,7 @@ import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
 import { handleError, showMessage } from "../../../util/helpers";
 import { HomeScreenData } from "../../../util/HomeScreenUtils";
 import { BlurView } from "@react-native-community/blur";
+import {EXPERIENCE_TYPE_CHOICES} from "util/constants";
 
 const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(
@@ -35,7 +42,6 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
-
   const bottomSheetRef = useRef<BottomSheet>(null);
   const snapPoints = useMemo(() => ["33%"], []);
   const dispatch = useDispatch();
@@ -125,24 +131,24 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     navigation.navigate("ARChallenge");
   };
 
-  const navigateToGeoARChanllenge = () => {
-    navigation.navigate("GeoArChallengeDetails");
+  const navigateToGeoARChanllenge = (isEvent = false) => {
+    navigation.navigate("GeoArChallengeDetails", {isEvent});
   };
 
   const HomeScreenARItem = item => {
-    const isPhotoChallenge = item?.id === 1;
     return (
       <TouchableOpacity
-        onPress={isPhotoChallenge ? navigateToARChanllenge : () => navigateToGeoARChanllenge()}
+        onPress={item?.experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE ?
+          navigateToARChanllenge : () => navigateToGeoARChanllenge(item?.experience_type === EXPERIENCE_TYPE_CHOICES.EVENT)}
       >
         <View style={styles.imageBg}>
           <View style={styles.row}>
             <View style={styles.innerView}>
-              <AppText style={styles.headerText}>{item?.title}</AppText>
-              <AppText style={styles.headerText}>{item?.title1}</AppText>
+              <AppText style={styles.headerText}>{item?.title_1}</AppText>
+              <AppText style={styles.headerText}>{item?.title_2}</AppText>
               <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
               <AppText style={styles.challengesText}>
-                {isPhotoChallenge ? numberOfChallenges : selectedDestination.star_ar_sites.length}{" "}
+                {item?.challenges?.length ? item?.challenges?.length : item?.geo_challenges?.length}{" "}
                 Challenges
               </AppText>
             </View>
@@ -173,7 +179,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
           <FlatList
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
-            data={HomeScreenData}
+            data={selectedDestination?.ar_experiences}
             renderItem={({ item }) => <HomeScreenARItem {...item} />}
             keyExtractor={item => item?.id?.toString()}
             showsVerticalScrollIndicator={false}

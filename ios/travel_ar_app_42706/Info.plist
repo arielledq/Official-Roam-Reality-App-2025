@@ -103,8 +103,6 @@
 	<string>Access to save videos/photos to camera roll.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Access to the photo library is required to select a photo.</string>
-	<key>TikTokAppID</key>
-	<string>awx8jb1brvngfo5m</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SFUIDisplayBlack.otf</string>

@@ -1,6 +1,6 @@
 {
   "name": "travel_ar_app_42706",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "private": true,
   "scripts": {
     "android": "react-native run-android",
@@ -12,9 +12,10 @@
     "web:build": "./node_modules/.bin/webpack --config ./webpack.config.js --color --mode production",
     "postinstall": "patch-package",
     "fix-deps": "bash ./scripts/fix-dependencies.sh",
-    "reinstall-pods": "cd ios && pod install && wait; cd .. && yarn fix deps && wait;",
     "build-apk": "bash ./scripts/build-apk.sh",
-    "build-aab": "bash ./scripts/build-aab.sh"
+    "build-aab": "bash ./scripts/build-aab.sh",
+    "clean-ios": "rm -rf node_modules ios/Pods ios/build ios/travel_ar_app_42706.xcodeproj/xcuserdata ios/travel_ar_app_42706.xcworkspace/xcuserdata",
+    "reinstall-ios": "yarn install && wait; cd ios && pod install && wait; cd .. && yarn fix-deps && wait; yarn start --reset-cache"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.10",
@@ -27,6 +28,7 @@
     "@react-native-community/blur": "^4.4.0",
     "@react-native-community/datetimepicker": "7.6.4",
     "@react-native-community/geolocation": "^3.4.0",
+    "@react-native-community/netinfo": "11.3.2",
     "@react-native-google-signin/google-signin": "^11.0.0",
     "@react-native-masked-view/masked-view": "^0.2.9",
     "@react-navigation/drawer": "^6.6.6",
@@ -38,6 +40,7 @@
     "@rneui/base": "^4.0.0-rc.8",
     "@rneui/themed": "^4.0.0-rc.8",
     "@rnmapbox/maps": "^10.1.33",
+    "@sayem314/react-native-keep-awake": "1.2.2",
     "@viro-community/react-viro": "https://github.com/shabeebhasan/viro.git",
     "@voximplant/react-native-foreground-service": "^3.0.2",
     "add": "^2.0.6",
@@ -96,6 +99,7 @@
     "react-native-svg": "^14.1.0",
     "react-native-tab-view": "^3.5.2",
     "react-native-toast-message": "^2.2.0",
+    "react-native-tts": "4.1.1",
     "react-native-uuid": "^2.0.1",
     "react-native-vector-icons": "^10.2.0",
     "react-native-video": "^5.2.1",

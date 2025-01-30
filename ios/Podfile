@@ -53,7 +53,6 @@ target 'travel_ar_app_42706' do
   
   pod 'react-native-google-maps', :path => '../node_modules/react-native-maps'
   pod 'GoogleMaps'
-  # pod 'TikTokOpenSDK', '~> 5.0.15'
 
   target 'travel_ar_app_42706Tests' do
     inherit! :complete

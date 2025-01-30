@@ -100,8 +100,8 @@ android {
         applicationId "com.roam_reality"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 11
-        versionName "1.0.11"
+        versionCode 13
+        versionName "1.0.13"
         multiDexEnabled true
     }
 
@@ -189,6 +189,10 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+
+//
+//     // debugImplementation because LeakCanary should only run in debug builds.
+//     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.14'
 
     configurations.all {
         resolutionStrategy {

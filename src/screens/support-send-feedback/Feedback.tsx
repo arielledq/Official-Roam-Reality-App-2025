@@ -18,11 +18,6 @@ const Feedback = () => {
   const [isDescInputFocused, setDescInputFocused] = useState(false);
 
   const SupportOptionsData = [
-    // {
-    //   icon: Images.AppIconLight,
-    //   text: "Our Website",
-    //   link: "https://www.facebook.com/RoamReality"
-    // },
     {
       icon: Images.Facebook,
       text: "Facebook",
@@ -33,11 +28,6 @@ const Feedback = () => {
       text: "Instagram",
       link: "https://www.instagram.com/roamreality",
     },
-    // {
-    //   icon: Images.TikTok,
-    //   text: "TikTok",
-    //   link: "https://www.tiktok.com"
-    // },
     {
       icon: Images.YouTube,
       text: "YouTube",

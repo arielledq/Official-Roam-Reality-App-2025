@@ -2,13 +2,13 @@ import json
 
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
-    DestinationFacts, PanicMessage
+    DestinationFacts, PanicMessage, GeoArSiteCategory
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories, \
-    GeoStarPointSerializer
+    GeoStarPointSerializer, GeoArSiteCategorySerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -26,6 +26,8 @@ from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.utils import timezone
 import datetime
+from django_filters.rest_framework import DjangoFilterBackend
+
 
 
 
@@ -120,100 +122,82 @@ class ARMemoriesViewSet(ViewSet):
     @action(detail=False, methods=['post'], url_path='check-challenge-done', name='Check Challenge')
     def check_challenge_done(self, request):
         user_id = self.request.user.id
-        challenges_id = request.data.get("challenges")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(challenges=challenges_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = Challenges.objects.get(pk=challenges_id)
-        if len(results) < challengeObj.challenge_attempt:
-            return Response({'message': "Challenge submission can be added more."}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "Challenge experience already submitted and can't submitted more."},
-                            status=status.HTTP_403_FORBIDDEN)
+        challenge_id = request.data.get("challenges")
 
-        # try:
-        #     challenge_obj = Challenges.objects.get(pk=challenges_id)
-        # except Challenges.DoesNotExist:
-        #     return Response(
-        #         {'message': f'El challenge {challenges_id} no existe.'},
-        #         status=status.HTTP_404_NOT_FOUND
-        #     )
-        #
-        # results = ARMemories.objects.filter(user=user_id, challenges=challenges_id)
-        #
-        # if len(results) >= challenge_obj.challenge_attempt:
-        #     return Response(
-        #         {'message': "Challenge experience already submitted the maximum times."},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
-        # last_memory = results.order_by('-created_at').first()
-        # if last_memory:
-        #     cooldown_hours = getattr(challenge_obj, 'cooldown_hours', 24)
-        #     cooldown_limit = last_memory.created_at + datetime.timedelta(hours=cooldown_hours)
-        #
-        #     if timezone.now() < cooldown_limit:
-        #         time_remaining = cooldown_limit - timezone.now()
-        #         return Response(
-        #             {
-        #                 'message': "You are still in cooldown period.",
-        #                 'remaining': str(time_remaining)
-        #             },
-        #             status=status.HTTP_403_FORBIDDEN
-        #         )
-        #
-        # return Response(
-        #     {'message': "Challenge can be submitted now."},
-        #     status=status.HTTP_200_OK
-        # )
+        try:
+            challenge_obj = Challenges.objects.get(pk=challenge_id)
+        except GeoARChallenges.DoesNotExist:
+            return Response(
+                {'message': f'Challenge {challenge_id} does not exist.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        results = ARMemories.objects.filter(user=user_id, challenges=challenge_id)
+
+        total_attempts = len(results)
+        if total_attempts >= challenge_obj.challenge_attempt:
+            # Is important to verify if total_attempts is multiple of challenge_attempt,
+            # so if it is true, checks the cooldown
+            if total_attempts % challenge_obj.challenge_attempt == 0:
+                last_check_in = results.order_by('-created_at').first()
+                if last_check_in:
+                    cooldown_hours = getattr(challenge_obj, 'cooldown_hours', 24)
+                    cooldown_limit = last_check_in.created_at + timezone.timedelta(hours=cooldown_hours)
+
+                    if timezone.now() < cooldown_limit:
+                        time_remaining = cooldown_limit - timezone.now()
+                        return Response(
+                            {
+                                'message': "You are still in cooldown period.",
+                                'remaining': str(time_remaining)
+                            },
+                            status=status.HTTP_403_FORBIDDEN
+                        )
+
+        return Response(
+            {'message': "Challenge can be submitted now."},
+            status=status.HTTP_200_OK
+        )
 
     @action(detail=False, methods=['post'], url_path='check-geo-challenge-done', name='Check Geo Challenge')
     def check_geo_challenge_done(self, request):
         user_id = self.request.user.id
         geo_challenge_id = request.data.get("geo_challenge")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(geo_challenge=geo_challenge_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
-        if len(results) < challengeObj.challenge_attempt:
-            return Response({'message': "Geo Challenge submission can be added more."}, status=status.HTTP_200_OK)
-        else:
-            return Response({'message': "Geo Challenge experience already submitted and can't submitted more."},
-                            status=status.HTTP_403_FORBIDDEN)
 
-        # try:
-        #     challenge_obj = GeoARChallenges.objects.get(pk=geo_challenge_id)
-        # except Challenges.DoesNotExist:
-        #     return Response(
-        #         {'message': f'El challenge {geo_challenge_id} no existe.'},
-        #         status=status.HTTP_404_NOT_FOUND
-        #     )
-        #
-        # results = ARSitePinCheckIn.objects.filter(user=user_id, challenges=geo_challenge_id)
-        #
-        # if len(results) >= challenge_obj.challenge_attempt:
-        #     return Response(
-        #         {'message': "Challenge experience already submitted the maximum times."},
-        #         status=status.HTTP_403_FORBIDDEN
-        #     )
-        # last_check_in = results.order_by('-created_at').first()
-        # if last_check_in:
-        #     cooldown_hours = getattr(challenge_obj, 'cooldown_hours', 24)
-        #     cooldown_limit = last_check_in.created_at + datetime.timedelta(hours=cooldown_hours)
-        #
-        #     if timezone.now() < cooldown_limit:
-        #         time_remaining = cooldown_limit - timezone.now()
-        #         return Response(
-        #             {
-        #                 'message': "You are still in cooldown period.",
-        #                 'remaining': str(time_remaining)
-        #             },
-        #             status=status.HTTP_403_FORBIDDEN
-        #         )
-        #
-        # return Response(
-        #     {'message': "Challenge can be submitted now."},
-        #     status=status.HTTP_200_OK
-        # )
+        try:
+            challenge_obj = GeoARChallenges.objects.get(pk=geo_challenge_id)
+        except GeoARChallenges.DoesNotExist:
+            return Response(
+                {'message': f'Challenge {geo_challenge_id} does not exist.'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        results = ARSitePinCheckIn.objects.filter(user=user_id, challenges=geo_challenge_id)
+
+        total_attempts = len(results)
+        if total_attempts >= challenge_obj.challenge_attempt:
+            # Is important to verify if total_attempts is multiple of challenge_attempt,
+            # so if it is true, check the cooldown
+            if total_attempts % challenge_obj.challenge_attempt == 0:
+                last_check_in = results.order_by('-created_at').first()
+                if last_check_in:
+                    cooldown_hours = getattr(challenge_obj, 'cooldown_hours', 24)
+                    cooldown_limit = last_check_in.created_at + timezone.timedelta(hours=cooldown_hours)
+
+                    if timezone.now() < cooldown_limit:
+                        time_remaining = cooldown_limit - timezone.now()
+                        return Response(
+                            {
+                                'message': "You are still in cooldown period.",
+                                'remaining': str(time_remaining)
+                            },
+                            status=status.HTTP_403_FORBIDDEN
+                        )
+
+        return Response(
+            {'message': "Challenge can be submitted now."},
+            status=status.HTTP_200_OK
+        )
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.queryset.get(pk=kwargs.get('pk'))
@@ -231,16 +215,11 @@ class ARMemoriesViewSet(ViewSet):
         criterion2 = Q(geo_challenge=geo_challenge_id)
         results = ARMemories.objects.filter(criterion1 & criterion2)
         challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
-        if len(results) < challengeObj.challenge_attempt:
-            serializer = ARMemoriesSerializer(data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': "Geo Challenge experience already submitted and can't submitted more."},
-                            status=403)
+        serializer = ARMemoriesSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def create(self, request, *args, **kwargs):
         user_id = self.request.user.id
@@ -250,16 +229,15 @@ class ARMemoriesViewSet(ViewSet):
         criterion2 = Q(challenges=challenges_id)
         results = ARMemories.objects.filter(criterion1 & criterion2)
         challengeObj = Challenges.objects.get(pk=challenges_id)
-        if len(results) < challengeObj.challenge_attempt:
-            request.data['points'] = challengeObj.points
-            serializer = ARMemoriesSerializer(data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
+        # if len(results) < challengeObj.challenge_attempt:
+        request.data['points'] = challengeObj.points
+        serializer = ARMemoriesSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # else:
+        #     return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
 
 
 class ARProfileViewSet(ViewSet):
@@ -368,6 +346,15 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     """
     queryset = GeoLocation.objects.all().order_by('sequence_number')
     serializer_class = GeoLocationSerializer
+    http_method_names = ["get"]
+
+
+class GeoArSiteCategoryViewSet(viewsets.ModelViewSet):
+    """
+    A simple ViewSet for listing all categories for GeoArSite.
+    """
+    queryset = GeoArSiteCategory.objects.all()
+    serializer_class = GeoArSiteCategorySerializer
     http_method_names = ["get"]
 
 
@@ -521,18 +508,14 @@ class ARSitePinCheckInViewSet(ViewSet):
         results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
         challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
         geosite = GeoArSite.objects.get(pk=geo_site)
-        if len(results) < challengeObj.challenge_attempt:
-            request.data['points'] = challengeObj.points
-            serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
-            if serializer.is_valid(raise_exception=True):
-                serializer.save()
-                geosite.check_ins = F('check_ins') + 1
-                geosite.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            else:
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
+        request.data['points'] = challengeObj.points
+        serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            geosite.check_ins = F('check_ins') + 1
+            geosite.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class StarCollectionViewSet(ViewSet):

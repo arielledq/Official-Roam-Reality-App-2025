@@ -858,7 +858,6 @@
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Outcomes\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_XCFramework\"",
-					"\"${PODS_ROOT}/TikTokOpenSDK\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics\"",
@@ -874,7 +873,6 @@
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOutcomes\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/TikTokOpenSDK\"",
 					"/Users/rod/development/GitInnovatica/room-reality/unity/builds/ios/UnityFramework.framework/Frameworks/**",
 				);
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
@@ -933,7 +931,6 @@
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Outcomes\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_XCFramework\"",
-					"\"${PODS_ROOT}/TikTokOpenSDK\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics\"",
@@ -949,7 +946,6 @@
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOutcomes\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/TikTokOpenSDK\"",
 					"/Users/rod/development/GitInnovatica/room-reality/unity/builds/ios/UnityFramework.framework/Frameworks/**",
 				);
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
