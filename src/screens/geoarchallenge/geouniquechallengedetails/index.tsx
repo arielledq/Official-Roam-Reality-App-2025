@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { RootStackParamList, ScreenStackComponent } from "../../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../../constants/types";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";

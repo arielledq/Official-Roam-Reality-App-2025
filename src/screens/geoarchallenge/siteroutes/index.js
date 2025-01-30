@@ -25,6 +25,7 @@ import RoadIcon from "../../../assets/geoar/road.svg";
 import TimeIcon from "../../../assets/geoar/time.svg";
 import MarkerIcon from "../../../assets/geoar/marker_img.svg";
 import CirclePinIcon from "assets/geoar/circle_marker_img.svg";
+import { MAP_MODE } from "constants";
 
 // Navigation Step 1
 const GeoArSiteRoutes = ({ route }) => {
@@ -45,6 +46,7 @@ const GeoArSiteRoutes = ({ route }) => {
 
   const starChallengeObj = route.params?.starsChallenge;
   const isStarChallenge = !!starChallengeObj?.id;
+  const experience_type = route.params?.experience_type;
 
   const getFullBounds = () => {
     if (selectedGeoSite.geo_site_border) {
@@ -186,6 +188,14 @@ const GeoArSiteRoutes = ({ route }) => {
     );
   };
 
+  const navigateToNextScreen = (mapMode = MAP_MODE.DRIVING) => {
+    navigation.navigate("GeoArSiteNavigation", {
+      mapMode: mapMode,
+      starsChallenge: starChallengeObj,
+      experience_type: experience_type,
+    });
+  };
+
   useEffect(() => {
     if (!!userLocation?.latitude && !!userLocation?.longitude) setIsLoading(false);
   }, [userLocation?.latitude, userLocation?.longitude]);
@@ -266,12 +276,7 @@ const GeoArSiteRoutes = ({ route }) => {
           </View>
           <View style={styles.buttonContainer}>
             <AppButton
-              onPress={() =>
-                navigation.navigate("GeoArSiteNavigation", {
-                  mapMode: "DRIVING",
-                  starsChallenge: starChallengeObj,
-                })
-              }
+              onPress={() => navigateToNextScreen(MAP_MODE.DRIVING)}
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
               title={"Drive To Location"}
@@ -280,12 +285,13 @@ const GeoArSiteRoutes = ({ route }) => {
           </View>
           <View style={styles.buttonContainer}>
             <AppButton
-              onPress={() =>
-                navigation.navigate("GeoArSiteNavigation", {
-                  mapMode: "WALKING",
-                  starsChallenge: starChallengeObj,
-                })
-              }
+              onPress={() => navigateToNextScreen(MAP_MODE.WALKING)}
+              // onPress={() =>
+              //   navigation.navigate("GeoArSiteNavigation", {
+              //     mapMode: "WALKING",
+              //     starsChallenge: starChallengeObj,
+              //   })
+              // }
               buttonStyle={styles.buttonStyle}
               containerStyle={styles.buttonContainerStyle}
               title={"Walk to Location"}

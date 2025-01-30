@@ -57,7 +57,9 @@ const HomeScreenData = [
   },
 ];
 
-const ChallengeSelection = () => {
+const ChallengeSelection = ({ route }) => {
+  const experience_type = route.params?.experience_type;
+
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
   const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
@@ -128,24 +130,32 @@ const ChallengeSelection = () => {
   };
 
   const goToRoute = route => {
-    if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
-      showMessage("Pin Challenge is unavailable right now", "error");
-      return;
-    }
-    // if (route === "PinChallenge" && !!myCheckIns) {
-    //   showMessage("Check-ins already submitted and can't submitted more.", "error");
-    //   return;
-    // }
-    if (route === "StarChallenge" && selectedGeoARSiteStars.length === 0) {
-      showMessage("This Star Challenge is completed.", "error");
-      return;
-    } else {
-      if (route === "StarChallenge") {
+    switch (route) {
+      case "StarChallenge":
+        if (selectedGeoARSiteStars.length === 0) {
+          showMessage("This Star Challenge is completed.", "error");
+          return;
+        }
         if (!starsChallenge) return;
         navigation.navigate("GeoArSiteRoutes", { starsChallenge });
-      } else {
+        break;
+      case "PinChallenge":
+        if (!selectedGeoSite.pin_challenge) {
+          showMessage("Pin Challenge is unavailable right now", "error");
+          return;
+        }
+
+        navigation.navigate("ChallengeDetails", {
+          challengeObj: selectedGeoSite,
+          experience_type: experience_type,
+        });
+
+        break;
+
+      default:
         navigation.navigate(route);
-      }
+
+        break;
     }
   };
 

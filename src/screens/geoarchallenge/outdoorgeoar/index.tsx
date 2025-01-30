@@ -16,7 +16,11 @@ import { BlurView } from "@react-native-community/blur";
 
 import { resetState } from "../../../redux/Login";
 import { deleteAccount, logout } from "../../../network";
-import { RootStackParamList, ScreenStackComponent } from "../../../navigation/types";
+import {
+  ExperienceTypeChoices,
+  RootStackParamList,
+  ScreenStackComponent,
+} from "../../../constants/types";
 
 import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
 import { showMessage } from "../../../util/helpers";
@@ -27,7 +31,8 @@ import { AppHeader, AppText } from "../../../components";
 import useStyles from "./styles";
 import theme from "../../../assets/theme";
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
-import { EXPERIENCE_TYPE_CHOICES } from "util/constants";
+// @ts-ignore
+import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
@@ -88,7 +93,7 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     navigation.navigate("GeoArChallengeDetails", { isEvent });
   };
 
-  const cardPressHandler = (experienceType: string) => {
+  const cardPressHandler = (experienceType: ExperienceTypeChoices) => {
     switch (experienceType) {
       case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
         navigateToARChallenge();

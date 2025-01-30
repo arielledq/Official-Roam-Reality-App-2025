@@ -20,6 +20,7 @@ import { updateARUserData, updateARSettings } from "../../redux/AR";
 
 import { useDispatch, useSelector } from "react-redux";
 import useStyles from "./styles";
+import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 const ArChallenge = ({}) => {
   const _styles = useStyles();
@@ -105,7 +106,10 @@ const ArChallenge = ({}) => {
 
   const navigateToChallengeDetails = obj => {
     // return
-    navigation.navigate("ArChallengeDetails", { challengeObj: obj });
+    navigation.navigate("ChallengeDetails", {
+      challengeObj: obj,
+      experience_type: EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE,
+    });
   };
 
   const Item = ({ obj }) => (

@@ -21,8 +21,6 @@ import useStyles from "./styles";
 import { updateSelectedSites } from "../../../redux/AR";
 import {
   getARSiteCategories,
-  getARSiteCategory,
-  getARSites,
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
@@ -36,6 +34,7 @@ import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
+import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 const SCROLL_AMOUNT = 70;
 
@@ -257,7 +256,11 @@ const GeoArChallengeDetails = ({}) => {
             <Callout
               onPress={() => {
                 dispatch(updateSelectedSites(o));
-                navigation.navigate("GeoArSiteDetails");
+                navigation.navigate("GeoArSiteDetails", {
+                  experience_type: isEvent
+                    ? EXPERIENCE_TYPE_CHOICES.EVENT
+                    : EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE,
+                });
               }}
               style={{
                 backgroundColor: "#fff",
@@ -505,11 +508,6 @@ const GeoArChallengeDetails = ({}) => {
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
-          {/* {
-            selectedDestination.unique_ar_sites.map((o) => {
-              return _markerView(o)
-            })
-          } */}
           {isEvent
             ? filteredSites.length > 0
               ? filteredSites.map(o => {

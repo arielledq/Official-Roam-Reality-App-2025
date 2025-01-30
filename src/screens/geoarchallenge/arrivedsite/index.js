@@ -18,13 +18,15 @@ import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
 // Navigation Step 3
 const GeoArSiteArrived = ({ route }) => {
+  const starChallengeObj = route.params?.starsChallenge;
+  const isStarChallenge = !!starChallengeObj?.id;
+
+  const experience_type = route.params?.experience_type;
+
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
 
   const _styles = useStyles();
   const navigation = useNavigation();
-
-  const starChallengeObj = route.params?.starsChallenge;
-  const isStarChallenge = !!starChallengeObj?.id;
 
   let latitude = 0;
   let longitude = 0;
@@ -39,9 +41,15 @@ const GeoArSiteArrived = ({ route }) => {
 
   const arrivedButtonHandler = () => {
     if (isStarChallenge) {
-      navigation.navigate("StarChallenge", { starChallenge: starChallengeObj });
+      navigation.navigate("StarChallenge", {
+        starChallenge: starChallengeObj,
+        // INFO: Optionally pass it in the future
+        // experience_type: experience_type,
+      });
     } else {
-      navigation.navigate("ChallengeSelection");
+      navigation.navigate("ChallengeSelection", {
+        experience_type: experience_type,
+      });
     }
   };
 

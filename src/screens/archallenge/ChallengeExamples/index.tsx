@@ -1,55 +1,62 @@
-import React, { useState, useRef } from 'react'
-import { FontLineHeights, FontSizes } from '../../../util/FontUtils'
-import { Dimensions, Image, Text, TouchableOpacity, View, FlatList, StyleSheet } from 'react-native'
-import { RootStackParamList, ScreenStackComponent } from '../../../navigation/types'
-import BackgroundWithImage from '../../../components/background'
-import AppHeader from '../../../components/header'
-import { useRoute } from '@react-navigation/native'
-import Video from 'react-native-video'
-import { screenHorizontalPadding } from '../../../util/AppDimensions'
-// import { ResizeMode, Video } from 'expo-av' // Use Video from expo-av
+import React, { useState, useRef } from "react";
+import { FontLineHeights, FontSizes } from "../../../util/FontUtils";
+import {
+  Dimensions,
+  Image,
+  Text,
+  TouchableOpacity,
+  View,
+  FlatList,
+  StyleSheet,
+} from "react-native";
+import { RootStackParamList, ScreenStackComponent } from "../../../constants/types";
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import { useRoute } from "@react-navigation/native";
+import Video from "react-native-video";
+import { screenHorizontalPadding } from "../../../util/AppDimensions";
 
-const { width } = Dimensions.get('window')
+const { width } = Dimensions.get("window");
 
-const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExamples'> = ({}) => {
-  const route = useRoute()
+const ChallengeExamples: ScreenStackComponent<RootStackParamList, "ChallengeExamples"> = ({}) => {
+  const route = useRoute();
 
-  const examples = route?.params?.examples
-  const hasImages = !!examples?.images?.length
-  const hasVideos = !!examples?.videos?.length
+  const examples = route?.params?.examples;
+  const hasImages = !!examples?.images?.length;
+  const hasVideos = !!examples?.videos?.length;
 
-  const [activeIndex, setActiveIndex] = useState(0)
-  const [isImageTab, setIsImageTab] = useState(true) // toggle between images and videos
-  const flatListRef = useRef(null)
+  const [activeIndex, setActiveIndex] = useState(0);
+  const [isImageTab, setIsImageTab] = useState(true); // toggle between images and videos
+  const flatListRef = useRef(null);
 
   const onNext = () => {
     if (activeIndex < (isImageTab ? examples?.images.length - 1 : examples?.videos.length - 1)) {
-      const newIndex = activeIndex + 1
-      setActiveIndex(newIndex)
-      flatListRef?.current?.scrollToIndex({ index: newIndex })
+      const newIndex = activeIndex + 1;
+      setActiveIndex(newIndex);
+      flatListRef?.current?.scrollToIndex({ index: newIndex });
     }
-  }
+  };
 
   const onPrev = () => {
     if (activeIndex > 0) {
-      const newIndex = activeIndex - 1
-      setActiveIndex(newIndex)
-      flatListRef?.current?.scrollToIndex({ index: newIndex })
+      const newIndex = activeIndex - 1;
+      setActiveIndex(newIndex);
+      flatListRef?.current?.scrollToIndex({ index: newIndex });
     }
-  }
+  };
 
   const renderItem = ({ item }) => {
     return isImageTab ? (
       <Image
         source={{ uri: item?.image }}
         style={styles.media}
-        resizeMode='cover'
-        resizeMethod='auto'
+        resizeMode="cover"
+        resizeMethod="auto"
       />
     ) : (
-      <Video source={{ uri: item?.video_file }} style={styles.media} resizeMode='cover' controls />
-    )
-  }
+      <Video source={{ uri: item?.video_file }} style={styles.media} resizeMode="cover" controls />
+    );
+  };
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -59,7 +66,7 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
           numberOfLines: 2,
           style: [styles.heading],
         }}
-        backgroundColor='transparent'
+        backgroundColor="transparent"
       />
 
       <View style={styles.container}>
@@ -69,9 +76,9 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
             <TouchableOpacity
               style={{ flex: 1 }}
               onPress={() => {
-                setIsImageTab(true)
-                setActiveIndex(0)
-                flatListRef.current.scrollToIndex({ index: 0 })
+                setIsImageTab(true);
+                setActiveIndex(0);
+                flatListRef.current.scrollToIndex({ index: 0 });
               }}
             >
               <Text style={[styles.toggleButton, isImageTab && styles.activeButton]}>Images</Text>
@@ -81,9 +88,9 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
             <TouchableOpacity
               style={{ flex: 1 }}
               onPress={() => {
-                setIsImageTab(false)
-                setActiveIndex(0)
-                flatListRef.current.scrollToIndex({ index: 0 })
+                setIsImageTab(false);
+                setActiveIndex(0);
+                flatListRef.current.scrollToIndex({ index: 0 });
               }}
             >
               <Text style={[styles.toggleButton, !isImageTab && styles.activeButton]}>Videos</Text>
@@ -102,8 +109,8 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
             showsHorizontalScrollIndicator={false}
             keyExtractor={item => item.id}
             onScroll={e => {
-              const index = Math.round(e.nativeEvent.contentOffset.x / width)
-              setActiveIndex(index)
+              const index = Math.round(e.nativeEvent.contentOffset.x / width);
+              setActiveIndex(index);
             }}
           />
         </View>
@@ -111,7 +118,7 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
         {/* Navigation Buttons */}
         <View style={styles.navButtons}>
           <TouchableOpacity onPress={onPrev} style={styles.navButton}>
-            <Text style={styles.navText}>{'<'}</Text>
+            <Text style={styles.navText}>{"<"}</Text>
           </TouchableOpacity>
           {/* Dot Indicators */}
           <View style={styles.dotContainer}>
@@ -123,15 +130,15 @@ const ChallengeExamples: ScreenStackComponent<RootStackParamList, 'ChallengeExam
             ))}
           </View>
           <TouchableOpacity onPress={onNext} style={styles.navButton}>
-            <Text style={styles.navText}>{'>'}</Text>
+            <Text style={styles.navText}>{">"}</Text>
           </TouchableOpacity>
         </View>
       </View>
     </BackgroundWithImage>
-  )
-}
+  );
+};
 
-export default ChallengeExamples
+export default ChallengeExamples;
 
 const styles = StyleSheet.create({
   mainContainer: {
@@ -141,41 +148,41 @@ const styles = StyleSheet.create({
   heading: {
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
-    fontWeight: '700',
-    color: '#FFF',
+    fontWeight: "700",
+    color: "#FFF",
     marginTop: 5,
-    textAlign: 'center',
+    textAlign: "center",
   },
   container: {
     marginTop: 16,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   toggleContainer: {
     marginBottom: 24,
-    width: '100%',
+    width: "100%",
     height: 35,
     gap: 4,
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   toggleButton: {
     flex: 1,
-    textAlign: 'center',
+    textAlign: "center",
     paddingVertical: 6,
 
-    fontWeight: '700',
-    color: '#FFFFFF',
+    fontWeight: "700",
+    color: "#FFFFFF",
     fontSize: 14,
-    backgroundColor: '#77777750',
-    borderColor: '#6B7280',
+    backgroundColor: "#77777750",
+    borderColor: "#6B7280",
     borderRadius: 2,
     borderWidth: 1,
   },
   activeButton: {
-    backgroundColor: '#B816E050',
-    borderColor: '#B816E0',
+    backgroundColor: "#B816E050",
+    borderColor: "#B816E0",
   },
   media: {
     width: width - 40,
@@ -184,25 +191,25 @@ const styles = StyleSheet.create({
   },
   navButtons: {
     marginTop: 24,
-    width: '100%',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    width: "100%",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
   navButton: {
-    backgroundColor: '#CCC',
+    backgroundColor: "#CCC",
     padding: 10,
     borderRadius: 12,
     width: 40,
   },
   navText: {
-    color: '#000',
-    textAlign: 'center',
+    color: "#000",
+    textAlign: "center",
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   dotContainer: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginTop: 15,
   },
   dot: {
@@ -212,9 +219,9 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   activeDot: {
-    backgroundColor: '#6C3BD9',
+    backgroundColor: "#6C3BD9",
   },
   inactiveDot: {
-    backgroundColor: '#CCC',
+    backgroundColor: "#CCC",
   },
-})
+});

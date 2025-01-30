@@ -25,13 +25,15 @@ import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
 import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
-import { getAllARSitesStars, sendRoamingNotification } from "../../../network";
+import { getAllARSitesStars } from "../../../network";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 
-const GeoArSiteDetails = ({}) => {
+const GeoArSiteDetails = ({ route }) => {
+  const experience_type = route.params?.experience_type;
+
   const [isLoading, setIsLoading] = useState(false);
   const [showProTips, setShowProTips] = useState(false);
   const [address, setAddress] = useState(null);
@@ -171,6 +173,7 @@ const GeoArSiteDetails = ({}) => {
   };
 
   const letsRoamButtonHandler = async () => {
+    // INFO: Commented out temporarily
     // try {
     //   const metadata = {
     //     destinationId: selectedDestination?.id,
@@ -182,7 +185,7 @@ const GeoArSiteDetails = ({}) => {
     //   console.error('There was an error sending the notification to friends:', error)
     // }
 
-    navigation.navigate("GeoArSiteRoutes");
+    navigation.navigate("GeoArSiteRoutes", { experience_type });
   };
 
   const initialRegion = {

@@ -1,43 +1,63 @@
 import React, { useEffect, useState } from "react";
+import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { fontGroup, FontSizes } from "../../../util/FontUtils";
-import {
-  Alert,
-  Dimensions,
-  Image,
-  Keyboard,
-  Linking,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { RootStackParamList, ScreenStackComponent } from "../../../navigation/types";
-import BackgroundWithImage from "../../../components/background";
-import AppHeader from "../../../components/header";
-import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
-import AppButton from "../../../components/button";
+import { useIsFocused } from "@react-navigation/native";
 import RenderHtml from "react-native-render-html";
 import moment from "moment";
-import { useDispatch, useSelector } from "react-redux";
-import useStyles from "./styles";
+
+import { FontSizes } from "../../../util/FontUtils";
 import { checkARChallengeDoneAPI, getAnyARExamples } from "../../../network";
-import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import { showMessage } from "../../../util/helpers";
+
+import { RootStackParamList, ScreenStackComponent } from "../../../constants/types";
+// @ts-ignore
+import { EXPERIENCE_TYPE_CHOICES } from "constants";
+
+import useStyles from "./styles";
+
+import BackgroundWithImage from "../../../components/background";
+import AppHeader from "../../../components/header";
+import AppButton from "../../../components/button";
+
+// @ts-ignore
+import BGArShare from "../../../assets/ar/bg-ar-share.png";
 
 const { width } = Dimensions.get("window");
 
-const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeDetails"> = ({}) => {
-  const styles = useStyles();
-  const dispatch = useDispatch();
-  const navigation = useNavigation();
-  const route = useRoute();
+const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetails"> = ({
+  navigation,
+  route,
+}) => {
+  const experience_type = route.params?.experience_type;
+  let challengeObj = route?.params?.challengeObj;
+
+  switch (experience_type) {
+    case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
+      challengeObj = challengeObj;
+      break;
+    case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+      challengeObj = challengeObj.pin_challenge;
+      break;
+
+    default:
+      challengeObj = null;
+      break;
+  }
+
+  if (!challengeObj) {
+    console.error("challengeObj is empty", challengeObj);
+    navigation.goBack();
+  }
+
+  const startDate = moment(challengeObj.created_at).format("DD-MM-YYYY");
+  const expiryDate = moment(challengeObj.expiry_date).format("DD-MM-YYYY");
+
   const [examples, setExamples] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isChallengeDone, setIsChallengeDone] = useState(false);
-  const challengeObj = route?.params?.challengeObj;
-  const startDate = moment(challengeObj.created_at).format("DD-MM-YYYY");
-  const expiryDate = moment(challengeObj.expiry_date).format("DD-MM-YYYY");
+
+  const styles = useStyles();
+
   const isFocused = useIsFocused();
 
   const checkIfChallengeIsDone = () => {
@@ -67,7 +87,19 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
 
   const navigateToChallengeCapture = () => {
     if (!isChallengeDone) {
-      navigation.navigate("ArChallengeCapture", { challengeObj });
+      switch (experience_type) {
+        case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
+          // @ts-ignore
+          navigation.navigate("ArChallengeCapture", { challengeObj });
+          break;
+        case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+          // @ts-ignore
+          navigation.navigate("PinChallenge");
+          break;
+
+        default:
+          break;
+      }
     } else {
       showMessage("You have already completed the challenge.", "info", "AR Challenges");
     }
@@ -83,6 +115,7 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   const openExample = () => {
     const examplesList = examples?.length ? examples[0] : null;
     if (examplesList) {
+      // @ts-ignore
       navigation.navigate("ChallengeExamples", { examples: examplesList });
     } else {
       showMessage("We are working on adding examples to this challenge.", "info");
@@ -184,4 +217,4 @@ const ArChallengeDetails: ScreenStackComponent<RootStackParamList, "ArChallengeD
   );
 };
 
-export default ArChallengeDetails;
+export default ChallengeDetails;

@@ -15,8 +15,6 @@ import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
 import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
-import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
-import PinInfoCaptureFooter from "components/PinInfoCaptureFooter";
 
 import { showMessage } from "../../../util/helpers";
 import {
@@ -580,8 +578,6 @@ const PinChallenge = () => {
           customInstructions="Stand next to the pin, resize as needed, snap your photo"
         />
       )}
-      {/* Removing temporarily */}
-      {/* <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} /> */}
     </ChallengeScreen>
   );
 };
