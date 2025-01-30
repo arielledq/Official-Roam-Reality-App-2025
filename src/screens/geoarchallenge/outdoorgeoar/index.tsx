@@ -88,17 +88,26 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     navigation.navigate("GeoArChallengeDetails", { isEvent });
   };
 
+  const cardPressHandler = (experienceType: string) => {
+    switch (experienceType) {
+      case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
+        navigateToARChallenge();
+        break;
+      case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+        navigateToGeoARChallenge(false);
+        break;
+      case EXPERIENCE_TYPE_CHOICES.EVENT:
+        navigateToGeoARChallenge(true);
+        break;
+
+      default:
+        break;
+    }
+  };
+
   const HomeScreenARItem = (item: any) => {
-    const isPhotoChallenge = item?.id === 1;
     return (
-      <TouchableOpacity
-        onPress={
-          item?.experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE
-            ? navigateToARChallenge
-            : () =>
-                navigateToGeoARChallenge(item?.experience_type === EXPERIENCE_TYPE_CHOICES.EVENT)
-        }
-      >
+      <TouchableOpacity onPress={() => cardPressHandler(item?.experience_type)}>
         <View style={styles.imageBg}>
           <View style={styles.row}>
             <View style={styles.innerView}>
