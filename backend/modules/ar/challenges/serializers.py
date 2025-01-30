@@ -281,7 +281,7 @@ class ARExperienceSerializer(serializers.ModelSerializer):
             "order",
             "challenges",
             "geo_challenges",
-            "is_event",
+            "experience_type",
             "geo_location",
         )
 

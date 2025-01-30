@@ -27,6 +27,7 @@ import { AppHeader, AppText } from "../../../components";
 import useStyles from "./styles";
 import theme from "../../../assets/theme";
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
+import { EXPERIENCE_TYPE_CHOICES } from "util/constants";
 
 const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
@@ -92,7 +93,10 @@ const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route 
     return (
       <TouchableOpacity
         onPress={
-          isPhotoChallenge ? navigateToARChallenge : () => navigateToGeoARChallenge(item?.is_event)
+          item?.experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE
+            ? navigateToARChanllenge
+            : () =>
+                navigateToGeoARChanllenge(item?.experience_type === EXPERIENCE_TYPE_CHOICES.EVENT)
         }
       >
         <View style={styles.imageBg}>
