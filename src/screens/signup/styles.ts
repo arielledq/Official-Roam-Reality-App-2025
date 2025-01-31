@@ -1,6 +1,6 @@
 import { makeStyles } from "@rneui/themed";
 import { screenHorizontalPadding } from "../../util/AppDimensions";
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -56,7 +56,7 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH20,
-    color: theme.colors.TandCgrey,
+    color: theme.colors.white,
     textAlign: "center",
     marginTop: "5%",
   },
@@ -70,7 +70,7 @@ const useStyles = makeStyles(theme => ({
     ...fontGroup.nunitoBold,
     fontSize: FontSizes.S13,
     lineHeight: FontLineHeights.LH16,
-    color: theme.colors.grey,
+    color: theme.colors.white,
     textAlign: "center",
     marginBottom: 50,
   },
