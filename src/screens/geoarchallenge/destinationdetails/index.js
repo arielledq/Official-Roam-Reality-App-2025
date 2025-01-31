@@ -469,14 +469,14 @@ const GeoArChallengeDetails = ({}) => {
         )}
       </View>
 
-      {!isEvent && (
-        <View
-          style={{
-            flexDirection: "row",
-            marginBottom: 20,
-            justifyContent: "space-between",
-          }}
-        >
+      <View
+        style={{
+          flexDirection: "row",
+          marginBottom: 20,
+          justifyContent: "space-between",
+        }}
+      >
+        {!isEvent && (
           <View style={_styles.selectionsContainer}>
             <View>
               <Text style={_styles.selectionTextHeading}>Sites</Text>
@@ -484,15 +484,16 @@ const GeoArChallengeDetails = ({}) => {
             </View>
             <AppSwitch onValueChange={setARSitesOnSwitch} value={arSitesOn} />
           </View>
-          <View style={_styles.selectionsContainer}>
-            <View>
-              <Text style={_styles.selectionTextHeading}>My Friends</Text>
-              <Text style={_styles.selectionTextDetails}>Live Location</Text>
-            </View>
-            <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
+        )}
+
+        <View style={_styles.selectionsContainer}>
+          <View>
+            <Text style={_styles.selectionTextHeading}>My Friends</Text>
+            <Text style={_styles.selectionTextDetails}>Live Location</Text>
           </View>
+          <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
         </View>
-      )}
+      </View>
       <View
         style={{
           width: "100%",
