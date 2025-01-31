@@ -1,29 +1,29 @@
-import { Path } from "react-native-svg"
-import { makeStyles } from "@rneui/themed"
-import { FontSizes, fontGroup } from "../../util/FontUtils"
-import { screenHorizontalPadding } from "../../util/AppDimensions"
+import { Path } from "react-native-svg";
+import { makeStyles } from "@rneui/themed";
+import { FontSizes, fontGroup } from "../../util/FontUtils";
+import { screenHorizontalPadding } from "../../util/AppDimensions";
 
 const useStyles = makeStyles(theme => ({
   container: {
     paddingHorizontal: screenHorizontalPadding - 15,
     flex: 1,
-    marginTop: 20
+    marginTop: 20,
   },
   chidlView: { flex: 1 },
   input: {
-    ...fontGroup.sf500,
+    ...fontGroup.nunitoRegular,
     height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG,
     marginVertical: -5,
-    color: theme?.colors?.white
+    color: theme?.colors?.white,
   },
   focusedInput: {
-    backgroundColor: theme.colors.inputBlue
+    backgroundColor: theme.colors.inputBlue,
   },
   inputError: {
-    backgroundColor: theme.colors.pink
+    backgroundColor: theme.colors.pink,
   },
   buttonContainer: { marginBottom: "10%" },
   buttonStyle: { height: 50 },
@@ -31,52 +31,52 @@ const useStyles = makeStyles(theme => ({
     height: 140,
     paddingTop: 20,
     paddingLeft: 20,
-    backgroundColor: theme?.colors?.inputBG
+    backgroundColor: theme?.colors?.inputBG,
   },
   subHeaderText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
-    paddingLeft: 20
+    paddingLeft: 20,
   },
   text: {
-    ...fontGroup.ns300,
+    ...fontGroup.nunitoLight,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
-    paddingLeft: 10
+    paddingLeft: 10,
   },
   scroll: {
-    flex: 1
+    flex: 1,
   },
   row: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
   },
   rowSpaceBetween: {
-    justifyContent: "space-between"
+    justifyContent: "space-between",
   },
   linkContainer: {
     paddingLeft: 10,
     paddingRight: 20,
     marginTop: 10,
-    marginBottom: 20
+    marginBottom: 20,
   },
   contactOption: {
     paddingVertical: 20,
     borderRadius: 10,
     paddingHorizontal: 20,
     marginTop: 10,
-    backgroundColor: theme?.colors?.inputBG
+    backgroundColor: theme?.colors?.inputBG,
   },
   link: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
-    color: theme.colors.inputBlue
+    color: theme.colors.inputBlue,
   },
   shareInvite: {
     width: 127,
     aspectRatio: 1,
-    alignSelf: "center"
-  }
-}))
-export default useStyles
+    alignSelf: "center",
+  },
+}));
+export default useStyles;

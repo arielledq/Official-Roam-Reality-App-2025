@@ -8,20 +8,20 @@ const useStyles = makeStyles(theme => ({
   },
   nameContainer: { flex: 1 },
   name: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH40,
   },
   name1: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH40,
     marginTop: 150,
   },
   userName: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     color: theme.colors.white,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH16,
@@ -35,7 +35,7 @@ const useStyles = makeStyles(theme => ({
     marginHorizontal: 5,
   },
   verificationStatus: {
-    ...fontGroup.p500,
+    ...fontGroup.nunitoRegular,
     color: theme.colors.yellow,
     fontSize: FontSizes.S10,
     lineHeight: FontLineHeights.LH14,
@@ -45,7 +45,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: "flex-end",
   },
   verifyNow: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.inputRed,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,

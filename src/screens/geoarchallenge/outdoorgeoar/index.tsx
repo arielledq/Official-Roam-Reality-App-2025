@@ -203,13 +203,13 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
     marginVertical: 8,
   },
   logoutText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH20,
     fontWeight: "400",
@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     height: 50,
   },
   cancelButtonText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     color: theme.darkColors?.inputBlue,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH20,
@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   buttonTitle: {
-    ...fontGroup.p600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     fontWeight: "600",
   },

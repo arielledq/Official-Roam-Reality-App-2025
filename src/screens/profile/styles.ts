@@ -27,7 +27,7 @@ const useStyles = makeStyles(theme => ({
     marginHorizontal: 5,
   },
   heading: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
     fontWeight: "800",
     lineHeight: FontLineHeights.LH30,
@@ -46,7 +46,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "center",
   },
   scoreboard: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     fontSize: FontSizes.S48,
     lineHeight: FontLineHeights.LH66,
@@ -76,7 +76,7 @@ const useStyles = makeStyles(theme => ({
     width: 112,
   },
   buttonText: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH16,
     marginLeft: 10,

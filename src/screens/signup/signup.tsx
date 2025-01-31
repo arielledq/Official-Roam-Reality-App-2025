@@ -65,7 +65,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={[_styles.headerText, { ...fontGroup.ns900 }]}>Sign up</AppText>
+      <AppText style={[_styles.headerText, { ...fontGroup.nunitoBold }]}>Sign up</AppText>
       <AppText style={_styles.subHeaderText}>
         Create an account to ROAM a new dimension with captivating AR experiences.
       </AppText>

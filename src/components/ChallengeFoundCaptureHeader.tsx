@@ -51,7 +51,7 @@ const ChallengeFoundCaptureHeader = ({
           <Text
             // @ts-ignore
             style={{
-              ...fontGroup.ns400,
+              ...fontGroup.nunitoRegular,
               fontSize: FontSizes.S12,
               color: theme.lightColors?.white,
               lineHeight: 13.64,
@@ -64,7 +64,7 @@ const ChallengeFoundCaptureHeader = ({
           <Text
             // @ts-ignore
             style={{
-              ...fontGroup.ns600,
+              ...fontGroup.nunitoBold,
               fontSize: FontSizes.S16,
               color: "#C881F0",
               textAlign: "center",
@@ -79,7 +79,7 @@ const ChallengeFoundCaptureHeader = ({
           <Text
             // @ts-ignore
             style={{
-              ...fontGroup.ns400,
+              ...fontGroup.nunitoRegular,
               fontSize: FontSizes.S12,
               color: theme.lightColors?.white,
               lineHeight: 13.64,
@@ -92,7 +92,7 @@ const ChallengeFoundCaptureHeader = ({
           <Text
             // @ts-ignore
             style={{
-              ...fontGroup.ns600,
+              ...fontGroup.nunitoBold,
               fontSize: FontSizes.S16,
               color: "#C881F0",
               textAlign: "center",

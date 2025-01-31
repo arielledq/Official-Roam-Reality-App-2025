@@ -102,7 +102,7 @@ const ForgotPassword: ScreenStackComponent<RootStackParamList, "ForgotPassword">
                 <View style={_styles.appIconContainer}>
                   <Image source={Images.AppIconCircle} />
                 </View>
-                <AppText style={[_styles.headerText, { ...fontGroup.ns800 }]}>
+                <AppText style={[_styles.headerText, { ...fontGroup.nunitoBold }]}>
                   Forgot Password ?
                 </AppText>
                 <AppText style={_styles.subHeaderText}>

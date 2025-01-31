@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   heading: {
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     marginTop: 5,
     textAlign: "center",
@@ -50,13 +50,13 @@ const useStyles = makeStyles(theme => ({
   },
 
   challengeSponsorName: {
-    ...fontGroup.p700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S20,
     color: theme.colors.white,
   },
 
   btnText: {
-    ...fontGroup.p600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     color: "#2B0143",
   },
@@ -67,7 +67,7 @@ const useStyles = makeStyles(theme => ({
   },
 
   descriptionText: {
-    ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     textAlign: "center",
     color: "#9CA3AF",

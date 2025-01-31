@@ -1,58 +1,56 @@
-import { makeStyles } from '@rneui/themed';
-import { screenHorizontalPadding } from '../../../util/AppDimensions';
-import { FontLineHeights, FontSizes, fontGroup } from '../../../util/FontUtils';
+import { makeStyles } from "@rneui/themed";
+import { screenHorizontalPadding } from "../../../util/AppDimensions";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(theme => ({
   container: {
     paddingHorizontal: screenHorizontalPadding,
     flex: 1,
-    marginTop: 40
+    marginTop: 40,
   },
   input: {
-    ...fontGroup.sf500,
+    ...fontGroup.nunitoRegular,
     height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
     backgroundColor: theme?.colors?.inputBG,
     marginVertical: -5,
-    color: theme?.colors?.white
+    color: theme?.colors?.white,
   },
   focusedInput: {
-    backgroundColor: theme.colors.inputBlue
+    backgroundColor: theme.colors.inputBlue,
   },
   inputError: {
-    backgroundColor: theme.colors.pink
+    backgroundColor: theme.colors.pink,
   },
   buttonContainer: { marginBottom: 10 },
   buttonStyle: { height: 50 },
   textbox: {
     height: 140,
     paddingTop: 20,
-    paddingLeft: 20
+    paddingLeft: 20,
   },
   scroll: {
-    flex: 1
+    flex: 1,
   },
   notShareBottomText: {
-    ...fontGroup.p700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S19,
-    textAlign: 'center',
+    textAlign: "center",
     color: "#DC2626",
     fontWeight: "700",
   },
   emergencyText: {
-    ...fontGroup.ns500,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     color: "#fff",
-    marginVertical:5
+    marginVertical: 5,
   },
   emergencyTextDes: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     color: "#fff",
-    marginBottom:10
+    marginBottom: 10,
   },
-})
-)
+}));
 export default useStyles;
-

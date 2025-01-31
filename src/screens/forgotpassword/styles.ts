@@ -1,6 +1,6 @@
-import { makeStyles } from "@rneui/themed"
-import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
+import { makeStyles } from "@rneui/themed";
+import { screenHorizontalPadding } from "../../util/AppDimensions";
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -14,64 +14,64 @@ const useStyles = makeStyles(theme => ({
   },
   formContainer: {
     paddingHorizontal: screenHorizontalPadding,
-    flex: 1
+    flex: 1,
   },
   appIconContainer: {
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH55,
-    color: theme.colors.white
+    color: theme.colors.white,
   },
   subHeaderText: {
-   ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
     marginTop: 10,
   },
   input: {
-   ...fontGroup.sf400,
+    ...fontGroup.nunitoRegular,
     height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
-    backgroundColor: theme?.colors?.inputBG
+    backgroundColor: theme?.colors?.inputBG,
   },
   buttonStyle: {
-    height: 50
+    height: 50,
   },
   buttonContainerStyle: {
-    marginBottom: '10%'
+    marginBottom: "10%",
   },
   otptext: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
     color: theme.colors.white,
   },
   resendButton: {
-    ...fontGroup.sf400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     color: theme.colors.inputBlue,
-    textDecorationLine: "underline"
+    textDecorationLine: "underline",
   },
   childView: { flex: 1 },
   scroll: { flex: 1 },
   alreadyHaveAccount: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.white,
-    marginBottom: 10
+    marginBottom: 10,
   },
   SignInLink: {
-    ...fontGroup.sf500,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S14,
     color: theme.colors.inputBlue,
   },
-}))
+}));
 
-export default useStyles
+export default useStyles;

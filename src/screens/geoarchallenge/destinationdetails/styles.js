@@ -11,7 +11,7 @@ const useStyles = makeStyles(theme => ({
   heading: {
     fontSize: FontSizes.S20,
     // lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     marginTop: 5,
     textAlign: "center",
@@ -23,23 +23,23 @@ const useStyles = makeStyles(theme => ({
   },
   container: { marginTop: "10%" },
   headerText: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
     color: theme.colors.white,
   },
   subHeaderText: {
-    ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     marginTop: 5,
   },
   pointsText: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
     color: theme.colors.white,
   },
   yourPointsText: {
-    ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     marginTop: 5,
@@ -90,13 +90,13 @@ const useStyles = makeStyles(theme => ({
     position: "relative",
   },
   list_title: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S26,
     color: theme.colors.white,
     marginTop: 5,
   },
   s_list_count: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
     alignItems: "center",
@@ -105,7 +105,7 @@ const useStyles = makeStyles(theme => ({
     top: 15,
   },
   s_list_text: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: 11,
     color: theme.colors.white,
     alignItems: "center",
@@ -121,12 +121,12 @@ const useStyles = makeStyles(theme => ({
   },
 
   selectionTextHeading: {
-    ...fontGroup.ns600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
   },
   selectionTextDetails: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S8,
     color: theme.colors.white,
   },

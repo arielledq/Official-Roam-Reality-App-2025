@@ -51,7 +51,7 @@ const SponsorBannerCaptureHeader = ({
             style={{
               fontSize: FontSizes.S20,
               color: theme.lightColors?.white,
-              ...fontGroup.p700,
+              ...fontGroup.nunitoBold,
             }}
           >
             {sponsorName}
@@ -72,7 +72,7 @@ const SponsorBannerCaptureHeader = ({
             style={{
               fontSize: FontSizes.S16,
               color: "#2B0143",
-              ...fontGroup.p600,
+              ...fontGroup.nunitoBold,
             }}
           >
             View Details

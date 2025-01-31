@@ -29,7 +29,7 @@ const useStyles = makeStyles(_theme => ({
     paddingBottom: 25,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S22,
     lineHeight: FontLineHeights.LH30,
     marginVertical: 0,
@@ -41,14 +41,14 @@ const useStyles = makeStyles(_theme => ({
     width: "70%",
   },
   challengesText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
     marginStart: 3,
   },
   subtitleText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,

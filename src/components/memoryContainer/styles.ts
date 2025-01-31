@@ -33,14 +33,14 @@ const useStyles = makeStyles(theme => ({
     gap: 4,
   },
   title: {
-    ...(fontGroup.ns800 as any),
+    ...(fontGroup.nunitoBold as any),
     fontSize: FontSizes.S12,
     fontWeight: 800,
     color: theme.colors.white,
   },
   description: {
     height: 32,
-    ...(fontGroup.sf500 as any),
+    ...(fontGroup.nunitoRegular as any),
     fontSize: FontSizes.S10,
     fontWeight: 500,
     lineHeight: FontLineHeights.LH12,

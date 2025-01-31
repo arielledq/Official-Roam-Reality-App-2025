@@ -1,42 +1,35 @@
-import React, { useState } from "react"
-import {
-  View,
-  StyleSheet,
-  Image,
-  Alert,
-  TouchableOpacity,
-  Pressable
-} from "react-native"
-import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer"
-import theme from "../../assets/theme"
-import { useNavigation } from "@react-navigation/native"
-import Images from "../../assets/images"
-import Icon from "../../components/Icon"
-import AppText from "../../components/text"
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils"
-import LinearGradient from "react-native-linear-gradient"
-import BackgroundWithImage from "../../components/background"
-import useStyles from "./styles"
-import { AppHeader } from "../../components"
+import React, { useState } from "react";
+import { View, StyleSheet, Image, Alert, TouchableOpacity, Pressable } from "react-native";
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
+import theme from "../../assets/theme";
+import { useNavigation } from "@react-navigation/native";
+import Images from "../../assets/images";
+import Icon from "../../components/Icon";
+import AppText from "../../components/text";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import LinearGradient from "react-native-linear-gradient";
+import BackgroundWithImage from "../../components/background";
+import useStyles from "./styles";
+import { AppHeader } from "../../components";
 
 const DrawerList = [
   { icon: "Folder", label: "Privacy Policy", navigateTo: "PrivacyPolicy" },
   {
     icon: "Folder",
     label: "Terms and Conditions",
-    navigateTo: "TermsAndConditions"
+    navigateTo: "TermsAndConditions",
   },
   {
     icon: "Folder",
     label: "End User Agreement",
-    navigateTo: "TermsAndConditions"
+    navigateTo: "TermsAndConditions",
   },
   {
     icon: "Folder",
     label: "Waiver",
-    navigateTo: "TermsAndConditions"
-  }
-]
+    navigateTo: "TermsAndConditions",
+  },
+];
 
 const DrawerLayout = ({ icon, label, navigateTo, index, onPress }) => {
   const renderDrawerItem = () => {
@@ -45,20 +38,15 @@ const DrawerLayout = ({ icon, label, navigateTo, index, onPress }) => {
         style={{
           flexDirection: "row",
           alignItems: "center",
-          justifyContent: "space-between"
+          justifyContent: "space-between",
         }}
       >
         <Icon name={icon} family={"custom"} color={"white"} size={20} />
         <AppText style={styles.Text}>{label}</AppText>
-        <Icon
-          name="chevron-right"
-          family="entypo"
-          color={theme.darkColors?.white}
-          size={20}
-        />
+        <Icon name="chevron-right" family="entypo" color={theme.darkColors?.white} size={20} />
       </View>
-    )
-  }
+    );
+  };
   return (
     <>
       {index === 0 ? (
@@ -73,16 +61,13 @@ const DrawerLayout = ({ icon, label, navigateTo, index, onPress }) => {
           </LinearGradient>
         </TouchableOpacity>
       ) : (
-        <TouchableOpacity
-          onPress={() => onPress(navigateTo)}
-          style={styles.linearGradient}
-        >
+        <TouchableOpacity onPress={() => onPress(navigateTo)} style={styles.linearGradient}>
           {renderDrawerItem()}
         </TouchableOpacity>
       )}
     </>
-  )
-}
+  );
+};
 
 const DrawerItems = ({ onPress }) => {
   return DrawerList.map((el, i) => {
@@ -95,13 +80,13 @@ const DrawerItems = ({ onPress }) => {
         index={i}
         onPress={v => onPress(el.navigateTo)}
       />
-    )
-  })
-}
+    );
+  });
+};
 function DrawerContent(props) {
-  const navigation = useNavigation()
-  const _styles = useStyles()
-  const onPressHandler = navigateTo => navigation.navigate(navigateTo)
+  const navigation = useNavigation();
+  const _styles = useStyles();
+  const onPressHandler = navigateTo => navigation.navigate(navigateTo);
 
   return (
     <>
@@ -114,31 +99,31 @@ function DrawerContent(props) {
         </View>
       </BackgroundWithImage>
     </>
-  )
+  );
 }
 
-export default DrawerContent
+export default DrawerContent;
 
 const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
-    paddingBottom: 20
+    paddingBottom: 20,
   },
   drawerSection: {
     marginTop: 15,
-    borderBottomWidth: 0
+    borderBottomWidth: 0,
   },
   Text: {
-    ...fontGroup.p600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,
     marginLeft: 10,
-    flex: 1
+    flex: 1,
   },
   checkIcon: {
     alignItems: "center",
-    justifyContent: "center"
+    justifyContent: "center",
   },
   linearGradient: {
     marginLeft: 20,
@@ -147,6 +132,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     justifyContent: "center",
-    alignItems: "flex-start"
-  }
-})
+    alignItems: "flex-start",
+  },
+});

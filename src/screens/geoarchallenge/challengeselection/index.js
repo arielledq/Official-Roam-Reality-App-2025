@@ -275,7 +275,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S26,
     lineHeight: FontLineHeights.LH35,
     marginVertical: 0,
@@ -286,7 +286,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   challengesText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
@@ -294,7 +294,7 @@ const styles = StyleSheet.create({
     color: theme.lightColors?.white,
   },
   subtitleText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,

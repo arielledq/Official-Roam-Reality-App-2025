@@ -82,7 +82,7 @@ const Privacy = () => {
       <AppHeader title={"Privacy"} backgroundColor="transparent" />
       <AppText
         style={{
-          ...fontGroup.ns400,
+          ...fontGroup.nunitoRegular,
           fontSize: FontSizes.S20,
           marginLeft: 25,
           paddingVertical: 10,
@@ -122,7 +122,7 @@ const Privacy = () => {
       />
       {/* <AppText
         style={{
-          ...fontGroup.ns400,
+          ...fontGroup.nunitoRegular,
           fontSize: FontSizes.S20,
           marginLeft: 25,
           marginTop: 10
@@ -135,7 +135,7 @@ const Privacy = () => {
           Linking.openSettings()
         }}
         style={{
-          ...fontGroup.ns400,
+          ...fontGroup.nunitoRegular,
           fontSize: FontSizes.S16,
           marginTop: 10,
           color: theme?.lightColors?.yellow,
@@ -158,7 +158,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme?.colors?.inputBG,
   },
   text: {
-    ...fontGroup.ns600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,

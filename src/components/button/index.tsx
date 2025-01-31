@@ -1,15 +1,10 @@
-import { Button } from "@rneui/themed"
-import React, { FC } from "react"
-import { StyleSheet } from "react-native"
-import theme from "../../assets/theme"
-import {
-  FontFamily,
-  FontLineHeights,
-  FontSizes,
-  fontGroup
-} from "../../util/FontUtils"
-import { ButtonProps } from "./type"
-import LinearGradient from "react-native-linear-gradient"
+import { Button } from "@rneui/themed";
+import React, { FC } from "react";
+import { StyleSheet } from "react-native";
+import theme from "../../assets/theme";
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import { ButtonProps } from "./type";
+import LinearGradient from "react-native-linear-gradient";
 
 const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
   const {
@@ -18,10 +13,10 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     containerStyle = {},
     customColors,
     ...otherProps
-  } = props
+  } = props;
 
-  const defaultColors = ["#B816E0", "#1158F4", "#9003E0"]
-  const colors = customColors || defaultColors
+  const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
+  const colors = customColors || defaultColors;
   return (
     <LinearGradient
       colors={colors}
@@ -38,23 +33,23 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
         {...otherProps}
       />
     </LinearGradient>
-  )
-}
+  );
+};
 
-const BORDER_RADIUS = 8
+const BORDER_RADIUS = 8;
 
 const styles = StyleSheet.create({
   buttonStyle: {
     borderRadius: BORDER_RADIUS,
-    backgroundColor: "transparent"
+    backgroundColor: "transparent",
   },
   titleStyle: {
     fontSize: FontSizes.S18,
-    ...fontGroup.sf400,
+    ...fontGroup.nunitoRegular,
     lineHeight: FontLineHeights.LH20,
-    color: theme.darkColors?.white
+    color: theme.darkColors?.white,
   },
-  containerStyle: { borderRadius: BORDER_RADIUS }
-})
+  containerStyle: { borderRadius: BORDER_RADIUS },
+});
 
-export default AppButton
+export default AppButton;

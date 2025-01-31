@@ -66,7 +66,7 @@ const ChallengeScreen = ({
               lineHeight: FontLineHeights.LH20,
               color: theme.lightColors?.white,
               textAlign: "center",
-              ...fontGroup.ns700,
+              ...fontGroup.nunitoBold,
             },
           }}
           centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}

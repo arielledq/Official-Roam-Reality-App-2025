@@ -341,7 +341,7 @@ const ArChallengeShare = () => {
               ></BackgroundWithImage>
               <AppText
                 style={{
-                  ...fontGroup.p900,
+                  ...fontGroup.nunitoBold,
                   fontWeight: "900",
                   fontSize: FontSizes.S24,
                   color: theme.lightColors?.white,
@@ -352,7 +352,7 @@ const ArChallengeShare = () => {
               </AppText>
               <AppText
                 style={{
-                  ...fontGroup.p400,
+                  ...fontGroup.nunitoRegular,
                   fontWeight: "400",
                   fontSize: FontSizes.S10,
                   color: theme.lightColors?.white,
@@ -365,7 +365,7 @@ const ArChallengeShare = () => {
             <AppText
               numberOfLines={3}
               style={{
-                ...fontGroup.ns900,
+                ...fontGroup.nunitoBold,
                 fontWeight: "900",
                 fontSize: FontSizes.S18,
                 color: theme.lightColors?.white,
@@ -434,7 +434,7 @@ const ArChallengeShare = () => {
             <Image style={{ width: 20, height: 20, marginEnd: 8 }} source={{ uri: sponsorImage }} />
             <Text
               style={{
-                ...fontGroup.p700,
+                ...fontGroup.nunitoBold,
                 fontWeight: "700",
                 fontSize: FontSizes.S20,
                 color: theme.lightColors?.white,
@@ -448,7 +448,7 @@ const ArChallengeShare = () => {
           {!isMemory && challengeTitle && (
             <Text
               style={{
-                ...fontGroup.p300,
+                ...fontGroup.nunitoLight,
                 fontWeight: "300",
                 fontSize: FontSizes.S10,
                 color: theme.lightColors?.white,

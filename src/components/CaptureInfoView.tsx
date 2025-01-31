@@ -98,7 +98,7 @@ const $challengeInfoHeaderContainer: ViewStyle = {
 
 // @ts-ignore
 const $challengeInfoHeader: TextStyle = {
-  ...fontGroup.ns700,
+  ...fontGroup.nunitoBold,
   fontSize: FontSizes.S18,
   color: theme.lightColors?.white,
   marginTop: 10,
@@ -113,7 +113,7 @@ const $buttonContainerStyle: ViewStyle = {
 };
 
 const $bottomText: TextStyle = {
-  ...fontGroup.p700,
+  ...fontGroup.nunitoBold,
   fontSize: FontSizes.S18,
   textAlign: "center",
   color: "#1158F4",

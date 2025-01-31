@@ -16,7 +16,7 @@ const useStyles = makeStyles(theme => ({
   heading: {
     fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontWeight: "700",
     color: theme.colors.white,
     marginTop: 5,
@@ -51,7 +51,7 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: 25,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontWeight: "700",
     fontSize: FontSizes.S26,
     lineHeight: FontLineHeights.LH35,
@@ -64,7 +64,7 @@ const useStyles = makeStyles(theme => ({
     width: "70%",
   },
   challengesText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontWeight: "800",
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
@@ -72,7 +72,7 @@ const useStyles = makeStyles(theme => ({
     marginStart: 3,
   },
   subtitleText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontWeight: "400",
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,

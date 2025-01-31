@@ -10,7 +10,7 @@ const useStyles = makeStyles(theme => ({
   },
   chidlView: { flex: 1 },
   input: {
-    ...fontGroup.sf500,
+    ...fontGroup.nunitoRegular,
     height: 50,
     paddingHorizontal: 20,
     borderRadius: 6,
@@ -33,13 +33,13 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme?.colors?.inputBG,
   },
   subHeaderText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S18,
     color: theme.colors.white,
     paddingLeft: 20,
   },
   text: {
-    ...fontGroup.ns300,
+    ...fontGroup.nunitoLight,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
     paddingLeft: 10,
@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: theme?.colors?.inputBG,
   },
   link: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     color: theme.colors.inputBlue,
   },
@@ -77,7 +77,7 @@ const useStyles = makeStyles(theme => ({
     aspectRatio: 1,
   },
   linkText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     color: theme.colors.white,
     paddingLeft: 10,

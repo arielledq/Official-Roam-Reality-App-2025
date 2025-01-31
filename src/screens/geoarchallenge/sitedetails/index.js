@@ -370,19 +370,19 @@ const GeoArSiteDetails = ({ route }) => {
             contentWidth={width}
             tagsStyles={{
               p: {
-                ...fontGroup.ns500,
+                ...fontGroup.nunitoRegular,
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S12,
               },
               strong: {
-                ...fontGroup.ns500,
+                ...fontGroup.nunitoRegular,
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S14,
               },
               span: {
-                ...fontGroup.ns500,
+                ...fontGroup.nunitoRegular,
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S12,
