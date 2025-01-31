@@ -55,10 +55,10 @@ const useStyles = makeStyles(_theme => ({
     marginStart: 3,
   },
   containerStyle: {
-    marginTop: 140,
+    paddingTop: 140,
+    paddingBottom: 60,
   },
   list: {
-    marginBottom: 80,
     flex: 1,
   },
   blurView: {
