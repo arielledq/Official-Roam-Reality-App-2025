@@ -175,7 +175,7 @@ class ARMemoriesViewSet(ViewSet):
             )
         results = ARSitePinCheckIn.objects.filter(
             user=user_id,
-            challenges=geo_challenge_id,
+            geo_challenge=geo_challenge_id,
             geo_site=geo_site_id,
         )
 
