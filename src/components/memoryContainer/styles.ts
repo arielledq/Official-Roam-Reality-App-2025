@@ -1,13 +1,13 @@
-import { makeStyles } from '@rneui/themed'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
+import { makeStyles } from "@rneui/themed";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 const useStyles = makeStyles(theme => ({
   cardWrapper: {
     width: 115,
 
-    alignContent: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
 
     backgroundColor: theme.colors.boxStatBG,
     borderRadius: 12,
@@ -19,9 +19,9 @@ const useStyles = makeStyles(theme => ({
     gap: 4,
   },
   cardContainer: {
-    justifyContent: 'center',
-    alignContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignContent: "center",
+    alignItems: "center",
     gap: 4,
   },
   cardImage: {
@@ -42,10 +42,10 @@ const useStyles = makeStyles(theme => ({
     height: 32,
     ...(fontGroup.sf500 as any),
     fontSize: FontSizes.S10,
-    fontWeight: 800,
+    fontWeight: 500,
     lineHeight: FontLineHeights.LH12,
-    color: theme.colors.TandCgrey,
+    color: theme.colors.white,
   },
-}))
+}));
 
-export default useStyles
+export default useStyles;
