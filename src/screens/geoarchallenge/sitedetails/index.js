@@ -30,6 +30,7 @@ import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
+import Icon from "components/Icon";
 
 const GeoArSiteDetails = ({ route }) => {
   const experience_type = route.params?.experience_type;
@@ -292,6 +293,7 @@ const GeoArSiteDetails = ({ route }) => {
               height: 213,
               borderRadius: 12,
               overflow: "hidden",
+              position: "relative",
             }}
             source={{ uri: selectedGeoSite.image }}
             resizeMode="cover"
@@ -308,6 +310,42 @@ const GeoArSiteDetails = ({ route }) => {
                 width: "110%",
               }}
             />
+            <View
+              style={{
+                position: "absolute",
+                top: 10,
+                left: 10,
+                backgroundColor: "#fff",
+                opacity: 0.9,
+                borderRadius: 32,
+                flexDirection: "row",
+                paddingHorizontal: 16,
+                gap: 4,
+                alignItems: "center",
+                height: 40,
+              }}
+            >
+              <Text style={{ fontSize: 12, color: "black" }}>My Check-ins:</Text>
+              <Text style={{ fontSize: 12, fontWeight: "bold", color: "purple" }}>1/3</Text>
+            </View>
+            <View
+              style={{
+                position: "absolute",
+                top: 10,
+                right: 10,
+                backgroundColor: "#fff",
+                opacity: 0.9,
+                borderRadius: 32,
+                flexDirection: "row",
+                paddingHorizontal: 16,
+                gap: 8,
+                alignItems: "center",
+                height: 40,
+              }}
+            >
+              <Text style={{ fontSize: 12, color: "black" }}>{`<1h cooldown`}</Text>
+              <Icon name="clockcircleo" family="antdesign" size={20} color="purple" />
+            </View>
           </ImageBackground>
           <Text style={_styles.site_d_header}>{selectedGeoSite.name}</Text>
           <Text style={_styles.site_d_text}>{address}</Text>

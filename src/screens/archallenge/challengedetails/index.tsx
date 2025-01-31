@@ -157,24 +157,42 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           <Text style={styles.pointCount}>{challengeObj.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
         </View>
-        <View style={{ paddingHorizontal: 10, flex: 1 }}>
-          <View style={{ flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flex: 1, justifyContent: "center", padding: 8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <Image
-              style={{ width: 24, height: 24, marginEnd: 10 }}
+              style={{ width: 24, height: 24 }}
               source={{ uri: challengeObj.sponsored.image }}
             />
             <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
           </View>
-          <View style={{ marginTop: 10, justifyContent: "space-between", width: "100%" }}>
-            <Text style={styles.challengeSponsorStartDateText}>
-              Started on: <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text>
-            </Text>
-            <Text style={styles.challengeSponsorStartDateText}>
-              Ends on:{" "}
-              <Text style={styles.challengeSponsorStartDateTextValue}>
-                {challengeObj.expiry_date ? expiryDate : "None"}
+          <View
+            style={{
+              flex: 1,
+              flexDirection: "row",
+              gap: 24,
+              alignItems: "center",
+            }}
+          >
+            <View style={{ gap: 2 }}>
+              <Text style={styles.challengeSponsorStartDateText}>
+                Started on:{" "}
+                <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text>
               </Text>
-            </Text>
+              <Text style={styles.challengeSponsorStartDateText}>
+                Ends on:{" "}
+                <Text style={styles.challengeSponsorStartDateTextValue}>
+                  {challengeObj.expiry_date ? expiryDate : "None"}
+                </Text>
+              </Text>
+            </View>
+            <View style={{ gap: 2 }}>
+              <Text style={styles.challengeSponsorStartDateText}>
+                My Check-ins: <Text style={styles.challengeSponsorStartDateTextValue}>{`1/3`}</Text>
+              </Text>
+              <Text style={styles.challengeSponsorStartDateText}>
+                Cooldown: <Text style={styles.challengeSponsorStartDateTextValue}>{`<1h`}</Text>
+              </Text>
+            </View>
           </View>
         </View>
       </View>
