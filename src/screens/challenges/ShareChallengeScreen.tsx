@@ -367,7 +367,7 @@ const ArChallengeShare = () => {
               style={{
                 ...fontGroup.ns900,
                 fontWeight: "900",
-                fontSize: FontSizes.S20,
+                fontSize: FontSizes.S18,
                 color: theme.lightColors?.white,
                 flex: 1,
               }}
@@ -404,7 +404,7 @@ const ArChallengeShare = () => {
                 flex: 1,
                 justifyContent: "flex-end",
                 alignItems: "flex-end",
-                width: "100%",
+                width: "60%",
               }}
               source={{
                 uri: capturedDataUri,
@@ -416,7 +416,7 @@ const ArChallengeShare = () => {
               source={{ uri: capturedDataUri }}
               style={{
                 backgroundColor: "transparent",
-                width: "70%",
+                width: "60%",
                 flex: 1,
               }}
             />
@@ -493,14 +493,14 @@ const ArChallengeShare = () => {
             <AppButton
               onPress={shareToSocialMediaButtonHandler}
               containerStyle={{ flex: 1, justifyContent: "center" }}
-              titleStyle={{ fontSize: FontSizes.S16 }}
+              titleStyle={{ fontSize: FontSizes.S16, fontWeight: "bold" }}
               title={"Share To Socials"}
             />
 
             <AppButton
               onPress={checkPermission}
               containerStyle={{ flex: 1, justifyContent: "center" }}
-              titleStyle={{ fontSize: FontSizes.S16 }}
+              titleStyle={{ fontSize: FontSizes.S16, fontWeight: "bold" }}
               title={"Save Image"}
             />
           </View>
@@ -525,6 +525,7 @@ const ArChallengeShare = () => {
             onPress={endShareProfileButtonHandler}
             buttonStyle={{ height: 55 }}
             containerStyle={{}}
+            titleStyle={{ fontSize: FontSizes.S18, fontWeight: "bold" }}
             title={endChallengeButtonText}
             loading={isLoading}
           />
