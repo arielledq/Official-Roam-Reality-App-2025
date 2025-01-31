@@ -22,6 +22,8 @@ const GeoArSiteArrived = ({ route }) => {
   const isStarChallenge = !!starChallengeObj?.id;
 
   const experience_type = route.params?.experience_type;
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
 
@@ -49,6 +51,8 @@ const GeoArSiteArrived = ({ route }) => {
     } else {
       navigation.navigate("ChallengeSelection", {
         experience_type: experience_type,
+        coolDown,
+        checkIns,
       });
     }
   };

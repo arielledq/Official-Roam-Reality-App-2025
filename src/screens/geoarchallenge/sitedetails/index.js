@@ -25,7 +25,7 @@ import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
 import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
-import { getAllARSitesStars } from "../../../network";
+import { checkUniqueARChallengeDoneAPI, getAllARSitesStars } from "../../../network";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
@@ -39,6 +39,8 @@ const GeoArSiteDetails = ({ route }) => {
   const [showProTips, setShowProTips] = useState(false);
   const [address, setAddress] = useState(null);
   const [starsCount, setStarsCount] = useState(0);
+  const [coolDownFinished, setCoolDownFinished] = useState(false);
+  const [coolDownHoursText, setCoolDownHoursText] = useState("");
 
   const selectedDestination = useSelector(state => state.ar?.selectedDestination);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
@@ -47,6 +49,61 @@ const GeoArSiteDetails = ({ route }) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
+  const checkIfChallengeIsDone = () => {
+    setIsLoading(true);
+
+    checkUniqueARChallengeDoneAPI({
+      geo_challenge: selectedGeoSite.pin_challenge.id,
+      geo_site: selectedGeoSite.id,
+    })
+      .then(res => {
+        if (res?.message?.message && res?.message?.remaining) {
+          const timeString = res?.message?.remaining;
+          // Split the string into hours, minutes, seconds, and milliseconds
+          const [hours, minutes, seconds] = timeString.split(/[:.]/);
+
+          // Convert to a Date object (assuming today's date)
+          const date = new Date();
+          date.setHours(hours, minutes, seconds);
+
+          // Extract the time in hours (24-hour format)
+          const hoursOnly = date.getHours();
+          const minutesOnly = date.getMinutes();
+          const secondsOnly = date.getSeconds();
+
+          // setCoolDownHours(hoursOnly);
+
+          let coolDownHasFinished = false;
+          if (hoursOnly === 0 && minutesOnly === 0 && secondsOnly === 0) {
+            coolDownHasFinished = true;
+            setCoolDownFinished(coolDownHasFinished);
+          }
+
+          let remainingText = "";
+
+          if (hoursOnly >= 1) {
+            remainingText = `${hoursOnly}h`;
+          } else {
+            remainingText = `<1h`;
+          }
+          if (coolDownHasFinished) {
+            remainingText = `0h`;
+          }
+          setCoolDownHoursText(remainingText);
+        }
+        // if (res.errorStatus == 403) {
+        //   setIsChallengeDone(true);
+        // } else {
+        //   setIsChallengeDone(false);
+        // }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
+  // console.log("coolDownHours", coolDownHours, coolDownFinished);
 
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
@@ -186,7 +243,14 @@ const GeoArSiteDetails = ({ route }) => {
     //   console.error('There was an error sending the notification to friends:', error)
     // }
 
-    navigation.navigate("GeoArSiteRoutes", { experience_type });
+    navigation.navigate("GeoArSiteRoutes", {
+      experience_type,
+      coolDown: {
+        coolDownFinished,
+        coolDownHoursText,
+      },
+      checkIns: "",
+    });
   };
 
   const initialRegion = {
@@ -209,6 +273,7 @@ const GeoArSiteDetails = ({ route }) => {
   useEffect(() => {
     getAddress();
     geoARSitesStars();
+    checkIfChallengeIsDone();
   }, []);
 
   useEffect(() => {
@@ -310,11 +375,11 @@ const GeoArSiteDetails = ({ route }) => {
                 width: "110%",
               }}
             />
-            <View
+            {/* <View
               style={{
                 position: "absolute",
-                top: 10,
-                left: 10,
+                top: 60,
+                right: 10,
                 backgroundColor: "#fff",
                 opacity: 0.9,
                 borderRadius: 32,
@@ -327,7 +392,7 @@ const GeoArSiteDetails = ({ route }) => {
             >
               <Text style={{ fontSize: 12, color: "black" }}>My Check-ins:</Text>
               <Text style={{ fontSize: 12, fontWeight: "bold", color: "purple" }}>1/3</Text>
-            </View>
+            </View> */}
             <View
               style={{
                 position: "absolute",
@@ -343,7 +408,9 @@ const GeoArSiteDetails = ({ route }) => {
                 height: 40,
               }}
             >
-              <Text style={{ fontSize: 12, color: "black" }}>{`<1h cooldown`}</Text>
+              <Text
+                style={{ fontSize: 12, color: "black" }}
+              >{`${coolDownHoursText} cool down`}</Text>
               <Icon name="clockcircleo" family="antdesign" size={20} color="purple" />
             </View>
           </ImageBackground>

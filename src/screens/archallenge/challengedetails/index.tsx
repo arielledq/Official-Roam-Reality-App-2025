@@ -29,6 +29,12 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   route,
 }) => {
   const experience_type = route.params?.experience_type;
+  // coolDown: {
+  //   coolDownFinished,
+  //   coolDownHoursText,
+  // },
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
   let challengeObj = route?.params?.challengeObj;
 
   switch (experience_type) {
@@ -186,11 +192,15 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               </Text>
             </View>
             <View style={{ gap: 2 }}>
+              {/* <Text style={styles.challengeSponsorStartDateText}>
+                My Check-ins:{" "}
+                <Text style={styles.challengeSponsorStartDateTextValue}>{checkIns}</Text>
+              </Text> */}
               <Text style={styles.challengeSponsorStartDateText}>
-                My Check-ins: <Text style={styles.challengeSponsorStartDateTextValue}>{`1/3`}</Text>
-              </Text>
-              <Text style={styles.challengeSponsorStartDateText}>
-                Cooldown: <Text style={styles.challengeSponsorStartDateTextValue}>{`<1h`}</Text>
+                Cooldown:{" "}
+                <Text style={styles.challengeSponsorStartDateTextValue}>
+                  {coolDown.coolDownHoursText}
+                </Text>
               </Text>
             </View>
           </View>

@@ -103,6 +103,8 @@ type MapCoords = {
 // Navigation Step 2
 const GeoArSiteNavigation = ({ route }) => {
   const experience_type = route.params?.experience_type;
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
 
   const [mileDistance, setMileDistance] = useState(0);
   const [durationMins, setDurationMins] = useState(0);
@@ -208,6 +210,8 @@ const GeoArSiteNavigation = ({ route }) => {
     navigation.replace("GeoArSiteArrived", {
       starsChallenge: starChallengeObj,
       experience_type: experience_type,
+      coolDown,
+      checkIns,
     });
   };
 

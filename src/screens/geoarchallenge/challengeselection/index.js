@@ -59,6 +59,8 @@ const HomeScreenData = [
 
 const ChallengeSelection = ({ route }) => {
   const experience_type = route.params?.experience_type;
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
 
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
@@ -148,6 +150,8 @@ const ChallengeSelection = ({ route }) => {
         navigation.navigate("ChallengeDetails", {
           challengeObj: selectedGeoSite,
           experience_type: experience_type,
+          coolDown,
+          checkIns,
         });
 
         break;
