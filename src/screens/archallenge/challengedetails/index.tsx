@@ -33,7 +33,10 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   //   coolDownFinished,
   //   coolDownHoursText,
   // },
-  const coolDown = route.params?.coolDown;
+  const coolDown = route.params?.coolDown || {
+    coolDownFinished: true,
+    coolDownHoursText: "0h",
+  };
   const checkIns = route.params?.checkIns;
   let challengeObj = route?.params?.challengeObj;
 

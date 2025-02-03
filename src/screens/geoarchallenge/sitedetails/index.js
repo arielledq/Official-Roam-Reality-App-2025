@@ -72,8 +72,6 @@ const GeoArSiteDetails = ({ route }) => {
           const minutesOnly = date.getMinutes();
           const secondsOnly = date.getSeconds();
 
-          // setCoolDownHours(hoursOnly);
-
           let coolDownHasFinished = false;
           if (hoursOnly === 0 && minutesOnly === 0 && secondsOnly === 0) {
             coolDownHasFinished = true;
@@ -91,19 +89,15 @@ const GeoArSiteDetails = ({ route }) => {
             remainingText = `0h`;
           }
           setCoolDownHoursText(remainingText);
+        } else {
+          setCoolDownFinished(true);
+          setCoolDownHoursText("0h");
         }
-        // if (res.errorStatus == 403) {
-        //   setIsChallengeDone(true);
-        // } else {
-        //   setIsChallengeDone(false);
-        // }
       })
       .finally(() => {
         setIsLoading(false);
       });
   };
-
-  // console.log("coolDownHours", coolDownHours, coolDownFinished);
 
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
