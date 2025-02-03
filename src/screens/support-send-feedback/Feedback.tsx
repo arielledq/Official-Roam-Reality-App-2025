@@ -108,8 +108,8 @@ const Feedback = () => {
                     onSubmitEditing={Keyboard.dismiss}
                     placeholderTextColor={
                       (touched.title && errors?.title) || isTitleFocused
-                        ? theme.darkColors?.white
-                        : theme.darkColors?.grey
+                        ? theme.lightColors?.white
+                        : theme.lightColors?.grey0
                     }
                     value={values.title}
                     onChangeText={handleChange("title")}
@@ -132,8 +132,8 @@ const Feedback = () => {
                     maxLength={500}
                     placeholderTextColor={
                       (touched.description && errors?.description) || isDescInputFocused
-                        ? theme.darkColors?.white
-                        : theme.darkColors?.grey
+                        ? theme.lightColors?.white
+                        : theme.lightColors?.grey0
                     }
                     value={values.description}
                     onChangeText={handleChange("description")}

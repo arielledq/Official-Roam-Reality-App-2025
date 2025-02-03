@@ -25,7 +25,7 @@ const useStyles = makeStyles(theme => ({
   },
   answer: {
     ...fontGroup.nunitoRegular,
-    color: theme.colors.grey,
+    color: theme.colors.grey0,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH24,
     marginBottom: 20,

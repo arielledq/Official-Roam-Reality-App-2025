@@ -284,8 +284,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                       onSubmitEditing={Keyboard.dismiss}
                       placeholderTextColor={
                         (touched.name && errors?.name) || isNameInputFocused
-                          ? theme.darkColors?.white
-                          : theme.darkColors?.grey
+                          ? theme.lightColors?.white
+                          : theme.lightColors?.grey0
                       }
                       value={values.name}
                       onChangeText={e => handleInputName(e)}
@@ -297,8 +297,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                           family="feather"
                           color={
                             (touched.name && errors?.name) || isNameInputFocused
-                              ? theme.darkColors?.white
-                              : theme.darkColors?.TandCgrey
+                              ? theme.lightColors?.white
+                              : theme.lightColors?.grey0
                           }
                           size={24}
                         />
@@ -317,8 +317,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                           color:
                             // (touched.gender && errors?.gender && !gender) ||
                             isGenderDropDownFocused
-                              ? theme.darkColors?.white
-                              : theme.darkColors?.grey,
+                              ? theme.lightColors?.white
+                              : theme.lightColors?.grey0,
                           marginStart: 13,
                           fontSize: FontSizes.S14,
                           opacity: 1,
@@ -333,7 +333,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                         onBlur={() => {
                           setGenderDropDownFocused(false);
                         }}
-                        activeColor={theme.darkColors?.inputBG}
+                        activeColor={theme.lightColors?.inputBG}
                         itemContainerStyle={_styles.itemContainerStyle}
                         itemTextStyle={_styles.placeholderStyle}
                         selectedTextStyle={_styles.selectedTextStyle}
@@ -358,8 +358,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                             color={
                               // (touched.gender && errors?.gender && !gender) ||
                               isGenderDropDownFocused
-                                ? theme.darkColors?.white
-                                : theme.darkColors?.TandCgrey
+                                ? theme.lightColors?.white
+                                : theme.lightColors?.grey0
                             }
                             size={24}
                           />
@@ -381,8 +381,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                       placeholder="Mobile Number"
                       placeholderTextColor={
                         (touched.phoneNumber && errors?.phoneNumber) || isMobileInputFocused
-                          ? theme.darkColors?.white
-                          : theme.darkColors?.grey
+                          ? theme.lightColors?.white
+                          : theme.lightColors?.grey0
                       }
                       selectionColor={"white"}
                       value={values.phoneNumber}
@@ -399,8 +399,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                           family="feather"
                           color={
                             (touched.phoneNumber && errors?.phoneNumber) || isMobileInputFocused
-                              ? theme.darkColors?.white
-                              : theme.darkColors?.TandCgrey
+                              ? theme.lightColors?.white
+                              : theme.lightColors?.grey0
                           }
                           size={24}
                         />
@@ -417,8 +417,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                       onSubmitEditing={Keyboard.dismiss}
                       placeholderTextColor={
                         (touched.address && errors?.address) || isAddressInputFocused
-                          ? theme.darkColors?.white
-                          : theme.darkColors?.grey
+                          ? theme.lightColors?.white
+                          : theme.lightColors?.grey0
                       }
                       selectionColor={"white"}
                       placeholder="Hometown"
@@ -432,8 +432,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                           family="feather"
                           color={
                             (touched.address && errors?.address) || isAddressInputFocused
-                              ? theme.darkColors?.white
-                              : theme.darkColors?.TandCgrey
+                              ? theme.lightColors?.white
+                              : theme.lightColors?.grey0
                           }
                           size={24}
                         />
@@ -451,8 +451,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                           color:
                             (touched.country && errors?.country && !country) ||
                             isCountryDropDownFocused
-                              ? theme.darkColors?.white
-                              : theme.darkColors?.grey,
+                              ? theme.lightColors?.white
+                              : theme.lightColors?.grey0,
                           marginStart: 13,
                           fontSize: FontSizes.S14,
                           opacity: 1,
@@ -467,7 +467,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                         onBlur={() => {
                           setCountryDropDownFocused(false);
                         }}
-                        activeColor={theme.darkColors?.inputBG}
+                        activeColor={theme.lightColors?.inputBG}
                         itemContainerStyle={_styles.itemContainerStyle}
                         itemTextStyle={_styles.placeholderStyle}
                         selectedTextStyle={_styles.selectedTextStyle}
@@ -490,8 +490,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                             color={
                               (touched.country && errors?.country && !country) ||
                               isCountryDropDownFocused
-                                ? theme.darkColors?.white
-                                : theme.darkColors?.TandCgrey
+                                ? theme.lightColors?.white
+                                : theme.lightColors?.grey0
                             }
                             size={24}
                           />
@@ -518,9 +518,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                             family="feather"
                             color={
                               // touched.dob && errors?.dob && !bDate
-                              //   ? theme.darkColors?.white
+                              //   ? theme.lightColors?.white
                               //   :
-                              theme.darkColors?.TandCgrey
+                              theme.lightColors?.grey0
                             }
                             size={24}
                           />
@@ -557,9 +557,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                           family="feather"
                           color={
                             // touched.dob && errors?.dob && !bDate
-                            //   ? theme.darkColors?.white
+                            //   ? theme.lightColors?.white
                             //   :
-                            theme.darkColors?.TandCgrey
+                            theme.lightColors?.grey0
                           }
                           size={24}
                         />

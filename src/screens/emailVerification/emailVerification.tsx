@@ -106,7 +106,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
                   inputContainerStyle={[_styles.input]}
                   containerStyle={{ marginTop: 20 }}
                   placeholder={"Email Verification code"}
-                  placeholderTextColor={theme.darkColors?.grey}
+                  placeholderTextColor={theme.lightColors?.grey0}
                   value={values.code}
                   autoCapitalize="none"
                   onChangeText={handleChange("code")}

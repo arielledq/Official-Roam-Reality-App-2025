@@ -113,7 +113,7 @@ const ForgotPassword: ScreenStackComponent<RootStackParamList, "ForgotPassword">
                   inputContainerStyle={[_styles.input]}
                   containerStyle={{ marginBottom: -10, marginTop: 10 }}
                   placeholder={placeholderText}
-                  placeholderTextColor={theme.darkColors?.grey}
+                  placeholderTextColor={theme.lightColors?.grey0}
                   value={values.input}
                   autoCapitalize="none"
                   onChangeText={handleChange("input")}

@@ -68,7 +68,7 @@ const useStyles = makeStyles(theme => ({
   },
   placeholderStyle: {
     ...fontGroup.nunitoRegular,
-    color: theme.colors.grey,
+    color: theme.colors.grey0,
     marginStart: 3,
     fontSize: FontSizes.S14,
     opacity: 1,
@@ -83,12 +83,12 @@ const useStyles = makeStyles(theme => ({
   timeteststyle: {
     ...fontGroup.nunitoRegular,
     marginStart: 3,
-    color: theme.colors.grey,
+    color: theme.colors.grey0,
     fontSize: FontSizes.S14,
     opacity: 1,
   },
   itemContainerStyle: {
-    color: theme.colors.grey,
+    color: theme.colors.grey0,
     backgroundColor: theme.colors.inputBG,
     borderRadius: 6,
   },
@@ -107,7 +107,7 @@ const useStyles = makeStyles(theme => ({
   },
   privacyText: {
     ...fontGroup.nunitoRegular,
-    color: theme.colors.grey,
+    color: theme.colors.grey0,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
   },

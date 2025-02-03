@@ -22,7 +22,7 @@ const useStyles = makeStyles(theme => ({
   },
   userName: {
     ...fontGroup.nunitoRegular,
-    color: theme.colors.grey,
+    color: theme.colors.grey0,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH16,
   },

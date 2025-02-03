@@ -77,7 +77,7 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                     secureTextEntry={oldpasswordVisibility}
                     placeholder="Old Password"
                     onSubmitEditing={Keyboard.dismiss}
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     value={values.oldPassword}
                     onChangeText={handleChange("oldPassword")}
                     onBlur={handleBlur("oldPassword")}
@@ -96,7 +96,7 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         size={23}
                       />
                     }
-                    leftIcon={<Icon name={"lock"} family="feather" color={"grey"} size={24} />}
+                    leftIcon={<Icon name={"lock"} family="feather" color={"grey0"} size={24} />}
                   />
                   <AppInput
                     inputContainerStyle={[_styles.input]}
@@ -104,7 +104,7 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                     containerStyle={{ marginBottom: -10 }}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="Password"
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     value={values.newPassword}
                     onChangeText={handleChange("newPassword")}
                     onBlur={handleBlur("newPassword")}
@@ -123,13 +123,13 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         size={23}
                       />
                     }
-                    leftIcon={<Icon name={"lock"} family="feather" color={"grey"} size={24} />}
+                    leftIcon={<Icon name={"lock"} family="feather" color={"grey0"} size={24} />}
                   />
                   <AppInput
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={confirmnewpasswordVisibility}
                     onSubmitEditing={Keyboard.dismiss}
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     placeholder="Confirm Password"
                     value={values.confirmnewPassword}
                     onChangeText={handleChange("confirmnewPassword")}
@@ -151,7 +151,7 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         size={23}
                       />
                     }
-                    leftIcon={<Icon name={"lock"} family="feather" color={"grey"} size={24} />}
+                    leftIcon={<Icon name={"lock"} family="feather" color={"grey0"} size={24} />}
                   />
                 </View>
 

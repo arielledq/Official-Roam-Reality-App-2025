@@ -65,7 +65,7 @@ const InAppUsers = () => {
           selectionColor={"white"}
           placeholder="Search for a friend"
           onSubmitEditing={Keyboard.dismiss}
-          placeholderTextColor={theme.darkColors?.grey}
+          placeholderTextColor={theme.lightColors?.grey0}
           value={searchText}
           onChangeText={setSearchText}
           autoCapitalize="none"
@@ -74,7 +74,7 @@ const InAppUsers = () => {
               name="closecircleo"
               type="antdesign"
               size={15}
-              color={theme.darkColors?.grey}
+              color={theme.lightColors?.grey0}
               onPress={() => setSearchText("")}
             />
           }

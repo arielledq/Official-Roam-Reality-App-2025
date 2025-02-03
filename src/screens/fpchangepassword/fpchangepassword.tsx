@@ -73,7 +73,7 @@ const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePasswo
                     containerStyle={{ marginBottom: -10 }}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="New Password"
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     value={values.newPassword}
                     onChangeText={handleChange("newPassword")}
                     // onBlur={handleBlur('password')}
@@ -98,7 +98,7 @@ const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePasswo
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={confirmnewpasswordVisibility}
                     onSubmitEditing={Keyboard.dismiss}
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     placeholder="Confirm Password"
                     value={values.confirmnewPassword}
                     onChangeText={handleChange("confirmnewPassword")}

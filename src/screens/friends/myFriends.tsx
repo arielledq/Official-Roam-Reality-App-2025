@@ -1,64 +1,57 @@
 // MyFriends.tsx
-import React, { useCallback, useState } from "react"
-import {
-  View,
-  Text,
-  FlatList,
-  Keyboard,
-  ImageBackground,
-  Pressable
-} from "react-native"
-import { AppInput } from "../../components"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import useStyles from "./styles"
-import theme from "../../assets/theme"
-import { Icon } from "react-native-elements"
-import { useFocusEffect, useNavigation } from "@react-navigation/native"
-import { getUserFriendList } from "../../network"
-import FastImage from "react-native-fast-image"
-import useDebounce from "../../hooks/debounce"
-import { DEBOUNCE_TIME } from "../../util/helpers"
-import Images from "../../assets/images"
+import React, { useCallback, useState } from "react";
+import { View, Text, FlatList, Keyboard, ImageBackground, Pressable } from "react-native";
+import { AppInput } from "../../components";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import useStyles from "./styles";
+import theme from "../../assets/theme";
+import { Icon } from "react-native-elements";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { getUserFriendList } from "../../network";
+import FastImage from "react-native-fast-image";
+import useDebounce from "../../hooks/debounce";
+import { DEBOUNCE_TIME } from "../../util/helpers";
+import Images from "../../assets/images";
 
 const MyFriends = () => {
-  const [searchText, setSearchText] = React.useState("")
-  const navigation = useNavigation()
-  const [friendList, setFriendList] = useState([])
-  const [filteredUsers, setFilteredUsers] = React.useState([])
-  const _styles = useStyles()
-  const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME)
-  const [isFetching, setFetching] = useState(false)
+  const [searchText, setSearchText] = React.useState("");
+  const navigation = useNavigation();
+  const [friendList, setFriendList] = useState([]);
+  const [filteredUsers, setFilteredUsers] = React.useState([]);
+  const _styles = useStyles();
+  const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME);
+  const [isFetching, setFetching] = useState(false);
 
-  useFocusEffect(useCallback(() => getFriends(), []))
+  useFocusEffect(useCallback(() => getFriends(), []));
 
   const getFriends = () => {
-    setFetching(true)
+    setFetching(true);
     getUserFriendList()
       .then(response => {
-        setFetching(false)
+        setFetching(false);
         if (response) {
-          setFriendList(response?.data[0]?.friends || [])
-          setFilteredUsers(response?.data[0]?.friends || [])
+          setFriendList(response?.data[0]?.friends || []);
+          setFilteredUsers(response?.data[0]?.friends || []);
         }
       })
       .catch(error => {
-        setFetching(false)
-        console.error(error)
-      })
-  }
+        setFetching(false);
+        console.error(error);
+      });
+  };
 
   const onChangeText = () => {
     const filtered = friendList?.filter(item =>
       item?.user?.name?.toLowerCase().includes(debounceQuery.toLowerCase())
-    )
-    setFilteredUsers(filtered)
-  }
+    );
+    setFilteredUsers(filtered);
+  };
 
   React.useEffect(() => {
-    onChangeText()
-  }, [debounceQuery])
+    onChangeText();
+  }, [debounceQuery]);
 
-  const onRefresh = () => getFriends()
+  const onRefresh = () => getFriends();
 
   return (
     <KeyboardAwareScrollView
@@ -74,7 +67,7 @@ const MyFriends = () => {
           selectionColor={"white"}
           placeholder="Search for a friend"
           onSubmitEditing={Keyboard.dismiss}
-          placeholderTextColor={theme.darkColors?.grey}
+          placeholderTextColor={theme.darkColors?.grey0}
           value={searchText}
           onChangeText={setSearchText}
           autoCapitalize="none"
@@ -88,18 +81,14 @@ const MyFriends = () => {
         />
       </View>
     </KeyboardAwareScrollView>
-  )
-}
+  );
+};
 
 const renderFriendItem = (item, styles, navigation) => {
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
-        <ImageBackground
-          source={Images.BGBlur}
-          style={localStyle.imageBG}
-          resizeMode="stretch"
-        >
+        <ImageBackground source={Images.BGBlur} style={localStyle.imageBG} resizeMode="stretch">
           <FastImage
             style={localStyle.image}
             source={
@@ -123,22 +112,22 @@ const renderFriendItem = (item, styles, navigation) => {
       </View>
       <Pressable
         onPress={() => {
-          navigation.navigate("PublicProfile", { userData: item })
+          navigation.navigate("PublicProfile", { userData: item });
         }}
         style={{ marginLeft: 10 }}
       >
         <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
 const localStyle = {
   container: {
-    paddingHorizontal: 20
+    paddingHorizontal: 20,
   },
   addButton: {
-    color: theme.lightColors?.green
+    color: theme.lightColors?.green,
   },
   contactContainer: {
     flexDirection: "row",
@@ -148,25 +137,25 @@ const localStyle = {
     paddingRight: 20,
     borderRadius: 10,
     marginVertical: 5,
-    flex: 1
+    flex: 1,
   },
   contactLeftWrapper: {
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    flex: 0.9
+    flex: 0.9,
   },
   imageBG: {
     width: 80,
     aspectRatio: 1,
     justifyContent: "center",
-    alignItems: "center"
+    alignItems: "center",
   },
   image: {
     width: 30,
     aspectRatio: 1,
-    borderRadius: 5
-  }
-}
+    borderRadius: 5,
+  },
+};
 
-export default MyFriends
+export default MyFriends;
