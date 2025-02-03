@@ -124,14 +124,9 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
-		<string>NunitoSans10ptBlack.ttf</string>
 		<string>NunitoSans10ptBold.ttf</string>
-		<string>NunitoSans10ptExtraBold.ttf</string>
 		<string>NunitoSans10ptExtraLight.ttf</string>
-		<string>NunitoSans10ptLight.ttf</string>
-		<string>NunitoSans10ptMedium.ttf</string>
 		<string>NunitoSans10ptRegular.ttf</string>
-		<string>NunitoSans10ptSemiBold.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

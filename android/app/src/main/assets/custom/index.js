@@ -1,12 +1,7 @@
-import { Platform } from "react-native";
-
 const fonts = {
-  nunitoLight:
-    Platform.OS === "ios"
-      ? "Nunito Sans 10pt,Nunito Sans 10pt ExtraLight ExtraLight,Regular"
-      : "NunitoSans10ptExtraLight",
-  nunitoRegular: Platform.OS === "ios" ? "Nunito Sans 10pt Regular" : "NunitoSans10ptRegular",
-  nunitoBold: Platform.OS === "ios" ? "Nunito Sans 10pt Bold" : "NunitoSans10ptBold",
+  nunitoLight: "Nunito Sans 10pt ExtraLight",
+  nunitoRegular: "Nunito Sans 10pt",
+  nunitoBold: "Nunito Sans 10pt",
 };
 
 const fontGroup = {
