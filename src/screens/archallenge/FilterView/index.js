@@ -247,6 +247,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       resizeMode="contain"
                       style={{
                         alignItems: "flex-end",
+                        marginTop: "4%",
                         height: "100%",
                         width: "100%",
                       }}
@@ -258,7 +259,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                         styles.textFilterView,
                         {
                           justifyContent: "flex-end",
-                          paddingBottom: 10,
+                          paddingBottom: '5%',
                         },
                       ]}
                     >
@@ -304,7 +305,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     </View>
                   )}
                   {filter.gradient_direction === "TOP_TO_BOTTOM" && (
-                    <View style={[styles.textFilterView, { justifyContent: "flex-start" }]}>
+                    <View style={[styles.textFilterView, { justifyContent: "flex-start", paddingTop: '10%' }]}>
                       {!filter?.text_form_image && (
                         <Text
                           style={[
