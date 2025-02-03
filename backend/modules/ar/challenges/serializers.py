@@ -15,6 +15,7 @@ from rest_framework_gis.serializers import GeoModelSerializer
 
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
+    check_ins = serializers.SerializerMethodField()
   
     class Meta:
         model = ARUserProfile
@@ -27,6 +28,9 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
             "current_location",
             "created_at",
         )
+
+    def get_check_ins(self, instance):
+        return ARSitePinCheckIn.objects.filter(user=instance.user).count()
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -561,7 +565,7 @@ class PanicMessageSerializer(GeoModelSerializer):
 class ARAllMemories(serializers.Serializer):
     def to_representation(self, instance):
         if isinstance(instance, ARMemories):
-            return ARMemoriesSerializerGet(instance).data
+            return ARMemoriesSerializerGet(instance, context=self.context).data
         elif isinstance(instance, ARSitePinCheckIn):
-            return ARMemoriesSerializerGet(instance).data
+            return ARSitePinCheckInSerializer(instance, context=self.context).data
         return {}

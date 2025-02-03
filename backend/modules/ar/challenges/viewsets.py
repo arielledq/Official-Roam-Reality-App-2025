@@ -631,7 +631,11 @@ class MemoryCheckinViewSet(ViewSet):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
             all_user_memories = ARMemories.objects.filter(user=request.user.id)
-            serializer = ARAllMemories([*all_user_check_in, *all_user_memories], many=True)
+            serializer = ARAllMemories(
+                [*all_user_check_in, *all_user_memories],
+                many=True,
+                context={'request': request}
+            )
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
