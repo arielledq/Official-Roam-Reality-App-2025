@@ -33,12 +33,38 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   //   coolDownFinished,
   //   coolDownHoursText,
   // },
-  const coolDown = route.params?.coolDown || {
+  let coolDown = route.params?.coolDown || {
     coolDownFinished: true,
     coolDownHoursText: "0h",
   };
-  const checkIns = route.params?.checkIns;
+  let checkIns = route.params?.checkIns;
   let challengeObj = route?.params?.challengeObj;
+
+  switch (experience_type) {
+    case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
+      if (!isNaN(challengeObj?.user_attempts) && !isNaN(challengeObj?.challenge_attempt)) {
+        checkIns = `${challengeObj?.user_attempts || 0}/${challengeObj?.challenge_attempt || 0}`;
+      } else {
+        checkIns = "";
+      }
+      // TODO: Receive from an API the cool down data
+      coolDown = {
+        coolDownFinished: true,
+        coolDownHoursText: "",
+      };
+      break;
+    case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+      coolDown = {
+        coolDownFinished: true,
+        coolDownHoursText: "",
+      };
+
+    default:
+      break;
+  }
+
+  // console.log("experience_type", experience_type);
+  // console.log("challengeObj", JSON.stringify(challengeObj, null, 2));
 
   switch (experience_type) {
     case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
@@ -75,6 +101,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       challenges: challengeObj.id,
     })
       .then(res => {
+        // console.log("checkARChallengeDoneAPI", JSON.stringify(res, null, 2));
         if (res.errorStatus == 403) {
           setIsChallengeDone(true);
         } else {
@@ -182,7 +209,14 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               alignItems: "center",
             }}
           >
-            <View style={{ gap: 2 }}>
+            <View
+              style={{
+                gap: 2,
+                flex: 1,
+                marginVertical: 8,
+                alignItems: "flex-start",
+              }}
+            >
               <Text style={styles.challengeSponsorStartDateText}>
                 Started on:{" "}
                 <Text style={styles.challengeSponsorStartDateTextValue}>{startDate}</Text>
@@ -194,17 +228,28 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 </Text>
               </Text>
             </View>
-            <View style={{ gap: 2 }}>
-              {/* <Text style={styles.challengeSponsorStartDateText}>
-                My Check-ins:{" "}
-                <Text style={styles.challengeSponsorStartDateTextValue}>{checkIns}</Text>
-              </Text> */}
-              <Text style={styles.challengeSponsorStartDateText}>
-                Cooldown:{" "}
-                <Text style={styles.challengeSponsorStartDateTextValue}>
-                  {coolDown.coolDownHoursText}
+            <View
+              style={{
+                gap: 2,
+                flex: 1,
+                marginVertical: 8,
+                alignItems: "flex-start",
+              }}
+            >
+              {checkIns && (
+                <Text style={[styles.challengeSponsorStartDateText, { flex: 1 }]}>
+                  My Check-ins:{" "}
+                  <Text style={styles.challengeSponsorStartDateTextValue}>{checkIns}</Text>
                 </Text>
-              </Text>
+              )}
+              {coolDown?.coolDownHoursText && (
+                <Text style={[styles.challengeSponsorStartDateText, { flex: 1 }]}>
+                  Cool Down:{" "}
+                  <Text style={styles.challengeSponsorStartDateTextValue}>
+                    {coolDown.coolDownHoursText}
+                  </Text>
+                </Text>
+              )}
             </View>
           </View>
         </View>

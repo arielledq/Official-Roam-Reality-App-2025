@@ -50,6 +50,11 @@ const GeoArSiteDetails = ({ route }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
 
+  // console.log(
+  //   "selectedGeoSite.pin_challenge",
+  //   JSON.stringify(selectedGeoSite.pin_challenge, null, 2)
+  // );
+
   const checkIfChallengeIsDone = () => {
     setIsLoading(true);
 
@@ -58,6 +63,7 @@ const GeoArSiteDetails = ({ route }) => {
       geo_site: selectedGeoSite.id,
     })
       .then(res => {
+        // console.log("res?.message?.message", res?.message);
         if (res?.message?.message && res?.message?.remaining) {
           const timeString = res?.message?.remaining;
           // Split the string into hours, minutes, seconds, and milliseconds
@@ -91,7 +97,7 @@ const GeoArSiteDetails = ({ route }) => {
           setCoolDownHoursText(remainingText);
         } else {
           setCoolDownFinished(true);
-          setCoolDownHoursText("0h");
+          setCoolDownHoursText("");
         }
       })
       .finally(() => {
@@ -387,26 +393,28 @@ const GeoArSiteDetails = ({ route }) => {
               <Text style={{ fontSize: 12, color: "black" }}>My Check-ins:</Text>
               <Text style={{ fontSize: 12, fontWeight: "bold", color: "purple" }}>1/3</Text>
             </View> */}
-            <View
-              style={{
-                position: "absolute",
-                top: 10,
-                right: 10,
-                backgroundColor: "#fff",
-                opacity: 0.9,
-                borderRadius: 32,
-                flexDirection: "row",
-                paddingHorizontal: 16,
-                gap: 8,
-                alignItems: "center",
-                height: 40,
-              }}
-            >
-              <Text
-                style={{ fontSize: 12, color: "black" }}
-              >{`${coolDownHoursText} cool down`}</Text>
-              <Icon name="clockcircleo" family="antdesign" size={20} color="purple" />
-            </View>
+            {coolDownHoursText && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  backgroundColor: "#fff",
+                  opacity: 0.9,
+                  borderRadius: 32,
+                  flexDirection: "row",
+                  paddingHorizontal: 16,
+                  gap: 8,
+                  alignItems: "center",
+                  height: 40,
+                }}
+              >
+                <Text
+                  style={{ fontSize: 12, color: "black" }}
+                >{`${coolDownHoursText} cool down`}</Text>
+                <Icon name="clockcircleo" family="antdesign" size={20} color="purple" />
+              </View>
+            )}
           </ImageBackground>
           <Text style={_styles.site_d_header}>{selectedGeoSite.name}</Text>
           <Text style={_styles.site_d_text}>{address}</Text>
