@@ -141,9 +141,14 @@ class ChallengesSerializer(serializers.ModelSerializer):
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     ar_filters = serializers.SerializerMethodField(method_name='get_ar_filters_sorted')
+    user_attempts = serializers.SerializerMethodField()
 
     def get_image(self, obj):
         return obj.image.url
+
+    def get_user_attempts(self, obj):
+        user = self.context['request'].user
+        return ARMemories.objects.filter(user=user, challenges=obj).count()
 
     class Meta:
         model = Challenges
@@ -164,13 +169,14 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "description",
             "points",
             "challenge_choice",
-            "challenge_requirement",
+            "challenge_attempt",
             "created_at",
             "expiry_date",
             "sponsored",
             "parameters",
             "ar_filters",
             "info",
+            "user_attempts",
         )
 
 
@@ -310,6 +316,8 @@ class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
     pin_challenge = GeoARChallengesSerializer(read_only=True)
     category = GeoArSiteCategorySerializer(read_only=True)
+    check_ins = serializers.SerializerMethodField()
+    user_attempts = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoArSite
@@ -331,7 +339,15 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "check_ins",
             "check_in_site_radius",
             "category",
+            "user_attempts",
         )
+
+        def get_check_ins(self, obj):
+            return ARSitePinCheckIn.objects.filter(geo_site=obj).count()
+
+        def get_user_attempts(self, obj):
+            user = self.context['request'].user
+            return ARSitePinCheckIn.objects.filter(user=user, geo_site=obj, geo_challenge=obj.pin_challenge).count()
 
 
 class GeoRegionSerializer(GeoModelSerializer):
