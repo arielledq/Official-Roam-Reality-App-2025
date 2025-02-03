@@ -342,12 +342,14 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "user_attempts",
         )
 
-        def get_check_ins(self, obj):
-            return ARSitePinCheckIn.objects.filter(geo_site=obj).count()
+    def get_check_ins(self, obj):
+        return ARSitePinCheckIn.objects.filter(geo_site=obj).count()
 
-        def get_user_attempts(self, obj):
-            user = self.context['request'].user
+    def get_user_attempts(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
             return ARSitePinCheckIn.objects.filter(user=user, geo_site=obj, geo_challenge=obj.pin_challenge).count()
+        return 0
 
 
 class GeoRegionSerializer(GeoModelSerializer):
