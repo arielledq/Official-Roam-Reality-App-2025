@@ -597,7 +597,7 @@ const PinChallenge = () => {
     }
     if (data.infoButton?.isButton) {
       setChallengeInformationView(data.infoButton?.isButton);
-      setIsUnityLoaded(false);
+      setIsUnityLoaded(true);
     }
   };
   const modals = (
