@@ -387,7 +387,7 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
     def get_by_ar_site(self, request):
         id = request.GET.get("id")
         objs = self.queryset.filter(geo_site=id)
-        serializer = GeoStarSerializer(objs, many=True)
+        serializer = GeoStarSerializer(objs, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='get-stars-sites', name='AR Site Stars')
