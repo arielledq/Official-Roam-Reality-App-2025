@@ -383,24 +383,18 @@ const PinChallenge = () => {
   };
 
   const onDonePress = async () => {
-    // const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
-    // let updatedData = capturedImage ? capturedImage : capturedVideo;
     let updatedData = capturedImage;
-
-    // if (hasFilters) {
     try {
       // Capturar la vista dentro de ViewShot
       const capturedUri = await viewShotRef.current.capture();
-      // console.log("Imagen capturada con filtro:", capturedUri);
       updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
     } catch (error) {
       console.error("Error capturando la imagen con filtros:", error);
     }
-    // }
 
     navigation.replace("ArChallengeShare", {
       challengeObj: { ...challengeObj, geo_site: { ...selectedGeoSite, pin_challenge: undefined } },
-      captureData: capturedImage,
+      captureData: updatedData,
       challengeType: CHALLENGES_TYPE.PIN_CHECK_IN,
     });
   };
@@ -629,12 +623,6 @@ const PinChallenge = () => {
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
       scrollable={false}
     >
-      {/* <ChallengeFoundCaptureHeader
-        leftTitle="Pin Found"
-        challengeFound={!!isMeInsideInSite}
-        points={challengeObj?.points}
-      /> */}
-
       <UnityARCamera
         width="100%"
         height="100%"
