@@ -9,6 +9,7 @@ const theme = createTheme({
     grey0: "#BCBCBC",
     grey1: "#6F6F76",
     grey2: "#99999990",
+    grey3: "#27273F",
     // INFO: Validated colors
     white: "#FFFFFF",
     inputBG: "#131422",
@@ -27,9 +28,15 @@ const theme = createTheme({
   },
   // TODO: Verify usage of 'darkColors', remove and update usage to 'lightColors'
   darkColors: {
+    // INFO: 'grey' colors were validated
+    grey0: "#BCBCBC",
+    grey1: "#6F6F76",
+    grey2: "#99999990",
+    grey3: "#27273F",
+
     white: "#FFFFFF",
     inputBG: "#131422",
-    grey: "#9CA3AF",
+    // grey: "#9CA3AF",
     dividerGrey: "#4B5563",
     TandCgrey: "#6B7280",
     purple: "#9003E0",
@@ -41,7 +48,7 @@ const theme = createTheme({
     statBG: "#323250",
     boxStatBG: "#27273F",
     toggleOff: "#6F6F76",
-    grey: "#BCBCBC",
+    // grey: "#BCBCBC",
     grey31: "#4F4F4F",
     drawerBG: "#202136",
     inputRed: "#D75D50",
