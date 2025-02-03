@@ -148,7 +148,9 @@ class ChallengesSerializer(serializers.ModelSerializer):
 
     def get_user_attempts(self, obj):
         user = self.context['request'].user
-        return ARMemories.objects.filter(user=user, challenges=obj).count()
+        if user.is_authenticated:
+            return ARMemories.objects.filter(user=user, challenges=obj).count()
+        return 0
 
     class Meta:
         model = Challenges
