@@ -52,7 +52,7 @@ const UnityARCamera = ({
   const challenge_type = imageFilter?.challengeObj?.challenge_type;
   const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
   return (
-    <View style={{ flex: 1, alignItems: "center", marginVertical: 12 }}>
+    <View style={{ flex: 1, alignItems: "center", }}>
       <View
         style={{
           height: height || aspectHeight,

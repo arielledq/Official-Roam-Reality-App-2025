@@ -365,7 +365,7 @@ const ArChallengeCapture = ({}) => {
     if(data.infoButton?.isButton)
     {
       setChallengeInformationView(data.infoButton?.isButton)
-      setIsUnityLoaded(false)
+      setIsUnityLoaded(true)
     }
  
 };
@@ -373,7 +373,7 @@ const ArChallengeCapture = ({}) => {
     <ChallengeScreen title="AR Challenges" modals={modals} appHeader = {false}
     style={{
         paddingHorizontal: 0,
-        paddingTop: 20,
+        // paddingTop: "7%",
         height:"100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
     }}

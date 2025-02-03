@@ -164,7 +164,10 @@ const PinChallenge = () => {
         isRotationEnabled: true,
         // ### DISTANCIA DONDE SE REPOSICIONARA NUEVAMENTE LA ESTRELLA ## //
         distanceCamera: 2, // AGREGAR PARA RECIBIR DESDE EL BACK 
+        
+        //VISIBLE OBJECT//
         isVisible: true,
+        
         /* ###POSICIONAMIENTO MEDIANTE GPS### 
         useGPS: true, // Activar GPS
         gpsLatitude: siteLatitude || 0, // Latitud del GPS
