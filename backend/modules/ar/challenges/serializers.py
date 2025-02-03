@@ -403,14 +403,14 @@ class GeoLocationSerializer(GeoModelSerializer):
         star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
             category__isnull=False
         )
-        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True)
+        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data
 
     def get_ar_event_sites(self, instance):
         star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
             category__isnull=True
         )
-        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True)
+        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data
 
 
