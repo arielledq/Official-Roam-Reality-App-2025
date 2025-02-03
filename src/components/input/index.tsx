@@ -40,7 +40,8 @@ const styles = StyleSheet.create({
   text: {
     fontSize: FontSizes.S14,
     ...fontGroup.nunitoRegular,
-    color: theme.darkColors?.white,
+    fontWeight: "400",
+    color: theme.lightColors?.white,
     lineHeight: FontLineHeights.LH20,
     marginTop: Platform.OS == "ios" ? -3 : 0,
   },

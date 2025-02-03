@@ -85,7 +85,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
                 inputContainerStyle={[_styles.input]}
                 containerStyle={{ marginBottom: -10 }}
                 placeholder={"Email Address"}
-                placeholderTextColor={theme.darkColors?.grey}
+                placeholderTextColor={theme.darkColors?.grey0}
                 value={values.email}
                 autoCapitalize="none"
                 onChangeText={handleChange("email")}
@@ -103,7 +103,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
                 secureTextEntry={passwordVisibility && true}
                 onSubmitEditing={Keyboard.dismiss}
                 placeholder="Password"
-                placeholderTextColor={theme.darkColors?.grey}
+                placeholderTextColor={theme.darkColors?.grey0}
                 value={values.password}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}
@@ -129,7 +129,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
                 secureTextEntry={rePasswordVisibility && true}
                 onSubmitEditing={Keyboard.dismiss}
                 placeholder="Confirm Password"
-                placeholderTextColor={theme.darkColors?.grey}
+                placeholderTextColor={theme.darkColors?.grey0}
                 value={values.confirmPassword}
                 onChangeText={handleChange("confirmPassword")}
                 onBlur={handleBlur("confirmPassword")}
