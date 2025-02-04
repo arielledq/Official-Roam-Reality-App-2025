@@ -67,7 +67,7 @@ const GeoArSiteArrived = ({ route }) => {
         backgroundColor="transparent"
       />
 
-      <ScrollView style={{ width: "100%" }} showsVerticalScrollIndicator={false}>
+      <View style={{ width: "100%", flex: 1, justifyContent: 'space-between'}} >
         <View
           style={{
             position: "relative",
@@ -76,6 +76,7 @@ const GeoArSiteArrived = ({ route }) => {
             overflow: "hidden",
             marginTop: 20,
             marginHorizontal: 30,
+            flex: 1
           }}
         >
           <MapView
@@ -133,7 +134,7 @@ const GeoArSiteArrived = ({ route }) => {
             <MoveForwardIcon style={{ width: 56, height: 56 }} />
           </View>
         </TouchableOpacity>
-      </ScrollView>
+      </View>
     </BackgroundWithImage>
   );
 };
