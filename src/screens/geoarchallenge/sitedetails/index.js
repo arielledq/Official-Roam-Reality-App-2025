@@ -46,6 +46,8 @@ const GeoArSiteDetails = ({ route }) => {
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
 
+  // console.log("selectedGeoARSiteStars", selectedGeoARSiteStars);
+
   const _styles = useStyles();
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -135,7 +137,7 @@ const GeoArSiteDetails = ({ route }) => {
   };
 
   const setStarCounts = () => {
-    setStarsCount(selectedGeoARSiteStars?.length);
+    setStarsCount(selectedGeoARSiteStars?.length || 0);
   };
 
   const InfoView = () => {
