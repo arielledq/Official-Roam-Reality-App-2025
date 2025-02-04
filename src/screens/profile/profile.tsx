@@ -31,6 +31,7 @@ import ScreenLoader from "../../components/screenLoader";
 import { updateARUserData } from "../../redux/AR";
 import { BlurView } from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
+import { height } from "util/AppDimensions";
 
 const SCROLL_AMOUNT = 150;
 
@@ -237,7 +238,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       {profileDetails?.image ? (
-        <View style={[_styles.avatarContainer]}>
+        <View style={_styles.avatarContainer}>
           <LinearGradient
             colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
             start={{ x: 0.5, y: 1 }}
@@ -254,8 +255,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <FastImage
             style={{
               width: "100%",
-              marginTop: 28,
-              aspectRatio: 1,
+              height: height * 0.5,
             }}
             //  @ts-ignore
             source={{ uri: profileDetails?.image }}
@@ -278,7 +278,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           >
             <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
             {/* @ts-ignore */}
-            <AppText style={_styles.buttonText}>Edit Profile</AppText>
+            <AppText style={_styles.buttonText}>Edit Profile </AppText>
           </AppButton>
         </View>
       ) : (
@@ -295,7 +295,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
               onProfileUpdate,
             });
           }}
-          // onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           {/* @ts-ignore */}
@@ -373,32 +372,32 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   );
 
   return (
-    <ScreenContainer style={{ ..._styles.mainContainer, paddingHorizontal: 0 }}>
-      {/* <BackgroundWithImage style={_styles.mainContainer}> */}
-      {loading ? (
-        <ScreenLoader style={{}} />
-      ) : (
-        <FlatList
-          data={data}
-          contentContainerStyle={_styles.container_style}
-          keyExtractor={item => item.id.toString()}
-          renderItem={renderItem}
-          ListHeaderComponent={renderHeader}
-          numColumns={3}
-          nestedScrollEnabled={true}
-          ListFooterComponent={renderFooter}
-        />
-      )}
-      <View style={_styles.blurView}>
-        <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
-          <AppHeader
-            containerStyle={_styles.headerContainer}
-            title={"Profile"}
-            leftComponent={handleMenuButton()}
+    <ScreenContainer style={{ ..._styles.mainContainer, paddingHorizontal: 0, paddingTop: 0 }}>
+      <>
+        {loading ? (
+          <ScreenLoader style={{}} />
+        ) : (
+          <FlatList
+            data={data}
+            contentContainerStyle={_styles.container_style}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderItem}
+            ListHeaderComponent={renderHeader}
+            numColumns={3}
+            nestedScrollEnabled={true}
+            ListFooterComponent={renderFooter}
           />
-        </BlurView>
-      </View>
-      {/* </BackgroundWithImage> */}
+        )}
+        <View style={_styles.blurView}>
+          <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
+            <AppHeader
+              containerStyle={_styles.headerContainer}
+              title={"Profile"}
+              leftComponent={handleMenuButton()}
+            />
+          </BlurView>
+        </View>
+      </>
     </ScreenContainer>
   );
 };
