@@ -46,16 +46,9 @@ const GeoArSiteDetails = ({ route }) => {
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
 
-  // console.log("selectedGeoARSiteStars", selectedGeoARSiteStars);
-
   const _styles = useStyles();
   const dispatch = useDispatch();
   const navigation = useNavigation();
-
-  // console.log(
-  //   "selectedGeoSite.pin_challenge",
-  //   JSON.stringify(selectedGeoSite.pin_challenge, null, 2)
-  // );
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true);
