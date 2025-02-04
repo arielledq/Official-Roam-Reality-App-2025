@@ -171,6 +171,7 @@ const ArChallengeCapture = ({}) => {
 
   useFocusEffect(
     useCallback(() => {
+    
       console.log("focus change", challengeType);
       if (unityRef.current && !!CAPTURE_CHALLENGE_TYPE[challengeType]) {
         unityRef.current.postMessage(
@@ -189,15 +190,19 @@ const ArChallengeCapture = ({}) => {
             setVisibleButtonPosition: false,
           })
         );
+        unityRef.current.postMessage(
+          "OBJImport",
+          "SetLoadingVisibility",
+          JSON.stringify({ isVisible: false }))
       }
     }, [isUnityLoaded, challengeType])
   );
 
-  useEffect(() => {
-    if (unityRef.current && challengeHasFilters) {
-      loadingFalse();
-    }
-  }, [isUnityLoaded]);
+  // useEffect(() => {
+  //   if (unityRef.current && challengeHasFilters) {
+  //     loadingFalse();
+  //   }
+  // }, [isUnityLoaded]);
 
   // Ejemplos de uso:
   //   EnviarComandoAUnity('pause');  // Para pausar el juego
@@ -224,15 +229,15 @@ const ArChallengeCapture = ({}) => {
     setIsUnityLoaded(true);
   };
 
-  const loadingFalse = () => {
-    if (challengeHasFilters) {
-      unityRef.current.postMessage(
-        "OBJImport",
-        "SetLoadingVisibility",
-        JSON.stringify({ isVisible: false })
-      );
-    }
-  };
+  // const loadingFalse = () => {
+  //   if (challengeHasFilters) {
+  //     unityRef.current.postMessage(
+  //       "OBJImport",
+  //       "SetLoadingVisibility",
+  //       JSON.stringify({ isVisible: false })
+  //     );
+  //   }
+  // };
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
     let updatedData = capturedImage ? capturedImage : capturedVideo;

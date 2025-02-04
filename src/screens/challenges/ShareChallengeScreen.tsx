@@ -312,8 +312,9 @@ const ArChallengeShare = () => {
   };
 
   return (
-    <ChallengeScreen title={screenTitle}>
-      <View style={{ flex: 1, paddingHorizontal: 32 }}>
+    <ChallengeScreen title={screenTitle} style={{justifyContent:'space-between', flex:1, }}>
+     <View style={{ height:'100%', paddingHorizontal: 32}}>
+      <View style={{ flex: 1, }}>
         {challengeTitle && (
           <View style={{ flexDirection: "row", gap: 12 }}>
             {/* Points box */}
@@ -464,6 +465,7 @@ const ArChallengeShare = () => {
             width: "100%",
             flexDirection: "column",
             gap: 16,
+            flex:1,
             alignItems: "center",
           }}
         >
@@ -480,7 +482,10 @@ const ArChallengeShare = () => {
             </Text>
           )}
 
-          <View
+        </View>
+      </View>
+      <View style={{gap: 8, }}>
+      <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -504,23 +509,7 @@ const ArChallengeShare = () => {
               title={"Save Image"}
             />
           </View>
-
-          <View style={{ paddingHorizontal: 10 }}>
-            <View style={{ width: "100%" }}>
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  width: "100%",
-                  justifyContent: "space-between",
-                  marginTop: 2,
-                }}
-              ></View>
-            </View>
-          </View>
-        </View>
-
-        {!isMemory && (
+      {!isMemory && (
           <AppButton
             onPress={endShareProfileButtonHandler}
             buttonStyle={{ height: 55 }}
@@ -530,6 +519,7 @@ const ArChallengeShare = () => {
             loading={isLoading}
           />
         )}
+        </View>
       </View>
 
       <ShareToSocialsModal
