@@ -30,6 +30,7 @@ import FastImage from "react-native-fast-image";
 import ScreenLoader from "../../components/screenLoader";
 import { updateARUserData } from "../../redux/AR";
 import { BlurView } from "@react-native-community/blur";
+import ScreenContainer from "components/ScreenContainer";
 
 const SCROLL_AMOUNT = 150;
 
@@ -253,7 +254,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <FastImage
             style={{
               width: "100%",
-              marginTop: 80,
+              marginTop: 28,
               aspectRatio: 1,
             }}
             //  @ts-ignore
@@ -372,7 +373,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   );
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
+    <ScreenContainer style={{ ..._styles.mainContainer, paddingHorizontal: 0 }}>
+      {/* <BackgroundWithImage style={_styles.mainContainer}> */}
       {loading ? (
         <ScreenLoader style={{}} />
       ) : (
@@ -396,7 +398,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           />
         </BlurView>
       </View>
-    </BackgroundWithImage>
+      {/* </BackgroundWithImage> */}
+    </ScreenContainer>
   );
 };
 

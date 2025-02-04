@@ -20,6 +20,7 @@ import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "assets/svg";
 import { handleError } from "util/helpers";
+import ScreenContainer from "components/ScreenContainer";
 
 const ScoreBoard = ({}) => {
   const _styles = useStyles();
@@ -310,7 +311,7 @@ const ScoreBoard = ({}) => {
   };
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
+    <ScreenContainer>
       <AppHeader
         leftComponent={handleMenuButton()}
         centerComponent={{
@@ -341,7 +342,7 @@ const ScoreBoard = ({}) => {
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
-    </BackgroundWithImage>
+    </ScreenContainer>
   );
 };
 

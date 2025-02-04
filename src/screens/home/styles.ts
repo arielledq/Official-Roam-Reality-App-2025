@@ -3,11 +3,6 @@ import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 import { screenHorizontalPadding } from "util/AppDimensions";
 
 const useStyles = makeStyles(theme => ({
-  mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
-    paddingBottom: 80,
-  },
   container: {
     flex: 1,
     paddingHorizontal: screenHorizontalPadding,

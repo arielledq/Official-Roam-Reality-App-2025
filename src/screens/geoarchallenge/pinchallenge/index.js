@@ -329,7 +329,6 @@ const PinChallenge = () => {
   };
 
   const _takeScreenshot = async () => {
-    // if (true) {
     if (isMeInsideInSite) {
       playCameraSound();
 

@@ -10,6 +10,7 @@ import ScoreBoard from "../screens/scoreboard";
 
 import Icon from "../components/Icon";
 import { Icons } from "../assets/Icons";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -26,7 +27,8 @@ const BottomTabNavigator = () => {
     );
   };
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaProvider style={styles.container}>
+      {/* <SafeAreaView style={styles.container}> */}
       <Tab.Navigator
         initialRouteName="GeoArChallenge"
         barStyle={styles.tabBarStyle}
@@ -108,7 +110,7 @@ const BottomTabNavigator = () => {
           }}
         />
       </Tab.Navigator>
-    </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 
@@ -120,13 +122,12 @@ const styles = StyleSheet.create({
     backgroundColor: "#090A16",
   },
   tabBarStyle: {
-    height: 80,
     position: "absolute",
     backgroundColor: "#090A16",
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
     paddingHorizontal: 25,
-    paddingVertical: 5,
+    paddingTop: 5,
   },
   tabBarIconStyle: {
     marginTop: -40,
