@@ -1,11 +1,19 @@
-import React from "react";
+import React, {useState} from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
-import { AppHeader } from "../../components";
+import {AppButton, AppHeader} from "../../components";
 import Icon from "../../components/Icon";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 import { useNavigation } from "@react-navigation/native";
+import CaptureInfoView from "components/CaptureInfoView";
+import ViewInfoModal from "components/ViewInfoModal";
+import {deleteAccount, logout} from "network";
+import {removeItem, showMessage} from "util/helpers";
+import {GoogleSignin} from "@react-native-google-signin/google-signin";
+import {resetState} from "redux/Login";
+import {useDispatch} from "react-redux";
+import ConfirmationPopUp from "components/confirmationPopUp";
 
 function SettingsItem({ label, onPress, icon }) {
   return (
@@ -40,6 +48,28 @@ function SettingsItem({ label, onPress, icon }) {
 
 const Settings = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const [isOpenDeleteModal, setIsOpenDeleteModal] = useState(false);
+
+  const handleLogOutButton = async () => {
+    await GoogleSignin.revokeAccess().catch(err => console.error(err));
+    await GoogleSignin.signOut().catch(err => console.error(err));
+    await removeItem("fbToken");
+    await removeItem("instaToken");
+    logout();
+    dispatch(resetState());
+  };
+
+  const handleDeleteAccount = () => {
+    deleteAccount().then(res => {
+      if (res.status == 1) {
+        handleLogOutButton();
+        showMessage("Your account has been deleted successfully");
+      } else {
+        showMessage(res.message.error, "error");
+      }
+    });
+  };
 
   const handleChangePassword = () => {
     navigation.navigate("ChangePassword");
@@ -51,8 +81,27 @@ const Settings = () => {
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={"Settings"} backgroundColor="transparent" />
-      <SettingsItem icon="lock" label={"Change password"} onPress={handleChangePassword} />
-      <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
+        <SettingsItem icon="lock" label={"Change password"} onPress={handleChangePassword} />
+        <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
+        <View style={{ width: "100%", paddingHorizontal: 24 }}>
+          <AppButton
+            onPress={()=> setIsOpenDeleteModal(true)}
+            // buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            customColors={[theme.darkColors?.inputRed, theme.darkColors?.inputRed]}
+            title={"Delete account"}
+            // loading={isLoading}
+          />
+        </View>
+      <ConfirmationPopUp
+        title={"Delete Account"}
+        description={"Are you sure you want to delete you account? This action is irreversible."}
+        confirmText={"Accept and Continue"}
+        confirmHandler={handleDeleteAccount}
+        isVisible={isOpenDeleteModal}
+        cancelText={"Cancel"}
+        cancelHandler={()=> setIsOpenDeleteModal(false)}
+      />
     </BackgroundWithImage>
   );
 };
@@ -84,4 +133,10 @@ const styles = StyleSheet.create({
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.inputBlue,
   },
+  buttonStyle: {
+    backgroundColor: theme.darkColors?.inputRed,
+  },
+  buttonContainerStyle :{
+    marginTop: 24,
+  }
 });

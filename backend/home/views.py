@@ -144,8 +144,10 @@ class DeleteAccountView(APIView):
 
     def delete(self, request, *args, **kwargs):
         try:
-            user=self.request.user
-            user.delete()
+            user = request.user
+            # user.delete()
+            user.is_active = False
+            user.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
