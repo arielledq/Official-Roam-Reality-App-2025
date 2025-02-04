@@ -1,5 +1,4 @@
 import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
@@ -15,13 +14,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     marginTop: 5,
     textAlign: "center",
-  },
-  mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
-    justifyContent: "flex-start",
-    position: "relative",
-    paddingBottom: 65,
   },
   subTitle: {
     ...fontGroup.nunitoBold,

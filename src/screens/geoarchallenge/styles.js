@@ -1,5 +1,4 @@
 import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
@@ -8,11 +7,6 @@ import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
  */
 
 const useStyles = makeStyles(theme => ({
-  mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
-    paddingBottom: 80,
-  },
   heading: {
     fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,

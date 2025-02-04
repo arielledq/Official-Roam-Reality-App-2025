@@ -13,6 +13,7 @@ import RightArrowIcon from "../../assets/svg/RightArrowIcon";
 import { handleError, showMessage } from "../../util/helpers";
 import { HomeScreenData } from "../../util/HomeScreenUtils";
 import BackgroundWithImage from "components/background";
+import ScreenContainer from "components/ScreenContainer";
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(
@@ -138,7 +139,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   };
 
   return (
-    <BackgroundWithImage style={styles.mainContainer}>
+    <ScreenContainer>
       <AppHeader
         leftComponent={handleMenuButton()}
         centerComponent={{
@@ -164,7 +165,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </BackgroundWithImage>
+    </ScreenContainer>
   );
 };
 

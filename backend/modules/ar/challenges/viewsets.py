@@ -163,25 +163,31 @@ class ARMemoriesViewSet(ViewSet):
     def check_geo_challenge_done(self, request):
         user_id = self.request.user.id
         geo_challenge_id = request.data.get("geo_challenge")
+        geo_site_id = request.data.get("geo_site")
 
         try:
-            challenge_obj = GeoARChallenges.objects.get(pk=geo_challenge_id)
+            GeoARChallenges.objects.get(pk=geo_challenge_id)
+            site_obj = GeoArSite.objects.get(pk=geo_site_id)
         except GeoARChallenges.DoesNotExist:
             return Response(
-                {'message': f'Challenge {geo_challenge_id} does not exist.'},
+                {'message': f'Challenge or site does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-        results = ARSitePinCheckIn.objects.filter(user=user_id, challenges=geo_challenge_id)
+        results = ARSitePinCheckIn.objects.filter(
+            user=user_id,
+            geo_challenge=geo_challenge_id,
+            geo_site=geo_site_id,
+        )
 
         total_attempts = len(results)
-        if total_attempts >= challenge_obj.challenge_attempt:
+
+        if total_attempts >= site_obj.challenge_attempt:
             # Is important to verify if total_attempts is multiple of challenge_attempt,
             # so if it is true, check the cooldown
-            if total_attempts % challenge_obj.challenge_attempt == 0:
+            if total_attempts % site_obj.challenge_attempt == 0:
                 last_check_in = results.order_by('-created_at').first()
                 if last_check_in:
-                    cooldown_hours = getattr(challenge_obj, 'cooldown_hours', 24)
+                    cooldown_hours = getattr(site_obj, 'cooldown_hours', 24)
                     cooldown_limit = last_check_in.created_at + timezone.timedelta(hours=cooldown_hours)
 
                     if timezone.now() < cooldown_limit:
@@ -381,7 +387,7 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
     def get_by_ar_site(self, request):
         id = request.GET.get("id")
         objs = self.queryset.filter(geo_site=id)
-        serializer = GeoStarSerializer(objs, many=True)
+        serializer = GeoStarSerializer(objs, many=True, context={'request': request})
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='get-stars-sites', name='AR Site Stars')
@@ -625,7 +631,11 @@ class MemoryCheckinViewSet(ViewSet):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
             all_user_memories = ARMemories.objects.filter(user=request.user.id)
-            serializer = ARAllMemories([*all_user_check_in, *all_user_memories], many=True)
+            serializer = ARAllMemories(
+                [*all_user_check_in, *all_user_memories],
+                many=True,
+                context={'request': request}
+            )
 
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:

@@ -20,6 +20,7 @@ import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "assets/svg";
 import { handleError } from "util/helpers";
+import ScreenContainer from "components/ScreenContainer";
 
 const ScoreBoard = ({}) => {
   const _styles = useStyles();
@@ -192,13 +193,13 @@ const ScoreBoard = ({}) => {
       let count = 1;
       for (let i = 0; i < allUsers.length; i++) {
         let userCheck = allUsers[i];
-        if (userCheck.user_ar_profile && userCheck.user_ar_profile?.current_location) {
+        if (userCheck.user_ar_profile && userCheck.user_ar_profile?.current_location?.coordinates?.length > 0) {
           const pointUser = {
             latitude: userCheck.user_ar_profile?.current_location.coordinates[1],
             longitude: userCheck.user_ar_profile?.current_location.coordinates[0],
           };
-          const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
 
+          const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
           if (isInsideSiteArea) {
             userCheck.rank = count;
             filterUserWithDes.push(userCheck);
@@ -246,7 +247,8 @@ const ScoreBoard = ({}) => {
     </Pressable>
   );
 
-  const Item = ({ obj }) => (
+  const Item = ({ obj }) => {
+    return (
     <View
       style={{
         flexDirection: "row",
@@ -296,7 +298,7 @@ const ScoreBoard = ({}) => {
         <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.points}</Text>
       </View>
     </View>
-  );
+  )};
 
   const handleMenuButton = () => {
     return (
@@ -310,7 +312,7 @@ const ScoreBoard = ({}) => {
   };
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
+    <ScreenContainer>
       <AppHeader
         leftComponent={handleMenuButton()}
         centerComponent={{
@@ -341,7 +343,7 @@ const ScoreBoard = ({}) => {
         renderItem={({ item }) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
-    </BackgroundWithImage>
+    </ScreenContainer>
   );
 };
 
