@@ -27,6 +27,7 @@ import {
 import { CHALLENGES_TYPE } from "constants";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
+import { PIN_CHALLENGE_CONFIG } from "constants";
 
 const PinChallenge = () => {
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
@@ -643,7 +644,7 @@ const PinChallenge = () => {
           onDone={onDonePress}
           onCameraPress={_takeScreenshot}
           hasCapturedContent={!!capturedImage}
-          customInstructions="Stand next to the pin, resize as needed, snap your photo"
+          customInstructions={PIN_CHALLENGE_CONFIG.CUSTOM_INSTRUCTIONS}
         />
       )}
     </ChallengeScreen>

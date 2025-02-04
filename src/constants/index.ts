@@ -29,3 +29,7 @@ export const MAP_MODE = {
   DRIVING: "DRIVING",
   WALKING: "WALKING",
 };
+
+export const PIN_CHALLENGE_CONFIG = {
+  CUSTOM_INSTRUCTIONS: "You need to be at the location to snap a photo",
+};
