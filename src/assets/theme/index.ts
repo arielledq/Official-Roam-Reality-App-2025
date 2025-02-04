@@ -9,7 +9,7 @@ const theme = createTheme({
     grey0: "#BCBCBC",
     grey1: "#6F6F76",
     grey2: "#99999990",
-    grey3: "#27273F",
+    grey3: "#323250",
     // INFO: Validated colors
     white: "#FFFFFF",
     inputBG: "#131422",
@@ -32,7 +32,7 @@ const theme = createTheme({
     grey0: "#BCBCBC",
     grey1: "#6F6F76",
     grey2: "#99999990",
-    grey3: "#27273F",
+    grey3: "#323250",
 
     white: "#FFFFFF",
     inputBG: "#131422",
