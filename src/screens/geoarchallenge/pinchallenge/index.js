@@ -484,7 +484,7 @@ const PinChallenge = () => {
       // Enviar mensaje a Unity para iniciar la grabación
       const data = {
         isNotification: !isMeInsideInSite,
-        textNotification: "You need to be on the location to capture the event photo.",
+        textNotification: PIN_CHALLENGE_CONFIG.CUSTOM_INSTRUCTIONS,
       };
 
       unityRef.current.postMessage(

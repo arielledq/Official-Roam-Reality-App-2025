@@ -111,11 +111,13 @@ const GeoArSiteNavigation = ({ route }) => {
   const [estimatedTime, setEstimatedTime] = useState("");
   const [location, setLocation] = useState<MapCoords | null>(null);
   const [routeInitialLocation, setRouteInitialLocation] = useState<MapCoords | null>(null);
+
   const [steps, setSteps] = useState<StepResponse[]>([]);
-  const [mute, setMute] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepResponse | null>(null);
+  const [selectedStep, setSelectedStep] = useState<StepResponse | null>(null);
+
+  const [mute, setMute] = useState(false);
   const [currentRouteIcon, setCurrentRouteIcon] = useState<React.ReactNode | null>(null);
-  const distanceFromStep = useRef(0);
 
   const selectedGeoSite = useSelector((state: any) => state.ar?.selectedGeoSite);
   const { userLocation } = useContext(GeolocationContext);
@@ -123,13 +125,13 @@ const GeoArSiteNavigation = ({ route }) => {
   const [longitude, setLongitude] = useState(userLocation?.longitude);
   const [zoomLevel, setZoomLevel] = useState(0);
   const [router, setRoute] = useState<{} | null>(null);
-  const [selectedStep, setSelectedStep] = useState<StepResponse | null>(null);
 
   const mapView = useRef(null);
   const mapViewRef = useRef(null);
   const watchIdRef = useRef(null);
   const compassHeading = useRef(0);
   const navigationMessage = useRef("");
+  const distanceFromStep = useRef(0);
 
   // const route = useRoute();
   const _styles = useStyles();
@@ -243,12 +245,6 @@ const GeoArSiteNavigation = ({ route }) => {
     navigation.goBack();
   };
 
-  const adjustZoomLevel = (distance: number) => {
-    if (distance < 3) return 19; // Close-up for short distances
-    if (distance < 10) return 18; // Medium zoom for moderate distances
-    return 17; // Wider view for long distances
-  };
-
   const getCurrentStep = () => {
     const currentStep = steps.find(step => !step.reached);
     if (currentStep) {
@@ -283,6 +279,7 @@ const GeoArSiteNavigation = ({ route }) => {
           if (!mute) {
             Tts.setDucking(true);
             Tts.speak(navigationMessage.current);
+            // console.log("Tts.speak", navigationMessage.current);
           }
         }
 
@@ -756,7 +753,6 @@ const GeoArSiteNavigation = ({ route }) => {
           >
             {/* Center camera on first render or as needed: */}
             <MapboxGL.Camera
-              // ref={mapViewRef}
               zoomLevel={18}
               pitch={60} // Sets the 3D pitch angle
               animationMode="flyTo"
