@@ -197,7 +197,6 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       {
                         color: theme.lightColors.white,
                         fontSize: 12,
-                        textTransform: "uppercase",
                         fontWeight: "bold",
                       },
                     ]}
@@ -259,7 +258,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                         styles.textFilterView,
                         {
                           justifyContent: "flex-end",
-                          paddingBottom: '5%',
+                          paddingBottom: "5%",
                         },
                       ]}
                     >
@@ -305,7 +304,12 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     </View>
                   )}
                   {filter.gradient_direction === "TOP_TO_BOTTOM" && (
-                    <View style={[styles.textFilterView, { justifyContent: "flex-start", paddingTop: '10%' }]}>
+                    <View
+                      style={[
+                        styles.textFilterView,
+                        { justifyContent: "flex-start", paddingTop: "10%" },
+                      ]}
+                    >
                       {!filter?.text_form_image && (
                         <Text
                           style={[

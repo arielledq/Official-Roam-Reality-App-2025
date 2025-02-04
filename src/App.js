@@ -14,6 +14,9 @@ import { NotificationProvider } from "./NotificationProvider";
 import Config from "./config";
 import { GeolocationProvider } from "./GeolocationProvider";
 import MapboxGL from "@rnmapbox/maps";
+if (__DEV__) {
+  require("../ReactotronConfig"); // Import before any other code
+}
 // import * as Sentry from '@sentry/react-native';
 
 // if(!__DEV__) {

@@ -46,7 +46,8 @@ const useStyles = makeStyles(theme => ({
   },
   scoreboard: {
     ...fontGroup.nunitoBold,
-    color: theme.colors.white,
+    color: theme.colors.grey3,
+    fontWeight: "900",
     fontSize: FontSizes.S48,
     lineHeight: FontLineHeights.LH66,
     marginTop: "5%",
