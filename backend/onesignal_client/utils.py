@@ -31,7 +31,7 @@ def send_notification(notification_type, user, data=None, extra_data=None):
         },
         NotificationTypes.FRIEND_REQUEST_SENT: {
             'title': 'Friend Request',
-            'description': 'Your friend request has been sent!'
+            'description': 'You have received a friend request!'
         },
         NotificationTypes.FRIEND_REQUEST_ACCEPTED: {
             'title': 'Friend Request Accepted',
