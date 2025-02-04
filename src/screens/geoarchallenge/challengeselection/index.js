@@ -201,9 +201,9 @@ const ChallengeSelection = ({ route }) => {
                   <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
                 )}
               </View>
-              <TouchableOpacity onPress={() => goToRoute(item.navigation)}>
+              <View>
                 <RightArrowIcon />
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>

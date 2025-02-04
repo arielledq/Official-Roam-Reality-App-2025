@@ -235,6 +235,15 @@ const GeoArChallengeDetails = ({}) => {
     }
   };
 
+  const navigateToNextScreen = updatedSelectedSite => {
+    dispatch(updateSelectedSites(updatedSelectedSite));
+    navigation.navigate("GeoArSiteDetails", {
+      experience_type: isEvent
+        ? EXPERIENCE_TYPE_CHOICES.EVENT
+        : EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE,
+    });
+  };
+
   const _markerView = o => {
     if (o.lat_long) {
       return (
@@ -245,23 +254,13 @@ const GeoArChallengeDetails = ({}) => {
             longitude: o.lat_long.coordinates[0],
           }}
           title={o.name}
-          onCalloutPress={() => {
-            dispatch(updateSelectedSites(o));
-            navigation.navigate("GeoArSiteDetails");
-          }}
+          onCalloutPress={() => navigateToNextScreen(o)}
           pinColor={pinColor}
           tracksViewChanges={tracksViewChanges}
         >
           {Platform.OS === "ios" && (
             <Callout
-              onPress={() => {
-                dispatch(updateSelectedSites(o));
-                navigation.navigate("GeoArSiteDetails", {
-                  experience_type: isEvent
-                    ? EXPERIENCE_TYPE_CHOICES.EVENT
-                    : EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE,
-                });
-              }}
+              onPress={() => navigateToNextScreen(o)}
               style={{
                 backgroundColor: "#fff",
                 minWidth: 100,

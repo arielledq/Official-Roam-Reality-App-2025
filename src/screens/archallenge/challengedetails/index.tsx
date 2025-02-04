@@ -71,7 +71,10 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       challengeObj = challengeObj;
       break;
     case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
-      challengeObj = challengeObj.pin_challenge;
+      challengeObj = challengeObj?.pin_challenge;
+      break;
+    case EXPERIENCE_TYPE_CHOICES.EVENT:
+      challengeObj = challengeObj?.pin_challenge;
       break;
 
     default:
@@ -84,8 +87,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     navigation.goBack();
   }
 
-  const startDate = moment(challengeObj.created_at).format("DD-MM-YYYY");
-  const expiryDate = moment(challengeObj.expiry_date).format("DD-MM-YYYY");
+  const startDate = moment(challengeObj?.created_at).format("DD-MM-YYYY");
+  const expiryDate = moment(challengeObj?.expiry_date).format("DD-MM-YYYY");
 
   const [examples, setExamples] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -98,7 +101,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   const checkIfChallengeIsDone = () => {
     setIsLoading(true);
     checkARChallengeDoneAPI({
-      challenges: challengeObj.id,
+      challenges: challengeObj?.id,
     })
       .then(res => {
         // console.log("checkARChallengeDoneAPI", JSON.stringify(res, null, 2));
@@ -114,7 +117,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   };
 
   const getExample = () => {
-    getAnyARExamples(challengeObj.id)
+    getAnyARExamples(challengeObj?.id)
       .then(res => {
         setExamples(res.data);
       })
@@ -129,6 +132,10 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           navigation.navigate("ArChallengeCapture", { challengeObj });
           break;
         case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+          // @ts-ignore
+          navigation.navigate("PinChallenge");
+          break;
+        case EXPERIENCE_TYPE_CHOICES.EVENT:
           // @ts-ignore
           navigation.navigate("PinChallenge");
           break;
@@ -190,16 +197,16 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               right: 0,
             }}
           ></BackgroundWithImage>
-          <Text style={styles.pointCount}>{challengeObj.points}</Text>
+          <Text style={styles.pointCount}>{challengeObj?.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
         </View>
         <View style={{ flex: 1, justifyContent: "center", padding: 8 }}>
           <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
             <Image
               style={{ width: 24, height: 24 }}
-              source={{ uri: challengeObj.sponsored.image }}
+              source={{ uri: challengeObj?.sponsored?.image }}
             />
-            <Text style={styles.challengeSponsorName}>{challengeObj.sponsored.name}</Text>
+            <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
           </View>
           <View
             style={{
@@ -224,7 +231,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               <Text style={styles.challengeSponsorStartDateText}>
                 Ends on:{" "}
                 <Text style={styles.challengeSponsorStartDateTextValue}>
-                  {challengeObj.expiry_date ? expiryDate : "None"}
+                  {challengeObj?.expiry_date ? expiryDate : "None"}
                 </Text>
               </Text>
             </View>
@@ -274,7 +281,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
             },
           }}
           source={{
-            html: `${challengeObj.description}`,
+            html: `${challengeObj?.description}`,
           }}
         />
       </ScrollView>
