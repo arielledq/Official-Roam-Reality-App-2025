@@ -374,7 +374,8 @@ class GeoRegionSerializer(GeoModelSerializer):
 
 class GeoLocationSerializer(GeoModelSerializer):
     image = serializers.ImageField()
-    unique_ar_sites = UniqueChallengeSiteSerializer(source='geo_location_ar_unique_site',read_only=True, many=True)
+    # unique_ar_sites = UniqueChallengeSiteSerializer(source='geo_location_ar_unique_site',read_only=True, many=True)
+    unique_ar_sites = serializers.SerializerMethodField()
     # star_ar_sites = GeoArSiteSerializer(source='geo_location_ar_site', read_only=True, many=True)
     star_ar_sites = serializers.SerializerMethodField()
     ar_event_sites = serializers.SerializerMethodField()
@@ -416,6 +417,14 @@ class GeoLocationSerializer(GeoModelSerializer):
         )
         serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data
+
+    def get_unique_ar_sites(self, instance):
+        ar_experiences = instance.ar_experiences.filter(experience_type="AR_CHALLENGE").all()
+        challenges = []
+        if ar_experiences:
+            for experience in ar_experiences:
+                challenges += experience.challenges.all()
+        return ChallengesSerializer(challenges, many=True, context=self.context).data
 
 
 class GeoStarSerializer(GeoModelSerializer):
@@ -494,6 +503,7 @@ class StarCollectionSerializer(serializers.ModelSerializer):
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
+    challenge_details = GeoARChallengesSerializer(source='geo_challenge', read_only=True)
     # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:
@@ -507,8 +517,8 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
             "declined_reason",
             "created_at",
             "updated_at",
-            "geo_challenge",
             "points",
+            "challenge_details",
         )
 
 

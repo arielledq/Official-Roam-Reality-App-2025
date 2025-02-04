@@ -386,9 +386,11 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='get-by-site-id', name='AR Site Stars')
     def get_by_ar_site(self, request):
         id = request.GET.get("id")
-        objs = self.queryset.filter(geo_site=id)
-        serializer = GeoStarSerializer(objs, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        star_zones = self.queryset.filter(geo_site=id)
+        star_count = 0
+        for star_zone in star_zones:
+            star_count += star_zone.stars.count()
+        return Response({"stars": star_count}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='get-stars-sites', name='AR Site Stars')
     def get_ar_star_sites(self, request):
