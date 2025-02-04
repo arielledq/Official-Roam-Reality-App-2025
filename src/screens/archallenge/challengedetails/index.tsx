@@ -64,7 +64,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   }
 
   // console.log("experience_type", experience_type);
-  // console.log("challengeObj", JSON.stringify(challengeObj, null, 2));
+  // console.log("challengeObj", challengeObj);
 
   switch (experience_type) {
     case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
@@ -150,7 +150,15 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
 
   useEffect(() => {
     if (isFocused) {
-      checkIfChallengeIsDone();
+      switch (experience_type) {
+        case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
+          checkIfChallengeIsDone();
+
+          break;
+
+        default:
+          break;
+      }
     }
     getExample();
   }, [isFocused]);
@@ -294,6 +302,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainerStyle}
           title={"Start Challenge"}
+          disabled={isLoading}
         />
       </View>
     </BackgroundWithImage>
