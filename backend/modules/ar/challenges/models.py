@@ -366,12 +366,17 @@ class Challenges(models.Model):
         related_name="challenges",  # _ar_experience
     )
 
+    order = models.PositiveIntegerField(
+        _("Order"), default=0
+    )
+
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name_plural = "AR Challenge"
         verbose_name = "AR Challenge"
+        ordering = ['order']
 
     def __str__(self):
         return self.name
@@ -392,7 +397,6 @@ class GeoARChallenges(models.Model):
         blank=False,
         related_name="sponsors_geo_ar",
     )
-    challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=1)
     points = models.IntegerField(verbose_name="Challenge Points", default=0)
     challenge_requirement = models.CharField(
         max_length=50, choices=CHALLENGE_REQUIREMENT, default="PHOTO"
@@ -411,11 +415,6 @@ class GeoARChallenges(models.Model):
     expiry_date = models.DateTimeField(blank=True, null=True)
     description = RichTextField(_("Description"), blank=True, null=True)
     info = RichTextField(_("Info"), blank=True, null=True)
-    cooldown_hours = models.PositiveIntegerField(
-        default=24,
-        verbose_name='Cooldown (in hours)'
-    )
-
     ar_experience = models.ForeignKey(
         ARExperience,
         on_delete=models.SET_NULL,
@@ -594,6 +593,11 @@ class GeoArSite(models.Model):
         related_name="geo_sites",
         null=True,
         blank=True,
+    )
+    challenge_attempt = models.IntegerField(verbose_name="Challenge Attempts", default=1)
+    cooldown_hours = models.PositiveIntegerField(
+        default=24,
+        verbose_name='Cooldown (in hours)'
     )
 
     class Meta:

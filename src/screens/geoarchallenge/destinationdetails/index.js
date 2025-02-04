@@ -547,7 +547,7 @@ const GeoArChallengeDetails = ({}) => {
           }}
         >
           <ARSiteCountBG style={{ width: 48, height: 48 }}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{selectedDestination.star_ar_sites.length}</Text>
+          <Text style={_styles.s_list_count}>{isEvent? selectedDestination?.ar_event_sites?.length : selectedDestination?.star_ar_sites?.length}</Text>
           <Text style={_styles.s_list_text}>Sites</Text>
         </View>
         <View

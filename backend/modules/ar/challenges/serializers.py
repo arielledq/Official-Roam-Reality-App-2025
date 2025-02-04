@@ -15,6 +15,7 @@ from rest_framework_gis.serializers import GeoModelSerializer
 
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
+    check_ins = serializers.SerializerMethodField()
   
     class Meta:
         model = ARUserProfile
@@ -27,6 +28,9 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
             "current_location",
             "created_at",
         )
+
+    def get_check_ins(self, instance):
+        return ARSitePinCheckIn.objects.filter(user=instance.user).count()
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -141,9 +145,16 @@ class ChallengesSerializer(serializers.ModelSerializer):
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     ar_filters = serializers.SerializerMethodField(method_name='get_ar_filters_sorted')
+    user_attempts = serializers.SerializerMethodField()
 
     def get_image(self, obj):
         return obj.image.url
+
+    def get_user_attempts(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return ARMemories.objects.filter(user=user, challenges=obj).count()
+        return 0
 
     class Meta:
         model = Challenges
@@ -164,13 +175,14 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "description",
             "points",
             "challenge_choice",
-            "challenge_requirement",
+            "challenge_attempt",
             "created_at",
             "expiry_date",
             "sponsored",
             "parameters",
             "ar_filters",
             "info",
+            "user_attempts",
         )
 
 
@@ -310,6 +322,8 @@ class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
     pin_challenge = GeoARChallengesSerializer(read_only=True)
     category = GeoArSiteCategorySerializer(read_only=True)
+    check_ins = serializers.SerializerMethodField()
+    user_attempts = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoArSite
@@ -331,7 +345,17 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "check_ins",
             "check_in_site_radius",
             "category",
+            "user_attempts",
         )
+
+    def get_check_ins(self, obj):
+        return ARSitePinCheckIn.objects.filter(geo_site=obj).count()
+
+    def get_user_attempts(self, obj):
+        user = self.context['request'].user
+        if user.is_authenticated:
+            return ARSitePinCheckIn.objects.filter(user=user, geo_site=obj, geo_challenge=obj.pin_challenge).count()
+        return 0
 
 
 class GeoRegionSerializer(GeoModelSerializer):
@@ -383,14 +407,14 @@ class GeoLocationSerializer(GeoModelSerializer):
         star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
             category__isnull=False
         )
-        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True)
+        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data
 
     def get_ar_event_sites(self, instance):
         star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
             category__isnull=True
         )
-        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True)
+        serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data
 
 
@@ -541,7 +565,7 @@ class PanicMessageSerializer(GeoModelSerializer):
 class ARAllMemories(serializers.Serializer):
     def to_representation(self, instance):
         if isinstance(instance, ARMemories):
-            return ARMemoriesSerializerGet(instance).data
+            return ARMemoriesSerializerGet(instance, context=self.context).data
         elif isinstance(instance, ARSitePinCheckIn):
-            return ARMemoriesSerializerGet(instance).data
+            return ARSitePinCheckInSerializer(instance, context=self.context).data
         return {}
