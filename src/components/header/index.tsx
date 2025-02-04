@@ -2,7 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Header } from "@rneui/base";
 import React, { FC } from "react";
 import { AppHeaderProps } from "./type";
-import { Platform, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
 import useStyles from "./styles";
 import theme from "../../assets/theme";
 import { getHitSlop } from "../../util/buttonUtil";
@@ -29,9 +29,11 @@ const AppHeader: FC<AppHeaderProps> = props => {
     }
   }
 
-  const isIOS = Platform.OS === "ios";
   const isBottomTab = !!props?.isBottomTab;
-  const edges = isBottomTab && isIOS ? [""] : ["top"];
+  let edges = ["top"];
+  if (isBottomTab) {
+    edges = [""];
+  }
 
   return (
     <Header

@@ -88,7 +88,6 @@ const useStyles = makeStyles(theme => ({
   },
   editButtonContainer: {
     position: "absolute",
-    top: 110,
     right: 10,
     zIndex: 10,
   },

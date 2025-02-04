@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Image, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Platform, TouchableOpacity, View } from "react-native";
 import useStyles from "./styles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
@@ -265,7 +265,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <AppButton
             customColors={["#7B16FF", "#1158F4"]}
             buttonStyle={_styles.editButton}
-            containerStyle={_styles.editButtonContainer}
+            containerStyle={[
+              _styles.editButtonContainer,
+              {
+                top: Platform.OS === "ios" ? 125 : 110,
+              },
+            ]}
             onPress={() => {
               setIsTransitioning(true);
               //  @ts-ignore
