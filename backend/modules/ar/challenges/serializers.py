@@ -349,6 +349,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "check_ins",
             "check_in_site_radius",
             "category",
+            "challenge_attempt",
             "user_attempts",
             "sponsors",
         )
