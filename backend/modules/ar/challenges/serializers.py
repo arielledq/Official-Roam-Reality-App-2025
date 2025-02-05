@@ -41,6 +41,8 @@ class SponsorSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "image",
+            "description",
+            "tags",
             "created_at",
         )
 
@@ -324,6 +326,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     category = GeoArSiteCategorySerializer(read_only=True)
     check_ins = serializers.SerializerMethodField()
     user_attempts = serializers.SerializerMethodField()
+    sponsors = SponsorSerializer(read_only=True, many=True)
 
     class Meta:
         model = GeoArSite
@@ -346,6 +349,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "check_in_site_radius",
             "category",
             "user_attempts",
+            "sponsors",
         )
 
     def get_check_ins(self, obj):
@@ -430,7 +434,7 @@ class GeoLocationSerializer(GeoModelSerializer):
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
-    sponsors = SponsorSerializer(read_only=True, many=True)
+    sponsored = SponsorSerializer(source='sponsor', read_only=True)
 
     class Meta:
         model = GeoARStar
@@ -443,7 +447,7 @@ class GeoStarSerializer(GeoModelSerializer):
             "visibility_radius",
             "geo_site",
             "challenges",
-            "sponsors",
+            "sponsored",
             "following_mode",
         )
 
