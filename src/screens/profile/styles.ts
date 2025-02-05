@@ -66,12 +66,6 @@ const useStyles = makeStyles(theme => ({
     flexWrap: "wrap",
     justifyContent: "space-between",
   },
-  arrow_3: {
-    flex: 1,
-    alignItems: "flex-end",
-    marginRight: -29,
-    marginTop: -23,
-  },
   buttonStyle: {
     height: 44,
   },

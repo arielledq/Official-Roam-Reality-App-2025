@@ -238,36 +238,40 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-        <LinearGradient
-          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-          start={{ x: 0.5, y: 1 }}
-          end={{ x: 0.5, y: 0.7 }}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1,
-          }}
-        />
         {profileDetails?.image ? (
-          <FastImage
-            style={{
-              width: "100%",
-              height: height * 0.5,
-            }}
-            //  @ts-ignore
-            source={{ uri: profileDetails?.image }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
+          <>
+            <FastImage
+              style={{
+                width: "100%",
+                height: height * 0.5,
+              }}
+              //  @ts-ignore
+              source={{ uri: profileDetails?.image }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <LinearGradient
+              colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+              start={{ x: 0.5, y: 1 }}
+              end={{ x: 0.5, y: 0.7 }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1,
+              }}
+            />
+          </>
         ) : (
-          <View
-            style={{
-              width: "100%",
-              height: 100,
-            }}
-          />
+          <>
+            <View
+              style={{
+                width: "100%",
+                height: 200,
+              }}
+            />
+          </>
         )}
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
@@ -275,7 +279,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           containerStyle={[
             _styles.editButtonContainer,
             {
-              top: Platform.OS === "ios" ? 125 : 110,
+              top: Platform.OS === "ios" ? 130 : 110,
             },
           ]}
           onPress={() => {
