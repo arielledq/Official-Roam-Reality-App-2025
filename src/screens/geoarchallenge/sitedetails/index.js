@@ -175,7 +175,7 @@ const GeoArSiteDetails = ({ route }) => {
               },
             }}
             source={{
-              html: `${selectedGeoSite?.pro_tips.toString().replaceAll("#000000", "#fff")}}`,
+              html: `${selectedGeoSite?.pro_tips.toString().replaceAll("#000000", "#fff")}`,
             }}
           />
         </ScrollView>
