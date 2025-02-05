@@ -139,10 +139,10 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
     { id: 2, value: starsCount, property: "Stars" },
     { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
     { id: 4, value: 0, property: "Friends" },
-    { id: 5, value: 0, property: "Credits" },
-    { id: 6, value: 0, property: "Tokens" },
-    { id: 7, value: 0, property: "Rallies" },
-    { id: 8, value: countryCount, property: "Countries" },
+    // { id: 5, value: 0, property: "Credits" },
+    // { id: 6, value: 0, property: "Tokens" },
+    // { id: 7, value: 0, property: "Rallies" },
+    // { id: 8, value: countryCount, property: "Countries" },
   ];
   // Split the data into chunks of 3 for each row
   const rows = [];
@@ -241,8 +241,8 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () =>
   const renderFooter = () => (
     <View style={_styles.scroll}>
       <TouchableOpacity style={_styles.headingView}>
-        <AppText style={_styles.heading}>MY AR Adventures</AppText>
-        <View style={_styles.arrow_3}>
+        <AppText style={_styles.heading}>My AR Adventures</AppText>
+        <View>
           <Image source={Images.ForwardIcon} />
         </View>
       </TouchableOpacity>

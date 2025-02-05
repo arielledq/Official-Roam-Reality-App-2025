@@ -237,21 +237,21 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
-      {profileDetails?.image ? (
-        <View style={_styles.avatarContainer}>
-          <LinearGradient
-            colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-            start={{ x: 0.5, y: 1 }}
-            end={{ x: 0.5, y: 0.7 }}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 1,
-            }}
-          />
+      <View style={_styles.avatarContainer}>
+        <LinearGradient
+          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+          start={{ x: 0.5, y: 1 }}
+          end={{ x: 0.5, y: 0.7 }}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+          }}
+        />
+        {profileDetails?.image ? (
           <FastImage
             style={{
               width: "100%",
@@ -261,39 +261,26 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             source={{ uri: profileDetails?.image }}
             resizeMode={FastImage.resizeMode.cover}
           />
-
-          <AppButton
-            customColors={["#7B16FF", "#1158F4"]}
-            buttonStyle={_styles.editButton}
-            containerStyle={[
-              _styles.editButtonContainer,
-              {
-                top: Platform.OS === "ios" ? 125 : 110,
-              },
-            ]}
-            onPress={() => {
-              setIsTransitioning(true);
-              //  @ts-ignore
-              navigation.navigate("EditProfile", {
-                edit: true,
-                profileDetails,
-                onProfileUpdate,
-              });
+        ) : (
+          <View
+            style={{
+              width: "100%",
+              height: 100,
             }}
-          >
-            <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
-            {/* @ts-ignore */}
-            <AppText style={_styles.buttonText}>Edit Profile </AppText>
-          </AppButton>
-        </View>
-      ) : (
+          />
+        )}
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
-          containerStyle={_styles.editButtonContainer}
+          containerStyle={[
+            _styles.editButtonContainer,
+            {
+              top: Platform.OS === "ios" ? 125 : 110,
+            },
+          ]}
           onPress={() => {
             setIsTransitioning(true);
-            // @ts-ignore
+            //  @ts-ignore
             navigation.navigate("EditProfile", {
               edit: true,
               profileDetails,
@@ -303,9 +290,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           {/* @ts-ignore */}
-          <AppText style={_styles.buttonText}>Edit Profile</AppText>
+          <AppText style={_styles.buttonText}>Edit Profile </AppText>
         </AppButton>
-      )}
+      </View>
+
       <View style={_styles.scroll}>
         <UserInfoCard
           // @ts-ignore
@@ -350,7 +338,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     <View style={_styles.scroll}>
       <View style={_styles.headingView}>
         <AppText style={_styles.heading}>Player AR Memories</AppText>
-        <TouchableOpacity style={_styles.arrow_3} onPress={scrollRegionsPressHandler}>
+        <TouchableOpacity onPress={scrollRegionsPressHandler}>
           <Image source={Images.ForwardIcon} />
         </TouchableOpacity>
       </View>
