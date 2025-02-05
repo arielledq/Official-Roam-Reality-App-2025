@@ -154,7 +154,7 @@ class ChallengesSerializer(serializers.ModelSerializer):
 
     def get_user_attempts(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
+        if user:
             return ARMemories.objects.filter(user=user, challenges=obj).count()
         return 0
 
@@ -357,7 +357,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
 
     def get_user_attempts(self, obj):
         user = self.context['request'].user
-        if user.is_authenticated:
+        if user:
             return ARSitePinCheckIn.objects.filter(user=user, geo_site=obj, geo_challenge=obj.pin_challenge).count()
         return 0
 
