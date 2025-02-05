@@ -391,6 +391,8 @@ class GeoARChallenges(models.Model):
     image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
     model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    color = models.CharField(_("Color"), max_length=10, blank=True, null=True,
+                             default='#ffffff')
     sponsor = models.ForeignKey(
         Sponsor,
         on_delete=models.CASCADE,

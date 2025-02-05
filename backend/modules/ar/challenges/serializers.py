@@ -264,6 +264,7 @@ class GeoARChallengesSerializer(serializers.ModelSerializer):
             "parameters",
             "ar_filters",
             "info",
+            "color",
         )
 
 
@@ -508,7 +509,6 @@ class StarCollectionSerializer(serializers.ModelSerializer):
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
     challenge_details = GeoARChallengesSerializer(source='geo_challenge', read_only=True)
-    # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:
         model = ARSitePinCheckIn
