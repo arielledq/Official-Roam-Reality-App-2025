@@ -326,6 +326,8 @@ class ChallengesViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing challenges.
     """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = Challenges.objects.all()
     serializer_class = ChallengesSerializer
     http_method_names = ["get"]
@@ -363,11 +365,19 @@ class GeoArSiteCategoryViewSet(viewsets.ModelViewSet):
     serializer_class = GeoArSiteCategorySerializer
     http_method_names = ["get"]
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if geo_site_id := self.request.query_params.get('site_id'):
+            qs = qs.filter(geo_sites__in=[geo_site_id])
+        return qs
+
 
 class GeoArSiteViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing GeoArSite.
     """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = GeoArSite.objects.all()
     serializer_class = GeoArSiteSerializer
     http_method_names = ["get"]
@@ -386,9 +396,11 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
     @action(detail=False, methods=['get'], url_path='get-by-site-id', name='AR Site Stars')
     def get_by_ar_site(self, request):
         id = request.GET.get("id")
-        objs = self.queryset.filter(geo_site=id)
-        serializer = GeoStarSerializer(objs, many=True, context={'request': request})
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        star_zones = self.queryset.filter(geo_site=id)
+        star_count = 0
+        for star_zone in star_zones:
+            star_count += star_zone.stars.count()
+        return Response({"stars": star_count}, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['get'], url_path='get-stars-sites', name='AR Site Stars')
     def get_ar_star_sites(self, request):
