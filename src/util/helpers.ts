@@ -161,3 +161,39 @@ export function isPointInPolygon(point: number[], polygon: any) {
 export const tracksViewChanges = false;
 export const pinColor = undefined; //'#B14FE9'
 export const useCustomMarkers = true;
+
+export const processCoolDownPeriod = (remaining: string) => {
+  const timeString = remaining;
+  // Split the string into hours, minutes, seconds, and milliseconds
+  const [hours, minutes, seconds] = timeString.split(/[:.]/);
+
+  // Convert to a Date object (assuming today's date)
+  const date = new Date();
+  // @ts-ignore
+  date.setHours(hours, minutes, seconds);
+
+  // Extract the time in hours (24-hour format)
+  const hoursOnly = date.getHours();
+  const minutesOnly = date.getMinutes();
+  const secondsOnly = date.getSeconds();
+
+  let coolDownHasFinished = false;
+  if (hoursOnly === 0 && minutesOnly === 0 && secondsOnly === 0) {
+    coolDownHasFinished = true;
+  }
+
+  let remainingText = "";
+
+  if (hoursOnly >= 1) {
+    remainingText = `${hoursOnly}h`;
+  } else {
+    remainingText = `<1h`;
+  }
+  if (coolDownHasFinished) {
+    remainingText = `0h`;
+  }
+  return {
+    coolDownHasFinished: coolDownHasFinished,
+    remainingText: remainingText,
+  };
+};
