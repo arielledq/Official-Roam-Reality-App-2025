@@ -444,23 +444,14 @@ const PinChallenge = () => {
         notificationView();
         if (!isMeInsideInSite) {
           isLoadingUnity();
-          unityRef.current.postMessage(
-            "Scriptposition",
-            "SetVisibleButton",
-            JSON.stringify({
-              setVisibleButtonPosition: false,
-            })
-          );
         }
-        if (isMeInsideInSite) {
-          unityRef.current.postMessage(
-            "Scriptposition",
-            "SetVisibleButton",
-            JSON.stringify({
-              setVisibleButtonPosition: true,
-            })
-          );
-        }
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({
+            setVisibleButtonPosition: true,
+          })
+        );
       }
     }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded, isMeInsideInSite])
   );
