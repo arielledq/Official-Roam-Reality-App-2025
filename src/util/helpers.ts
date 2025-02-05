@@ -197,3 +197,11 @@ export const processCoolDownPeriod = (remaining: string) => {
     remainingText: remainingText,
   };
 };
+
+export const processMyCheckIns = (user_attempts: number, challenge_attempt: number) => {
+  if (!isNaN(user_attempts) && !isNaN(challenge_attempt)) {
+    return `${user_attempts || 0}/${challenge_attempt || 0}`;
+  } else {
+    return "";
+  }
+};

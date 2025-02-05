@@ -7,7 +7,7 @@ import moment from "moment";
 
 import { FontSizes } from "../../../util/FontUtils";
 import { checkARChallengeDoneAPI, getAnyARExamples } from "../../../network";
-import { processCoolDownPeriod, showMessage } from "../../../util/helpers";
+import { processCoolDownPeriod, processMyCheckIns, showMessage } from "../../../util/helpers";
 
 import { RootStackParamList, ScreenStackComponent } from "../../../constants/types";
 // @ts-ignore
@@ -27,17 +27,8 @@ const { width } = Dimensions.get("window");
 const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetails"> = ({
   navigation,
   route,
-  // route: {
-  //   params: {
-  //     cooldown: { coolDownFinished: boolean, coolDownHoursText: string },
-  //     experience_type: string,
-  //     checkIns: string
-  //   },
-  // },
 }) => {
   const experience_type = route.params?.experience_type;
-
-  let checkIns = route.params?.checkIns;
   let challengeObj = route?.params?.challengeObj;
 
   switch (experience_type) {
@@ -67,7 +58,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   const [examples, setExamples] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isChallengeDone, setIsChallengeDone] = useState(false);
-  const [coolDownFinished, setCoolDownFinished] = useState(false);
   const [coolDownHoursText, setCoolDownHoursText] = useState("");
   const [myCheckInsText, setMyCheckInsText] = useState("");
 
@@ -82,14 +72,10 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     })
       .then(res => {
         if (res.errorStatus == 403) {
-          const { coolDownHasFinished, remainingText } = processCoolDownPeriod(
-            res?.message?.remaining
-          );
-          setCoolDownFinished(coolDownHasFinished);
+          const { remainingText } = processCoolDownPeriod(res?.message?.remaining);
           setCoolDownHoursText(remainingText);
           setIsChallengeDone(true);
         } else {
-          setCoolDownFinished(true);
           setCoolDownHoursText("0h");
           setIsChallengeDone(false);
         }
@@ -139,31 +125,27 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           checkIfChallengeIsDone();
 
           // My Check-ins info
-          if (!isNaN(challengeObj?.user_attempts) && !isNaN(challengeObj?.challenge_attempt)) {
-            setMyCheckInsText(
-              `${challengeObj?.user_attempts || 0}/${challengeObj?.challenge_attempt || 0}`
-            );
-          } else {
-            setMyCheckInsText("");
-          }
-
+          const usersCheckIns = processMyCheckIns(
+            challengeObj?.user_attempts,
+            challengeObj?.challenge_attempt
+          );
+          setMyCheckInsText(usersCheckIns);
           break;
         case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
-          // checkIfChallengeIsDone();
-
           // Cool Down info
           const coolDownParams = route.params?.coolDown;
+
           if (coolDownParams) {
-            setCoolDownFinished(coolDownParams?.coolDownFinished);
             setCoolDownHoursText(coolDownParams?.coolDownHoursText);
           } else {
-            setCoolDownFinished(true);
             setCoolDownHoursText("0h");
           }
 
           // My Check-ins info
           const checkInsParams = route.params?.checkIns;
-          console.log("checkInsParams", checkInsParams);
+          if (checkInsParams) {
+            setMyCheckInsText(checkInsParams);
+          }
 
           break;
 
@@ -183,8 +165,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       showMessage("We are working on adding examples to this challenge.", "info");
     }
   };
-
-  // console.log(coolDown);
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
