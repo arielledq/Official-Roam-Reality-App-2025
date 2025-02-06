@@ -22,6 +22,7 @@ interface ShareToSocialsModalProps {
   ) => void;
   fileUri?: string | undefined;
   fileExt?: string | undefined;
+  sponsor?: { description: string; tags: string } | undefined;
   isMemory?: boolean;
 }
 
@@ -31,6 +32,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   onPointsGranted,
   fileUri,
   fileExt,
+  sponsor,
   isMemory = false,
 }) => {
   const share = async (selectedSSNN: string) => {
@@ -73,6 +75,9 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         shareOptions = {
           url: updatedFileUri,
           type: mimeType,
+          message: `${sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""}\n\n${
+            sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""
+          }`,
         };
         break;
 
@@ -112,6 +117,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       }
     }
   };
+
+  if (!isVisible) return null;
 
   return (
     <View style={{ flex: 1 }}>

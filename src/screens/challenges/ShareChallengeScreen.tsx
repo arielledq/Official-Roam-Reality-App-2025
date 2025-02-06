@@ -80,9 +80,10 @@ const ArChallengeShare = () => {
       socialPointsCounter.others;
   }
 
-  let challengeTitle = `Congrats on completing the ${challengeObj?.sponsored?.name} AR Experience!`;
-  let sponsorImage = challengeObj?.sponsored?.image || "";
-  let sponsorName = challengeObj?.sponsored?.name || "";
+  let sponsor = challengeObj?.sponsored;
+  let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
+  let sponsorImage = sponsor?.image || "";
+  let sponsorName = sponsor?.name || "";
   let startDate = moment().format("MM-DD-YYYY");
   let endChallengeButtonText = "End & Share to Roam Profile";
   switch (challengeType) {
@@ -97,8 +98,9 @@ const ArChallengeShare = () => {
     case CHALLENGES_TYPE.STAR:
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
 
-      sponsorImage = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored?.image;
-      sponsorName = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored?.name;
+      sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
+      sponsorImage = sponsor?.image;
+      sponsorName = sponsor?.name;
       if (isMemory) startDate = "-";
       const remainingStars = challengeObj?.remaining_stars;
       if (remainingStars > 1) {
@@ -565,6 +567,7 @@ const ArChallengeShare = () => {
         fileExt={fileExt}
         isVisible={shareToSocialsIsOpen}
         isMemory={isMemory}
+        sponsor={sponsor}
         onPointsGranted={countSocialPoints}
         onClose={closeShareToSocialMediaButtonHandler}
       />
