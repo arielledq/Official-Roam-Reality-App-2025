@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Image, Platform, Text, View } from "react-native";
+import { Image, Platform, Text, View, Dimensions } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -65,7 +65,6 @@ const ArChallengeShare = () => {
     useRoute<RouteProp<{ ShareChallenge: ShareChallengeRouteParams }, "ShareChallenge">>();
   const navigation = useNavigation();
 
-  let isStarChallenge = false;
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
@@ -97,7 +96,6 @@ const ArChallengeShare = () => {
       break;
     case CHALLENGES_TYPE.STAR:
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
-      isStarChallenge = true;
 
       sponsorImage = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored?.image;
       sponsorName = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored?.name;
@@ -343,36 +341,20 @@ const ArChallengeShare = () => {
         .then(res => {
           if (Platform.OS == "ios") {
             cameraRollSaveAsset(res.data, fileExt);
-            // CameraRoll.saveAsset(res.data, { type: fileExt == "mp4" ? "video" : "photo" })
-            //   .then(() => {
-            //     showMessage("Saved to Camera Roll", "success", "AR Memories!");
-            //   })
-            //   .catch(err => {
-            //     showMessage("There was an error saving to Camera Roll", "error", "AR Memories!");
-            //   });
           } else {
             showMessage("Saved to Camera Roll", "success", "AR Memories!");
           }
         });
     } else {
       cameraRollSaveAsset(capturedDataUri, fileExt);
-
-      // CameraRoll.saveAsset(capturedDataUri, {
-      //   type: fileExt === "mp4" ? "video" : "photo",
-      // })
-      //   .then(() => {
-      //     showMessage("Saved to Camera Roll.");
-      //   })
-      //   .catch(err => {
-      //     console.error("err:", err);
-      //     showMessage("Not able to save, please check permission.", "error");
-      //   });
     }
   };
 
+  const imageContainerHeight = Dimensions.get("screen").height - 540;
+
   return (
     <ChallengeScreen title={screenTitle} style={{ justifyContent: "space-between", flex: 1 }}>
-      <View style={{ height: "100%", paddingHorizontal: 32 }}>
+      <View style={{ flex: 1, paddingHorizontal: 32 }}>
         <View style={{ flex: 1 }}>
           {challengeTitle && (
             <View style={{ flexDirection: "row", gap: 12 }}>
@@ -421,7 +403,6 @@ const ArChallengeShare = () => {
                   Points
                 </AppText>
               </View>
-
               <AppText
                 numberOfLines={3}
                 style={{
@@ -439,9 +420,6 @@ const ArChallengeShare = () => {
 
           <View
             style={{
-              width: "100%",
-              height: 440,
-
               backgroundColor: "#272741",
 
               gap: 8,
@@ -461,10 +439,11 @@ const ArChallengeShare = () => {
                 resizeMode={"contain"}
                 repeat={true}
                 style={{
-                  flex: 1,
+                  height: imageContainerHeight,
+                  maxHeight: 440,
+                  width: "60%",
                   justifyContent: "flex-end",
                   alignItems: "flex-end",
-                  width: "60%",
                 }}
                 source={{
                   uri: capturedDataUri,
@@ -475,9 +454,10 @@ const ArChallengeShare = () => {
                 resizeMode={"contain"}
                 source={{ uri: capturedDataUri }}
                 style={{
+                  height: imageContainerHeight,
+                  maxHeight: 440,
                   backgroundColor: "transparent",
                   width: "60%",
-                  flex: 1,
                 }}
               />
             )}
@@ -507,7 +487,7 @@ const ArChallengeShare = () => {
               </Text>
             </View>
 
-            {/* Completition date */}
+            {/* Completion date */}
             {!isMemory && challengeTitle && (
               <Text
                 style={{
@@ -524,17 +504,14 @@ const ArChallengeShare = () => {
 
           <View
             style={{
-              width: "100%",
               flexDirection: "column",
               gap: 16,
-              flex: 1,
               alignItems: "center",
             }}
           >
             {!isMemory && (
               <Text
                 style={{
-                  flex: 1,
                   fontSize: FontSizes.S12,
                   color: theme.lightColors?.grey0,
                 }}
