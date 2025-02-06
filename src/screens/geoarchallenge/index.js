@@ -3,7 +3,7 @@ import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "
 
 import OneSignal from "react-native-onesignal";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
@@ -42,6 +42,8 @@ const GeoArChallenge = ({}) => {
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
+
+  const account_setup = useSelector(state => state?.login?.data?.user?.user_profile?.account_setup);
 
   useEffect(() => {
     OneSignal.setNotificationOpenedHandler(notification => {
@@ -167,6 +169,15 @@ const GeoArChallenge = ({}) => {
   useEffect(() => {
     loadDestinations();
     setOnesignalDevice();
+  }, []);
+
+  useEffect(() => {
+    if (!account_setup) {
+      setTimeout(() => {
+        // @ts-ignore
+        navigation.replace("EditProfile");
+      }, 300);
+    }
   }, []);
 
   const navigateToChallengeDetails = obj => {

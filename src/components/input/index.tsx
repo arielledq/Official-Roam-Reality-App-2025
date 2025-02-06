@@ -2,7 +2,7 @@ import { Input } from "@rneui/themed";
 import React, { FC, useState } from "react";
 import { Platform, StyleSheet } from "react-native";
 import theme from "../../assets/theme";
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 import { TextInputProps } from "./type";
 
 const AppInput: FC<TextInputProps> = (props: TextInputProps) => {
@@ -18,7 +18,6 @@ const AppInput: FC<TextInputProps> = (props: TextInputProps) => {
       }
       containerStyle={[styles.container, containerStyle]}
       inputStyle={[styles.text, inputStyle]}
-      // style={[focus && styles.style, style]}
       inputContainerStyle={[styles.inputStyle, inputContainerStyle]}
       onFocus={e => {
         setFocus(true);
@@ -27,7 +26,6 @@ const AppInput: FC<TextInputProps> = (props: TextInputProps) => {
       onBlur={e => {
         setFocus(false);
         props?.onBlur && props?.onBlur(e);
-        // inputRef.current.blur();
       }}
       leftIconContainerStyle={styles.leftContainerStyle}
       {...otherProps}

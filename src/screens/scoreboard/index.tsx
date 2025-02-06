@@ -1,61 +1,68 @@
 import React, { useRef, useState } from "react";
-import { Text, View, Pressable, ImageBackground, TouchableOpacity } from "react-native";
-import { AppHeader } from "../../components";
-import { FlatList } from "react-native-gesture-handler";
-import useStyles from "./styles";
 import {
-  getARProfile,
-  getGeoARDestinations,
-  getProfieDetails,
-  searchUsers,
-  sendFriendRequest,
-} from "../../network";
+  Text,
+  View,
+  Pressable,
+  ImageBackground,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+
+import { FlatList } from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
-import Images from "../../assets/images";
 import { useDispatch, useSelector } from "react-redux";
-import BackgroundWithImage from "../../components/background";
-import { updateARUserData } from "../../redux/AR";
-import RankBG from "../../assets/geoar/rank_bg.svg";
-import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { MenuIcon } from "assets/svg";
+
+import { getARProfile, getGeoARDestinations, getProfieDetails, searchUsers } from "../../network";
+import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { handleError } from "util/helpers";
+import { updateARUserData } from "../../redux/AR";
+
+import { AppHeader } from "../../components";
 import ScreenContainer from "components/ScreenContainer";
 
+import useStyles from "./styles";
+
+import Images from "../../assets/images";
+// @ts-ignore
+import RankBG from "../../assets/geoar/rank_bg.svg";
+import { MenuIcon } from "assets/svg";
+
 const ScoreBoard = ({}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [filteredUsers, setFilteredUsers] = React.useState<[]>([]);
+  const [allUsers, setAllUsers] = React.useState([]);
+  const [profileDetails, setProfileDetails] = useState<any>(null);
+  const [rankMine, setRankMine] = useState<number | null>(null);
+  const [destinationData, setDestinationData] = useState([]);
+  const [selectedDestination, setSelectedDestination] = useState<any>(null);
+
   const _styles = useStyles();
   const dispatch = useDispatch();
-  const [isLoading, setIsLoading] = useState(false);
-  const [filteredUsers, setFilteredUsers] = React.useState([]);
-  const [allUsers, setAllUsers] = React.useState([]);
-  const userProfile = useSelector(state => state.login?.data?.user);
-  const arProfile = useSelector(state => state.ar?.arProfile);
-  const [profileDetails, setProfileDetails] = useState(null);
-  const [rankMine, setRankMine] = useState(null);
-  const [destinationData, setDestinationData] = useState([]);
-  const [selectedDestination, setSelectedDestination] = useState(null);
   const desRef = useRef();
   const navigation = useNavigation();
 
-  const fetchUsers = () => {
+  const userProfile = useSelector((state: any) => state?.login?.data?.user);
+  const arProfile = useSelector((state: any) => state?.ar?.arProfile);
+
+  const fetchUsers = (userId: number) => {
     const payload = {
       search: "",
     };
     searchUsers(payload).then(response => {
       if (response) {
         if (response?.data?.length > 0) {
-          let arProfiles = response?.data.filter(a => a.user_ar_profile);
-          arProfiles = arProfiles.filter(a => a.name);
+          let arProfiles = response?.data.filter((a: any) => a?.user_ar_profile);
+          arProfiles = arProfiles.filter((a: any) => a?.name);
           if (arProfile && userProfile) {
-            userProfile.user_ar_profile = arProfile;
             arProfiles.push(userProfile);
           }
           const aa = arProfiles.sort(
-            (a, b) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
+            (a: any, b: any) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
           );
           for (var i = 0; i < aa.length; i++) {
             aa[i].rank = i + 1;
-            if (aa[i].id == userProfile.id) {
+            if (aa[i].id == userId) {
               setRankMine(i + 1);
             }
           }
@@ -66,10 +73,10 @@ const ScoreBoard = ({}) => {
     });
   };
 
-  const fetchProfileDetails = async () => {
+  const fetchProfileDetails = async (userProfileId: number) => {
     try {
       getProfieDetails({
-        id: userProfile.user_profile.id,
+        id: userProfileId,
       })
         .then(res => {
           if (res.status == 1) {
@@ -113,12 +120,154 @@ const ScoreBoard = ({}) => {
       .finally(() => {});
   };
 
-  React.useEffect(() => {
-    fetchProfileDetails();
-    fetchUsers();
-    fetchARUserProfile();
-    ARDestinations();
-  }, []);
+  const getAllPoints = (destination: any) => {
+    const arrayPoints = [];
+    if (destination?.border?.coordinates) {
+      for (let i = 0; i < destination.border.coordinates.length; i++) {
+        const points = destination.border.coordinates[i];
+        for (let j = 0; j < points.length; j++) {
+          const point = points[j];
+          arrayPoints.push({ latitude: point[1], longitude: point[0] });
+        }
+      }
+      return arrayPoints;
+    }
+    return null;
+  };
+
+  const filterDestinations = (o: any, index: number) => {
+    setSelectedDestination(o);
+    // @ts-ignore
+    desRef?.current?.scrollToIndex({
+      animated: true,
+      index: index,
+    });
+    const destinationPoints = getAllPoints(o);
+    if (destinationPoints) {
+      const filterUserWithDes = [];
+      let count = 1;
+      for (let i = 0; i < allUsers.length; i++) {
+        let userCheck: any = allUsers[i];
+        if (
+          userCheck?.user_ar_profile &&
+          userCheck?.user_ar_profile?.current_location?.coordinates?.length > 0
+        ) {
+          const pointUser = {
+            latitude: userCheck?.user_ar_profile?.current_location?.coordinates[1],
+            longitude: userCheck?.user_ar_profile?.current_location?.coordinates[0],
+          };
+
+          const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
+          if (isInsideSiteArea) {
+            userCheck.rank = count;
+            filterUserWithDes.push(userCheck);
+            count++;
+          }
+        }
+        // @ts-ignore
+        setFilteredUsers(filterUserWithDes);
+      }
+    }
+  };
+
+  const DestinationItem = ({ obj, index }: { obj: any; index: number }) => (
+    <Pressable
+      onPress={() => filterDestinations(obj, index)}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        height: 48,
+        borderRadius: 100,
+        borderColor: "#9003E0",
+        backgroundColor: "#323250",
+        paddingHorizontal: 8,
+        marginHorizontal: 5,
+        borderWidth: obj.id == selectedDestination?.id ? 1 : 0,
+      }}
+    >
+      <FastImage
+        style={{
+          width: 40,
+          aspectRatio: 1,
+          height: 40,
+          borderRadius: 100,
+          overflow: "hidden",
+          marginEnd: 8,
+        }}
+        source={{ uri: obj?.flag_image }}
+        resizeMode={FastImage.resizeMode.cover}
+      />
+      <View>
+        <Text style={_styles.destinationText}>{obj?.name}</Text>
+        <Text style={_styles.destinationText}>Scoreboard</Text>
+      </View>
+    </Pressable>
+  );
+
+  const Item = ({ obj }: { obj: any }) => {
+    return (
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          backgroundColor: "#131422",
+          borderRadius: 12,
+          marginVertical: 4,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center" }}>
+          <View style={{ marginStart: 10, alignItems: "center" }}>
+            <Text style={_styles.rankText}>Rank</Text>
+            <Text style={_styles.rankTextNumber}>{obj?.rank}</Text>
+          </View>
+          <ImageBackground
+            source={Images.BGBlur}
+            style={{
+              width: 80,
+              aspectRatio: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            resizeMode="stretch"
+          >
+            <FastImage
+              style={{
+                width: 40,
+                aspectRatio: 1,
+                borderRadius: 5,
+                height: 40,
+              }}
+              source={{ uri: obj?.user_profile?.image }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+          </ImageBackground>
+          <Text numberOfLines={2} style={_styles.nameText}>
+            {obj?.name?.replace(" ", "\n")}
+          </Text>
+        </View>
+        <View style={{ alignItems: "center" }}>
+          <Text style={_styles.rankText}>Site Visited</Text>
+          <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.check_ins}</Text>
+        </View>
+        <View style={{ marginEnd: 10, alignItems: "center" }}>
+          <Text style={_styles.rankText}>Points</Text>
+          <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.points}</Text>
+        </View>
+      </View>
+    );
+  };
+
+  const handleMenuButton = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
+        style={{ paddingLeft: 5 }}
+      >
+        <MenuIcon />
+      </TouchableOpacity>
+    );
+  };
 
   const myRank = () => {
     return (
@@ -151,198 +300,81 @@ const ScoreBoard = ({}) => {
             />
           </ImageBackground>
           <Text numberOfLines={2} style={_styles.nameText}>
-            {userProfile?.name.replace(" ", "\n")}
+            {userProfile?.name ? userProfile?.name?.replace(" ", "\n") : "You"}
           </Text>
         </View>
         <View style={{ alignItems: "center" }}>
           <Text style={_styles.rankText}>Site Visited</Text>
-          <Text style={_styles.rankTextNumber}>{arProfile.check_ins}</Text>
+          <Text style={_styles.rankTextNumber}>{arProfile?.check_ins}</Text>
         </View>
         <View style={{ marginEnd: 10, alignItems: "center" }}>
           <Text style={_styles.rankText}>Points</Text>
-          <Text style={_styles.rankTextNumber}>{arProfile.points}</Text>
+          <Text style={_styles.rankTextNumber}>{arProfile?.points}</Text>
         </View>
       </View>
     );
   };
 
-  const getAllPoints = destination => {
-    const arrayPoints = [];
-    if (destination?.border?.coordinates) {
-      for (let i = 0; i < destination.border.coordinates.length; i++) {
-        const points = destination.border.coordinates[i];
-        for (let j = 0; j < points.length; j++) {
-          const point = points[j];
-          arrayPoints.push({ latitude: point[1], longitude: point[0] });
-        }
-      }
-      return arrayPoints;
+  React.useEffect(() => {
+    ARDestinations();
+    fetchARUserProfile();
+  }, []);
+
+  React.useEffect(() => {
+    const userId = userProfile?.id;
+    if (userId) {
+      fetchUsers(userId);
     }
-    return null;
-  };
 
-  const filterDestinations = (o, index) => {
-    setSelectedDestination(o);
-    desRef?.current?.scrollToIndex({
-      animated: true,
-      index: index,
-    });
-    const destinationPoints = getAllPoints(o);
-    if (destinationPoints) {
-      const filterUserWithDes = [];
-      let count = 1;
-      for (let i = 0; i < allUsers.length; i++) {
-        let userCheck = allUsers[i];
-        if (userCheck.user_ar_profile && userCheck.user_ar_profile?.current_location?.coordinates?.length > 0) {
-          const pointUser = {
-            latitude: userCheck.user_ar_profile?.current_location.coordinates[1],
-            longitude: userCheck.user_ar_profile?.current_location.coordinates[0],
-          };
-
-          const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
-          if (isInsideSiteArea) {
-            userCheck.rank = count;
-            filterUserWithDes.push(userCheck);
-            count++;
-          }
-        }
-        setFilteredUsers(filterUserWithDes);
-      }
+    const userProfileId = userProfile?.user_profile?.id;
+    if (userProfileId) {
+      fetchProfileDetails(userProfileId);
     }
-  };
-
-  const DestinationItem = ({ obj, index }) => (
-    <Pressable
-      onPress={() => filterDestinations(obj, index)}
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        height: 48,
-        borderRadius: 100,
-        backgroundColor: "",
-        borderColor: "#9003E0",
-        backgroundColor: "#323250",
-        paddingHorizontal: 8,
-        marginHorizontal: 5,
-        borderWidth: obj.id == selectedDestination?.id ? 1 : 0,
-      }}
-    >
-      <FastImage
-        style={{
-          width: 40,
-          aspectRatio: 1,
-          borderRadius: 5,
-          height: 40,
-          borderRadius: 100,
-          overflow: "hidden",
-          marginEnd: 8,
-        }}
-        source={{ uri: obj?.flag_image }}
-        resizeMode={FastImage.resizeMode.cover}
-      />
-      <View>
-        <Text style={_styles.destinationText}>{obj.name}</Text>
-        <Text style={_styles.destinationText}>Scoreboard</Text>
-      </View>
-    </Pressable>
-  );
-
-  const Item = ({ obj }) => {
-    return (
-    <View
-      style={{
-        flexDirection: "row",
-        alignItems: "center",
-        justifyContent: "space-between",
-        backgroundColor: "#131422",
-        borderRadius: 12,
-        marginVertical: 4,
-      }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center" }}>
-        <View style={{ marginStart: 10, alignItems: "center" }}>
-          <Text style={_styles.rankText}>Rank</Text>
-          <Text style={_styles.rankTextNumber}>{obj.rank}</Text>
-        </View>
-        <ImageBackground
-          source={Images.BGBlur}
-          style={{
-            width: 80,
-            aspectRatio: 1,
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-          resizeMode="stretch"
-        >
-          <FastImage
-            style={{
-              width: 40,
-              aspectRatio: 1,
-              borderRadius: 5,
-              height: 40,
-            }}
-            source={{ uri: obj?.user_profile?.image }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-        </ImageBackground>
-        <Text numberOfLines={2} style={_styles.nameText}>
-          {obj?.name?.replace(" ", "\n")}
-        </Text>
-      </View>
-      <View style={{ alignItems: "center" }}>
-        <Text style={_styles.rankText}>Site Visited</Text>
-        <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.check_ins}</Text>
-      </View>
-      <View style={{ marginEnd: 10, alignItems: "center" }}>
-        <Text style={_styles.rankText}>Points</Text>
-        <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.points}</Text>
-      </View>
-    </View>
-  )};
-
-  const handleMenuButton = () => {
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
-        style={{ paddingLeft: 5 }}
-      >
-        <MenuIcon />
-      </TouchableOpacity>
-    );
-  };
+  }, [userProfile]);
 
   return (
     <ScreenContainer>
-      <AppHeader
-        leftComponent={handleMenuButton()}
-        centerComponent={{
-          text: "Scoreboard",
-          style: [_styles.heading],
-        }}
-        backgroundColor="transparent"
-        isBottomTab
-      />
-      <View style={{ height: 50 }}>
-        <FlatList
-          horizontal
-          ref={desRef}
-          data={destinationData}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />}
+      <>
+        <AppHeader
+          leftComponent={handleMenuButton()}
+          centerComponent={{
+            text: "Scoreboard",
+            style: [_styles.heading],
+          }}
+          backgroundColor="transparent"
+          isBottomTab
         />
-      </View>
-      <Text style={_styles.subTitle}>Your rank</Text>
-      {myRank()}
-      <Text style={_styles.subTitle}>Leaderboard</Text>
-      <FlatList
-        style={{ flex: 1, marginVertical: 15 }}
-        data={filteredUsers}
-        showsHorizontalScrollIndicator={false}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <Item obj={item} />}
-        keyExtractor={item => item.id}
-      />
+        {isLoading ? (
+          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+            <ActivityIndicator size="large" />
+          </View>
+        ) : (
+          <>
+            <View style={{ height: 50 }}>
+              <FlatList
+                horizontal
+                // @ts-ignore
+                ref={desRef}
+                data={destinationData}
+                showsHorizontalScrollIndicator={false}
+                showsVerticalScrollIndicator={false}
+                renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />}
+              />
+            </View>
+            <Text style={_styles.subTitle}>Your rank</Text>
+            {myRank()}
+            <Text style={_styles.subTitle}>Leaderboard</Text>
+            <FlatList
+              style={{ flex: 1, marginVertical: 15 }}
+              data={filteredUsers}
+              showsHorizontalScrollIndicator={false}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item }) => <Item obj={item} />}
+              keyExtractor={(item: any) => item?.id}
+            />
+          </>
+        )}
+      </>
     </ScreenContainer>
   );
 };

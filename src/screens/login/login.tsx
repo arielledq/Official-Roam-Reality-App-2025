@@ -88,7 +88,9 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
           initialValues={{
             email: "",
             password: "",
+            // email: "user03@yopmail.com", // User without profile pic
             // email: "ar01@yopmail.com",
+            // email: "user11@yopmail.com",
             // password: "Password123@",
           }}
           onSubmit={v => handleLogin(v)}

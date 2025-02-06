@@ -7,6 +7,7 @@ import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
  * @return useStyles @method
  */
 
+// @ts-ignore
 const useStyles = makeStyles(theme => ({
   mainContainer: {
     flex: 1,
@@ -120,6 +121,7 @@ const useStyles = makeStyles(theme => ({
   errorText: {
     fontSize: FontSizes.S13,
     marginLeft: 5,
+    color: theme.colors.error,
   },
   loaderContainer: {
     flex: 1,
