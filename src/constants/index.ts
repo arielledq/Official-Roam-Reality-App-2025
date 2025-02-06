@@ -31,5 +31,5 @@ export const MAP_MODE = {
 };
 
 export const PIN_CHALLENGE_CONFIG = {
-  CUSTOM_INSTRUCTIONS: "You need to be at the location to snap a photo",
+  CUSTOM_INSTRUCTIONS: "Users cannot take pictures unless you are within range of the AR ",
 };

@@ -174,6 +174,7 @@ const ArChallengeCapture = ({}) => {
     
       console.log("focus change", challengeType);
       if (unityRef.current && !!CAPTURE_CHALLENGE_TYPE[challengeType]) {
+        PointsCount();
         unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
@@ -345,7 +346,16 @@ const ArChallengeCapture = ({}) => {
       />
     </>
   );
-
+  const PointsCount = async () => {
+    if (unityRef.current) {
+      // Enviar mensaje a Unity para iniciar la grabación
+      const pointData = {
+        points: challengeObj?.points,
+        isPointView: true,
+      };
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
+    }
+  };
   //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
