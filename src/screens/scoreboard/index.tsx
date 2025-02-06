@@ -365,7 +365,7 @@ const ScoreBoard = ({}) => {
             {myRank()}
             <Text style={_styles.subTitle}>Leaderboard</Text>
             <FlatList
-              style={{ flex: 1, marginVertical: 15 }}
+              style={{ flex: 1, marginTop: 15 }}
               data={filteredUsers}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
