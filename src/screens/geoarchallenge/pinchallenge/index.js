@@ -459,7 +459,7 @@ const PinChallenge = () => {
           })
         );
       }
-    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded,isMeInsideInSite])
+    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded,isMeInsideInSite, threshold, intensity])
   );
 
   useFocusEffect(
