@@ -8,9 +8,7 @@ import { useSelector } from "react-redux";
 import { GeolocationContext } from "GeolocationProvider";
 
 import {
-  checkGeoPinCheckInDoneAPI,
   getARChallenges as getARChallengesApi,
-  getCheckInCount,
   getNextStar as getNextStarApi,
 } from "../../../network";
 import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
@@ -64,8 +62,6 @@ const ChallengeSelection = ({ route }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
-  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
-  const [myCheckIns, setMyCheckIns] = useState(0);
   const [starsChallenge, setStarsChallenge] = useState();
 
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
@@ -77,24 +73,6 @@ const ChallengeSelection = ({ route }) => {
 
   const latitude = userLocation?.latitude;
   const longitude = userLocation?.longitude;
-
-  const checkIfPinCheckIsDone = () => {
-    checkGeoPinCheckInDoneAPI({ geo_site: selectedGeoSite.id })
-      .then(res => {
-        setIsPinCheckIsDone(res.errorStatus === 403);
-      })
-      .finally(() => {});
-  };
-
-  const getMyCheckInsCount = () => {
-    getCheckInCount({})
-      .then(res => {
-        if (res.status === 1) {
-          setMyCheckIns(res.count);
-        }
-      })
-      .finally(() => {});
-  };
 
   const getNextStar = async () => {
     try {
@@ -186,9 +164,7 @@ const ChallengeSelection = ({ route }) => {
               <View style={{ flex: 1 }}>
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
                 {item?.id === 1 && (
-                  <AppText style={styles.challengesText}>
-                    Pin located: {isPinCheckIsDone ? 1 : 0}/1 • My Check-ins: {myCheckIns}
-                  </AppText>
+                  <AppText style={styles.challengesText}>My Check-ins: {checkIns}</AppText>
                 )}
                 {item?.id === 2 && (
                   <AppText style={styles.challengesText}>
@@ -214,8 +190,6 @@ const ChallengeSelection = ({ route }) => {
   useEffect(() => {
     if (isFocused) {
       getArChallenges();
-      checkIfPinCheckIsDone();
-      getMyCheckInsCount();
       getNextStar();
     }
   }, [isFocused]);

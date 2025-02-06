@@ -88,21 +88,21 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Access to the camera is required to take the picture or record video.</string>
+	<string>Room Reality needs access to your camera to allow you to take photos and videos for your profile and to share them within the app.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Roam Reality requires Contact permission to check your friends on platform</string>
+	<string>Room Reality needs access to your contacts to allow you to find your friends within the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>App requires GPS to track</string>
+	<string>Room Reality needs access to your location to provide personalized content based on where you are, such as nearby AR Challenges and AR Events.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>App requires GPS to track</string>
+	<string>Room Reality needs access to your location to provide personalized content based on where you are, such as nearby AR Challenges and AR Events.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>App requires GPS to track</string>
+	<string>Room Reality needs access to your location to provide personalized content based on where you are, such as nearby AR Challenges and AR Events.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Access to the microphone is required to record a video.</string>
+	<string>Room Reality needs access to your microphone to allow you to take videos for your profile and to share them within the app.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Access to save videos/photos to camera roll.</string>
+	<string>Room Reality needs access to your camera roll to allow you to save photos and videos and update your profile picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Access to the photo library is required to select a photo.</string>
+	<string>Room Reality needs access to your camera roll to allow you to save photos and videos and update your profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

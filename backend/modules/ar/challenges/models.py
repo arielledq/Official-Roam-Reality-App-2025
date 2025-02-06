@@ -110,6 +110,8 @@ class Sponsor(models.Model):
         blank=True,
         null=True,
     )
+    description = RichTextField(_("Description"), blank=True, null=True)
+    tags = models.CharField(_("Tags (optional)"), max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -563,6 +565,14 @@ class GeoArSite(models.Model):
     image = models.ImageField(upload_to="geoar/img/", null=False, blank=False, default=None)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="geo_site",
+    )
     geo_location = models.ForeignKey(
         GeoLocation,
         on_delete=models.CASCADE,

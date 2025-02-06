@@ -23,8 +23,9 @@ const useStyles = makeStyles(theme => ({
   },
   headingView: {
     flexDirection: "row",
-    marginTop: 20,
-    marginHorizontal: 5,
+    marginTop: 4,
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   heading: {
     ...fontGroup.nunitoBold,
@@ -32,7 +33,8 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH30,
     color: theme.colors.white,
     flex: 1,
-    marginLeft: -5,
+    alignItems: "center",
+    marginLeft: 16,
   },
   menuIcon: {
     paddingLeft: 5,
@@ -61,12 +63,6 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-between",
-  },
-  arrow_3: {
-    flex: 1,
-    alignItems: "flex-end",
-    marginRight: -29,
-    marginTop: -23,
   },
   buttonStyle: {
     height: 44,

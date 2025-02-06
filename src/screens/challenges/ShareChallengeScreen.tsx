@@ -1,5 +1,5 @@
 import React, { useContext, useState } from "react";
-import { Image, Text, View } from "react-native";
+import { Image, Platform, Text, View } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -33,6 +33,7 @@ import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
 import { GeolocationContext } from "GeolocationProvider";
+import RNFetchBlob from "rn-fetch-blob";
 
 // Add this interface near the top of the file, after the imports
 interface ShareChallengeRouteParams {
@@ -298,194 +299,254 @@ const ArChallengeShare = () => {
     setShareToSocialsIsOpen(false);
   };
 
-  const checkPermission = () => {
-    CameraRoll.saveAsset(capturedDataUri, {
-      type: fileExt == "mp4" ? "video" : "photo",
-    })
+  const cameraRollSaveAsset = (asset, fileExt) => {
+    CameraRoll.saveAsset(asset, { type: fileExt == "mp4" ? "video" : "photo" })
       .then(() => {
-        showMessage("Saved to Camera Roll.");
+        showMessage("Saved to Camera Roll", "success", "AR Memories!");
       })
       .catch(err => {
-        console.error("err:", err);
-        showMessage("Not able to save, please check permission.", "error");
+        showMessage("There was an error saving to Camera Roll", "error", "AR Memories!");
       });
   };
 
+  const saveToGallery = () => {
+    if (isMemory) {
+      const getPathFromUrl = (url: String) => {
+        return url.split("?")[0];
+      };
+
+      let memoryURL = capturedDataUri;
+      let memoryPath = getPathFromUrl(capturedDataUri);
+      const fileExt = memoryPath.split(".").pop();
+
+      let newMemoryUri = memoryPath.lastIndexOf("/");
+      let memoryName = memoryPath.substring(newMemoryUri);
+
+      let dirs = RNFetchBlob.fs.dirs;
+      const path =
+        Platform.OS === "ios" ? dirs.LibraryDir + memoryName : dirs.PictureDir + memoryName;
+
+      RNFetchBlob.config({
+        fileCache: true,
+        appendExt: fileExt,
+        indicator: true,
+        IOSBackgroundTask: true,
+        path: path,
+        addAndroidDownloads: {
+          useDownloadManager: true,
+          notification: true,
+          path: path,
+          description: fileExt == "mp4" ? "Video" : "Image",
+        },
+      })
+        .fetch("GET", memoryURL)
+        .then(res => {
+          if (Platform.OS == "ios") {
+            cameraRollSaveAsset(res.data, fileExt);
+            // CameraRoll.saveAsset(res.data, { type: fileExt == "mp4" ? "video" : "photo" })
+            //   .then(() => {
+            //     showMessage("Saved to Camera Roll", "success", "AR Memories!");
+            //   })
+            //   .catch(err => {
+            //     showMessage("There was an error saving to Camera Roll", "error", "AR Memories!");
+            //   });
+          } else {
+            showMessage("Saved to Camera Roll", "success", "AR Memories!");
+          }
+        });
+    } else {
+      cameraRollSaveAsset(capturedDataUri, fileExt);
+
+      // CameraRoll.saveAsset(capturedDataUri, {
+      //   type: fileExt === "mp4" ? "video" : "photo",
+      // })
+      //   .then(() => {
+      //     showMessage("Saved to Camera Roll.");
+      //   })
+      //   .catch(err => {
+      //     console.error("err:", err);
+      //     showMessage("Not able to save, please check permission.", "error");
+      //   });
+    }
+  };
+
   return (
-    <ChallengeScreen title={screenTitle} style={{justifyContent:'space-between', flex:1, }}>
-     <View style={{ height:'100%', paddingHorizontal: 32}}>
-      <View style={{ flex: 1, }}>
-        {challengeTitle && (
-          <View style={{ flexDirection: "row", gap: 12 }}>
-            {/* Points box */}
-            <View
-              style={{
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                borderRadius: 8,
-                backgroundColor: "transparent",
-                width: 55,
-                height: 55,
-              }}
-            >
-              <BackgroundWithImage
-                imageSource={BGArShare}
+    <ChallengeScreen title={screenTitle} style={{ justifyContent: "space-between", flex: 1 }}>
+      <View style={{ height: "100%", paddingHorizontal: 32 }}>
+        <View style={{ flex: 1 }}>
+          {challengeTitle && (
+            <View style={{ flexDirection: "row", gap: 12 }}>
+              {/* Points box */}
+              <View
                 style={{
+                  flexDirection: "column",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: 8,
                   backgroundColor: "transparent",
-                  position: "absolute",
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
+                  width: 55,
+                  height: 55,
                 }}
-              ></BackgroundWithImage>
+              >
+                <BackgroundWithImage
+                  imageSource={BGArShare}
+                  style={{
+                    backgroundColor: "transparent",
+                    position: "absolute",
+                    top: 0,
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
+                ></BackgroundWithImage>
+                <AppText
+                  style={{
+                    ...fontGroup.nunitoBold,
+                    fontWeight: "900",
+                    fontSize: FontSizes.S24,
+                    color: theme.lightColors?.white,
+                    margin: 0,
+                  }}
+                >
+                  {challengePoints}
+                </AppText>
+                <AppText
+                  style={{
+                    ...fontGroup.nunitoRegular,
+                    fontWeight: "400",
+                    fontSize: FontSizes.S10,
+                    color: theme.lightColors?.white,
+                  }}
+                >
+                  Points
+                </AppText>
+              </View>
+
               <AppText
+                numberOfLines={3}
                 style={{
                   ...fontGroup.nunitoBold,
                   fontWeight: "900",
-                  fontSize: FontSizes.S24,
+                  fontSize: FontSizes.S18,
                   color: theme.lightColors?.white,
-                  margin: 0,
+                  flex: 1,
                 }}
               >
-                {challengePoints}
+                {challengeTitle}
               </AppText>
-              <AppText
+            </View>
+          )}
+
+          <View
+            style={{
+              width: "100%",
+              height: 440,
+
+              backgroundColor: "#272741",
+
+              gap: 8,
+
+              paddingVertical: 8,
+
+              marginTop: 16,
+              marginBottom: 8,
+
+              borderRadius: 12,
+
+              alignItems: "center",
+            }}
+          >
+            {fileExt == "mp4" ? (
+              <Video
+                resizeMode={"contain"}
+                repeat={true}
                 style={{
-                  ...fontGroup.nunitoRegular,
-                  fontWeight: "400",
+                  flex: 1,
+                  justifyContent: "flex-end",
+                  alignItems: "flex-end",
+                  width: "60%",
+                }}
+                source={{
+                  uri: capturedDataUri,
+                }}
+              />
+            ) : (
+              <Image
+                resizeMode={"contain"}
+                source={{ uri: capturedDataUri }}
+                style={{
+                  backgroundColor: "transparent",
+                  width: "60%",
+                  flex: 1,
+                }}
+              />
+            )}
+
+            {/* Sponsor row */}
+            <View
+              style={{
+                width: "100%",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Image
+                style={{ width: 20, height: 20, marginEnd: 8 }}
+                source={{ uri: sponsorImage }}
+              />
+              <Text
+                style={{
+                  ...fontGroup.nunitoBold,
+                  fontWeight: "700",
+                  fontSize: FontSizes.S20,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                {sponsorName}
+              </Text>
+            </View>
+
+            {/* Completition date */}
+            {!isMemory && challengeTitle && (
+              <Text
+                style={{
+                  ...fontGroup.nunitoLight,
+                  fontWeight: "300",
                   fontSize: FontSizes.S10,
                   color: theme.lightColors?.white,
                 }}
               >
-                Points
-              </AppText>
-            </View>
-
-            <AppText
-              numberOfLines={3}
-              style={{
-                ...fontGroup.nunitoBold,
-                fontWeight: "900",
-                fontSize: FontSizes.S18,
-                color: theme.lightColors?.white,
-                flex: 1,
-              }}
-            >
-              {challengeTitle}
-            </AppText>
+                Completed on: {startDate}
+              </Text>
+            )}
           </View>
-        )}
 
-        <View
-          style={{
-            width: "100%",
-            height: 440,
-
-            backgroundColor: "#272741",
-
-            gap: 8,
-
-            paddingVertical: 8,
-
-            marginTop: 16,
-            marginBottom: 8,
-
-            borderRadius: 12,
-
-            alignItems: "center",
-          }}
-        >
-          {fileExt == "mp4" ? (
-            <Video
-              resizeMode={"contain"}
-              repeat={true}
-              style={{
-                flex: 1,
-                justifyContent: "flex-end",
-                alignItems: "flex-end",
-                width: "60%",
-              }}
-              source={{
-                uri: capturedDataUri,
-              }}
-            />
-          ) : (
-            <Image
-              resizeMode={"contain"}
-              source={{ uri: capturedDataUri }}
-              style={{
-                backgroundColor: "transparent",
-                width: "60%",
-                flex: 1,
-              }}
-            />
-          )}
-
-          {/* Sponsor row */}
           <View
             style={{
               width: "100%",
-              flexDirection: "row",
+              flexDirection: "column",
+              gap: 16,
+              flex: 1,
               alignItems: "center",
-              justifyContent: "center",
             }}
           >
-            <Image style={{ width: 20, height: 20, marginEnd: 8 }} source={{ uri: sponsorImage }} />
-            <Text
-              style={{
-                ...fontGroup.nunitoBold,
-                fontWeight: "700",
-                fontSize: FontSizes.S20,
-                color: theme.lightColors?.white,
-              }}
-            >
-              {sponsorName}
-            </Text>
+            {!isMemory && (
+              <Text
+                style={{
+                  flex: 1,
+                  fontSize: FontSizes.S12,
+                  color: theme.lightColors?.grey0,
+                }}
+              >
+                Must share to at least one social media platform to earn any points. Users earn one
+                additional point per social platform.
+              </Text>
+            )}
           </View>
-
-          {/* Completition date */}
-          {!isMemory && challengeTitle && (
-            <Text
-              style={{
-                ...fontGroup.nunitoLight,
-                fontWeight: "300",
-                fontSize: FontSizes.S10,
-                color: theme.lightColors?.white,
-              }}
-            >
-              Completed on: {startDate}
-            </Text>
-          )}
         </View>
-
-        <View
-          style={{
-            width: "100%",
-            flexDirection: "column",
-            gap: 16,
-            flex:1,
-            alignItems: "center",
-          }}
-        >
-          {!isMemory && (
-            <Text
-              style={{
-                flex: 1,
-                fontSize: FontSizes.S12,
-                color: theme.lightColors?.grey0,
-              }}
-            >
-              Must share to at least one social media platform to earn any points. Users earn one
-              additional point per social platform.
-            </Text>
-          )}
-
-        </View>
-      </View>
-      <View style={{gap: 8, }}>
-      <View
+        <View style={{ gap: 8 }}>
+          <View
             style={{
               flexDirection: "row",
               alignItems: "center",
@@ -503,22 +564,22 @@ const ArChallengeShare = () => {
             />
 
             <AppButton
-              onPress={checkPermission}
+              onPress={saveToGallery}
               containerStyle={{ flex: 1, justifyContent: "center" }}
               titleStyle={{ fontSize: FontSizes.S16, fontWeight: "bold" }}
               title={"Save Image"}
             />
           </View>
-      {!isMemory && (
-          <AppButton
-            onPress={endShareProfileButtonHandler}
-            buttonStyle={{ height: 55 }}
-            containerStyle={{}}
-            titleStyle={{ fontSize: FontSizes.S18, fontWeight: "bold" }}
-            title={endChallengeButtonText}
-            loading={isLoading}
-          />
-        )}
+          {!isMemory && (
+            <AppButton
+              onPress={endShareProfileButtonHandler}
+              buttonStyle={{ height: 55 }}
+              containerStyle={{}}
+              titleStyle={{ fontSize: FontSizes.S18, fontWeight: "bold" }}
+              title={endChallengeButtonText}
+              loading={isLoading}
+            />
+          )}
         </View>
       </View>
 
