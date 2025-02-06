@@ -66,6 +66,11 @@ const PinChallenge = () => {
   const modelFile = challengeObj.model_file;
   const viewInfoModalContent = challengeObj?.info;
 
+  const dataNotificationUnity = {
+    isNotification: false,
+    textNotification: PIN_CHALLENGE_CONFIG.CUSTOM_INSTRUCTIONS,
+  };
+
   let siteLatitude = 0;
   let siteLongitude = 0;
   if (selectedGeoSite?.lat_long?.coordinates?.length === 2) {
@@ -208,6 +213,7 @@ const PinChallenge = () => {
   };
   const sendBloomValuesToUnity = () => {
     const bloomData = { threshold, intensity };
+
     if (unityRef.current) {
       unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
     }
@@ -279,6 +285,7 @@ const PinChallenge = () => {
         forceRequestLocation: true,
         forceLocationManager: true,
         showLocationDialog: true,
+        interval: 1500,
       }
     );
   };
@@ -441,10 +448,7 @@ const PinChallenge = () => {
       if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
         sendBloomValuesToUnity();
         PointsCount();
-        notificationView();
-        if (!isMeInsideInSite) {
-          isLoadingUnity();
-        }
+        enableButtonPhoto();
         unityRef.current.postMessage(
           "Scriptposition",
           "SetVisibleButton",
@@ -453,13 +457,24 @@ const PinChallenge = () => {
           })
         );
       }
-    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded, isMeInsideInSite])
+    }, [
+      modelOBJ,
+      textureBase,
+      emissionValue,
+      textureEmission,
+      isUnityLoaded,
+      isMeInsideInSite,
+      threshold,
+      intensity,
+    ])
   );
-  useEffect(() => {
-    if (unityRef.current) {
-      notificationView();
-    }
-  }, [isMeInsideInSite]);
+
+  useFocusEffect(
+    useCallback(() => {
+      sendModelDataToUnitySpawn();
+    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded])
+  );
+
   const eraseFile = async () => {
     try {
       const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
@@ -470,21 +485,31 @@ const PinChallenge = () => {
       console.error(error);
     }
   };
-  const notificationView = async () => {
-    if (unityRef.current) {
-      // Enviar mensaje a Unity para iniciar la grabación
-      const data = {
-        isNotification: !isMeInsideInSite,
-        textNotification: PIN_CHALLENGE_CONFIG.CUSTOM_INSTRUCTIONS,
-      };
 
+  const viewNotification = () => {
+    if (!isMeInsideInSite) {
       unityRef.current.postMessage(
         "Scriptposition",
         "SetVisibleNotification",
-        JSON.stringify(data)
+        JSON.stringify({ ...dataNotificationUnity, isNotification: true })
       );
-      if (isMeInsideInSite == false) {
-        sendModelDataToUnitySpawn();
+
+      setTimeout(() => {
+        if (unityRef.current) {
+          unityRef.current.postMessage(
+            "Scriptposition",
+            "SetVisibleNotification",
+            JSON.stringify({ ...dataNotificationUnity, isNotification: false })
+          );
+        }
+      }, 5000);
+    }
+  };
+
+  const enableButtonPhoto = async () => {
+    if (unityRef.current) {
+      if (isMeInsideInSite === false) {
+        // sendModelDataToUnitySpawn();
         unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
@@ -495,7 +520,13 @@ const PinChallenge = () => {
           })
         );
       }
-      if (isMeInsideInSite) {
+      if (isMeInsideInSite === true) {
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleNotification",
+          JSON.stringify({ ...dataNotificationUnity, isNotification: false })
+        );
+
         unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
@@ -505,22 +536,13 @@ const PinChallenge = () => {
             isLocation: true,
           })
         );
-        unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleButton",
-          JSON.stringify({
-            setVisibleButtonPosition: true,
-          })
-        );
-        sendModelDataToUnitySpawn();
       }
     }
   };
   const PointsCount = async () => {
     if (unityRef.current) {
-      // Enviar mensaje a Unity para iniciar la grabación
       const pointData = {
-        points: "4",
+        points: challengeObj?.points,
         isPointView: true,
       };
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
@@ -566,9 +588,14 @@ const PinChallenge = () => {
     const data = JSON.parse(result.nativeEvent.message);
     buttonInfo = data?.enableButton;
     buttonBack = data?.backPress;
+    buttonPhotoIsPressed = data?.ispressed;
 
     if (buttonBack) {
       navigation?.goBack();
+    }
+
+    if (buttonPhotoIsPressed && !isMeInsideInSite) {
+      viewNotification();
     }
 
     if (data.photoVideoButton?.isPhoto) {
