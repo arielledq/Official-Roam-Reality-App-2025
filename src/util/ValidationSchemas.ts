@@ -50,7 +50,7 @@ export const EditProfileSchema = Yup.object().shape({
   name: Yup.string().required("Full name is required"),
   phoneNumber: Yup.string().length(14, "Invalid phone number").required("Phone number is required"),
   address: Yup.string().required("Home address is required"),
-  gender: Yup.string().required("Gender is required"),
+  gender: Yup.number().required("Gender is required"),
   country: Yup.string().required("Home country is required"),
   date_of_birth: Yup.string().required("Date of birth is required"),
 });

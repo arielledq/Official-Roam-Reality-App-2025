@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Keyboard, Pressable, Text, View } from "react-native";
+import { Alert, Keyboard, Pressable, Text, View } from "react-native";
 
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -8,7 +8,6 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import axios from "axios";
 import { Asset, CameraOptions, launchImageLibrary } from "react-native-image-picker";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import { DateFormat, formatDate } from "../../util/DateUtils";
@@ -50,35 +49,45 @@ const dateToString = (date: Date | null) => {
   return formattedDate;
 };
 
-const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () => {
+const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
+  route,
+  navigation,
+}) => {
+  console.log("route?.params", route?.params);
   const edit = route?.params?.edit;
   const userData = route?.params?.profileDetails;
   const onProfileUpdate = route?.params?.onProfileUpdate;
 
-  const [profileDetails, setProfileDetails] = useState(userData);
+  const initialFormValues = {
+    pImage: userData?.image ?? undefined,
+    name: userData?.user?.name ?? "",
+    gender: userData?.gender ?? undefined,
+    phoneNumber: userData?.phone_number ?? "",
+    address: userData?.home_address ?? "",
+    country: userData?.home_country ?? "",
+    date_of_birth: userData?.date_of_birth ?? "",
+  };
+
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [isNameInputFocused, setNameInputFocused] = useState(false);
   const [isMobileInputFocused, setMobileInputFocused] = useState(false);
   const [isAddressInputFocused, setAddressInputFocused] = useState(false);
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false);
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false);
-  const [pImage, setPImage] = useState<string | undefined>(undefined);
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null);
   const [countryData, setCountryData] = useState<[]>([]);
   const [bDate, setBDate] = useState<Date | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [gender, setGender] = useState({
-    label: profileDetails?.gender ?? "",
-    value: profileDetails?.gender ?? "",
+    label: userData?.gender ?? "",
+    value: userData?.gender ?? "",
   });
   const [country, setCountry] = useState({
-    label: profileDetails?.home_country ?? "",
-    value: profileDetails?.home_country ?? "",
+    label: userData?.home_country ?? "",
+    value: userData?.home_country ?? "",
   });
 
-  const navigation = useNavigation();
   const dispatch = useDispatch();
-  const route = useRoute();
   const _styles = useStyles();
   const nameRef = useRef();
 
@@ -106,20 +115,17 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
     });
   }
 
-  async function pickImage() {
+  async function pickImage(setFieldValue: (field: string, value: any) => {}) {
     const options = {
       mediaType: "photo",
       includeBase64: false,
-      // maxHeight: 300,
-      // maxWidth: 300,
       quality: 1,
     } as CameraOptions;
 
     await launchImageLibrary(options, response => {
-      // setPImage(response?.assets?.[0]?.uri);
       if (response?.assets) {
         const selectedImageUri = response?.assets?.[0]?.uri;
-        setPImage(selectedImageUri);
+        setFieldValue("pImage", selectedImageUri);
         uploadProfileImage(response?.assets?.[0]);
       }
     });
@@ -142,10 +148,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
   const handleEditProfile = (values: any) => {
     const formattedDate = dateToString(bDate);
     // Check if country has a value, if not, use the existing value
-    const updatedCountry = country.value ? country.value : profileDetails?.home_country;
-    const updatedGender = gender.value ? gender.value : profileDetails?.gender;
+    const updatedCountry = country.value ? country.value : userData?.home_country;
+    const updatedGender = gender.value ? gender.value : userData?.gender;
     // Check if formattedDate has a value, if not, use the existing value
-    const updatedDateOfBirth = formattedDate ? formattedDate : profileDetails?.date_of_birth;
+    const updatedDateOfBirth = formattedDate ? formattedDate : userData?.date_of_birth;
     nameRef.current = values.name;
     const updatedProfileData = new FormData();
     updatedProfileData.append("name", values.name);
@@ -194,19 +200,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
     return formatted;
   };
 
-  const handleInputChange = (input: string) => {
-    const formattedNumber = formatPhoneNumber(input);
-    setProfileDetails({ ...profileDetails, phone_number: formattedNumber });
-  };
-
-  const handleInputName = (input: string) => {
-    setProfileDetails({ ...profileDetails, user: { name: input } });
-  };
-
-  const handleInputAddress = (input: string) => {
-    setProfileDetails({ ...profileDetails, home_address: input });
-  };
-
   useEffect(() => {
     var config = {
       method: "get",
@@ -243,26 +236,20 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
 
       <KeyboardAwareScrollView nestedScrollEnabled>
         <Formik
-          initialValues={{
-            name: profileDetails?.user.name ?? "",
-            phoneNumber: profileDetails?.phone_number ?? "",
-            address: profileDetails?.home_address ?? "",
-            gender: profileDetails?.gender ?? "",
-            country: profileDetails?.country ?? "",
-            pImage: (pImage || profileDetails?.image) ?? undefined,
-            date_of_birth: profileDetails?.date_of_birth ?? "",
-          }}
+          initialValues={initialFormValues}
           onSubmit={values => handleEditProfile(values)}
           enableReinitialize
           validationSchema={EditProfileSchema}
         >
           {({ handleSubmit, values, errors, touched, setFieldValue }) => {
-            console.log(values, errors);
             return (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
                   {/* profile avatar */}
-                  <ProfileAvatar onChangeProfilePic={pickImage} avatarUrl={values.pImage} />
+                  <ProfileAvatar
+                    onChangeProfilePic={() => pickImage(setFieldValue)}
+                    avatarUrl={values.pImage}
+                  />
 
                   {/* Name */}
                   <AppInput
@@ -282,7 +269,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                         : theme.lightColors?.grey0
                     }
                     value={values.name}
-                    onChangeText={e => handleInputName(e)}
+                    onChangeText={value => setFieldValue("name", value)}
                     errorMessage={touched.name && errors?.name ? errors.name : undefined}
                     autoCapitalize="none"
                     leftIcon={
@@ -381,7 +368,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                     }
                     selectionColor={"white"}
                     value={values.phoneNumber}
-                    onChangeText={e => handleInputChange(e)}
+                    onChangeText={value => setFieldValue("phoneNumber", formatPhoneNumber(value))}
                     maxLength={14}
                     errorMessage={
                       touched.phoneNumber && errors?.phoneNumber ? errors.phoneNumber : undefined
@@ -420,7 +407,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                     selectionColor={"white"}
                     placeholder="Hometown"
                     value={values.address}
-                    onChangeText={e => handleInputAddress(e)}
+                    onChangeText={value => setFieldValue("address", value)}
                     errorMessage={touched.address && errors?.address ? errors.address : undefined}
                     autoCapitalize="none"
                     leftIcon={
@@ -531,10 +518,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = () 
                             {formatDate(bDate, DateFormat.MMDDYY)}
                           </AppText>
                         </View>
-                      ) : profileDetails?.date_of_birth ? (
+                      ) : userData?.date_of_birth ? (
                         <View style={_styles.textContainer}>
                           <AppText style={_styles.timeteststyle}>
-                            {formatDate(profileDetails.date_of_birth, DateFormat.MMDDYY)}
+                            {formatDate(userData.date_of_birth, DateFormat.MMDDYY)}
                           </AppText>
                         </View>
                       ) : (
