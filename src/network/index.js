@@ -398,7 +398,7 @@ export const inviteFriendByEmail = data =>
     logoutFunc
   );
 export const getGeoARDestinations = () =>
-  Request.callAR(
+  Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-location/`,
       method: "GET",

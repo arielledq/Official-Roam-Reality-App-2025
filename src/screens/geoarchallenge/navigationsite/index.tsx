@@ -23,6 +23,8 @@ import {
 } from "../../../util/helpers";
 import { getLocationDistance, hasLocationPermission } from "../../../util/LocationLib";
 import mapCustomStyle from "../../../constants/MapCustomStyles";
+// @ts-ignore
+import { MAP_MODE } from "constants";
 
 // @ts-ignore
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
@@ -717,7 +719,7 @@ const GeoArSiteNavigation = ({ route }) => {
                 strokeWidth={8}
                 strokeColor="#C881F0"
                 // @ts-ignore
-                lineDashPattern={mapMode === "DRIVING" ? null : [5, 5]}
+                lineDashPattern={mapMode === MAP_MODE.DRIVING ? null : [5, 5]}
                 optimizeWaypoints
                 onReady={(result: any) => {
                   const steps = result.legs[0].steps;

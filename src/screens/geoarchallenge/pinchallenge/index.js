@@ -445,7 +445,7 @@ const PinChallenge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
+      if (unityRef.current) {
         sendBloomValuesToUnity();
         PointsCount();
         enableButtonPhoto();
@@ -458,21 +458,18 @@ const PinChallenge = () => {
         );
       }
     }, [
-      modelOBJ,
-      textureBase,
-      emissionValue,
-      textureEmission,
       isUnityLoaded,
       isMeInsideInSite,
-      threshold,
-      intensity,
     ])
   );
 
   useFocusEffect(
     useCallback(() => {
-      sendModelDataToUnitySpawn();
-    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded])
+      if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
+        sendModelDataToUnitySpawn();
+      }
+    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded,  threshold,
+      intensity,])
   );
 
   const eraseFile = async () => {

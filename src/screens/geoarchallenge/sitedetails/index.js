@@ -37,6 +37,8 @@ import {
   useCustomMarkers,
 } from "util/helpers";
 import Icon from "components/Icon";
+import theme from "assets/theme";
+import { MAP_MODE } from "constants";
 
 const GeoArSiteDetails = ({ route }) => {
   const experience_type = route.params?.experience_type;
@@ -114,7 +116,7 @@ const GeoArSiteDetails = ({ route }) => {
   };
 
   const setStarCounts = () => {
-    setStarsCount(selectedGeoARSiteStars?.length || 0);
+    setStarsCount(selectedGeoARSiteStars?.stars || 0);
   };
 
   const InfoView = () => {
@@ -209,6 +211,17 @@ const GeoArSiteDetails = ({ route }) => {
     }
   };
 
+  const skipNavigationButtonHandler = () => {
+    navigation.navigate("ChallengeSelection", {
+      experience_type,
+      coolDown: {
+        coolDownFinished: coolDownFinished,
+        coolDownHoursText: coolDownHoursText,
+      },
+      checkIns: myCheckInsText,
+    });
+  };
+
   const letsRoamButtonHandler = async () => {
     // INFO: Commented out temporarily
     // try {
@@ -222,13 +235,16 @@ const GeoArSiteDetails = ({ route }) => {
     //   console.error('There was an error sending the notification to friends:', error)
     // }
 
-    navigation.navigate("GeoArSiteRoutes", {
+    // navigation.navigate("GeoArSiteRoutes", {
+    navigation.navigate("GeoArSiteNavigation", {
       experience_type,
       coolDown: {
         coolDownFinished: coolDownFinished,
         coolDownHoursText: coolDownHoursText,
       },
       checkIns: myCheckInsText,
+      mapMode: MAP_MODE.DRIVING,
+      starsChallenge: null,
     });
   };
 
@@ -471,7 +487,22 @@ const GeoArSiteDetails = ({ route }) => {
             >
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
               <Text style={_styles.protip_text}>
-                {selectedGeoSite?.category?.id ? "Useful Links" : "Pro Tips"}
+                {selectedGeoSite?.category?.id ? "Useful\nLinks" : "Pro Tips"}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={{
+                borderColor: theme.lightColors.magenta,
+                borderWidth: 2,
+                borderRadius: 16,
+                paddingVertical: 16,
+                paddingHorizontal: 8,
+              }}
+              disabled={isLoading}
+              onPress={skipNavigationButtonHandler}
+            >
+              <Text style={{ color: theme.lightColors.magenta, fontWeight: "bold" }}>
+                Skip To Site
               </Text>
             </TouchableOpacity>
             <View>
