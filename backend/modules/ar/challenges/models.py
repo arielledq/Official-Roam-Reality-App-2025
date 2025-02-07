@@ -311,6 +311,8 @@ class ARExperience(models.Model):
         related_name="ar_experiences",
     )
 
+    is_active = models.BooleanField(_("Active"), default=True)
+
     class Meta:
         verbose_name_plural = "AR Experiences"
         verbose_name = "AR Experience"

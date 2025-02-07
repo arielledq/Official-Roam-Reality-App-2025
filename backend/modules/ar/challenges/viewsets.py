@@ -352,6 +352,8 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing GeoLocation.
     """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = GeoLocation.objects.all().order_by('sequence_number')
     serializer_class = GeoLocationSerializer
     http_method_names = ["get"]
