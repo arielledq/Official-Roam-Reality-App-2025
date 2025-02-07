@@ -7,8 +7,8 @@ from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
-    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, ARAllMemories, \
-    GeoStarPointSerializer, GeoArSiteCategorySerializer
+    GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, \
+    GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -643,7 +643,7 @@ class MemoryCheckinViewSet(ViewSet):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
             all_user_memories = ARMemories.objects.filter(user=request.user.id)
-            serializer = ARAllMemories(
+            serializer = ARAllMemoriesSerializer(
                 [*all_user_check_in, *all_user_memories],
                 many=True,
                 context={'request': request}

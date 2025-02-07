@@ -523,6 +523,7 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "points",
+            "geo_challenge",
             "challenge_details",
         )
 
@@ -577,7 +578,7 @@ class PanicMessageSerializer(GeoModelSerializer):
         )
 
 
-class ARAllMemories(serializers.Serializer):
+class ARAllMemoriesSerializer(serializers.Serializer):
     def to_representation(self, instance):
         if isinstance(instance, ARMemories):
             return ARMemoriesSerializerGet(instance, context=self.context).data
