@@ -487,7 +487,7 @@ const GeoArSiteDetails = ({ route }) => {
             >
               <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
               <Text style={_styles.protip_text}>
-                {selectedGeoSite?.category?.id ? "Useful Links" : "Pro Tips"}
+                {selectedGeoSite?.category?.id ? "Useful\nLinks" : "Pro Tips"}
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
