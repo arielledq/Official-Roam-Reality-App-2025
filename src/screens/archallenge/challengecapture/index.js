@@ -171,10 +171,18 @@ const ArChallengeCapture = ({}) => {
 
   useFocusEffect(
     useCallback(() => {
-    
-      console.log("focus change", challengeType);
-      if (unityRef.current && !!CAPTURE_CHALLENGE_TYPE[challengeType]) {
+      isLoadingUnity()
+      if (unityRef.current){
+        isLoadingUnity()
         PointsCount();
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({
+            setVisibleButtonPosition: false,
+          })
+        );
+        if( !!CAPTURE_CHALLENGE_TYPE[challengeType]) {
         unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
@@ -185,20 +193,21 @@ const ArChallengeCapture = ({}) => {
           })
         );
         unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleButton",
-          JSON.stringify({
-            setVisibleButtonPosition: false,
-          })
-        );
-        unityRef.current.postMessage(
           "OBJImport",
           "SetLoadingVisibility",
           JSON.stringify({ isVisible: false }))
-      }
+      }}
     }, [isUnityLoaded, challengeType])
   );
-
+  const isLoadingUnity = () => {
+    if (unityRef.current){
+    unityRef.current.postMessage(
+      "OBJImport",
+      "SetLoadingVisibility",
+      JSON.stringify({ isVisible: false })
+    );
+  }
+  };
   // useEffect(() => {
   //   if (unityRef.current && challengeHasFilters) {
   //     loadingFalse();
