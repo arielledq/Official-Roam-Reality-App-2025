@@ -6,13 +6,14 @@ import { deleteAccount, getARChallenges, logout } from "../../network";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 import { MenuIcon } from "../../assets/svg";
-import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import BottomSheet from "@gorhom/bottom-sheet";
 import useStyles from "./styles";
 import RightArrowIcon from "../../assets/svg/RightArrowIcon";
 import { handleError, showMessage } from "../../util/helpers";
 import { HomeScreenData } from "../../util/HomeScreenUtils";
 import BackgroundWithImage from "components/background";
+import ScreenContainer from "components/ScreenContainer";
 
 const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   const account_setup = useSelector(
@@ -138,7 +139,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
   };
 
   return (
-    <BackgroundWithImage style={styles.mainContainer}>
+    <ScreenContainer>
       <AppHeader
         leftComponent={handleMenuButton()}
         centerComponent={{
@@ -164,7 +165,7 @@ const Home: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
           showsVerticalScrollIndicator={false}
         />
       )}
-    </BackgroundWithImage>
+    </ScreenContainer>
   );
 };
 

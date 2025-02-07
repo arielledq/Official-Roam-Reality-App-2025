@@ -1,9 +1,7 @@
 import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../../util/AppDimensions";
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
-import { Platform } from "react-native";
+import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles(_theme => ({
   mainContainer: {
     flex: 1,
     backgroundColor: "#202136",
@@ -31,9 +29,9 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: 25,
   },
   headerText: {
-    ...fontGroup.ns700,
-    fontSize: FontSizes.S26,
-    lineHeight: FontLineHeights.LH35,
+    ...fontGroup.nunitoBold,
+    fontSize: FontSizes.S22,
+    lineHeight: FontLineHeights.LH30,
     marginVertical: 0,
   },
   imageStyle: {
@@ -43,24 +41,24 @@ const useStyles = makeStyles(theme => ({
     width: "70%",
   },
   challengesText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
     marginStart: 3,
   },
   subtitleText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
     marginStart: 3,
   },
   containerStyle: {
-    marginTop: 140,
+    paddingTop: 140,
+    paddingBottom: 60,
   },
   list: {
-    marginBottom: 80,
     flex: 1,
   },
   blurView: {

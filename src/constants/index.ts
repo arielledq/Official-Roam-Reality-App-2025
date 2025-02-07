@@ -18,3 +18,18 @@ export const SSNN = {
   FACEBOOK: "FACEBOOK",
   OTHERS: "OTHERS",
 };
+
+export const EXPERIENCE_TYPE_CHOICES = {
+  AR_CHALLENGE: "AR_CHALLENGE",
+  GEO_AR_CHALLENGE: "GEO_AR_CHALLENGE",
+  EVENT: "EVENT",
+};
+
+export const MAP_MODE = {
+  DRIVING: "DRIVING",
+  WALKING: "WALKING",
+};
+
+export const PIN_CHALLENGE_CONFIG = {
+  CUSTOM_INSTRUCTIONS: "Users cannot take pictures unless you are within range of the AR ",
+};

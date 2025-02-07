@@ -15,8 +15,6 @@ import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
 import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
-import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
-import PinInfoCaptureFooter from "components/PinInfoCaptureFooter";
 
 import { showMessage } from "../../../util/helpers";
 import {
@@ -29,6 +27,7 @@ import {
 import { CHALLENGES_TYPE } from "constants";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
+import { PIN_CHALLENGE_CONFIG } from "constants";
 
 const PinChallenge = () => {
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
@@ -66,6 +65,11 @@ const PinChallenge = () => {
   const challengeObjParameters = challengeObj?.parameters;
   const modelFile = challengeObj.model_file;
   const viewInfoModalContent = challengeObj?.info;
+
+  const dataNotificationUnity = {
+    isNotification: false,
+    textNotification: PIN_CHALLENGE_CONFIG.CUSTOM_INSTRUCTIONS,
+  };
 
   let siteLatitude = 0;
   let siteLongitude = 0;
@@ -165,30 +169,21 @@ const PinChallenge = () => {
         // ### DISTANCIA DONDE SE REPOSICIONARA NUEVAMENTE LA ESTRELLA ## //
         distanceCamera: 2, // AGREGAR PARA RECIBIR DESDE EL BACK
 
+        //VISIBLE OBJECT//
+        isVisible: true,
+
         /* ###POSICIONAMIENTO MEDIANTE GPS### 
         useGPS: true, // Activar GPS
         gpsLatitude: siteLatitude || 0, // Latitud del GPS
         gpsLongitude: siteLongitude || 0, // Longitud del GPS
          */
-
         position: {
           x: parseFloat(challengeObjParameters?.positionX) || 0,
           y: parseFloat(challengeObjParameters?.positionY) || 0,
-          z: parseFloat(challengeObjParameters?.positionZ) || 0.4,
+          z: 2 || 0.4,
         },
       };
-      console.log("Enviando datos del modelo a Unity:", modelData);
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
-      const visibilityConfig = {
-        isVisible: true,
-      };
-
-      unityRef.current.postMessage(
-        "OBJImport", // Nombre del script en Unity
-        "SetVisibilityFromReact", // Método que se llamará
-        JSON.stringify(visibilityConfig)
-      );
-      console.log("Todos los datos fueron enviados a Unity.");
     } else {
       console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
@@ -209,9 +204,16 @@ const PinChallenge = () => {
       );
     }*/
   };
-
+  const isLoadingUnity = () => {
+    unityRef.current.postMessage(
+      "OBJImport",
+      "SetLoadingVisibility",
+      JSON.stringify({ isVisible: false })
+    );
+  };
   const sendBloomValuesToUnity = () => {
     const bloomData = { threshold, intensity };
+
     if (unityRef.current) {
       unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
     }
@@ -283,6 +285,7 @@ const PinChallenge = () => {
         forceRequestLocation: true,
         forceLocationManager: true,
         showLocationDialog: true,
+        interval: 1500,
       }
     );
   };
@@ -333,7 +336,6 @@ const PinChallenge = () => {
   };
 
   const _takeScreenshot = async () => {
-    // if (true) {
     if (isMeInsideInSite) {
       playCameraSound();
 
@@ -388,24 +390,18 @@ const PinChallenge = () => {
   };
 
   const onDonePress = async () => {
-    // const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
-    // let updatedData = capturedImage ? capturedImage : capturedVideo;
     let updatedData = capturedImage;
-
-    // if (hasFilters) {
     try {
       // Capturar la vista dentro de ViewShot
       const capturedUri = await viewShotRef.current.capture();
-      // console.log("Imagen capturada con filtro:", capturedUri);
       updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
     } catch (error) {
       console.error("Error capturando la imagen con filtros:", error);
     }
-    // }
 
     navigation.replace("ArChallengeShare", {
       challengeObj: { ...challengeObj, geo_site: { ...selectedGeoSite, pin_challenge: undefined } },
-      captureData: capturedImage,
+      captureData: updatedData,
       challengeType: CHALLENGES_TYPE.PIN_CHECK_IN,
     });
   };
@@ -450,8 +446,9 @@ const PinChallenge = () => {
   useFocusEffect(
     useCallback(() => {
       if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
-        sendModelDataToUnitySpawn();
         sendBloomValuesToUnity();
+        PointsCount();
+        enableButtonPhoto();
         unityRef.current.postMessage(
           "Scriptposition",
           "SetVisibleButton",
@@ -460,6 +457,21 @@ const PinChallenge = () => {
           })
         );
       }
+    }, [
+      modelOBJ,
+      textureBase,
+      emissionValue,
+      textureEmission,
+      isUnityLoaded,
+      isMeInsideInSite,
+      threshold,
+      intensity,
+    ])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      sendModelDataToUnitySpawn();
     }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded])
   );
 
@@ -474,6 +486,68 @@ const PinChallenge = () => {
     }
   };
 
+  const viewNotification = () => {
+    if (!isMeInsideInSite) {
+      unityRef.current.postMessage(
+        "Scriptposition",
+        "SetVisibleNotification",
+        JSON.stringify({ ...dataNotificationUnity, isNotification: true })
+      );
+
+      setTimeout(() => {
+        if (unityRef.current) {
+          unityRef.current.postMessage(
+            "Scriptposition",
+            "SetVisibleNotification",
+            JSON.stringify({ ...dataNotificationUnity, isNotification: false })
+          );
+        }
+      }, 5000);
+    }
+  };
+
+  const enableButtonPhoto = async () => {
+    if (unityRef.current) {
+      if (isMeInsideInSite === false) {
+        // sendModelDataToUnitySpawn();
+        unityRef.current.postMessage(
+          "screen",
+          "SetTypeChallenge",
+          JSON.stringify({
+            typeChallenge: "PHOTO",
+            arChallenge: false,
+            isLocation: false,
+          })
+        );
+      }
+      if (isMeInsideInSite === true) {
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleNotification",
+          JSON.stringify({ ...dataNotificationUnity, isNotification: false })
+        );
+
+        unityRef.current.postMessage(
+          "screen",
+          "SetTypeChallenge",
+          JSON.stringify({
+            typeChallenge: "PHOTO",
+            arChallenge: false,
+            isLocation: true,
+          })
+        );
+      }
+    }
+  };
+  const PointsCount = async () => {
+    if (unityRef.current) {
+      const pointData = {
+        points: challengeObj?.points,
+        isPointView: true,
+      };
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
+    }
+  };
   const keepFileMostRecent = async (ruta, extension = "") => {
     try {
       const files = await RNFS.readDir(ruta);
@@ -512,7 +586,17 @@ const PinChallenge = () => {
   };
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton;
+    buttonInfo = data?.enableButton;
+    buttonBack = data?.backPress;
+    buttonPhotoIsPressed = data?.ispressed;
+
+    if (buttonBack) {
+      navigation?.goBack();
+    }
+
+    if (buttonPhotoIsPressed && !isMeInsideInSite) {
+      viewNotification();
+    }
 
     if (data.photoVideoButton?.isPhoto) {
       setCapturedImage(data.photoVideoButton?.filepath);
@@ -525,7 +609,7 @@ const PinChallenge = () => {
     }
     if (data.infoButton?.isButton) {
       setChallengeInformationView(data.infoButton?.isButton);
-      setIsUnityLoaded(false);
+      setIsUnityLoaded(true);
     }
   };
   const modals = (
@@ -549,9 +633,9 @@ const PinChallenge = () => {
       appHeader={false}
       style={{
         paddingHorizontal: 0,
-        paddingTop: 20,
+        // paddingTop: 20,
         height: "100%",
-        backgroundColor: isUnityLoaded ? theme.lightColors?.black : theme.lightColors?.inputBG,
+        backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
       }}
       modals={modals}
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
@@ -577,11 +661,9 @@ const PinChallenge = () => {
           onDone={onDonePress}
           onCameraPress={_takeScreenshot}
           hasCapturedContent={!!capturedImage}
-          customInstructions="Stand next to the pin, resize as needed, snap your photo"
+          customInstructions={PIN_CHALLENGE_CONFIG.CUSTOM_INSTRUCTIONS}
         />
       )}
-      {/* Removing temporarily */}
-      {/* <PinInfoCaptureFooter pinFound={!!isMeInsideInSite} distance={distanceInFeet} /> */}
     </ChallengeScreen>
   );
 };

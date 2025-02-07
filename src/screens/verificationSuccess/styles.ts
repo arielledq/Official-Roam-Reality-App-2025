@@ -1,6 +1,6 @@
-import { makeStyles } from "@rneui/themed"
-import { screenHorizontalPadding } from "../../util/AppDimensions"
-import { FontFamily, FontLineHeights, FontSizes,fontGroup } from "../../util/FontUtils"
+import { makeStyles } from "@rneui/themed";
+import { screenHorizontalPadding } from "../../util/AppDimensions";
+import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -15,33 +15,33 @@ const useStyles = makeStyles(theme => ({
   },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     paddingHorizontal: 10,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S35,
     lineHeight: FontLineHeights.LH48,
-    color: theme.colors.white
+    color: theme.colors.white,
   },
   subHeaderText: {
-    ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH25,
     color: theme.colors.white,
-    textAlign: 'center',
-    marginTop: '10%',
+    textAlign: "center",
+    marginTop: "10%",
   },
   buttonStyle: {
-    height: 50
+    height: 50,
   },
   buttonContainerStyle: {
-    marginBottom: '10%'
+    marginBottom: "10%",
   },
   checkIcon: {
-    marginBottom: '10%'
+    marginBottom: "10%",
   },
-}))
+}));
 
-export default useStyles
+export default useStyles;

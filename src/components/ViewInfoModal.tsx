@@ -63,14 +63,14 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   challengeInfoHeader: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontWeight: "700",
     fontSize: FontSizes.S18,
     color: theme.lightColors?.white,
     marginTop: 10,
   },
   bottomText: {
-    ...fontGroup.p700,
+    ...fontGroup.nunitoBold,
     fontWeight: "700",
     fontSize: FontSizes.S18,
     textAlign: "center",

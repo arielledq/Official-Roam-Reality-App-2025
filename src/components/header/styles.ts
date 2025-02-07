@@ -5,7 +5,7 @@ const useStyles = makeStyles(theme => ({
   heading: {
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     marginTop: 5,
   },

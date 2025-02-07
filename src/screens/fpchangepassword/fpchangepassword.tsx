@@ -1,51 +1,51 @@
-import React, { useState } from "react"
-import { Keyboard, View } from "react-native"
-import { Formik } from "formik"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import theme from "../../assets/theme"
-import AppButton from "../../components/button"
-import useStyles from "./styles"
-import {
-  RootStackParamList,
-  ScreenStackComponent
-} from "../../navigation/types"
-import BackgroundWithImage from "../../components/background"
-import AppHeader from "../../components/header"
-import AppInput from "../../components/input"
-import { LockIcon } from "../../assets/svg"
-import { FPChangePasswordSchema } from "../../util/ValidationSchemas"
-import Icon from "../../components/Icon"
-import { resetPassword } from "../../network"
-import { handleError } from "../../util/helpers"
+import React, { useState } from "react";
+import { Keyboard, View } from "react-native";
+import { Formik } from "formik";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import theme from "../../assets/theme";
+import AppButton from "../../components/button";
+import useStyles from "./styles";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import BackgroundWithImage from "../../components/background";
+import AppHeader from "../../components/header";
+import AppInput from "../../components/input";
+import { LockIcon } from "../../assets/svg";
+import { FPChangePasswordSchema } from "../../util/ValidationSchemas";
+import Icon from "../../components/Icon";
+import { resetPassword } from "../../network";
+import { handleError } from "../../util/helpers";
 
-const FPChangePassword: ScreenStackComponent<
-  RootStackParamList,
-  "FPChangePassword"
-> = ({ navigation, route }) => {
-  const _styles = useStyles()
-  const { token, uid } = route.params
-  const [isLoading, setIsLoading] = useState(false)
-  const [newpasswordVisibility, setNewPasswordVisibility] = useState(true)
-  const [confirmnewpasswordVisibility, setConfirmNewPasswordVisibility] =
-    useState(true)
+const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePassword"> = ({
+  navigation,
+  route,
+}) => {
+  const _styles = useStyles();
+  const { token, uid } = route.params;
+  const [isLoading, setIsLoading] = useState(false);
+  const [newpasswordVisibility, setNewPasswordVisibility] = useState(true);
+  const [confirmnewpasswordVisibility, setConfirmNewPasswordVisibility] = useState(true);
 
-  const handleChangePassword = (values) => {
+  const handleChangePassword = values => {
     setIsLoading(true);
     resetPassword({
       new_password1: values.newPassword,
       new_password2: values.confirmnewPassword,
       uid: uid,
-      token: token
-    }).then((res) => {{
-      if (res.status == 1) {
-        navigation.navigate('VerificationSuccess', {ChangePassword: true})
-      } else {
-        handleError(res)
-      }
-    }}).finally(() => {
-      setIsLoading(false)
+      token: token,
     })
-  }
+      .then(res => {
+        {
+          if (res.status == 1) {
+            navigation.navigate("VerificationSuccess", { ChangePassword: true });
+          } else {
+            handleError(res);
+          }
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   return (
     <>
@@ -59,7 +59,7 @@ const FPChangePassword: ScreenStackComponent<
           <Formik
             initialValues={{
               newPassword: "",
-              confirmnewPassword: ""
+              confirmnewPassword: "",
             }}
             onSubmit={values => handleChangePassword(values)}
             validationSchema={FPChangePasswordSchema}
@@ -73,20 +73,18 @@ const FPChangePassword: ScreenStackComponent<
                     containerStyle={{ marginBottom: -10 }}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="New Password"
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     value={values.newPassword}
                     onChangeText={handleChange("newPassword")}
                     // onBlur={handleBlur('password')}
                     errorMessage={
-                      touched.newPassword && errors?.newPassword
-                        ? errors.newPassword
-                        : undefined
+                      touched.newPassword && errors?.newPassword ? errors.newPassword : undefined
                     }
                     autoCapitalize="none"
                     rightIcon={
                       <Icon
                         onPress={() => {
-                          setNewPasswordVisibility(p => !p)
+                          setNewPasswordVisibility(p => !p);
                         }}
                         name={newpasswordVisibility ? "eye" : "eye-off"}
                         family="feather"
@@ -100,7 +98,7 @@ const FPChangePassword: ScreenStackComponent<
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={confirmnewpasswordVisibility}
                     onSubmitEditing={Keyboard.dismiss}
-                    placeholderTextColor={theme.darkColors?.grey}
+                    placeholderTextColor={theme.lightColors?.grey0}
                     placeholder="Confirm Password"
                     value={values.confirmnewPassword}
                     onChangeText={handleChange("confirmnewPassword")}
@@ -114,7 +112,7 @@ const FPChangePassword: ScreenStackComponent<
                     rightIcon={
                       <Icon
                         onPress={() => {
-                          setConfirmNewPasswordVisibility(p => !p)
+                          setConfirmNewPasswordVisibility(p => !p);
                         }}
                         name={confirmnewpasswordVisibility ? "eye" : "eye-off"}
                         family="feather"
@@ -140,7 +138,7 @@ const FPChangePassword: ScreenStackComponent<
         </KeyboardAwareScrollView>
       </BackgroundWithImage>
     </>
-  )
-}
+  );
+};
 
-export default FPChangePassword
+export default FPChangePassword;

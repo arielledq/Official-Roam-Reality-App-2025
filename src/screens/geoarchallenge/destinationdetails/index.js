@@ -21,8 +21,6 @@ import useStyles from "./styles";
 import { updateSelectedSites } from "../../../redux/AR";
 import {
   getARSiteCategories,
-  getARSiteCategory,
-  getARSites,
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
@@ -36,6 +34,7 @@ import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
+import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 const SCROLL_AMOUNT = 70;
 
@@ -236,6 +235,15 @@ const GeoArChallengeDetails = ({}) => {
     }
   };
 
+  const navigateToNextScreen = updatedSelectedSite => {
+    dispatch(updateSelectedSites(updatedSelectedSite));
+    navigation.navigate("GeoArSiteDetails", {
+      experience_type: isEvent
+        ? EXPERIENCE_TYPE_CHOICES.EVENT
+        : EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE,
+    });
+  };
+
   const _markerView = o => {
     if (o.lat_long) {
       return (
@@ -246,19 +254,13 @@ const GeoArChallengeDetails = ({}) => {
             longitude: o.lat_long.coordinates[0],
           }}
           title={o.name}
-          onCalloutPress={() => {
-            dispatch(updateSelectedSites(o));
-            navigation.navigate("GeoArSiteDetails");
-          }}
+          onCalloutPress={() => navigateToNextScreen(o)}
           pinColor={pinColor}
           tracksViewChanges={tracksViewChanges}
         >
           {Platform.OS === "ios" && (
             <Callout
-              onPress={() => {
-                dispatch(updateSelectedSites(o));
-                navigation.navigate("GeoArSiteDetails");
-              }}
+              onPress={() => navigateToNextScreen(o)}
               style={{
                 backgroundColor: "#fff",
                 minWidth: 100,
@@ -348,11 +350,15 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const showFilteredList = category => {
-    if (category)
-      return setFilteredSites(
-        selectedDestination.ar_event_sites.filter(site => site.category?.id === category)
+    if (category) {
+      const filteredEventSites = selectedDestination.ar_event_sites.filter(
+        site => site.category?.id === category
       );
-    setFilteredSites([]);
+
+      setFilteredSites(filteredEventSites);
+    } else {
+      setFilteredSites([]);
+    }
   };
 
   const initialRegion = {
@@ -466,14 +472,14 @@ const GeoArChallengeDetails = ({}) => {
         )}
       </View>
 
-      {!isEvent && (
-        <View
-          style={{
-            flexDirection: "row",
-            marginBottom: 20,
-            justifyContent: "space-between",
-          }}
-        >
+      <View
+        style={{
+          flexDirection: "row",
+          marginBottom: 20,
+          justifyContent: "space-between",
+        }}
+      >
+        {!isEvent && (
           <View style={_styles.selectionsContainer}>
             <View>
               <Text style={_styles.selectionTextHeading}>Sites</Text>
@@ -481,15 +487,16 @@ const GeoArChallengeDetails = ({}) => {
             </View>
             <AppSwitch onValueChange={setARSitesOnSwitch} value={arSitesOn} />
           </View>
-          <View style={_styles.selectionsContainer}>
-            <View>
-              <Text style={_styles.selectionTextHeading}>My Friends</Text>
-              <Text style={_styles.selectionTextDetails}>Live Location</Text>
-            </View>
-            <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
+        )}
+
+        <View style={_styles.selectionsContainer}>
+          <View>
+            <Text style={_styles.selectionTextHeading}>My Friends</Text>
+            <Text style={_styles.selectionTextDetails}>Live Location</Text>
           </View>
+          <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
         </View>
-      )}
+      </View>
       <View
         style={{
           width: "100%",
@@ -505,11 +512,6 @@ const GeoArChallengeDetails = ({}) => {
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
-          {/* {
-            selectedDestination.unique_ar_sites.map((o) => {
-              return _markerView(o)
-            })
-          } */}
           {isEvent
             ? filteredSites.length > 0
               ? filteredSites.map(o => {
@@ -549,7 +551,11 @@ const GeoArChallengeDetails = ({}) => {
           }}
         >
           <ARSiteCountBG style={{ width: 48, height: 48 }}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{isEvent? selectedDestination?.ar_event_sites?.length : selectedDestination?.star_ar_sites?.length}</Text>
+          <Text style={_styles.s_list_count}>
+            {isEvent
+              ? selectedDestination?.ar_event_sites?.length
+              : selectedDestination?.star_ar_sites?.length}
+          </Text>
           <Text style={_styles.s_list_text}>Sites</Text>
         </View>
         <View

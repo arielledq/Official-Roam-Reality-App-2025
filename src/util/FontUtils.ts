@@ -1,24 +1,24 @@
-import { PixelRatio } from 'react-native'
-import { moderateScale } from './AppDimensions'
-import fontGroup from '../assets/fonts'
+import { PixelRatio } from "react-native";
+import { moderateScale } from "./AppDimensions";
+import fontGroup from "../assets/fonts";
 
-export { fontGroup }
+export { fontGroup };
 
 export enum FontFamily {
-  NunitoSansRegular = 'NunitoSans10pt-Regular',
-  NunitoSansBold = 'NunitoSans10pt-Bold',
-  NunitoSansSemiBold = 'NunitoSans10pt-SemiBold',
-  PoppinsRegular = 'Poppins-Regular',
-  PoppinsBold = 'Poppins-Bold',
-  SFUIDisplay = 'SFUIDisplay-Regular',
+  NunitoSansRegular = "NunitoSans10pt-Regular",
+  NunitoSansBold = "NunitoSans10pt-Bold",
+  NunitoSansSemiBold = "NunitoSans10pt-SemiBold",
+  PoppinsRegular = "Poppins-Regular",
+  PoppinsBold = "Poppins-Bold",
+  SFUIDisplay = "SFUIDisplay-Regular",
 }
 
 // Basic fonts size to use in Application
-const fontScale = PixelRatio.getFontScale()
+const fontScale = PixelRatio.getFontScale();
 const getFontSize = (size: number) => {
-  return moderateScale(size * 0.9)
+  return moderateScale(size * 0.9);
   // return size / fontScale;
-}
+};
 
 export const FontSizes = {
   S8: getFontSize(8),
@@ -39,7 +39,7 @@ export const FontSizes = {
   S40: getFontSize(40),
   S44: getFontSize(44),
   S48: getFontSize(48),
-}
+};
 
 // Basic Line heights to use in Application
 export const FontLineHeights = {
@@ -62,4 +62,4 @@ export const FontLineHeights = {
   LH48: 48,
   LH55: 55,
   LH66: 66,
-}
+};

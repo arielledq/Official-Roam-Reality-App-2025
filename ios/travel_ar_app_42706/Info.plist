@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleGetInfoString</key>
-	<string></string>
+	<string/>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -52,7 +52,7 @@
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
-	<string></string>
+	<string/>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>fb</string>
@@ -88,51 +88,23 @@
 		</dict>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Access to the camera is required to take the picture or record video.</string>
+	<string>Room Reality needs access to your camera to allow you to take photos and videos for your profile and to share them within the app.</string>
 	<key>NSContactsUsageDescription</key>
-	<string>Roam Reality requires Contact permission to check your friends on platform</string>
+	<string>Room Reality needs access to your contacts to allow you to find your friends within the app.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>App requires GPS to track</string>
+	<string>Room Reality needs access to your location to provide personalized content based on where you are, such as nearby AR Challenges and AR Events.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>App requires GPS to track</string>
+	<string>Room Reality needs access to your location to provide personalized content based on where you are, such as nearby AR Challenges and AR Events.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>App requires GPS to track</string>
+	<string>Room Reality needs access to your location to provide personalized content based on where you are, such as nearby AR Challenges and AR Events.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>Access to the microphone is required to record a video.</string>
+	<string>Room Reality needs access to your microphone to allow you to take videos for your profile and to share them within the app.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Access to save videos/photos to camera roll.</string>
+	<string>Room Reality needs access to your camera roll to allow you to save photos and videos and update your profile picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Access to the photo library is required to select a photo.</string>
+	<string>Room Reality needs access to your camera roll to allow you to save photos and videos and update your profile picture.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>SFUIDisplayBlack.otf</string>
-		<string>SFUIDisplayBold.otf</string>
-		<string>SFUIDisplayLight.otf</string>
-		<string>SFUIDisplayMedium.otf</string>
-		<string>SFUIDisplaySemibold.otf</string>
-		<string>SFUIDisplayThin.otf</string>
-		<string>SFUIDisplayUltralight.otf</string>
-		<string>SFUIDisplayRegular.ttf</string>
-		<string>NunitoSans10ptBlack.ttf</string>
-		<string>NunitoSans10ptBold.ttf</string>
-		<string>NunitoSans10ptExtraBold.ttf</string>
-		<string>NunitoSans10ptExtraLight.ttf</string>
-		<string>NunitoSans10ptLight.ttf</string>
-		<string>NunitoSans10ptMedium.ttf</string>
-		<string>NunitoSans10ptRegular.ttf</string>
-		<string>NunitoSans10ptSemiBold.ttf</string>
-		<string>PoppinsBlack.ttf</string>
-		<string>PoppinsBold.ttf</string>
-		<string>PoppinsExtraBold.ttf</string>
-		<string>PoppinsExtraLight.ttf</string>
-		<string>PoppinsLight.ttf</string>
-		<string>PoppinsMedium.ttf</string>
-		<string>PoppinsRegular.ttf</string>
-		<string>PoppinsSemiBold.ttf</string>
-		<string>PoppinsThin.ttf</string>
-		<string>GlacialIndifferenceBold.otf</string>
-		<string>GlacialIndifferenceRegular.otf</string>
-		<string>GlacialIndifferenceItalic.otf</string>
 		<string>AntDesign.ttf</string>
 		<string>Entypo.ttf</string>
 		<string>EvilIcons.ttf</string>
@@ -152,6 +124,9 @@
 		<string>Octicons.ttf</string>
 		<string>Zocial.ttf</string>
 		<string>Fontisto.ttf</string>
+		<string>NunitoSans10ptBold.ttf</string>
+		<string>NunitoSans10ptExtraLight.ttf</string>
+		<string>NunitoSans10ptRegular.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>
@@ -160,7 +135,7 @@
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string></string>
+	<string/>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -173,7 +148,7 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-  <key>LSMinimumSystemVersion</key>
-  <string>12.0.0</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>12.0.0</string>
 </dict>
 </plist>

@@ -8,7 +8,7 @@ import { ScrollView, StyleSheet, useWindowDimensions, View, ViewStyle } from "re
 import LinearGradient from "react-native-linear-gradient";
 
 interface CaptureChallengeScreenProps {
-  appHeader: boolean;
+  appHeader?: boolean;
   title?: string;
   headerRightComponent?: React.ReactNode;
   modals?: React.ReactNode;
@@ -31,7 +31,7 @@ const ChallengeScreen = ({
   const screenContainerStyle = {
     paddingBottom: 40,
     paddingHorizontal: screenHorizontalPadding,
-    ...style
+    ...style,
   };
   let screenContainer = (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={screenContainerStyle}>
@@ -66,7 +66,7 @@ const ChallengeScreen = ({
               lineHeight: FontLineHeights.LH20,
               color: theme.lightColors?.white,
               textAlign: "center",
-              ...fontGroup.ns700,
+              ...fontGroup.nunitoBold,
             },
           }}
           centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}

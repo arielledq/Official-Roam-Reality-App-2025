@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Image, TouchableOpacity, View } from "react-native";
+import { FlatList, Image, Platform, TouchableOpacity, View } from "react-native";
 import useStyles from "./styles";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import { MenuIcon } from "../../assets/svg";
@@ -30,6 +30,8 @@ import FastImage from "react-native-fast-image";
 import ScreenLoader from "../../components/screenLoader";
 import { updateARUserData } from "../../redux/AR";
 import { BlurView } from "@react-native-community/blur";
+import ScreenContainer from "components/ScreenContainer";
+import { height } from "util/AppDimensions";
 
 const SCROLL_AMOUNT = 150;
 
@@ -235,72 +237,67 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
-      {profileDetails?.image ? (
-        <View style={[_styles.avatarContainer]}>
-          <LinearGradient
-            colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-            start={{ x: 0.5, y: 1 }}
-            end={{ x: 0.5, y: 0.7 }}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 1,
-            }}
-          />
-          <FastImage
-            style={{
-              width: "100%",
-              marginTop: 80,
-              aspectRatio: 1,
-            }}
-            //  @ts-ignore
-            source={{ uri: profileDetails?.image }}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-
-          <AppButton
-            customColors={["#7B16FF", "#1158F4"]}
-            buttonStyle={_styles.editButton}
-            containerStyle={_styles.editButtonContainer}
-            onPress={() => {
-              setIsTransitioning(true);
+      <View style={_styles.avatarContainer}>
+        {profileDetails?.image ? (
+          <>
+            <FastImage
+              style={{
+                width: "100%",
+                height: height * 0.5,
+              }}
               //  @ts-ignore
-              navigation.navigate("EditProfile", {
-                edit: true,
-                profileDetails,
-                onProfileUpdate,
-              });
-            }}
-          >
-            <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
-            {/* @ts-ignore */}
-            <AppText style={_styles.buttonText}>Edit Profile</AppText>
-          </AppButton>
-        </View>
-      ) : (
+              source={{ uri: profileDetails?.image }}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <LinearGradient
+              colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+              start={{ x: 0.5, y: 1 }}
+              end={{ x: 0.5, y: 0.7 }}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1,
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                width: "100%",
+                height: 200,
+              }}
+            />
+          </>
+        )}
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
-          containerStyle={_styles.editButtonContainer}
+          containerStyle={[
+            _styles.editButtonContainer,
+            {
+              top: Platform.OS === "ios" ? 130 : 110,
+            },
+          ]}
           onPress={() => {
             setIsTransitioning(true);
-            // @ts-ignore
+            //  @ts-ignore
             navigation.navigate("EditProfile", {
               edit: true,
               profileDetails,
               onProfileUpdate,
             });
           }}
-          // onPress={() => navigation.navigate("EditProfile", { edit: true ,profileDetails,onProfileUpdate})}
         >
           <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
           {/* @ts-ignore */}
-          <AppText style={_styles.buttonText}>Edit Profile</AppText>
+          <AppText style={_styles.buttonText}>Edit Profile </AppText>
         </AppButton>
-      )}
+      </View>
+
       <View style={_styles.scroll}>
         <UserInfoCard
           // @ts-ignore
@@ -345,7 +342,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     <View style={_styles.scroll}>
       <View style={_styles.headingView}>
         <AppText style={_styles.heading}>Player AR Memories</AppText>
-        <TouchableOpacity style={_styles.arrow_3} onPress={scrollRegionsPressHandler}>
+        <TouchableOpacity onPress={scrollRegionsPressHandler}>
           <Image source={Images.ForwardIcon} />
         </TouchableOpacity>
       </View>
@@ -372,31 +369,33 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   );
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      {loading ? (
-        <ScreenLoader style={{}} />
-      ) : (
-        <FlatList
-          data={data}
-          contentContainerStyle={_styles.container_style}
-          keyExtractor={item => item.id.toString()}
-          renderItem={renderItem}
-          ListHeaderComponent={renderHeader}
-          numColumns={3}
-          nestedScrollEnabled={true}
-          ListFooterComponent={renderFooter}
-        />
-      )}
-      <View style={_styles.blurView}>
-        <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
-          <AppHeader
-            containerStyle={_styles.headerContainer}
-            title={"Profile"}
-            leftComponent={handleMenuButton()}
+    <ScreenContainer style={{ ..._styles.mainContainer, paddingHorizontal: 0, paddingTop: 0 }}>
+      <>
+        {loading ? (
+          <ScreenLoader style={{}} />
+        ) : (
+          <FlatList
+            data={data}
+            contentContainerStyle={_styles.container_style}
+            keyExtractor={item => item.id.toString()}
+            renderItem={renderItem}
+            ListHeaderComponent={renderHeader}
+            numColumns={3}
+            nestedScrollEnabled={true}
+            ListFooterComponent={renderFooter}
           />
-        </BlurView>
-      </View>
-    </BackgroundWithImage>
+        )}
+        <View style={_styles.blurView}>
+          <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
+            <AppHeader
+              containerStyle={_styles.headerContainer}
+              title={"Profile"}
+              leftComponent={handleMenuButton()}
+            />
+          </BlurView>
+        </View>
+      </>
+    </ScreenContainer>
   );
 };
 

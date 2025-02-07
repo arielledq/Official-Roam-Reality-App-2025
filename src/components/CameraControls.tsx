@@ -110,14 +110,14 @@ const $actionButtons: ViewStyle = {
 
 // @ts-ignore
 const $bottomButtonText: TextStyle = {
-  ...fontGroup.p700,
+  ...fontGroup.nunitoBold,
   color: theme.lightColors?.white,
   fontSize: FontSizes.S14,
 };
 
 // @ts-ignore
 const $instructionsText: TextStyle = {
-  ...fontGroup.p600,
+  ...fontGroup.nunitoBold,
   fontSize: FontSizes.S10,
   textAlign: "center",
   color: theme.lightColors?.white,

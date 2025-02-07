@@ -25,17 +25,29 @@ import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
 import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
-import { getAllARSitesStars, sendRoamingNotification } from "../../../network";
+import { checkUniqueARChallengeDoneAPI, getAllARSitesStars } from "../../../network";
 import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
-import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
+import {
+  pinColor,
+  processCoolDownPeriod,
+  processMyCheckIns,
+  tracksViewChanges,
+  useCustomMarkers,
+} from "util/helpers";
+import Icon from "components/Icon";
 
-const GeoArSiteDetails = ({}) => {
+const GeoArSiteDetails = ({ route }) => {
+  const experience_type = route.params?.experience_type;
+
   const [isLoading, setIsLoading] = useState(false);
   const [showProTips, setShowProTips] = useState(false);
   const [address, setAddress] = useState(null);
   const [starsCount, setStarsCount] = useState(0);
+  const [coolDownFinished, setCoolDownFinished] = useState(false);
+  const [coolDownHoursText, setCoolDownHoursText] = useState("");
+  const [myCheckInsText, setMyCheckInsText] = useState("");
 
   const selectedDestination = useSelector(state => state.ar?.selectedDestination);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
@@ -44,6 +56,33 @@ const GeoArSiteDetails = ({}) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+
+  const checkIfChallengeIsDone = () => {
+    setIsLoading(true);
+
+    checkUniqueARChallengeDoneAPI({
+      geo_challenge: selectedGeoSite.pin_challenge.id,
+      geo_site: selectedGeoSite.id,
+    })
+      .then(res => {
+        if (res?.message?.message && res?.message?.remaining) {
+          const { coolDownHasFinished, remainingText } = processCoolDownPeriod(
+            res?.message?.remaining
+          );
+          setCoolDownFinished(coolDownHasFinished);
+          setCoolDownHoursText(remainingText);
+        } else if (res?.message && res?.status === 1) {
+          setCoolDownFinished(true);
+          setCoolDownHoursText("0h");
+        } else {
+          setCoolDownFinished(true);
+          setCoolDownHoursText("");
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
 
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
@@ -75,7 +114,7 @@ const GeoArSiteDetails = ({}) => {
   };
 
   const setStarCounts = () => {
-    setStarsCount(selectedGeoARSiteStars?.length);
+    setStarsCount(selectedGeoARSiteStars?.length || 0);
   };
 
   const InfoView = () => {
@@ -120,7 +159,7 @@ const GeoArSiteDetails = ({}) => {
               },
             }}
             source={{
-              html: `${selectedGeoSite?.pro_tips.toString().replaceAll("#000000", "#fff")}}`,
+              html: `${selectedGeoSite?.pro_tips.toString().replaceAll("#000000", "#fff")}`,
             }}
           />
         </ScrollView>
@@ -171,6 +210,7 @@ const GeoArSiteDetails = ({}) => {
   };
 
   const letsRoamButtonHandler = async () => {
+    // INFO: Commented out temporarily
     // try {
     //   const metadata = {
     //     destinationId: selectedDestination?.id,
@@ -182,7 +222,14 @@ const GeoArSiteDetails = ({}) => {
     //   console.error('There was an error sending the notification to friends:', error)
     // }
 
-    navigation.navigate("GeoArSiteRoutes");
+    navigation.navigate("GeoArSiteRoutes", {
+      experience_type,
+      coolDown: {
+        coolDownFinished: coolDownFinished,
+        coolDownHoursText: coolDownHoursText,
+      },
+      checkIns: myCheckInsText,
+    });
   };
 
   const initialRegion = {
@@ -205,6 +252,16 @@ const GeoArSiteDetails = ({}) => {
   useEffect(() => {
     getAddress();
     geoARSitesStars();
+
+    // Cool Down info
+    checkIfChallengeIsDone();
+
+    // My Check-ins info
+    const usersCheckIns = processMyCheckIns(
+      selectedGeoSite?.user_attempts,
+      selectedGeoSite?.challenge_attempt
+    );
+    setMyCheckInsText(usersCheckIns);
   }, []);
 
   useEffect(() => {
@@ -289,6 +346,7 @@ const GeoArSiteDetails = ({}) => {
               height: 213,
               borderRadius: 12,
               overflow: "hidden",
+              position: "relative",
             }}
             source={{ uri: selectedGeoSite.image }}
             resizeMode="cover"
@@ -305,6 +363,50 @@ const GeoArSiteDetails = ({}) => {
                 width: "110%",
               }}
             />
+            {myCheckInsText && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 60,
+                  right: 10,
+                  backgroundColor: "#fff",
+                  opacity: 0.9,
+                  borderRadius: 32,
+                  flexDirection: "row",
+                  paddingHorizontal: 16,
+                  gap: 4,
+                  alignItems: "center",
+                  height: 40,
+                }}
+              >
+                <Text style={{ fontSize: 12, color: "black" }}>My Check-ins:</Text>
+                <Text style={{ fontSize: 12, fontWeight: "bold", color: "purple" }}>
+                  {myCheckInsText}
+                </Text>
+              </View>
+            )}
+            {coolDownHoursText && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 10,
+                  right: 10,
+                  backgroundColor: "#fff",
+                  opacity: 0.9,
+                  borderRadius: 32,
+                  flexDirection: "row",
+                  paddingHorizontal: 16,
+                  gap: 8,
+                  alignItems: "center",
+                  height: 40,
+                }}
+              >
+                <Text
+                  style={{ fontSize: 12, color: "black" }}
+                >{`${coolDownHoursText} cool down`}</Text>
+                <Icon name="clockcircleo" family="antdesign" size={20} color="purple" />
+              </View>
+            )}
           </ImageBackground>
           <Text style={_styles.site_d_header}>{selectedGeoSite.name}</Text>
           <Text style={_styles.site_d_text}>{address}</Text>
@@ -329,19 +431,19 @@ const GeoArSiteDetails = ({}) => {
             contentWidth={width}
             tagsStyles={{
               p: {
-                ...fontGroup.ns500,
+                ...fontGroup.nunitoRegular,
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S12,
               },
               strong: {
-                ...fontGroup.ns500,
+                ...fontGroup.nunitoRegular,
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S14,
               },
               span: {
-                ...fontGroup.ns500,
+                ...fontGroup.nunitoRegular,
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S12,

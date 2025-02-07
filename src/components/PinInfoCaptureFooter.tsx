@@ -122,7 +122,7 @@ const PinInfoCaptureFooter = ({ pinFound, distance = 0 }: PinInfoCaptureFooterPr
             <Text
               // @ts-ignore
               style={{
-                ...fontGroup.ns400,
+                ...fontGroup.nunitoRegular,
                 fontSize: FontSizes.S12,
                 color: theme.lightColors?.white,
               }}
@@ -132,7 +132,7 @@ const PinInfoCaptureFooter = ({ pinFound, distance = 0 }: PinInfoCaptureFooterPr
             <Text
               // @ts-ignore
               style={{
-                ...fontGroup.ns600,
+                ...fontGroup.nunitoBold,
                 fontSize: FontSizes.S14,
                 color: "#C881F0",
               }}
@@ -155,7 +155,7 @@ const PinInfoCaptureFooter = ({ pinFound, distance = 0 }: PinInfoCaptureFooterPr
         <Text
           // @ts-ignore
           style={{
-            ...fontGroup.ns400,
+            ...fontGroup.nunitoRegular,
             fontSize: FontSizes.S10,
             color: theme.lightColors?.white,
             lineHeight: 13.64,

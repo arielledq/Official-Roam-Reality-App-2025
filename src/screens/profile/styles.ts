@@ -1,6 +1,6 @@
-import { makeStyles } from '@rneui/themed'
-import { screenHorizontalPadding } from '../../util/AppDimensions'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
+import { makeStyles } from "@rneui/themed";
+import { screenHorizontalPadding } from "../../util/AppDimensions";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -16,24 +16,27 @@ const useStyles = makeStyles(theme => ({
   headerContainer: {
     paddingVertical: 15,
     borderBottomWidth: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.0)',
+    backgroundColor: "rgba(0, 0, 0, 0.0)",
   },
   header: {
     marginBottom: 20,
   },
   headingView: {
-    flexDirection: 'row',
-    marginTop: 20,
-    marginHorizontal: 5,
+    flexDirection: "row",
+    marginTop: 24,
+    marginBottom: 8,
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   heading: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
-    fontWeight: '800',
+    fontWeight: "800",
     lineHeight: FontLineHeights.LH30,
     color: theme.colors.white,
     flex: 1,
-    marginLeft: -5,
+    alignItems: "center",
+    marginLeft: 16,
   },
   menuIcon: {
     paddingLeft: 5,
@@ -42,31 +45,26 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: screenHorizontalPadding - 4,
   },
   scoreboardContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
   scoreboard: {
-    ...fontGroup.ns900,
-    color: theme.colors.lightGrey,
+    ...fontGroup.nunitoBold,
+    color: theme.colors.grey3,
     fontSize: FontSizes.S48,
+    fontWeight: "900",
     lineHeight: FontLineHeights.LH66,
-    marginTop: '5%',
+    marginTop: "5%",
   },
   statContainerStyle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
   },
   boxstatContainerStyle: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  arrow_3: {
-    flex: 1,
-    alignItems: 'flex-end',
-    marginRight: -29,
-    marginTop: -23,
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
   },
   buttonStyle: {
     height: 44,
@@ -76,19 +74,18 @@ const useStyles = makeStyles(theme => ({
     width: 112,
   },
   buttonText: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH16,
     marginLeft: 10,
   },
   avatarContainer: {
-    position: 'relative',
+    position: "relative",
     marginBottom: 10,
   },
   editButtonContainer: {
-    position: 'absolute',
-    top: 140,
-    right: 20,
+    position: "absolute",
+    right: 10,
     zIndex: 10,
   },
   editButton: {
@@ -98,12 +95,12 @@ const useStyles = makeStyles(theme => ({
     paddingBottom: 50,
   },
   blurView: {
-    overflow: 'hidden',
-    position: 'absolute',
+    overflow: "hidden",
+    position: "absolute",
     top: 0,
     zIndex: 10,
-    backgroundColor: 'transparent',
+    backgroundColor: "transparent",
   },
-}))
+}));
 
-export default useStyles
+export default useStyles;

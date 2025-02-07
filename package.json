@@ -108,6 +108,7 @@
     "react-native-webview": "^13.10.5",
     "react-native-zip-archive": "^7.0.1",
     "react-redux": "^8.0.5",
+    "reactotron-react-native": "^5.1.12",
     "redux": "^4.2.1",
     "redux-logger": "^3.0.6",
     "redux-persist": "^6.0.0",

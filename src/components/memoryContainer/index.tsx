@@ -74,6 +74,8 @@ const MemoryContainer = ({
     }
   };
 
+  // console.log("item", JSON.stringify(item, null, 2));
+
   return (
     <Pressable
       style={styles.cardWrapper}
@@ -104,7 +106,7 @@ const MemoryContainer = ({
             </TouchableOpacity>
           </View>
           <AppText numberOfLines={2} style={styles.description}>
-            {truncateText(item?.challenge_details?.description.replace(/<[^>]+>/g, ""), 30)}
+            {truncateText(item?.challenge_details?.description.replace(/<[^>]*>?/gm, " "), 30)}
           </AppText>
         </View>
       </View>

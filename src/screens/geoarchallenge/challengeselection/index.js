@@ -8,9 +8,7 @@ import { useSelector } from "react-redux";
 import { GeolocationContext } from "GeolocationProvider";
 
 import {
-  checkGeoPinCheckInDoneAPI,
   getARChallenges as getARChallengesApi,
-  getCheckInCount,
   getNextStar as getNextStarApi,
 } from "../../../network";
 import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
@@ -37,15 +35,15 @@ const HomeScreenData = [
     Icon: SiteIcon,
     navigation: "PinChallenge",
   },
-  {
-    id: 2,
-    title: "Let's go chase the ",
-    title1: "stars!",
-    subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
-    image: Images.Home1,
-    Icon: StarSiteIcon,
-    navigation: "StarChallenge",
-  },
+  // {
+  //   id: 2,
+  //   title: "Let's go chase the ",
+  //   title1: "stars!",
+  //   subtitle: "Use our GPS navigation to find all our hidden stars located at this site!",
+  //   image: Images.Home1,
+  //   Icon: StarSiteIcon,
+  //   navigation: "StarChallenge",
+  // },
   {
     id: 4,
     title: "AR ",
@@ -57,11 +55,13 @@ const HomeScreenData = [
   },
 ];
 
-const ChallengeSelection = () => {
+const ChallengeSelection = ({ route }) => {
+  const experience_type = route.params?.experience_type;
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
+
   const [isLoading, setIsLoading] = useState(false);
   const [numberOfChallenges, setNumberOfChallenges] = useState(0);
-  const [isPinCheckIsDone, setIsPinCheckIsDone] = useState(false);
-  const [myCheckIns, setMyCheckIns] = useState(0);
   const [starsChallenge, setStarsChallenge] = useState();
 
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
@@ -73,24 +73,6 @@ const ChallengeSelection = () => {
 
   const latitude = userLocation?.latitude;
   const longitude = userLocation?.longitude;
-
-  const checkIfPinCheckIsDone = () => {
-    checkGeoPinCheckInDoneAPI({ geo_site: selectedGeoSite.id })
-      .then(res => {
-        setIsPinCheckIsDone(res.errorStatus === 403);
-      })
-      .finally(() => {});
-  };
-
-  const getMyCheckInsCount = () => {
-    getCheckInCount({})
-      .then(res => {
-        if (res.status === 1) {
-          setMyCheckIns(res.count);
-        }
-      })
-      .finally(() => {});
-  };
 
   const getNextStar = async () => {
     try {
@@ -128,24 +110,34 @@ const ChallengeSelection = () => {
   };
 
   const goToRoute = route => {
-    if (route === "PinChallenge" && !selectedGeoSite.pin_challenge) {
-      showMessage("Pin Challenge is unavailable right now", "error");
-      return;
-    }
-    // if (route === "PinChallenge" && !!myCheckIns) {
-    //   showMessage("Check-ins already submitted and can't submitted more.", "error");
-    //   return;
-    // }
-    if (route === "StarChallenge" && selectedGeoARSiteStars.length === 0) {
-      showMessage("This Star Challenge is completed.", "error");
-      return;
-    } else {
-      if (route === "StarChallenge") {
+    switch (route) {
+      case "StarChallenge":
+        if (selectedGeoARSiteStars.length === 0) {
+          showMessage("This Star Challenge is completed.", "error");
+          return;
+        }
         if (!starsChallenge) return;
         navigation.navigate("GeoArSiteRoutes", { starsChallenge });
-      } else {
+        break;
+      case "PinChallenge":
+        if (!selectedGeoSite.pin_challenge) {
+          showMessage("Pin Challenge is unavailable right now", "error");
+          return;
+        }
+
+        navigation.navigate("ChallengeDetails", {
+          challengeObj: selectedGeoSite,
+          experience_type: experience_type,
+          coolDown,
+          checkIns,
+        });
+
+        break;
+
+      default:
         navigation.navigate(route);
-      }
+
+        break;
     }
   };
 
@@ -172,9 +164,7 @@ const ChallengeSelection = () => {
               <View style={{ flex: 1 }}>
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
                 {item?.id === 1 && (
-                  <AppText style={styles.challengesText}>
-                    Pin located: {isPinCheckIsDone ? 1 : 0}/1 • My Check-ins: {myCheckIns}
-                  </AppText>
+                  <AppText style={styles.challengesText}>My Check-ins: {checkIns}</AppText>
                 )}
                 {item?.id === 2 && (
                   <AppText style={styles.challengesText}>
@@ -187,9 +177,9 @@ const ChallengeSelection = () => {
                   <AppText style={styles.challengesText}>{numberOfChallenges} Challenges</AppText>
                 )}
               </View>
-              <TouchableOpacity onPress={() => goToRoute(item.navigation)}>
+              <View>
                 <RightArrowIcon />
-              </TouchableOpacity>
+              </View>
             </View>
           </View>
         </View>
@@ -200,8 +190,6 @@ const ChallengeSelection = () => {
   useEffect(() => {
     if (isFocused) {
       getArChallenges();
-      checkIfPinCheckIsDone();
-      getMyCheckInsCount();
       getNextStar();
     }
   }, [isFocused]);
@@ -265,7 +253,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S26,
     lineHeight: FontLineHeights.LH35,
     marginVertical: 0,
@@ -276,7 +264,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   challengesText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,
@@ -284,7 +272,7 @@ const styles = StyleSheet.create({
     color: theme.lightColors?.white,
   },
   subtitleText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     lineHeight: FontLineHeights.LH15,
     marginTop: 10,

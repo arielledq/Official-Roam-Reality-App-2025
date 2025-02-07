@@ -5,7 +5,7 @@ import { Keyboard, View } from "react-native";
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../navigation/types";
+import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import AppButton from "../../components/button";
 import AppInput from "../../components/input";
 import { LockIcon, MailIcon } from "../../assets/svg";
@@ -88,6 +88,10 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
           initialValues={{
             email: "",
             password: "",
+            // email: "user03@yopmail.com", // User without profile pic
+            // email: "ar01@yopmail.com",
+            // email: "user11@yopmail.com",
+            // password: "Password123@",
           }}
           onSubmit={v => handleLogin(v)}
           validationSchema={SigninSchema}
@@ -98,7 +102,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
                 inputContainerStyle={[_styles.input]}
                 containerStyle={{ marginBottom: -10 }}
                 placeholder={"Email Address"}
-                placeholderTextColor={theme.darkColors?.grey}
+                placeholderTextColor={theme.lightColors?.grey0}
                 value={values.email}
                 autoCapitalize="none"
                 onChangeText={handleChange("email")}
@@ -115,7 +119,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
                 secureTextEntry={passwordVisibility && true}
                 onSubmitEditing={Keyboard.dismiss}
                 placeholder="Password"
-                placeholderTextColor={theme.darkColors?.grey}
+                placeholderTextColor={theme.lightColors?.grey0}
                 value={values.password}
                 onChangeText={handleChange("password")}
                 onBlur={handleBlur("password")}

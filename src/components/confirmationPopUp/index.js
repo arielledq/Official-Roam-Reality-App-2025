@@ -1,10 +1,10 @@
-import { StyleSheet, TouchableOpacity, View, Modal } from 'react-native'
-import React, { useState } from 'react'
-import AppText from '../text'
-import AppButton from '../button'
-import { FontLineHeights, FontSizes, fontGroup } from '../../util/FontUtils'
-import theme from '../../assets/theme'
-import { screenHorizontalPadding } from '../../util/AppDimensions'
+import { StyleSheet, TouchableOpacity, View, Modal } from "react-native";
+import React, { useState } from "react";
+import AppText from "../text";
+import AppButton from "../button";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import theme from "../../assets/theme";
+import { screenHorizontalPadding } from "../../util/AppDimensions";
 
 const ConfirmationPopUp = ({
   title,
@@ -13,15 +13,10 @@ const ConfirmationPopUp = ({
   cancelText,
   confirmHandler = () => {},
   cancelHandler = () => {},
-  isVisible
+  isVisible,
 }) => {
   return (
-    <Modal
-      visible={isVisible}
-      transparent
-      animationType="slide"
-      onRequestClose={cancelHandler}
-    >
+    <Modal visible={isVisible} transparent animationType="slide" onRequestClose={cancelHandler}>
       <View style={styles.modalContainer}>
         {/* Header */}
         <View style={styles.header}>
@@ -51,75 +46,75 @@ const ConfirmationPopUp = ({
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};
 
-export default ConfirmationPopUp
+export default ConfirmationPopUp;
 
 const styles = StyleSheet.create({
   modalContainer: {
     backgroundColor: theme.lightColors.inputBG,
-    justifyContent: 'flex-end',
-    position: 'absolute',
+    justifyContent: "flex-end",
+    position: "absolute",
     bottom: 0,
     left: 0,
-    right: 0
+    right: 0,
   },
   header: {
-    alignItems: 'center',
-    marginBottom: 12
+    alignItems: "center",
+    marginBottom: 12,
   },
   headerText: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
     marginBottom: 8,
-    marginTop: 13
+    marginTop: 13,
   },
   logoutText: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH25,
-    textAlign: 'center'
+    textAlign: "center",
   },
   horizontalLine: {
     height: 1,
-    alignSelf: 'stretch',
+    alignSelf: "stretch",
     backgroundColor: theme.darkColors?.dividerGrey,
     opacity: 0.4,
-    marginVertical: 8
+    marginVertical: 8,
   },
   cancelButton: {
     marginTop: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 50
+    alignItems: "center",
+    justifyContent: "center",
+    height: 50,
   },
   cancelButtonText: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     color: theme.darkColors?.inputBlue,
     fontSize: FontSizes.S16,
-    lineHeight: FontLineHeights.LH20
+    lineHeight: FontLineHeights.LH20,
   },
   buttonheaderContainer: {
     paddingHorizontal: screenHorizontalPadding + 5,
-    alignItems: 'center',
+    alignItems: "center",
     marginBottom: 15,
-    marginTop: 7
+    marginTop: 7,
   },
   buttonContainer: {
-    paddingHorizontal: screenHorizontalPadding - 5
+    paddingHorizontal: screenHorizontalPadding - 5,
   },
   buttonStyle: {
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center'
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonContainerStyle: {
-    marginTop: 10
+    marginTop: 10,
   },
   buttonTitle: {
-    ...fontGroup.p600,
-    fontSize: FontSizes.S16
-  }
-})
+    ...fontGroup.nunitoBold,
+    fontSize: FontSizes.S16,
+  },
+});

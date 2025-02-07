@@ -1,5 +1,4 @@
 import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 
 /**
@@ -8,38 +7,33 @@ import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
  */
 
 const useStyles = makeStyles(theme => ({
-  mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
-    paddingBottom: 80,
-  },
   heading: {
     fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     color: theme.colors.white,
     marginTop: 5,
     textAlign: "center",
   },
   container: { marginTop: "10%" },
   headerText: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
     color: theme.colors.white,
   },
   subHeaderText: {
-    ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     marginTop: 5,
   },
   pointsText: {
-    ...fontGroup.ns900,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
     color: theme.colors.white,
   },
   yourPointsText: {
-    ...fontGroup.p400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     marginTop: 5,
@@ -94,20 +88,20 @@ const useStyles = makeStyles(theme => ({
     position: "relative",
   },
   list_title: {
-    ...fontGroup.ns800,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S26,
     color: theme.colors.white,
     marginTop: 5,
   },
   s_list_count: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S14,
     color: theme.colors.white,
     alignItems: "center",
     textAlign: "center",
   },
   s_list_text: {
-    ...fontGroup.ns400,
+    ...fontGroup.nunitoRegular,
     fontSize: FontSizes.S12,
     color: theme.colors.white,
     alignItems: "center",

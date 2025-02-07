@@ -1,6 +1,14 @@
 import React, { useEffect, useState } from "react";
-
 import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
+
+import OneSignal from "react-native-onesignal";
+import { DrawerActions, useNavigation } from "@react-navigation/native";
+import { useDispatch, useSelector } from "react-redux";
+
+import AppHeader from "../../components/header";
+import ScreenContainer from "components/ScreenContainer";
+import PanicPopUp from "./panicpopup";
+
 import { handleError } from "../../util/helpers";
 import {
   getGeoARDestinations,
@@ -10,15 +18,6 @@ import {
   getARSitesStars,
   setDevice,
 } from "../../network";
-
-import BackgroundWithImage from "../../components/background";
-import AppHeader from "../../components/header";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
-import SiteIcon from "../../assets/geoar/siteicon.svg";
-import StarSiteIcon from "../../assets/geoar/starsite.svg";
-import GradientDownPNG from "../../assets/geoar/gradient_down.png";
-import SOSIcon from "../../assets/Icons/sos.svg";
-import ArIcon from "../../assets/geoar/aricon.svg";
 import {
   updateARUserData,
   updateARSettings,
@@ -26,11 +25,14 @@ import {
   updateAnyWhereChallenges,
 } from "../../redux/AR";
 
-import { useDispatch } from "react-redux";
-import useStyles from "./styles";
+import SiteIcon from "../../assets/geoar/siteicon.svg";
+import StarSiteIcon from "../../assets/geoar/starsite.svg";
+import GradientDownPNG from "../../assets/geoar/gradient_down.png";
+import SOSIcon from "../../assets/Icons/sos.svg";
+import ArIcon from "../../assets/geoar/aricon.svg";
 import { MenuIcon } from "../../assets/svg";
-import PanicPopUp from "./panicpopup";
-import OneSignal from "react-native-onesignal";
+
+import useStyles from "./styles";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -40,6 +42,8 @@ const GeoArChallenge = ({}) => {
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
+
+  const account_setup = useSelector(state => state?.login?.data?.user?.user_profile?.account_setup);
 
   useEffect(() => {
     OneSignal.setNotificationOpenedHandler(notification => {
@@ -167,6 +171,15 @@ const GeoArChallenge = ({}) => {
     setOnesignalDevice();
   }, []);
 
+  useEffect(() => {
+    if (!account_setup) {
+      setTimeout(() => {
+        // @ts-ignore
+        navigation.replace("EditProfile");
+      }, 300);
+    }
+  }, []);
+
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj));
     navigation.navigate("GeoArOutdoor", { challengeObj: obj });
@@ -250,7 +263,7 @@ const GeoArChallenge = ({}) => {
   };
 
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
+    <ScreenContainer>
       <AppHeader
         rightComponent={<MenuRightComponent />}
         leftComponent={handleMenuButton()}
@@ -263,7 +276,7 @@ const GeoArChallenge = ({}) => {
       />
       <FlatList
         showsVerticalScrollIndicator={false}
-        style={{ flex: 1, marginVertical: 15 }}
+        style={{ flex: 1, marginTop: 15 }}
         data={destinationData}
         numColumns={1}
         refreshing={isLoading}
@@ -282,7 +295,7 @@ const GeoArChallenge = ({}) => {
           />
         </View>
       )}
-    </BackgroundWithImage>
+    </ScreenContainer>
   );
 };
 

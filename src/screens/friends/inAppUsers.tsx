@@ -1,63 +1,55 @@
-import * as React from "react"
-import {
-  Text,
-  View,
-  StyleSheet,
-  Keyboard,
-  Pressable,
-  ImageBackground,
-  Alert
-} from "react-native"
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view"
-import { AppInput } from "../../components"
-import { FlatList } from "react-native-gesture-handler"
-import useStyles from "./styles"
-import theme from "../../assets/theme"
-import { Icon } from "react-native-elements"
-import { searchUsers, sendFriendRequest } from "../../network"
-import FastImage from "react-native-fast-image"
-import { color } from "@rneui/base"
-import Images from "../../assets/images"
-import fontGroup from "../../assets/fonts"
-import { FontSizes } from "../../util/FontUtils"
-import useDebounce from "../../hooks/debounce"
-import { DEBOUNCE_TIME, showMessage } from "../../util/helpers"
+import * as React from "react";
+import { Text, View, StyleSheet, Keyboard, Pressable, ImageBackground, Alert } from "react-native";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { AppInput } from "../../components";
+import { FlatList } from "react-native-gesture-handler";
+import useStyles from "./styles";
+import theme from "../../assets/theme";
+import { Icon } from "react-native-elements";
+import { searchUsers, sendFriendRequest } from "../../network";
+import FastImage from "react-native-fast-image";
+import { color } from "@rneui/base";
+import Images from "../../assets/images";
+import fontGroup from "../../assets/fonts";
+import { FontSizes } from "../../util/FontUtils";
+import useDebounce from "../../hooks/debounce";
+import { DEBOUNCE_TIME, showMessage } from "../../util/helpers";
 
 const InAppUsers = () => {
-  const _styles = useStyles()
-  const [searchText, setSearchText] = React.useState("")
-  const [filteredUsers, setFilteredUsers] = React.useState([])
-  const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME)
+  const _styles = useStyles();
+  const [searchText, setSearchText] = React.useState("");
+  const [filteredUsers, setFilteredUsers] = React.useState([]);
+  const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME);
 
   const fetchUsers = React.useCallback(() => {
     const payload = {
-      search: debounceQuery
-    }
+      search: debounceQuery,
+    };
     searchUsers(payload).then(response => {
       if (response) {
-        setFilteredUsers(response?.data)
+        setFilteredUsers(response?.data);
       }
-    })
-  }, [debounceQuery])
+    });
+  }, [debounceQuery]);
 
   React.useEffect(() => {
-    fetchUsers()
-  }, [debounceQuery, fetchUsers])
+    fetchUsers();
+  }, [debounceQuery, fetchUsers]);
 
   const onAddFriendClick = (userObj: any) => {
     // Call api to send friend request to user
     sendFriendRequest({ to_user: userObj?.id })
       .then(response => {
         if (response) {
-          showMessage("Friend request sent successfully")
-          setSearchText("")
-          fetchUsers() // Refresh the list after sending request
+          showMessage("Friend request sent successfully");
+          setSearchText("");
+          fetchUsers(); // Refresh the list after sending request
         }
       })
       .catch(error => {
-        console.error(error)
-      })
-  }
+        console.error(error);
+      });
+  };
 
   return (
     <KeyboardAwareScrollView
@@ -73,7 +65,7 @@ const InAppUsers = () => {
           selectionColor={"white"}
           placeholder="Search for a friend"
           onSubmitEditing={Keyboard.dismiss}
-          placeholderTextColor={theme.darkColors?.grey}
+          placeholderTextColor={theme.lightColors?.grey0}
           value={searchText}
           onChangeText={setSearchText}
           autoCapitalize="none"
@@ -82,7 +74,7 @@ const InAppUsers = () => {
               name="closecircleo"
               type="antdesign"
               size={15}
-              color={theme.darkColors?.grey}
+              color={theme.lightColors?.grey0}
               onPress={() => setSearchText("")}
             />
           }
@@ -90,14 +82,12 @@ const InAppUsers = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) =>
-            renderFriendItem(item, onAddFriendClick, _styles)
-          }
+          renderItem={({ item }) => renderFriendItem(item, onAddFriendClick, _styles)}
         />
       </View>
     </KeyboardAwareScrollView>
-  )
-}
+  );
+};
 
 const renderFriendItem = (item, onAddFriendClick, styles?) => {
   return (
@@ -110,7 +100,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
         paddingRight: 20,
         borderRadius: 10,
         marginVertical: 5,
-        flex: 1
+        flex: 1,
       }}
     >
       <View
@@ -118,7 +108,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
           flexDirection: "row",
           justifyContent: "flex-start",
           alignItems: "center",
-          flex: 0.9
+          flex: 0.9,
         }}
       >
         <ImageBackground
@@ -127,7 +117,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
             width: 80,
             aspectRatio: 1,
             justifyContent: "center",
-            alignItems: "center"
+            alignItems: "center",
           }}
           resizeMode="stretch"
         >
@@ -135,7 +125,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
             style={{
               width: 30,
               aspectRatio: 1,
-              borderRadius: 5
+              borderRadius: 5,
             }}
             source={{ uri: item?.user_profile?.image }}
             resizeMode={FastImage.resizeMode.cover}
@@ -152,22 +142,19 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
           </Text> */}
         </View>
       </View>
-      <Pressable
-        onPress={() => onAddFriendClick(item)}
-        style={{ marginLeft: 10 }}
-      >
+      <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10 }}>
         <Text style={localStyle.addButton}>Add as friend</Text>
       </Pressable>
     </View>
-  )
-}
+  );
+};
 
 const localStyle = {
   addButton: {
-    ...fontGroup.ns600,
+    ...fontGroup.nunitoBold,
     color: theme.lightColors?.green,
-    fontSize: FontSizes.S12
-  }
-}
+    fontSize: FontSizes.S12,
+  },
+};
 
-export default InAppUsers
+export default InAppUsers;

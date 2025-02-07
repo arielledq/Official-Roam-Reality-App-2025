@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme?.colors?.inputBG,
   },
   text: {
-    ...fontGroup.ns600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,
@@ -123,12 +123,12 @@ const styles = StyleSheet.create({
   socialAccount: {
     paddingHorizontal: 25,
     paddingVertical: 10,
-    ...fontGroup.ns600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S18,
     lineHeight: FontLineHeights.LH24,
   },
   linkNow: {
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S16,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.inputBlue,

@@ -1,50 +1,29 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Dimensions,
-  Image,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { Dimensions, Text, TouchableOpacity, View } from "react-native";
 
 import { useSelector } from "react-redux";
-import { useIsFocused, useNavigation, useRoute } from "@react-navigation/native";
-import Sound from "react-native-sound";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import moment from "moment";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
-import Modal from "react-native-modal";
 import Tts from "react-native-tts";
 import { activateKeepAwake, deactivateKeepAwake } from "@sayem314/react-native-keep-awake";
 import { useNetInfo } from "@react-native-community/netinfo";
 import MapboxGL from "@rnmapbox/maps";
-import { Button } from "@rneui/themed";
 import OfflineManager from "@rnmapbox/maps/src/modules/offline/offlineManager";
 import Geolocation from "react-native-geolocation-service";
-
-import BackgroundWithImage from "../../../components/background";
-import AppHeader from "../../../components/header";
 
 import { GeolocationContext } from "../../../GeolocationProvider";
 import Config from "../../../config";
 import {
   convertKilometersToMiles,
   pinColor,
-  showMessage,
   tracksViewChanges,
   useCustomMarkers,
 } from "../../../util/helpers";
-import {
-  getDeviceCurrentLocation,
-  getLocationDistance,
-  hasLocationPermission,
-} from "../../../util/LocationLib";
+import { getLocationDistance, hasLocationPermission } from "../../../util/LocationLib";
 import mapCustomStyle from "../../../constants/MapCustomStyles";
 
-// @ts-ignore
-import HomeIcon from "../../../assets/geoar/home.svg";
 // @ts-ignore
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
 // @ts-ignore
@@ -68,8 +47,6 @@ import TurnSlightRight from "../../../assets/svg/ManeuverMapsIcon/TurnSlightRigh
 import TurnSharpLeft from "../../../assets/svg/ManeuverMapsIcon/TurnSharpLeft.svg";
 // @ts-ignore
 import TurnSharpRight from "../../../assets/svg/ManeuverMapsIcon/TurnSharpRight.svg";
-// @ts-ignore
-import CallMerge from "../../../assets/svg/ManeuverMapsIcon/CallMerge.svg";
 // @ts-ignore
 import UTurnLeft from "../../../assets/svg/ManeuverMapsIcon/UTurnLeft.svg";
 // @ts-ignore
@@ -124,17 +101,23 @@ type MapCoords = {
 };
 
 // Navigation Step 2
-const GeoArSiteNavigation = () => {
+const GeoArSiteNavigation = ({ route }) => {
+  const experience_type = route.params?.experience_type;
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
+
   const [mileDistance, setMileDistance] = useState(0);
   const [durationMins, setDurationMins] = useState(0);
   const [estimatedTime, setEstimatedTime] = useState("");
   const [location, setLocation] = useState<MapCoords | null>(null);
   const [routeInitialLocation, setRouteInitialLocation] = useState<MapCoords | null>(null);
+
   const [steps, setSteps] = useState<StepResponse[]>([]);
-  const [mute, setMute] = useState(false);
   const [currentStep, setCurrentStep] = useState<StepResponse | null>(null);
+  const [selectedStep, setSelectedStep] = useState<StepResponse | null>(null);
+
+  const [mute, setMute] = useState(false);
   const [currentRouteIcon, setCurrentRouteIcon] = useState<React.ReactNode | null>(null);
-  const distanceFromStep = useRef(0);
 
   const selectedGeoSite = useSelector((state: any) => state.ar?.selectedGeoSite);
   const { userLocation } = useContext(GeolocationContext);
@@ -142,15 +125,15 @@ const GeoArSiteNavigation = () => {
   const [longitude, setLongitude] = useState(userLocation?.longitude);
   const [zoomLevel, setZoomLevel] = useState(0);
   const [router, setRoute] = useState<{} | null>(null);
-  const [selectedStep, setSelectedStep] = useState<StepResponse | null>(null);
 
   const mapView = useRef(null);
   const mapViewRef = useRef(null);
   const watchIdRef = useRef(null);
   const compassHeading = useRef(0);
   const navigationMessage = useRef("");
+  const distanceFromStep = useRef(0);
 
-  const route = useRoute();
+  // const route = useRoute();
   const _styles = useStyles();
   const navigation = useNavigation();
   const isFocused = useIsFocused();
@@ -226,7 +209,12 @@ const GeoArSiteNavigation = () => {
 
   const navigateToNextScreen = () => {
     //@ts-ignore
-    navigation.replace("GeoArSiteArrived", { starsChallenge: starChallengeObj });
+    navigation.replace("GeoArSiteArrived", {
+      starsChallenge: starChallengeObj,
+      experience_type: experience_type,
+      coolDown,
+      checkIns,
+    });
   };
 
   const minOrHoursWalkDriving = (walkDurationMins: number) => {
@@ -255,12 +243,6 @@ const GeoArSiteNavigation = () => {
   const closeHandler = () => {
     // navigation.replace('ChallengeSelection')
     navigation.goBack();
-  };
-
-  const adjustZoomLevel = (distance: number) => {
-    if (distance < 3) return 19; // Close-up for short distances
-    if (distance < 10) return 18; // Medium zoom for moderate distances
-    return 17; // Wider view for long distances
   };
 
   const getCurrentStep = () => {
@@ -297,6 +279,7 @@ const GeoArSiteNavigation = () => {
           if (!mute) {
             Tts.setDucking(true);
             Tts.speak(navigationMessage.current);
+            // console.log("Tts.speak", navigationMessage.current);
           }
         }
 
@@ -391,9 +374,7 @@ const GeoArSiteNavigation = () => {
     );
 
     if (dis < selectedGeoSite.check_in_site_radius) {
-      // @ts-ignore
-      navigation.replace("GeoArSiteArrived");
-      return;
+      navigateToNextScreen();
     }
   };
 
@@ -772,7 +753,6 @@ const GeoArSiteNavigation = () => {
           >
             {/* Center camera on first render or as needed: */}
             <MapboxGL.Camera
-              // ref={mapViewRef}
               zoomLevel={18}
               pitch={60} // Sets the 3D pitch angle
               animationMode="flyTo"

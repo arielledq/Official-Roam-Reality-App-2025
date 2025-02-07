@@ -29,7 +29,7 @@ const useStyles = makeStyles(() => ({
     color: "#fff",
     fontSize: FontSizes.S22,
     lineHeight: FontLineHeights.LH25,
-    ...fontGroup.ns700,
+    ...fontGroup.nunitoBold,
   },
   cornerStyles: {
     padding: 8,
@@ -52,12 +52,12 @@ const useStyles = makeStyles(() => ({
     fontSize: FontSizes.S10,
     maxWidth: "95%",
     textAlign: "center",
-    ...fontGroup.giRegular,
+    ...fontGroup.nunitoRegular,
   },
   filterTitleText: {
     color: "#fff",
     fontSize: FontSizes.S30,
-    ...fontGroup.giBold,
+    ...fontGroup.nunitoBold,
     textAlign: "center",
   },
   filterTextView: {
@@ -88,7 +88,7 @@ const useStyles = makeStyles(() => ({
   appNameText: {
     color: "#fff",
     fontSize: FontSizes.S14,
-    ...fontGroup.giRegular,
+    ...fontGroup.nunitoRegular,
     textAlign: "center",
   },
   textFilterView: {

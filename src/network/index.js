@@ -147,7 +147,7 @@ export const updateProfile = payload =>
     logoutFunc
   );
 export const getARChallenges = () =>
-  Request.callAR(
+  Request.callWithToken(
     {
       url: `modules/challenges/user/`,
       method: "GET",
@@ -156,7 +156,7 @@ export const getARChallenges = () =>
   );
 
 export const getARSiteCategories = () =>
-  Request.callAR(
+  Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-site-categories/`,
       method: "GET",

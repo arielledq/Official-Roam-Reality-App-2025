@@ -212,7 +212,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0,
   },
   Text: {
-    ...fontGroup.p600,
+    ...fontGroup.nunitoBold,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH21,
     color: theme.darkColors?.white,

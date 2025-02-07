@@ -197,12 +197,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       {
                         color: theme.lightColors.white,
                         fontSize: 12,
-                        textTransform: "uppercase",
                         fontWeight: "bold",
                       },
                     ]}
                   >
-                    {getLocationText(filter?.location_option)}
+                    {getLocationText("SITE_ONLY")}
                   </Text>
                 </View>
               )}
@@ -247,6 +246,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       resizeMode="contain"
                       style={{
                         alignItems: "flex-end",
+                        marginTop: "4%",
                         height: "100%",
                         width: "100%",
                       }}
@@ -258,7 +258,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                         styles.textFilterView,
                         {
                           justifyContent: "flex-end",
-                          paddingBottom: 10,
+                          paddingBottom: "5%",
                         },
                       ]}
                     >
@@ -304,7 +304,12 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     </View>
                   )}
                   {filter.gradient_direction === "TOP_TO_BOTTOM" && (
-                    <View style={[styles.textFilterView, { justifyContent: "flex-start" }]}>
+                    <View
+                      style={[
+                        styles.textFilterView,
+                        { justifyContent: "flex-start", paddingTop: "10%" },
+                      ]}
+                    >
                       {!filter?.text_form_image && (
                         <Text
                           style={[
