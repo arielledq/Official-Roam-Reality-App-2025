@@ -264,6 +264,7 @@ class GeoARChallengesSerializer(serializers.ModelSerializer):
             "parameters",
             "ar_filters",
             "info",
+            "color",
         )
 
 
@@ -348,6 +349,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "check_ins",
             "check_in_site_radius",
             "category",
+            "challenge_attempt",
             "user_attempts",
             "sponsors",
         )
@@ -508,7 +510,6 @@ class StarCollectionSerializer(serializers.ModelSerializer):
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
     challenge_details = GeoARChallengesSerializer(source='geo_challenge', read_only=True)
-    # challenge_details = ChallengesSerializer(source='challenges', read_only=True)
 
     class Meta:
         model = ARSitePinCheckIn
@@ -522,6 +523,7 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
             "created_at",
             "updated_at",
             "points",
+            "geo_challenge",
             "challenge_details",
         )
 
@@ -576,7 +578,7 @@ class PanicMessageSerializer(GeoModelSerializer):
         )
 
 
-class ARAllMemories(serializers.Serializer):
+class ARAllMemoriesSerializer(serializers.Serializer):
     def to_representation(self, instance):
         if isinstance(instance, ARMemories):
             return ARMemoriesSerializerGet(instance, context=self.context).data
