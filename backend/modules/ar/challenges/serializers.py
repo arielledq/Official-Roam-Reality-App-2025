@@ -386,7 +386,7 @@ class GeoLocationSerializer(GeoModelSerializer):
     star_ar_sites = serializers.SerializerMethodField()
     ar_event_sites = serializers.SerializerMethodField()
     regions = GeoRegionSerializer(read_only=True, many=True)
-    ar_experiences = ARExperienceSerializer(read_only=True, many=True)
+    ar_experiences = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoLocation
@@ -431,6 +431,11 @@ class GeoLocationSerializer(GeoModelSerializer):
             for experience in ar_experiences:
                 challenges += experience.challenges.all()
         return ChallengesSerializer(challenges, many=True, context=self.context).data
+
+    def get_ar_experiences(self, instance):
+        ar_experiences = instance.ar_experiences.exclude(is_active=False)
+        serializer = ARExperienceSerializer(ar_experiences, many=True,  context=self.context)
+        return serializer.data
 
 
 class GeoStarSerializer(GeoModelSerializer):
