@@ -114,7 +114,7 @@ const GeoArSiteDetails = ({ route }) => {
   };
 
   const setStarCounts = () => {
-    setStarsCount(selectedGeoARSiteStars?.length || 0);
+    setStarsCount(selectedGeoARSiteStars?.stars || 0);
   };
 
   const InfoView = () => {
