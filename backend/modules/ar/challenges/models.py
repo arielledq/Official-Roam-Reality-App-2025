@@ -373,6 +373,7 @@ class Challenges(models.Model):
     order = models.PositiveIntegerField(
         _("Order"), default=0
     )
+    is_active = models.BooleanField(_("Active"), default=True)
 
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)
@@ -613,6 +614,7 @@ class GeoArSite(models.Model):
         default=24,
         verbose_name='Cooldown (in hours)'
     )
+    is_active = models.BooleanField(_("Active"), default=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
