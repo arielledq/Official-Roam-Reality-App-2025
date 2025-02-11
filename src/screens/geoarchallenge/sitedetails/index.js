@@ -89,6 +89,7 @@ const GeoArSiteDetails = ({ route }) => {
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
       setAddress(selectedGeoSite.address_text);
+      return;
     }
     Geocoder.from({
       latitude: selectedGeoSite.lat_long.coordinates[1],
