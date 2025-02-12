@@ -158,10 +158,12 @@ class ARChallengeParameterSettings(models.Model):
         decimal_places=2,
         default=1.00
     )
-    rotation_speed = models.IntegerField(
+    rotation_speed = models.DecimalField(
         _("Rotation Speed"),
-        validators=[MinValueValidator(0)],
-        default=1
+        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(1)],
+        max_digits=3,
+        decimal_places=2,
+        default=0.01,
     )
     scale_speed = models.DecimalField(
         _("Scale Speed"),
