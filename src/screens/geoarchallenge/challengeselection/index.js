@@ -27,8 +27,8 @@ const HomeScreenData = [
   { id: -1, blank: true },
   {
     id: 1,
-    title: "Check in with our ",
-    title1: "Roam Pin!",
+    title: "Geo Check-Ins",
+    title1: "",
     subtitle:
       "Snap a fun and creative picture standing next to our location pin as proof of your arrival.",
     image: Images.Home,

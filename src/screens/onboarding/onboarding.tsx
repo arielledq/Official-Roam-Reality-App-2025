@@ -13,18 +13,18 @@ const onboardingScreens = [
   {
     backgroundImage: Images.Onboarding1, 
     device: Images.Device1, 
-    icon: <Icons.NavigationPoint1 />
+    // icon: <Icons.NavigationPoint1 />
   },
-  {
-    backgroundImage: Images.Onboarding2, 
-    device: Images.Device2, 
-    icon: <Icons.NavigationPoint2 />
-  },
-  {
-    backgroundImage: Images.Onboarding3, 
-    device: Images.Device3, 
-    icon: <Icons.NavigationPoint3 />
-  },
+  // {
+  //   backgroundImage: Images.Onboarding2,
+  //   device: Images.Device2,
+  //   icon: <Icons.NavigationPoint2 />
+  // },
+  // {
+  //   backgroundImage: Images.Onboarding3,
+  //   device: Images.Device3,
+  //   icon: <Icons.NavigationPoint3 />
+  // },
 ];
 
 const Onboarding = ({navigation}) => {
@@ -33,7 +33,7 @@ const Onboarding = ({navigation}) => {
   const { newUser } = useSelector(state => state.persist)
 
   useEffect(()=>{
-    setTimeout(()=>{
+    const timeout = setTimeout(()=>{
       if(activeIndex === onboardingScreens.length){
         navigation.reset({
           index: 0,
@@ -44,10 +44,12 @@ const Onboarding = ({navigation}) => {
         setActiveIndex((prevIndex) => prevIndex + 1)
       }
     }, 2000)
+    return () => clearTimeout(timeout)
   },[activeIndex])
 
   const getImageSource = () => onboardingScreens[activeIndex - 1] || onboardingScreens[0];
-  const { backgroundImage, device, icon } = getImageSource();
+  // const { backgroundImage, device, icon } = getImageSource();
+  const { backgroundImage, device } = getImageSource();
 
   const continueHandler = () => {
     navigation.reset({
@@ -67,7 +69,7 @@ const Onboarding = ({navigation}) => {
     <Image source={device} style={styles.image}/>
     <AppText style={styles.footerText1}>{Strings.WithTheCarribean}</AppText>
     <AppText style={styles.footerText2}>{Strings.FirstTravelARGame}</AppText>
-    <>{icon}</>
+    {/*<>{icon}</>*/}
     <AppButton
       containerStyle={styles.btnContainer}
       title={Strings.LetsBegin}
