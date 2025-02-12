@@ -18,7 +18,7 @@ import AppSwitch from "../../components/Switch";
 import userLocationHook from "./location.hook";
 
 const DrawerList = [
-  { icon: "target", label: "AR Challenges", navigateTo: "Home" },
+  { icon: "target", label: "AR Challenges", navigateTo: "ARChallenge" },
   {
     icon: "pin",
     label: "My Live Location",
