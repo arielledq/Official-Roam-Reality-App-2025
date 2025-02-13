@@ -59,55 +59,49 @@ const GeoArSiteArrived = ({ route }) => {
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        centerComponent={{
-          text: "You have Arrived",
-          style: [_styles.heading],
-        }}
-        backgroundColor="transparent"
-      />
-
-      <View style={{ width: "100%", flex: 1, justifyContent: 'space-between'}} >
-        <View
-          style={{
-            position: "relative",
-            minHeight: 520,
-            borderRadius: 16,
-            overflow: "hidden",
-            marginTop: 20,
-            marginHorizontal: 30,
-            flex: 1
+      <View style={_styles.headingContainer}>
+        <AppHeader
+          centerComponent={{
+            text: "You have Arrived",
+            style: [_styles.heading],
           }}
+          backgroundColor="transparent"
+        />
+      </View>
+
+      <MapView
+        customMapStyle={mapCustomStyle}
+        provider={PROVIDER_GOOGLE}
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+        zoomEnabled={true}
+        scrollEnabled={true}
+        initialRegion={{
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: 0.0032,
+          longitudeDelta: 0.0032,
+        }}
+      >
+        <Marker
+          coordinate={{
+            latitude: latitude,
+            longitude: longitude,
+          }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
         >
-          <MapView
-            customMapStyle={mapCustomStyle}
-            provider={PROVIDER_GOOGLE}
-            style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
-            zoomEnabled={true}
-            scrollEnabled={true}
-            initialRegion={{
-              latitude: latitude,
-              longitude: longitude,
-              latitudeDelta: 0.0032,
-              longitudeDelta: 0.0032,
-            }}
-          >
-            <Marker
-              coordinate={{
-                latitude: latitude,
-                longitude: longitude,
-              }}
-              pinColor={pinColor}
-              tracksViewChanges={tracksViewChanges}
-            >
-              {useCustomMarkers && (
-                <View style={{ width: 30, height: 30 }}>
-                  {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
-                </View>
-              )}
-            </Marker>
-          </MapView>
-        </View>
+          {useCustomMarkers && (
+            <View style={{ width: 30, height: 30 }}>
+              {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
+            </View>
+          )}
+        </Marker>
+      </MapView>
+
+      <View style={_styles.bottomActionsContainer}>
         <TouchableOpacity
           onPress={arrivedButtonHandler}
           style={{
