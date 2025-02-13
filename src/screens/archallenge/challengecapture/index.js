@@ -42,7 +42,7 @@ const ArChallengeCapture = ({}) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
-  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(true);
   const [isVideo, setIsvideo] = useState(false);
 
   const settings = useSelector(state => state.ar?.arSettings);

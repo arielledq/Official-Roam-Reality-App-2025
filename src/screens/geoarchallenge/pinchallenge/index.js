@@ -30,7 +30,7 @@ import ViewInfoButton from "components/ViewInfoButton";
 import { PIN_CHALLENGE_CONFIG } from "constants";
 
 const PinChallenge = () => {
-  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
   const [distanceInFeet, setDistanceInFeet] = useState(0);
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false);
