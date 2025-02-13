@@ -461,7 +461,13 @@ const ArChallengeShare = () => {
     checkPermissions();
   }, []);
 
-  const imageContainerHeight = Dimensions.get("screen").height - 540;
+  const offset = 175;
+  const { width: screenWidth } = Dimensions.get("window"); // Get screen width
+  const aspectWidth = screenWidth - offset;
+  const aspectHeight = (aspectWidth * 16) / 9; // Calculate height based on 9:16 aspect ratio
+
+  const mediaContainerWidth = aspectWidth;
+  const mediaContainerHeight = aspectHeight;
 
   return (
     <ChallengeScreen title={screenTitle} style={{ justifyContent: "space-between", flex: 1 }}>
@@ -531,86 +537,83 @@ const ArChallengeShare = () => {
 
           <View
             style={{
+              flex: 1,
               backgroundColor: "#272741",
-
               gap: 8,
-
               paddingVertical: 8,
-
               marginTop: 16,
               marginBottom: 8,
-
               borderRadius: 12,
-
               alignItems: "center",
             }}
           >
-            {fileExt == "mp4" ? (
-              <Video
-                resizeMode={"contain"}
-                repeat={true}
-                style={{
-                  height: imageContainerHeight,
-                  maxHeight: 440,
-                  width: "60%",
-                  justifyContent: "flex-end",
-                  alignItems: "flex-end",
-                }}
-                source={{
-                  uri: capturedDataUri,
-                }}
-              />
-            ) : (
-              <Image
-                resizeMode={"contain"}
-                source={{ uri: capturedDataUri }}
-                style={{
-                  height: imageContainerHeight,
-                  maxHeight: 440,
-                  backgroundColor: "transparent",
-                  width: "60%",
-                }}
-              />
-            )}
-
-            {/* Sponsor row */}
-            <View
-              style={{
-                width: "100%",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              <Image
-                style={{ width: 20, height: 20, marginEnd: 8 }}
-                source={{ uri: sponsorImage }}
-              />
-              <Text
-                style={{
-                  ...fontGroup.nunitoBold,
-                  fontWeight: "700",
-                  fontSize: FontSizes.S20,
-                  color: theme.lightColors?.white,
-                }}
-              >
-                {sponsorName}
-              </Text>
+            <View style={{ flex: 1, justifyContent: "center" }}>
+              {fileExt == "mp4" ? (
+                <Video
+                  resizeMode={"contain"}
+                  repeat={true}
+                  style={{
+                    width: mediaContainerWidth,
+                    height: mediaContainerHeight,
+                    justifyContent: "flex-end",
+                    alignItems: "flex-end",
+                  }}
+                  source={{
+                    uri: capturedDataUri,
+                  }}
+                />
+              ) : (
+                <Image
+                  resizeMode={"contain"}
+                  source={{ uri: capturedDataUri }}
+                  style={{
+                    width: mediaContainerWidth,
+                    height: mediaContainerHeight,
+                    backgroundColor: "transparent",
+                  }}
+                />
+              )}
             </View>
 
-            {/* Completion date */}
-            {!isMemory && challengeTitle && (
-              <Text
+            <View style={{ alignItems: "center" }}>
+              {/* Sponsor row */}
+              <View
                 style={{
-                  ...fontGroup.nunitoLight,
-                  fontWeight: "300",
-                  fontSize: FontSizes.S10,
-                  color: theme.lightColors?.white,
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
               >
-                Completed on: {startDate}
-              </Text>
-            )}
+                <Image
+                  style={{ width: 20, height: 20, marginEnd: 8 }}
+                  source={{ uri: sponsorImage }}
+                />
+                <Text
+                  style={{
+                    ...fontGroup.nunitoBold,
+                    fontWeight: "700",
+                    fontSize: FontSizes.S20,
+                    color: theme.lightColors?.white,
+                  }}
+                >
+                  {sponsorName}
+                </Text>
+              </View>
+
+              {/* Completion date */}
+              {!isMemory && challengeTitle && (
+                <Text
+                  style={{
+                    ...fontGroup.nunitoLight,
+                    fontWeight: "300",
+                    fontSize: FontSizes.S10,
+                    color: theme.lightColors?.white,
+                  }}
+                >
+                  Completed on: {startDate}
+                </Text>
+              )}
+            </View>
           </View>
 
           <View
@@ -618,6 +621,8 @@ const ArChallengeShare = () => {
               flexDirection: "column",
               gap: 16,
               alignItems: "center",
+              marginTop: 8,
+              marginBottom: 16,
             }}
           >
             {!isMemory && (
