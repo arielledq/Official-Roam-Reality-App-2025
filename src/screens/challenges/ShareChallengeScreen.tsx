@@ -119,7 +119,7 @@ const ArChallengeShare = () => {
       break;
   }
 
-  const capturedDataUri = isMemory ? captureData : `file://${captureData}`;
+  const capturedDataUri = captureData;
 
   const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
   const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop();
