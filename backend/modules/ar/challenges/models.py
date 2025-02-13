@@ -158,10 +158,12 @@ class ARChallengeParameterSettings(models.Model):
         decimal_places=2,
         default=1.00
     )
-    rotation_speed = models.IntegerField(
+    rotation_speed = models.DecimalField(
         _("Rotation Speed"),
-        validators=[MinValueValidator(0)],
-        default=1
+        validators=[MinValueValidator(Decimal('0.01')), MaxValueValidator(1)],
+        max_digits=3,
+        decimal_places=2,
+        default=0.01,
     )
     scale_speed = models.DecimalField(
         _("Scale Speed"),
@@ -373,6 +375,7 @@ class Challenges(models.Model):
     order = models.PositiveIntegerField(
         _("Order"), default=0
     )
+    is_active = models.BooleanField(_("Active"), default=True)
 
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)
@@ -613,6 +616,7 @@ class GeoArSite(models.Model):
         default=24,
         verbose_name='Cooldown (in hours)'
     )
+    is_active = models.BooleanField(_("Active"), default=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"

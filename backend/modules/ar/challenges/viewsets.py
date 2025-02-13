@@ -328,7 +328,7 @@ class ChallengesViewSet(viewsets.ModelViewSet):
     """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = Challenges.objects.all()
+    queryset = Challenges.objects.filter(is_active=True)
     serializer_class = ChallengesSerializer
     http_method_names = ["get"]
 

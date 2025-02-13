@@ -89,6 +89,7 @@ const GeoArSiteDetails = ({ route }) => {
   const getAddress = () => {
     if (selectedGeoSite.address_text != "") {
       setAddress(selectedGeoSite.address_text);
+      return;
     }
     Geocoder.from({
       latitude: selectedGeoSite.lat_long.coordinates[1],
@@ -395,7 +396,7 @@ const GeoArSiteDetails = ({ route }) => {
                   height: 40,
                 }}
               >
-                <Text style={{ fontSize: 12, color: "black" }}>My Check-ins:</Text>
+                <Text style={{ fontSize: 12, color: "black" }}>My Check-Ins:</Text>
                 <Text style={{ fontSize: 12, fontWeight: "bold", color: "purple" }}>
                   {myCheckInsText}
                 </Text>
@@ -485,33 +486,41 @@ const GeoArSiteDetails = ({ route }) => {
                 alignItems: "center",
               }}
             >
-              <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} />
-              <Text style={_styles.protip_text}>
+              <Icon
+                name={"info"}
+                family="feather"
+                color={theme.lightColors?.inputBlue}
+                size={32}
+                // style={styles.verificationIcon}
+              />
+              {/* <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} /> */}
+              {/* <Text style={_styles.protip_text}>
                 {selectedGeoSite?.category?.id ? "Useful\nLinks" : "Pro Tips"}
-              </Text>
+              </Text> */}
             </TouchableOpacity>
-            <TouchableOpacity
+
+            <View
               style={{
-                borderColor: theme.lightColors.magenta,
-                borderWidth: 2,
-                borderRadius: 16,
-                paddingVertical: 16,
-                paddingHorizontal: 8,
+                flexDirection: "row",
+                gap: 16,
+                alignItems: "center",
               }}
-              disabled={isLoading}
-              onPress={skipNavigationButtonHandler}
             >
-              <Text style={{ color: theme.lightColors.magenta, fontWeight: "bold" }}>
-                Skip To Site
-              </Text>
-            </TouchableOpacity>
-            <View>
               <AppButton
                 onPress={letsRoamButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{ fontWeight: "bold" }}
                 containerStyle={_styles.buttonContainerStyle}
-                title={"Let's Roam"}
+                title={"Navigate"}
+                loading={isLoading}
+              />
+
+              <AppButton
+                onPress={skipNavigationButtonHandler}
+                buttonStyle={_styles.buttonStyle}
+                titleStyle={{ fontWeight: "bold" }}
+                containerStyle={_styles.buttonContainerStyle}
+                title={"Geo Check-In"}
                 loading={isLoading}
               />
             </View>

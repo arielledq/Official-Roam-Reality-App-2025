@@ -246,7 +246,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
             >
               {myCheckInsText && (
                 <Text style={[styles.challengeSponsorStartDateText, { flex: 1 }]}>
-                  My Check-ins:{" "}
+                  My Check-Ins:{" "}
                   <Text style={styles.challengeSponsorStartDateTextValue}>{myCheckInsText}</Text>
                 </Text>
               )}

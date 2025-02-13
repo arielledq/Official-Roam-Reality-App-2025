@@ -38,7 +38,7 @@ const ArChallenge = ({}) => {
       .then(res => {
         if (res.status == 1) {
           setSponsoredDataAll(res.data);
-          setSponsoredData(res.data.filter(x => x.challenge_requirement == challengeChoice));
+          setSponsoredData(res.data.filter(x => x.challenge_requirement.includes(challengeChoice)));
         } else {
           res.message.message = "Error in loading Challenges.";
           handleError(res);
@@ -89,13 +89,7 @@ const ArChallenge = ({}) => {
 
   const setDataWithChoice = choice => {
     setChallengeChoice(choice);
-    if (choice == "PHOTO") {
-      const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement == "PHOTO");
-      setSponsoredData(filteredArray.slice());
-    } else {
-      const filteredArray = sponsoredDataAll.filter(x => x.challenge_requirement !== "PHOTO");
-      setSponsoredData(filteredArray.slice());
-    }
+    setSponsoredData(sponsoredDataAll.filter(x => x.challenge_requirement.includes(choice)));
   };
 
   useEffect(() => {

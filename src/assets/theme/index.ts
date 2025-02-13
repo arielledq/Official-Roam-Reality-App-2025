@@ -13,11 +13,11 @@ const theme = createTheme({
     // INFO: Validated colors
     white: "#FFFFFF",
     inputBG: "#131422",
+    inputBlue: "#1158F4",
 
     // TODO: Verify usage of these colors
     purple: "#9003E0",
     pink: "#B816E0",
-    inputBlue: "#1158F4",
     yellow: "#EAB308",
     statBG: "#323250",
     boxStatBG: "#27273F",
