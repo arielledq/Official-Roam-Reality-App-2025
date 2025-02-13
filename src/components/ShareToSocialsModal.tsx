@@ -98,24 +98,24 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
     }
-    // if (!isMemory && hasShared) {
-    //   try {
-    //     const grantSocialPointsHandler = async (selectedSSNN: string) => {
-    //       await socialPointsARUpdateAPI({
-    //         social_network: selectedSSNN,
-    //       });
+    if (!isMemory && hasShared) {
+      try {
+        const grantSocialPointsHandler = async (selectedSSNN: string) => {
+          await socialPointsARUpdateAPI({
+            social_network: selectedSSNN,
+          });
 
-    //       showMessage(
-    //         "You've been granted points for sharing to your socials",
-    //         "success",
-    //         `Socials points granted!`
-    //       );
-    //     };
-    //     onPointsGranted(selectedSSNN, grantSocialPointsHandler);
-    //   } catch (error: any) {
-    //     console.error("Error assigning points:", error?.message, error);
-    //   }
-    // }
+          showMessage(
+            "You've been granted points for sharing to your socials",
+            "success",
+            `Socials points granted!`
+          );
+        };
+        onPointsGranted(selectedSSNN, grantSocialPointsHandler);
+      } catch (error: any) {
+        console.error("Error assigning points:", error?.message, error);
+      }
+    }
   };
 
   if (!isVisible) return null;
