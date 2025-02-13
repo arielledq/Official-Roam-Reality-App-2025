@@ -86,7 +86,7 @@
     "react-native-onesignal": "^4.5.1",
     "react-native-pager-view": "^6.2.3",
     "react-native-paper": "^5.9.1",
-    "react-native-permissions": "^4.1.0",
+    "react-native-permissions": "^5.2.5",
     "react-native-radio-buttons-group": "^2.3.2",
     "react-native-reanimated": "~2.14.0",
     "react-native-render-html": "^6.3.4",
