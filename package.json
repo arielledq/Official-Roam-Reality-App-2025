@@ -59,6 +59,7 @@
     "react-native": "0.71.19",
     "react-native-compass-heading": "^1.5.0",
     "react-native-contacts": "^7.0.8",
+    "react-native-date-picker": "^5.0.10",
     "react-native-devsettings": "^1.0.5",
     "react-native-dotenv": "^3.4.8",
     "react-native-drag-text-editor": "^1.0.5",
