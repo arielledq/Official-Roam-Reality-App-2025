@@ -153,7 +153,15 @@ const PinChallenge = () => {
 
   const sendModelDataToUnitySpawn = useCallback(() => {
     // console.log('sendModelDataToUnitySpawn')
-    if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission && challengeObjParameters) { // Add challengeObjParameters
+    if (
+      unityRef.current &&
+      modelOBJ &&
+      textureBase &&
+      emissionValue &&
+      textureEmission &&
+      challengeObjParameters
+    ) {
+      // Add challengeObjParameters
       const modelData = {
         objFile: modelOBJ.replace("file://", ""),
         mtlFile: modelResource ? modelResource.replace("file://", "") : null,
@@ -178,13 +186,21 @@ const PinChallenge = () => {
       // console.log('enviando datos modeldata')
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
-      }, 500)
+      }, 500);
     } else {
       // console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
-  }, [unityRef, modelOBJ, textureBase, emissionValue, textureEmission, scale, rotation, challengeObjParameters, modelResource]); // Add all dependencies
-
-
+  }, [
+    unityRef,
+    modelOBJ,
+    textureBase,
+    emissionValue,
+    textureEmission,
+    scale,
+    rotation,
+    challengeObjParameters,
+    modelResource,
+  ]); // Add all dependencies
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -194,14 +210,14 @@ const PinChallenge = () => {
         PERMISSIONS.ANDROID.RECORD_AUDIO,
         PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
         PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      ]).then(response => { });
+      ]).then(response => {});
     } else if (Platform.OS === "ios") {
       requestMultiple([
         PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
         PERMISSIONS.IOS.PHOTO_LIBRARY,
         PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-      ]).then(response => { });
+      ]).then(response => {});
     }
   };
 
@@ -413,7 +429,7 @@ const PinChallenge = () => {
   useFocusEffect(
     useCallback(() => {
       // console.log('entrando USECALLBACK', isUnityLoaded, '=======',unityRef.current, '=====', isMeInsideInSite )
-      if (unityRef.current && isUnityLoaded) {
+      if (unityRef.current || isUnityLoaded) {
         // console.log('entrando UNITY.CURRENT')
         sendBloomValuesToUnity();
         PointsCount();
@@ -423,18 +439,25 @@ const PinChallenge = () => {
           JSON.stringify({
             setVisibleButtonPosition: true,
           })
-        )
-          ;
+        );
       }
-      if (unityRef.current && isUnityLoaded && isMeInsideInSite) { // Check all dependencies here
+      if (unityRef.current && isUnityLoaded && isMeInsideInSite) {
+        // Check all dependencies here
         enableButtonPhoto();
       }
-    }, [unityRef, isUnityLoaded, isMeInsideInSite, sendBloomValuesToUnity, PointsCount, enableButtonPhoto])
+    }, [
+      unityRef,
+      isUnityLoaded,
+      isMeInsideInSite,
+      sendBloomValuesToUnity,
+      PointsCount,
+      enableButtonPhoto,
+    ])
   );
 
   const isLoadingUnity = useCallback(() => {
     if (unityRef.current) {
-      console.log('useCall==== ISLOADING');
+      console.log("useCall==== ISLOADING");
       unityRef.current.postMessage(
         "OBJImport",
         "SetLoadingVisibility",
@@ -451,10 +474,26 @@ const PinChallenge = () => {
   }, [unityRef, threshold, intensity]);
   useFocusEffect(
     useCallback(() => {
-      if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded) {
+      if (
+        unityRef.current &&
+        modelOBJ &&
+        textureBase &&
+        emissionValue &&
+        textureEmission &&
+        isUnityLoaded
+      ) {
         sendModelDataToUnitySpawn();
       }
-    }, [unityRef, unityRef.current, modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded, sendModelDataToUnitySpawn])
+    }, [
+      unityRef,
+      unityRef.current,
+      modelOBJ,
+      textureBase,
+      emissionValue,
+      textureEmission,
+      isUnityLoaded,
+      sendModelDataToUnitySpawn,
+    ])
   );
 
   const eraseFile = async () => {
