@@ -328,6 +328,8 @@ PODS:
     - React-Core
   - react-native-contacts (7.0.8):
     - React-Core
+  - react-native-date-picker (5.0.10):
+    - React-Core
   - react-native-fbsdk-next (12.2.0):
     - React-Core
     - react-native-fbsdk-next/Core (= 12.2.0)
@@ -514,7 +516,7 @@ PODS:
     - React
     - React-Core
     - Turf
-  - RNPermissions (4.1.5):
+  - RNPermissions (5.2.5):
     - React-Core
   - RNReanimated (2.14.4):
     - DoubleConversion
@@ -603,6 +605,7 @@ DEPENDENCIES:
   - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-compass-heading (from `../node_modules/react-native-compass-heading`)
   - react-native-contacts (from `../node_modules/react-native-contacts`)
+  - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
   - react-native-geolocation-service (from `../node_modules/react-native-geolocation-service`)
@@ -733,6 +736,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-compass-heading"
   react-native-contacts:
     :path: "../node_modules/react-native-contacts"
+  react-native-date-picker:
+    :path: "../node_modules/react-native-date-picker"
   react-native-fbsdk-next:
     :path: "../node_modules/react-native-fbsdk-next"
   react-native-geolocation:
@@ -884,6 +889,7 @@ SPEC CHECKSUMS:
   react-native-cameraroll: 0789488d9f5e79caed73c078daaf58f79ed3c61c
   react-native-compass-heading: 1b4403d1c99dfd8311073ca8fc52bfc8e365cfac
   react-native-contacts: cb4f3b823550adbce0802901b9e63bf1526ec0af
+  react-native-date-picker: 58c231c37c1a9be5715018b369210c34e83f6e48
   react-native-fbsdk-next: fcecfa33c37ce63bcda9cd24766ee9d345463230
   react-native-geolocation: 2d8f71eb7d0c9a0c52f336d4634444488669371d
   react-native-geolocation-service: 608e1da71a1ac31b4de64d9ef2815f697978c55b
@@ -928,7 +934,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: 24d3b3261f78b0fae0aa013f8ab6f8d25e369b0c
   RNImageCropPicker: 35a3ceb837446fa11547704709bb22b5fac6d584
   rnmapbox-maps: 334654168efcdc29584a9af1519d890a07a4a28e
-  RNPermissions: 44af63c2760ca4fd466b5b2841a5cd516ce52319
+  RNPermissions: afe8d1a35a47f8e16c34e106822d49229e44318d
   RNReanimated: cc5e3aa479cb9170bcccf8204291a6950a3be128
   RNScreens: 50ad6e3dbea9023272b3aa753e3ee2720b0c9b8f
   RNShare: 0fad69ae2d71de9d1f7b9a43acf876886a6cb99c
@@ -943,6 +949,6 @@ SPEC CHECKSUMS:
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: d4f5b037672e6b68ba484c7cf7fe6790122df792
 
-PODFILE CHECKSUM: 6199e81504280de90a7a89bae3be7de23b3ea60d
+PODFILE CHECKSUM: 55f15d3b37d64cfd240a9dc29521b2288bef9dcb
 
 COCOAPODS: 1.16.2

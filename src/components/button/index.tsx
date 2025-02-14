@@ -28,7 +28,7 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
         loadingStyle={{ backgroundColor: "transparent" }}
         disabledStyle={{ backgroundColor: "transparent" }}
         buttonStyle={[styles.buttonStyle, buttonStyle]}
-        containerStyle={[styles.containerStyle, otherProps?.loading && { width: 100 }]}
+        containerStyle={[styles.containerStyle, otherProps?.loading && { minWidth: 100 }]}
         titleStyle={[styles.titleStyle, titleStyle]}
         {...otherProps}
       />

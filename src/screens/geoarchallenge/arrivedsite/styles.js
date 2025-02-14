@@ -8,6 +8,27 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util
  */
 
 const useStyles = makeStyles(theme => ({
+  mainContainer: {
+    flex: 1,
+    justifyContent: "flex-start",
+    alignItems: "center",
+    position: "relative",
+  },
+  headingContainer: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 1,
+    paddingHorizontal: screenHorizontalPadding,
+  },
+  bottomActionsContainer: {
+    position: "absolute",
+    bottom: 20,
+    left: 0,
+    right: 0,
+    paddingHorizontal: screenHorizontalPadding,
+  },
   heading: {
     fontSize: FontSizes.S20,
     lineHeight: FontLineHeights.LH25,
@@ -15,12 +36,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     marginTop: 5,
     textAlign: "center",
-  },
-  mainContainer: {
-    flex: 1,
-    paddingHorizontal: screenHorizontalPadding,
-    justifyContent: "flex-start",
-    alignItems: "center",
   },
   container: { marginTop: "10%" },
   headerText: {

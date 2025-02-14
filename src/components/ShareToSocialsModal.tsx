@@ -37,8 +37,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 }) => {
   const share = async (selectedSSNN: string) => {
     // If correctedCaptureData doesn't already have "file://" prefix, add it
-    let updatedFileUri = "";
-    if (!updatedFileUri.startsWith("file://")) {
+    let updatedFileUri = fileUri;
+    if (!updatedFileUri?.startsWith("file://")) {
       updatedFileUri = `file://${fileUri}`;
     }
 
