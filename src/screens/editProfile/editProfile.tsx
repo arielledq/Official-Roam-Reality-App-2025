@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Alert, Keyboard, Pressable, Text, View } from "react-native";
+import { Keyboard, Pressable, Text, View } from "react-native";
 
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Dropdown } from "react-native-element-dropdown";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DatePicker from "react-native-date-picker";
 import axios from "axios";
 import { Asset, CameraOptions, launchImageLibrary } from "react-native-image-picker";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,11 +53,15 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   route,
   navigation,
 }) => {
-  console.log("route?.params", route?.params);
   const edit = route?.params?.edit;
   const userData = route?.params?.profileDetails;
   const onProfileUpdate = route?.params?.onProfileUpdate;
 
+  let dateOfBirth = null;
+  if (userData?.date_of_birth) {
+    const [year, month, day] = userData.date_of_birth.split("-").map(Number);
+    dateOfBirth = new Date(year, month - 1, day);
+  }
   const initialFormValues = {
     pImage: userData?.image ?? undefined,
     name: userData?.user?.name ?? "",
@@ -65,7 +69,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     phoneNumber: userData?.phone_number ?? "",
     address: userData?.home_address ?? "",
     country: userData?.home_country ?? "",
-    date_of_birth: userData?.date_of_birth ?? "",
+    date_of_birth: dateOfBirth ?? "",
   };
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
@@ -76,7 +80,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false);
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null);
   const [countryData, setCountryData] = useState<[]>([]);
-  const [bDate, setBDate] = useState<Date | null>(null);
+  const [bDate, setBDate] = useState<Date>(dateOfBirth);
   const [isLoading, setIsLoading] = useState(false);
   const [gender, setGender] = useState({
     label: userData?.gender ?? "",
@@ -555,15 +559,13 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       </Text>
                     ) : undefined}
                   </View>
-                  <DateTimePickerModal
-                    isVisible={isDatePickerVisible}
+                  <DatePicker
+                    modal
                     mode="date"
-                    themeVariant="light"
+                    open={isDatePickerVisible}
+                    date={bDate || new Date()}
                     onConfirm={date => handleConfirm(date, setFieldValue)}
                     onCancel={hideDatePicker}
-                    maximumDate={new Date()}
-                    date={bDate || new Date()} // Provide a default value if bDate is null
-                    // locale="en_GB"
                   />
 
                   <View style={_styles.privacyContainer}>
