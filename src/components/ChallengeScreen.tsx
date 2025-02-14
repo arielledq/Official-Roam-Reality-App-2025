@@ -77,7 +77,7 @@ const ChallengeScreen = ({
       )}
       {screenContainer}
 
-      {modals}
+      {/*{modals}*/}
     </View>
   );
 };

@@ -28,6 +28,7 @@ import useStyles from "./styles";
 
 import theme from "../../assets/theme";
 import { Icons } from "../../assets/Icons";
+import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
 
 interface ImageData {
   uri: string | undefined;
@@ -90,11 +91,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     label: userData?.home_country ?? "",
     value: userData?.home_country ?? "",
   });
-
+  const [detailsShow, setDetailsShow] = useState(false);
   const dispatch = useDispatch();
   const _styles = useStyles();
   const nameRef = useRef();
-
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
 
   const handleConfirm = (date: Date, setFieldValue: (field: string, value: any) => {}) => {
@@ -142,10 +142,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     } else {
       dispatch(updateName(nameRef.current));
       dispatch(updateAccountFlag(true));
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
-      });
+      setDetailsShow(true);
     }
   };
 
@@ -229,6 +226,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         console.error(error);
       });
   }, []);
+
+  const acceptWaiverButtonHandler = () => {
+    setDetailsShow(false);
+    navigation.reset({
+      index: 0,
+      routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+    });
+  };
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -584,6 +589,13 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     title={"Save & Continue"}
                     onPress={handleSubmit}
                     loading={isLoading}
+                  />
+                  <WaiverDetailsModal
+                    isVisible={detailsShow}
+                    confirmHandler={acceptWaiverButtonHandler}
+                    cancelHandler={() => {
+                      setDetailsShow(false);
+                    }}
                   />
                 </View>
               </View>
