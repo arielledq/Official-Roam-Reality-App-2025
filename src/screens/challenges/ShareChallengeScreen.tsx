@@ -1,5 +1,5 @@
-import React, { useContext, useState } from "react";
-import { Image, Platform, Text, View, Dimensions } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import { Image, Platform, Text, View, Dimensions, Linking } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -8,8 +8,9 @@ import Video from "react-native-video";
 import { useDispatch } from "react-redux";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { RouteProp } from "@react-navigation/native";
-import { SSNN } from "../../constants";
+import { PERMISSIONS, RESULTS, request, requestMultiple } from "react-native-permissions";
 
+import { SSNN } from "../../constants";
 import {
   getARProfile,
   postArMemory,
@@ -34,6 +35,7 @@ import theme from "assets/theme";
 import BGArShare from "assets/ar/bg-ar-share.png";
 import { GeolocationContext } from "GeolocationProvider";
 import RNFetchBlob from "rn-fetch-blob";
+import { Alert } from "react-native";
 
 // Add this interface near the top of the file, after the imports
 interface ShareChallengeRouteParams {
@@ -50,6 +52,7 @@ function getFileExtension(url: string) {
 
 const ArChallengeShare = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
   const [socialPointsCounter, setSocialPointsCounter] = useState({
     facebook: 0,
@@ -299,14 +302,94 @@ const ArChallengeShare = () => {
     setShareToSocialsIsOpen(false);
   };
 
-  const cameraRollSaveAsset = (asset, fileExt) => {
-    CameraRoll.saveAsset(asset, { type: fileExt == "mp4" ? "video" : "photo" })
-      .then(() => {
-        showMessage("Saved to Camera Roll", "success", "AR Memories!");
-      })
-      .catch(err => {
-        showMessage("There was an error saving to Camera Roll", "error", "AR Memories!");
-      });
+  const getAndroidPermissions = () => {
+    const androidVersion = Platform.Version;
+    if (androidVersion >= 33) {
+      return [PERMISSIONS.ANDROID.READ_MEDIA_IMAGES, PERMISSIONS.ANDROID.READ_MEDIA_VIDEO];
+    } else {
+      return PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE;
+    }
+  };
+
+  const requestCameraRollPermission = async () => {
+    try {
+      const perms =
+        Platform.OS === "ios" ? PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY : getAndroidPermissions();
+      let res;
+
+      if (Array.isArray(perms)) {
+        res = await requestMultiple(perms);
+      } else {
+        res = await request(perms);
+      }
+
+      if (Platform.OS === "android" && Platform.Version >= 33) {
+        if (
+          res[PERMISSIONS.ANDROID.READ_MEDIA_IMAGES] === RESULTS.GRANTED &&
+          res[PERMISSIONS.ANDROID.READ_MEDIA_VIDEO] === RESULTS.GRANTED
+        ) {
+          setHasPermission(true);
+          return true;
+        } else {
+          const deniedPerms = Object.keys(res).filter(
+            perm => res[perm] === RESULTS.DENIED || res[perm] === RESULTS.BLOCKED
+          );
+          const permNames = deniedPerms.map(perm => {
+            if (perm === PERMISSIONS.ANDROID.READ_MEDIA_IMAGES) return "images";
+            if (perm === PERMISSIONS.ANDROID.READ_MEDIA_VIDEO) return "videos";
+            return "storage"; // Fallback
+          });
+
+          Alert.alert(
+            "Permission Denied",
+            `This app needs access to your ${permNames.join(
+              " and "
+            )} to save images. Please go to your device settings to grant permission.`,
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "OK", onPress: () => Linking.openSettings() },
+            ]
+          );
+          return false;
+        }
+      } else {
+        // iOS or older Android
+        if (res === RESULTS.GRANTED || res === RESULTS.LIMITED) {
+          setHasPermission(true);
+          return true;
+        } else {
+          Alert.alert(
+            "Permission Denied",
+            "This app needs access to your photo library to save images. Please go to your device settings to grant permission.",
+            [
+              { text: "Cancel", style: "cancel" },
+              { text: "OK", onPress: () => Linking.openSettings() },
+            ]
+          );
+          return false;
+        }
+      }
+    } catch (err) {
+      return false;
+    }
+  };
+
+  const cameraRollSaveAsset = async (asset: string, fileExt: string) => {
+    if (!hasPermission) {
+      const granted = await requestCameraRollPermission();
+      if (!granted) return; // Don't proceed if permission is not granted
+    }
+
+    if (!asset || !fileExt) {
+      showMessage("There was an error generating the file.", "error", "AR Memories!");
+      return;
+    }
+
+    const newURI = await CameraRoll.saveAsset(asset, {
+      type: fileExt == "mp4" ? "video" : "photo",
+    });
+
+    showMessage("Saved to Camera Roll.", "success", "AR Memories!");
   };
 
   const saveToGallery = () => {
@@ -351,6 +434,32 @@ const ArChallengeShare = () => {
       cameraRollSaveAsset(capturedDataUri, fileExt);
     }
   };
+
+  useEffect(() => {
+    async function checkPermissions() {
+      const perm =
+        Platform.OS === "ios" ? PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY : getAndroidPermissions();
+      let res;
+      if (Array.isArray(perm)) {
+        res = await requestMultiple(perm);
+      } else {
+        res = await request(perm);
+      }
+      if (Platform.OS === "android" && Platform.Version >= 33) {
+        if (
+          res[PERMISSIONS.ANDROID.READ_MEDIA_IMAGES] === RESULTS.GRANTED &&
+          res[PERMISSIONS.ANDROID.READ_MEDIA_VIDEO] === RESULTS.GRANTED
+        ) {
+          setHasPermission(true);
+        }
+      } else {
+        if (res === RESULTS.GRANTED || res === RESULTS.LIMITED) {
+          setHasPermission(true);
+        }
+      }
+    }
+    checkPermissions();
+  }, []);
 
   const imageContainerHeight = Dimensions.get("screen").height - 540;
 
@@ -518,8 +627,9 @@ const ArChallengeShare = () => {
                   color: theme.lightColors?.grey0,
                 }}
               >
-                Must share to at least one social media platform to earn any points. Users earn one
-                additional point per social platform.
+                Must share to at least one social media platform and tag @roamreality as well as the
+                brand sponsor to earn your points. Users earn one additional point per social
+                platform.
               </Text>
             )}
           </View>

@@ -20,7 +20,7 @@ import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader"
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
 
-const ArChallengeCapture = ({}) => {
+const ArChallengeCapture = ({ route, navigation }) => {
   const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
   const [modelOBJ, setModelOBJ] = useState(null);
   const [modelResource, setModelResource] = useState(null);
@@ -50,8 +50,8 @@ const ArChallengeCapture = ({}) => {
   const unityRef = useRef(null);
   const viewShotRef = useRef();
 
-  const route = useRoute();
-  const navigation = useNavigation();
+  // const route = useRoute();
+  // const navigation = useNavigation();
 
   const challengeObj = route?.params?.challengeObj;
   const challengeObjParameters = route?.params?.challengeObj?.parameters;
@@ -171,8 +171,8 @@ const ArChallengeCapture = ({}) => {
 
   useFocusEffect(
     useCallback(() => {
-      isLoadingUnity()
-      if (unityRef.current){
+      if (unityRef.current) {
+        console.log('usecallback')
         isLoadingUnity()
         PointsCount();
         unityRef.current.postMessage(
@@ -182,32 +182,48 @@ const ArChallengeCapture = ({}) => {
             setVisibleButtonPosition: false,
           })
         );
-        if( !!CAPTURE_CHALLENGE_TYPE[challengeType]) {
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: challengeType,
-             arChallenge: true,
-             isLocation: false
-          })
-        );
-        unityRef.current.postMessage(
-          "OBJImport",
-          "SetLoadingVisibility",
-          JSON.stringify({ isVisible: false }))
-      }}
-    }, [isUnityLoaded, challengeType])
+        console.log('Challenge TYPE', challengeType)
+
+        if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
+        console.log('useCall==== Challenge TYPE')
+
+          unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: challengeType,
+              arChallenge: true,
+              isLocation: false
+            })
+          );
+        }
+      }
+    }, [unityRef.current, isLoadingUnity, PointsCount, isUnityLoaded])
   );
-  const isLoadingUnity = () => {
-    if (unityRef.current){
+
+  const PointsCount = useCallback(async () => {
+    if (unityRef.current) {
+      console.log('useCall==== POINTSCOUNT')
+      // Enviar mensaje a Unity para iniciar la grabación
+      const pointData = {
+        points: challengeObj?.points,
+        isPointView: true,
+      };
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
+    }
+  }, [unityRef.current]
+  );
+
+  const isLoadingUnity = useCallback(() => {
+    if (!unityRef.current) return
+    console.log('useCall==== ISLOADING')
     unityRef.current.postMessage(
       "OBJImport",
       "SetLoadingVisibility",
       JSON.stringify({ isVisible: false })
     );
-  }
-  };
+  }, [unityRef.current]
+  )
   // useEffect(() => {
   //   if (unityRef.current && challengeHasFilters) {
   //     loadingFalse();
@@ -327,7 +343,7 @@ const ArChallengeCapture = ({}) => {
       );
 
       if (filteredFiles.length <= 0) {
-        return; 
+        return;
       }
       filteredFiles.sort((a, b) => b.mtime - a.mtime);
 
@@ -337,7 +353,7 @@ const ArChallengeCapture = ({}) => {
         await RNFS.unlink(file.path);
       }
     } catch (error) {
-      console.error( error);
+      console.error(error);
     }
   };
 
@@ -355,52 +371,43 @@ const ArChallengeCapture = ({}) => {
       />
     </>
   );
-  const PointsCount = async () => {
-    if (unityRef.current) {
-      // Enviar mensaje a Unity para iniciar la grabación
-      const pointData = {
-        points: challengeObj?.points,
-        isPointView: true,
-      };
-      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
-    }
-  };
+
   //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
     buttonInfo = data.enableButton
     buttonBack = data.backPress
 
-    if (buttonBack){
-      navigation?.goBack()}
+    if (buttonBack) {
+      navigation?.goBack()
+    }
 
-    if (data.photoVideoButton?.isPhoto){
+    if (data.photoVideoButton?.isPhoto) {
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false)
       playCameraSound()
       eraseFile()
-    } 
-    if (data.photoVideoButton?.isPhoto == false){
-      playRecordSound()
-      setCapturedVideo(data.photoVideoButton?.filepath); 
-      setIsUnityLoaded(false); 
-      
     }
-    if(data.infoButton?.isButton)
-    {
+    if (data.photoVideoButton?.isPhoto == false) {
+      playRecordSound()
+      setCapturedVideo(data.photoVideoButton?.filepath);
+      setIsUnityLoaded(false);
+
+    }
+    if (data.infoButton?.isButton) {
       setChallengeInformationView(data.infoButton?.isButton)
       setIsUnityLoaded(true)
     }
- 
-};
+
+  };
   return (
-    <ChallengeScreen title="AR Challenges" modals={modals} appHeader = {false}
-    style={{
+    <ChallengeScreen title="AR Challenges" modals={modals} appHeader={false}
+      style={{
         paddingHorizontal: 0,
         // paddingTop: "7%",
-        height:"100%",
+        height: "100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
-    }}
+      }}
     // paddingH={0.1} paddingTop={20} heighContainer = '100%'
     >
       <UnityARCamera

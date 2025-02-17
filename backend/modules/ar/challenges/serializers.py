@@ -281,7 +281,7 @@ class GeoArSiteCategorySerializer(serializers.ModelSerializer):
 
 class ARExperienceSerializer(serializers.ModelSerializer):
     image = serializers.ImageField()
-    challenges = ChallengesSerializer(read_only=True, many=True)
+    challenges = serializers.SerializerMethodField()
     geo_challenges = GeoARChallengesSerializer(read_only=True, many=True)
 
     class Meta:
@@ -302,6 +302,11 @@ class ARExperienceSerializer(serializers.ModelSerializer):
 
     def get_image(self, obj):
         return obj.image.url
+
+    def get_challenges(self, instance):
+        challenges = instance.challenges.exclude(is_active=False)
+        serializer = ChallengesSerializer(challenges, many=True, context=self.context)
+        return serializer.data
 
 
 class UniqueChallengeSiteSerializer(GeoModelSerializer):
@@ -411,15 +416,15 @@ class GeoLocationSerializer(GeoModelSerializer):
         )
 
     def get_star_ar_sites(self, instance):
-        star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
-            category__isnull=False
+        star_ar_sites_queryset = instance.geo_location_ar_site.filter(is_active=True).exclude(
+            category__isnull=False,
         )
         serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data
 
     def get_ar_event_sites(self, instance):
-        star_ar_sites_queryset = instance.geo_location_ar_site.exclude(
-            category__isnull=True
+        star_ar_sites_queryset = instance.geo_location_ar_site.filter(is_active=True).exclude(
+            category__isnull=True,
         )
         serializer = GeoArSiteSerializer(star_ar_sites_queryset, many=True, context=self.context)
         return serializer.data

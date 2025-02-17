@@ -151,73 +151,40 @@ const PinChallenge = () => {
     }
   };
 
-  const sendModelDataToUnitySpawn = () => {
-    if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
+  const sendModelDataToUnitySpawn = useCallback(() => {
+    // console.log('sendModelDataToUnitySpawn')
+    if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission && challengeObjParameters) { // Add challengeObjParameters
       const modelData = {
-        objFile: modelOBJ.replace("file://", ""), // Ruta del archivo OBJ
-        mtlFile: modelResource ? modelResource.replace("file://", "") : null, // Ruta del archivo MTL
-        textureBase: textureBase ? textureBase.replace("file://", "") : "", // Ruta de la textura base
-        textureEmission: textureEmission ? textureEmission.replace("file://", "") : "", // Ruta de la textura de emisión
-        scale, // Escala del modelo
-        rotation, // Rotación del modelo
-        emissionIntensity: emissionValue, // Intensidad de la emisión (float)
-        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1, // Velocidad de rotación
-        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01, // Velocidad de escalado
+        objFile: modelOBJ.replace("file://", ""),
+        mtlFile: modelResource ? modelResource.replace("file://", "") : null,
+        textureBase: textureBase ? textureBase.replace("file://", "") : "",
+        textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
+        scale,
+        rotation,
+        emissionIntensity: emissionValue,
+        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1,
+        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
         isRotationEnabled: true,
-        // ### DISTANCIA DONDE SE REPOSICIONARA NUEVAMENTE LA ESTRELLA ## //
-        distanceCamera: 2, // AGREGAR PARA RECIBIR DESDE EL BACK
-
-        //VISIBLE OBJECT//
+        distanceCamera: 2,
         isVisible: true,
-
-        /* ###POSICIONAMIENTO MEDIANTE GPS### 
-        useGPS: true, // Activar GPS
-        gpsLatitude: siteLatitude || 0, // Latitud del GPS
-        gpsLongitude: siteLongitude || 0, // Longitud del GPS
-         */
         position: {
-          x: parseFloat(challengeObjParameters?.positionX) || 0,
-          y: parseFloat(challengeObjParameters?.positionY) || 0,
+          x: parseFloat(challengeObjParameters.positionX) || 0, // No optional chaining here, already checked above
+          y: parseFloat(challengeObjParameters.positionY) || 0,
           z: 2 || 0.4,
         },
       };
-      unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+      // console.log('enviando datos modeldata')
+      setTimeout(() => {
+        unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+      }, 500)
     } else {
-      console.log("No pasó la validación: Unity no está listo o faltan datos.");
+      // console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
-    /* ###SUAVIZAR LA NUEVA REPOSICION DEL OBJETO###
-    if (modelData.useGPS) {
-      const gpsConfig = {
-        smoothingFactor: 0.1, // Factor de suavizado del GPS
-        minGPSAccuracy: 5.0, // Precisión mínima aceptable del GPS
-        scaleFactor: 1.0, // Factor de escala para las coordenadas GPS
-        maxWait: 20, // Tiempo máximo de espera para inicializar el GPS
-        isVisibleObject: true, // Controlar visibilidad inicial
-      };
-      console.log("Enviando configuración de GPS a Unity:", gpsConfig);
-      unityRef.current.postMessage(
-        "OBJImport", // GameObject que contiene el script
-        "ConfigureGPSFromReact", // Método del script
-        JSON.stringify(gpsConfig)
-      );
-    }*/
-  };
-  const isLoadingUnity = () => {
-    unityRef.current.postMessage(
-      "OBJImport",
-      "SetLoadingVisibility",
-      JSON.stringify({ isVisible: false })
-    );
-  };
-  const sendBloomValuesToUnity = () => {
-    const bloomData = { threshold, intensity };
+  }, [unityRef, modelOBJ, textureBase, emissionValue, textureEmission, scale, rotation, challengeObjParameters, modelResource]); // Add all dependencies
 
-    if (unityRef.current) {
-      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
-    }
-  };
+
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -227,14 +194,14 @@ const PinChallenge = () => {
         PERMISSIONS.ANDROID.RECORD_AUDIO,
         PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
         PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      ]).then(response => {});
+      ]).then(response => { });
     } else if (Platform.OS === "ios") {
       requestMultiple([
         PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
         PERMISSIONS.IOS.PHOTO_LIBRARY,
         PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-      ]).then(response => {});
+      ]).then(response => { });
     }
   };
 
@@ -445,31 +412,49 @@ const PinChallenge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      if (unityRef.current) {
+      // console.log('entrando USECALLBACK', isUnityLoaded, '=======',unityRef.current, '=====', isMeInsideInSite )
+      if (unityRef.current && isUnityLoaded) {
+        // console.log('entrando UNITY.CURRENT')
         sendBloomValuesToUnity();
         PointsCount();
-        enableButtonPhoto();
         unityRef.current.postMessage(
           "Scriptposition",
           "SetVisibleButton",
           JSON.stringify({
             setVisibleButtonPosition: true,
           })
-        );
+        )
+          ;
       }
-    }, [
-      isUnityLoaded,
-      isMeInsideInSite,
-    ])
+      if (unityRef.current && isUnityLoaded && isMeInsideInSite) { // Check all dependencies here
+        enableButtonPhoto();
+      }
+    }, [unityRef, isUnityLoaded, isMeInsideInSite, sendBloomValuesToUnity, PointsCount, enableButtonPhoto])
   );
 
+  const isLoadingUnity = useCallback(() => {
+    if (unityRef.current) {
+      console.log('useCall==== ISLOADING');
+      unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({ isVisible: false })
+      );
+    }
+  }, [unityRef]);
+  const sendBloomValuesToUnity = useCallback(() => {
+    const bloomData = { threshold, intensity };
+
+    if (unityRef.current) {
+      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
+    }
+  }, [unityRef, threshold, intensity]);
   useFocusEffect(
     useCallback(() => {
-      if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission) {
+      if (unityRef.current && modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded) {
         sendModelDataToUnitySpawn();
       }
-    }, [modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded,  threshold,
-      intensity,])
+    }, [unityRef, unityRef.current, modelOBJ, textureBase, emissionValue, textureEmission, isUnityLoaded, sendModelDataToUnitySpawn])
   );
 
   const eraseFile = async () => {
@@ -503,48 +488,38 @@ const PinChallenge = () => {
     }
   };
 
-  const enableButtonPhoto = async () => {
+  const enableButtonPhoto = useCallback(async () => {
     if (unityRef.current) {
-      if (isMeInsideInSite === false) {
-        // sendModelDataToUnitySpawn();
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "PHOTO",
-            arChallenge: false,
-            isLocation: false,
-          })
-        );
-      }
-      if (isMeInsideInSite === true) {
+      const messageData = {
+        typeChallenge: "PHOTO",
+        arChallenge: false,
+      };
+
+      if (isMeInsideInSite) {
         unityRef.current.postMessage(
           "Scriptposition",
           "SetVisibleNotification",
           JSON.stringify({ ...dataNotificationUnity, isNotification: false })
         );
-
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "PHOTO",
-            arChallenge: false,
-            isLocation: true,
-          })
-        );
+        messageData.isLocation = true;
+      } else {
+        messageData.isLocation = false;
       }
+
+      unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
     }
-  };
-  const PointsCount = async () => {
-    if (unityRef.current) {
+  }, [unityRef, isMeInsideInSite, dataNotificationUnity]);
+
+  const PointsCount = useCallback(async () => {
+    if (unityRef.current && challengeObj?.points) {
       const pointData = {
-        points: challengeObj?.points,
+        points: challengeObj.points,
         isPointView: true,
       };
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
     }
-  };
+  }, [unityRef, challengeObj]);
+
   const keepFileMostRecent = async (ruta, extension = "") => {
     try {
       const files = await RNFS.readDir(ruta);
@@ -595,7 +570,7 @@ const PinChallenge = () => {
       viewNotification();
     }
 
-    if (data.photoVideoButton?.isPhoto) {
+    if (data.photoVideoButton?.isPhoto && isMeInsideInSite) {
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
       eraseFile();
@@ -606,7 +581,7 @@ const PinChallenge = () => {
     }
     if (data.infoButton?.isButton) {
       setChallengeInformationView(data.infoButton?.isButton);
-      setIsUnityLoaded(true);
+      // setIsUnityLoaded(true);
     }
   };
   const modals = (
