@@ -62,6 +62,14 @@ class SignupViewSet(ModelViewSet):
                 profileObj.points += configs.POINTS_GIFT
                 profileObj.save()
                 configs.NUMBER_USER_POINT_GIFT += 1
+
+                send_notification(
+                    NotificationTypes.DEFAULT,
+                    user,
+                    title="\U0001F381 Surprise!",
+                    description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for '
+                                f'being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
+                )
             return Response({"token": token.key, "user": user_serializer.data})
         except User.DoesNotExist:
             return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
@@ -81,7 +89,6 @@ class LoginViewSet(ViewSet):
         token, created = Token.objects.get_or_create(user=user)
         if ReportedContent.objects.filter(reported_user=user, block_reported_user=True).exists():
             return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
-
         # Here send notification to friends
         # [send_notification(NotificationTypes.FRIEND_ROAMING_ONLINE, user) for user in user.user_profile.friends.all()]
         user_serializer = UserSerializer(user)
