@@ -15,6 +15,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
 
+from modules.ar.challenges.models import ARUserProfile
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
@@ -35,6 +36,7 @@ import re
 from functools import reduce
 from django.db.models import F, Value
 from django.db.models.functions import Replace
+from configuration import configs
 
 logger = logging.getLogger('django')
 
@@ -55,6 +57,11 @@ class SignupViewSet(ModelViewSet):
             user = User.objects.get(email=serializer.validated_data.get('email'))
             token, created = Token.objects.get_or_create(user=user)
             user_serializer = UserSerializer(user)
+            profileObj, created = ARUserProfile.objects.get_or_create(user=user)
+            if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+                profileObj.points += configs.POINTS_GIFT
+                profileObj.save()
+                configs.NUMBER_USER_POINT_GIFT += 1
             return Response({"token": token.key, "user": user_serializer.data})
         except User.DoesNotExist:
             return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
