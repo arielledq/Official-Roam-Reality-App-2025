@@ -229,10 +229,12 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
   const acceptWaiverButtonHandler = () => {
     setDetailsShow(false);
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
-    });
+    setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+      });
+    }, 500);
   };
 
   return (
@@ -590,19 +592,20 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     onPress={handleSubmit}
                     loading={isLoading}
                   />
-                  <WaiverDetailsModal
-                    isVisible={detailsShow}
-                    confirmHandler={acceptWaiverButtonHandler}
-                    cancelHandler={() => {
-                      setDetailsShow(false);
-                    }}
-                  />
                 </View>
               </View>
             );
           }}
         </Formik>
       </KeyboardAwareScrollView>
+
+      <WaiverDetailsModal
+        isVisible={detailsShow}
+        confirmHandler={acceptWaiverButtonHandler}
+        cancelHandler={() => {
+          setDetailsShow(false);
+        }}
+      />
     </BackgroundWithImage>
   );
 };
