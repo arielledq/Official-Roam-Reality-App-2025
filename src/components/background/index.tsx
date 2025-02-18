@@ -26,6 +26,7 @@ const BackgroundWithImage: React.FC<BackgroundWithImageProps> = ({
 }) => {
   return (
     <ImageBackground
+      borderRadius={16}
       source={imageSource}
       style={[styles.background, style]}
       imageStyle={imageStyle}

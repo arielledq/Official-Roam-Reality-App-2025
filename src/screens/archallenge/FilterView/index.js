@@ -225,6 +225,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       <LinearGradient
                         style={{
                           flex: 1,
+                          borderRadius: 15,
                           transform: [
                             {
                               rotate: isTopToBottom ? "0deg" : "180deg",
@@ -242,9 +243,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   )}
                   {filter?.image && (
                     <ImageBackground
+                    borderRadius={16}
                       source={{ uri: filter.image }}
                       resizeMode="contain"
                       style={{
+                        flex:1,
                         alignItems: "flex-end",
                         marginTop: "4%",
                         height: "100%",
@@ -307,7 +310,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     <View
                       style={[
                         styles.textFilterView,
-                        { justifyContent: "flex-start", paddingTop: "10%" },
+                        { justifyContent: "flex-start", paddingTop: "10%", },
                       ]}
                     >
                       {!filter?.text_form_image && (

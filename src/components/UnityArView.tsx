@@ -65,6 +65,7 @@ const UnityARCamera = ({
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
+              
             }}
           >
             <Text style={{ color: "white" }}>Processing your content...</Text>
@@ -107,6 +108,7 @@ const UnityARCamera = ({
               <Video
                 repeat
                 style={{
+                  borderRadius: 16,
                   width: "100%",
                   flex: 1,
                   top: 0,
@@ -130,6 +132,7 @@ export default UnityARCamera;
 
 const capturedImageContainer: ViewStyle = {
   width: "100%",
+  borderRadius: 16,
   flex: 1,
   top: 0,
   bottom: 0,

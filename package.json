@@ -1,6 +1,6 @@
 {
   "name": "travel_ar_app_42706",
-  "version": "1.0.17",
+  "version": "1.0.21",
   "private": true,
   "scripts": {
     "android": "react-native run-android",

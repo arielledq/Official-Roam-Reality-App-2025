@@ -397,6 +397,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
     if (data.infoButton?.isButton) {
       setChallengeInformationView(data.infoButton?.isButton)
       setIsUnityLoaded(true)
+      console.log('ayudaa',challengeInformationView)
     }
 
   };
@@ -404,7 +405,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
     <ChallengeScreen title="AR Challenges" modals={modals} appHeader={false}
       style={{
         paddingHorizontal: 0,
-        // paddingTop: "7%",
+        paddingTop: "15%",
         height: "100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
       }}
