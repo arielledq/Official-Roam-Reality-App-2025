@@ -1,7 +1,7 @@
 from notifications.models import Notification, NotificationTypes
 
 
-def send_notification(notification_type, user, data=None, extra_data=None):
+def send_notification(notification_type, user, data=None, extra_data=None, title=None, description=None):
     if data is None:
         data = {}
     if extra_data is None:
@@ -44,6 +44,10 @@ def send_notification(notification_type, user, data=None, extra_data=None):
         NotificationTypes.REFRESH_APP_REMINDER: {
             'title': 'Refresh App Reminder',
             'description': 'Remember to refresh the app regularly to access the latest updates and new experiences!'
+        },
+        NotificationTypes.DEFAULT: {
+            'title': title,
+            'description': description
         },
     }
 

@@ -102,6 +102,7 @@ LOCAL_APPS = [
     'feedback',
     'notifications',
     'onesignal_client',
+    'configuration',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
@@ -123,6 +124,7 @@ THIRD_PARTY_APPS = [
     'taggit',
     'rest_framework_gis',
     'webshell',
+    'django_json_widget',
     'django_filters',
 ]
 MODULES_APPS = get_modules()
