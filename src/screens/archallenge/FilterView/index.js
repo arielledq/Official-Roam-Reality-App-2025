@@ -169,6 +169,9 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
     getLocation();
   }, []);
 
+  console.log("ar_filters", ar_filters);
+  console.log("challengeObj", challengeObj);
+
   return (
     <ViewShot
       ref={viewShotRef}
@@ -189,7 +192,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
             >
               {fullLocation && (
                 <View
-                  style={{ backgroundColor: theme.lightColors?.grey2, padding: 8, borderRadius: 6 }}
+                  style={{
+                    backgroundColor: challengeObj?.color || theme.lightColors?.grey2,
+                    padding: 8,
+                    borderRadius: 6,
+                  }}
                 >
                   <Text
                     style={[
