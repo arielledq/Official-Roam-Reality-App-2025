@@ -202,7 +202,7 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
     http_method_names = ["get",]
-    queryset = User.objects.filter(is_superuser=False, is_active=True)
+    queryset = User.objects.filter(is_superuser=False, is_active=True, user_ar_profile__isnull=False)
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filterset_class = ScoreFilterSet
     search_fields = ['name', ]
