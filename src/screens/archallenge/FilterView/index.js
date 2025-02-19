@@ -175,7 +175,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
       style={styles.mainContainer}
       options={{ fileName: "filtered_share", format: "png", quality: 0.9 }}
     >
-      <BackgroundWithImage source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
+      <BackgroundWithImage borderRadius={16} source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
         <PagerView style={styles.pagerView} initialPage={0}>
           {is_pin_challenge ? (
             <View
@@ -251,9 +251,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       source={{ uri: filter.image }}
                       resizeMode="contain"
                       style={{
-                        flex:1,
                         alignItems: "flex-end",
-                        marginTop: "4%",
                         height: "100%",
                         width: "100%",
                       }}
