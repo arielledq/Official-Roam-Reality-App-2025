@@ -1,21 +1,16 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import { Platform, Alert } from "react-native";
-import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import { Platform } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
-import { useSelector } from "react-redux";
-import Share from "react-native-share";
 import theme from "assets/theme";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
-import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
-import ViewInfoButton from "components/ViewInfoButton";
 import ViewInfoModal from "components/ViewInfoModal";
 
 import { CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE } from "constants";
-import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
 
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
@@ -30,12 +25,10 @@ const ArChallengeCapture = ({ route, navigation }) => {
   const [loading, setLoading] = useState(false);
   const [sourcesFiles, setSourcesFiles] = useState([]);
   const [scale, setScale] = useState({ x: 1, y: 1, z: 1 });
-  const [rotation, setRotation] = useState({ x: 0, y: 0, z: 0 });
   const [position, setPosition] = useState({ x: 0, y: 0, z: 0 });
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
   const [emissionValue, setEmissionValue] = useState(1);
-  const [detailsShow, setDetailsShow] = useState(true);
   const [recordingStart, setRecordingStart] = useState(false);
   const [timer, setTimer] = useState("00:00");
   const [challengeInformationView, setChallengeInformationView] = useState(false);
@@ -45,13 +38,8 @@ const ArChallengeCapture = ({ route, navigation }) => {
   const [isUnityLoaded, setIsUnityLoaded] = useState(true);
   const [isVideo, setIsvideo] = useState(false);
 
-  const settings = useSelector(state => state.ar?.arSettings);
-
   const unityRef = useRef(null);
   const viewShotRef = useRef();
-
-  // const route = useRoute();
-  // const navigation = useNavigation();
 
   const challengeObj = route?.params?.challengeObj;
   const challengeObjParameters = route?.params?.challengeObj?.parameters;
@@ -59,7 +47,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
 
   const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
   const challengeType = challengeObj?.challenge_requirement;
-  console.log('capture type ', challengeType)
+  console.log("capture type ", challengeType);
   const viewInfoModalContent = challengeObj?.info;
 
   const handleUnityViewLayout = event => {
@@ -83,7 +71,6 @@ const ArChallengeCapture = ({ route, navigation }) => {
 
   const unzipModelFile = (sourcePath, targetPath) => {
     const charset = "UTF-8";
-    // setProcessingMedia(true);
 
     unzip(sourcePath, targetPath, charset)
       .then(path => {
@@ -120,9 +107,6 @@ const ArChallengeCapture = ({ route, navigation }) => {
       })
       .catch(err => {
         console.error("Error descomprimiendo el archivo:", err);
-      })
-      .finally(() => {
-        // setProcessingMedia(false);
       });
   };
 
@@ -172,8 +156,8 @@ const ArChallengeCapture = ({ route, navigation }) => {
   useFocusEffect(
     useCallback(() => {
       if (unityRef.current) {
-        console.log('usecallback')
-        isLoadingUnity()
+        console.log("usecallback");
+        isLoadingUnity();
         PointsCount();
         unityRef.current.postMessage(
           "Scriptposition",
@@ -182,10 +166,10 @@ const ArChallengeCapture = ({ route, navigation }) => {
             setVisibleButtonPosition: false,
           })
         );
-        console.log('Challenge TYPE', challengeType)
+        console.log("Challenge TYPE", challengeType);
 
         if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
-        console.log('useCall==== Challenge TYPE')
+          console.log("useCall==== Challenge TYPE");
 
           unityRef.current.postMessage(
             "screen",
@@ -193,7 +177,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
             JSON.stringify({
               typeChallenge: challengeType,
               arChallenge: true,
-              isLocation: false
+              isLocation: false,
             })
           );
         }
@@ -203,7 +187,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
 
   const PointsCount = useCallback(async () => {
     if (unityRef.current) {
-      console.log('useCall==== POINTSCOUNT')
+      console.log("useCall==== POINTSCOUNT");
       // Enviar mensaje a Unity para iniciar la grabación
       const pointData = {
         points: challengeObj?.points,
@@ -211,19 +195,17 @@ const ArChallengeCapture = ({ route, navigation }) => {
       };
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
     }
-  }, [unityRef.current]
-  );
+  }, [unityRef.current]);
 
   const isLoadingUnity = useCallback(() => {
-    if (!unityRef.current) return
-    console.log('useCall==== ISLOADING')
+    if (!unityRef.current) return;
+    console.log("useCall==== ISLOADING");
     unityRef.current.postMessage(
       "OBJImport",
       "SetLoadingVisibility",
       JSON.stringify({ isVisible: false })
     );
-  }, [unityRef.current]
-  )
+  }, [unityRef.current]);
   // useEffect(() => {
   //   if (unityRef.current && challengeHasFilters) {
   //     loadingFalse();
@@ -250,20 +232,6 @@ const ArChallengeCapture = ({ route, navigation }) => {
     });
   };
 
-  const acceptWaiverButtonHandler = () => {
-    setDetailsShow(false);
-    setIsUnityLoaded(true);
-  };
-
-  // const loadingFalse = () => {
-  //   if (challengeHasFilters) {
-  //     unityRef.current.postMessage(
-  //       "OBJImport",
-  //       "SetLoadingVisibility",
-  //       JSON.stringify({ isVisible: false })
-  //     );
-  //   }
-  // };
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
     let updatedData = capturedImage ? capturedImage : capturedVideo;
@@ -272,7 +240,6 @@ const ArChallengeCapture = ({ route, navigation }) => {
       try {
         // Capturar la vista dentro de ViewShot
         const capturedUri = await viewShotRef.current.capture();
-        // console.log("Imagen capturada con filtro:", capturedUri);
         updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
       } catch (error) {
         console.error("Error capturando la imagen con filtros:", error);
@@ -302,8 +269,6 @@ const ArChallengeCapture = ({ route, navigation }) => {
     setCapturedImage(null);
     setCapturedVideo(null);
     setIsUnityLoaded(true);
-    // setIsvideo(false)
-    // enviarComandoAUnity('restart'); TODO VERIFICAR SI ES NECESARIO
   };
 
   const startRecordVideoHandler = () => {
@@ -339,7 +304,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
     try {
       const files = await RNFS.readDir(ruta);
       const filteredFiles = files.filter(
-        (file) => file.isFile() && (extension === '' || file.name.endsWith(extension))
+        file => file.isFile() && (extension === "" || file.name.endsWith(extension))
       );
 
       if (filteredFiles.length <= 0) {
@@ -358,57 +323,49 @@ const ArChallengeCapture = ({ route, navigation }) => {
   };
 
   const modals = (
-    <>
-      <CaptureInfoView
-        isVisible={detailsShow}
-        content={settings?.waiver_details}
-        onAccept={acceptWaiverButtonHandler}
-      />
-      <ViewInfoModal
-        isVisible={challengeInformationView}
-        onClose={closeViewInfoButtonHandler}
-        content={viewInfoModalContent}
-      />
-    </>
+    <ViewInfoModal
+      isVisible={challengeInformationView}
+      onClose={closeViewInfoButtonHandler}
+      content={viewInfoModalContent}
+    />
   );
 
   //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton
-    buttonBack = data.backPress
+    buttonInfo = data.enableButton;
+    buttonBack = data.backPress;
 
     if (buttonBack) {
-      navigation?.goBack()
+      navigation?.goBack();
     }
 
     if (data.photoVideoButton?.isPhoto) {
       setCapturedImage(data.photoVideoButton?.filepath);
-      setIsUnityLoaded(false)
-      playCameraSound()
-      eraseFile()
+      setIsUnityLoaded(false);
+      playCameraSound();
+      eraseFile();
     }
     if (data.photoVideoButton?.isPhoto == false) {
-      playRecordSound()
+      playRecordSound();
       setCapturedVideo(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
-
     }
     if (data.infoButton?.isButton) {
-      setChallengeInformationView(data.infoButton?.isButton)
-      setIsUnityLoaded(true)
+      setChallengeInformationView(data.infoButton?.isButton);
+      setIsUnityLoaded(true);
     }
-
   };
   return (
-    <ChallengeScreen title="AR Challenges" modals={modals} appHeader={false}
+    <ChallengeScreen
+      title="AR Challenges"
+      modals={modals}
+      appHeader={false}
       style={{
         paddingHorizontal: 0,
-        // paddingTop: "7%",
         height: "100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
       }}
-    // paddingH={0.1} paddingTop={20} heighContainer = '100%'
     >
       <UnityARCamera
         width="100%"

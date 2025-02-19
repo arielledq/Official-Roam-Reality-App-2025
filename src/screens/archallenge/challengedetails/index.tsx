@@ -139,7 +139,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           );
           setMyCheckInsText(usersCheckIns);
           break;
-        case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+
+        default:
           // Cool Down info
           const coolDownParams = route.params?.coolDown;
 
@@ -154,10 +155,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           if (checkInsParams) {
             setMyCheckInsText(checkInsParams);
           }
-
-          break;
-
-        default:
           break;
       }
     }

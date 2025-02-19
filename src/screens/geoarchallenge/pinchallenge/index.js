@@ -13,7 +13,6 @@ import theme from "assets/theme";
 
 import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
-import CaptureInfoView from "components/CaptureInfoView";
 import ChallengeScreen from "components/ChallengeScreen";
 
 import { showMessage } from "../../../util/helpers";
@@ -34,7 +33,6 @@ const PinChallenge = () => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [distanceInFeet, setDistanceInFeet] = useState(0);
   const [isMeInsideInSite, setIsMeInsideInSite] = useState(false);
-  const [detailsShow, setDetailsShow] = useState(true);
   const [modelOBJ, setModelOBJ] = useState(null);
   const [modelResource, setModelResource] = useState(null);
   const [textureBase, setTextureBase] = useState(null);
@@ -53,7 +51,6 @@ const PinChallenge = () => {
   const [processingMedia, setProcessingMedia] = useState(false);
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  const settings = useSelector(state => state.ar?.arSettings);
 
   const unityRef = useRef(null); // Unity reference
   const watchIdRef = useRef(null);
@@ -152,7 +149,6 @@ const PinChallenge = () => {
   };
 
   const sendModelDataToUnitySpawn = useCallback(() => {
-    // console.log('sendModelDataToUnitySpawn')
     if (
       unityRef.current &&
       modelOBJ &&
@@ -183,12 +179,9 @@ const PinChallenge = () => {
           z: 2 || 0.4,
         },
       };
-      // console.log('enviando datos modeldata')
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
-    } else {
-      // console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
   }, [
     unityRef,
@@ -210,14 +203,14 @@ const PinChallenge = () => {
         PERMISSIONS.ANDROID.RECORD_AUDIO,
         PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
         PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      ]).then(response => {});
+      ]);
     } else if (Platform.OS === "ios") {
       requestMultiple([
         PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
         PERMISSIONS.IOS.PHOTO_LIBRARY,
         PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-      ]).then(response => {});
+      ]);
     }
   };
 
@@ -348,8 +341,6 @@ const PinChallenge = () => {
 
                 if (foundFile) {
                   console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
-                  // setFileFound(foundFile.path);
-                  // setCaptureData(foundFile.path);
                   setCapturedImage(foundFile.path); // Actualiza capturedImage
                   setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
                 } else {
@@ -428,9 +419,7 @@ const PinChallenge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      // console.log('entrando USECALLBACK', isUnityLoaded, '=======',unityRef.current, '=====', isMeInsideInSite )
       if (unityRef.current || isUnityLoaded) {
-        // console.log('entrando UNITY.CURRENT')
         sendBloomValuesToUnity();
         PointsCount();
         unityRef.current.postMessage(
@@ -455,16 +444,6 @@ const PinChallenge = () => {
     ])
   );
 
-  const isLoadingUnity = useCallback(() => {
-    if (unityRef.current) {
-      console.log("useCall==== ISLOADING");
-      unityRef.current.postMessage(
-        "OBJImport",
-        "SetLoadingVisibility",
-        JSON.stringify({ isVisible: false })
-      );
-    }
-  }, [unityRef]);
   const sendBloomValuesToUnity = useCallback(() => {
     const bloomData = { threshold, intensity };
 
@@ -581,11 +560,6 @@ const PinChallenge = () => {
     }
   };
 
-  const acceptWaiverButtonHandler = () => {
-    setDetailsShow(false);
-    setIsUnityLoaded(true);
-  };
-
   const viewInfoButtonHandler = () => {
     setChallengeInformationView(true);
     setIsUnityLoaded(false);
@@ -620,22 +594,14 @@ const PinChallenge = () => {
     }
     if (data.infoButton?.isButton) {
       setChallengeInformationView(data.infoButton?.isButton);
-      // setIsUnityLoaded(true);
     }
   };
   const modals = (
-    <>
-      <CaptureInfoView
-        isVisible={detailsShow}
-        content={settings?.waiver_details}
-        onAccept={acceptWaiverButtonHandler}
-      />
-      <ViewInfoModal
-        isVisible={challengeInformationView}
-        onClose={closeViewInfoButtonHandler}
-        content={viewInfoModalContent}
-      />
-    </>
+    <ViewInfoModal
+      isVisible={challengeInformationView}
+      onClose={closeViewInfoButtonHandler}
+      content={viewInfoModalContent}
+    />
   );
 
   return (
@@ -644,7 +610,6 @@ const PinChallenge = () => {
       appHeader={false}
       style={{
         paddingHorizontal: 0,
-        // paddingTop: 20,
         height: "100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
       }}
