@@ -71,7 +71,8 @@ class SignupSerializer(serializers.ModelSerializer):
     def save(self, request=None):
         """rest_auth passes request so we must override to accept it"""
         return super().save()
-    
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
