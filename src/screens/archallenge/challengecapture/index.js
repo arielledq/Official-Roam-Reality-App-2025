@@ -363,6 +363,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
       appHeader={false}
       style={{
         paddingHorizontal: 0,
+        paddingTop: "11%",
         height: "100%",
         backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
       }}
