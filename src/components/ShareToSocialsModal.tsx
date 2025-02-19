@@ -121,7 +121,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, position: 'absolute' }}>
       <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
         <View
           style={{

@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import { Image, Platform, Text, View, Dimensions, Linking } from "react-native";
+import React, { useContext, useEffect, useRef, useState } from "react";
+import { Image, Platform, Text, View, Linking } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -59,6 +59,9 @@ const ArChallengeShare = () => {
     instagram: 0,
     others: 0,
   });
+
+  const [viewWidth, setViewWidth] = useState(0);
+  const viewRef = useRef(null);
 
   const { userLocation } = useContext(GeolocationContext);
   const dispatch = useDispatch();
@@ -435,6 +438,11 @@ const ArChallengeShare = () => {
     }
   };
 
+  const handleLayout = (event: any) => {
+    const { width, height } = event.nativeEvent.layout;
+    setViewWidth(width);
+  };
+
   useEffect(() => {
     async function checkPermissions() {
       const perm =
@@ -461,9 +469,15 @@ const ArChallengeShare = () => {
     checkPermissions();
   }, []);
 
-  const offset = 175;
-  const { width: screenWidth } = Dimensions.get("window"); // Get screen width
-  const aspectWidth = screenWidth - offset;
+  const baseOffset = 110;
+  let offset = baseOffset;
+  if (viewWidth >= 320) {
+    offset = baseOffset - (viewWidth / 300) * 8;
+  }
+  if (viewWidth >= 300 && viewWidth < 320) {
+    offset = baseOffset - (viewWidth / 300) * 24;
+  }
+  const aspectWidth = viewWidth - offset;
   const aspectHeight = (aspectWidth * 16) / 9; // Calculate height based on 9:16 aspect ratio
 
   const mediaContainerWidth = aspectWidth;
@@ -546,6 +560,8 @@ const ArChallengeShare = () => {
               borderRadius: 12,
               alignItems: "center",
             }}
+            ref={viewRef}
+            onLayout={handleLayout}
           >
             <View style={{ flex: 1, justifyContent: "center" }}>
               {fileExt == "mp4" ? (

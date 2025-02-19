@@ -28,7 +28,7 @@ const DrawerList = [
   { icon: "users", label: "Friends", navigateTo: "Friends" },
   { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },
   { icon: "Folder", label: "Legal", navigateTo: "Legal" },
-  { icon: "info", label: "Suport & Feedback", navigateTo: "SendFeedback" },
+  { icon: "info", label: "Support & Feedback", navigateTo: "SendFeedback" },
   { icon: "settings", label: "Settings", navigateTo: "Settings" },
   { icon: "log-out", label: "Logout", navigateTo: "logout" },
 ];

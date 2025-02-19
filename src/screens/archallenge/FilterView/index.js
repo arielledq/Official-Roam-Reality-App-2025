@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, View, Text, ImageBackground, Platform } from "react-native";
+import { View, Text, ImageBackground } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import useStyles from "./styles";
 import LinearGradient from "react-native-linear-gradient";
@@ -189,7 +189,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
             >
               {fullLocation && (
                 <View
-                  style={{ backgroundColor: theme.lightColors?.grey2, padding: 8, borderRadius: 6 }}
+                  style={{
+                    backgroundColor: challengeObj?.color || theme.lightColors?.grey2,
+                    padding: 8,
+                    borderRadius: 6,
+                  }}
                 >
                   <Text
                     style={[
