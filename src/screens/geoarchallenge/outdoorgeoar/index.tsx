@@ -34,7 +34,7 @@ import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
 // @ts-ignore
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
-const GeoArOutdoor: ScreenStackComponent<RootStackParamList, "Home"> = ({ route }) => {
+const GeoArOutdoor = ({ route }: any) => {
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 

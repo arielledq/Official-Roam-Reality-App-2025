@@ -2,7 +2,7 @@ import { StyleSheet, Text, View, Image, SafeAreaView } from "react-native";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
 import { useTheme } from "react-native-paper";
 
-import Home from "../screens/home";
+import ARTipsScreen from "../screens/arTips";
 import Profile from "../screens/profile/profile";
 import Rally from "../screens/rally";
 import GeoArChallenge from "../screens/geoarchallenge";
@@ -28,7 +28,6 @@ const BottomTabNavigator = () => {
   };
   return (
     <SafeAreaProvider style={styles.container}>
-      {/* <SafeAreaView style={styles.container}> */}
       <Tab.Navigator
         initialRouteName="GeoArChallenge"
         barStyle={styles.tabBarStyle}
@@ -67,7 +66,7 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="Go Navigate"
           // @ts-ignore
-          component={Home}
+          component={ARTipsScreen}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({ focused }) => (
