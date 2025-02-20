@@ -1,7 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { View, ActivityIndicator, FlatList, Dimensions, Image, StyleSheet } from "react-native";
+import { View, ActivityIndicator, FlatList, Image, StyleSheet } from "react-native";
+
 import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import { AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS, AR_TIPS_AUTO_SLIDE_SECONDS } from "../../constants";
+
 import ScreenContainer from "components/ScreenContainer";
+
 import theme from "assets/theme";
 
 const ARTipsImage1 = require("../../assets/arTips/1.png");
@@ -15,27 +19,22 @@ const ARTipsImage8 = require("../../assets/arTips/8.png");
 const ARTipsImage9 = require("../../assets/arTips/9.png");
 const ARTipsImage10 = require("../../assets/arTips/10.png");
 
-const { width } = Dimensions.get("screen");
-
 const examples: any = {
   images: [
     { image: ARTipsImage1 },
-    { image: ARTipsImage2 },
-    { image: ARTipsImage3 },
-    { image: ARTipsImage4 },
-    { image: ARTipsImage5 },
-    { image: ARTipsImage6 },
-    { image: ARTipsImage7 },
-    { image: ARTipsImage8 },
-    { image: ARTipsImage9 },
-    { image: ARTipsImage10 },
+    // { image: ARTipsImage2 },
+    // { image: ARTipsImage3 },
+    // { image: ARTipsImage4 },
+    // { image: ARTipsImage5 },
+    // { image: ARTipsImage6 },
+    // { image: ARTipsImage7 },
+    // { image: ARTipsImage8 },
+    // { image: ARTipsImage9 },
+    // { image: ARTipsImage10 },
   ],
 };
 
-const AUTO_SLIDE_SECONDS = 4;
-const PAUSE_DURATION = 10;
-
-const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ route }) => {
+const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
@@ -43,12 +42,20 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ rout
   const flatListRef = useRef(null);
   const pauseTimerRef = useRef(null);
 
+  const [viewWidth, setViewWidth] = useState(0);
+  const viewRef = useRef(null);
+
+  const handleLayout = (event: any) => {
+    const { width, height } = event.nativeEvent.layout;
+    setViewWidth(width);
+  };
+
   const renderItem = ({ item }: any) => {
     return (
       <Image
         source={item?.image}
         // source={{ uri: item?.image }}
-        style={styles.media}
+        style={[styles.media, { width: viewWidth }]}
         resizeMode="cover"
         resizeMethod="auto"
       />
@@ -62,9 +69,10 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ rout
       clearTimeout(pauseTimerRef.current);
     }
     setIsPaused(true);
+    // @ts-ignore
     pauseTimerRef.current = setTimeout(() => {
       setIsPaused(false);
-    }, PAUSE_DURATION * 1000);
+    }, AR_TIPS_AUTO_SLIDE_SECONDS * 1000);
   };
 
   // Auto slide effect that depends on isPaused
@@ -73,10 +81,11 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ rout
       const timer = setInterval(() => {
         setActiveIndex(prevIndex => {
           const newIndex = prevIndex < examples.images.length - 1 ? prevIndex + 1 : 0;
+          // @ts-ignore
           flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
           return newIndex;
         });
-      }, AUTO_SLIDE_SECONDS * 1000);
+      }, AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS * 1000);
       return () => clearInterval(timer);
     }
   }, [isPaused]);
@@ -93,8 +102,9 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ rout
         ) : (
           <>
             {/* Media Slider */}
-            <View style={styles.mediaSliderContainer}>
+            <View style={styles.mediaSliderContainer} ref={viewRef} onLayout={handleLayout}>
               <FlatList
+                style={{ borderRadius: 16 }}
                 ref={flatListRef}
                 data={examples.images}
                 renderItem={renderItem}
@@ -103,13 +113,29 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ rout
                 showsHorizontalScrollIndicator={false}
                 keyExtractor={(_, index) => index.toString()}
                 onScroll={e => {
-                  const index = Math.round(e.nativeEvent.contentOffset.x / width);
+                  const index = Math.round(e.nativeEvent.contentOffset.x / viewWidth);
                   setActiveIndex(index);
                 }}
                 // Pause auto slide when user interacts with the slider
                 onScrollBeginDrag={handleUserInteraction}
                 onTouchStart={handleUserInteraction}
               />
+            </View>
+
+            {/* Navigation Buttons */}
+            <View style={styles.navButtons}>
+              {/* Dot Indicators */}
+              <View style={styles.dotContainer}>
+                {examples?.images?.map((_: any, index: number) => (
+                  <View
+                    key={index}
+                    style={[
+                      styles.dot,
+                      index === activeIndex ? styles.activeDot : styles.inactiveDot,
+                    ]}
+                  />
+                ))}
+              </View>
             </View>
           </>
         )}
@@ -121,12 +147,34 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = ({ rout
 export default ARTipsScreen;
 
 const styles = StyleSheet.create({
-  screen: { paddingTop: 0, paddingHorizontal: 0, paddingBottom: 50 },
+  screen: {},
   mediaSliderContainer: {
     flex: 1,
   },
   media: {
-    width: width,
     height: "100%",
+  },
+
+  navButtons: {
+    width: "100%",
+    alignItems: "center",
+    marginTop: 4,
+    marginBottom: 10,
+  },
+  dotContainer: {
+    flexDirection: "row",
+    marginTop: 15,
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeDot: {
+    backgroundColor: theme.lightColors?.purple,
+  },
+  inactiveDot: {
+    backgroundColor: theme.lightColors?.grey0,
   },
 });

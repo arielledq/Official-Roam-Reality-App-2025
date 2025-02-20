@@ -33,3 +33,6 @@ export const MAP_MODE = {
 export const PIN_CHALLENGE_CONFIG = {
   CUSTOM_INSTRUCTIONS: "Users cannot take pictures unless you are within range of the AR ",
 };
+
+export const AR_TIPS_AUTO_SLIDE_SECONDS = 60 * 10;
+export const AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS = 10;
