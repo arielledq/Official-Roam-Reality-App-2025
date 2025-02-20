@@ -208,8 +208,12 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     search_fields = ['name', ]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).order_by('-user_ar_profile__points')
+        queryset = (super().get_queryset()
+                    .exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).
+                    order_by('-user_ar_profile__points'))
+        if self.request.query_params.get('destination'):
+            return queryset
+        return queryset[:1000]
 
 
 class FriendshipViewSet(ModelViewSet):

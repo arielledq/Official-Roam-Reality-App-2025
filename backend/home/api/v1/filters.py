@@ -47,4 +47,4 @@ class ScoreFilterSet(filters.FilterSet):
         ).annotate(
             destination_points=F('memories_points') + F('checkin_points')
         )
-        return queryset.order_by('destination_points')
+        return queryset.order_by('-destination_points')[:1000]
