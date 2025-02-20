@@ -22,15 +22,15 @@ const ARTipsImage10 = require("../../assets/arTips/10.png");
 const examples: any = {
   images: [
     { image: ARTipsImage1 },
-    // { image: ARTipsImage2 },
-    // { image: ARTipsImage3 },
-    // { image: ARTipsImage4 },
-    // { image: ARTipsImage5 },
-    // { image: ARTipsImage6 },
-    // { image: ARTipsImage7 },
-    // { image: ARTipsImage8 },
-    // { image: ARTipsImage9 },
-    // { image: ARTipsImage10 },
+    { image: ARTipsImage2 },
+    { image: ARTipsImage3 },
+    { image: ARTipsImage4 },
+    { image: ARTipsImage5 },
+    { image: ARTipsImage6 },
+    { image: ARTipsImage7 },
+    { image: ARTipsImage8 },
+    { image: ARTipsImage9 },
+    { image: ARTipsImage10 },
   ],
 };
 
