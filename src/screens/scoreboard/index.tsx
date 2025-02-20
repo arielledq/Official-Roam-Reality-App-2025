@@ -13,7 +13,7 @@ import FastImage from "react-native-fast-image";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 
-import { getARProfile, getGeoARDestinations, getProfieDetails, searchUsers } from "../../network";
+import {getARProfile, getGeoARDestinations, getProfieDetails, getScoreboardList, searchUsers} from "../../network";
 import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { handleError } from "util/helpers";
 import { updateARUserData } from "../../redux/AR";
@@ -27,14 +27,14 @@ import Images from "../../assets/images";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import { MenuIcon } from "assets/svg";
-
 const ScoreBoard = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
-  const [filteredUsers, setFilteredUsers] = React.useState<[]>([]);
-  const [allUsers, setAllUsers] = React.useState([]);
+  // const [filteredUsers, setFilteredUsers] = React.useState<[]>([]);
+  // const [allUsers, setAllUsers] = React.useState([]);
+  const [users, setUsers] = React.useState([]);
   const [profileDetails, setProfileDetails] = useState<any>(null);
   const [rankMine, setRankMine] = useState<number | null>(null);
-  const [destinationData, setDestinationData] = useState([]);
+  const [destinationData, setDestinationData] = useState([{name: "Global"}]);
   const [selectedDestination, setSelectedDestination] = useState<any>(null);
 
   const _styles = useStyles();
@@ -45,61 +45,69 @@ const ScoreBoard = ({}) => {
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
   const arProfile = useSelector((state: any) => state?.ar?.arProfile);
 
-  const fetchUsers = (userId: number) => {
-    const payload = {
-      search: "",
-    };
-    searchUsers(payload).then(response => {
+  // const fetchUsers = (userId: number) => {
+  //   const payload = {
+  //     search: "",
+  //   };
+  //   searchUsers(payload).then(response => {
+  //     if (response) {
+  //       if (response?.data?.length > 0) {
+  //         let arProfiles = response?.data.filter((a: any) => a?.user_ar_profile);
+  //         arProfiles = arProfiles.filter((a: any) => a?.name);
+  //         if (arProfile && userProfile) {
+  //           arProfiles.push(userProfile);
+  //         }
+  //         const aa = arProfiles.sort(
+  //           (a: any, b: any) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
+  //         );
+  //         for (var i = 0; i < aa.length; i++) {
+  //           aa[i].rank = i + 1;
+  //           if (aa[i].id == userId) {
+  //             setRankMine(i + 1);
+  //           }
+  //         }
+  //         setFilteredUsers(aa);
+  //         setAllUsers(aa);
+  //       }
+  //     }
+  //   });
+  // };
+
+  const getScoreboard = (destination="") => {
+    getScoreboardList(destination).then(response => {
       if (response) {
-        if (response?.data?.length > 0) {
-          let arProfiles = response?.data.filter((a: any) => a?.user_ar_profile);
-          arProfiles = arProfiles.filter((a: any) => a?.name);
-          if (arProfile && userProfile) {
-            arProfiles.push(userProfile);
-          }
-          const aa = arProfiles.sort(
-            (a: any, b: any) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
-          );
-          for (var i = 0; i < aa.length; i++) {
-            aa[i].rank = i + 1;
-            if (aa[i].id == userId) {
-              setRankMine(i + 1);
-            }
-          }
-          setFilteredUsers(aa);
-          setAllUsers(aa);
-        }
+        setUsers(response?.data);
       }
     });
   };
 
-  const fetchProfileDetails = async (userProfileId: number) => {
-    try {
-      getProfieDetails({
-        id: userProfileId,
-      })
-        .then(res => {
-          if (res.status == 1) {
-            setProfileDetails(res);
-          } else {
-            console.error("Error", "Error fetching profile details: ");
-          }
-        })
-        .catch(err => {
-          console.error("Error", "Error fetching profile details: ");
-        })
-        .finally(() => setIsLoading(false));
-    } catch (error) {
-      console.error("Error", "Error fetching profile details: ");
-    }
-  };
+  // const fetchProfileDetails = async (userProfileId: number) => {
+  //   try {
+  //     getProfieDetails({
+  //       id: userProfileId,
+  //     })
+  //       .then(res => {
+  //         if (res.status == 1) {
+  //           setProfileDetails(res);
+  //         } else {
+  //           console.error("Error", "Error fetching profile details: ");
+  //         }
+  //       })
+  //       .catch(err => {
+  //         console.error("Error", "Error fetching profile details: ");
+  //       })
+  //       .finally(() => setIsLoading(false));
+  //   } catch (error) {
+  //     console.error("Error", "Error fetching profile details: ");
+  //   }
+  // };
 
   const ARDestinations = () => {
     setIsLoading(true);
     getGeoARDestinations()
       .then(res => {
         if (res.status == 1) {
-          setDestinationData(res.data);
+          setDestinationData([ ...destinationData, ...res.data]);
         } else {
           res.message.message = "Error in loading Destinations.";
           handleError(res);
@@ -142,33 +150,35 @@ const ScoreBoard = ({}) => {
       animated: true,
       index: index,
     });
-    const destinationPoints = getAllPoints(o);
-    if (destinationPoints) {
-      const filterUserWithDes = [];
-      let count = 1;
-      for (let i = 0; i < allUsers.length; i++) {
-        let userCheck: any = allUsers[i];
-        if (
-          userCheck?.user_ar_profile &&
-          userCheck?.user_ar_profile?.current_location?.coordinates?.length > 0
-        ) {
-          const pointUser = {
-            latitude: userCheck?.user_ar_profile?.current_location?.coordinates[1],
-            longitude: userCheck?.user_ar_profile?.current_location?.coordinates[0],
-          };
-
-          const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
-          if (isInsideSiteArea) {
-            userCheck.rank = count;
-            filterUserWithDes.push(userCheck);
-            count++;
-          }
-        }
-        // @ts-ignore
-        setFilteredUsers(filterUserWithDes);
-      }
-    }
+    // const destinationPoints = getAllPoints(o);
+    // if (destinationPoints) {
+    //   const filterUserWithDes = [];
+    //   let count = 1;
+    //   for (let i = 0; i < allUsers.length; i++) {
+    //     let userCheck: any = allUsers[i];
+    //     if (
+    //       userCheck?.user_ar_profile &&
+    //       userCheck?.user_ar_profile?.current_location?.coordinates?.length > 0
+    //     ) {
+    //       const pointUser = {
+    //         latitude: userCheck?.user_ar_profile?.current_location?.coordinates[1],
+    //         longitude: userCheck?.user_ar_profile?.current_location?.coordinates[0],
+    //       };
+    //
+    //       const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
+    //       if (isInsideSiteArea) {
+    //         userCheck.rank = count;
+    //         filterUserWithDes.push(userCheck);
+    //         count++;
+    //       }
+    //     }
+    //     // @ts-ignore
+    //     setFilteredUsers(filterUserWithDes);
+    //   }
+    // }
   };
+
+
 
   const DestinationItem = ({ obj, index }: { obj: any; index: number }) => (
     <Pressable
@@ -204,7 +214,7 @@ const ScoreBoard = ({}) => {
     </Pressable>
   );
 
-  const Item = ({ obj }: { obj: any }) => {
+  const Item = ({ obj, rank }: { obj: any, rank: number }) => {
     return (
       <View
         style={{
@@ -219,7 +229,7 @@ const ScoreBoard = ({}) => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ marginStart: 10, alignItems: "center" }}>
             <Text style={_styles.rankText}>Rank</Text>
-            <Text style={_styles.rankTextNumber}>{obj?.rank}</Text>
+            <Text style={_styles.rankTextNumber}>{rank + 1}</Text>
           </View>
           <ImageBackground
             source={Images.BGBlur}
@@ -318,19 +328,25 @@ const ScoreBoard = ({}) => {
   React.useEffect(() => {
     ARDestinations();
     fetchARUserProfile();
+    getScoreboard();
   }, []);
 
   React.useEffect(() => {
-    const userId = userProfile?.id;
-    if (userId) {
-      fetchUsers(userId);
-    }
+    console.log("selectedDestination", selectedDestination?.id)
+    getScoreboard(selectedDestination?.id);
+  }, [selectedDestination]);
 
-    const userProfileId = userProfile?.user_profile?.id;
-    if (userProfileId) {
-      fetchProfileDetails(userProfileId);
-    }
-  }, [userProfile]);
+  // React.useEffect(() => {
+  //   // const userId = userProfile?.id;
+  //   // if (userId) {
+  //   //   fetchUsers(userId);
+  //   // }
+  //   //
+  //   // const userProfileId = userProfile?.user_profile?.id;
+  //   // if (userProfileId) {
+  //   //   fetchProfileDetails(userProfileId);
+  //   // }
+  // }, [userProfile]);
 
   return (
     <ScreenContainer>
@@ -351,6 +367,7 @@ const ScoreBoard = ({}) => {
         ) : (
           <>
             <View style={{ height: 50 }}>
+              {/*<DestinationItem index={0} obj={GLOBAL_DESTINATION} />*/}
               <FlatList
                 horizontal
                 // @ts-ignore
@@ -366,10 +383,10 @@ const ScoreBoard = ({}) => {
             <Text style={_styles.subTitle}>Leaderboard</Text>
             <FlatList
               style={{ flex: 1, marginTop: 15 }}
-              data={filteredUsers}
+              data={users}
               showsHorizontalScrollIndicator={false}
               showsVerticalScrollIndicator={false}
-              renderItem={({ item }) => <Item obj={item} />}
+              renderItem={({ item, index }) => <Item obj={item} rank={index} />}
               keyExtractor={(item: any) => item?.id}
             />
           </>
