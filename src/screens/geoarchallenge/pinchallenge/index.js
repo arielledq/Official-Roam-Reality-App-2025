@@ -571,9 +571,9 @@ const PinChallenge = () => {
   };
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data?.enableButton;
-    buttonBack = data?.backPress;
-    buttonPhotoIsPressed = data?.ispressed;
+    const buttonInfo = data?.enableButton;
+    const buttonBack = data?.backPress;
+    const buttonPhotoIsPressed = data?.ispressed;
 
     if (buttonBack) {
       navigation?.goBack();
