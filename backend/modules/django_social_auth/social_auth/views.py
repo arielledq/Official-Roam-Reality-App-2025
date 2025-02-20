@@ -1,3 +1,4 @@
+from configuration import configs
 from feedback.models import ReportedContent
 from rest_framework.permissions import AllowAny
 from allauth.socialaccount.providers.facebook.views import FacebookOAuth2Adapter
@@ -20,6 +21,7 @@ from home.api.v1.serializers import UserSerializer
 from rest_auth.social_serializers import TwitterLoginSerializer
 from rest_framework import status
 
+from ...ar.challenges.models import ARUserProfile
 
 try:
     APP_DOMAIN = f"https://{get_current_site(None)}"
@@ -46,6 +48,11 @@ class FacebookLogin(SocialLoginView):
         user_profile.is_verified = True
         user_profile.save()
         serializer = UserSerializer(user)
+        profileObj, created = ARUserProfile.objects.get_or_create(user=user)
+        if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+            profileObj.points += configs.POINTS_GIFT
+            profileObj.save()
+            configs.NUMBER_USER_POINT_GIFT += 1
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
     
 
@@ -70,6 +77,11 @@ class GoogleLogin(SocialLoginView):
         user_profile.is_verified = True
         user_profile.save()
         serializer = UserSerializer(user)
+        profileObj, created = ARUserProfile.objects.get_or_create(user=user)
+        if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+            profileObj.points += configs.POINTS_GIFT
+            profileObj.save()
+            configs.NUMBER_USER_POINT_GIFT += 1
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -95,6 +107,11 @@ class AppleLogin(SocialLoginView):
         user_profile.is_verified = True
         user_profile.save()
         serializer = UserSerializer(user)
+        profileObj, created = ARUserProfile.objects.get_or_create(user=user)
+        if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+            profileObj.points += configs.POINTS_GIFT
+            profileObj.save()
+            configs.NUMBER_USER_POINT_GIFT += 1
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 
 
