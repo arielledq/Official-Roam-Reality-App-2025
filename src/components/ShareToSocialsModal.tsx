@@ -37,8 +37,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 }) => {
   const share = async (selectedSSNN: string) => {
     // If correctedCaptureData doesn't already have "file://" prefix, add it
-    let updatedFileUri = "";
-    if (!updatedFileUri.startsWith("file://")) {
+    let updatedFileUri = fileUri;
+    if (!updatedFileUri?.startsWith("file://")) {
       updatedFileUri = `file://${fileUri}`;
     }
 
@@ -121,7 +121,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, position: 'absolute' }}>
       <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
         <View
           style={{

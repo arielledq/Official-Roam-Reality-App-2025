@@ -6,7 +6,7 @@ import RenderHtml from "react-native-render-html";
 import moment from "moment";
 
 import { FontSizes } from "../../../util/FontUtils";
-import { checkARChallengeDoneAPI, getAnyARExamples } from "../../../network";
+import { checkARChallengeDoneAPI, getAnyARExamples, getGeoARExamples } from "../../../network";
 import { processCoolDownPeriod, processMyCheckIns, showMessage } from "../../../util/helpers";
 
 import { RootStackParamList, ScreenStackComponent } from "../../../constants/types";
@@ -86,11 +86,19 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   };
 
   const getExample = () => {
-    getAnyARExamples(challengeObj?.id)
-      .then(res => {
-        setExamples(res.data);
-      })
-      .finally(() => {});
+    if (experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE) {
+      getAnyARExamples(challengeObj?.id)
+        .then(res => {
+          setExamples(res.data);
+        })
+        .finally(() => {});
+    } else {
+      getGeoARExamples(challengeObj?.id)
+        .then(res => {
+          setExamples(res.data);
+        })
+        .finally(() => {});
+    }
   };
 
   const navigateToChallengeCapture = () => {
@@ -131,7 +139,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           );
           setMyCheckInsText(usersCheckIns);
           break;
-        case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
+
+        default:
           // Cool Down info
           const coolDownParams = route.params?.coolDown;
 
@@ -146,10 +155,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           if (checkInsParams) {
             setMyCheckInsText(checkInsParams);
           }
-
-          break;
-
-        default:
           break;
       }
     }

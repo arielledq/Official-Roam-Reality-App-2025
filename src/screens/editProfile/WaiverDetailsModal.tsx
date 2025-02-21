@@ -1,18 +1,26 @@
-import {StyleSheet, TouchableOpacity, View, Modal, ScrollView, useWindowDimensions, Text} from "react-native";
-import React, { useState } from "react";
+import {
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  Modal,
+  ScrollView,
+  useWindowDimensions,
+  Text,
+} from "react-native";
+import React from "react";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 import theme from "../../assets/theme";
 import { screenHorizontalPadding } from "../../util/AppDimensions";
-import {useSelector} from "react-redux";
+import { useSelector } from "react-redux";
 import RenderHTML from "react-native-render-html";
-import {AppButton, AppText} from "components";
+import { AppButton, AppText } from "components";
 
 const ConfirmationPopUp = ({
-   confirmHandler = () => {},
-   cancelHandler = () => {},
-   isVisible = false,
-   }) => {
-  const settings = useSelector(state => state.ar?.arSettings);
+  confirmHandler = () => {},
+  cancelHandler = () => {},
+  isVisible = false,
+}) => {
+  const settings = useSelector((state: any) => state.ar?.arSettings);
   const htmlContent = settings?.waiver_details?.replace(/#000000/g, "#fff");
   const { width } = useWindowDimensions();
   return (
@@ -45,13 +53,9 @@ const ConfirmationPopUp = ({
             onPress={confirmHandler}
             buttonStyle={styles.buttonStyle}
             containerStyle={styles.buttonContainerStyle}
-            // titleStyle={styles.buttonTitle}
             title={"Accept and Continue"}
           />
-          <TouchableOpacity
-            activeOpacity={0.6}
-            onPress={cancelHandler}
-          >
+          <TouchableOpacity activeOpacity={0.6} onPress={cancelHandler}>
             <Text style={styles.cancelButtonText}>Cancel</Text>
           </TouchableOpacity>
         </View>
@@ -64,7 +68,7 @@ export default ConfirmationPopUp;
 
 const styles = StyleSheet.create({
   modalContainer: {
-    backgroundColor: theme.lightColors.inputBG,
+    backgroundColor: theme.lightColors?.inputBG,
     height: 440,
     borderTopLeftRadius: 30,
     borderTopRightRadius: 30,

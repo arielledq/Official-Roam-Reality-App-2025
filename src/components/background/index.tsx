@@ -15,6 +15,7 @@ interface BackgroundWithImageProps {
   imageSource?: ImageSourcePropType;
   style?: StyleProp<ViewStyle>;
   imageStyle?: StyleProp<ImageStyle>;
+  borderRadius?: number
 }
 
 const BackgroundWithImage: React.FC<BackgroundWithImageProps> = ({
@@ -22,10 +23,12 @@ const BackgroundWithImage: React.FC<BackgroundWithImageProps> = ({
   imageSource = Images.Background,
   style,
   imageStyle,
+  borderRadius,
   ...props
 }) => {
   return (
     <ImageBackground
+      borderRadius={borderRadius}
       source={imageSource}
       style={[styles.background, style]}
       imageStyle={imageStyle}

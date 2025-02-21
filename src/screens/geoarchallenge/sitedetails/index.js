@@ -39,6 +39,7 @@ import {
 import Icon from "components/Icon";
 import theme from "assets/theme";
 import { MAP_MODE } from "constants";
+import { EXPERIENCE_TYPE_CHOICES } from "../../../constants";
 
 const GeoArSiteDetails = ({ route }) => {
   const experience_type = route.params?.experience_type;
@@ -213,14 +214,29 @@ const GeoArSiteDetails = ({ route }) => {
   };
 
   const skipNavigationButtonHandler = () => {
-    navigation.navigate("ChallengeSelection", {
-      experience_type,
-      coolDown: {
-        coolDownFinished: coolDownFinished,
-        coolDownHoursText: coolDownHoursText,
-      },
-      checkIns: myCheckInsText,
-    });
+    switch (experience_type) {
+      case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
+        navigation.navigate("ARChallenge");
+        break;
+
+      default:
+        if (!selectedGeoSite?.pin_challenge) {
+          showMessage("Pin Challenge is unavailable right now", "error");
+          return;
+        }
+
+        navigation.navigate("ChallengeDetails", {
+          challengeObj: selectedGeoSite,
+          experience_type: experience_type,
+          coolDown: {
+            coolDownFinished: coolDownFinished,
+            coolDownHoursText: coolDownHoursText,
+          },
+          checkIns: myCheckInsText,
+        });
+
+        break;
+    }
   };
 
   const letsRoamButtonHandler = async () => {

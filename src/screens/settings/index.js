@@ -1,18 +1,16 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
-import {AppButton, AppHeader} from "../../components";
+import { AppButton, AppHeader } from "../../components";
 import Icon from "../../components/Icon";
 import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 import { useNavigation } from "@react-navigation/native";
-import CaptureInfoView from "components/CaptureInfoView";
-import ViewInfoModal from "components/ViewInfoModal";
-import {deleteAccount, logout} from "network";
-import {removeItem, showMessage} from "util/helpers";
-import {GoogleSignin} from "@react-native-google-signin/google-signin";
-import {resetState} from "redux/Login";
-import {useDispatch} from "react-redux";
+import { deleteAccount, logout } from "network";
+import { removeItem, showMessage } from "util/helpers";
+import { GoogleSignin } from "@react-native-google-signin/google-signin";
+import { resetState } from "redux/Login";
+import { useDispatch } from "react-redux";
 import ConfirmationPopUp from "components/confirmationPopUp";
 
 function SettingsItem({ label, onPress, icon }) {
@@ -81,18 +79,18 @@ const Settings = () => {
   return (
     <BackgroundWithImage style={styles.mainContainer}>
       <AppHeader title={"Settings"} backgroundColor="transparent" />
-        <SettingsItem icon="lock" label={"Change password"} onPress={handleChangePassword} />
-        <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
-        <View style={{ width: "100%", paddingHorizontal: 24 }}>
-          <AppButton
-            onPress={()=> setIsOpenDeleteModal(true)}
-            // buttonStyle={styles.buttonStyle}
-            containerStyle={styles.buttonContainerStyle}
-            customColors={[theme.darkColors?.inputRed, theme.darkColors?.inputRed]}
-            title={"Delete account"}
-            // loading={isLoading}
-          />
-        </View>
+      <SettingsItem icon="lock" label={"Change password"} onPress={handleChangePassword} />
+      <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
+      <View style={{ width: "100%", paddingHorizontal: 24 }}>
+        <AppButton
+          onPress={() => setIsOpenDeleteModal(true)}
+          // buttonStyle={styles.buttonStyle}
+          containerStyle={styles.buttonContainerStyle}
+          customColors={[theme.darkColors?.inputRed, theme.darkColors?.inputRed]}
+          title={"Delete account"}
+          // loading={isLoading}
+        />
+      </View>
       <ConfirmationPopUp
         title={"Delete Account"}
         description={"Are you sure you want to delete you account? This action is irreversible."}
@@ -100,7 +98,7 @@ const Settings = () => {
         confirmHandler={handleDeleteAccount}
         isVisible={isOpenDeleteModal}
         cancelText={"Cancel"}
-        cancelHandler={()=> setIsOpenDeleteModal(false)}
+        cancelHandler={() => setIsOpenDeleteModal(false)}
       />
     </BackgroundWithImage>
   );
@@ -136,7 +134,7 @@ const styles = StyleSheet.create({
   buttonStyle: {
     backgroundColor: theme.darkColors?.inputRed,
   },
-  buttonContainerStyle :{
+  buttonContainerStyle: {
     marginTop: 24,
-  }
+  },
 });
