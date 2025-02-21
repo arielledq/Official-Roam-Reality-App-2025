@@ -87,6 +87,8 @@ class GeoLocation(models.Model):
     flag_image = models.ImageField(verbose_name="Flag Scoreboard", upload_to="geoar/img-flag/", null=True, blank=True)
     geo_location = gis_models.PointField(_("Geo Location"), blank=True, null=True)
     border = gis_models.MultiLineStringField(_("Borders"), blank=True, null=True)
+    event_borders = gis_models.MultiLineStringField(_("Event Borders"), blank=True, null=True)
+    band_borders = gis_models.MultiLineStringField(_("Band Borders"), blank=True, null=True)
     regions = models.ManyToManyField(GeoRegion, verbose_name="AR Regions", related_name="geo_location_region",
                                      blank=True, default=None)
     sequence_number = models.IntegerField(verbose_name="Sequence Number", default=0)

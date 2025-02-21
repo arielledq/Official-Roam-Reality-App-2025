@@ -412,6 +412,8 @@ class GeoLocationSerializer(GeoModelSerializer):
             "flag_image",
             "geo_location",#
             "border",
+            "event_borders",
+            "band_borders",
             "regions",
             "sequence_number",
             "map_longitude_delta",
