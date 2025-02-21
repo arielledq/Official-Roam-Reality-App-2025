@@ -11,6 +11,7 @@ import ChallengeScreen from "components/ChallengeScreen";
 import ViewInfoModal from "components/ViewInfoModal";
 
 import { CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE } from "constants";
+import { CAMERA_NOTIFICATION } from "constants";
 
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
@@ -49,6 +50,12 @@ const ArChallengeCapture = ({ route, navigation }) => {
   const challengeType = challengeObj?.challenge_requirement;
   console.log("capture type ", challengeType);
   const viewInfoModalContent = challengeObj?.info;
+
+// FILTERS PENDING
+//  const ar_filters = challengeObj?.ar_filters;
+//  const imageUrls = ar_filters.map(filter => filter.image);
+//  const gradientColors = ar_filters[0]?.gradient_colors || ["#FF0000", "#00FF00"];
+//  const gradientDirection = ar_filters[0]?.gradient_direction === "TOP_TO_BOTTOM";
 
   const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
@@ -153,10 +160,38 @@ const ArChallengeCapture = ({ route, navigation }) => {
     }
   }, [challengeObjParameters]);
 
+  const sendBloomValuesToUnity = useCallback(() => {
+    const bloomData = { threshold : 1, intensity : 1 };
+
+    if (unityRef.current) {
+      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
+    }
+  }, [unityRef, threshold, intensity]);
+
+
+  const viewNotification = (isNotification) => {
+    if (unityRef.current) {
+      const message = CAMERA_NOTIFICATION[challengeType] || "Default notification text";
+      console.log('message', message)
+      unityRef.current.postMessage(
+        "Scriptposition",
+        "SetVisibleNotification",
+        JSON.stringify({ textNotification: message, isNotification: isNotification })
+      );
+    }
+  }
+
+  useEffect(() => {
+    viewNotification(true)
+      setTimeout(() => {
+        viewNotification(false)
+      }, 5000);
+  }, []);
+
   useFocusEffect(
     useCallback(() => {
       if (unityRef.current) {
-        console.log("usecallback");
+        sendBloomValuesToUnity()
         isLoadingUnity();
         PointsCount();
         unityRef.current.postMessage(
@@ -356,6 +391,51 @@ const ArChallengeCapture = ({ route, navigation }) => {
       setIsUnityLoaded(true);
     }
   };
+
+  // Pending //
+
+  // const sendImageUrlsToUnity = () => {
+  //   // Datos que quieres enviar a Unity
+  //   const data = {
+  //     urls: imageUrls,
+  //   };
+
+  //   // Convertir el objeto a JSON
+  //   const jsonData = JSON.stringify(data);
+
+  //   // Enviar el JSON a Unity
+  //   unityRef.current.postMessage(
+  //     "Scroll View", // Nombre del GameObject en Unity
+  //     "SetImageUrls",       // Método en el script de Unity
+  //     jsonData              // Datos en formato JSON
+  //   );
+  // };
+  // const Gradientes = () => {
+  //   // Datos que quieres enviar a Unity
+  //   const data = {
+  //     gradientsColors: gradientColors, // Colores para el gradiente
+  //     topBottom: gradientDirection, // Dirección del gradiente
+  //     startAlpha: 1.0, // Opacidad inicial
+  //     endAlpha: 0.0 // Opacidad final
+  //   };
+
+  //   // Convertir el objeto a JSON
+  //   const jsonData = JSON.stringify(data);
+
+  //   // Enviar el JSON a Unity
+  //   unityRef.current.postMessage(
+  //     "Image", // Nombre del GameObject en Unity
+  //     "SetFilterData",       // Método en el script de Unity
+  //     {urls: imageUrls  }            // Datos en formato JSON
+  //   );
+  // };
+  // useEffect(() => {
+  //   if (challengeObj && modelFile) {
+  //     Gradientes();
+  //     sendImageUrlsToUnity()
+  //   }
+  // }, []);
+
   return (
     <ChallengeScreen
       title="AR Challenges"
