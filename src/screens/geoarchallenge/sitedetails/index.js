@@ -17,6 +17,7 @@ import CloseBIcon from "../../../assets/geoar/close-square.svg";
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg";
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png";
 import Geocoder from "react-native-geocoding";
+import { showLocation } from "react-native-map-link";
 
 import { useDispatch, useSelector } from "react-redux";
 import useStyles from "./styles";
@@ -239,7 +240,7 @@ const GeoArSiteDetails = ({ route }) => {
     }
   };
 
-  const letsRoamButtonHandler = async () => {
+  const navigateButtonHandler = async () => {
     // INFO: Commented out temporarily
     // try {
     //   const metadata = {
@@ -252,17 +253,37 @@ const GeoArSiteDetails = ({ route }) => {
     //   console.error('There was an error sending the notification to friends:', error)
     // }
 
-    // navigation.navigate("GeoArSiteRoutes", {
-    navigation.navigate("GeoArSiteNavigation", {
-      experience_type,
-      coolDown: {
-        coolDownFinished: coolDownFinished,
-        coolDownHoursText: coolDownHoursText,
-      },
-      checkIns: myCheckInsText,
-      mapMode: MAP_MODE.DRIVING,
-      starsChallenge: null,
+    // Open external navigation app
+    if (!selectedGeoSite?.lat_long?.coordinates?.length) {
+      return;
+    }
+
+    const lat = selectedGeoSite?.lat_long?.coordinates[1];
+    const long = selectedGeoSite?.lat_long?.coordinates[0];
+    showLocation({
+      latitude: lat,
+      longitude: long,
+      alwaysIncludeGoogle: true,
+      appsWhiteList: ["apple-maps", "google-maps", "waze"],
+    }).then(value => {
+      if (value) {
+        setTimeout(() => {
+          skipNavigationButtonHandler();
+        }, 2000);
+      }
     });
+
+    // Keeping for reference
+    // navigation.navigate("GeoArSiteNavigation", {
+    //   experience_type,
+    //   coolDown: {
+    //     coolDownFinished: coolDownFinished,
+    //     coolDownHoursText: coolDownHoursText,
+    //   },
+    //   checkIns: myCheckInsText,
+    //   mapMode: MAP_MODE.DRIVING,
+    //   starsChallenge: null,
+    // });
   };
 
   const initialRegion = {
@@ -523,7 +544,7 @@ const GeoArSiteDetails = ({ route }) => {
               }}
             >
               <AppButton
-                onPress={letsRoamButtonHandler}
+                onPress={navigateButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{ fontWeight: "bold" }}
                 containerStyle={_styles.buttonContainerStyle}
