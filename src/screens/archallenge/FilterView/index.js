@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, View, Text, ImageBackground, Platform } from "react-native";
+import { View, Text, ImageBackground } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import useStyles from "./styles";
 import LinearGradient from "react-native-linear-gradient";
@@ -175,7 +175,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
       style={styles.mainContainer}
       options={{ fileName: "filtered_share", format: "png", quality: 0.9 }}
     >
-      <BackgroundWithImage source={{ uri: correctedCaptureData }} style={styles.mainContainer}>
+      <BackgroundWithImage
+        borderRadius={16}
+        source={{ uri: correctedCaptureData }}
+        style={styles.mainContainer}
+      >
         <PagerView style={styles.pagerView} initialPage={0}>
           {is_pin_challenge ? (
             <View
@@ -189,7 +193,11 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
             >
               {fullLocation && (
                 <View
-                  style={{ backgroundColor: theme.lightColors?.grey2, padding: 8, borderRadius: 6 }}
+                  style={{
+                    backgroundColor: challengeObj?.color || theme.lightColors?.grey2,
+                    padding: 8,
+                    borderRadius: 6,
+                  }}
                 >
                   <Text
                     style={[
@@ -225,6 +233,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                       <LinearGradient
                         style={{
                           flex: 1,
+                          borderRadius: 15,
                           transform: [
                             {
                               rotate: isTopToBottom ? "0deg" : "180deg",
@@ -242,11 +251,10 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   )}
                   {filter?.image && (
                     <ImageBackground
+                      borderRadius={16}
                       source={{ uri: filter.image }}
-                      resizeMode="contain"
+                      resizeMode="stretch"
                       style={{
-                        alignItems: "flex-end",
-                        marginTop: "4%",
                         height: "100%",
                         width: "100%",
                       }}

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useRef, useState } from "react";
 import {
   TouchableOpacity,
   View,
@@ -10,26 +10,13 @@ import {
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AppHeader from "../../../components/header";
-import Video from "react-native-video";
-import uuid from "react-native-uuid";
-import { FontSizes } from "../../../util/FontUtils";
-import RNFetchBlob from "rn-fetch-blob";
 import useStyles from "./styles";
-import CaptureImage from "../../../assets/ar/camera.png";
-import LineIcon from "../../../assets/ar/line.png";
-import { unzip } from "react-native-zip-archive";
-import { AppButton } from "../../../components";
 import RenderHTML from "react-native-render-html";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
-import { requestMultiple, PERMISSIONS } from "react-native-permissions";
-import { useSelector } from "react-redux";
 import BackgroundWithImage from "../../../components/background";
-import UnityView from "@azesmway/react-native-unity/src";
-import Share from "react-native-share";
 import CameraControls from "components/CameraControls";
 import UnityARCamera from "components/UnityArView";
-import CaptureInfoView from "components/CaptureInfoView";
 
 const { width } = Dimensions.get("window");
 const VIDEO_RECORD_TIME = 10;
@@ -40,17 +27,9 @@ const UniqueArChallengeCapture = () => {
   const navigation = useNavigation();
   const challengeObj = route?.params?.challengeObj;
   const unityRef = useRef(null);
-  const viewShotRef = useRef();
-  const settings = useSelector(state => state.ar?.arSettings);
 
   const [fileFound, setFileFound] = useState(null);
   const [captureData, setCaptureData] = useState("");
-  const [modelOBJ, setModelOBJ] = useState(null);
-  const [modelResource, setModelResource] = useState(null);
-  const [textureBase, setTextureBase] = useState(null);
-  const [textureEmission, setTextureEmission] = useState(null);
-  const [sourcesFiles, setSourcesFiles] = useState([]);
-  const [detailsShow, setDetailsShow] = useState(true);
   const [recordingStart, setRecordingStart] = useState(false);
   const [timer, setTimer] = useState("00:00");
   const [recordTimeInMillis, setRecordTimeInMillis] = useState(0);
@@ -215,11 +194,6 @@ const UniqueArChallengeCapture = () => {
     </View>
   );
 
-  const acceptWaiverButtonHandler = () => {
-    setDetailsShow(false);
-    setIsUnityLoaded(true);
-  };
-
   const retakeButtonHandler = () => {
     setCapturedImage(null);
     setCapturedVideo(null);
@@ -285,12 +259,6 @@ const UniqueArChallengeCapture = () => {
           isVideo={!isPhotoChallenge}
         />
       </ScrollView>
-
-      <CaptureInfoView
-        isVisible={detailsShow}
-        content={settings?.waiver_details}
-        onAccept={acceptWaiverButtonHandler}
-      />
 
       {challengeInformationView && <ChallengeDetailView />}
     </BackgroundWithImage>

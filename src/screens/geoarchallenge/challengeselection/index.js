@@ -120,7 +120,7 @@ const ChallengeSelection = ({ route }) => {
         navigation.navigate("GeoArSiteRoutes", { starsChallenge });
         break;
       case "PinChallenge":
-        if (!selectedGeoSite.pin_challenge) {
+        if (!selectedGeoSite?.pin_challenge) {
           showMessage("Pin Challenge is unavailable right now", "error");
           return;
         }

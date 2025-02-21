@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { ScrollView, Platform } from "react-native";
 
-import { useSelector } from "react-redux";
 import { useNavigation } from "@react-navigation/native";
 import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
@@ -12,7 +11,6 @@ import Sound from "react-native-sound";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import UnityARCamera from "components/UnityArView";
-import CaptureInfoView from "components/CaptureInfoView";
 import CameraControls from "components/CameraControls";
 import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
 
@@ -23,7 +21,6 @@ const StarChallenge = ({ route }) => {
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
-  const [detailsShow, setDetailsShow] = useState(true);
   const [starModels, setStarModels] = useState();
   const [processingMedia, setProcessingMedia] = useState(false);
   const [textureBase, setTextureBase] = useState();
@@ -31,8 +28,6 @@ const StarChallenge = ({ route }) => {
   const [modelResource, setModelResource] = useState();
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
-
-  const settings = useSelector(state => state.ar?.arSettings);
 
   const _styles = useStyles();
   const navigation = useNavigation();
@@ -43,8 +38,6 @@ const StarChallenge = ({ route }) => {
   const challengeObjParameters = route.params?.starChallenge?.geo_ar_star?.geo_site?.pin_challenge;
   const isStarChallenge = !!starChallengeObj?.id;
 
-  console.log("[StarChallenge] isStarChallenge", isStarChallenge);
-
   // Check and request permissions
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -54,14 +47,14 @@ const StarChallenge = ({ route }) => {
         PERMISSIONS.ANDROID.RECORD_AUDIO,
         PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
         PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      ]).then(response => {});
+      ]);
     } else if (Platform.OS === "ios") {
       requestMultiple([
         PERMISSIONS.IOS.CAMERA,
         PERMISSIONS.IOS.MICROPHONE,
         PERMISSIONS.IOS.PHOTO_LIBRARY,
         PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-      ]).then(response => {});
+      ]);
     }
   };
 
@@ -83,13 +76,11 @@ const StarChallenge = ({ route }) => {
           .fetch("GET", modelFile)
           .progress((received, total) => {
             const progress = Math.trunc((received / total) * 100);
-            // setProgress(progress);
             console.log("Progreso de descarga:", progress, "%");
           })
           .then(res => {
             unzipModelFile(res.path(), targetPath);
-          })
-          .catch(error => {});
+          });
       };
       const unzipModelFile = (sourcePath, targetPath) => {
         unzip(sourcePath, targetPath, "UTF-8")
@@ -129,10 +120,7 @@ const StarChallenge = ({ route }) => {
                   setModelResource(mtlFile);
                   setTextureBase(baseTexture);
                   setTextureEmission(emissionTexture);
-                  // setSourcesFiles(sourcesArray);
-                  // setFoldefile(result);
                 });
-                // setLoading(false);
               })
               .catch(error => {
                 console.error("Error leyendo el directorio descomprimido:", error);
@@ -156,11 +144,6 @@ const StarChallenge = ({ route }) => {
           console.error("Error verificando existencia del archivo:", error);
         });
     }
-  };
-
-  const acceptWaiverButtonHandler = () => {
-    setDetailsShow(false);
-    setIsUnityLoaded(true);
   };
 
   const retakeButtonHandler = () => {
@@ -261,18 +244,12 @@ const StarChallenge = ({ route }) => {
             ? Number(challengeObjParameters?.scale_object)
             : 0.05,
         },
-        // position : {
-        //   x: parseFloat(challengeObjParameters?.positionX) || 0,
-        //   y: parseFloat(challengeObjParameters?.positionY) || 0,
-        //   z: parseFloat(challengeObjParameters?.positionZ) || 0,
-        // },
         emissionIntensity: parseFloat(challengeObjParameters?.emission_value) || 1,
         rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1,
         scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
       };
-      // console.log("Datos del modelo a enviar:", modelData);
       // Enviar datos del modelo a Unity
       unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
 
@@ -320,10 +297,6 @@ const StarChallenge = ({ route }) => {
         "SetVisibilityFromReact", // Método que se llamará
         JSON.stringify(visibilityConfig)
       );
-
-      // console.log("Todos los datos fueron enviados a Unity.");
-    } else {
-      // console.log("No pasó la validación: Unity no está listo o faltan datos.");
     }
   };
 
@@ -336,12 +309,10 @@ const StarChallenge = ({ route }) => {
 
   useEffect(() => {
     if (!unityRef.current) {
-      // console.log("UnityRef not ready, waiting...");
       return;
     }
 
     if (starModels && textureBase && unityRef.current) {
-      // console.log("Sending data to Unity...");
       sendModelDataToUnity();
       sendBloomValuesToUnity();
     }
@@ -384,7 +355,6 @@ const StarChallenge = ({ route }) => {
         />
 
         {/* Unity AR Camera */}
-
         <UnityARCamera
           unityRef={unityRef}
           isProcessingMedia={processingMedia}
@@ -402,12 +372,6 @@ const StarChallenge = ({ route }) => {
           customInstructions="Stand next to the Star, resize as needed, snap your photo"
         />
       </ScrollView>
-
-      <CaptureInfoView
-        isVisible={detailsShow}
-        content={settings?.waiver_details}
-        onAccept={acceptWaiverButtonHandler}
-      />
     </BackgroundWithImage>
   );
 };

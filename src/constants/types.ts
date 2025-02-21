@@ -12,7 +12,7 @@ export type RootStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   TermsAndConditions: undefined;
-  Home: { openBottomSheet: boolean; deleteAccount: boolean };
+  ARTips: undefined;
   FPChangePassword: { token: string; uid: string };
   PrivacyPolicy: undefined;
   HomeScreen: undefined;
