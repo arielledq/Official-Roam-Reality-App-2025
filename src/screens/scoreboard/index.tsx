@@ -1,12 +1,5 @@
 import React, { useRef, useState } from "react";
-import {
-  Text,
-  View,
-  Pressable,
-  ImageBackground,
-  TouchableOpacity,
-  ActivityIndicator,
-} from "react-native";
+import { Text, View, ImageBackground, TouchableOpacity, ActivityIndicator } from "react-native";
 
 import { FlatList } from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
@@ -171,8 +164,9 @@ const ScoreBoard = ({}) => {
   };
 
   const DestinationItem = ({ obj, index }: { obj: any; index: number }) => (
-    <Pressable
-      onPress={() => filterDestinations(obj, index)}
+    <View
+      // TODO: Temporarily disabled (Pressable) - 2025-02-21
+      // onPress={() => filterDestinations(obj, index)}
       style={{
         flexDirection: "row",
         alignItems: "center",
@@ -201,7 +195,7 @@ const ScoreBoard = ({}) => {
         <Text style={_styles.destinationText}>{obj?.name}</Text>
         <Text style={_styles.destinationText}>Scoreboard</Text>
       </View>
-    </Pressable>
+    </View>
   );
 
   const Item = ({ obj }: { obj: any }) => {
