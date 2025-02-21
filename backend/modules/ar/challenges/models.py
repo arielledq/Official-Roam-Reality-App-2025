@@ -625,6 +625,9 @@ class GeoArSite(models.Model):
         verbose_name='Cooldown (in hours)'
     )
     is_active = models.BooleanField(_("Active"), default=True)
+    band_user = models.OneToOneField(
+        User, on_delete=models.CASCADE, related_name="geo_site", null=True, blank=True
+    )
 
     class Meta:
         verbose_name_plural = "Geo AR Site"

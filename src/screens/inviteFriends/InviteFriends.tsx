@@ -1,5 +1,5 @@
 import * as React from "react";
-import { View, StyleSheet, Keyboard, Pressable, Image, Share } from "react-native";
+import {View, StyleSheet, Keyboard, Pressable, Image, Share, Platform} from "react-native";
 import BackgroundWithImage from "../../components/background";
 import { AppButton, AppHeader, AppInput } from "../../components";
 import { Formik } from "formik";
@@ -26,7 +26,9 @@ const InviteFriends = (props: InviteFriendsProps) => {
    */
   const onShareLinkClick = async () => {
     const result = Share.share({
-      message: "https://www.google.com",
+      message: Platform.OS === 'ios'?
+        "https://apps.apple.com/py/app/roam-reality/id6477857812?l=en-GB"
+        : "https://play.google.com/store/apps/details?id=com.roam_reality",
       title: "Invite Friends",
     });
     if (result?.action === Share.sharedAction) {
