@@ -94,7 +94,7 @@ class SendgridClient(object):
             html_content = render_to_string(
                 'invite_email.html',
                 {
-                    'message': message,
+                    'user_name': message,
                 },
             )
             message = strip_tags(html_content)
