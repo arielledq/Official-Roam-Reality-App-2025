@@ -1,5 +1,13 @@
-import React, { useEffect, useState } from "react";
-import { Image, Modal, Text, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import React, { useState } from "react";
+import {
+  Image,
+  Modal,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { StyleSheet } from "react-native";
 
 import { useDispatch, useSelector } from "react-redux";
@@ -30,15 +38,9 @@ const BandHome = ({}) => {
   const loginState = useSelector((state: any) => state.login);
   const user = loginState?.data?.user;
   const [isSettingsModalVisible, setIsSettingsModalVisible] = useState(false);
-  const [isSharingLocation, setIsSharingLocation] = useState(false);
-
-  useEffect(() => {
-    setIsSharingLocation(locationIsEnabled);
-  }, [locationIsEnabled]);
 
   const toggleLiveLocationButtonHandler = () => {
-    setIsSharingLocation(currVal => !currVal);
-    // toggleUserLocation();
+    toggleUserLocation();
   };
 
   const toggleSettingsModalHandler = () => setIsSettingsModalVisible(currState => !currState);
@@ -94,11 +96,22 @@ const BandHome = ({}) => {
               </Text>
             </View>
 
-            <View style={{ marginVertical: 24, alignItems: "center" }}>
-              <Image
-                source={isSharingLocation ? pinOn : pinOff}
-                style={{ width: 100, height: 100 }}
-              />
+            <View
+              style={{
+                marginVertical: 24,
+                alignItems: "center",
+                height: 100,
+                justifyContent: "center",
+              }}
+            >
+              {loading ? (
+                <ActivityIndicator color={theme.lightColors?.white} size="large" />
+              ) : (
+                <Image
+                  source={locationIsEnabled ? pinOn : pinOff}
+                  style={{ width: 100, height: 100 }}
+                />
+              )}
             </View>
 
             <TouchableWithoutFeedback onPress={toggleLiveLocationButtonHandler}>
@@ -106,14 +119,14 @@ const BandHome = ({}) => {
                 <View style={styles.locationTextLabelContainer}>
                   <Text style={styles.locationLabel}>Share Location:</Text>
                   <Text style={styles.locationSubText}>
-                    {isSharingLocation ? ENABLED_LOCATION_TEXT : DISABLED_LOCATION_TEXT}
+                    {locationIsEnabled ? ENABLED_LOCATION_TEXT : DISABLED_LOCATION_TEXT}
                   </Text>
                 </View>
 
                 <View style={styles.locationInputContainer}>
                   <AppSwitch
                     onValueChange={toggleLiveLocationButtonHandler}
-                    value={isSharingLocation}
+                    value={locationIsEnabled}
                     loading={loading}
                   />
                 </View>

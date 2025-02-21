@@ -129,7 +129,7 @@ const Navigation = () => {
     );
   };
   const renderCommonStack = () => {
-    const userType = loginState?.data?.user_type;
+    const userType = loginState?.data?.user?.type;
     const sharedRoutes = (
       <>
         <Stack.Screen name="ChangePassword" component={ChangePassword} />

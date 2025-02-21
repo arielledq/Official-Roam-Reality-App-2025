@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Geolocation from "react-native-geolocation-service";
 import { hasLocationPermission } from "../../util/LocationLib";
 import { updateUserLocationData } from "../../redux/Login";
-import { updateUserLocation } from "../../network";
+import { updateARSiteLocation, updateUserLocation } from "../../network";
+import { USER_TYPES } from "../../constants";
 
 const WATCH_POSITION_CONFIG = {
   accuracy: {
@@ -28,6 +29,8 @@ const userLocationHook = () => {
   });
 
   const userData = useSelector(state => state?.login?.data);
+  const userType = userData?.user?.type || 0;
+  const siteId = userData?.user?.geo_site || 0;
 
   const dispatch = useDispatch();
 
@@ -91,11 +94,36 @@ const userLocationHook = () => {
     }
   };
 
+  const updatePlayerUserLocationAPI = (latitude, longitude) => {
+    updateUserLocation({ latitude, longitude });
+    dispatch(updateUserLocationData({ latitude, longitude }));
+  };
+
+  const clearPlayerUserLocation = () => {
+    updateUserLocation({ latitude: null, longitude: null });
+    dispatch(updateUserLocationData());
+  };
+
+  const updateBandUserLocationAPI = (latitude, longitude) => {
+    updateARSiteLocation(siteId, latitude, longitude);
+  };
+
+  const clearBandUserLocation = () => {
+    updateARSiteLocation(siteId);
+  };
+
   const updateUserLocationAPI = async ({ latitude, longitude }) => {
     if (!isNaN(latitude) && !isNaN(longitude)) {
       try {
-        await updateUserLocation({ latitude, longitude });
-        dispatch(updateUserLocationData({ latitude, longitude }));
+        switch (userType) {
+          case USER_TYPES.BAND:
+            updateBandUserLocationAPI(latitude, longitude);
+            break;
+
+          default:
+            updatePlayerUserLocationAPI(latitude, longitude);
+            break;
+        }
       } catch (error) {
         clearLocation();
         console.error("[location.hook] updateUserLocationAPI error", error);
@@ -107,10 +135,23 @@ const userLocationHook = () => {
   };
 
   const clearLocation = () => {
-    updateUserLocation({ latitude: null, longitude: null });
-    dispatch(updateUserLocationData());
+    switch (userType) {
+      case USER_TYPES.BAND:
+        clearBandUserLocation();
+        break;
+
+      default:
+        clearPlayerUserLocation();
+        break;
+    }
     Geolocation.stopObserving();
   };
+
+  useEffect(() => {
+    if (userType === USER_TYPES.BAND && userData?.user?.is_band_location_active) {
+      watchLocation();
+    }
+  }, []);
 
   return {
     initialUserLocation,

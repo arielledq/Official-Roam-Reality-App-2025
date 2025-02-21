@@ -163,6 +163,32 @@ export const getARSiteCategories = () =>
     },
     logoutFunc
   );
+export const updateARSiteLocation = (site_id = 0, lat = 0, long = 0) => {
+  if (!site_id) {
+    return;
+  }
+
+  let data = {
+    is_active: false,
+  };
+  if (!isNaN(lat) && !isNaN(long)) {
+    data = {
+      lat_long: {
+        type: "Point",
+        coordinates: [lat, long],
+      },
+    };
+  }
+
+  Request.callWithToken(
+    {
+      url: `modules/challenges/geo-ar-site/${site_id}/`,
+      method: "PATCH",
+      data: data,
+    },
+    logoutFunc
+  );
+};
 
 export const getARSposored = () =>
   Request.callAR(

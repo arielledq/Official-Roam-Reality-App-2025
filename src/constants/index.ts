@@ -37,14 +37,14 @@ export const PIN_CHALLENGE_CONFIG = {
 export const AR_TIPS_AUTO_SLIDE_SECONDS = 60 * 10;
 export const AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS = 10;
 
-export type USER_TYPE = "BAND" | "PLAYER";
+type USER_TYPE = 1 | 2;
 
 export const USER_TYPES: {
   PLAYER: USER_TYPE;
   BAND: USER_TYPE;
 } = {
-  PLAYER: "PLAYER",
-  BAND: "BAND",
+  PLAYER: 1,
+  BAND: 2,
 };
 
 export const ENABLED_LOCATION_TEXT = "Location sharing is ON. Users can see your band's location.";
