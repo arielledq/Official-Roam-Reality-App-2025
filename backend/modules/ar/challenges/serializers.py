@@ -16,6 +16,7 @@ from rest_framework_gis.serializers import GeoModelSerializer
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
     check_ins = serializers.SerializerMethodField()
+    points = serializers.SerializerMethodField()
   
     class Meta:
         model = ARUserProfile
@@ -31,6 +32,11 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
 
     def get_check_ins(self, instance):
         return ARSitePinCheckIn.objects.filter(user=instance.user).count()
+
+    def get_points(self, instance):
+        if hasattr(instance.user, 'destination_points'):
+            return instance.user.destination_points
+        return instance.points
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -357,6 +363,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "challenge_attempt",
             "user_attempts",
             "sponsors",
+            "is_active",
         )
 
     def get_check_ins(self, obj):

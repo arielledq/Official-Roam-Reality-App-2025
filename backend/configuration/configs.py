@@ -32,6 +32,11 @@ POINTS_GIFT = ConfigKey(
     verbose_name='Points given away',
 )
 
+SCOREBOARD_EXCLUDED_USER_IDS = ConfigKey(
+    value=[],
+    verbose_name='Scoreboard excluded user ids',
+)
+
 
 
 

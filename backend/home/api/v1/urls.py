@@ -11,7 +11,7 @@ from home.api.v1.viewsets import (
     NotificationViewset,
     SendEmailOtpViewset,
     SignupViewSet,
-    LoginViewSet,
+    LoginViewSet, ScoreViewSet,
 )
 
 router = DefaultRouter()
@@ -20,6 +20,7 @@ router.register("login", LoginViewSet, basename="login")
 router.register("send-email-otp", SendEmailOtpViewset, basename="send_email_otp")
 router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_email_otp")
 router.register("account-setup", AccountSetupViewset, basename="account-setup")
+router.register("scoreboard", ScoreViewSet, basename="scoreboard")
 router.register("friends", FriendshipViewSet, basename="friends")
 router.register("notifications", NotificationViewset, basename="friends")
 

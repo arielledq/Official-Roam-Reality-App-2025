@@ -28,6 +28,19 @@ class User(AbstractUser):
     # around the globe.
     name = models.CharField(_("Name of User"), blank=True, null=True, max_length=255)
 
+    class UserType:
+        REGULAR = 1
+        BAND = 2
+        choices = (
+            (1, 'REGULAR'),
+            (2, 'BAND'),
+        )
+
+    type = models.IntegerField(
+        choices=UserType.choices,
+        default=UserType.REGULAR
+    )
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
     
