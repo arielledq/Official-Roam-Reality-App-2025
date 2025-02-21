@@ -20,7 +20,7 @@ import { useDispatch } from "react-redux";
 import { updateUserData } from "../../redux/Login";
 import Timer from "../../components/timer";
 
-const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerificationC"> = () => {
+const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerification"> = () => {
   const _styles = useStyles();
   const navigation = useNavigation();
   const dispatch = useDispatch();

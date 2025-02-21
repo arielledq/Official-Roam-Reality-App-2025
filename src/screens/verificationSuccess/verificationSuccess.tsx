@@ -11,10 +11,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { updateUserData, updateVerified } from "../../redux/Login";
 
-const VerificationSuccess: ScreenStackComponent<
-  RootStackParamList,
-  "VerificationSuccessC"
-> = () => {
+const VerificationSuccess: ScreenStackComponent<RootStackParamList, "VerificationSuccess"> = () => {
   const _styles = useStyles();
   const navigation = useNavigation();
   const dispatch = useDispatch();

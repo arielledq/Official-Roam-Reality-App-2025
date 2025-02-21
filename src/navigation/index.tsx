@@ -60,7 +60,7 @@ import { subscribeToStorageChanges, unsubscribeFromStorageChanges } from "../uti
 import { resetState } from "../redux/Login";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { removeItem } from "../util/helpers";
-import { USER_TYPES } from "constants";
+import { USER_TYPES } from "../constants";
 import BandHome from "screens/bandHome";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -185,7 +185,9 @@ const Navigation = () => {
             <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="Privacy" component={Privacy} />
+            {/* @ts-ignore */}
             <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
+            {/* @ts-ignore */}
             <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
             <Stack.Screen name="FAQ" component={FAQ} />
