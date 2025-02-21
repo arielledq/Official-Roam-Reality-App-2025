@@ -436,6 +436,12 @@ const ArChallengeCapture = ({ route, navigation }) => {
   //   }
   // }, []);
 
+
+  let screenPadding = {};
+  if (!isUnityLoaded) {
+    screenPadding = { paddingBottom: 24 };
+  }
+
   return (
     <ChallengeScreen
       title="AR Challenges"
@@ -445,7 +451,8 @@ const ArChallengeCapture = ({ route, navigation }) => {
         paddingHorizontal: 0,
         paddingTop: "11%",
         height: "100%",
-        backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
+        backgroundColor: "#000",
+        ...screenPadding,
       }}
     >
       <UnityARCamera

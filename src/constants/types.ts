@@ -12,7 +12,7 @@ export type RootStackParamList = {
   Profile: undefined;
   EditProfile: undefined;
   TermsAndConditions: undefined;
-  Home: { openBottomSheet: boolean; deleteAccount: boolean };
+  ARTips: undefined;
   FPChangePassword: { token: string; uid: string };
   PrivacyPolicy: undefined;
   HomeScreen: undefined;
@@ -22,6 +22,39 @@ export type RootStackParamList = {
   ChallengeExamples: undefined;
   ArChallengeCapture: undefined;
   ArChallengeShare: undefined;
+  BandHome: undefined;
+  TabNavigator: undefined;
+  PublicProfile: undefined;
+  ArStarChallengeShare: undefined;
+  ScoreBoard: undefined;
+  Friends: undefined;
+  AddFriend: undefined;
+  SendFeedback: undefined;
+  InviteFriends: undefined;
+  GeoArOutdoor: undefined;
+  ARFilter: undefined;
+  GeoArChallenge: undefined;
+  GeoArChallengeDetails: undefined;
+  GeoArSiteDetails: undefined;
+  GeoArSiteRoutes: undefined;
+  GeoArSiteNavigation: undefined;
+  GeoArSiteArrived: undefined;
+  ChallengeSelection: undefined;
+  UniqueArChallenge: undefined;
+  PinChallenge: undefined;
+  StarChallenge: undefined;
+  GeoUniqueArChallengeDetails: undefined;
+  UniqueArChallengeCapture: undefined;
+  UniqueArChallengeShare: undefined;
+  Settings: undefined;
+  Privacy: undefined;
+  EmailVerificationC: undefined;
+  VerificationSuccessC: undefined;
+  ContactUs: undefined;
+  FAQ: undefined;
+  Notifications: undefined;
+  Legal: undefined;
+  AnimatedSplash: undefined;
 };
 
 export type ScreenStackComponent<

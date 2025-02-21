@@ -92,11 +92,18 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         }}
                         name={oldpasswordVisibility ? "eye" : "eye-off"}
                         family="feather"
-                        color={"#9CA3AF"}
+                        color={theme.lightColors?.grey0}
                         size={23}
                       />
                     }
-                    leftIcon={<Icon name={"lock"} family="feather" color={"grey0"} size={24} />}
+                    leftIcon={
+                      <Icon
+                        name={"lock"}
+                        family="feather"
+                        color={theme.lightColors?.grey0}
+                        size={24}
+                      />
+                    }
                   />
                   <AppInput
                     inputContainerStyle={[_styles.input]}
@@ -119,11 +126,18 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         }}
                         name={newpasswordVisibility ? "eye" : "eye-off"}
                         family="feather"
-                        color={"#9CA3AF"}
+                        color={theme.lightColors?.grey0}
                         size={23}
                       />
                     }
-                    leftIcon={<Icon name={"lock"} family="feather" color={"grey0"} size={24} />}
+                    leftIcon={
+                      <Icon
+                        name={"lock"}
+                        family="feather"
+                        color={theme.lightColors?.grey0}
+                        size={24}
+                      />
+                    }
                   />
                   <AppInput
                     inputContainerStyle={[_styles.input]}
@@ -147,11 +161,18 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         }}
                         name={confirmnewpasswordVisibility ? "eye" : "eye-off"}
                         family="feather"
-                        color={"#9CA3AF"}
+                        color={theme.lightColors?.grey0}
                         size={23}
                       />
                     }
-                    leftIcon={<Icon name={"lock"} family="feather" color={"grey0"} size={24} />}
+                    leftIcon={
+                      <Icon
+                        name={"lock"}
+                        family="feather"
+                        color={theme.lightColors?.grey0}
+                        size={24}
+                      />
+                    }
                   />
                 </View>
 
@@ -159,7 +180,7 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                   buttonStyle={_styles.buttonStyle}
                   containerStyle={_styles.buttonContainer}
                   title={"Change Password"}
-                  onPress={handleSubmit}
+                  onPress={() => handleSubmit()}
                   loading={isLoading}
                   disabled={isLoading}
                 />

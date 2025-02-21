@@ -60,6 +60,8 @@ import { subscribeToStorageChanges, unsubscribeFromStorageChanges } from "../uti
 import { resetState } from "../redux/Login";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { removeItem } from "../util/helpers";
+import { USER_TYPES } from "../constants";
+import BandHome from "screens/bandHome";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -72,6 +74,7 @@ const Drawer = createDrawerNavigator();
 const Navigation = () => {
   const splashShown = useSelector((state: any) => state.splash?.splashShown);
   const token = useSelector((state: any) => state.login?.data?.token);
+  const loginState = useSelector((state: any) => state.login);
   const { newUser } = useSelector((state: any) => state.persist);
   const dispatch = useDispatch();
 
@@ -126,82 +129,74 @@ const Navigation = () => {
     );
   };
   const renderCommonStack = () => {
-    return (
+    const userType = loginState?.data?.user_type;
+    const sharedRoutes = (
       <>
-        {/* @ts-ignore */}
-        <Stack.Screen name="TabNavigator" component={DrawerNav} />
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
-        <Stack.Screen name="EditProfile" component={EditProfile} />
-        <Stack.Screen name="Profile" component={Profile} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="PublicProfile" component={PublicProfile} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="Friends" component={Friends} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="AddFriend" component={AddFriendScreen} />
-        <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="SendFeedback" component={Feedback} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="InviteFriends" component={InviteFriends} />
-        <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
-        <Stack.Screen name="ARChallenge" component={ARChallenge} />
-        <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} />
-        <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
-        <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
-        <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="ARFilter" component={ARFilter} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="PinChallenge" component={PinChallenge} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="StarChallenge" component={StarChallenge} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="GeoUniqueArChallengeDetails" component={GeoUniqueArChallengeDetails} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="Settings" component={Settings} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="Privacy" component={Privacy} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="ContactUs" component={ContactUs} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="FAQ" component={FAQ} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="Notifications" component={NotificationList} />
-        {/* @ts-ignore */}
-        <Stack.Screen name="Legal" component={Legal} />
       </>
     );
+    switch (userType) {
+      case USER_TYPES.BAND:
+        return (
+          <>
+            <Stack.Screen name="BandHome" component={BandHome} />
+            {sharedRoutes}
+          </>
+        );
+
+      default:
+        return (
+          <>
+            <Stack.Screen name="TabNavigator" component={DrawerNav} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="Profile" component={Profile} />
+            <Stack.Screen name="PublicProfile" component={PublicProfile} />
+            <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
+            <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
+            <Stack.Screen name="Friends" component={Friends} />
+            <Stack.Screen name="AddFriend" component={AddFriendScreen} />
+            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+            <Stack.Screen name="SendFeedback" component={Feedback} />
+            <Stack.Screen name="InviteFriends" component={InviteFriends} />
+            <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+            <Stack.Screen name="ARChallenge" component={ARChallenge} />
+            <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} />
+            <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
+            <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
+            <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+            <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
+            {/* @ts-ignore */}
+            <Stack.Screen name="ARFilter" component={ARFilter} />
+            <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
+            <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
+            <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
+            <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
+            <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
+            <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
+            <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
+            <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
+            <Stack.Screen name="PinChallenge" component={PinChallenge} />
+            <Stack.Screen name="StarChallenge" component={StarChallenge} />
+            <Stack.Screen
+              name="GeoUniqueArChallengeDetails"
+              component={GeoUniqueArChallengeDetails}
+            />
+            <Stack.Screen name="UniqueArChallengeCapture" component={UniqueArChallengeCapture} />
+            <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
+            <Stack.Screen name="Settings" component={Settings} />
+            <Stack.Screen name="Privacy" component={Privacy} />
+            {/* @ts-ignore */}
+            <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
+            {/* @ts-ignore */}
+            <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
+            <Stack.Screen name="ContactUs" component={ContactUs} />
+            <Stack.Screen name="FAQ" component={FAQ} />
+            <Stack.Screen name="Notifications" component={NotificationList} />
+            <Stack.Screen name="Legal" component={Legal} />
+            {sharedRoutes}
+          </>
+        );
+    }
   };
 
   const DrawerNav = () => {
@@ -234,7 +229,6 @@ const Navigation = () => {
           )
         ) : (
           <>
-            {/* @ts-ignore */}
             <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
           </>
         )}

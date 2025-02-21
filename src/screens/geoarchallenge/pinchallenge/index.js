@@ -571,9 +571,9 @@ const PinChallenge = () => {
   };
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data?.enableButton;
-    buttonBack = data?.backPress;
-    buttonPhotoIsPressed = data?.ispressed;
+    const buttonInfo = data?.enableButton;
+    const buttonBack = data?.backPress;
+    const buttonPhotoIsPressed = data?.ispressed;
 
     if (buttonBack) {
       navigation?.goBack();
@@ -604,6 +604,11 @@ const PinChallenge = () => {
     />
   );
 
+  let screenPadding = {};
+  if (!isUnityLoaded) {
+    screenPadding = { paddingBottom: 24 };
+  }
+
   return (
     <ChallengeScreen
       title={`Location Check In\n${selectedGeoSite.name}`}
@@ -612,7 +617,8 @@ const PinChallenge = () => {
         paddingHorizontal: 0,
         paddingTop: "11%",
         height: "100%",
-        backgroundColor: isUnityLoaded ? "#000" : theme.darkColors?.inputBG,
+        backgroundColor: "#000",
+        ...screenPadding,
       }}
       modals={modals}
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}

@@ -48,9 +48,13 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
     })
       .then(res => {
         if (res.status == 1) {
-          console.log("userToken", res?.token);
           setItemWithListener("userToken", res?.token);
-          dispatch(updateUserData(res));
+          const updatedRes = {
+            ...res,
+            // TODO: Add here specific data to identify 'band' users
+            // user_type: "BAND",
+          };
+          dispatch(updateUserData(updatedRes));
           setOnesignalDevice();
           if (newUser) {
             dispatch(updateAsOldUser());

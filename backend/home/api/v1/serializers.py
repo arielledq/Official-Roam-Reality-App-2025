@@ -23,7 +23,7 @@ User = get_user_model()
 class SignupSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'name', 'email', 'password')
+        fields = ('id', 'name', 'email', 'password', 'type',)
         extra_kwargs = {
             'password': {
                 'write_only': True,
@@ -71,7 +71,8 @@ class SignupSerializer(serializers.ModelSerializer):
     def save(self, request=None):
         """rest_auth passes request so we must override to accept it"""
         return super().save()
-    
+
+
 class UserProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
@@ -82,10 +83,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     user_profile = UserProfileSerializer()
     user_ar_profile = ARUserProfileSerializer()
+    is_band_location_active = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'user_profile', 'user_ar_profile']
+        fields = ['id', 'email', 'name', 'user_profile', 'user_ar_profile', 'type', 'geo_site',
+                  'is_band_location_active']
+
+    def get_is_band_location_active(self, instance):
+        if hasattr(instance, 'geo_site'):
+            return instance.geo_site.is_active
+        return False
 
 
 class PasswordSerializer(PasswordResetSerializer):

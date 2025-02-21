@@ -382,7 +382,6 @@ class GeoArSiteViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
     queryset = GeoArSite.objects.all()
     serializer_class = GeoArSiteSerializer
-    http_method_names = ["get"]
 
 
 class GeoArStarViewSet(viewsets.ModelViewSet):

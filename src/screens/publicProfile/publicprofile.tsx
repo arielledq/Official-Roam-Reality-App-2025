@@ -31,7 +31,7 @@ import ReportUserModal from "../reportUser/ReportUser";
 import { showMessage } from "../../util/helpers";
 import ConfirmationPopUp from "../../components/confirmationPopUp";
 
-const PublicProfile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
+const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const _styles = useStyles();
