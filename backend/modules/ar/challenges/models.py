@@ -487,6 +487,14 @@ class ARMemories(models.Model):
         null=True,
         blank=True,
     )
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Geo Destination",
+        related_name="ar_memories",
+    )
     declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
     challenge_approval = models.CharField(
         max_length=50,
@@ -801,6 +809,14 @@ class ARSitePinCheckIn(models.Model):
         default=None,
         null=True,
         blank=True,
+    )
+    geo_location = models.ForeignKey(
+        GeoLocation,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Geo Destination",
+        related_name="ar_checkins",
     )
     points = models.IntegerField(verbose_name="Points", default=0)
 

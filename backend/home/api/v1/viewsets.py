@@ -1,9 +1,10 @@
 import logging
-
-from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
+from rest_framework.filters import SearchFilter
+from rest_framework.mixins import ListModelMixin
 from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
-from rest_framework.viewsets import ModelViewSet, ViewSet
+from rest_framework.viewsets import ModelViewSet, ViewSet, GenericViewSet
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework import status
@@ -14,7 +15,7 @@ from django.utils.encoding import force_bytes
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
-
+from home.api.v1.filters import ScoreFilterSet
 from modules.ar.challenges.models import ARUserProfile
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
@@ -62,6 +63,14 @@ class SignupViewSet(ModelViewSet):
                 profileObj.points += configs.POINTS_GIFT
                 profileObj.save()
                 configs.NUMBER_USER_POINT_GIFT += 1
+
+                send_notification(
+                    NotificationTypes.DEFAULT,
+                    user,
+                    title="\U0001F381 Surprise!",
+                    description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for '
+                                f'being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
+                )
             return Response({"token": token.key, "user": user_serializer.data})
         except User.DoesNotExist:
             return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
@@ -81,7 +90,6 @@ class LoginViewSet(ViewSet):
         token, created = Token.objects.get_or_create(user=user)
         if ReportedContent.objects.filter(reported_user=user, block_reported_user=True).exists():
             return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
-
         # Here send notification to friends
         # [send_notification(NotificationTypes.FRIEND_ROAMING_ONLINE, user) for user in user.user_profile.friends.all()]
         user_serializer = UserSerializer(user)
@@ -184,7 +192,25 @@ class AccountSetupViewset(ModelViewSet):
             return UserProfile.objects.filter(pk=user_id)
         else:
             return UserProfile.objects.filter(user=self.request.user)
-    
+
+
+class ScoreViewSet(GenericViewSet, ListModelMixin):
+    """
+    Users for listing, searching and filtering.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserSerializer
+    http_method_names = ["get",]
+    queryset = User.objects.filter(is_superuser=False, is_active=True, user_ar_profile__isnull=False)
+    filter_backends = [SearchFilter, DjangoFilterBackend]
+    filterset_class = ScoreFilterSet
+    search_fields = ['name', ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).order_by('-user_ar_profile__points')
+
 
 class FriendshipViewSet(ModelViewSet):
     authentication_classes = [TokenAuthentication]
