@@ -465,6 +465,15 @@ export const getScoreboardList = (destination) =>
     logoutFunc
   );
 
+export const getMyRank = (destination) =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}scoreboard/my-rank/?destination=${destination}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
 export const findFriends = data =>
   Request.callWithToken(
     {

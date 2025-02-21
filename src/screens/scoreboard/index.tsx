@@ -13,7 +13,14 @@ import FastImage from "react-native-fast-image";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 
-import {getARProfile, getGeoARDestinations, getProfieDetails, getScoreboardList, searchUsers} from "../../network";
+import {
+  getARProfile,
+  getGeoARDestinations,
+  getMyRank,
+  getProfieDetails,
+  getScoreboardList,
+  searchUsers
+} from "../../network";
 import { isLocationPointInPolygon } from "../../util/LocationLib";
 import { handleError } from "util/helpers";
 import { updateARUserData } from "../../redux/AR";
@@ -27,6 +34,7 @@ import Images from "../../assets/images";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import { MenuIcon } from "assets/svg";
+import theme from "assets/theme";
 const ScoreBoard = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
   // const [filteredUsers, setFilteredUsers] = React.useState<[]>([]);
@@ -74,10 +82,26 @@ const ScoreBoard = ({}) => {
   // };
 
   const getScoreboard = (destination="") => {
+    setIsLoading(true)
     getScoreboardList(destination).then(response => {
       if (response) {
         setUsers(response?.data);
       }
+    })
+    .finally(() => {
+      setIsLoading(false);
+    });
+  };
+
+  const getMyRankPoints = (destination="") => {
+    setIsLoading(true)
+    getMyRank(destination).then(response => {
+      if (response) {
+        setRankMine(response);
+      }
+    })
+    .finally(() => {
+      setIsLoading(false);
     });
   };
 
@@ -128,20 +152,20 @@ const ScoreBoard = ({}) => {
       .finally(() => {});
   };
 
-  const getAllPoints = (destination: any) => {
-    const arrayPoints = [];
-    if (destination?.border?.coordinates) {
-      for (let i = 0; i < destination.border.coordinates.length; i++) {
-        const points = destination.border.coordinates[i];
-        for (let j = 0; j < points.length; j++) {
-          const point = points[j];
-          arrayPoints.push({ latitude: point[1], longitude: point[0] });
-        }
-      }
-      return arrayPoints;
-    }
-    return null;
-  };
+  // const getAllPoints = (destination: any) => {
+  //   const arrayPoints = [];
+  //   if (destination?.border?.coordinates) {
+  //     for (let i = 0; i < destination.border.coordinates.length; i++) {
+  //       const points = destination.border.coordinates[i];
+  //       for (let j = 0; j < points.length; j++) {
+  //         const point = points[j];
+  //         arrayPoints.push({ latitude: point[1], longitude: point[0] });
+  //       }
+  //     }
+  //     return arrayPoints;
+  //   }
+  //   return null;
+  // };
 
   const filterDestinations = (o: any, index: number) => {
     setSelectedDestination(o);
@@ -286,7 +310,7 @@ const ScoreBoard = ({}) => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ marginStart: 10, alignItems: "center" }}>
             <Text style={_styles.rankText}>Rank</Text>
-            <Text style={_styles.rankTextNumber}>{rankMine}</Text>
+            <Text style={_styles.rankTextNumber}>{rankMine?.my_rank}</Text>
           </View>
           <ImageBackground
             source={Images.BGBlur}
@@ -319,7 +343,7 @@ const ScoreBoard = ({}) => {
         </View>
         <View style={{ marginEnd: 10, alignItems: "center" }}>
           <Text style={_styles.rankText}>Points</Text>
-          <Text style={_styles.rankTextNumber}>{arProfile?.points}</Text>
+          <Text style={_styles.rankTextNumber}>{rankMine?.my_points}</Text>
         </View>
       </View>
     );
@@ -329,11 +353,12 @@ const ScoreBoard = ({}) => {
     ARDestinations();
     fetchARUserProfile();
     getScoreboard();
+    getMyRankPoints();
   }, []);
 
   React.useEffect(() => {
-    console.log("selectedDestination", selectedDestination?.id)
     getScoreboard(selectedDestination?.id);
+    getMyRankPoints(selectedDestination?.id)
   }, [selectedDestination]);
 
   // React.useEffect(() => {
@@ -381,6 +406,7 @@ const ScoreBoard = ({}) => {
             <Text style={_styles.subTitle}>Your rank</Text>
             {myRank()}
             <Text style={_styles.subTitle}>Leaderboard</Text>
+            {isLoading && <ActivityIndicator size="large" />}
             <FlatList
               style={{ flex: 1, marginTop: 15 }}
               data={users}
@@ -388,6 +414,7 @@ const ScoreBoard = ({}) => {
               showsVerticalScrollIndicator={false}
               renderItem={({ item, index }) => <Item obj={item} rank={index} />}
               keyExtractor={(item: any) => item?.id}
+
             />
           </>
         )}
