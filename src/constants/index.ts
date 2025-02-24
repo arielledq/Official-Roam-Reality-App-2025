@@ -30,6 +30,12 @@ export const MAP_MODE = {
   WALKING: "WALKING",
 };
 
+export const CAMERA_NOTIFICATION = {
+  PHOTO: "Tap the button once to take a photo.",
+  VIDEO: "Press and hold the button to record. Release to stop recording.",
+  PHOTOVIDEO: "Tap once to take a photo. Press and hold to record a video.",
+}
+
 export const PIN_CHALLENGE_CONFIG = {
   CUSTOM_INSTRUCTIONS: "Users cannot take pictures unless you are within range of the AR ",
 };
