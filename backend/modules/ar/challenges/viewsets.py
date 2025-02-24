@@ -1,5 +1,6 @@
 import json
-
+from itertools import chain
+from operator import attrgetter
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
     DestinationFacts, PanicMessage, GeoArSiteCategory
@@ -644,12 +645,16 @@ class MemoryCheckinViewSet(ViewSet):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
             all_user_memories = ARMemories.objects.filter(user=request.user.id)
+            result_list = sorted(
+                chain(all_user_check_in, all_user_memories),
+                key=attrgetter('created_at'),
+                reverse=True
+            )
             serializer = ARAllMemoriesSerializer(
-                [*all_user_check_in, *all_user_memories],
+                result_list,
                 many=True,
                 context={'request': request}
             )
-
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
