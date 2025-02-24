@@ -36,10 +36,18 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   isMemory = false,
 }) => {
   const share = async (selectedSSNN: string) => {
-    // If correctedCaptureData doesn't already have "file://" prefix, add it
+    // Construct the full file:// URI more explicitly
     let updatedFileUri = fileUri;
-    if (!updatedFileUri?.startsWith("file://")) {
-      updatedFileUri = `file://${fileUri}`;
+
+    if (updatedFileUri) {
+      // Check if fileUri is not null or undefined
+      if (!updatedFileUri.startsWith("file://")) {
+        if (updatedFileUri.startsWith("/")) {
+          updatedFileUri = `file://${updatedFileUri}`; // Correctly handle paths starting with /
+        } else {
+          updatedFileUri = `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`; // If relative, assume it's in cache (adjust if needed) - requires react-native-fs
+        }
+      }
     }
 
     // Determine MIME type based on file extension
@@ -121,7 +129,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   if (!isVisible) return null;
 
   return (
-    <View style={{ flex: 1, position: 'absolute' }}>
+    <View style={{ flex: 1, position: "absolute" }}>
       <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
         <View
           style={{
