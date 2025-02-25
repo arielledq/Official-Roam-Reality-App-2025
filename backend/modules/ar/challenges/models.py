@@ -58,6 +58,7 @@ EXPERIENCE_TYPE_CHOICES = [
         ('AR_CHALLENGE', 'AR CHALLENGE'),
         ('GEO_AR_CHALLENGE', 'GEO AR CHALLENGE'),
         ('EVENT', 'EVENT'),
+        ('BAND', 'BAND'),
     ]
 
 
