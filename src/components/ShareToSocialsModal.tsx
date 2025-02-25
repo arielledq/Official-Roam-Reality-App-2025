@@ -169,35 +169,34 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
   const ChooseSocialNetwork = (
     <>
-          <Text
-            style={{ fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white }}
-          >
-            Share To Socials
-          </Text>
+      <Text
+        style={{ fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white }}
+      >
+        Share To Socials
+      </Text>
 
-          <Text style={{ fontSize: FontSizes.S12, color: theme.lightColors?.grey0 }}>
-            Must share to at least one social media platform to earn any points. Users earn one
-            additional point per social platform.
-          </Text>
+      <Text style={{ fontSize: FontSizes.S12, color: theme.lightColors?.grey0 }}>
+        {SHARE_CONDITIONS_TEXT}
+      </Text>
 
-          <View style={{ flexDirection: "row", justifyContent: "center", gap: 32 }}>
-            <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
-              <Image source={Images.Instagram} style={{ height: 40, width: 40 }} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
-              <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
-              <Image source={Images.TikTokShare} style={{ height: 40, width: 68 }} />
-            </TouchableOpacity>
-          </View>
+      <View style={{ flexDirection: "row", justifyContent: "center", gap: 32 }}>
+        <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
+          <Image source={Images.Instagram} style={{ height: 40, width: 40 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
+          <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
+          <Image source={Images.TikTokShare} style={{ height: 40, width: 68 }} />
+        </TouchableOpacity>
+      </View>
 
-          <AppButton
-            onPress={onClose}
-            buttonStyle={{ height: 45, width: 95 }}
-            containerStyle={{}}
-            title={"Done"}
-          />
+      <AppButton
+        onPress={onClose}
+        buttonStyle={{ height: 45, width: 95 }}
+        containerStyle={{}}
+        title={"Done"}
+      />
     </>
   );
 

@@ -648,9 +648,7 @@ const ArChallengeShare = () => {
                   color: theme.lightColors?.grey0,
                 }}
               >
-                Must share to at least one social media platform and tag @roamreality as well as the
-                brand sponsor to earn your points. Users earn one additional point per social
-                platform.
+                {SHARE_CONDITIONS_TEXT}
               </Text>
             )}
           </View>

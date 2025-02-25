@@ -62,3 +62,6 @@ export const USER_TYPES: {
 export const ENABLED_LOCATION_TEXT = "Location sharing is ON. Users can see your band's location.";
 export const DISABLED_LOCATION_TEXT =
   "Location sharing is OFF. Your location is not being broadcast.";
+
+export const SHARE_CONDITIONS_TEXT =
+  "Must share to at least one social media platform and tag @roamreality as well as the brand sponsor to earn your points. Users earn one additional point per social platform.";
