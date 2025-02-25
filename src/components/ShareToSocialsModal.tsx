@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 
 import Share from "react-native-share";
@@ -11,7 +11,37 @@ import { socialPointsARUpdateAPI } from "network";
 import Images from "assets/images";
 import { showMessage } from "util/helpers";
 import Config from "config";
-import { SSNN } from "../constants";
+import { SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE } from "../constants";
+
+interface IGPostTypeButtonProps {
+  onPress: () => {};
+  imageSource: any | { uri: string };
+  text: string;
+}
+
+const IGPostTypeButton = ({ onPress, imageSource, text }: IGPostTypeButtonProps) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        paddingHorizontal: 8,
+        paddingVertical: 16,
+        borderRadius: 8,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        gap: 16,
+        borderColor: theme.lightColors?.purple,
+        borderWidth: 3,
+        width: 124,
+      }}
+    >
+      <View style={{ height: 64, width: 64, justifyContent: "center", alignItems: "center" }}>
+        <Image source={imageSource} />
+      </View>
+      <Text style={{ color: theme.lightColors?.white, fontSize: 12 }}>{text}</Text>
+    </TouchableOpacity>
+  );
+};
 
 interface ShareToSocialsModalProps {
   isVisible: boolean;
@@ -35,7 +65,9 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   sponsor,
   isMemory = false,
 }) => {
-  const share = async (selectedSSNN: string) => {
+  const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
+  const share = async (selectedSSNN: SSNN_TYPE) => {
+    // const share = async (selectedSSNN: SSNN_TYPE, selectedChannel?: string) => {
     // Construct the full file:// URI more explicitly
     let updatedFileUri = fileUri;
 
@@ -58,8 +90,13 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
     switch (selectedSSNN) {
       case SSNN.INSTAGRAM:
+        // if (!selectedChannel) {
+        //   setShowChooseIGPostType(true);
+        //   return;
+        // }
         shareOptions = {
           social: Share.Social.INSTAGRAM_STORIES,
+          // social: Share.Social.INSTAGRAM,
           appId: Config.FACEBOOK_APP_ID,
         };
         if (fileExt === "mp4") {
@@ -105,6 +142,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       }
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
+    } finally {
+      setShowChooseIGPostType(false);
     }
     if (!isMemory && hasShared) {
       try {
@@ -128,19 +167,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
   if (!isVisible) return null;
 
-  return (
-    <View style={{ flex: 1, position: "absolute" }}>
-      <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
-        <View
-          style={{
-            backgroundColor: theme.lightColors?.boxStatBG,
-            borderRadius: 8,
-            paddingHorizontal: 16,
-            paddingVertical: 24,
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
+  const ChooseSocialNetwork = (
+    <>
           <Text
             style={{ fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white }}
           >
@@ -170,6 +198,45 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             containerStyle={{}}
             title={"Done"}
           />
+    </>
+  );
+
+  const ChooseInstagramPostType = (
+    <>
+      <View style={{ alignItems: "center", gap: 16 }}>
+        <Text style={{ color: theme.lightColors?.white }}>Choose how to share on Instagram</Text>
+
+        <View style={{ flexDirection: "row", gap: 16 }}>
+          <IGPostTypeButton
+            onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM_STORIES)}
+            text="Share to Stories"
+            imageSource={require("../assets/images/ig_stories.png")}
+          />
+
+          <IGPostTypeButton
+            onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM)}
+            text="Share to Feed"
+            imageSource={require("../assets/images/ig_post.png")}
+          />
+        </View>
+      </View>
+    </>
+  );
+
+  return (
+    <View style={{ flex: 1, position: "absolute" }}>
+      <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
+        <View
+          style={{
+            backgroundColor: theme.lightColors?.boxStatBG,
+            borderRadius: 8,
+            paddingHorizontal: 16,
+            paddingVertical: 24,
+            alignItems: "center",
+            gap: 16,
+          }}
+        >
+          {showChooseIGPostType ? ChooseInstagramPostType : ChooseSocialNetwork}
         </View>
       </ReactNativeModal>
     </View>

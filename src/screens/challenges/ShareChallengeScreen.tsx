@@ -10,7 +10,7 @@ import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { RouteProp } from "@react-navigation/native";
 import { PERMISSIONS, RESULTS, request, requestMultiple } from "react-native-permissions";
 
-import { SSNN } from "../../constants";
+import { SHARE_CONDITIONS_TEXT, SSNN } from "../../constants";
 import {
   getARProfile,
   postArMemory,
