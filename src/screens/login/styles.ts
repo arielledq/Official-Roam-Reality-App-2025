@@ -72,7 +72,6 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.white,
     textAlign: "center",
-    marginBottom: 10,
   },
   SignInLink: {
     ...fontGroup.nunitoRegular,
