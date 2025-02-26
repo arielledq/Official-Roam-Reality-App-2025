@@ -41,7 +41,7 @@ const SCROLL_AMOUNT = 70;
 
 const GeoArChallengeDetails = ({}) => {
   const route = useRoute();
-  const { isEvent } = route?.params;
+  const { isEvent, experienceType } = route?.params;
   const _styles = useStyles();
   const dispatch = useDispatch();
   const { userLocation } = useContext(GeolocationContext);
@@ -292,10 +292,17 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const getFullBounds = _ => {
-    if (selectedDestination.border) {
+    let bordersOfDestination = selectedDestination?.border
+    if(experienceType){
+      if(experienceType === EXPERIENCE_TYPE_CHOICES.EVENT)
+        bordersOfDestination = selectedDestination?.event_borders
+      else if(experienceType === EXPERIENCE_TYPE_CHOICES.BAND)
+        bordersOfDestination = selectedDestination?.band_borders
+    }
+    if (bordersOfDestination) {
       let arrayPoints = [];
-      for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
-        const points = selectedDestination.border.coordinates[i];
+      for (let i = 0; i < bordersOfDestination.coordinates.length; i++) {
+        const points = bordersOfDestination.coordinates[i];
         for (let j = 0; j < points.length; j++) {
           const point = points[j];
           arrayPoints.push({ latitude: point[1], longitude: point[0] });
@@ -322,10 +329,17 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const getFullCenter = _ => {
-    if (selectedDestination.border) {
+    let bordersOfDestination = selectedDestination?.border
+    if(experienceType){
+      if(experienceType === EXPERIENCE_TYPE_CHOICES.EVENT)
+        bordersOfDestination = selectedDestination?.event_borders
+      else if(experienceType === EXPERIENCE_TYPE_CHOICES.BAND)
+        bordersOfDestination = selectedDestination?.band_borders
+    }
+    if (bordersOfDestination) {
       let arrayPoints = [];
-      for (let i = 0; i < selectedDestination.border.coordinates.length; i++) {
-        const points = selectedDestination.border.coordinates[i];
+      for (let i = 0; i < bordersOfDestination.coordinates.length; i++) {
+        const points = bordersOfDestination.coordinates[i];
         for (let j = 0; j < points.length; j++) {
           const point = points[j];
           arrayPoints.push({ latitude: point[1], longitude: point[0] });

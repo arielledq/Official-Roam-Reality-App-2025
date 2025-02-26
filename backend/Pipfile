@@ -39,7 +39,6 @@ cb-terms-and-conditions = {editable = true, path = "./modules/terms_and_conditio
 cb-privacy-policy = {editable = true, path = "./modules/privacy_policy"}
 cb-ar = {editable = true, path = "./modules/ar"}
 sendgrid = "*"
-django-allauth = "==0.54.0"
 django-ckeditor = "*"
 ffmpeg_downloader = "*"
 django-taggit = '*'
@@ -49,3 +48,4 @@ django-webshell = "0.4.0"
 tablib = "3.0.0"
 django-filter = "*"
 django-json-widget = "*"
+django-allauth = "==0.50.0"

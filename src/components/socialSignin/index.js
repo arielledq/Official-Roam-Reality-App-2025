@@ -19,6 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { updateUserData } from "../../redux/Login";
 import { updateAsOldUser } from "../../redux/Persist";
 import { handleError, showMessage } from "../../util/helpers";
+import Config from "config";
 
 const SocialSignin = ({ setLoading }) => {
   const dispatch = useDispatch();
@@ -32,9 +33,10 @@ const SocialSignin = ({ setLoading }) => {
       const tokens = await GoogleSignin.getTokens();
 
       // console.log("userinfo", userinfo);
-      // console.log("tokens", tokens);
+      console.log("tokens", tokens);
       googleLogin({
         access_token: tokens.accessToken,
+        id_token: tokens.idToken,
       })
         .then(res => {
           // console.log("res", JSON.stringify(res, null, 2));
@@ -201,6 +203,7 @@ const SocialSignin = ({ setLoading }) => {
 
   useEffect(() => {
     GoogleSignin.configure({
+      webClientId: Config.GOOGLE_WEB_CLIENT,
       scopes: ["email", "profile"],
     });
   }, []);
