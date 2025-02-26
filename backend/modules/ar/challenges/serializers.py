@@ -340,9 +340,6 @@ class GeoArSiteSerializer(GeoModelSerializer):
     user_attempts = serializers.SerializerMethodField()
     sponsors = SponsorSerializer(read_only=True, many=True)
 
-    from home.api.v1.serializers import UserSerializer
-    band_user = UserSerializer(read_only=True)
-
     class Meta:
         model = GeoArSite
         geo_field = ('lat_long', 'geo_site_area',)
