@@ -136,13 +136,13 @@ const Navigation = () => {
       </>
     );
     switch (userType) {
-      case USER_TYPES.BAND:
-        return (
-          <>
-            <Stack.Screen name="BandHome" component={BandHome} />
-            {sharedRoutes}
-          </>
-        );
+      // case USER_TYPES.BAND:
+      //   return (
+      //     <>
+      //       <Stack.Screen name="BandHome" component={BandHome} />
+      //       {sharedRoutes}
+      //     </>
+      //   );
 
       default:
         return (

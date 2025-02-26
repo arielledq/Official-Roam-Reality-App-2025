@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import Geolocation from "react-native-geolocation-service";
 import { hasLocationPermission } from "../../util/LocationLib";
@@ -6,19 +6,17 @@ import { updateUserLocationData } from "../../redux/Login";
 import { updateARSiteLocation, updateUserLocation } from "../../network";
 import { USER_TYPES } from "../../constants";
 
-const WATCH_POSITION_CONFIG = {
-  accuracy: {
-    android: "high",
-    ios: "best",
-  },
+const GET_LOCATION_CONFIG = {
   enableHighAccuracy: true,
-  distanceFilter: 5,
-  interval: 5000,
-  fastestInterval: 2000,
-  forceRequestLocation: true,
-  forceLocationManager: false,
-  showLocationDialog: true,
-  useSignificantChanges: false,
+  timeout: 15000,
+  maximumAge: 10000,
+};
+
+const WATCH_POSITION_CONFIG = {
+  ...GET_LOCATION_CONFIG,
+  maximumAge: 5000,
+  distanceFilter: 10,
+  interval: 10000,
 };
 
 const userLocationHook = () => {
@@ -43,21 +41,24 @@ const userLocationHook = () => {
       return;
     }
     setLoading(true);
-
-    Geolocation.watchPosition(
+    Geolocation.getCurrentPosition(
       position => {
         const coords = {
           latitude: position?.coords?.latitude,
           longitude: position?.coords?.longitude,
         };
         setInitialUserLocation(coords);
+        setLoading(false);
       },
       error => {
-        console.error("[location.hook] Geolocation watchPosition error", error);
+        console.error(
+          `[${new Date().toLocaleTimeString()}] [location.hook] Geolocation.getCurrentPosition error callback (getLocation) - Loading state before set to FALSE: ${loading}`,
+          error
+        );
         setLoading(false);
         clearLocation();
       },
-      WATCH_POSITION_CONFIG
+      GET_LOCATION_CONFIG
     );
   };
 
@@ -78,7 +79,10 @@ const userLocationHook = () => {
         setLoading(false);
       },
       error => {
-        console.error("[location.hook] Geolocation watchPosition error", error);
+        console.error(
+          `[${new Date().toLocaleTimeString()}] [location.hook] Geolocation.watchPosition error callback (WATCH_POSITION_CONFIG) - Loading state before set to FALSE: ${loading}`,
+          error
+        );
         setLoading(false);
         clearLocation();
       },
@@ -106,10 +110,12 @@ const userLocationHook = () => {
 
   const updateBandUserLocationAPI = (latitude, longitude) => {
     updateARSiteLocation(siteId, latitude, longitude);
+    dispatch(updateUserLocationData({ latitude, longitude }));
   };
 
   const clearBandUserLocation = () => {
     updateARSiteLocation(siteId);
+    dispatch(updateUserLocationData());
   };
 
   const updateUserLocationAPI = async ({ latitude, longitude }) => {
@@ -135,6 +141,7 @@ const userLocationHook = () => {
   };
 
   const clearLocation = () => {
+    console.log("[location.hook] clearLocation function called"); // ADDED LOG
     switch (userType) {
       case USER_TYPES.BAND:
         clearBandUserLocation();
@@ -145,13 +152,8 @@ const userLocationHook = () => {
         break;
     }
     Geolocation.stopObserving();
+    console.log("[location.hook] Geolocation.stopObserving() called"); // ADDED LOG
   };
-
-  useEffect(() => {
-    if (userType === USER_TYPES.BAND && userData?.user?.is_band_location_active) {
-      watchLocation();
-    }
-  }, []);
 
   return {
     initialUserLocation,

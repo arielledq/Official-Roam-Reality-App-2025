@@ -205,7 +205,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
               textDecorationLine: "underline",
             }}
           >
-          Sign Up
+            Sign Up
           </Text>
         </TouchableOpacity>
       </View>

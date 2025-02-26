@@ -55,6 +55,12 @@ const BandHome = ({}) => {
     dispatch(resetState());
   };
 
+  // useEffect(() => {
+  //   if (user?.is_band_location_active && !locationIsEnabled) {
+  //     toggleLiveLocationButtonHandler();
+  //   }
+  // }, [user?.is_band_location_active, locationIsEnabled]);
+
   const changePasswordColors = [`${theme.lightColors?.inputBG}`, `${theme.lightColors?.inputBG}`];
   const logoutColors = [`${theme.lightColors?.inputRed}`, `${theme.lightColors?.inputRed}`];
 

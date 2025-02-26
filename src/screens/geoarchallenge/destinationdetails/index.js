@@ -21,6 +21,7 @@ import useStyles from "./styles";
 import { updateSelectedSites } from "../../../redux/AR";
 import {
   getARSiteCategories,
+  getARSiteLocation,
   getARSitesHiddenStars,
   getARSitesStars,
   getDestinationFacts,
@@ -126,6 +127,14 @@ const GeoArChallengeDetails = ({}) => {
       .finally(() => {});
   };
 
+  // const getBandLocationUpdates = () => {
+  //   // getARSiteLocation();
+
+  //   if (isEvent) {
+  //     console.log(selectedDestination.ar_event_sites);
+  //   }
+  // };
+
   useEffect(() => {
     if (
       !selectedDestination.geo_location ||
@@ -156,6 +165,8 @@ const GeoArChallengeDetails = ({}) => {
     loadDFacts(selectedDestination?.id);
     getARStarSites();
     getArSiteCategories();
+
+    // getBandLocationUpdates();
   }, []);
 
   const loadDFacts = async id => {
