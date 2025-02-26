@@ -65,4 +65,4 @@ export type ScreenStackComponent<
   route: RouteProp<T, RouteName>;
 }>;
 
-export type ExperienceTypeChoices = "AR_CHALLENGE" | "GEO_AR_CHALLENGE" | "EVENT";
+export type ExperienceTypeChoices = "AR_CHALLENGE" | "GEO_AR_CHALLENGE" | "EVENT" | "BAND";
