@@ -34,9 +34,7 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
         return ARSitePinCheckIn.objects.filter(user=instance.user).count()
 
     def get_points(self, instance):
-        if hasattr(instance.user, 'destination_points'):
-            return instance.user.destination_points
-        return instance.points
+        return getattr(instance.user, 'destination_points', instance.user.user_ar_profile.points)
 
 
 class SponsorSerializer(serializers.ModelSerializer):
