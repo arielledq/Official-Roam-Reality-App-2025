@@ -166,7 +166,7 @@ const PinChallenge = () => {
         scale,
         rotation,
         emissionIntensity: emissionValue,
-        rotationSpeed: 5,
+        rotationSpeed: 10,
         scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
