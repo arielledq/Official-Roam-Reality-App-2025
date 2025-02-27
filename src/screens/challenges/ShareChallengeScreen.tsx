@@ -36,6 +36,7 @@ import BGArShare from "assets/ar/bg-ar-share.png";
 import { GeolocationContext } from "GeolocationProvider";
 import RNFetchBlob from "rn-fetch-blob";
 import { Alert } from "react-native";
+import ScreenLoader from "components/screenLoader";
 
 // Add this interface near the top of the file, after the imports
 interface ShareChallengeRouteParams {
@@ -52,6 +53,7 @@ function getFileExtension(url: string) {
 
 const ArChallengeShare = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
   const [socialPointsCounter, setSocialPointsCounter] = useState({
@@ -71,6 +73,8 @@ const ArChallengeShare = () => {
     useRoute<RouteProp<{ ShareChallenge: ShareChallengeRouteParams }, "ShareChallenge">>();
   const navigation = useNavigation();
 
+  const [arMemories, setARMemories] = useState([]);
+  const [challengeRequirement, setChallengeRequirement] = useState(null)
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
@@ -124,6 +128,7 @@ const ArChallengeShare = () => {
 
   const capturedDataUri = captureData;
 
+  const isVideo = capturedDataUri.includes('.mp4');
   const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
   const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop();
 
@@ -234,7 +239,7 @@ const ArChallengeShare = () => {
     setIsLoading(true);
     let filename = capturedDataUri.split("/").pop();
     let shareFile = {
-      uri: capturedDataUri,
+      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri  ,
       type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
       name: filename,
     };
@@ -249,7 +254,6 @@ const ArChallengeShare = () => {
           formData.append("challenges", challengeObj.id);
           formData.append("memory_file", shareFile);
           formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
-
           res = await postArMemory(formData);
           break;
 
@@ -563,10 +567,13 @@ const ArChallengeShare = () => {
             ref={viewRef}
             onLayout={handleLayout}
           >
-            <View style={{ flex: 1, justifyContent: "center" }}>
-              {fileExt == "mp4" ? (
+             {isLoadingDisplay && <ScreenLoader/>}
+            <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1, }}>
+              {fileExt == "mp4" || isVideo ? (
                 <Video
                   resizeMode={"contain"}
+                  onLoadStart={() => setIsLoadingDisplay(true)}
+                  onReadyForDisplay={() => setIsLoadingDisplay(false)}
                   repeat={true}
                   style={{
                     width: mediaContainerWidth,
@@ -582,6 +589,8 @@ const ArChallengeShare = () => {
                 <Image
                   resizeMode={"contain"}
                   source={{ uri: capturedDataUri }}
+                  onLoadStart= {() => setIsLoadingDisplay(true)}
+                  onLoad={() => setIsLoadingDisplay(false)}
                   style={{
                     width: mediaContainerWidth,
                     height: mediaContainerHeight,
