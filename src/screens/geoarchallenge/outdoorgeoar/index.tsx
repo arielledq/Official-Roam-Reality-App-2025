@@ -88,7 +88,7 @@ const GeoArOutdoor = ({ route }: any) => {
     navigation.navigate("ARChallenge" as never);
   };
 
-  const navigateToGeoARChallenge = (isEvent = false, experienceType = '') => {
+  const navigateToGeoARChallenge = (isEvent = false, experienceType = "") => {
     // @ts-ignore
     navigation.navigate("GeoArChallengeDetails", { isEvent, experienceType });
   };
@@ -102,6 +102,9 @@ const GeoArOutdoor = ({ route }: any) => {
         navigateToGeoARChallenge(false, experienceType);
         break;
       case EXPERIENCE_TYPE_CHOICES.EVENT:
+        navigateToGeoARChallenge(true, experienceType);
+        break;
+      case EXPERIENCE_TYPE_CHOICES.BAND:
         navigateToGeoARChallenge(true, experienceType);
         break;
 

@@ -28,7 +28,7 @@ const { width } = Dimensions.get("window");
 
 const GeoUniqueArChallengeDetails: ScreenStackComponent<
   RootStackParamList,
-  "ArChallengeDetails"
+  "GeoUniqueArChallengeDetails"
 > = ({}) => {
   const styles = useStyles();
   const dispatch = useDispatch();

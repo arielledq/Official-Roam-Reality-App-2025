@@ -68,6 +68,7 @@ export default ConfirmationPopUp;
 
 const styles = StyleSheet.create({
   modalContainer: {
+    width: "100%",
     backgroundColor: theme.lightColors?.inputBG,
     height: 440,
     borderTopLeftRadius: 30,

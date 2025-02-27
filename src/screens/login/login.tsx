@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Keyboard, View } from "react-native";
+import { Keyboard, Text, TouchableOpacity, View } from "react-native";
 
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -23,6 +23,8 @@ import SocialSignin from "../../components/socialSignin";
 import { updateAsOldUser } from "../../redux/Persist";
 import OneSignal from "react-native-onesignal";
 import { setItemWithListener } from "../../util/EventsListener";
+import { fonts } from "assets/fonts";
+import { FontSizes } from "util/FontUtils";
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }) => {
   const _styles = useStyles();
@@ -48,7 +50,6 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
     })
       .then(res => {
         if (res.status == 1) {
-          console.log("userToken", res?.token);
           setItemWithListener("userToken", res?.token);
           dispatch(updateUserData(res));
           setOnesignalDevice();
@@ -88,9 +89,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
           initialValues={{
             email: "",
             password: "",
-            // email: "user03@yopmail.com", // User without profile pic
             // email: "ar01@yopmail.com",
-            // email: "user11@yopmail.com",
+            // email: "ar10@yopmail.com",
             // password: "Password123@",
           }}
           onSubmit={v => handleLogin(v)}
@@ -182,12 +182,33 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
           )}
         </Formik>
       </KeyboardAwareScrollView>
-      <AppText style={_styles.alreadyHaveAccount}>
-        Don’t have an account? {""}
-        <AppText style={_styles.SignInLink} onPress={navigateToSignUp}>
-          Sign Up
-        </AppText>
-      </AppText>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 50,
+        }}
+      >
+        <AppText style={_styles.alreadyHaveAccount}>Don’t have an account? {""}</AppText>
+        <TouchableOpacity
+          onPress={navigateToSignUp}
+          style={{
+            padding: 8,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: fonts.nunitoBold,
+              fontSize: FontSizes.S14,
+              color: theme.lightColors?.purple,
+              textDecorationLine: "underline",
+            }}
+          >
+            Sign Up
+          </Text>
+        </TouchableOpacity>
+      </View>
     </BackgroundWithImage>
   );
 };

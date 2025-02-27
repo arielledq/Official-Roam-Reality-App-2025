@@ -51,12 +51,14 @@ const UnityARCamera = ({
   const imageHasFilters = imageFilter?.challengeObj?.ar_filters?.length > 0;
   const challenge_type = imageFilter?.challengeObj?.challenge_type;
   const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
+  const mediaHeight = height || aspectHeight;
+  const mediaWidth = width || screenWidth - offset;
   return (
-    <View style={{ flex: 1, alignItems: "center", }}>
+    <View style={{ flex: 1, alignItems: "center" }}>
       <View
         style={{
-          height: height || aspectHeight,
-          width: width || screenWidth - offset,
+          height: mediaHeight,
+          width: mediaWidth,
         }}
       >
         {isProcessingMedia ? (
@@ -65,7 +67,6 @@ const UnityARCamera = ({
               flex: 1,
               justifyContent: "center",
               alignItems: "center",
-              
             }}
           >
             <Text style={{ color: "white" }}>Processing your content...</Text>
@@ -107,16 +108,17 @@ const UnityARCamera = ({
             {capturedVideo && (
               <Video
                 repeat
+                resizeMode="cover"
                 style={{
+                  height: mediaHeight,
+                  width: mediaWidth,
                   borderRadius: 16,
-                  width: "100%",
-                  flex: 1,
                   top: 0,
                   bottom: 0,
                   left: 0,
                   right: 0,
                   position: "absolute",
-                  backgroundColor: "#fff",
+                  backgroundColor: "#000",
                 }}
                 source={{ uri: `file://${capturedVideo}` }}
               />

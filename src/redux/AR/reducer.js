@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit'
+import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
   arProfile: {},
@@ -8,45 +8,71 @@ const initialState = {
   selectedGeoSite: {},
   selectedGeoARSiteStars: [],
   destinationFactsAll: [],
-  destinationVisited: []
-
-}
+  destinationVisited: [],
+};
 
 export const sliceAR = createSlice({
-  name: 'ar',
+  name: "ar",
   initialState,
   reducers: {
     resetState: () => initialState,
     updateARUserData: (state, action) => {
-      state.arProfile = action.payload
+      state.arProfile = action.payload;
     },
     updateARSettings: (state, action) => {
-      state.arSettings = action.payload
+      state.arSettings = action.payload;
     },
     updateSelectedDestination: (state, action) => {
-      state.selectedDestination = action.payload
+      state.selectedDestination = action.payload;
+    },
+    updateSelectedDestinationBandLocation: (state, action) => {
+      state.selectedDestination = {
+        ...state.selectedDestination,
+        ar_event_sites: state.selectedDestination?.ar_event_sites?.map(site => {
+          const selectedSiteId = action.payload?.id;
+
+          let updatedCoordinates = site?.lat_long?.coordinates;
+          if (site.id === selectedSiteId) {
+            updatedCoordinates = [action.payload?.long, action.payload?.lat];
+          }
+
+          return {
+            ...site,
+            lat_long: {
+              ...site?.lat_long,
+              coordinates: updatedCoordinates,
+            },
+          };
+        }),
+      };
     },
     updateAnyWhereChallenges: (state, action) => {
-      state.anywhereChallenges = action.payload
+      state.anywhereChallenges = action.payload;
     },
     updateSelectedSites: (state, action) => {
-      state.selectedGeoSite = action.payload
+      state.selectedGeoSite = action.payload;
     },
     updateSelectedGeoARSiteStars: (state, action) => {
-      state.selectedGeoARSiteStars = action.payload
+      state.selectedGeoARSiteStars = action.payload;
     },
     updateDestinationFactsAll: (state, action) => {
-      state.destinationFactsAll = action.payload
+      state.destinationFactsAll = action.payload;
     },
     updateDestinationVisited: (state, action) => {
-      state.destinationVisited.push(action.payload)
-    }
-  }
-})
+      state.destinationVisited.push(action.payload);
+    },
+  },
+});
 
-export const { resetState, updateARUserData,
-  updateARSettings, updateSelectedDestination,
-  updateAnyWhereChallenges, updateSelectedSites,
-  updateSelectedGeoARSiteStars, updateDestinationFactsAll,
-  updateDestinationVisited
-} = sliceAR.actions
+export const {
+  resetState,
+  updateARUserData,
+  updateARSettings,
+  updateSelectedDestination,
+  updateAnyWhereChallenges,
+  updateSelectedSites,
+  updateSelectedGeoARSiteStars,
+  updateDestinationFactsAll,
+  updateDestinationVisited,
+  updateSelectedDestinationBandLocation,
+} = sliceAR.actions;

@@ -14,7 +14,7 @@ import { DateFormat, formatDate } from "../../util/DateUtils";
 import { FontSizes } from "../../util/FontUtils";
 import { updateProfile } from "../../network";
 import { handleError, showMessage } from "../../util/helpers";
-import { updateAccountFlag, updateName } from "../../redux/Login";
+import { updateAccountFlag } from "../../redux/Login";
 import { EditProfileSchema } from "../../util/ValidationSchemas";
 
 import AppButton from "../../components/button";
@@ -140,8 +140,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       onProfileUpdate();
       navigation.goBack();
     } else {
-      dispatch(updateName(nameRef.current));
-      dispatch(updateAccountFlag(true));
       setDetailsShow(true);
     }
   };
@@ -229,13 +227,24 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
   const acceptWaiverButtonHandler = () => {
     setDetailsShow(false);
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
-      });
-    }, 500);
+    dispatch(updateAccountFlag(true));
+    setIsLoading(true);
   };
+
+  const hasAccountSetupDone = userProfile?.user_profile?.account_setup;
+
+  useEffect(() => {
+    if (edit) return;
+
+    if (hasAccountSetupDone) {
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+        });
+      }, 250);
+    }
+  }, [hasAccountSetupDone]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>

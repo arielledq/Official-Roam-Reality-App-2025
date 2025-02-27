@@ -17,6 +17,7 @@ import CloseBIcon from "../../../assets/geoar/close-square.svg";
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg";
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png";
 import Geocoder from "react-native-geocoding";
+import { showLocation } from "react-native-map-link";
 
 import { useDispatch, useSelector } from "react-redux";
 import useStyles from "./styles";
@@ -26,7 +27,7 @@ import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
 import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
 import { checkUniqueARChallengeDoneAPI, getAllARSitesStars } from "../../../network";
-import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
+import { getBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
 import {
@@ -38,7 +39,6 @@ import {
 } from "util/helpers";
 import Icon from "components/Icon";
 import theme from "assets/theme";
-import { MAP_MODE } from "constants";
 import { EXPERIENCE_TYPE_CHOICES } from "../../../constants";
 
 const GeoArSiteDetails = ({ route }) => {
@@ -196,23 +196,6 @@ const GeoArSiteDetails = ({ route }) => {
     }
   };
 
-  const getFullCenter = _ => {
-    if (selectedGeoSite.geo_site_border) {
-      let arrayPoints = [];
-      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
-        const points = selectedGeoSite.geo_site_border.coordinates[i];
-        for (let j = 0; j < points.length; j++) {
-          const point = points[j];
-          arrayPoints.push({ latitude: point[1], longitude: point[0] });
-        }
-      }
-      const latitude_longitude = getCenterOfBounds(arrayPoints);
-      return latitude_longitude;
-    } else {
-      return null;
-    }
-  };
-
   const skipNavigationButtonHandler = () => {
     switch (experience_type) {
       case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
@@ -239,7 +222,7 @@ const GeoArSiteDetails = ({ route }) => {
     }
   };
 
-  const letsRoamButtonHandler = async () => {
+  const navigateButtonHandler = async () => {
     // INFO: Commented out temporarily
     // try {
     //   const metadata = {
@@ -252,17 +235,37 @@ const GeoArSiteDetails = ({ route }) => {
     //   console.error('There was an error sending the notification to friends:', error)
     // }
 
-    // navigation.navigate("GeoArSiteRoutes", {
-    navigation.navigate("GeoArSiteNavigation", {
-      experience_type,
-      coolDown: {
-        coolDownFinished: coolDownFinished,
-        coolDownHoursText: coolDownHoursText,
-      },
-      checkIns: myCheckInsText,
-      mapMode: MAP_MODE.DRIVING,
-      starsChallenge: null,
+    // Open external navigation app
+    if (!selectedGeoSite?.lat_long?.coordinates?.length) {
+      return;
+    }
+
+    const lat = selectedGeoSite?.lat_long?.coordinates[1];
+    const long = selectedGeoSite?.lat_long?.coordinates[0];
+    showLocation({
+      latitude: lat,
+      longitude: long,
+      alwaysIncludeGoogle: true,
+      appsWhiteList: ["apple-maps", "google-maps", "waze"],
+    }).then(value => {
+      if (value) {
+        setTimeout(() => {
+          skipNavigationButtonHandler();
+        }, 2000);
+      }
     });
+
+    // Keeping for reference
+    // navigation.navigate("GeoArSiteNavigation", {
+    //   experience_type,
+    //   coolDown: {
+    //     coolDownFinished: coolDownFinished,
+    //     coolDownHoursText: coolDownHoursText,
+    //   },
+    //   checkIns: myCheckInsText,
+    //   mapMode: MAP_MODE.DRIVING,
+    //   starsChallenge: null,
+    // });
   };
 
   const initialRegion = {
@@ -271,15 +274,10 @@ const GeoArSiteDetails = ({ route }) => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
-  const full_latitude_longitude = getFullCenter();
   const full_bounds = getFullBounds();
   if (full_bounds) {
     initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
     initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
-  }
-  if (full_latitude_longitude) {
-    initialRegion.latitude = Number(full_latitude_longitude.latitude);
-    initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
   useEffect(() => {
@@ -523,7 +521,7 @@ const GeoArSiteDetails = ({ route }) => {
               }}
             >
               <AppButton
-                onPress={letsRoamButtonHandler}
+                onPress={navigateButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{ fontWeight: "bold" }}
                 containerStyle={_styles.buttonContainerStyle}
