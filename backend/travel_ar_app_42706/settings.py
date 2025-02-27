@@ -103,6 +103,7 @@ LOCAL_APPS = [
     'notifications',
     'onesignal_client',
     'configuration',
+    'slide_pictures',
 ]
 THIRD_PARTY_APPS = [
     'rest_framework',
