@@ -38,6 +38,7 @@ urlpatterns = [
     path("rest-auth/registration/", include("rest_auth.registration.urls")),
     # path("rest-auth/login/", CustomLoginView.as_view()),
     path('adminx/webshell/', include('webshell.urls')),
+    path("configuration/", include("configuration.urls")),
 ]
 
 admin.site.site_header = "Travel AR App"

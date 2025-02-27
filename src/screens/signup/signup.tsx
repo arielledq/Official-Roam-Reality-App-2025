@@ -1,6 +1,6 @@
 import React, { useRef, useState } from "react";
 
-import { Alert, Keyboard, View } from "react-native";
+import { Alert, Keyboard, Text, TouchableOpacity, View } from "react-native";
 
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
@@ -15,13 +15,14 @@ import theme from "../../assets/theme";
 import AppText from "../../components/text";
 import Icon from "../../components/Icon";
 import { signUp } from "../../network";
-import fontGroup from "../../assets/fonts";
+import fontGroup, { fonts } from "../../assets/fonts";
 import { handleError, showMessage } from "../../util/helpers";
 import { SignUpSchema } from "../../util/ValidationSchemas";
 import SocialSignin from "../../components/socialSignin";
 import { useNavigation } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { updateAsOldUser } from "../../redux/Persist";
+import { FontFamily, FontSizes } from "util/FontUtils";
 
 const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   const _styles = useStyles();
@@ -191,12 +192,33 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
           )}
         </Formik>
       </KeyboardAwareScrollView>
-      <AppText style={_styles.alreadyHaveAccount}>
-        Already have an account? {""}
-        <AppText style={_styles.SignInLink} onPress={navigateToLogin}>
-          Sign In
-        </AppText>
-      </AppText>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "center",
+          alignItems: "center",
+          marginBottom: 50,
+        }}
+      >
+        <AppText style={_styles.alreadyHaveAccount}>Already have an account? {""}</AppText>
+        <TouchableOpacity
+          onPress={navigateToLogin}
+          style={{
+            padding: 8,
+          }}
+        >
+          <Text
+            style={{
+              fontFamily: fonts.nunitoBold,
+              fontSize: FontSizes.S14,
+              color: theme.lightColors?.purple,
+              textDecorationLine: "underline",
+            }}
+          >
+            Sign In
+          </Text>
+        </TouchableOpacity>
+      </View>
     </BackgroundWithImage>
   );
 };

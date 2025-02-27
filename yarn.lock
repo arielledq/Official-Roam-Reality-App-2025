@@ -8364,6 +8364,11 @@ react-native-linear-gradient@^2.8.3:
   resolved "https://registry.yarnpkg.com/react-native-linear-gradient/-/react-native-linear-gradient-2.8.3.tgz#9a116649f86d74747304ee13db325e20b21e564f"
   integrity sha512-KflAXZcEg54PXkLyflaSZQ3PJp4uC4whM7nT/Uot9m0e/qxFV3p6uor1983D1YOBJbJN7rrWdqIjq0T42jOJyA==
 
+react-native-map-link@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-map-link/-/react-native-map-link-3.7.0.tgz#7a32772104048aae80d53d9cc8fddbac8cb97430"
+  integrity sha512-6kbjD4aVy1ZlKSH4/XMqXqlkY13mZ42/TomXqF9QbLdpK/cn07Gs7beagmjsJxOSy9uFiUaFrpu7OPF5fhtLkw==
+
 react-native-maps-directions@^1.9.0:
   version "1.9.0"
   resolved "https://registry.yarnpkg.com/react-native-maps-directions/-/react-native-maps-directions-1.9.0.tgz#63ae8e8b36499042a658e43cd4836ac89aab8b7d"
@@ -8480,10 +8485,10 @@ react-native-screens@^3.32.0:
     react-freeze "^1.0.0"
     warn-once "^0.1.0"
 
-react-native-share@^10.0.2:
-  version "10.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-10.2.1.tgz#baf94848c2acee6e52f6b28e05c47fa5fa9402be"
-  integrity sha512-Z2LWGYWH7raM4H6Oauttv1tEhaB43XSWJAN8iS6oaSG9CnyrUBeYFF4QpU1AH5RgNeylXQdN8CtbizCHHt6coQ==
+react-native-share@^12.0.9:
+  version "12.0.9"
+  resolved "https://registry.yarnpkg.com/react-native-share/-/react-native-share-12.0.9.tgz#771640136114de6179aa42269a9e45135ac1a9cf"
+  integrity sha512-vSuz/9aF+/AZS3I5NC19MrB56h1Yivk2Yz8lf2d8Szv3KuRw2BnDI/AfCTjMWByJLVYr6xgzfkTkAfvbDGzxLQ==
 
 react-native-size-matters@^0.3.1:
   version "0.3.1"

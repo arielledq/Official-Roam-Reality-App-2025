@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TouchableOpacity, Image } from "react-native";
 
 import Share from "react-native-share";
@@ -11,7 +11,37 @@ import { socialPointsARUpdateAPI } from "network";
 import Images from "assets/images";
 import { showMessage } from "util/helpers";
 import Config from "config";
-import { SSNN } from "../constants";
+import { SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE } from "../constants";
+
+interface IGPostTypeButtonProps {
+  onPress: () => {};
+  imageSource: any | { uri: string };
+  text: string;
+}
+
+const IGPostTypeButton = ({ onPress, imageSource, text }: IGPostTypeButtonProps) => {
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        paddingHorizontal: 8,
+        paddingVertical: 16,
+        borderRadius: 8,
+        justifyContent: "flex-end",
+        alignItems: "center",
+        gap: 16,
+        borderColor: theme.lightColors?.purple,
+        borderWidth: 3,
+        width: 124,
+      }}
+    >
+      <View style={{ height: 64, width: 64, justifyContent: "center", alignItems: "center" }}>
+        <Image source={imageSource} />
+      </View>
+      <Text style={{ color: theme.lightColors?.white, fontSize: 12 }}>{text}</Text>
+    </TouchableOpacity>
+  );
+};
 
 interface ShareToSocialsModalProps {
   isVisible: boolean;
@@ -35,11 +65,21 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   sponsor,
   isMemory = false,
 }) => {
-  const share = async (selectedSSNN: string) => {
-    // If correctedCaptureData doesn't already have "file://" prefix, add it
+  const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
+  const share = async (selectedSSNN: SSNN_TYPE) => {
+    // const share = async (selectedSSNN: SSNN_TYPE, selectedChannel?: string) => {
+    // Construct the full file:// URI more explicitly
     let updatedFileUri = fileUri;
-    if (!updatedFileUri?.startsWith("file://")) {
-      updatedFileUri = `file://${fileUri}`;
+
+    if (updatedFileUri) {
+      // Check if fileUri is not null or undefined
+      if (!updatedFileUri.startsWith("file://")) {
+        if (updatedFileUri.startsWith("/")) {
+          updatedFileUri = `file://${updatedFileUri}`; // Correctly handle paths starting with /
+        } else {
+          updatedFileUri = `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`; // If relative, assume it's in cache (adjust if needed) - requires react-native-fs
+        }
+      }
     }
 
     // Determine MIME type based on file extension
@@ -50,8 +90,13 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
     switch (selectedSSNN) {
       case SSNN.INSTAGRAM:
+        // if (!selectedChannel) {
+        //   setShowChooseIGPostType(true);
+        //   return;
+        // }
         shareOptions = {
           social: Share.Social.INSTAGRAM_STORIES,
+          // social: Share.Social.INSTAGRAM,
           appId: Config.FACEBOOK_APP_ID,
         };
         if (fileExt === "mp4") {
@@ -97,6 +142,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       }
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
+    } finally {
+      setShowChooseIGPostType(false);
     }
     if (!isMemory && hasShared) {
       try {
@@ -120,8 +167,63 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
   if (!isVisible) return null;
 
+  const ChooseSocialNetwork = (
+    <>
+      <Text
+        style={{ fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white }}
+      >
+        Share To Socials
+      </Text>
+
+      <Text style={{ fontSize: FontSizes.S12, color: theme.lightColors?.grey0 }}>
+        {SHARE_CONDITIONS_TEXT}
+      </Text>
+
+      <View style={{ flexDirection: "row", justifyContent: "center", gap: 32 }}>
+        <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
+          <Image source={Images.Instagram} style={{ height: 40, width: 40 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
+          <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
+          <Image source={Images.TikTokShare} style={{ height: 40, width: 68 }} />
+        </TouchableOpacity>
+      </View>
+
+      <AppButton
+        onPress={onClose}
+        buttonStyle={{ height: 45, width: 95 }}
+        containerStyle={{}}
+        title={"Done"}
+      />
+    </>
+  );
+
+  const ChooseInstagramPostType = (
+    <>
+      <View style={{ alignItems: "center", gap: 16 }}>
+        <Text style={{ color: theme.lightColors?.white }}>Choose how to share on Instagram</Text>
+
+        <View style={{ flexDirection: "row", gap: 16 }}>
+          <IGPostTypeButton
+            onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM_STORIES)}
+            text="Share to Stories"
+            imageSource={require("../assets/images/ig_stories.png")}
+          />
+
+          <IGPostTypeButton
+            onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM)}
+            text="Share to Feed"
+            imageSource={require("../assets/images/ig_post.png")}
+          />
+        </View>
+      </View>
+    </>
+  );
+
   return (
-    <View style={{ flex: 1, position: 'absolute' }}>
+    <View style={{ flex: 1, position: "absolute" }}>
       <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
         <View
           style={{
@@ -133,35 +235,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             gap: 16,
           }}
         >
-          <Text
-            style={{ fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white }}
-          >
-            Share To Socials
-          </Text>
-
-          <Text style={{ fontSize: FontSizes.S12, color: theme.lightColors?.grey0 }}>
-            Must share to at least one social media platform to earn any points. Users earn one
-            additional point per social platform.
-          </Text>
-
-          <View style={{ flexDirection: "row", justifyContent: "center", gap: 32 }}>
-            <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
-              <Image source={Images.Instagram} style={{ height: 40, width: 40 }} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
-              <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
-              <Image source={Images.TikTokShare} style={{ height: 40, width: 68 }} />
-            </TouchableOpacity>
-          </View>
-
-          <AppButton
-            onPress={onClose}
-            buttonStyle={{ height: 45, width: 95 }}
-            containerStyle={{}}
-            title={"Done"}
-          />
+          {showChooseIGPostType ? ChooseInstagramPostType : ChooseSocialNetwork}
         </View>
       </ReactNativeModal>
     </View>

@@ -208,8 +208,34 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     search_fields = ['name', ]
 
     def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset.exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).order_by('-user_ar_profile__points')
+        queryset = (super().get_queryset()
+                    .exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).
+                    order_by('-user_ar_profile__points'))
+        return queryset
+
+    def list(self, request, *args, **kwargs):
+        qs = self.filter_queryset(self.get_queryset())
+        qs = qs[:1000]
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='my-rank')
+    def my_rank(self, request):
+        qs = self.filter_queryset(self.get_queryset())
+        user = request.user
+
+        if request.query_params.get('destination'):
+            annotated_user = qs.filter(pk=user.pk).first()
+            user_points = annotated_user.destination_points if annotated_user else 0
+            rank = qs.filter(destination_points__gt=user_points).count() + 1
+        else:
+            user_points = user.user_ar_profile.points
+            rank = qs.filter(user_ar_profile__points__gt=user_points).count() + 1
+
+        return Response({
+            'my_rank': rank,
+            'my_points': user_points
+        })
 
 
 class FriendshipViewSet(ModelViewSet):

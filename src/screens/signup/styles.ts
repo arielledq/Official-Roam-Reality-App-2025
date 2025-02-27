@@ -72,13 +72,6 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH16,
     color: theme.colors.white,
     textAlign: "center",
-    marginBottom: 50,
-  },
-  SignInLink: {
-    ...fontGroup.nunitoBold,
-    fontSize: FontSizes.S14,
-    color: theme.colors.purple,
-    textDecorationLine: "underline",
   },
   socialSUcontainer: { flexDirection: "row", alignItems: "center", justifyContent: "center" },
   socialSIicon: {

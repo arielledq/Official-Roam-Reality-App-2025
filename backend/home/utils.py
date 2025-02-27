@@ -97,10 +97,10 @@ class SendgridClient(object):
                     'user_name': message,
                 },
             )
-            message = strip_tags(html_content)
             email_obj = EmailMessage(
-                subject=subject, body=message, to=[email]
+                subject=subject, body=html_content, to=[email]
             )
+            email_obj.content_subtype = "html"
             email_obj.send()
         else:
             raise Exception("Email not provided")
