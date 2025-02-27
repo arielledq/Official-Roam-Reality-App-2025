@@ -362,6 +362,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "user_attempts",
             "sponsors",
             "is_active",
+            "band_user",
         )
 
     def get_check_ins(self, obj):
