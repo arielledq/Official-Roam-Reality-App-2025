@@ -1,14 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import {
-  ActivityIndicator,
-  FlatList,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import { FlatList, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useNavigation, useRoute } from "@react-navigation/native";
