@@ -568,7 +568,7 @@ const ArChallengeShare = () => {
             onLayout={handleLayout}
           >
              {isLoadingDisplay && <ScreenLoader/>}
-            <View style={{ flex: 1, justifyContent: "center", display: isLoadingDisplay ? "none" : 'flex' }}>
+            <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1, }}>
               {fileExt == "mp4" || isVideo ? (
                 <Video
                   resizeMode={"contain"}
