@@ -41,6 +41,9 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     case EXPERIENCE_TYPE_CHOICES.EVENT:
       challengeObj = challengeObj?.pin_challenge;
       break;
+    case EXPERIENCE_TYPE_CHOICES.BAND:
+      challengeObj = challengeObj?.pin_challenge;
+      break;
 
     default:
       challengeObj = null;
@@ -48,7 +51,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   }
 
   if (!challengeObj) {
-    console.error("challengeObj is empty", challengeObj);
+    console.error("[ChallengeDetails] Route param 'challengeObj' is empty", challengeObj);
     navigation.goBack();
   }
 
@@ -113,6 +116,10 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           navigation.navigate("PinChallenge");
           break;
         case EXPERIENCE_TYPE_CHOICES.EVENT:
+          // @ts-ignore
+          navigation.navigate("PinChallenge");
+          break;
+        case EXPERIENCE_TYPE_CHOICES.BAND:
           // @ts-ignore
           navigation.navigate("PinChallenge");
           break;
