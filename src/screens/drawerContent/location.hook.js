@@ -15,7 +15,7 @@ const GET_LOCATION_CONFIG = {
 const WATCH_POSITION_CONFIG = {
   ...GET_LOCATION_CONFIG,
   maximumAge: 5000,
-  distanceFilter: 10,
+  distanceFilter: 5,
   interval: 10000,
 };
 

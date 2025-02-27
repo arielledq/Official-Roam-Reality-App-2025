@@ -27,7 +27,7 @@ import RenderHTML from "react-native-render-html";
 import { FontSizes, fontGroup } from "../../../util/FontUtils";
 import { updateSelectedGeoARSiteStars } from "../../../redux/AR";
 import { checkUniqueARChallengeDoneAPI, getAllARSitesStars } from "../../../network";
-import { getBounds, getCenterOfBounds } from "../../../util/LocationLib";
+import { getBounds } from "../../../util/LocationLib";
 import NumericStatItem from "../../../components/NumericStatItem";
 import MarkerIcon from "components/marker";
 import {
@@ -39,7 +39,6 @@ import {
 } from "util/helpers";
 import Icon from "components/Icon";
 import theme from "assets/theme";
-import { MAP_MODE } from "constants";
 import { EXPERIENCE_TYPE_CHOICES } from "../../../constants";
 
 const GeoArSiteDetails = ({ route }) => {
@@ -197,23 +196,6 @@ const GeoArSiteDetails = ({ route }) => {
     }
   };
 
-  const getFullCenter = _ => {
-    if (selectedGeoSite.geo_site_border) {
-      let arrayPoints = [];
-      for (let i = 0; i < selectedGeoSite.geo_site_border.coordinates.length; i++) {
-        const points = selectedGeoSite.geo_site_border.coordinates[i];
-        for (let j = 0; j < points.length; j++) {
-          const point = points[j];
-          arrayPoints.push({ latitude: point[1], longitude: point[0] });
-        }
-      }
-      const latitude_longitude = getCenterOfBounds(arrayPoints);
-      return latitude_longitude;
-    } else {
-      return null;
-    }
-  };
-
   const skipNavigationButtonHandler = () => {
     switch (experience_type) {
       case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
@@ -292,15 +274,10 @@ const GeoArSiteDetails = ({ route }) => {
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   };
-  const full_latitude_longitude = getFullCenter();
   const full_bounds = getFullBounds();
   if (full_bounds) {
     initialRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
     initialRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
-  }
-  if (full_latitude_longitude) {
-    initialRegion.latitude = Number(full_latitude_longitude.latitude);
-    initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
   useEffect(() => {

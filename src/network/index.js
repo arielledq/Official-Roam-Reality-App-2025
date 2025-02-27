@@ -169,7 +169,7 @@ export const getARSiteLocation = (site_id = 0) => {
     return;
   }
 
-  Request.callWithToken(
+  return Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-site/${site_id}/`,
       method: "GET",
@@ -183,26 +183,26 @@ export const updateARSiteLocation = (site_id = 0, lat = 0, long = 0) => {
     return;
   }
 
-  let data = {
-    is_active: false,
-  };
+  // NOTE: 2025-02-27 - Band Sites will remain visible when the 'Band' user turns off their location
+  // to the latest location they shared. These type of sites will only be deactivated
+  // from the admin panel.
+
   if (lat && long) {
-    data = {
+    const data = {
       lat_long: {
         type: "Point",
-        coordinates: [lat, long],
+        coordinates: [long, lat],
       },
     };
+    Request.callWithToken(
+      {
+        url: `modules/challenges/geo-ar-site/${site_id}/`,
+        method: "PATCH",
+        data: data,
+      },
+      logoutFunc
+    );
   }
-
-  Request.callWithToken(
-    {
-      url: `modules/challenges/geo-ar-site/${site_id}/`,
-      method: "PATCH",
-      data: data,
-    },
-    logoutFunc
-  );
 };
 
 export const getARSposored = () =>
@@ -497,7 +497,7 @@ export const getUserFriendList = () =>
     logoutFunc
   );
 
-export const getScoreboardList = (destination) =>
+export const getScoreboardList = destination =>
   Request.callWithToken(
     {
       url: `${commonApiRoute}scoreboard/?destination=${destination}`,
@@ -506,7 +506,7 @@ export const getScoreboardList = (destination) =>
     logoutFunc
   );
 
-export const getMyRank = (destination) =>
+export const getMyRank = destination =>
   Request.callWithToken(
     {
       url: `${commonApiRoute}scoreboard/my-rank/?destination=${destination}`,

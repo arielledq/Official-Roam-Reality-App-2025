@@ -18,7 +18,7 @@ import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg";
 import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg";
 import { useDispatch, useSelector } from "react-redux";
 import useStyles from "./styles";
-import { updateSelectedSites } from "../../../redux/AR";
+import { updateSelectedSites, updateSelectedDestinationBandLocation } from "../../../redux/AR";
 import {
   getARSiteCategories,
   getARSiteLocation,
@@ -38,6 +38,7 @@ import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 const SCROLL_AMOUNT = 70;
+const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 1 minute
 
 const GeoArChallengeDetails = ({}) => {
   const route = useRoute();
@@ -47,7 +48,6 @@ const GeoArChallengeDetails = ({}) => {
   const { userLocation } = useContext(GeolocationContext);
   const latitude = userLocation?.latitude;
   const longitude = userLocation?.longitude;
-  const [isLoading, setIsLoading] = useState(false);
   const [hiddenStars, setHiddenStars] = useState(0);
   const [starsSites, setStarsSites] = useState(0);
   const [arSitesOn, setARSitesOnSwitch] = useState(true);
@@ -65,6 +65,8 @@ const GeoArChallengeDetails = ({}) => {
   const [scrollPosition, setScrollPosition] = useState(0);
   const [categories, setCategories] = useState([{ name: "Full" }]);
   const [filteredSites, setFilteredSites] = useState([]);
+
+  const bandLocationUpdatesIntervalId = useRef(null);
 
   const scrollRegionsPressHandler = () => {
     const newPosition = scrollPosition + SCROLL_AMOUNT;
@@ -127,13 +129,24 @@ const GeoArChallengeDetails = ({}) => {
       .finally(() => {});
   };
 
-  // const getBandLocationUpdates = () => {
-  //   // getARSiteLocation();
-
-  //   if (isEvent) {
-  //     console.log(selectedDestination.ar_event_sites);
-  //   }
-  // };
+  const getBandLocationUpdates = () => {
+    if (isEvent) {
+      const bandSites = selectedDestination?.ar_event_sites?.filter(site => !!site.band_user);
+      bandSites.forEach(async site => {
+        const siteId = site?.id;
+        try {
+          const response = await getARSiteLocation(siteId);
+          if (!!response?.lat_long?.coordinates?.length) {
+            const lat = response?.lat_long?.coordinates[1];
+            const long = response?.lat_long?.coordinates[0];
+            dispatch(updateSelectedDestinationBandLocation({ id: siteId, lat: lat, long: long }));
+          }
+        } catch (error) {
+          console.error("error", error);
+        }
+      });
+    }
+  };
 
   useEffect(() => {
     if (
@@ -166,7 +179,14 @@ const GeoArChallengeDetails = ({}) => {
     getARStarSites();
     getArSiteCategories();
 
-    // getBandLocationUpdates();
+    bandLocationUpdatesIntervalId.current = setInterval(
+      getBandLocationUpdates,
+      BAND_LOCATION_UPDATE_INTERVAL_SECONDS
+    );
+
+    return () => {
+      clearInterval(bandLocationUpdatesIntervalId.current);
+    };
   }, []);
 
   const loadDFacts = async id => {
@@ -248,10 +268,9 @@ const GeoArChallengeDetails = ({}) => {
 
   const navigateToNextScreen = updatedSelectedSite => {
     dispatch(updateSelectedSites(updatedSelectedSite));
+
     navigation.navigate("GeoArSiteDetails", {
-      experience_type: isEvent
-        ? EXPERIENCE_TYPE_CHOICES.EVENT
-        : EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE,
+      experience_type: experienceType,
     });
   };
 
@@ -291,14 +310,27 @@ const GeoArChallengeDetails = ({}) => {
     }
   };
 
-  const getFullBounds = _ => {
-    let bordersOfDestination = selectedDestination?.border
-    if(experienceType){
-      if(experienceType === EXPERIENCE_TYPE_CHOICES.EVENT)
-        bordersOfDestination = selectedDestination?.event_borders
-      else if(experienceType === EXPERIENCE_TYPE_CHOICES.BAND)
-        bordersOfDestination = selectedDestination?.band_borders
+  const getBordersOfDestination = () => {
+    let bordersOfDestination;
+
+    switch (experienceType) {
+      case EXPERIENCE_TYPE_CHOICES.EVENT:
+        bordersOfDestination = selectedDestination?.event_borders;
+        break;
+      case EXPERIENCE_TYPE_CHOICES.BAND:
+        bordersOfDestination = selectedDestination?.band_borders;
+        break;
+
+      default:
+        bordersOfDestination = selectedDestination?.border;
+        break;
     }
+
+    return bordersOfDestination;
+  };
+
+  const getFullBounds = () => {
+    const bordersOfDestination = getBordersOfDestination();
     if (bordersOfDestination) {
       let arrayPoints = [];
       for (let i = 0; i < bordersOfDestination.coordinates.length; i++) {
@@ -328,14 +360,8 @@ const GeoArChallengeDetails = ({}) => {
       });
   };
 
-  const getFullCenter = _ => {
-    let bordersOfDestination = selectedDestination?.border
-    if(experienceType){
-      if(experienceType === EXPERIENCE_TYPE_CHOICES.EVENT)
-        bordersOfDestination = selectedDestination?.event_borders
-      else if(experienceType === EXPERIENCE_TYPE_CHOICES.BAND)
-        bordersOfDestination = selectedDestination?.band_borders
-    }
+  const getFullCenter = () => {
+    const bordersOfDestination = getBordersOfDestination();
     if (bordersOfDestination) {
       let arrayPoints = [];
       for (let i = 0; i < bordersOfDestination.coordinates.length; i++) {
@@ -423,7 +449,6 @@ const GeoArChallengeDetails = ({}) => {
         backgroundColor="transparent"
       />
 
-      {isLoading && <ActivityIndicator size="large" />}
       <View
         style={{
           marginBottom: 10,
