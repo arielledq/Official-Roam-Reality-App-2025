@@ -173,10 +173,9 @@
 		<string>dgis</string>
 		<string>lftgpas</string>
 		<string>sygic</string>
-	</array>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
 		<string>itms-apps</string>
+		<string>instagram</string>
+		<string>facebook</string>
 	</array>
 </dict>
 </plist>
