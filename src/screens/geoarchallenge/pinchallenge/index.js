@@ -166,7 +166,7 @@ const PinChallenge = () => {
         scale,
         rotation,
         emissionIntensity: emissionValue,
-        rotationSpeed: 5,
+        rotationSpeed: 10,
         scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
         minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
@@ -402,7 +402,7 @@ const PinChallenge = () => {
   useEffect(() => {
     if (challengeObjParameters) {
       setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.9);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 5);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 3);
       setPosition({
         x: parseFloat(challengeObjParameters?.positionX) || 0,
         y: parseFloat(challengeObjParameters?.positionY) || 0,
@@ -461,9 +461,11 @@ const PinChallenge = () => {
         textureEmission &&
         isUnityLoaded
       ) {
+        sendBloomValuesToUnity()
         sendModelDataToUnitySpawn();
       }
     }, [
+      sendBloomValuesToUnity,
       unityRef,
       unityRef.current,
       modelOBJ,
