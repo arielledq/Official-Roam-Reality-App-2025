@@ -40,6 +40,13 @@ export const signUp = data =>
     method: "POST",
     data,
   });
+
+export const getArTips = () =>
+  Request.callWithToken({
+    url: `${commonApiRoute}slide-pictures/`,
+    method: "GET",
+  });
+
 export const sendCode = data =>
   Request.call({
     url: `${commonApiRoute}send-email-otp/`,

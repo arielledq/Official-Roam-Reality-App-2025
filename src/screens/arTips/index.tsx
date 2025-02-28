@@ -1,43 +1,17 @@
 import React, { useEffect, useRef, useState } from "react";
 import { View, ActivityIndicator, FlatList, Image, StyleSheet } from "react-native";
-
 import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
 import { AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS, AR_TIPS_AUTO_SLIDE_SECONDS } from "../../constants";
-
 import ScreenContainer from "components/ScreenContainer";
-
 import theme from "assets/theme";
-
-const ARTipsImage1 = require("../../assets/arTips/1.png");
-const ARTipsImage2 = require("../../assets/arTips/2.png");
-const ARTipsImage3 = require("../../assets/arTips/3.png");
-const ARTipsImage4 = require("../../assets/arTips/4.png");
-const ARTipsImage5 = require("../../assets/arTips/5.png");
-const ARTipsImage6 = require("../../assets/arTips/6.png");
-const ARTipsImage7 = require("../../assets/arTips/7.png");
-const ARTipsImage8 = require("../../assets/arTips/8.png");
-const ARTipsImage9 = require("../../assets/arTips/9.png");
-const ARTipsImage10 = require("../../assets/arTips/10.png");
-
-const examples: any = {
-  images: [
-    { image: ARTipsImage1 },
-    { image: ARTipsImage2 },
-    { image: ARTipsImage3 },
-    { image: ARTipsImage4 },
-    { image: ARTipsImage5 },
-    { image: ARTipsImage6 },
-    { image: ARTipsImage7 },
-    { image: ARTipsImage8 },
-    { image: ARTipsImage9 },
-    { image: ARTipsImage10 },
-  ],
-};
+import {getArTips, login} from "network";
+import {handleError} from "util/helpers";
 
 const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [activeIndex, setActiveIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
+  const [arTips, setArTips] = useState([]);
 
   const flatListRef = useRef(null);
   const pauseTimerRef = useRef(null);
@@ -50,11 +24,26 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
     setViewWidth(width);
   };
 
+  const getPictures = () => {
+    setIsLoading(true);
+    getArTips()
+      .then(res => {
+        if (res.status == 1) {
+          setArTips(res?.data)
+        } else {
+          handleError(res);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   const renderItem = ({ item }: any) => {
     return (
       <Image
-        source={item?.image}
-        // source={{ uri: item?.image }}
+        // source={item?.image}
+        source={{ uri: item?.image }}
         style={[styles.media, { width: viewWidth }]}
         resizeMode="cover"
         resizeMethod="auto"
@@ -80,7 +69,7 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
     if (!isPaused) {
       const timer = setInterval(() => {
         setActiveIndex(prevIndex => {
-          const newIndex = prevIndex < examples.images.length - 1 ? prevIndex + 1 : 0;
+          const newIndex = prevIndex < arTips?.length - 1 ? prevIndex + 1 : 0;
           // @ts-ignore
           flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
           return newIndex;
@@ -88,7 +77,11 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
       }, AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS * 1000);
       return () => clearInterval(timer);
     }
-  }, [isPaused]);
+  }, [isPaused, arTips]);
+
+  useEffect(() => {
+    getPictures()
+  }, []);
 
   return (
     <ScreenContainer style={styles.screen}>
@@ -106,7 +99,7 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
               <FlatList
                 style={{ borderRadius: 16 }}
                 ref={flatListRef}
-                data={examples.images}
+                data={arTips}
                 renderItem={renderItem}
                 horizontal
                 pagingEnabled
@@ -126,7 +119,7 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
             <View style={styles.navButtons}>
               {/* Dot Indicators */}
               <View style={styles.dotContainer}>
-                {examples?.images?.map((_: any, index: number) => (
+                {arTips?.map((_: any, index: number) => (
                   <View
                     key={index}
                     style={[
