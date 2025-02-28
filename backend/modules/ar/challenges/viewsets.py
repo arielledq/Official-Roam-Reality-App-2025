@@ -1,6 +1,8 @@
 import json
 from itertools import chain
 from operator import attrgetter
+
+from .filters import CategoryFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
     DestinationFacts, PanicMessage, GeoArSiteCategory
@@ -366,6 +368,8 @@ class GeoArSiteCategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = GeoArSiteCategory.objects.all()
     serializer_class = GeoArSiteCategorySerializer
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = CategoryFilterSet
     http_method_names = ["get"]
 
     def get_queryset(self):
