@@ -62,6 +62,7 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin";
 import { removeItem } from "../util/helpers";
 import { USER_TYPES } from "../constants";
 import BandHome from "screens/bandHome";
+import useCheckAppUpdates from "../hooks/useCheckAppUpdates";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -78,6 +79,8 @@ const Navigation = () => {
   const { newUser } = useSelector((state: any) => state.persist);
   const dispatch = useDispatch();
 
+  const { checkForUpdates } = useCheckAppUpdates();
+
   useEffect(() => {
     // Define a callback function to handle storage changes
     const handleStorageChange = async ({ key, value }: { key: string; value: any }) => {
@@ -92,6 +95,8 @@ const Navigation = () => {
 
     // Subscribe to storage changes
     subscribeToStorageChanges(handleStorageChange);
+
+    checkForUpdates();
 
     // Clean up the listener on component unmount
     return () => {
