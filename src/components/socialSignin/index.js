@@ -216,9 +216,9 @@ const SocialSignin = ({ setLoading }) => {
           <FacebookIcon style={styles.socialSIicon} />
         </TouchableOpacity>
         {/* TODO: Re enable after backend API connection - 2025-02-21 */}
-        {/* <TouchableOpacity onPress={handleGoogleLogin}>
+        <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleAppleLogin}>
           <AppleIcon style={styles.socialSIicon} />
         </TouchableOpacity>
