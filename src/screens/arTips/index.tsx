@@ -66,13 +66,13 @@ const ARTipsScreen: ScreenStackComponent<RootStackParamList, "ARTips"> = () => {
 
   // Auto slide effect that depends on isPaused
   useEffect(() => {
-    if (!isPaused) {
+    if (!isPaused && arTips.length > 0) {
       const timer = setInterval(() => {
-        setActiveIndex(prevIndex => {
-          const newIndex = prevIndex < arTips?.length - 1 ? prevIndex + 1 : 0;
+        setActiveIndex((prevIndex) => {
+          const nextIndex = prevIndex < arTips.length - 1 ? prevIndex + 1 : 0;
           // @ts-ignore
-          flatListRef.current?.scrollToIndex({ index: newIndex, animated: true });
-          return newIndex;
+          flatListRef.current?.scrollToIndex({ index: nextIndex, animated: true });
+          return nextIndex;
         });
       }, AR_TIPS_AUTO_SLIDE_PAUSE_SECONDS * 1000);
       return () => clearInterval(timer);
