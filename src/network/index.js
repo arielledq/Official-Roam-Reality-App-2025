@@ -162,10 +162,10 @@ export const getARChallenges = () =>
     logoutFunc
   );
 
-export const getARSiteCategories = () =>
+export const getARSiteCategories = (filter = { is_band: false }) =>
   Request.callWithToken(
     {
-      url: `modules/challenges/geo-ar-site-categories/`,
+      url: `modules/challenges/geo-ar-site-categories/?is_band=${!!filter?.is_band}`,
       method: "GET",
     },
     logoutFunc

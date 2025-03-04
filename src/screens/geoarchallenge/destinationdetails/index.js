@@ -106,7 +106,9 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const getArSiteCategories = () => {
-    getARSiteCategories()
+    const isBand = experienceType === EXPERIENCE_TYPE_CHOICES.BAND;
+
+    getARSiteCategories({ is_band: isBand })
       .then(res => {
         setCategories([...categories, ...res.data]);
       })
