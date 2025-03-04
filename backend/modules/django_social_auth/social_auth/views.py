@@ -49,7 +49,7 @@ class FacebookLogin(SocialLoginView):
         user_profile.save()
         serializer = UserSerializer(user)
         profileObj, created = ARUserProfile.objects.get_or_create(user=user)
-        if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+        if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
             configs.NUMBER_USER_POINT_GIFT += 1
@@ -78,7 +78,7 @@ class GoogleLogin(SocialLoginView):
         user_profile.save()
         serializer = UserSerializer(user)
         profileObj, created = ARUserProfile.objects.get_or_create(user=user)
-        if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+        if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
             configs.NUMBER_USER_POINT_GIFT += 1
@@ -108,7 +108,7 @@ class AppleLogin(SocialLoginView):
         user_profile.save()
         serializer = UserSerializer(user)
         profileObj, created = ARUserProfile.objects.get_or_create(user=user)
-        if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+        if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
             configs.NUMBER_USER_POINT_GIFT += 1

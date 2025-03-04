@@ -210,7 +210,7 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     def get_queryset(self):
         queryset = (super().get_queryset()
                     .exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).
-                    order_by('-user_ar_profile__points'))
+                    order_by('-user_ar_profile__points', 'user_ar_profile__updated_at'))
         return queryset
 
     def list(self, request, *args, **kwargs):
