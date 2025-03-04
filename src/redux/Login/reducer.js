@@ -12,6 +12,18 @@ export const sliceLogin = createSlice({
     updateUserData: (state, action) => {
       state.data = action.payload;
     },
+    updateUserProperties: (state, action) => {
+      return (state = {
+        ...state,
+        data:{
+          ...state?.data,
+          user: {
+            ...state?.data?.user,
+            ...action.payload,
+          }
+        }
+      });
+    },
     updateUserLocationData: (state, action) => {
       let coordinates = [];
       if (!isNaN(action.payload?.longitude) && !isNaN(action.payload?.latitude)) {
@@ -47,6 +59,7 @@ export const sliceLogin = createSlice({
 export const {
   resetState,
   updateUserData,
+  updateUserProperties,
   updateUserLocationData,
   updateAccountFlag,
   updateVerified,

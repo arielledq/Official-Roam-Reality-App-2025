@@ -88,7 +88,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
         fields = ['id', 'email', 'name', 'user_profile', 'user_ar_profile', 'type', 'geo_site',
-                  'is_band_location_active']
+                  'is_band_location_active', 'has_receive_points',]
 
     def get_is_band_location_active(self, instance):
         if hasattr(instance, 'geo_site'):
@@ -128,6 +128,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
     name = serializers.CharField(required=False)
     is_friend = serializers.SerializerMethodField()
     friends = UserSerializer(many=True, read_only=True)
+    has_receive_points = serializers.BooleanField(required=False)
 
     # ar_memories = serializers.SerializerMethodField()
 
@@ -155,6 +156,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         instance.account_setup = validated_data.get('account_setup', instance.account_setup)
         instance.image = validated_data.get('image', instance.image)
         instance.user.name = validated_data.get('name', instance.user.name)
+        instance.user.has_receive_points = validated_data.get('has_receive_points', instance.user.has_receive_points)
         instance.user.save()
         instance.save()
         return instance

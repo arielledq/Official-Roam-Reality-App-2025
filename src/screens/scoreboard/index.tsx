@@ -30,8 +30,6 @@ import { MenuIcon } from "assets/svg";
 import theme from "assets/theme";
 const ScoreBoard = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
-  // const [filteredUsers, setFilteredUsers] = React.useState<[]>([]);
-  // const [allUsers, setAllUsers] = React.useState([]);
   const [users, setUsers] = React.useState([]);
   const [profileDetails, setProfileDetails] = useState<any>(null);
   const [rankMine, setRankMine] = useState<number | null>(null);
@@ -45,34 +43,6 @@ const ScoreBoard = ({}) => {
 
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
   const arProfile = useSelector((state: any) => state?.ar?.arProfile);
-
-  // const fetchUsers = (userId: number) => {
-  //   const payload = {
-  //     search: "",
-  //   };
-  //   searchUsers(payload).then(response => {
-  //     if (response) {
-  //       if (response?.data?.length > 0) {
-  //         let arProfiles = response?.data.filter((a: any) => a?.user_ar_profile);
-  //         arProfiles = arProfiles.filter((a: any) => a?.name);
-  //         if (arProfile && userProfile) {
-  //           arProfiles.push(userProfile);
-  //         }
-  //         const aa = arProfiles.sort(
-  //           (a: any, b: any) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
-  //         );
-  //         for (var i = 0; i < aa.length; i++) {
-  //           aa[i].rank = i + 1;
-  //           if (aa[i].id == userId) {
-  //             setRankMine(i + 1);
-  //           }
-  //         }
-  //         setFilteredUsers(aa);
-  //         setAllUsers(aa);
-  //       }
-  //     }
-  //   });
-  // };
 
   const getScoreboard = (destination="") => {
     setIsLoading(true)
@@ -97,27 +67,6 @@ const ScoreBoard = ({}) => {
       setIsLoading(false);
     });
   };
-
-  // const fetchProfileDetails = async (userProfileId: number) => {
-  //   try {
-  //     getProfieDetails({
-  //       id: userProfileId,
-  //     })
-  //       .then(res => {
-  //         if (res.status == 1) {
-  //           setProfileDetails(res);
-  //         } else {
-  //           console.error("Error", "Error fetching profile details: ");
-  //         }
-  //       })
-  //       .catch(err => {
-  //         console.error("Error", "Error fetching profile details: ");
-  //       })
-  //       .finally(() => setIsLoading(false));
-  //   } catch (error) {
-  //     console.error("Error", "Error fetching profile details: ");
-  //   }
-  // };
 
   const ARDestinations = () => {
     setIsLoading(true);
@@ -145,21 +94,6 @@ const ScoreBoard = ({}) => {
       .finally(() => {});
   };
 
-  // const getAllPoints = (destination: any) => {
-  //   const arrayPoints = [];
-  //   if (destination?.border?.coordinates) {
-  //     for (let i = 0; i < destination.border.coordinates.length; i++) {
-  //       const points = destination.border.coordinates[i];
-  //       for (let j = 0; j < points.length; j++) {
-  //         const point = points[j];
-  //         arrayPoints.push({ latitude: point[1], longitude: point[0] });
-  //       }
-  //     }
-  //     return arrayPoints;
-  //   }
-  //   return null;
-  // };
-
   const filterDestinations = (o: any, index: number) => {
     setSelectedDestination(o);
     // @ts-ignore
@@ -167,32 +101,6 @@ const ScoreBoard = ({}) => {
       animated: true,
       index: index,
     });
-    // const destinationPoints = getAllPoints(o);
-    // if (destinationPoints) {
-    //   const filterUserWithDes = [];
-    //   let count = 1;
-    //   for (let i = 0; i < allUsers.length; i++) {
-    //     let userCheck: any = allUsers[i];
-    //     if (
-    //       userCheck?.user_ar_profile &&
-    //       userCheck?.user_ar_profile?.current_location?.coordinates?.length > 0
-    //     ) {
-    //       const pointUser = {
-    //         latitude: userCheck?.user_ar_profile?.current_location?.coordinates[1],
-    //         longitude: userCheck?.user_ar_profile?.current_location?.coordinates[0],
-    //       };
-    //
-    //       const isInsideSiteArea = isLocationPointInPolygon(pointUser, destinationPoints);
-    //       if (isInsideSiteArea) {
-    //         userCheck.rank = count;
-    //         filterUserWithDes.push(userCheck);
-    //         count++;
-    //       }
-    //     }
-    //     // @ts-ignore
-    //     setFilteredUsers(filterUserWithDes);
-    //   }
-    // }
   };
 
 
@@ -354,18 +262,6 @@ const ScoreBoard = ({}) => {
     getScoreboard(selectedDestination?.id);
     getMyRankPoints(selectedDestination?.id)
   }, [selectedDestination]);
-
-  // React.useEffect(() => {
-  //   // const userId = userProfile?.id;
-  //   // if (userId) {
-  //   //   fetchUsers(userId);
-  //   // }
-  //   //
-  //   // const userProfileId = userProfile?.user_profile?.id;
-  //   // if (userProfileId) {
-  //   //   fetchProfileDetails(userProfileId);
-  //   // }
-  // }, [userProfile]);
 
   return (
     <ScreenContainer>
