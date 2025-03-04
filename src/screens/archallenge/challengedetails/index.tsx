@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import {
+  Dimensions,
+  Image,
+  Modal,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  TouchableWithoutFeedback,
+  View,
+} from "react-native";
 
 import { useIsFocused } from "@react-navigation/native";
 import RenderHtml from "react-native-render-html";
@@ -14,6 +23,7 @@ import { RootStackParamList, ScreenStackComponent } from "../../../constants/typ
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 import useStyles from "./styles";
+import theme from "../../../assets/theme";
 
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
@@ -21,6 +31,7 @@ import AppButton from "../../../components/button";
 
 // @ts-ignore
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
+import Icon from "components/Icon";
 
 const { width } = Dimensions.get("window");
 
@@ -63,6 +74,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   const [isChallengeDone, setIsChallengeDone] = useState(false);
   const [coolDownHoursText, setCoolDownHoursText] = useState("");
   const [myCheckInsText, setMyCheckInsText] = useState("");
+  const [isStartChallengeOptionsVisible, setIsStartChallengeOptionsVisible] = useState(false);
 
   const styles = useStyles();
 
@@ -104,24 +116,28 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     }
   };
 
-  const navigateToChallengeCapture = () => {
+  const navigateToChallengeCapture = (openGallery = false) => {
+    setIsStartChallengeOptionsVisible(false);
     if (!isChallengeDone) {
+      const cameraOptions = {
+        openGallery: openGallery,
+      };
       switch (experience_type) {
         case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
           // @ts-ignore
-          navigation.navigate("ArChallengeCapture", { challengeObj });
+          navigation.navigate("ArChallengeCapture", { challengeObj, ...cameraOptions });
           break;
         case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
           // @ts-ignore
-          navigation.navigate("PinChallenge");
+          navigation.navigate("PinChallenge", { ...cameraOptions });
           break;
         case EXPERIENCE_TYPE_CHOICES.EVENT:
           // @ts-ignore
-          navigation.navigate("PinChallenge");
+          navigation.navigate("PinChallenge", { ...cameraOptions });
           break;
         case EXPERIENCE_TYPE_CHOICES.BAND:
           // @ts-ignore
-          navigation.navigate("PinChallenge");
+          navigation.navigate("PinChallenge", { ...cameraOptions });
           break;
 
         default:
@@ -164,8 +180,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           }
           break;
       }
+      getExample();
     }
-    getExample();
   }, [isFocused]);
 
   const openExample = () => {
@@ -177,6 +193,23 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       showMessage("We are working on adding examples to this challenge.", "info");
     }
   };
+
+  const toggleStartChallengeOptionsModalHandler = () => {
+    setIsStartChallengeOptionsVisible(currState => !currState);
+  };
+
+  const startChallengeButtonHandler = () => {
+    if (experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE) {
+      toggleStartChallengeOptionsModalHandler();
+    } else {
+      navigateToChallengeCapture();
+    }
+  };
+
+  const startChallengeOptionsButtonColor = [
+    `${theme.lightColors?.inputBG}`,
+    `${theme.lightColors?.inputBG}`,
+  ];
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -301,13 +334,63 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           <Text style={styles.bottomText}>Let's see an example</Text>
         </TouchableOpacity>
         <AppButton
-          onPress={() => navigateToChallengeCapture()}
+          onPress={startChallengeButtonHandler}
           buttonStyle={styles.buttonStyle}
           containerStyle={styles.buttonContainerStyle}
           title={"Start Challenge"}
           disabled={isLoading}
         />
       </View>
+
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isStartChallengeOptionsVisible}
+        onDismiss={toggleStartChallengeOptionsModalHandler}
+      >
+        <TouchableWithoutFeedback onPress={toggleStartChallengeOptionsModalHandler}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <AppButton
+                onPress={() => navigateToChallengeCapture(true)}
+                buttonStyle={styles.appButtonStyle}
+                customColors={startChallengeOptionsButtonColor}
+                containerStyle={styles.appButtonContainerStyle}
+                title={
+                  <>
+                    <Icon
+                      name="picture"
+                      family="antdesign"
+                      size={24}
+                      color={theme.lightColors?.white}
+                    />
+                    <Text style={styles.appButtonLabelStyle}>Upload from Gallery</Text>
+                  </>
+                }
+              />
+              <View style={styles.buttonDivider} />
+              <AppButton
+                onPress={() => navigateToChallengeCapture(false)}
+                buttonStyle={styles.appButtonStyle}
+                customColors={startChallengeOptionsButtonColor}
+                containerStyle={styles.appButtonContainerStyle}
+                title={
+                  <>
+                    <Icon
+                      name="camera"
+                      family="antdesign"
+                      size={24}
+                      color={theme.lightColors?.white}
+                    />
+                    <Text style={styles.appButtonLabelStyle}>Capture from Camera</Text>
+                  </>
+                }
+              />
+            </View>
+            <View style={styles.arrow} />
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </BackgroundWithImage>
   );
 };

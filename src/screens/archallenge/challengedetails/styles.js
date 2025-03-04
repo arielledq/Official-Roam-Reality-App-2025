@@ -97,6 +97,54 @@ const useStyles = makeStyles(theme => ({
     marginTop: 5,
     textAlign: "center",
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "flex-end",
+    alignItems: "center",
+  },
+  modalContent: {
+    margin: 20,
+    backgroundColor: theme.colors.inputBG,
+    borderRadius: 16,
+    padding: 16,
+    shadowColor: theme.colors.inputBG,
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+    gap: 8,
+    marginBottom: 0,
+  },
+  appButtonStyle: {
+    alignItems: "center",
+    justifyContent: "flex-start",
+  },
+  appButtonContainerStyle: { padding: 4 },
+  appButtonLabelStyle: {
+    marginLeft: 8,
+    color: theme.colors.white,
+    fontSize: FontSizes.S16,
+  },
+  buttonDivider: {
+    borderBottomWidth: 0.5,
+    borderBottomColor: theme.colors.white,
+    borderStyle: "solid",
+  },
+  arrow: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 10,
+    borderRightWidth: 10,
+    borderTopWidth: 10,
+    borderLeftColor: "transparent",
+    borderRightColor: "transparent",
+    borderTopColor: theme.colors.inputBG,
+    marginBottom: -5,
+    marginBottom: 70,
+  },
 }));
 
 export default useStyles;

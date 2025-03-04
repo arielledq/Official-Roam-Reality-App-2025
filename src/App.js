@@ -4,7 +4,7 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { persistor, store } from "./store";
 import "react-native-devsettings/withAsyncStorage";
-import { LogBox, StyleSheet } from "react-native";
+import { LogBox, StyleSheet, StatusBar } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import SplashScreen from "react-native-splash-screen";
 import Geocoder from "react-native-geocoding";
@@ -59,6 +59,7 @@ const App = () => {
         <GestureHandlerRootView style={styles.root}>
           <PersistGate loading={null} persistor={persistor}>
             <GeolocationProvider>
+              <StatusBar hidden={true} />
               <Navigation />
             </GeolocationProvider>
           </PersistGate>
