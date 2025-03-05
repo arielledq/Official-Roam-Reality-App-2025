@@ -32,7 +32,7 @@ import { EXPERIENCE_TYPE_CHOICES } from "constants";
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 1 minute
 
-const GeoArChallengeDetails = ({}) => {
+const GeoArChallengeDetails = ({ }) => {
   const route = useRoute();
   const { isEvent, experienceType } = route?.params;
   const _styles = useStyles();
@@ -115,7 +115,7 @@ const GeoArChallengeDetails = ({}) => {
       .then(res => {
         setCategories([...categories, ...res.data]);
       })
-      .finally(() => {});
+      .finally(() => { });
   };
 
   const getARStarSites = () => {
@@ -123,7 +123,7 @@ const GeoArChallengeDetails = ({}) => {
       .then(res => {
         setStarsSites(res.data[0]);
       })
-      .finally(() => {});
+      .finally(() => { });
   };
 
   const getBandLocationUpdates = () => {
@@ -217,7 +217,7 @@ const GeoArChallengeDetails = ({}) => {
           }
         }
       })
-      .finally(() => {});
+      .finally(() => { });
   };
 
   const f_markerView = o => {
@@ -272,43 +272,19 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const _markerView = o => {
-
-    const handleImageLoad = (setImagesLoadedCount) => {
-      let newsCount = 0;
-    
-      const intervalId = setInterval(() => {
-        setImagesLoadedCount(prev => {
-          const newCount = prev + 1;
-          console.log('Nuevo valor de imagesLoadedCount:', newCount);
-    
-          // Si llegamos a 5, detenemos el intervalo
-          if (newCount >= 15) {
-            clearInterval(intervalId);
-            return 15;  // Asegura que no supere el valor de 5
-          }
-    
-          return newCount;
-        });
-      }, 1000); // Ejecutar cada 1000ms (1 segundo)
-    };
-
-    // const handleImageLoad = (setImagesLoadedCount, markersCount) => {
-    //   setTimeout(() => {
-    //     setImagesLoadedCount(prev => {
-    //       const newCount = prev + 1;
-    //       console.log('Nuevo valor de imagesLoadedCount:', newCount);
-    //       if (newCount <= markersCount) {
-    //         return newCount;
-    //       }
-    //       return markersCount;
-    //     });
-    //   }, 10);
-    // };
-    console.log('aaaaaaaaakoooorekooo', imagesLoadedCount)
+    const [imageLoaded, setImageLoaded] = useState(false);
+    const [hasRenderedOnce, setHasRenderedOnce] = useState(false); // Nuevo estado
+  
+    useEffect(() => {
+      if (imageLoaded && !hasRenderedOnce) {
+        setHasRenderedOnce(true);
+      }
+    }, [imageLoaded]);
+  
     if (o?.lat_long) {
       return (
         <Marker
-          key={`marker-${o.pin_challenge.sponsored.image.length}-${imagesLoadedCount}`}
+          key={`marker-${o.id}-${imageLoaded}`}
           coordinate={{
             latitude: o?.lat_long.coordinates[1],
             longitude: o?.lat_long.coordinates[0],
@@ -340,28 +316,11 @@ const GeoArChallengeDetails = ({}) => {
               }}
             >
               <Image
-                // onLoad={() => {
-                //   console.log('Imagen cargada:', o.pin_challenge.sponsored.image);
-                //   setTimeout(() => {
-                //     setImagesLoadedCount(prev => {
-                //       prev = markers.length;
-                //       return markers.length;
-                //     });
-                //   }, 1000);
-                // }}
                 resizeMode="cover"
-                onLoadStart={() => {
-                  console.log('Imagen cargada1:', o.pin_challenge.sponsored.image); // Verifica que el evento se dispare correctamente
-                  handleImageLoad(setImagesLoadedCount, markersCount);}}
-
                 onLoad={() => {
-                  console.log('Imagen cargada2:', o.pin_challenge.sponsored.image); // Verifica que el evento se dispare correctamente
-                  handleImageLoad(setImagesLoadedCount, markersCount);}}
-                
-                  onLoadEnd={() => {
-                    console.log('Imagen cargada2:', o.pin_challenge.sponsored.image); // Verifica que el evento se dispare correctamente
-                    handleImageLoad(setImagesLoadedCount, markersCount);}}
-                    
+                  console.log('Imagen cargada:', o.pin_challenge.sponsored.image);
+                  setImageLoaded(true);
+                }}
                 style={{
                   width: 19,
                   height: 19,
@@ -377,6 +336,8 @@ const GeoArChallengeDetails = ({}) => {
         </Marker>
       );
     }
+  
+    return null;
   };
 
   const getBordersOfDestination = () => {
@@ -522,10 +483,6 @@ const GeoArChallengeDetails = ({}) => {
     : arSitesOn &&
     selectedDestination.star_ar_sites.map(o => _markerView(o));
 
-
-  console.log('aaaaaaaimage', imagesLoadedCount, totalImages)
-
-  console.log(markers.length)
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
