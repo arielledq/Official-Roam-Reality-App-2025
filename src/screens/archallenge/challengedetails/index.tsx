@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  Dimensions,
-  Image,
-  Modal,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  View,
-} from "react-native";
+import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { useIsFocused } from "@react-navigation/native";
 import RenderHtml from "react-native-render-html";
@@ -23,7 +14,6 @@ import { RootStackParamList, ScreenStackComponent } from "../../../constants/typ
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
 
 import useStyles from "./styles";
-import theme from "../../../assets/theme";
 
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
@@ -31,7 +21,7 @@ import AppButton from "../../../components/button";
 
 // @ts-ignore
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
-import Icon from "components/Icon";
+import theme from "assets/theme";
 
 const { width } = Dimensions.get("window");
 
@@ -74,7 +64,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   const [isChallengeDone, setIsChallengeDone] = useState(false);
   const [coolDownHoursText, setCoolDownHoursText] = useState("");
   const [myCheckInsText, setMyCheckInsText] = useState("");
-  const [isStartChallengeOptionsVisible, setIsStartChallengeOptionsVisible] = useState(false);
 
   const styles = useStyles();
 
@@ -117,7 +106,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
   };
 
   const navigateToChallengeCapture = (openGallery = false) => {
-    setIsStartChallengeOptionsVisible(false);
     if (!isChallengeDone) {
       const cameraOptions = {
         openGallery: openGallery,
@@ -193,23 +181,6 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       showMessage("We are working on adding examples to this challenge.", "info");
     }
   };
-
-  const toggleStartChallengeOptionsModalHandler = () => {
-    setIsStartChallengeOptionsVisible(currState => !currState);
-  };
-
-  const startChallengeButtonHandler = () => {
-    if (experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE) {
-      toggleStartChallengeOptionsModalHandler();
-    } else {
-      navigateToChallengeCapture();
-    }
-  };
-
-  const startChallengeOptionsButtonColor = [
-    `${theme.lightColors?.inputBG}`,
-    `${theme.lightColors?.inputBG}`,
-  ];
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -333,16 +304,47 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
         <TouchableOpacity onPress={openExample}>
           <Text style={styles.bottomText}>Let's see an example</Text>
         </TouchableOpacity>
-        <AppButton
-          onPress={startChallengeButtonHandler}
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainerStyle}
-          title={"Start Challenge"}
-          disabled={isLoading}
-        />
+        {experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE ? (
+          <View style={{ flexDirection: "row", gap: 16 }}>
+            <View style={{ flex: 1 }}>
+              <AppButton
+                onPress={() => navigateToChallengeCapture(true)}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={styles.buttonContainerStyle}
+                title={
+                  <Text style={{ fontSize: 14, fontWeight: 500, color: theme.lightColors?.white }}>
+                    Upload from Gallery
+                  </Text>
+                }
+                disabled={isLoading}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <AppButton
+                onPress={() => navigateToChallengeCapture(false)}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={styles.buttonContainerStyle}
+                title={
+                  <Text style={{ fontSize: 14, fontWeight: 500, color: theme.lightColors?.white }}>
+                    Capture from Camera
+                  </Text>
+                }
+                disabled={isLoading}
+              />
+            </View>
+          </View>
+        ) : (
+          <AppButton
+            onPress={() => navigateToChallengeCapture(false)}
+            buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            title={"Start Challenge"}
+            disabled={isLoading}
+          />
+        )}
       </View>
 
-      <Modal
+      {/* <Modal
         animationType="fade"
         transparent={true}
         visible={isStartChallengeOptionsVisible}
@@ -390,7 +392,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
             <View style={styles.arrow} />
           </View>
         </TouchableWithoutFeedback>
-      </Modal>
+      </Modal> */}
     </BackgroundWithImage>
   );
 };
