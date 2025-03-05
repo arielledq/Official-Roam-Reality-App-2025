@@ -455,6 +455,7 @@ class ARUserProfile(models.Model):
     )
     current_location = gis_models.PointField(_("Current Location"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name_plural = "AR User Profile"
