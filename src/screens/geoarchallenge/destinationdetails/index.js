@@ -28,11 +28,12 @@ import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
+import RNFS from "react-native-fs";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 1 minute
 
-const GeoArChallengeDetails = ({ }) => {
+const GeoArChallengeDetails = ({}) => {
   const route = useRoute();
   const { isEvent, experienceType } = route?.params;
   const _styles = useStyles();
@@ -105,7 +106,7 @@ const GeoArChallengeDetails = ({ }) => {
       .then(res => {
         setHiddenStars(res.data[0]);
       })
-      .finally(() => { });
+      .finally(() => {});
   };
 
   const getArSiteCategories = () => {
@@ -115,7 +116,7 @@ const GeoArChallengeDetails = ({ }) => {
       .then(res => {
         setCategories([...categories, ...res.data]);
       })
-      .finally(() => { });
+      .finally(() => {});
   };
 
   const getARStarSites = () => {
@@ -123,7 +124,7 @@ const GeoArChallengeDetails = ({ }) => {
       .then(res => {
         setStarsSites(res.data[0]);
       })
-      .finally(() => { });
+      .finally(() => {});
   };
 
   const getBandLocationUpdates = () => {
@@ -217,7 +218,7 @@ const GeoArChallengeDetails = ({ }) => {
           }
         }
       })
-      .finally(() => { });
+      .finally(() => {});
   };
 
   const f_markerView = o => {
@@ -272,19 +273,10 @@ const GeoArChallengeDetails = ({ }) => {
   };
 
   const _markerView = o => {
-    const [imageLoaded, setImageLoaded] = useState(false);
-    const [hasRenderedOnce, setHasRenderedOnce] = useState(false); // Nuevo estado
-  
-    useEffect(() => {
-      if (imageLoaded && !hasRenderedOnce) {
-        setHasRenderedOnce(true);
-      }
-    }, [imageLoaded]);
-  
     if (o?.lat_long) {
       return (
         <Marker
-          key={`marker-${o.id}-${imageLoaded}`}
+          key={`marker-${o.id}`}
           coordinate={{
             latitude: o?.lat_long.coordinates[1],
             longitude: o?.lat_long.coordinates[0],
@@ -294,13 +286,13 @@ const GeoArChallengeDetails = ({ }) => {
           pinColor={pinColor}
           tracksViewChanges={tracksViewChanges}
         >
-          {Platform.OS === 'ios' && (
+          {Platform.OS === "ios" && (
             <Callout
               onPress={() => navigateToNextScreen(o)}
               style={{
-                backgroundColor: '#fff',
+                backgroundColor: "#fff",
                 minWidth: 100,
-                alignItems: 'center',
+                alignItems: "center",
               }}
             >
               <Text>{o.name}</Text>
@@ -311,24 +303,20 @@ const GeoArChallengeDetails = ({ }) => {
               style={{
                 width: 30,
                 height: 30,
-                alignItems: 'center',
-                justifyContent: 'flex-start',
+                alignItems: "center",
+                justifyContent: "flex-start",
               }}
             >
               <Image
                 resizeMode="cover"
-                onLoad={() => {
-                  console.log('Imagen cargada:', o.pin_challenge.sponsored.image);
-                  setImageLoaded(true);
-                }}
                 style={{
                   width: 19,
                   height: 19,
-                  position: 'absolute',
+                  position: "absolute",
                   top: 2.5,
                   borderRadius: 100,
                 }}
-                source={{ uri: o.pin_challenge.sponsored.image }}
+                source={{ uri: o.localFilePath }}
               />
               <MarkerIcon color={o?.category?.color} />
             </View>
@@ -336,7 +324,7 @@ const GeoArChallengeDetails = ({ }) => {
         </Marker>
       );
     }
-  
+
     return null;
   };
 
@@ -469,19 +457,56 @@ const GeoArChallengeDetails = ({ }) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
-  const markersCount = isEvent
-  ? filteredSites.length > 0
-    ? filteredSites.length
-    : selectedDestination.ar_event_sites.length
-  : arSitesOn &&
-  selectedDestination.star_ar_sites.length
+  const [downloadedImages, setDownloadedImages] = useState([]);
 
-  const markers = isEvent
-    ? filteredSites.length > 0
-      ? filteredSites.map(o => _markerView(o))
-      : selectedDestination.ar_event_sites.map(o => _markerView(o))
-    : arSitesOn &&
-    selectedDestination.star_ar_sites.map(o => _markerView(o));
+  let markers = [];
+
+  if (isEvent) {
+    if (filteredSites?.length > 0) {
+      markers = filteredSites;
+    }
+    if (selectedDestination?.ar_event_sites?.length) {
+      markers = selectedDestination.ar_event_sites;
+    }
+  } else if (arSitesOn) {
+    if (selectedDestination?.star_ar_sites?.length) {
+      markers = selectedDestination.star_ar_sites;
+    }
+  }
+
+  useEffect(() => {
+    const downloadAllImages = async () => {
+      const results = await Promise.all(
+        markers.map(async (marker, index) => {
+          const url = marker.pin_challenge.sponsored.image;
+          const fileName = `${index}_` + url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+          const localFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+          try {
+            const downloadResult = await RNFS.downloadFile({
+              fromUrl: url,
+              toFile: localFilePath,
+              background: false,
+              discretionary: true,
+              cacheable: true,
+            }).promise;
+
+            if (downloadResult.statusCode === 200) {
+              return { ...marker, localFilePath };
+            } else {
+              return { ...marker, localFilePath: null }; // Download failed, return null path
+            }
+          } catch (error) {
+            return { ...marker, localFilePath: null }; // Download error, return null path
+          }
+        })
+      );
+
+      setDownloadedImages(results);
+    };
+
+    downloadAllImages();
+  }, [markers]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -601,19 +626,19 @@ const GeoArChallengeDetails = ({ }) => {
         }}
       >
         <MapView
-          key={markers}
           provider={PROVIDER_GOOGLE}
           ref={mapView}
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
-          {markers}
+          {!!downloadedImages?.length &&
+            downloadedImages.map(marker => {
+              return _markerView(marker);
+            })}
           {friendsLocationSitesOn &&
             friendList.map(o => {
-              return f_markerView(o)
-            })
-          }
-
+              return f_markerView(o);
+            })}
         </MapView>
       </View>
       <View>
