@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { FlatList, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Platform, ScrollView, Text, TouchableOpacity, View, Image } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -58,6 +58,9 @@ const GeoArChallengeDetails = ({}) => {
   const [categories, setCategories] = useState([{ name: "Full" }]);
   const [filteredSites, setFilteredSites] = useState([]);
 
+  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
+  const [totalImages, setTotalImages] = useState(0);
+
   const bandLocationUpdatesIntervalId = useRef(null);
 
   const scrollRegionsPressHandler = () => {
@@ -102,7 +105,7 @@ const GeoArChallengeDetails = ({}) => {
       .then(res => {
         setHiddenStars(res.data[0]);
       })
-      .finally(() => {});
+      .finally(() => { });
   };
 
   const getArSiteCategories = () => {
@@ -269,33 +272,105 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const _markerView = o => {
-    if (o.lat_long) {
+
+    const handleImageLoad = (setImagesLoadedCount) => {
+      let newsCount = 0;
+    
+      const intervalId = setInterval(() => {
+        setImagesLoadedCount(prev => {
+          const newCount = prev + 1;
+          console.log('Nuevo valor de imagesLoadedCount:', newCount);
+    
+          // Si llegamos a 5, detenemos el intervalo
+          if (newCount >= 15) {
+            clearInterval(intervalId);
+            return 15;  // Asegura que no supere el valor de 5
+          }
+    
+          return newCount;
+        });
+      }, 1000); // Ejecutar cada 1000ms (1 segundo)
+    };
+
+    // const handleImageLoad = (setImagesLoadedCount, markersCount) => {
+    //   setTimeout(() => {
+    //     setImagesLoadedCount(prev => {
+    //       const newCount = prev + 1;
+    //       console.log('Nuevo valor de imagesLoadedCount:', newCount);
+    //       if (newCount <= markersCount) {
+    //         return newCount;
+    //       }
+    //       return markersCount;
+    //     });
+    //   }, 10);
+    // };
+    console.log('aaaaaaaaakoooorekooo', imagesLoadedCount)
+    if (o?.lat_long) {
       return (
         <Marker
-          key={o.id}
+          key={`marker-${o.pin_challenge.sponsored.image.length}-${imagesLoadedCount}`}
           coordinate={{
-            latitude: o.lat_long.coordinates[1],
-            longitude: o.lat_long.coordinates[0],
+            latitude: o?.lat_long.coordinates[1],
+            longitude: o?.lat_long.coordinates[0],
           }}
-          title={o.name}
+          title={o?.name}
           onCalloutPress={() => navigateToNextScreen(o)}
           pinColor={pinColor}
           tracksViewChanges={tracksViewChanges}
         >
-          {Platform.OS === "ios" && (
+          {Platform.OS === 'ios' && (
             <Callout
               onPress={() => navigateToNextScreen(o)}
               style={{
-                backgroundColor: "#fff",
+                backgroundColor: '#fff',
                 minWidth: 100,
-                alignItems: "center",
+                alignItems: 'center',
               }}
             >
               <Text>{o.name}</Text>
             </Callout>
           )}
           {useCustomMarkers && (
-            <View style={{ width: 30, height: 30 }}>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+              }}
+            >
+              <Image
+                // onLoad={() => {
+                //   console.log('Imagen cargada:', o.pin_challenge.sponsored.image);
+                //   setTimeout(() => {
+                //     setImagesLoadedCount(prev => {
+                //       prev = markers.length;
+                //       return markers.length;
+                //     });
+                //   }, 1000);
+                // }}
+                resizeMode="cover"
+                onLoadStart={() => {
+                  console.log('Imagen cargada1:', o.pin_challenge.sponsored.image); // Verifica que el evento se dispare correctamente
+                  handleImageLoad(setImagesLoadedCount, markersCount);}}
+
+                onLoad={() => {
+                  console.log('Imagen cargada2:', o.pin_challenge.sponsored.image); // Verifica que el evento se dispare correctamente
+                  handleImageLoad(setImagesLoadedCount, markersCount);}}
+                
+                  onLoadEnd={() => {
+                    console.log('Imagen cargada2:', o.pin_challenge.sponsored.image); // Verifica que el evento se dispare correctamente
+                    handleImageLoad(setImagesLoadedCount, markersCount);}}
+                    
+                style={{
+                  width: 19,
+                  height: 19,
+                  position: 'absolute',
+                  top: 2.5,
+                  borderRadius: 100,
+                }}
+                source={{ uri: o.pin_challenge.sponsored.image }}
+              />
               <MarkerIcon color={o?.category?.color} />
             </View>
           )}
@@ -433,6 +508,24 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
+  const markersCount = isEvent
+  ? filteredSites.length > 0
+    ? filteredSites.length
+    : selectedDestination.ar_event_sites.length
+  : arSitesOn &&
+  selectedDestination.star_ar_sites.length
+
+  const markers = isEvent
+    ? filteredSites.length > 0
+      ? filteredSites.map(o => _markerView(o))
+      : selectedDestination.ar_event_sites.map(o => _markerView(o))
+    : arSitesOn &&
+    selectedDestination.star_ar_sites.map(o => _markerView(o));
+
+
+  console.log('aaaaaaaimage', imagesLoadedCount, totalImages)
+
+  console.log(markers.length)
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -551,27 +644,19 @@ const GeoArChallengeDetails = ({}) => {
         }}
       >
         <MapView
+          key={markers}
           provider={PROVIDER_GOOGLE}
           ref={mapView}
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
-          {isEvent
-            ? filteredSites.length > 0
-              ? filteredSites.map(o => {
-                  return _markerView(o);
-                })
-              : selectedDestination.ar_event_sites.map(o => {
-                  return _markerView(o);
-                })
-            : arSitesOn &&
-              selectedDestination.star_ar_sites.map(o => {
-                return _markerView(o);
-              })}
+          {markers}
           {friendsLocationSitesOn &&
             friendList.map(o => {
-              return f_markerView(o);
-            })}
+              return f_markerView(o)
+            })
+          }
+
         </MapView>
       </View>
       <View>
