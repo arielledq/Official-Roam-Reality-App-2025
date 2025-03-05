@@ -66,3 +66,6 @@ export const DISABLED_LOCATION_TEXT =
 
 export const SHARE_CONDITIONS_TEXT =
   "Must share to at least one social media platform and tag @roamreality as well as the brand sponsor to earn your points. Users earn one additional point per social platform.";
+
+export const GIFT_POINTS = 25;
+export const USERS_LIMIT = 25;

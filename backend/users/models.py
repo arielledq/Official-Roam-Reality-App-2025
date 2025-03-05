@@ -41,6 +41,8 @@ class User(AbstractUser):
         default=UserType.REGULAR
     )
 
+    has_receive_points = models.BooleanField(default=False)
+
     def get_absolute_url(self):
         return reverse("users:detail", kwargs={"username": self.username})
     
