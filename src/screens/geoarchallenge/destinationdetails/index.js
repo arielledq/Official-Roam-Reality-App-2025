@@ -57,10 +57,8 @@ const GeoArChallengeDetails = ({}) => {
   const scrollViewRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [categories, setCategories] = useState([{ name: "Full" }]);
-  const [filteredSites, setFilteredSites] = useState([]);
-
-  const [imagesLoadedCount, setImagesLoadedCount] = useState(0);
-  const [totalImages, setTotalImages] = useState(0);
+  const [updatedMarkers, setUpdatedMarkers] = useState([]);
+  const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
 
   const bandLocationUpdatesIntervalId = useRef(null);
 
@@ -420,13 +418,11 @@ const GeoArChallengeDetails = ({}) => {
 
   const showFilteredList = category => {
     if (category) {
-      const filteredEventSites = selectedDestination.ar_event_sites.filter(
-        site => site.category?.id === category
-      );
-
-      setFilteredSites(filteredEventSites);
+      const originalMarkers = updatedMarkers;
+      const filteredMarkers = originalMarkers.filter(site => site.category?.id === category);
+      setFilteredUpdatedMarkers(filteredMarkers);
     } else {
-      setFilteredSites([]);
+      setFilteredUpdatedMarkers(updatedMarkers);
     }
   };
 
@@ -457,28 +453,23 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
-  const [downloadedImages, setDownloadedImages] = useState([]);
-
-  let markers = [];
-
-  if (isEvent) {
-    if (filteredSites?.length > 0) {
-      markers = filteredSites;
-    }
-    if (selectedDestination?.ar_event_sites?.length) {
-      markers = selectedDestination.ar_event_sites;
-    }
-  } else if (arSitesOn) {
-    if (selectedDestination?.star_ar_sites?.length) {
-      markers = selectedDestination.star_ar_sites;
-    }
-  }
-
   useEffect(() => {
+    let markers = [];
+
+    if (isEvent) {
+      if (selectedDestination?.ar_event_sites?.length) {
+        markers = selectedDestination?.ar_event_sites;
+      }
+    } else {
+      if (selectedDestination?.star_ar_sites?.length) {
+        markers = selectedDestination?.star_ar_sites;
+      }
+    }
+
     const downloadAllImages = async () => {
       const results = await Promise.all(
         markers.map(async (marker, index) => {
-          const url = marker.pin_challenge.sponsored.image;
+          const url = marker?.pin_challenge?.sponsored?.image;
           const fileName = `${index}_` + url.substring(url.lastIndexOf("/") + 1).split("?")[0];
           const localFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
 
@@ -502,11 +493,20 @@ const GeoArChallengeDetails = ({}) => {
         })
       );
 
-      setDownloadedImages(results);
+      setUpdatedMarkers(results);
+      setFilteredUpdatedMarkers(results);
     };
 
     downloadAllImages();
-  }, [markers]);
+  }, []);
+
+  useEffect(() => {
+    if (arSitesOn) {
+      setFilteredUpdatedMarkers(updatedMarkers);
+    } else {
+      setFilteredUpdatedMarkers([]);
+    }
+  }, [arSitesOn]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -604,7 +604,10 @@ const GeoArChallengeDetails = ({}) => {
               <Text style={_styles.selectionTextHeading}>Sites</Text>
               <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
             </View>
-            <AppSwitch onValueChange={setARSitesOnSwitch} value={arSitesOn} />
+            <AppSwitch
+              onValueChange={() => setARSitesOnSwitch(currState => !currState)}
+              value={arSitesOn}
+            />
           </View>
         )}
 
@@ -631,8 +634,8 @@ const GeoArChallengeDetails = ({}) => {
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
-          {!!downloadedImages?.length &&
-            downloadedImages.map(marker => {
+          {!!filteredUpdatedMarkers?.length &&
+            filteredUpdatedMarkers.map(marker => {
               return _markerView(marker);
             })}
           {friendsLocationSitesOn &&
