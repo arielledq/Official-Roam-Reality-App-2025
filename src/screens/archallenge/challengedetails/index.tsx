@@ -21,6 +21,7 @@ import AppButton from "../../../components/button";
 
 // @ts-ignore
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
+import theme from "assets/theme";
 
 const { width } = Dimensions.get("window");
 
@@ -104,24 +105,27 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     }
   };
 
-  const navigateToChallengeCapture = () => {
+  const navigateToChallengeCapture = (openGallery = false) => {
     if (!isChallengeDone) {
+      const cameraOptions = {
+        openGallery: openGallery,
+      };
       switch (experience_type) {
         case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
           // @ts-ignore
-          navigation.navigate("ArChallengeCapture", { challengeObj });
+          navigation.navigate("ArChallengeCapture", { challengeObj, ...cameraOptions });
           break;
         case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
           // @ts-ignore
-          navigation.navigate("PinChallenge");
+          navigation.navigate("PinChallenge", { ...cameraOptions });
           break;
         case EXPERIENCE_TYPE_CHOICES.EVENT:
           // @ts-ignore
-          navigation.navigate("PinChallenge");
+          navigation.navigate("PinChallenge", { ...cameraOptions });
           break;
         case EXPERIENCE_TYPE_CHOICES.BAND:
           // @ts-ignore
-          navigation.navigate("PinChallenge");
+          navigation.navigate("PinChallenge", { ...cameraOptions });
           break;
 
         default:
@@ -164,8 +168,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           }
           break;
       }
+      getExample();
     }
-    getExample();
   }, [isFocused]);
 
   const openExample = () => {
@@ -300,14 +304,95 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
         <TouchableOpacity onPress={openExample}>
           <Text style={styles.bottomText}>Let's see an example</Text>
         </TouchableOpacity>
-        <AppButton
-          onPress={() => navigateToChallengeCapture()}
-          buttonStyle={styles.buttonStyle}
-          containerStyle={styles.buttonContainerStyle}
-          title={"Start Challenge"}
-          disabled={isLoading}
-        />
+        {experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE ? (
+          <View style={{ flexDirection: "row", gap: 16 }}>
+            <View style={{ flex: 1 }}>
+              <AppButton
+                onPress={() => navigateToChallengeCapture(true)}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={styles.buttonContainerStyle}
+                title={
+                  <Text style={{ fontSize: 14, fontWeight: 500, color: theme.lightColors?.white }}>
+                    Upload from Gallery
+                  </Text>
+                }
+                disabled={isLoading}
+              />
+            </View>
+            <View style={{ flex: 1 }}>
+              <AppButton
+                onPress={() => navigateToChallengeCapture(false)}
+                buttonStyle={styles.buttonStyle}
+                containerStyle={styles.buttonContainerStyle}
+                title={
+                  <Text style={{ fontSize: 14, fontWeight: 500, color: theme.lightColors?.white }}>
+                    Capture from Camera
+                  </Text>
+                }
+                disabled={isLoading}
+              />
+            </View>
+          </View>
+        ) : (
+          <AppButton
+            onPress={() => navigateToChallengeCapture(false)}
+            buttonStyle={styles.buttonStyle}
+            containerStyle={styles.buttonContainerStyle}
+            title={"Start Challenge"}
+            disabled={isLoading}
+          />
+        )}
       </View>
+
+      {/* <Modal
+        animationType="fade"
+        transparent={true}
+        visible={isStartChallengeOptionsVisible}
+        onDismiss={toggleStartChallengeOptionsModalHandler}
+      >
+        <TouchableWithoutFeedback onPress={toggleStartChallengeOptionsModalHandler}>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContent}>
+              <AppButton
+                onPress={() => navigateToChallengeCapture(true)}
+                buttonStyle={styles.appButtonStyle}
+                customColors={startChallengeOptionsButtonColor}
+                containerStyle={styles.appButtonContainerStyle}
+                title={
+                  <>
+                    <Icon
+                      name="picture"
+                      family="antdesign"
+                      size={24}
+                      color={theme.lightColors?.white}
+                    />
+                    <Text style={styles.appButtonLabelStyle}>Upload from Gallery</Text>
+                  </>
+                }
+              />
+              <View style={styles.buttonDivider} />
+              <AppButton
+                onPress={() => navigateToChallengeCapture(false)}
+                buttonStyle={styles.appButtonStyle}
+                customColors={startChallengeOptionsButtonColor}
+                containerStyle={styles.appButtonContainerStyle}
+                title={
+                  <>
+                    <Icon
+                      name="camera"
+                      family="antdesign"
+                      size={24}
+                      color={theme.lightColors?.white}
+                    />
+                    <Text style={styles.appButtonLabelStyle}>Capture from Camera</Text>
+                  </>
+                }
+              />
+            </View>
+            <View style={styles.arrow} />
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal> */}
     </BackgroundWithImage>
   );
 };

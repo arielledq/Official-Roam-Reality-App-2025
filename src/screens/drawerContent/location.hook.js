@@ -141,7 +141,6 @@ const userLocationHook = () => {
   };
 
   const clearLocation = () => {
-    console.log("[location.hook] clearLocation function called"); // ADDED LOG
     switch (userType) {
       case USER_TYPES.BAND:
         clearBandUserLocation();
@@ -152,7 +151,6 @@ const userLocationHook = () => {
         break;
     }
     Geolocation.stopObserving();
-    console.log("[location.hook] Geolocation.stopObserving() called"); // ADDED LOG
   };
 
   return {
