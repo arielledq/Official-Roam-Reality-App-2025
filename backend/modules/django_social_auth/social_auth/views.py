@@ -12,6 +12,8 @@ from allauth.socialaccount.models import SocialAccount, SocialToken
 
 from rest_auth.registration.views import SocialLoginView, SocialConnectView
 
+from notifications.models import NotificationTypes
+from onesignal_client.utils import send_notification
 from users.models import UserProfile
 from .serializers import CustomAppleSocialLoginSerializer, CustomAppleConnectSerializer
 from django.contrib.sites.shortcuts import get_current_site
@@ -53,6 +55,13 @@ class FacebookLogin(SocialLoginView):
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
             configs.NUMBER_USER_POINT_GIFT += 1
+            send_notification(
+                NotificationTypes.DEFAULT,
+                user,
+                title="\U0001F381 Surprise!",
+                description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for '
+                            f'being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
+            )
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
     
 
@@ -82,6 +91,13 @@ class GoogleLogin(SocialLoginView):
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
             configs.NUMBER_USER_POINT_GIFT += 1
+            send_notification(
+                NotificationTypes.DEFAULT,
+                user,
+                title="\U0001F381 Surprise!",
+                description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for '
+                            f'being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
+            )
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 
 
@@ -112,6 +128,13 @@ class AppleLogin(SocialLoginView):
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
             configs.NUMBER_USER_POINT_GIFT += 1
+            send_notification(
+                NotificationTypes.DEFAULT,
+                user,
+                title="\U0001F381 Surprise!",
+                description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for '
+                            f'being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
+            )
         return Response({'token': token.key, 'user': serializer.data}, status=status.HTTP_200_OK)
 
 

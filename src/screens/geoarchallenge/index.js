@@ -9,7 +9,7 @@ import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
 import PanicPopUp from "./panicpopup";
 
-import { handleError } from "../../util/helpers";
+import { handleError, showMessage } from "../../util/helpers";
 import {
   getGeoARDestinations,
   getARProfile,
@@ -17,6 +17,7 @@ import {
   getARChallenges,
   getARSitesStars,
   setDevice,
+  updateProfile,
 } from "../../network";
 import {
   updateARUserData,
@@ -33,6 +34,8 @@ import ArIcon from "../../assets/geoar/aricon.svg";
 import { MenuIcon } from "../../assets/svg";
 
 import useStyles from "./styles";
+import { GIFT_POINTS, USERS_LIMIT } from "constants";
+import { updateUserProperties } from "redux/Login/reducer";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -44,6 +47,7 @@ const GeoArChallenge = ({}) => {
   const navigation = useNavigation();
 
   const account_setup = useSelector(state => state?.login?.data?.user?.user_profile?.account_setup);
+  const user = useSelector(state => state?.login?.data?.user);
 
   useEffect(() => {
     OneSignal.setNotificationOpenedHandler(notification => {
@@ -166,6 +170,30 @@ const GeoArChallenge = ({}) => {
     return starSitesCount[id] ? starSitesCount[id] : 0;
   };
 
+  const updatePointsNotification = () => {
+    updateProfile({
+      id: user?.user_profile?.id,
+      data: { has_receive_points: true },
+    })
+      .then(res => {
+        if (res.status == 1) {
+          console.log("res", res);
+          dispatch(updateUserProperties({ has_receive_points: true }));
+          showMessage(
+            `Surprise! We’ve added ${GIFT_POINTS} bonus points to your Roam Reality account!`,
+            "success",
+            null,
+            10000
+          );
+        } else {
+          handleError(res);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+
   useEffect(() => {
     loadDestinations();
     setOnesignalDevice();
@@ -177,6 +205,9 @@ const GeoArChallenge = ({}) => {
         // @ts-ignore
         navigation.replace("EditProfile");
       }, 300);
+    }
+    if (user?.user_ar_profile?.points === GIFT_POINTS && user?.has_receive_points === false) {
+      updatePointsNotification();
     }
   }, []);
 

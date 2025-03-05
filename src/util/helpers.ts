@@ -114,7 +114,8 @@ type messageTypes = "error" | "success" | "info";
 export const showMessage = (
   error = "An error occurred while communicating with the server, please try again in a few moments",
   type: messageTypes = "success",
-  title = ""
+  title = "",
+  visibilityTime: number = 4000
 ) => {
   let titleShow = title;
   if (title === "") {
@@ -131,6 +132,7 @@ export const showMessage = (
     type,
     text1: titleShow,
     text2: error,
+    visibilityTime,
   });
 };
 
