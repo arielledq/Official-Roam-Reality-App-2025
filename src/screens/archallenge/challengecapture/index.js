@@ -36,7 +36,7 @@ const ArChallengeCapture = ({ route, navigation }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
-  const [isUnityLoaded, setIsUnityLoaded] = useState(true);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [isVideo, setIsvideo] = useState(false);
 
   const unityRef = useRef(null);
@@ -294,6 +294,8 @@ const ArChallengeCapture = ({ route, navigation }) => {
     ]).then(() => {
       if (openGallery) {
         pickFromGallery();
+      }else{
+        setIsUnityLoaded(true)
       }
     });
   }, []);
