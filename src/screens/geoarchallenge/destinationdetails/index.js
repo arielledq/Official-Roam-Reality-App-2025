@@ -29,6 +29,8 @@ import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
 import RNFS from "react-native-fs";
+import theme from "assets/theme";
+import MapSkeletonLoader from "components/MapSkeletonLoader";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 1 minute
@@ -59,6 +61,7 @@ const GeoArChallengeDetails = ({}) => {
   const [categories, setCategories] = useState([{ name: "Full" }]);
   const [updatedMarkers, setUpdatedMarkers] = useState([]);
   const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
+  const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
 
   const bandLocationUpdatesIntervalId = useRef(null);
 
@@ -453,6 +456,20 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
+  const debounceSetMarkersData = markers => {
+    setUpdatedMarkers(markers);
+    setFilteredUpdatedMarkers(markers);
+
+    setTimeout(() => {
+      setFilteredUpdatedMarkers([]);
+    }, 250);
+
+    setTimeout(() => {
+      setLoadingCustomMarkers(false);
+      setFilteredUpdatedMarkers(markers);
+    }, 500);
+  };
+
   useEffect(() => {
     let markers = [];
 
@@ -467,6 +484,8 @@ const GeoArChallengeDetails = ({}) => {
     }
 
     const downloadAllImages = async () => {
+      setLoadingCustomMarkers(true);
+
       const results = await Promise.all(
         markers.map(async (marker, index) => {
           const url = marker?.pin_challenge?.sponsored?.image;
@@ -482,8 +501,10 @@ const GeoArChallengeDetails = ({}) => {
               cacheable: true,
             }).promise;
 
+            const updatedLocalFilePath =
+              Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
             if (downloadResult.statusCode === 200) {
-              return { ...marker, localFilePath };
+              return { ...marker, localFilePath: updatedLocalFilePath };
             } else {
               return { ...marker, localFilePath: null }; // Download failed, return null path
             }
@@ -493,8 +514,7 @@ const GeoArChallengeDetails = ({}) => {
         })
       );
 
-      setUpdatedMarkers(results);
-      setFilteredUpdatedMarkers(results);
+      debounceSetMarkersData(results);
     };
 
     downloadAllImages();
@@ -643,6 +663,23 @@ const GeoArChallengeDetails = ({}) => {
               return f_markerView(o);
             })}
         </MapView>
+        {loadingCustomMarkers && (
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              height: "100%",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: theme.lightColors.inputBG,
+              flex: 1,
+            }}
+          >
+            <MapSkeletonLoader shimmerBaseColor={theme.lightColors.inputBG} />
+          </View>
+        )}
       </View>
       <View>
         <Text style={_styles.s_list_text}>Tap the pin to see more details</Text>
