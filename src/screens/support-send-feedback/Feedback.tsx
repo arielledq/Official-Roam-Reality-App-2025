@@ -31,7 +31,7 @@ const Feedback = () => {
     {
       icon: Images.YouTube,
       text: "YouTube",
-      link: "https://www.youtube.com/@roamreality",
+      link: "https://youtube.com/playlist?list=PL8nZ3JL_pRJfOEU1CeWnW1n_-i_aXIHHQ&feature=shared",
     },
   ];
 
