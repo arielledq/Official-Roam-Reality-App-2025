@@ -31,7 +31,7 @@ import Privacy from "../screens/privacy";
 import AnimatedSplash from "../screens/animatedSplash";
 import ContactUs from "../screens/ContactUs/ContactUs";
 import FAQ from "../screens/FAQ/FAQ";
-import GeoArChallenge from "../screens/geoarchallenge";
+import GeoArChallenge from "../screens/home";
 import GeoArChallengeDetails from "../screens/geoarchallenge/destinationdetails";
 import GeoArSiteDetails from "../screens/geoarchallenge/sitedetails";
 import GeoArSiteRoutes from "../screens/geoarchallenge/siteroutes";
@@ -190,10 +190,8 @@ const Navigation = () => {
             <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="Privacy" component={Privacy} />
-            {/* @ts-ignore */}
-            <Stack.Screen name="EmailVerificationC" component={EmailVerification} />
-            {/* @ts-ignore */}
-            <Stack.Screen name="VerificationSuccessC" component={VerificationSuccess} />
+            <Stack.Screen name="EmailVerification" component={EmailVerification} />
+            <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
             <Stack.Screen name="FAQ" component={FAQ} />
             <Stack.Screen name="Notifications" component={NotificationList} />

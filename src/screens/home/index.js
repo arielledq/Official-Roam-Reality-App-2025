@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
-import PanicPopUp from "./panicpopup";
+import PanicPopUp from "../geoarchallenge/panicpopup";
 
 import { handleError, showMessage } from "../../util/helpers";
 import {

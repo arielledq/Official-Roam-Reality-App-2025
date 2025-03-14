@@ -50,9 +50,15 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
   },
+  verifyAccountText: {
+    ...fontGroup.nunitoBold,
+    color: theme.colors.yellow,
+    fontSize: FontSizes.S14,
+    lineHeight: FontLineHeights.LH20,
+  },
   verifyButton: {
     height: 30,
-    width: 95,
+    minWidth: 95,
     backgroundColor: theme.colors.buttonGrey,
     alignItems: "center",
     justifyContent: "center",
