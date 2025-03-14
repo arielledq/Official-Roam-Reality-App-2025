@@ -8,12 +8,17 @@ import theme from "../../assets/theme";
 const UserInfoCard = ({
   name,
   email,
-  reportAction = null,
-  image = false,
+  reportAction,
+  image,
+  verifyAction,
+  isVerified,
 }: {
   name: string | null;
   email: string | null;
+  image: string;
   reportAction: () => void;
+  verifyAction: () => void;
+  isVerified: boolean;
 }) => {
   const styles = useStyles();
 
@@ -30,6 +35,13 @@ const UserInfoCard = ({
             <View style={styles.verifyNowContainer}>
               <Pressable style={styles.verifyButton} onPress={reportAction}>
                 <AppText style={styles.verifyNow}>Report User</AppText>
+              </Pressable>
+            </View>
+          )}
+          {!isVerified && (
+            <View style={styles.verifyNowContainer}>
+              <Pressable style={styles.verifyButton} onPress={verifyAction}>
+                <AppText style={styles.verifyAccountText}>Verify Your Account</AppText>
               </Pressable>
             </View>
           )}

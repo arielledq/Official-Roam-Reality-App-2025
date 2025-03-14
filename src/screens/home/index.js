@@ -7,16 +7,17 @@ import { useDispatch, useSelector } from "react-redux";
 
 import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
-import PanicPopUp from "./panicpopup";
+import PanicPopUp from "../geoarchallenge/panicpopup";
 
-import {handleError, showMessage} from "../../util/helpers";
+import { handleError, showMessage } from "../../util/helpers";
 import {
   getGeoARDestinations,
   getARProfile,
   getARStettings,
   getARChallenges,
   getARSitesStars,
-  setDevice, updateProfile,
+  setDevice,
+  updateProfile,
 } from "../../network";
 import {
   updateARUserData,
@@ -33,8 +34,8 @@ import ArIcon from "../../assets/geoar/aricon.svg";
 import { MenuIcon } from "../../assets/svg";
 
 import useStyles from "./styles";
-import {GIFT_POINTS, USERS_LIMIT} from "constants";
-import {updateUserProperties} from "redux/Login/reducer";
+import { GIFT_POINTS } from "../../constants";
+import { updateUserProperties } from "redux/Login/reducer";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -47,20 +48,6 @@ const GeoArChallenge = ({}) => {
 
   const account_setup = useSelector(state => state?.login?.data?.user?.user_profile?.account_setup);
   const user = useSelector(state => state?.login?.data?.user);
-
-  useEffect(() => {
-    OneSignal.setNotificationOpenedHandler(notification => {
-      const { additionalData } = notification.notification;
-
-      if (additionalData) {
-        navigateToGeoChanllenge(additionalData);
-      }
-    });
-
-    return () => {
-      OneSignal.clearHandlers();
-    };
-  }, []);
 
   const navigateToGeoChanllenge = additionalData => {
     const { destinationId } = additionalData;
@@ -172,13 +159,17 @@ const GeoArChallenge = ({}) => {
   const updatePointsNotification = () => {
     updateProfile({
       id: user?.user_profile?.id,
-      data: {has_receive_points: true},
+      data: { has_receive_points: true },
     })
       .then(res => {
         if (res.status == 1) {
-          console.log("res", res)
           dispatch(updateUserProperties({ has_receive_points: true }));
-          showMessage(`Surprise! We’ve added ${GIFT_POINTS} bonus points to your Roam Reality account!`);
+          showMessage(
+            `Surprise! We’ve added ${GIFT_POINTS} bonus points to your Roam Reality account!`,
+            "success",
+            null,
+            10000
+          );
         } else {
           handleError(res);
         }
@@ -187,23 +178,6 @@ const GeoArChallenge = ({}) => {
         setIsLoading(false);
       });
   };
-
-  useEffect(() => {
-    loadDestinations();
-    setOnesignalDevice();
-  }, []);
-
-  useEffect(() => {
-    if (!account_setup) {
-      setTimeout(() => {
-        // @ts-ignore
-        navigation.replace("EditProfile");
-      }, 300);
-    }
-    if(user?.user_ar_profile?.points === GIFT_POINTS && user?.has_receive_points === false){
-      updatePointsNotification()
-    }
-  }, []);
 
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj));
@@ -286,6 +260,40 @@ const GeoArChallenge = ({}) => {
       </TouchableOpacity>
     );
   };
+
+  useEffect(() => {
+    OneSignal.setNotificationOpenedHandler(notification => {
+      const { additionalData } = notification.notification;
+
+      if (additionalData) {
+        navigateToGeoChanllenge(additionalData);
+      }
+    });
+
+    return () => {
+      OneSignal.clearHandlers();
+    };
+  }, []);
+
+  useEffect(() => {
+    loadDestinations();
+    setOnesignalDevice();
+  }, []);
+
+  useEffect(() => {
+    if (!account_setup) {
+      setTimeout(() => {
+        // @ts-ignore
+        navigation.replace("EditProfile");
+      }, 300);
+    }
+  }, [account_setup]);
+
+  useEffect(() => {
+    if (user?.user_ar_profile?.points === GIFT_POINTS && !user?.has_receive_points) {
+      updatePointsNotification();
+    }
+  }, [user]);
 
   return (
     <ScreenContainer>

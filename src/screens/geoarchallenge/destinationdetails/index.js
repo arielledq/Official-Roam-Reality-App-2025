@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 
-import { FlatList, Platform, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Platform, ScrollView, Text, TouchableOpacity, View, Image } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -28,6 +28,9 @@ import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
 import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
+import RNFS from "react-native-fs";
+import theme from "assets/theme";
+import MapSkeletonLoader from "components/MapSkeletonLoader";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 1 minute
@@ -56,7 +59,9 @@ const GeoArChallengeDetails = ({}) => {
   const scrollViewRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [categories, setCategories] = useState([{ name: "Full" }]);
-  const [filteredSites, setFilteredSites] = useState([]);
+  const [updatedMarkers, setUpdatedMarkers] = useState([]);
+  const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
+  const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
 
   const bandLocationUpdatesIntervalId = useRef(null);
 
@@ -269,15 +274,15 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const _markerView = o => {
-    if (o.lat_long) {
+    if (o?.lat_long) {
       return (
         <Marker
-          key={o.id}
+          key={`marker-${o.id}`}
           coordinate={{
-            latitude: o.lat_long.coordinates[1],
-            longitude: o.lat_long.coordinates[0],
+            latitude: o?.lat_long.coordinates[1],
+            longitude: o?.lat_long.coordinates[0],
           }}
-          title={o.name}
+          title={o?.name}
           onCalloutPress={() => navigateToNextScreen(o)}
           pinColor={pinColor}
           tracksViewChanges={tracksViewChanges}
@@ -295,13 +300,33 @@ const GeoArChallengeDetails = ({}) => {
             </Callout>
           )}
           {useCustomMarkers && (
-            <View style={{ width: 30, height: 30 }}>
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <Image
+                resizeMode="cover"
+                style={{
+                  width: 19,
+                  height: 19,
+                  position: "absolute",
+                  top: 2.5,
+                  borderRadius: 100,
+                }}
+                source={{ uri: o.localFilePath }}
+              />
               <MarkerIcon color={o?.category?.color} />
             </View>
           )}
         </Marker>
       );
     }
+
+    return null;
   };
 
   const getBordersOfDestination = () => {
@@ -396,13 +421,11 @@ const GeoArChallengeDetails = ({}) => {
 
   const showFilteredList = category => {
     if (category) {
-      const filteredEventSites = selectedDestination.ar_event_sites.filter(
-        site => site.category?.id === category
-      );
-
-      setFilteredSites(filteredEventSites);
+      const originalMarkers = updatedMarkers;
+      const filteredMarkers = originalMarkers.filter(site => site.category?.id === category);
+      setFilteredUpdatedMarkers(filteredMarkers);
     } else {
-      setFilteredSites([]);
+      setFilteredUpdatedMarkers(updatedMarkers);
     }
   };
 
@@ -432,6 +455,78 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.latitude = Number(full_latitude_longitude.latitude);
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
+
+  const debounceSetMarkersData = markers => {
+    setUpdatedMarkers(markers);
+    setFilteredUpdatedMarkers(markers);
+
+    setTimeout(() => {
+      setFilteredUpdatedMarkers([]);
+    }, 250);
+
+    setTimeout(() => {
+      setLoadingCustomMarkers(false);
+      setFilteredUpdatedMarkers(markers);
+    }, 500);
+  };
+
+  useEffect(() => {
+    let markers = [];
+
+    if (isEvent) {
+      if (selectedDestination?.ar_event_sites?.length) {
+        markers = selectedDestination?.ar_event_sites;
+      }
+    } else {
+      if (selectedDestination?.star_ar_sites?.length) {
+        markers = selectedDestination?.star_ar_sites;
+      }
+    }
+
+    const downloadAllImages = async () => {
+      setLoadingCustomMarkers(true);
+
+      const results = await Promise.all(
+        markers.map(async (marker, index) => {
+          const url = marker?.pin_challenge?.sponsored?.image;
+          const fileName = `${index}_` + url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+          const localFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+          try {
+            const downloadResult = await RNFS.downloadFile({
+              fromUrl: url,
+              toFile: localFilePath,
+              background: false,
+              discretionary: true,
+              cacheable: true,
+            }).promise;
+
+            const updatedLocalFilePath =
+              Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+            if (downloadResult.statusCode === 200) {
+              return { ...marker, localFilePath: updatedLocalFilePath };
+            } else {
+              return { ...marker, localFilePath: null }; // Download failed, return null path
+            }
+          } catch (error) {
+            return { ...marker, localFilePath: null }; // Download error, return null path
+          }
+        })
+      );
+
+      debounceSetMarkersData(results);
+    };
+
+    downloadAllImages();
+  }, []);
+
+  useEffect(() => {
+    if (arSitesOn) {
+      setFilteredUpdatedMarkers(updatedMarkers);
+    } else {
+      setFilteredUpdatedMarkers([]);
+    }
+  }, [arSitesOn]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -529,7 +624,10 @@ const GeoArChallengeDetails = ({}) => {
               <Text style={_styles.selectionTextHeading}>Sites</Text>
               <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
             </View>
-            <AppSwitch onValueChange={setARSitesOnSwitch} value={arSitesOn} />
+            <AppSwitch
+              onValueChange={() => setARSitesOnSwitch(currState => !currState)}
+              value={arSitesOn}
+            />
           </View>
         )}
 
@@ -556,23 +654,32 @@ const GeoArChallengeDetails = ({}) => {
           style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
           initialRegion={initialRegion}
         >
-          {isEvent
-            ? filteredSites.length > 0
-              ? filteredSites.map(o => {
-                  return _markerView(o);
-                })
-              : selectedDestination.ar_event_sites.map(o => {
-                  return _markerView(o);
-                })
-            : arSitesOn &&
-              selectedDestination.star_ar_sites.map(o => {
-                return _markerView(o);
-              })}
+          {!!filteredUpdatedMarkers?.length &&
+            filteredUpdatedMarkers.map(marker => {
+              return _markerView(marker);
+            })}
           {friendsLocationSitesOn &&
             friendList.map(o => {
               return f_markerView(o);
             })}
         </MapView>
+        {loadingCustomMarkers && (
+          <View
+            style={{
+              position: "absolute",
+              left: 0,
+              top: 0,
+              height: "100%",
+              width: "100%",
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: theme.lightColors.inputBG,
+              flex: 1,
+            }}
+          >
+            <MapSkeletonLoader shimmerBaseColor={theme.lightColors.inputBG} />
+          </View>
+        )}
       </View>
       <View>
         <Text style={_styles.s_list_text}>Tap the pin to see more details</Text>

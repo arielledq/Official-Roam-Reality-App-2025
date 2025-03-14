@@ -15,13 +15,13 @@ export const sliceLogin = createSlice({
     updateUserProperties: (state, action) => {
       return (state = {
         ...state,
-        data:{
+        data: {
           ...state?.data,
           user: {
             ...state?.data?.user,
             ...action.payload,
-          }
-        }
+          },
+        },
       });
     },
     updateUserLocationData: (state, action) => {

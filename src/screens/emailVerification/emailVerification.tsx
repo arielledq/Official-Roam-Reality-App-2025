@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { Alert, View } from "react-native";
 
@@ -30,13 +30,10 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   const profile = route?.params?.profile;
   const [isLoading, setIsLoading] = useState(false);
   const [timerVisible, setTimerVisible] = useState(false);
+  const [firstEmailSent, setFirstEmailSent] = useState(false);
 
-  const navigatetoSuccess = () => {
-    if (profile) {
-      navigation.replace("VerificationSuccessC", { ChangePassword: false, data, profile });
-    } else {
-      navigation.replace("VerificationSuccess", { ChangePassword: false, data, profile });
-    }
+  const navigateToSuccess = () => {
+    navigation.replace("VerificationSuccess", { ChangePassword: false, data, profile });
   };
 
   const handleResend = () => {
@@ -59,7 +56,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
     confirmCode({ email: email, otp: values.code })
       .then(res => {
         if (res.status == 1) {
-          navigatetoSuccess();
+          navigateToSuccess();
         } else {
           handleError(res);
         }
@@ -70,13 +67,15 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   };
 
   const handleSkip = () => {
-    // login user
-    if (profile) {
-      navigation.goBack();
-    } else {
-      dispatch(updateUserData(data));
-    }
+    dispatch(updateUserData(data));
   };
+
+  useEffect(() => {
+    if (profile && !firstEmailSent) {
+      setFirstEmailSent(true);
+      handleResend();
+    }
+  }, [profile, firstEmailSent]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -92,7 +91,6 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
           onSubmit={values => {
             verifyEmail(values);
           }}
-          // validationSchema={validationSchema}
         >
           {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
             <View style={_styles.formContainer}>
@@ -134,16 +132,22 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
                     </AppText>
                   </AppText>
                 )}
+                {!profile && (
+                  <AppButton
+                    buttonStyle={_styles.buttonStyle}
+                    containerStyle={[_styles.buttonContainerStyle]}
+                    title={"Skip"}
+                    onPress={handleSkip}
+                    disabled={isLoading}
+                  />
+                )}
                 <AppButton
                   buttonStyle={_styles.buttonStyle}
-                  containerStyle={[_styles.buttonContainerStyle]}
-                  title={"Skip"}
-                  onPress={handleSkip}
-                  disabled={isLoading}
-                />
-                <AppButton
-                  buttonStyle={_styles.buttonStyle}
-                  containerStyle={[_styles.buttonContainerStyle, { marginTop: 10 }]}
+                  containerStyle={[
+                    _styles.buttonContainerStyle,
+                    { marginTop: 10 },
+                    profile && { marginTop: 24 },
+                  ]}
                   title={"Verify Now"}
                   onPress={handleSubmit}
                   loading={isLoading}

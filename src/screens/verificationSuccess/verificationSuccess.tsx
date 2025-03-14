@@ -28,7 +28,7 @@ const VerificationSuccess: ScreenStackComponent<RootStackParamList, "Verificatio
     if (ChangePassword) {
       navigation.navigate("Login");
     } else if (profile) {
-      navigation.goBack();
+      navigation.navigate("TabNavigator");
       dispatch(updateVerified(true));
     } else {
       data.user.user_profile.is_verified = true;

@@ -5,7 +5,7 @@ import { useTheme } from "react-native-paper";
 import ARTipsScreen from "../screens/arTips";
 import Profile from "../screens/profile/profile";
 import Rally from "../screens/rally";
-import GeoArChallenge from "../screens/geoarchallenge";
+import GeoArChallenge from "../screens/home";
 import ScoreBoard from "../screens/scoreboard";
 
 import Icon from "../components/Icon";

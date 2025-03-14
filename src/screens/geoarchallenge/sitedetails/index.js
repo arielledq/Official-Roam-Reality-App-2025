@@ -342,7 +342,25 @@ const GeoArSiteDetails = ({ route }) => {
               tracksViewChanges={tracksViewChanges}
             >
               {useCustomMarkers && (
-                <View style={{ width: 30, height: 30 }}>
+                <View
+                  style={{
+                    width: 30,
+                    height: 30,
+                    alignItems: "center",
+                    justifyContent: "flex-start",
+                  }}
+                >
+                  <Image
+                    resizeMode="cover"
+                    style={{
+                      width: 19,
+                      height: 19,
+                      position: "absolute",
+                      top: 2.5,
+                      borderRadius: 100,
+                    }}
+                    source={{ uri: selectedGeoSite?.localFilePath }}
+                  />
                   <MarkerIcon color={selectedGeoSite?.category?.color} />
                 </View>
               )}
