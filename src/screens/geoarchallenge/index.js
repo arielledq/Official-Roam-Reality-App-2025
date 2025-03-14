@@ -34,7 +34,7 @@ import ArIcon from "../../assets/geoar/aricon.svg";
 import { MenuIcon } from "../../assets/svg";
 
 import useStyles from "./styles";
-import { GIFT_POINTS, USERS_LIMIT } from "constants";
+import { GIFT_POINTS } from "../../constants";
 import { updateUserProperties } from "redux/Login/reducer";
 
 const GeoArChallenge = ({}) => {
@@ -48,20 +48,6 @@ const GeoArChallenge = ({}) => {
 
   const account_setup = useSelector(state => state?.login?.data?.user?.user_profile?.account_setup);
   const user = useSelector(state => state?.login?.data?.user);
-
-  useEffect(() => {
-    OneSignal.setNotificationOpenedHandler(notification => {
-      const { additionalData } = notification.notification;
-
-      if (additionalData) {
-        navigateToGeoChanllenge(additionalData);
-      }
-    });
-
-    return () => {
-      OneSignal.clearHandlers();
-    };
-  }, []);
 
   const navigateToGeoChanllenge = additionalData => {
     const { destinationId } = additionalData;
@@ -177,7 +163,6 @@ const GeoArChallenge = ({}) => {
     })
       .then(res => {
         if (res.status == 1) {
-          console.log("res", res);
           dispatch(updateUserProperties({ has_receive_points: true }));
           showMessage(
             `Surprise! We’ve added ${GIFT_POINTS} bonus points to your Roam Reality account!`,
@@ -193,23 +178,6 @@ const GeoArChallenge = ({}) => {
         setIsLoading(false);
       });
   };
-
-  useEffect(() => {
-    loadDestinations();
-    setOnesignalDevice();
-  }, []);
-
-  useEffect(() => {
-    if (!account_setup) {
-      setTimeout(() => {
-        // @ts-ignore
-        navigation.replace("EditProfile");
-      }, 300);
-    }
-    if (user?.user_ar_profile?.points === GIFT_POINTS && user?.has_receive_points === false) {
-      updatePointsNotification();
-    }
-  }, []);
 
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj));
@@ -292,6 +260,40 @@ const GeoArChallenge = ({}) => {
       </TouchableOpacity>
     );
   };
+
+  useEffect(() => {
+    OneSignal.setNotificationOpenedHandler(notification => {
+      const { additionalData } = notification.notification;
+
+      if (additionalData) {
+        navigateToGeoChanllenge(additionalData);
+      }
+    });
+
+    return () => {
+      OneSignal.clearHandlers();
+    };
+  }, []);
+
+  useEffect(() => {
+    loadDestinations();
+    setOnesignalDevice();
+  }, []);
+
+  useEffect(() => {
+    if (!account_setup) {
+      setTimeout(() => {
+        // @ts-ignore
+        navigation.replace("EditProfile");
+      }, 300);
+    }
+  }, [account_setup]);
+
+  useEffect(() => {
+    if (user?.user_ar_profile?.points === GIFT_POINTS && !user?.has_receive_points) {
+      updatePointsNotification();
+    }
+  }, [user]);
 
   return (
     <ScreenContainer>

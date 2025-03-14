@@ -32,14 +32,11 @@ const SocialSignin = ({ setLoading }) => {
       const userinfo = await GoogleSignin.signIn();
       const tokens = await GoogleSignin.getTokens();
 
-      // console.log("userinfo", userinfo);
-      console.log("tokens", tokens);
       googleLogin({
         access_token: tokens.accessToken,
         id_token: tokens.idToken,
       })
         .then(res => {
-          // console.log("res", JSON.stringify(res, null, 2));
           if (res.status == 1) {
             dispatch(updateUserData(res));
             if (newUser) {
@@ -89,7 +86,9 @@ const SocialSignin = ({ setLoading }) => {
               console.error("err", err);
               return;
             } else {
-              AccessToken.getCurrentAccessToken().then(data => {});
+              AccessToken.getCurrentAccessToken().then(data => {
+                // --
+              });
             }
           });
           new GraphRequestManager().addRequest(req).start();
