@@ -1,5 +1,10 @@
+import io
+import os
+import zipfile
+
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.http import HttpResponse
 
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
     GeoARStar, DestinationFacts, \
@@ -39,6 +44,27 @@ class GeoArSiteCategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
+def download_images(modeladmin, request, queryset):
+    buffer = io.BytesIO()
+
+    with zipfile.ZipFile(buffer, 'w') as zf:
+        for obj in queryset:
+            if obj.memory_file:
+                extension = os.path.splitext(obj.memory_file.name)[1]
+                challenge_name = obj.challenges.name if isinstance(obj, ARMemories) else obj.geo_site.name
+                new_filename = f"{obj.user.name}{challenge_name}{obj.created_at}{extension}"
+
+                obj.memory_file.open('rb')
+                image_data = obj.memory_file.read()
+                obj.memory_file.close()
+
+                zf.writestr(new_filename, image_data)
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=images.zip'
+    return response
+
+
 class ARMemoriesAdmin(admin.ModelAdmin):
     
     search_fields = (
@@ -49,11 +75,11 @@ class ARMemoriesAdmin(admin.ModelAdmin):
     list_select_related = ['user']  # To avoid extra queries
 
     exclude = ('geo_challenge', 'description',)
+    actions = [download_images]
 
     def user_name(self, memory):
         return memory.user.name
 
-    pass
 
 class ARChallengeAdmin(admin.ModelAdmin):
     pass
@@ -260,6 +286,7 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     )
     list_display = ('user_name', 'geo_site', 'challenge_approval', 'memory_file')
     list_select_related = ['user']  # To avoid extra queries
+    actions = [download_images]
 
     def user_name(self, obj):
         return obj.user.name
