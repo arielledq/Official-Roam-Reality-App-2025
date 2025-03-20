@@ -26,14 +26,14 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
-import { pinColor, tracksViewChanges, useCustomMarkers } from "util/helpers";
+import { pinColor, showMessage, tracksViewChanges, useCustomMarkers } from "util/helpers";
 import { EXPERIENCE_TYPE_CHOICES } from "constants";
 import RNFS from "react-native-fs";
 import theme from "assets/theme";
 import MapSkeletonLoader from "components/MapSkeletonLoader";
 
 const SCROLL_AMOUNT = 70;
-const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 1 minute
+const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 30; // 30 seconds
 
 const GeoArChallengeDetails = ({}) => {
   const route = useRoute();
@@ -528,6 +528,15 @@ const GeoArChallengeDetails = ({}) => {
     }
   }, [arSitesOn]);
 
+  const refreshMapButtonHandler = () => {
+    showMessage(
+      "The map is now updated with the latest locations.",
+      "success",
+      "Location updated!"
+    );
+    getBandLocationUpdates();
+  };
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -638,6 +647,19 @@ const GeoArChallengeDetails = ({}) => {
           </View>
           <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
         </View>
+        {isEvent && (
+          <TouchableOpacity style={_styles.selectionsContainer} onPress={refreshMapButtonHandler}>
+            <View style={{ flexDirection: "row", gap: 16, justifyContent: "center" }}>
+              <Text style={_styles.selectionTextHeading}>Refresh map</Text>
+              <Icon
+                name="refresh-cw"
+                family="feather"
+                color={theme.lightColors.magenta}
+                size={20}
+              />
+            </View>
+          </TouchableOpacity>
+        )}
       </View>
       <View
         style={{
