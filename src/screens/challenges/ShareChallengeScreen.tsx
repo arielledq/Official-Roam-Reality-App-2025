@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
-import { Image, Platform, Text, View, Linking } from "react-native";
+import { Image, Platform, Text, View, Linking, Dimensions } from "react-native";
 
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
@@ -38,7 +38,6 @@ import RNFetchBlob from "rn-fetch-blob";
 import { Alert } from "react-native";
 import ScreenLoader from "components/screenLoader";
 
-// Add this interface near the top of the file, after the imports
 interface ShareChallengeRouteParams {
   challengeObj: any; // Replace 'any' with proper type if available
   captureData: string;
@@ -68,13 +67,13 @@ const ArChallengeShare = () => {
   const { userLocation } = useContext(GeolocationContext);
   const dispatch = useDispatch();
 
+  const width = Dimensions.get("screen").width;
+
   // Update the route type
   const route =
     useRoute<RouteProp<{ ShareChallenge: ShareChallengeRouteParams }, "ShareChallenge">>();
   const navigation = useNavigation();
 
-  const [arMemories, setARMemories] = useState([]);
-  const [challengeRequirement, setChallengeRequirement] = useState(null)
   const challengeObj = route?.params?.challengeObj;
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
@@ -128,7 +127,7 @@ const ArChallengeShare = () => {
 
   const capturedDataUri = captureData;
 
-  const isVideo = capturedDataUri.includes('.mp4');
+  const isVideo = capturedDataUri.includes(".mp4");
   const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
   const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop();
 
@@ -239,7 +238,7 @@ const ArChallengeShare = () => {
     setIsLoading(true);
     let filename = capturedDataUri.split("/").pop();
     let shareFile = {
-      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri  ,
+      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
       type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
       name: filename,
     };
@@ -487,6 +486,11 @@ const ArChallengeShare = () => {
   const mediaContainerWidth = aspectWidth;
   const mediaContainerHeight = aspectHeight;
 
+  let shareButtonTextSize = FontSizes.S16;
+  if (width < 400) {
+    shareButtonTextSize = FontSizes.S14;
+  }
+
   return (
     <ChallengeScreen title={screenTitle} style={{ justifyContent: "space-between", flex: 1 }}>
       <View style={{ flex: 1, paddingHorizontal: 32 }}>
@@ -567,8 +571,8 @@ const ArChallengeShare = () => {
             ref={viewRef}
             onLayout={handleLayout}
           >
-             {isLoadingDisplay && <ScreenLoader/>}
-            <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1, }}>
+            {isLoadingDisplay && <ScreenLoader />}
+            <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1 }}>
               {fileExt == "mp4" || isVideo ? (
                 <Video
                   resizeMode={"contain"}
@@ -589,7 +593,7 @@ const ArChallengeShare = () => {
                 <Image
                   resizeMode={"contain"}
                   source={{ uri: capturedDataUri }}
-                  onLoadStart= {() => setIsLoadingDisplay(true)}
+                  onLoadStart={() => setIsLoadingDisplay(true)}
                   onLoad={() => setIsLoadingDisplay(false)}
                   style={{
                     width: mediaContainerWidth,
@@ -676,14 +680,14 @@ const ArChallengeShare = () => {
             <AppButton
               onPress={shareToSocialMediaButtonHandler}
               containerStyle={{ flex: 1, justifyContent: "center" }}
-              titleStyle={{ fontSize: FontSizes.S16, fontWeight: "bold" }}
+              titleStyle={{ fontSize: shareButtonTextSize, fontWeight: "bold" }}
               title={"Share To Socials"}
             />
 
             <AppButton
               onPress={saveToGallery}
               containerStyle={{ flex: 1, justifyContent: "center" }}
-              titleStyle={{ fontSize: FontSizes.S16, fontWeight: "bold" }}
+              titleStyle={{ fontSize: shareButtonTextSize, fontWeight: "bold" }}
               title={"Save Image"}
             />
           </View>
