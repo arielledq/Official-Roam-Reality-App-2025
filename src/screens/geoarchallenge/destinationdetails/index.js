@@ -27,7 +27,7 @@ import Icon from "../../../components/Icon";
 import { GeolocationContext } from "../../../GeolocationProvider";
 import MarkerIcon from "components/marker";
 import { pinColor, showMessage, tracksViewChanges, useCustomMarkers } from "util/helpers";
-import { EXPERIENCE_TYPE_CHOICES } from "constants";
+import { EXPERIENCE_TYPE_CHOICES } from "../../../constants";
 import RNFS from "react-native-fs";
 import theme from "assets/theme";
 import MapSkeletonLoader from "components/MapSkeletonLoader";
@@ -472,15 +472,29 @@ const GeoArChallengeDetails = ({}) => {
 
   useEffect(() => {
     let markers = [];
+    switch (experienceType) {
+      case EXPERIENCE_TYPE_CHOICES.BAND:
+        if (selectedDestination?.ar_event_sites?.length) {
+          markers = selectedDestination?.ar_event_sites.filter(
+            site => !!site?.band_user && !!site?.category?.id
+          );
+        }
+        break;
+      case EXPERIENCE_TYPE_CHOICES.EVENT:
+        if (selectedDestination?.ar_event_sites?.length) {
+          markers = selectedDestination?.ar_event_sites.filter(
+            site => !site?.band_user && !!site?.category?.id
+          );
+        }
+        break;
 
-    if (isEvent) {
-      if (selectedDestination?.ar_event_sites?.length) {
-        markers = selectedDestination?.ar_event_sites;
-      }
-    } else {
-      if (selectedDestination?.star_ar_sites?.length) {
-        markers = selectedDestination?.star_ar_sites;
-      }
+      default:
+        if (selectedDestination?.star_ar_sites?.length) {
+          markers = selectedDestination?.star_ar_sites.filter(
+            site => !site?.band_user && !site?.category?.id
+          );
+        }
+        break;
     }
 
     const downloadAllImages = async () => {
