@@ -9,7 +9,7 @@ import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
 import PanicPopUp from "../geoarchallenge/panicpopup";
 
-import { handleError, showMessage } from "../../util/helpers";
+import { accountSetupIsComplete, handleError, showMessage } from "../../util/helpers";
 import {
   getGeoARDestinations,
   getARProfile,
@@ -18,6 +18,7 @@ import {
   getARSitesStars,
   setDevice,
   updateProfile,
+  getProfieDetails,
 } from "../../network";
 import {
   updateARUserData,
@@ -46,7 +47,6 @@ const GeoArChallenge = ({}) => {
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
 
-  const account_setup = useSelector(state => state?.login?.data?.user?.user_profile?.account_setup);
   const user = useSelector(state => state?.login?.data?.user);
 
   const navigateToGeoChanllenge = additionalData => {
@@ -280,19 +280,33 @@ const GeoArChallenge = ({}) => {
     setOnesignalDevice();
   }, []);
 
-  useEffect(() => {
-    if (!account_setup) {
-      setTimeout(() => {
-        // @ts-ignore
-        navigation.replace("EditProfile");
-      }, 300);
+  const getUserProfile = async userProfileId => {
+    try {
+      const response = await getProfieDetails({ id: userProfileId });
+
+      if (response.status == 1) {
+        const accountIsComplete = accountSetupIsComplete(response);
+        if (!accountIsComplete) {
+          setTimeout(() => {
+            // @ts-ignore
+            navigation.replace("EditProfile", { profileDetails: response });
+          }, 300);
+        }
+      } else {
+        throw new Error("Error fetching profile details");
+      }
+    } catch (error) {
+      console.error("Error fetching profile details: ", error);
     }
-  }, [account_setup]);
+  };
 
   useEffect(() => {
     if (user?.user_ar_profile?.points === GIFT_POINTS && !user?.has_receive_points) {
       updatePointsNotification();
     }
+
+    const userProfileId = user?.user_profile?.id;
+    getUserProfile(userProfileId);
   }, [user]);
 
   return (

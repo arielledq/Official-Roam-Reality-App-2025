@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Keyboard, Pressable, Text, View } from "react-native";
-
 import { Formik } from "formik";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { Dropdown } from "react-native-element-dropdown";
@@ -13,7 +12,7 @@ import { RootStackParamList, ScreenStackComponent } from "../../constants/types"
 import { DateFormat, formatDate } from "../../util/DateUtils";
 import { FontSizes } from "../../util/FontUtils";
 import { updateProfile } from "../../network";
-import { handleError, showMessage } from "../../util/helpers";
+import { accountSetupIsComplete, handleError, showMessage } from "../../util/helpers";
 import { updateAccountFlag } from "../../redux/Login";
 import { EditProfileSchema } from "../../util/ValidationSchemas";
 
@@ -229,22 +228,35 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     setDetailsShow(false);
     dispatch(updateAccountFlag(true));
     setIsLoading(true);
-  };
 
-  const hasAccountSetupDone = userProfile?.user_profile?.account_setup;
-
-  useEffect(() => {
     if (edit) return;
 
-    if (hasAccountSetupDone) {
-      setTimeout(() => {
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
-        });
-      }, 250);
+    setTimeout(() => {
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+      });
+    }, 250);
+  };
+
+  const formikRef = useRef(null);
+
+  useEffect(() => {
+    console.log("accountSetupIsComplete", accountSetupIsComplete(userData));
+    console.log("userData", userData);
+    if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
+      const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
+      formikRef.current.setValues({
+        pImage: userData?.image || undefined,
+        name: userData?.user?.name || "",
+        gender: userData?.gender || undefined,
+        phoneNumber: userData?.phone_number || "",
+        address: userData?.home_address || "",
+        country: userData?.home_country || "",
+        date_of_birth: dob ? dateToString(dob) : "",
+      });
     }
-  }, [hasAccountSetupDone]);
+  }, [userData]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -256,6 +268,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
       <KeyboardAwareScrollView nestedScrollEnabled>
         <Formik
+          innerRef={formikRef}
           initialValues={initialFormValues}
           onSubmit={values => handleEditProfile(values)}
           enableReinitialize
