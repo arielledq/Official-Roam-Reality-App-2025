@@ -52,7 +52,7 @@ def download_images(modeladmin, request, queryset):
             if obj.memory_file:
                 extension = os.path.splitext(obj.memory_file.name)[1]
                 challenge_name = obj.challenges.name if isinstance(obj, ARMemories) else obj.geo_site.name
-                new_filename = f"{obj.user.name}{challenge_name}{obj.created_at}{extension}"
+                new_filename = f"{obj.user.name} {challenge_name} {obj.created_at} {extension}"
 
                 obj.memory_file.open('rb')
                 image_data = obj.memory_file.read()
