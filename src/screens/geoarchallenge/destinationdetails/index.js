@@ -532,7 +532,7 @@ const GeoArChallengeDetails = ({}) => {
     };
 
     downloadAllImages();
-  }, []);
+  }, [selectedDestination]);
 
   useEffect(() => {
     if (arSitesOn) {
@@ -661,7 +661,7 @@ const GeoArChallengeDetails = ({}) => {
           </View>
           <AppSwitch onValueChange={setFriendsLocationSitesOn} value={friendsLocationSitesOn} />
         </View>
-        {isEvent && (
+        {experienceType === EXPERIENCE_TYPE_CHOICES.BAND && (
           <TouchableOpacity style={_styles.selectionsContainer} onPress={refreshMapButtonHandler}>
             <View style={{ flexDirection: "row", gap: 16, justifyContent: "center" }}>
               <Text style={_styles.selectionTextHeading}>Refresh map</Text>
