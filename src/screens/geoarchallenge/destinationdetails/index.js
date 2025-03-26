@@ -33,7 +33,8 @@ import theme from "assets/theme";
 import MapSkeletonLoader from "components/MapSkeletonLoader";
 
 const SCROLL_AMOUNT = 70;
-const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 30; // 30 seconds
+const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 60 seconds
+const INITIAL_CATEGORIES = [{ name: "Full" }];
 
 const GeoArChallengeDetails = ({}) => {
   const route = useRoute();
@@ -58,7 +59,7 @@ const GeoArChallengeDetails = ({}) => {
   const [popUpFacts, setPopUpFacts] = useState(null);
   const scrollViewRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [categories, setCategories] = useState([{ name: "Full" }]);
+  const [categories, setCategories] = useState(INITIAL_CATEGORIES);
   const [updatedMarkers, setUpdatedMarkers] = useState([]);
   const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
   const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
@@ -113,11 +114,16 @@ const GeoArChallengeDetails = ({}) => {
   const getArSiteCategories = () => {
     const isBand = experienceType === EXPERIENCE_TYPE_CHOICES.BAND;
 
-    getARSiteCategories({ is_band: isBand })
-      .then(res => {
-        setCategories([...categories, ...res.data]);
-      })
-      .finally(() => {});
+    if (isBand) {
+      getARSiteCategories({ is_band: isBand })
+        .then(res => {
+          setCategories([...INITIAL_CATEGORIES, ...res.data]);
+        })
+        .finally(() => {});
+    } else {
+      const extractedCategories = new Set(updatedMarkers.map(item => item?.category));
+      setCategories([...INITIAL_CATEGORIES, ...extractedCategories]);
+    }
   };
 
   const getARStarSites = () => {
@@ -146,47 +152,6 @@ const GeoArChallengeDetails = ({}) => {
       });
     }
   };
-
-  useEffect(() => {
-    if (
-      !selectedDestination.geo_location ||
-      selectedDestination.geo_location.coordinates.length == 0
-    ) {
-      setTimeout(setMapBounds, 500);
-    } else {
-      const fullRegion = {
-        latitude: selectedDestination.geo_location?.coordinates[1],
-        longitude: selectedDestination.geo_location?.coordinates[0],
-        latitudeDelta: Number(selectedDestination.map_latitude_delta),
-        longitudeDelta: Number(selectedDestination.map_longitude_delta),
-      };
-      const full_latitude_longitude = getFullCenter();
-      const full_bounds = getFullBounds();
-      if (full_bounds) {
-        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
-        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
-      }
-      if (full_latitude_longitude) {
-        fullRegion.latitude = Number(full_latitude_longitude.latitude);
-        fullRegion.longitude = Number(full_latitude_longitude.longitude);
-      }
-      setFullRegion(fullRegion);
-    }
-    getHiddenStar();
-    getFriends();
-    loadDFacts(selectedDestination?.id);
-    getARStarSites();
-    getArSiteCategories();
-
-    bandLocationUpdatesIntervalId.current = setInterval(
-      getBandLocationUpdates,
-      BAND_LOCATION_UPDATE_INTERVAL_SECONDS
-    );
-
-    return () => {
-      clearInterval(bandLocationUpdatesIntervalId.current);
-    };
-  }, []);
 
   const loadDFacts = async id => {
     getDestinationFacts({
@@ -470,6 +435,58 @@ const GeoArChallengeDetails = ({}) => {
     }, 500);
   };
 
+  const refreshMapButtonHandler = () => {
+    showMessage(
+      "The map is now updated with the latest locations.",
+      "success",
+      "Location updated!"
+    );
+    getBandLocationUpdates();
+  };
+
+  useEffect(() => {
+    if (
+      !selectedDestination.geo_location ||
+      selectedDestination.geo_location.coordinates.length == 0
+    ) {
+      setTimeout(setMapBounds, 500);
+    } else {
+      const fullRegion = {
+        latitude: selectedDestination.geo_location?.coordinates[1],
+        longitude: selectedDestination.geo_location?.coordinates[0],
+        latitudeDelta: Number(selectedDestination.map_latitude_delta),
+        longitudeDelta: Number(selectedDestination.map_longitude_delta),
+      };
+      const full_latitude_longitude = getFullCenter();
+      const full_bounds = getFullBounds();
+      if (full_bounds) {
+        fullRegion.latitudeDelta = Number(full_bounds.maxLat - full_bounds.minLat);
+        fullRegion.longitudeDelta = Number(full_bounds.maxLng - full_bounds.minLng);
+      }
+      if (full_latitude_longitude) {
+        fullRegion.latitude = Number(full_latitude_longitude.latitude);
+        fullRegion.longitude = Number(full_latitude_longitude.longitude);
+      }
+      setFullRegion(fullRegion);
+    }
+    getHiddenStar();
+    getFriends();
+    loadDFacts(selectedDestination?.id);
+    getARStarSites();
+    getArSiteCategories();
+
+    if (experienceType === EXPERIENCE_TYPE_CHOICES.BAND) {
+      bandLocationUpdatesIntervalId.current = setInterval(
+        getBandLocationUpdates,
+        BAND_LOCATION_UPDATE_INTERVAL_SECONDS
+      );
+    }
+
+    return () => {
+      clearInterval(bandLocationUpdatesIntervalId.current);
+    };
+  }, []);
+
   useEffect(() => {
     let markers = [];
     switch (experienceType) {
@@ -542,14 +559,13 @@ const GeoArChallengeDetails = ({}) => {
     }
   }, [arSitesOn]);
 
-  const refreshMapButtonHandler = () => {
-    showMessage(
-      "The map is now updated with the latest locations.",
-      "success",
-      "Location updated!"
-    );
-    getBandLocationUpdates();
-  };
+  useEffect(() => {
+    if (updatedMarkers?.length) {
+      getArSiteCategories();
+    } else {
+      setCategories(INITIAL_CATEGORIES);
+    }
+  }, [updatedMarkers]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
