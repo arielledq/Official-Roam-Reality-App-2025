@@ -211,10 +211,10 @@ const SocialSignin = ({ setLoading }) => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
-        <TouchableOpacity onPress={handleFBLogin}>
+        {/* TODO: Re enable after Arielle's FB Console setup - 2025-03-26 */}
+        {/* <TouchableOpacity onPress={handleFBLogin}>
           <FacebookIcon style={styles.socialSIicon} />
-        </TouchableOpacity>
-        {/* TODO: Re enable after backend API connection - 2025-02-21 */}
+        </TouchableOpacity> */}
         <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
         </TouchableOpacity>

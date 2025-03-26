@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image } from "react-native";
+import { View, Text, TouchableOpacity, Image, Linking, Alert, Platform } from "react-native";
+import RNFS from "react-native-fs";
 
 import Share from "react-native-share";
 import ReactNativeModal from "react-native-modal";
@@ -12,6 +13,33 @@ import Images from "assets/images";
 import { showMessage } from "util/helpers";
 import Config from "config";
 import { SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE } from "../constants";
+
+import { ShareDialog } from "react-native-fbsdk-next";
+
+/**
+ * Converts a local file to a base64 data URI.
+ * @param {string} fileUri - The local file URI.
+ * @param {string} fileExt - The file extension (e.g., 'jpg', 'png', or 'mp4').
+ * @returns {Promise<string|null>} The data URI or null if there was an error.
+ */
+const getBase64DataUri = async (fileUri = "", fileExt = "") => {
+  // Ensure the URI doesn't include the "file://" prefix for RNFS.readFile
+  const normalizedUri = fileUri.startsWith("file://") ? fileUri.replace("file://", "") : fileUri;
+
+  try {
+    const base64Data = await RNFS.readFile(normalizedUri, "base64");
+    if (fileExt === "mp4") {
+      // For videos, note that large files may become impractical as base64 strings
+      return `data:video/mp4;base64,${base64Data}`;
+    } else {
+      // For images
+      return `data:image/${fileExt};base64,${base64Data}`;
+    }
+  } catch (error) {
+    console.error("Error converting file to base64:", error);
+    return null;
+  }
+};
 
 interface IGPostTypeButtonProps {
   onPress: () => {};
@@ -67,9 +95,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 }) => {
   const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
   const share = async (selectedSSNN: SSNN_TYPE) => {
-    // const share = async (selectedSSNN: SSNN_TYPE, selectedChannel?: string) => {
     // Construct the full file:// URI more explicitly
-    let updatedFileUri = fileUri;
+    let updatedFileUri = fileUri || "";
 
     if (updatedFileUri) {
       // Check if fileUri is not null or undefined
@@ -87,6 +114,10 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
     // Share the file
     let shareOptions = {};
+
+    const shareMessage = `${
+      sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
+    }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
 
     switch (selectedSSNN) {
       case SSNN.INSTAGRAM:
@@ -106,23 +137,47 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         }
         break;
       case SSNN.FACEBOOK:
-        shareOptions = {
-          social: Share.Social.FACEBOOK_STORIES,
-          appId: Config.FACEBOOK_APP_ID,
-        };
-        if (fileExt === "mp4") {
-          shareOptions = { ...shareOptions, backgroundImage: updatedFileUri };
+        if (Platform.OS === "ios") {
+          if (fileExt === "mp4") {
+            shareOptions = {
+              contentType: "video",
+              video: {
+                localUrl: updatedFileUri,
+              },
+            };
+          } else {
+            shareOptions = {
+              contentType: "photo",
+              photos: [
+                {
+                  imageUrl: updatedFileUri,
+                },
+              ],
+            };
+          }
         } else {
-          shareOptions = { ...shareOptions, backgroundVideo: updatedFileUri };
+          shareOptions = {
+            social: Share.Social.FACEBOOK,
+            appId: Config.FACEBOOK_APP_ID,
+            message: shareMessage,
+          };
+
+          // Convert the file to a base64 data URI
+          const dataUri = await getBase64DataUri(updatedFileUri, fileExt);
+          if (!dataUri) {
+            Alert.alert("Error", "Failed to convert content for Facebook");
+            return;
+          }
+
+          shareOptions = { ...shareOptions, url: dataUri };
         }
+
         break;
       case SSNN.OTHERS:
         shareOptions = {
           url: updatedFileUri,
           type: mimeType,
-          message: `${sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""}\n\n${
-            sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""
-          }`,
+          message: shareMessage,
         };
         break;
 
@@ -136,9 +191,18 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         await Share.open(shareOptions);
         hasShared = true;
       } else {
-        // @ts-ignore
-        await Share.shareSingle(shareOptions);
-        hasShared = true;
+        if (Platform.OS === "ios" && selectedSSNN === SSNN.FACEBOOK) {
+          await ShareDialog.canShow(shareOptions);
+          const resultDialog = await ShareDialog.show(shareOptions);
+          if (resultDialog?.isCancelled) {
+            throw new Error("Share cancelled");
+          }
+          hasShared = true;
+        } else {
+          // @ts-ignore
+          await Share.shareSingle(shareOptions);
+          hasShared = true;
+        }
       }
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);

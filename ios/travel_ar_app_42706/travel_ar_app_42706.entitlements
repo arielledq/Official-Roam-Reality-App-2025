@@ -12,5 +12,9 @@
 	<array>
 		<string>group.com.roam.reality.onesignal</string>
 	</array>
+	<key>keychain-access-groups</key>
+	<array>
+		<string>$(AppIdentifierPrefix)com.roam.reality</string>
+	</array>
 </dict>
 </plist>
