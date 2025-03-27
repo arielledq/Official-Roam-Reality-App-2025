@@ -48,4 +48,4 @@ class ScoreFilterSet(filters.FilterSet):
             destination_points=F('memories_points') + F('checkin_points')
         )
 
-        return queryset.order_by('-destination_points', 'user_ar_profile__updated_at')
+        return queryset.order_by('-destination_points', '-user_ar_profile__updated_at')
