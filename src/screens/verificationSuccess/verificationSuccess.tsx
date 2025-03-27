@@ -26,13 +26,26 @@ const VerificationSuccess: ScreenStackComponent<RootStackParamList, "Verificatio
 
   const handleContinue = () => {
     if (ChangePassword) {
-      navigation.navigate("Login");
+      navigation.replace("Login");
     } else if (profile) {
-      navigation.navigate("TabNavigator");
+      navigation.replace("TabNavigator");
       dispatch(updateVerified(true));
     } else {
-      data.user.user_profile.is_verified = true;
-      dispatch(updateUserData(data));
+      dispatch(
+        updateUserData({
+          ...data,
+          user: {
+            ...data?.user,
+            user_profile: {
+              ...data?.user?.user_profile,
+              is_verified: true,
+            },
+          },
+        })
+      );
+      setTimeout(() => {
+        navigation.replace("TabNavigator");
+      }, 250);
     }
   };
 

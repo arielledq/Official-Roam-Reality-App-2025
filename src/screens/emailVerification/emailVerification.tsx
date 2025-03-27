@@ -68,6 +68,9 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
 
   const handleSkip = () => {
     dispatch(updateUserData(data));
+    setTimeout(() => {
+      navigation.replace("TabNavigator");
+    }, 250);
   };
 
   useEffect(() => {
