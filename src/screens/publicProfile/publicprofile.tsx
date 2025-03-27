@@ -205,6 +205,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
           name={userProfile?.name}
           email={userProfile?.email}
           reportAction={() => setModalVisible(true)}
+          isVerified
         />
         <View style={_styles.scoreboardContainer}>
           <AppText

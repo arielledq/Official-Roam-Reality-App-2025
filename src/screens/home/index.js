@@ -261,25 +261,6 @@ const GeoArChallenge = ({}) => {
     );
   };
 
-  useEffect(() => {
-    OneSignal.setNotificationOpenedHandler(notification => {
-      const { additionalData } = notification.notification;
-
-      if (additionalData) {
-        navigateToGeoChanllenge(additionalData);
-      }
-    });
-
-    return () => {
-      OneSignal.clearHandlers();
-    };
-  }, []);
-
-  useEffect(() => {
-    loadDestinations();
-    setOnesignalDevice();
-  }, []);
-
   const getUserProfile = async userProfileId => {
     try {
       const response = await getProfieDetails({ id: userProfileId });
@@ -301,6 +282,23 @@ const GeoArChallenge = ({}) => {
   };
 
   useEffect(() => {
+    loadDestinations();
+    setOnesignalDevice();
+
+    OneSignal.setNotificationOpenedHandler(notification => {
+      const { additionalData } = notification.notification;
+
+      if (additionalData) {
+        navigateToGeoChanllenge(additionalData);
+      }
+    });
+
+    return () => {
+      OneSignal.clearHandlers();
+    };
+  }, []);
+
+  useEffect(() => {
     if (user?.user_ar_profile?.points === GIFT_POINTS && !user?.has_receive_points) {
       updatePointsNotification();
     }
@@ -308,6 +306,8 @@ const GeoArChallenge = ({}) => {
     const userProfileId = user?.user_profile?.id;
     getUserProfile(userProfileId);
   }, [user]);
+
+  // state.data.user.user_ar_profile.
 
   return (
     <ScreenContainer>

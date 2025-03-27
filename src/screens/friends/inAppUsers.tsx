@@ -14,12 +14,14 @@ import fontGroup from "../../assets/fonts";
 import { FontSizes } from "../../util/FontUtils";
 import useDebounce from "../../hooks/debounce";
 import { DEBOUNCE_TIME, showMessage } from "../../util/helpers";
+import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 
 const InAppUsers = () => {
   const _styles = useStyles();
   const [searchText, setSearchText] = React.useState("");
   const [filteredUsers, setFilteredUsers] = React.useState([]);
   const debounceQuery = useDebounce(searchText, DEBOUNCE_TIME);
+  const [loading, setLoading] = React.useState(false);
 
   const fetchUsers = React.useCallback(() => {
     const payload = {
@@ -37,6 +39,7 @@ const InAppUsers = () => {
   }, [debounceQuery, fetchUsers]);
 
   const onAddFriendClick = (userObj: any) => {
+    setLoading(true);
     // Call api to send friend request to user
     sendFriendRequest({ to_user: userObj?.id })
       .then(response => {
@@ -48,6 +51,9 @@ const InAppUsers = () => {
       })
       .catch(error => {
         console.error(error);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   };
 
@@ -85,6 +91,7 @@ const InAppUsers = () => {
           renderItem={({ item }) => renderFriendItem(item, onAddFriendClick, _styles)}
         />
       </View>
+      <FullScreenLoadingSpinner isLoading={loading} />
     </KeyboardAwareScrollView>
   );
 };
@@ -142,7 +149,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
           </Text> */}
         </View>
       </View>
-      <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10 }}>
+      <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10, padding: 16 }}>
         <Text style={localStyle.addButton}>Add as friend</Text>
       </Pressable>
     </View>

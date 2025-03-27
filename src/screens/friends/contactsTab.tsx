@@ -164,7 +164,7 @@ const ContactsTab = () => {
             </Text>
           </View>
         </View>
-        <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10 }}>
+        <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10, padding: 16 }}>
           <Text style={localStyle.addButton}>Add as friend</Text>
         </Pressable>
       </View>

@@ -114,7 +114,7 @@ const renderFriendItem = (item, styles, navigation) => {
         onPress={() => {
           navigation.navigate("PublicProfile", { userData: item });
         }}
-        style={{ marginLeft: 10 }}
+        style={{ marginLeft: 10, padding: 16 }}
       >
         <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>
