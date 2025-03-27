@@ -34,6 +34,7 @@ import MapSkeletonLoader from "components/MapSkeletonLoader";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 60 seconds
+const FRIENDS_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 60 seconds
 const INITIAL_CATEGORIES = [{ name: "Full" }];
 
 const GeoArChallengeDetails = ({}) => {
@@ -55,7 +56,6 @@ const GeoArChallengeDetails = ({}) => {
   const regions = selectedDestination?.regions;
   const [fullRegion, setFullRegion] = useState(null);
   const [friendList, setFriendList] = useState([]);
-  const [filteredUsers, setFilteredUsers] = React.useState([]);
   const [popUpFacts, setPopUpFacts] = useState(null);
   const scrollViewRef = useRef(null);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -65,6 +65,7 @@ const GeoArChallengeDetails = ({}) => {
   const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
 
   const bandLocationUpdatesIntervalId = useRef(null);
+  const friendsLocationUpdatesIntervalId = useRef(null);
 
   const scrollRegionsPressHandler = () => {
     const newPosition = scrollPosition + SCROLL_AMOUNT;
@@ -332,15 +333,20 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const getFriends = () => {
+    setLoadingCustomMarkers(true);
     getUserFriendList()
       .then(response => {
         if (response) {
           setFriendList(response?.data[0]?.friends || []);
-          setFilteredUsers(response?.data[0]?.friends || []);
         }
       })
       .catch(error => {
         console.error(error);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setLoadingCustomMarkers(false);
+        }, 500);
       });
   };
 
@@ -480,10 +486,16 @@ const GeoArChallengeDetails = ({}) => {
         getBandLocationUpdates,
         BAND_LOCATION_UPDATE_INTERVAL_SECONDS
       );
+    } else {
+      friendsLocationUpdatesIntervalId.current = setInterval(
+        getFriends,
+        FRIENDS_LOCATION_UPDATE_INTERVAL_SECONDS
+      );
     }
 
     return () => {
-      clearInterval(bandLocationUpdatesIntervalId.current);
+      clearInterval(bandLocationUpdatesIntervalId?.current);
+      clearInterval(friendsLocationUpdatesIntervalId?.current);
     };
   }, []);
 
