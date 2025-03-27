@@ -25,12 +25,17 @@ import OneSignal from "react-native-onesignal";
 import { setItemWithListener } from "../../util/EventsListener";
 import { fonts } from "assets/fonts";
 import { FontSizes } from "util/FontUtils";
+import Config from "config";
+
+const LOGIN_INITIAL_VALUES = {
+  email: __DEV__ ? Config?.DEV_EMAIL || "" : "",
+  password: __DEV__ ? Config?.DEV_PASSWORD || "" : "",
+};
 
 const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const newUser = useSelector(state => state.persist.newUser);
-  // const navigation = useNavigation()
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -87,11 +92,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
       >
         <Formik
           initialValues={{
-            email: "",
-            password: "",
-            // email: "ar01@yopmail.com",
-            // email: "ar10@yopmail.com",
-            // password: "Password123@",
+            email: LOGIN_INITIAL_VALUES.email,
+            password: LOGIN_INITIAL_VALUES.password,
           }}
           onSubmit={v => handleLogin(v)}
           validationSchema={SigninSchema}

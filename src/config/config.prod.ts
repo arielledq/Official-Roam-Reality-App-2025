@@ -21,4 +21,6 @@ export default {
   MAPBOX_PUBLIC_KEY:
     "pk.eyJ1Ijoicm9hbXJlYWxpdHkiLCJhIjoiY20ybDJpZXp6MDgxdDJxb3AwbWw0cmxqaSJ9.XS8GNE9TlK1U187fFjpk6A",
   FACEBOOK_APP_ID: "1735456000569385",
+  DEV_EMAIL: "",
+  DEV_PASSWORD: "",
 };
