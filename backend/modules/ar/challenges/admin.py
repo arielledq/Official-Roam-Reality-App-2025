@@ -79,8 +79,9 @@ def reject_and_notify(self, request, queryset):
                 user.user_ar_profile.points -= memory_checkin.points
                 user.user_ar_profile.save()
             notification = Notification.objects.create(
-                title="Your sumbission was declined",
-                description=memory_checkin.declined_reason,
+                title="Your submission was declined",
+                description=memory_checkin.declined_reason if memory_checkin.declined_reason else 'Your submission '
+                                                                                                  'was rejected',
                 type=NotificationTypes.POINTS_REVOKED,
                 channel=Notification.NotificationChannel.PUSH,
             )
