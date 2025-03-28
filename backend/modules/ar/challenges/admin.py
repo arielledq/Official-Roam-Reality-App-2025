@@ -4,8 +4,11 @@ import zipfile
 
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.db import transaction
 from django.http import HttpResponse
 
+from notifications.models import Notification, NotificationTypes
+from onesignal_client.utils import send_notification
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
@@ -65,6 +68,26 @@ def download_images(modeladmin, request, queryset):
     return response
 
 
+def reject_and_notify(self, request, queryset):
+    with transaction.atomic():
+        for memory_checkin in queryset:
+            user = memory_checkin.user
+            if memory_checkin.challenge_approval != "DECLINED":
+                memory_checkin.challenge_approval = "DECLINED"
+                memory_checkin.save()
+
+                user.user_ar_profile.points -= memory_checkin.points
+                user.user_ar_profile.save()
+            notification = Notification.objects.create(
+                title="Your sumbission was declined",
+                description=memory_checkin.declined_reason,
+                type=NotificationTypes.POINTS_REVOKED,
+                channel=Notification.NotificationChannel.PUSH,
+            )
+            notification.targets.set([user])
+            notification.send()
+
+
 class ARMemoriesAdmin(admin.ModelAdmin):
     
     search_fields = (
@@ -75,7 +98,7 @@ class ARMemoriesAdmin(admin.ModelAdmin):
     list_select_related = ['user']  # To avoid extra queries
 
     exclude = ('geo_challenge', 'description',)
-    actions = [download_images]
+    actions = [download_images, reject_and_notify]
 
     def user_name(self, memory):
         return memory.user.name
@@ -286,7 +309,7 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     )
     list_display = ('user_name', 'geo_site', 'challenge_approval', 'memory_file')
     list_select_related = ['user']  # To avoid extra queries
-    actions = [download_images]
+    actions = [download_images, reject_and_notify]
 
     def user_name(self, obj):
         return obj.user.name

@@ -24,7 +24,8 @@ class ScoreFilterSet(filters.FilterSet):
         memories_subquery = (
             ARMemories.objects.filter(
                 user=OuterRef('pk'),
-                geo_location=value
+                geo_location=value,
+                challenge_approval__in=["UNAPPROVED", "APPROVED"],
             )
             .values('user')
             .annotate(total=Sum('points'))
@@ -34,7 +35,8 @@ class ScoreFilterSet(filters.FilterSet):
         checkin_subquery = (
             ARSitePinCheckIn.objects.filter(
                 user=OuterRef('pk'),
-                geo_location=value
+                geo_location=value,
+                challenge_approval__in=["UNAPPROVED", "APPROVED"],
             )
             .values('user')
             .annotate(total=Sum('points'))

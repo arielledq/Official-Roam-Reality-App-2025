@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
-from .models import Challenges, GeoARChallenges, ARUserProfile, ARMemories
+from .models import Challenges, GeoARChallenges, ARUserProfile, ARMemories, ARSitePinCheckIn
 from django.db.models import F
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.base import File
@@ -13,28 +13,42 @@ from django.conf import settings
 import ffmpeg_downloader as ffdl
 import os
 
-@receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
-def update_points(sender, instance, **kwargs):
-    if instance.challenges:
-      cBbj = Challenges.objects.get(pk=instance.challenges.id)
-      profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
-      if instance.challenge_approval == "DECLINED":
-        profileObj.points =F('points')-cBbj.points
-        # send_notification(NotificationTypes.POINTS_REVOKED, profileObj.user)
-      elif kwargs['created'] and instance.challenge_approval == "UNAPPROVED":
-        profileObj.points =F('points')+cBbj.points
-        profileObj.challenge_completed =F('challenge_completed')+1
-      profileObj.save()
-    if instance.geo_challenge:
-      cBbj = GeoARChallenges.objects.get(pk=instance.geo_challenge.id)
-      profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
-      if instance.challenge_approval == "DECLINED":
-        profileObj.points =F('points')-cBbj.points
-        # send_notification(NotificationTypes.POINTS_REVOKED, profileObj.user)
-      elif kwargs['created'] and instance.challenge_approval == "UNAPPROVED":
-        profileObj.points =F('points')+cBbj.points
-        profileObj.challenge_completed =F('challenge_completed')+1
-      profileObj.save()
+# @receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
+# def update_points(sender, instance, **kwargs):
+#     if instance.challenges:
+#       cBbj = Challenges.objects.get(pk=instance.challenges.id)
+#       profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
+#       if instance.challenge_approval == "DECLINED":
+#         profileObj.points =F('points')-cBbj.points
+#         # send_notification(NotificationTypes.POINTS_REVOKED, profileObj.user)
+#       elif kwargs['created'] and instance.challenge_approval == "UNAPPROVED":
+#         profileObj.points =F('points')+cBbj.points
+#         profileObj.challenge_completed =F('challenge_completed')+1
+#       profileObj.save()
+#     if instance.geo_challenge:
+#       cBbj = GeoARChallenges.objects.get(pk=instance.geo_challenge.id)
+#       profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
+#       if instance.challenge_approval == "DECLINED":
+#         profileObj.points =F('points')-cBbj.points
+#         # send_notification(NotificationTypes.POINTS_REVOKED, profileObj.user)
+#       elif kwargs['created'] and instance.challenge_approval == "UNAPPROVED":
+#         profileObj.points =F('points')+cBbj.points
+#         profileObj.challenge_completed =F('challenge_completed')+1
+#       profileObj.save()
+#
+#
+# @receiver(post_save, sender=ARSitePinCheckIn, dispatch_uid="update_points")
+# def update_points_checkin(sender, instance, **kwargs):
+#     if instance.geo_challenge:
+#       cBbj = GeoARChallenges.objects.get(pk=instance.geo_challenge.id)
+#       profileObj , created = ARUserProfile.objects.get_or_create(user=instance.user)
+#       if instance.challenge_approval == "DECLINED":
+#         profileObj.points =F('points')-cBbj.points
+#         # send_notification(NotificationTypes.POINTS_REVOKED, profileObj.user)
+#       elif kwargs['created'] and instance.challenge_approval == "UNAPPROVED":
+#         profileObj.points =F('points')+cBbj.points
+#         profileObj.challenge_completed =F('challenge_completed')+1
+#       profileObj.save()
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_thumbnails_updated")
 def update_thumbnails(sender, instance, **kwargs):
