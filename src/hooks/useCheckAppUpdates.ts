@@ -6,7 +6,7 @@ import SpInAppUpdates, {
 import { Platform } from "react-native";
 import { useEffect, useRef, useState } from "react";
 
-const CHECK_UPDATES_INTERVAL_HOURS = 1000 * 60 * 60 * 6; // 6 Hours
+const CHECK_UPDATES_INTERVAL_HOURS = 1000 * 60 * 30; // 30 minutes
 
 const useCheckAppUpdates = () => {
   const [appHasUpdates, setAppHasUpdates] = useState(false);
