@@ -1,6 +1,8 @@
 from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
+from django import forms
+
 from users.models import FriendshipRequest, UserOtp, UserProfile
 
 from users.forms import UserChangeForm, UserCreationForm
@@ -21,8 +23,21 @@ class UserAdmin(auth_admin.UserAdmin):
     def system_generated_user_name(self, obj):
         return obj.username
 
+
+class UserProfileForm(forms.ModelForm):
+    class Meta:
+        model = UserProfile
+        fields = '__all__'
+
+    friends = forms.ModelMultipleChoiceField(
+        queryset=User.objects.all(),
+        required=False,
+    )
+
+
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
+    form = UserProfileForm
     list_display = ["user_id", "user_name", "user_email", "is_verified"]
     search_fields = ["user__id", "user__name", "user__email"]
     list_display_links = ("user_id", "user_name",)

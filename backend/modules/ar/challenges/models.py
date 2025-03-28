@@ -97,6 +97,7 @@ class GeoLocation(models.Model):
                                               default=1)
     map_latitude_delta = models.DecimalField(_("Map Initial Latitude Delta"), decimal_places=4, max_digits=6,
                                              default=0.0922)
+    is_active = models.BooleanField(_("Active"), default=True)
 
     class Meta:
         verbose_name_plural = "Geo Destination"
