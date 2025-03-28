@@ -1,6 +1,6 @@
 from django.db.models.functions import Coalesce
 from django_filters import rest_framework as filters
-from django.db.models import Q, Sum, Value, F, OuterRef, Subquery
+from django.db.models import Q, Sum, Value, F, OuterRef, Subquery, IntegerField, ExpressionWrapper
 from modules.ar.challenges.models import ARMemories, ARSitePinCheckIn
 from users.models import User
 
@@ -44,10 +44,13 @@ class ScoreFilterSet(filters.FilterSet):
         )
 
         queryset = queryset.annotate(
-            memories_points=Coalesce(Subquery(memories_subquery), Value(0)),
-            checkin_points=Coalesce(Subquery(checkin_subquery), Value(0))
+            memories_points=Coalesce(Subquery(memories_subquery, output_field=IntegerField()), Value(0, output_field=IntegerField())),
+            checkin_points=Coalesce(Subquery(checkin_subquery, output_field=IntegerField()), Value(0, output_field=IntegerField()))
         ).annotate(
-            destination_points=F('memories_points') + F('checkin_points')
+            destination_points=ExpressionWrapper(
+                F('memories_points') + F('checkin_points'),
+                output_field=IntegerField()
+            )
         )
 
         return queryset.order_by('-destination_points', '-user_ar_profile__updated_at')
