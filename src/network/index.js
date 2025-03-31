@@ -504,14 +504,16 @@ export const getUserFriendList = () =>
     logoutFunc
   );
 
-export const getScoreboardList = destination =>
-  Request.callWithToken(
+export const getScoreboardList = destination => {
+  const queryParams = destination ? `?destination=${destination}` : "";
+  return Request.callWithToken(
     {
-      url: `${commonApiRoute}scoreboard/?destination=${destination}`,
+      url: `${commonApiRoute}scoreboard/${queryParams}`,
       method: "GET",
     },
     logoutFunc
   );
+};
 
 export const getMyRank = destination =>
   Request.callWithToken(

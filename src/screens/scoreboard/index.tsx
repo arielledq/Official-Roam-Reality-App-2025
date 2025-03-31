@@ -1,20 +1,12 @@
 import React, { useRef, useState } from "react";
-import { Text, View, ImageBackground, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Text, View, ImageBackground, TouchableOpacity } from "react-native";
 
 import { FlatList } from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
 import { useDispatch, useSelector } from "react-redux";
 import { DrawerActions, useNavigation } from "@react-navigation/native";
 
-import {
-  getARProfile,
-  getGeoARDestinations,
-  getMyRank,
-  getProfieDetails,
-  getScoreboardList,
-  searchUsers
-} from "../../network";
-import { isLocationPointInPolygon } from "../../util/LocationLib";
+import { getARProfile, getGeoARDestinations, getMyRank, getScoreboardList } from "../../network";
 import { handleError } from "util/helpers";
 import { updateARUserData } from "../../redux/AR";
 
@@ -27,14 +19,14 @@ import Images from "../../assets/images";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import { MenuIcon } from "assets/svg";
-import theme from "assets/theme";
+import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
+
 const ScoreBoard = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = React.useState([]);
-  const [profileDetails, setProfileDetails] = useState<any>(null);
-  const [rankMine, setRankMine] = useState<number | null>(null);
-  const [destinationData, setDestinationData] = useState([{name: "Global"}]);
-  const [selectedDestination, setSelectedDestination] = useState<any>(null);
+  const [rankMine, setRankMine] = useState<any>();
+  const [destinationData, setDestinationData] = useState([{ name: "Global" }]);
+  const [selectedDestination, setSelectedDestination] = useState<any>();
 
   const _styles = useStyles();
   const dispatch = useDispatch();
@@ -44,43 +36,57 @@ const ScoreBoard = ({}) => {
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
   const arProfile = useSelector((state: any) => state?.ar?.arProfile);
 
-  const getScoreboard = (destination="") => {
-    setIsLoading(true)
-    getScoreboardList(destination).then(response => {
-      if (response) {
-        setUsers(response?.data);
-      }
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
+  const getScoreboard = (destination = "", firstLoad = false) => {
+    setIsLoading(true);
+    getScoreboardList(destination)
+      .then(response => {
+        if (response) {
+          setUsers(response?.data);
+        }
+      })
+      .finally(() => {
+        if (firstLoad) {
+          ARDestinations();
+        } else {
+          setIsLoading(false);
+        }
+      });
   };
 
-  const getMyRankPoints = (destination="") => {
-    setIsLoading(true)
-    getMyRank(destination).then(response => {
-      if (response) {
-        setRankMine(response);
-      }
-    })
-    .finally(() => {
-      setIsLoading(false);
-    });
+  const filterDestinations = (o: any, index: number) => {
+    setSelectedDestination(o);
+    getScoreboard(o.id);
+    // // @ts-ignore
+    // desRef?.current?.scrollToIndex({
+    //   animated: true,
+    //   index: index,
+    // });
   };
 
   const ARDestinations = () => {
-    setIsLoading(true);
     getGeoARDestinations()
       .then(res => {
         if (res.status == 1) {
-          setDestinationData([ ...destinationData, ...res.data]);
+          setDestinationData(currDestinations => [...currDestinations, ...res.data]);
         } else {
           res.message.message = "Error in loading Destinations.";
           handleError(res);
         }
       })
       .finally(() => {
-        setIsLoading(false);
+        getMyRankPoints();
+      });
+  };
+
+  const getMyRankPoints = (destination = "") => {
+    getMyRank(destination)
+      .then(response => {
+        if (response) {
+          setRankMine(response);
+        }
+      })
+      .finally(() => {
+        fetchARUserProfile();
       });
   };
 
@@ -91,24 +97,14 @@ const ScoreBoard = ({}) => {
           dispatch(updateARUserData(res));
         }
       })
-      .finally(() => {});
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
-
-  const filterDestinations = (o: any, index: number) => {
-    setSelectedDestination(o);
-    // @ts-ignore
-    desRef?.current?.scrollToIndex({
-      animated: true,
-      index: index,
-    });
-  };
-
-
 
   const DestinationItem = ({ obj, index }: { obj: any; index: number }) => (
-    <View
-      // TODO: Temporarily disabled (Pressable) - 2025-02-21
-      // onPress={() => filterDestinations(obj, index)}
+    <TouchableOpacity
+      onPress={() => filterDestinations(obj, index)}
       style={{
         flexDirection: "row",
         alignItems: "center",
@@ -137,10 +133,10 @@ const ScoreBoard = ({}) => {
         <Text style={_styles.destinationText}>{obj?.name}</Text>
         <Text style={_styles.destinationText}>Scoreboard</Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 
-  const Item = ({ obj, rank }: { obj: any, rank: number }) => {
+  const Item = ({ obj, rank }: { obj: any; rank: number }) => {
     return (
       <View
         style={{
@@ -205,6 +201,12 @@ const ScoreBoard = ({}) => {
     );
   };
 
+  const handlePullDownToRefresh = () => {
+    const destination = selectedDestination?.id;
+    const isFirstLoad = false;
+    getScoreboard(destination, isFirstLoad);
+  };
+
   const myRank = () => {
     return (
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
@@ -231,7 +233,7 @@ const ScoreBoard = ({}) => {
                 borderRadius: 5,
                 height: 40,
               }}
-              source={{ uri: profileDetails?.image }}
+              source={{ uri: userProfile?.image }}
               resizeMode={FastImage.resizeMode.cover}
             />
           </ImageBackground>
@@ -252,16 +254,10 @@ const ScoreBoard = ({}) => {
   };
 
   React.useEffect(() => {
-    ARDestinations();
-    fetchARUserProfile();
-    getScoreboard();
-    getMyRankPoints();
+    const destination = "";
+    const isFirstLoad = true;
+    getScoreboard(destination, isFirstLoad);
   }, []);
-
-  React.useEffect(() => {
-    getScoreboard(selectedDestination?.id);
-    getMyRankPoints(selectedDestination?.id)
-  }, [selectedDestination]);
 
   return (
     <ScreenContainer>
@@ -275,39 +271,34 @@ const ScoreBoard = ({}) => {
           backgroundColor="transparent"
           isBottomTab
         />
-        {isLoading ? (
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ActivityIndicator size="large" />
-          </View>
-        ) : (
-          <>
-            <View style={{ height: 50 }}>
-              {/*<DestinationItem index={0} obj={GLOBAL_DESTINATION} />*/}
-              <FlatList
-                horizontal
-                // @ts-ignore
-                ref={desRef}
-                data={destinationData}
-                showsHorizontalScrollIndicator={false}
-                showsVerticalScrollIndicator={false}
-                renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />}
-              />
-            </View>
-            <Text style={_styles.subTitle}>Your rank</Text>
-            {myRank()}
-            <Text style={_styles.subTitle}>Leaderboard</Text>
-            {isLoading && <ActivityIndicator size="large" />}
-            <FlatList
-              style={{ flex: 1, marginTop: 15 }}
-              data={users}
-              showsHorizontalScrollIndicator={false}
-              showsVerticalScrollIndicator={false}
-              renderItem={({ item, index }) => <Item obj={item} rank={index} />}
-              keyExtractor={(item: any) => item?.id}
 
-            />
-          </>
-        )}
+        <View style={{ height: 50 }}>
+          {/*<DestinationItem index={0} obj={GLOBAL_DESTINATION} />*/}
+          <FlatList
+            horizontal
+            // @ts-ignore
+            ref={desRef}
+            data={destinationData}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />}
+          />
+        </View>
+        <Text style={_styles.subTitle}>Your rank</Text>
+        {myRank()}
+        <Text style={_styles.subTitle}>Leaderboard</Text>
+
+        <FlatList
+          style={{ flex: 1, marginTop: 15 }}
+          data={users}
+          showsHorizontalScrollIndicator={false}
+          showsVerticalScrollIndicator={false}
+          renderItem={({ item, index }) => <Item obj={item} rank={index} />}
+          keyExtractor={(item: any) => item?.id}
+          onRefresh={handlePullDownToRefresh}
+          refreshing={isLoading}
+        />
+        <FullScreenLoadingSpinner isLoading={isLoading} />
       </>
     </ScreenContainer>
   );
