@@ -386,9 +386,11 @@ export const saveToGallery = async (
         }
 
         // Clean up the temporary downloaded file
-        RNFS.unlink(tempFilePath)
-          .then(() => console.log("Temporary file deleted."))
-          .catch(err => console.log("Error deleting temporary file:", err));
+        setTimeout(() => {
+          RNFS.unlink(tempFilePath)
+            .then(() => console.log("Temporary file deleted."))
+            .catch(err => console.log("Error deleting temporary file:", err));
+        }, 1000);
       } else {
         showMessage("Download failed", "error", "AR Memories!"); // Uncomment if you have showMessage
       }
