@@ -4,6 +4,8 @@ import RNFS from "react-native-fs";
 import { Alert, Linking, Platform } from "react-native";
 import { PERMISSIONS, RESULTS, request, requestMultiple } from "react-native-permissions";
 import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import { getConfiguration } from "network";
+import Config from "config";
 
 export const handleError = (res: any) => {
   let message = "";
@@ -401,5 +403,24 @@ export const saveToGallery = async (
     }
   } else {
     cameraRollSaveAsset(hasPermission, onPermissionsGranted, capturedDataUri, fileExt);
+  }
+};
+
+export const checkAppLatestUpdate = async () => {
+  let isUpdated = false;
+  if (Platform.OS === "ios") {
+    try {
+      const response = await getConfiguration();
+      const serverVersionNumber = response["0"].value;
+      if (serverVersionNumber === Config.APP_VERSION) {
+        isUpdated = true;
+      }
+    } catch (error) {
+      console.error(error);
+    }
+
+    return isUpdated;
+  } else {
+    return true;
   }
 };

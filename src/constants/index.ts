@@ -69,3 +69,5 @@ export const SHARE_CONDITIONS_TEXT =
 
 export const GIFT_POINTS = 25;
 export const USERS_LIMIT = 25;
+
+export const PUBLIC_APP_STORE_URL = "https://apps.apple.com/py/app/roam-reality/id6477857812";

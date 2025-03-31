@@ -1,5 +1,5 @@
 import { Request } from "./request";
-import { commonApiRoute } from "./config";
+import { BASE_URL, commonApiRoute } from "./config";
 import { removeItemWithListener } from "../util/EventsListener";
 
 /**
@@ -39,6 +39,12 @@ export const signUp = data =>
     url: `${commonApiRoute}signup/`,
     method: "POST",
     data,
+  });
+
+export const getConfiguration = () =>
+  Request.call({
+    url: `${BASE_URL}configuration/`,
+    method: "GET",
   });
 
 export const getArTips = () =>
