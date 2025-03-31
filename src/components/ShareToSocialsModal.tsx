@@ -15,6 +15,7 @@ import Config from "config";
 import { SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE } from "../constants";
 
 import { ShareDialog } from "react-native-fbsdk-next";
+import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
 
 /**
  * Converts a local file to a base64 data URI.
@@ -94,17 +95,49 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   isMemory = false,
 }) => {
   const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const share = async (selectedSSNN: SSNN_TYPE) => {
     // Construct the full file:// URI more explicitly
     let updatedFileUri = fileUri || "";
 
     if (updatedFileUri) {
       // Check if fileUri is not null or undefined
-      if (!updatedFileUri.startsWith("file://")) {
+      if (!updatedFileUri.startsWith("file://") && !updatedFileUri.startsWith("http")) {
         if (updatedFileUri.startsWith("/")) {
           updatedFileUri = `file://${updatedFileUri}`; // Correctly handle paths starting with /
         } else {
           updatedFileUri = `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`; // If relative, assume it's in cache (adjust if needed) - requires react-native-fs
+        }
+      } else if (updatedFileUri.startsWith("http")) {
+        // download image and get local uri
+        try {
+          setLoading(true);
+          // Get the filename from the URL
+          const filename = updatedFileUri.split("?")[0].split("/").pop();
+
+          // Determine the local file path
+          const localFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
+
+          // Download the file
+          const download = RNFS.downloadFile({
+            fromUrl: updatedFileUri,
+            toFile: localFilePath,
+          });
+
+          const downloadResult = await download.promise;
+
+          if (downloadResult.statusCode === 200) {
+            updatedFileUri = `file://${localFilePath}`;
+          } else {
+            console.error("Failed to download file:", downloadResult);
+            // Handle download error appropriately
+          }
+        } catch (error) {
+          console.error("Error downloading media:", error);
+          // Handle sharing error appropriately
+        } finally {
+          setLoading(false);
         }
       }
     }
@@ -121,13 +154,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
     switch (selectedSSNN) {
       case SSNN.INSTAGRAM:
-        // if (!selectedChannel) {
-        //   setShowChooseIGPostType(true);
-        //   return;
-        // }
         shareOptions = {
           social: Share.Social.INSTAGRAM_STORIES,
-          // social: Share.Social.INSTAGRAM,
           appId: Config.FACEBOOK_APP_ID,
         };
         if (fileExt === "mp4") {
@@ -300,6 +328,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           }}
         >
           {showChooseIGPostType ? ChooseInstagramPostType : ChooseSocialNetwork}
+          <FullScreenLoadingSpinner isLoading={loading} />
         </View>
       </ReactNativeModal>
     </View>

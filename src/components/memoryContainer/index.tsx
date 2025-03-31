@@ -1,14 +1,12 @@
-import React from "react";
-import { Platform, Pressable, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import { Pressable, TouchableOpacity, View } from "react-native";
 import useStyles from "./styles";
 import AppText from "../text";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import FastImage from "react-native-fast-image";
 //@ts-ignore
 import DownloadImg from "../../assets/ar/download.svg";
-import RNFetchBlob from "rn-fetch-blob";
-import { requestMultiple, PERMISSIONS } from "react-native-permissions";
-import { showMessage, truncateText } from "../../util/helpers";
+import { saveToGallery, truncateText } from "../../util/helpers";
+import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 
 const MemoryContainer = ({
   item,
@@ -17,64 +15,34 @@ const MemoryContainer = ({
   item: any;
   onPressAction?: (file: any, details: any) => void;
 }) => {
-  const getPathFromUrl = (url: String) => {
-    return url.split("?")[0];
-  };
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasPermission, setHasPermission] = useState(false);
 
   const styles = useStyles();
-  let memoryURL = item?.memory_file;
-  let memoryPath = getPathFromUrl(item?.memory_file);
-  const fileExt = memoryPath.split(".").pop();
 
-  let newMemoryUri = memoryPath.lastIndexOf("/");
-  let memoryName = memoryPath.substring(newMemoryUri);
+  const isMemory = true;
+  const capturedDataUri = item?.memory_file;
+  const filePath = capturedDataUri.split("?")[0];
+  const fileExt = filePath.split(".").pop() || "";
 
-  let dirs = RNFetchBlob.fs.dirs;
-  const path = Platform.OS === "ios" ? dirs.LibraryDir + memoryName : dirs.PictureDir + memoryName;
-  const saveToGallery = () => {
-    RNFetchBlob.config({
-      fileCache: true,
-      appendExt: fileExt,
-      indicator: true,
-      IOSBackgroundTask: true,
-      path: path,
-      addAndroidDownloads: {
-        useDownloadManager: true,
-        notification: true,
-        path: path,
-        description: fileExt == "mp4" ? "Video" : "Image",
-      },
-    })
-      .fetch("GET", memoryURL)
-      .then(res => {
-        if (Platform.OS == "ios") {
-          CameraRoll.saveAsset(res.data, { type: fileExt == "mp4" ? "video" : "photo" })
-            .then(() => {
-              showMessage("Saved to Camera Roll", "success", "AR Memories!");
-            })
-            .catch(err => {
-              showMessage("There was an error saving to Camera Roll", "error", "AR Memories!");
-            });
-        } else {
-          showMessage("Saved to Camera Roll", "success", "AR Memories!");
-        }
-      });
+  const permissionsGrantedHandler = () => {
+    setHasPermission(true);
   };
 
-  const checkPermission = () => {
-    if (Platform.OS == "android") {
-      requestMultiple([
-        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-      ]).then(response => {
-        saveToGallery();
-      });
-    } else {
-      saveToGallery();
-    }
+  const toggleLoadingHandler = () => {
+    setIsLoading(currState => !currState);
   };
 
-  // console.log("item", JSON.stringify(item, null, 2));
+  const saveToGalleryButtonHandler = () => {
+    saveToGallery(
+      hasPermission,
+      permissionsGrantedHandler,
+      isMemory,
+      capturedDataUri,
+      fileExt,
+      toggleLoadingHandler
+    );
+  };
 
   return (
     <Pressable
@@ -101,7 +69,10 @@ const MemoryContainer = ({
             <AppText numberOfLines={1} style={styles.title}>
               {truncateText(item?.challenge_details?.name, 8)}
             </AppText>
-            <TouchableOpacity onPress={checkPermission} style={{ marginStart: 10, padding: 4 }}>
+            <TouchableOpacity
+              onPress={saveToGalleryButtonHandler}
+              style={{ marginStart: 10, padding: 4 }}
+            >
               <DownloadImg style={{ width: 16, height: 12 }} />
             </TouchableOpacity>
           </View>
@@ -110,6 +81,7 @@ const MemoryContainer = ({
           </AppText>
         </View>
       </View>
+      <FullScreenLoadingSpinner isLoading={isLoading} />
     </Pressable>
   );
 };

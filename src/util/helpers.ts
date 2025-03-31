@@ -1,5 +1,9 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import RNFS from "react-native-fs";
+import { Alert, Linking, Platform } from "react-native";
+import { PERMISSIONS, RESULTS, request, requestMultiple } from "react-native-permissions";
+import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 export const handleError = (res: any) => {
   let message = "";
@@ -223,4 +227,177 @@ export const accountSetupIsComplete = (userObj: any) => {
     isComplete = true;
   }
   return isComplete;
+};
+
+export function getFileExtension(url: string) {
+  const match = url.match(/\.([a-zA-Z0-9]+)(?=\?|$)/);
+  return match ? `.${match[1]}` : "";
+}
+
+const getAndroidPermissions = () => {
+  const androidVersion = Platform.Version;
+  if (+androidVersion >= 33) {
+    return [PERMISSIONS.ANDROID.READ_MEDIA_IMAGES, PERMISSIONS.ANDROID.READ_MEDIA_VIDEO];
+  } else {
+    return PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE;
+  }
+};
+
+const requestCameraRollPermission = async (onPermissionsGranted: () => void) => {
+  try {
+    const perms =
+      Platform.OS === "ios" ? PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY : getAndroidPermissions();
+    let res: any;
+
+    if (Array.isArray(perms)) {
+      res = await requestMultiple(perms);
+    } else {
+      res = await request(perms);
+    }
+
+    if (Platform.OS === "android" && Platform.Version >= 33) {
+      if (
+        res[PERMISSIONS.ANDROID.READ_MEDIA_IMAGES] === RESULTS.GRANTED &&
+        res[PERMISSIONS.ANDROID.READ_MEDIA_VIDEO] === RESULTS.GRANTED
+      ) {
+        onPermissionsGranted();
+        return true;
+      } else {
+        const deniedPerms = Object.keys(res).filter(
+          perm => res[perm] === RESULTS.DENIED || res[perm] === RESULTS.BLOCKED
+        );
+        const permNames = deniedPerms.map(perm => {
+          if (perm === PERMISSIONS.ANDROID.READ_MEDIA_IMAGES) return "images";
+          if (perm === PERMISSIONS.ANDROID.READ_MEDIA_VIDEO) return "videos";
+          return "storage"; // Fallback
+        });
+
+        Alert.alert(
+          "Permission Denied",
+          `This app needs access to your ${permNames.join(
+            " and "
+          )} to save images. Please go to your device settings to grant permission.`,
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "OK", onPress: () => Linking.openSettings() },
+          ]
+        );
+        return false;
+      }
+    } else {
+      // iOS or older Android
+      if (res === RESULTS.GRANTED || res === RESULTS.LIMITED) {
+        onPermissionsGranted();
+        return true;
+      } else {
+        Alert.alert(
+          "Permission Denied",
+          "This app needs access to your photo library to save images. Please go to your device settings to grant permission.",
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "OK", onPress: () => Linking.openSettings() },
+          ]
+        );
+        return false;
+      }
+    }
+  } catch (err) {
+    return false;
+  }
+};
+
+const cameraRollSaveAsset = async (
+  hasPermission: boolean,
+  onPermissionsGranted: () => void,
+  asset: string,
+  fileExt: string
+) => {
+  if (!hasPermission) {
+    const granted = await requestCameraRollPermission(onPermissionsGranted);
+    if (!granted) return; // Don't proceed if permission is not granted
+  }
+
+  if (!asset || !fileExt) {
+    showMessage("There was an error generating the file.", "error", "AR Memories!");
+    return;
+  }
+
+  await CameraRoll.saveAsset(asset, {
+    type: fileExt == "mp4" ? "video" : "photo",
+  });
+
+  showMessage("Saved to Camera Roll.", "success", "AR Memories!");
+};
+
+export const saveToGallery = async (
+  hasPermission: boolean,
+  onPermissionsGranted: () => void,
+  isMemory: boolean,
+  capturedDataUri: string,
+  fileExt: string,
+  loadingHandler: () => void
+) => {
+  if (isMemory) {
+    const getPathFromUrl = (url: String) => {
+      return url.split("?")[0];
+    };
+
+    const memoryURL = capturedDataUri;
+    const memoryPath = getPathFromUrl(capturedDataUri);
+    const updatedFileExt = memoryPath.split(".").pop() || "";
+
+    let newMemoryUri = memoryPath.lastIndexOf("/");
+    let memoryName = memoryPath.substring(newMemoryUri);
+
+    try {
+      let dirs = RNFS.CachesDirectoryPath;
+
+      const tempFilePath = `${dirs}/${memoryName}`;
+      loadingHandler();
+      const downloadResult = await RNFS.downloadFile({
+        fromUrl: memoryURL,
+        toFile: tempFilePath,
+        progress: _res => {
+          // Optionally track download progress here
+        },
+      }).promise;
+
+      if (downloadResult.statusCode === 200) {
+        if (Platform.OS === "ios") {
+          cameraRollSaveAsset(
+            hasPermission,
+            onPermissionsGranted,
+            `file://${tempFilePath}`,
+            updatedFileExt
+          );
+        } else {
+          try {
+            await cameraRollSaveAsset(
+              hasPermission,
+              onPermissionsGranted,
+              `file://${tempFilePath}`,
+              "photo"
+            ); // 'photo' or 'video'
+
+            showMessage("Saved to Camera Roll", "success", "AR Memories!"); // Uncomment if you have showMessage
+          } catch (error) {
+            showMessage("Error saving to Camera Roll", "error", "AR Memories!"); // Uncomment if you have showMessage
+          }
+        }
+
+        // Clean up the temporary downloaded file
+        RNFS.unlink(tempFilePath)
+          .then(() => console.log("Temporary file deleted."))
+          .catch(err => console.log("Error deleting temporary file:", err));
+      } else {
+        showMessage("Download failed", "error", "AR Memories!"); // Uncomment if you have showMessage
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      loadingHandler();
+    }
+  } else {
+    cameraRollSaveAsset(hasPermission, onPermissionsGranted, capturedDataUri, fileExt);
+  }
 };

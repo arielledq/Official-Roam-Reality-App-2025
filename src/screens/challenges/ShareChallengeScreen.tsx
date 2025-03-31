@@ -1,14 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
-import { Image, Platform, Text, View, Linking, Dimensions } from "react-native";
-
+import React, { useContext, useRef, useState } from "react";
+import { Image, Platform, Text, View, Dimensions } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import moment from "moment";
 // @ts-ignore
 import Video from "react-native-video";
 import { useDispatch } from "react-redux";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 import { RouteProp } from "@react-navigation/native";
-import { PERMISSIONS, RESULTS, request, requestMultiple } from "react-native-permissions";
 
 import { SHARE_CONDITIONS_TEXT, SSNN } from "../../constants";
 import {
@@ -19,7 +16,7 @@ import {
   getNextStar as getNextStarApi,
 } from "network";
 import { fontGroup, FontSizes } from "util/FontUtils";
-import { handleError, showMessage } from "util/helpers";
+import { getFileExtension, handleError, saveToGallery, showMessage } from "util/helpers";
 // @ts-ignore
 import { CHALLENGES_TYPE } from "constants";
 import { updateARUserData } from "../../redux/AR";
@@ -34,20 +31,13 @@ import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
 import { GeolocationContext } from "GeolocationProvider";
-import RNFetchBlob from "rn-fetch-blob";
-import { Alert } from "react-native";
-import ScreenLoader from "components/screenLoader";
+import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 
 interface ShareChallengeRouteParams {
   challengeObj: any; // Replace 'any' with proper type if available
   captureData: string;
   challengeType: string;
   isMemory: boolean;
-}
-
-function getFileExtension(url: string) {
-  const match = url.match(/\.([a-zA-Z0-9]+)(?=\?|$)/);
-  return match ? `.${match[1]}` : "";
 }
 
 const ArChallengeShare = () => {
@@ -126,10 +116,9 @@ const ArChallengeShare = () => {
   }
 
   const capturedDataUri = captureData;
-
   const isVideo = capturedDataUri.includes(".mp4");
   const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
-  const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop();
+  const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop() || "";
 
   const countSocialPoints = (
     selectedSSNN: string,
@@ -308,169 +297,29 @@ const ArChallengeShare = () => {
     setShareToSocialsIsOpen(false);
   };
 
-  const getAndroidPermissions = () => {
-    const androidVersion = Platform.Version;
-    if (androidVersion >= 33) {
-      return [PERMISSIONS.ANDROID.READ_MEDIA_IMAGES, PERMISSIONS.ANDROID.READ_MEDIA_VIDEO];
-    } else {
-      return PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE;
-    }
+  const permissionsGrantedHandler = () => {
+    setHasPermission(true);
   };
 
-  const requestCameraRollPermission = async () => {
-    try {
-      const perms =
-        Platform.OS === "ios" ? PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY : getAndroidPermissions();
-      let res;
-
-      if (Array.isArray(perms)) {
-        res = await requestMultiple(perms);
-      } else {
-        res = await request(perms);
-      }
-
-      if (Platform.OS === "android" && Platform.Version >= 33) {
-        if (
-          res[PERMISSIONS.ANDROID.READ_MEDIA_IMAGES] === RESULTS.GRANTED &&
-          res[PERMISSIONS.ANDROID.READ_MEDIA_VIDEO] === RESULTS.GRANTED
-        ) {
-          setHasPermission(true);
-          return true;
-        } else {
-          const deniedPerms = Object.keys(res).filter(
-            perm => res[perm] === RESULTS.DENIED || res[perm] === RESULTS.BLOCKED
-          );
-          const permNames = deniedPerms.map(perm => {
-            if (perm === PERMISSIONS.ANDROID.READ_MEDIA_IMAGES) return "images";
-            if (perm === PERMISSIONS.ANDROID.READ_MEDIA_VIDEO) return "videos";
-            return "storage"; // Fallback
-          });
-
-          Alert.alert(
-            "Permission Denied",
-            `This app needs access to your ${permNames.join(
-              " and "
-            )} to save images. Please go to your device settings to grant permission.`,
-            [
-              { text: "Cancel", style: "cancel" },
-              { text: "OK", onPress: () => Linking.openSettings() },
-            ]
-          );
-          return false;
-        }
-      } else {
-        // iOS or older Android
-        if (res === RESULTS.GRANTED || res === RESULTS.LIMITED) {
-          setHasPermission(true);
-          return true;
-        } else {
-          Alert.alert(
-            "Permission Denied",
-            "This app needs access to your photo library to save images. Please go to your device settings to grant permission.",
-            [
-              { text: "Cancel", style: "cancel" },
-              { text: "OK", onPress: () => Linking.openSettings() },
-            ]
-          );
-          return false;
-        }
-      }
-    } catch (err) {
-      return false;
-    }
+  const toggleLoadingHandler = () => {
+    setIsLoading(currState => !currState);
   };
 
-  const cameraRollSaveAsset = async (asset: string, fileExt: string) => {
-    if (!hasPermission) {
-      const granted = await requestCameraRollPermission();
-      if (!granted) return; // Don't proceed if permission is not granted
-    }
-
-    if (!asset || !fileExt) {
-      showMessage("There was an error generating the file.", "error", "AR Memories!");
-      return;
-    }
-
-    const newURI = await CameraRoll.saveAsset(asset, {
-      type: fileExt == "mp4" ? "video" : "photo",
-    });
-
-    showMessage("Saved to Camera Roll.", "success", "AR Memories!");
-  };
-
-  const saveToGallery = () => {
-    if (isMemory) {
-      const getPathFromUrl = (url: String) => {
-        return url.split("?")[0];
-      };
-
-      let memoryURL = capturedDataUri;
-      let memoryPath = getPathFromUrl(capturedDataUri);
-      const fileExt = memoryPath.split(".").pop();
-
-      let newMemoryUri = memoryPath.lastIndexOf("/");
-      let memoryName = memoryPath.substring(newMemoryUri);
-
-      let dirs = RNFetchBlob.fs.dirs;
-      const path =
-        Platform.OS === "ios" ? dirs.LibraryDir + memoryName : dirs.PictureDir + memoryName;
-
-      RNFetchBlob.config({
-        fileCache: true,
-        appendExt: fileExt,
-        indicator: true,
-        IOSBackgroundTask: true,
-        path: path,
-        addAndroidDownloads: {
-          useDownloadManager: true,
-          notification: true,
-          path: path,
-          description: fileExt == "mp4" ? "Video" : "Image",
-        },
-      })
-        .fetch("GET", memoryURL)
-        .then(res => {
-          if (Platform.OS == "ios") {
-            cameraRollSaveAsset(res.data, fileExt);
-          } else {
-            showMessage("Saved to Camera Roll", "success", "AR Memories!");
-          }
-        });
-    } else {
-      cameraRollSaveAsset(capturedDataUri, fileExt);
-    }
+  const saveToGalleryButtonHandler = () => {
+    saveToGallery(
+      hasPermission,
+      permissionsGrantedHandler,
+      isMemory,
+      capturedDataUri,
+      fileExt,
+      toggleLoadingHandler
+    );
   };
 
   const handleLayout = (event: any) => {
     const { width, height } = event.nativeEvent.layout;
     setViewWidth(width);
   };
-
-  useEffect(() => {
-    async function checkPermissions() {
-      const perm =
-        Platform.OS === "ios" ? PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY : getAndroidPermissions();
-      let res;
-      if (Array.isArray(perm)) {
-        res = await requestMultiple(perm);
-      } else {
-        res = await request(perm);
-      }
-      if (Platform.OS === "android" && Platform.Version >= 33) {
-        if (
-          res[PERMISSIONS.ANDROID.READ_MEDIA_IMAGES] === RESULTS.GRANTED &&
-          res[PERMISSIONS.ANDROID.READ_MEDIA_VIDEO] === RESULTS.GRANTED
-        ) {
-          setHasPermission(true);
-        }
-      } else {
-        if (res === RESULTS.GRANTED || res === RESULTS.LIMITED) {
-          setHasPermission(true);
-        }
-      }
-    }
-    checkPermissions();
-  }, []);
 
   const baseOffset = 110;
   let offset = baseOffset;
@@ -491,8 +340,27 @@ const ArChallengeShare = () => {
     shareButtonTextSize = FontSizes.S14;
   }
 
+  const screenModals = (
+    <>
+      <ShareToSocialsModal
+        fileUri={filePath}
+        fileExt={fileExt}
+        isVisible={shareToSocialsIsOpen}
+        isMemory={isMemory}
+        sponsor={sponsor}
+        onPointsGranted={countSocialPoints}
+        onClose={closeShareToSocialMediaButtonHandler}
+      />
+      <FullScreenLoadingSpinner isLoading={isLoading} />
+    </>
+  );
+
   return (
-    <ChallengeScreen title={screenTitle} style={{ justifyContent: "space-between", flex: 1 }}>
+    <ChallengeScreen
+      title={screenTitle}
+      style={{ justifyContent: "space-between", flex: 1 }}
+      modals={screenModals}
+    >
       <View style={{ flex: 1, paddingHorizontal: 32 }}>
         <View style={{ flex: 1 }}>
           {challengeTitle && (
@@ -571,7 +439,7 @@ const ArChallengeShare = () => {
             ref={viewRef}
             onLayout={handleLayout}
           >
-            {isLoadingDisplay && <ScreenLoader />}
+            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
             <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1 }}>
               {fileExt == "mp4" || isVideo ? (
                 <Video
@@ -685,7 +553,7 @@ const ArChallengeShare = () => {
             />
 
             <AppButton
-              onPress={saveToGallery}
+              onPress={saveToGalleryButtonHandler}
               containerStyle={{ flex: 1, justifyContent: "center" }}
               titleStyle={{ fontSize: shareButtonTextSize, fontWeight: "bold" }}
               title={"Save Image"}
@@ -703,16 +571,6 @@ const ArChallengeShare = () => {
           )}
         </View>
       </View>
-
-      <ShareToSocialsModal
-        fileUri={filePath}
-        fileExt={fileExt}
-        isVisible={shareToSocialsIsOpen}
-        isMemory={isMemory}
-        sponsor={sponsor}
-        onPointsGranted={countSocialPoints}
-        onClose={closeShareToSocialMediaButtonHandler}
-      />
     </ChallengeScreen>
   );
 };
