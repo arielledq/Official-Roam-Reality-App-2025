@@ -37,6 +37,12 @@ SCOREBOARD_EXCLUDED_USER_IDS = ConfigKey(
     verbose_name='Scoreboard excluded user ids',
 )
 
+CURRENT_APP_VERSION = ConfigKey(
+    value="",
+    verbose_name='Current app version',
+    is_public=True,
+)
+
 
 
 

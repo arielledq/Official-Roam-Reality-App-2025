@@ -357,7 +357,7 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     """
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = GeoLocation.objects.all().order_by('sequence_number')
+    queryset = GeoLocation.objects.filter(is_active=True).order_by('sequence_number')
     serializer_class = GeoLocationSerializer
     http_method_names = ["get"]
 

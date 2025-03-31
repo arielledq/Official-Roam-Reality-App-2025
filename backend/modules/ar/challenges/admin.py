@@ -1,6 +1,14 @@
+import io
+import os
+import zipfile
+
 from django.contrib import admin
 from django.core.exceptions import ValidationError
+from django.db import transaction
+from django.http import HttpResponse
 
+from notifications.models import Notification, NotificationTypes
+from onesignal_client.utils import send_notification
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
@@ -39,6 +47,48 @@ class GeoArSiteCategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
 
 
+def download_images(modeladmin, request, queryset):
+    buffer = io.BytesIO()
+
+    with zipfile.ZipFile(buffer, 'w') as zf:
+        for obj in queryset:
+            if obj.memory_file:
+                extension = os.path.splitext(obj.memory_file.name)[1]
+                challenge_name = obj.challenges.name if isinstance(obj, ARMemories) else obj.geo_site.name
+                new_filename = f"{obj.user.name} {challenge_name} {obj.created_at} {extension}"
+
+                obj.memory_file.open('rb')
+                image_data = obj.memory_file.read()
+                obj.memory_file.close()
+
+                zf.writestr(new_filename, image_data)
+    buffer.seek(0)
+    response = HttpResponse(buffer, content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=images.zip'
+    return response
+
+
+def reject_and_notify(self, request, queryset):
+    with transaction.atomic():
+        for memory_checkin in queryset:
+            user = memory_checkin.user
+            if memory_checkin.challenge_approval != "DECLINED":
+                memory_checkin.challenge_approval = "DECLINED"
+                memory_checkin.save()
+
+                user.user_ar_profile.points -= memory_checkin.points
+                user.user_ar_profile.save()
+            notification = Notification.objects.create(
+                title="Your submission was declined",
+                description=memory_checkin.declined_reason if memory_checkin.declined_reason else 'Your submission '
+                                                                                                  'was rejected',
+                type=NotificationTypes.POINTS_REVOKED,
+                channel=Notification.NotificationChannel.PUSH,
+            )
+            notification.targets.set([user])
+            notification.send()
+
+
 class ARMemoriesAdmin(admin.ModelAdmin):
     
     search_fields = (
@@ -49,11 +99,11 @@ class ARMemoriesAdmin(admin.ModelAdmin):
     list_select_related = ['user']  # To avoid extra queries
 
     exclude = ('geo_challenge', 'description',)
+    actions = [download_images, reject_and_notify]
 
     def user_name(self, memory):
         return memory.user.name
 
-    pass
 
 class ARChallengeAdmin(admin.ModelAdmin):
     pass
@@ -260,6 +310,7 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
     )
     list_display = ('user_name', 'geo_site', 'challenge_approval', 'memory_file')
     list_select_related = ['user']  # To avoid extra queries
+    actions = [download_images, reject_and_notify]
 
     def user_name(self, obj):
         return obj.user.name
