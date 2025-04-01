@@ -734,7 +734,7 @@
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -808,7 +808,7 @@
 				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",

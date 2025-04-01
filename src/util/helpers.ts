@@ -410,15 +410,51 @@ export const checkAppLatestUpdate = async () => {
   let isUpdated = false;
   if (Platform.OS === "ios") {
     try {
-      const response = await getConfiguration();
-      const serverVersionNumber = response["0"].value;
-      if (serverVersionNumber === Config.APP_VERSION) {
+      let serverIOSProdVersionNumber;
+      let serverIOSDevVersionNumber;
+
+      // Extract app version from API response
+      const configurations = await getConfiguration();
+      const configurationItemKeys = Object.keys(configurations);
+      configurationItemKeys.forEach(configItemKey => {
+        const configurationContent = Object.keys(configurations[configItemKey]);
+        if (configurationContent?.includes("key") && configurationContent?.includes("value")) {
+          if (configurations[configItemKey]["key"] === "CURRENT_APP_VERSION") {
+            serverIOSProdVersionNumber = configurations[configItemKey]["value"];
+          }
+          if (configurations[configItemKey]["key"] === "CURRENT_APP_VERSION_TESTFLIGHT") {
+            serverIOSDevVersionNumber = configurations[configItemKey]["value"];
+          }
+        }
+      });
+
+      // Validate app version
+      if (serverIOSProdVersionNumber === Config.APP_IOS_PROD_VERSION) {
         isUpdated = true;
+        console.info("App updated on PROD");
+      } else {
+        console.info(
+          "App not updated on PROD:",
+          serverIOSProdVersionNumber,
+          "!==",
+          Config.APP_IOS_PROD_VERSION
+        );
+      }
+      if (serverIOSDevVersionNumber === Config.APP_IOS_DEV_VERSION) {
+        isUpdated = true;
+        console.info("App updated on DEV");
+      } else {
+        console.info(
+          "App not updated on DEV:",
+          serverIOSDevVersionNumber,
+          "!==",
+          Config.APP_IOS_DEV_VERSION
+        );
       }
     } catch (error) {
       console.error(error);
     }
-
+    console.log("isUpdated", isUpdated);
     return isUpdated;
   } else {
     return true;

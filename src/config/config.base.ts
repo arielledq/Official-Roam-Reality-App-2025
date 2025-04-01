@@ -2,7 +2,8 @@ export interface ConfigBaseProps {
   persistNavigation: "always" | "dev" | "prod" | "never";
   catchErrors: "always" | "dev" | "prod" | "never";
   exitRoutes: string[];
-  APP_VERSION: string;
+  APP_IOS_PROD_VERSION: string;
+  APP_IOS_DEV_VERSION: string;
 }
 
 export type PersistNavigationConfig = ConfigBaseProps["persistNavigation"];
@@ -23,7 +24,8 @@ const BaseConfig: ConfigBaseProps = {
    */
   exitRoutes: ["Welcome"],
 
-  APP_VERSION: "1.0.18",
+  APP_IOS_PROD_VERSION: "1.0.18",
+  APP_IOS_DEV_VERSION: "1.18.4",
 };
 
 export default BaseConfig;
