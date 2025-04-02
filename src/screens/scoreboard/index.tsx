@@ -225,8 +225,6 @@ const ScoreBoard = ({}) => {
   };
 
   const myRank = () => {
-    console.log("userProfile", JSON.stringify(userProfile?.user_profile?.image))
-    console.log("userProfile2", JSON.stringify(profileDetails))
     return (
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <RankBG style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }} />
