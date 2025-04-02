@@ -40,9 +40,28 @@ const ScoreBoard = ({}) => {
   const dispatch = useDispatch();
   const desRef = useRef();
   const navigation = useNavigation();
-
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
   const arProfile = useSelector((state: any) => state?.ar?.arProfile);
+
+  const fetchProfileDetails = async () => {
+    try {
+      getProfieDetails({
+        id: userProfile.user_profile.id,
+      })
+        .then(res => {
+          if (res.status == 1) {
+            setProfileDetails(res);
+          } else {
+            console.error("Error", "Error fetching profile details: ");
+          }
+        })
+        .catch(err => {
+          console.error("Error", "Error fetching profile details: ");
+        })
+    } catch (error) {
+      console.error("Error", "Error fetching profile details: ");
+    }
+  };
 
   const getScoreboard = (destination="") => {
     setIsLoading(true)
@@ -206,6 +225,8 @@ const ScoreBoard = ({}) => {
   };
 
   const myRank = () => {
+    console.log("userProfile", JSON.stringify(userProfile?.user_profile?.image))
+    console.log("userProfile2", JSON.stringify(profileDetails))
     return (
       <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
         <RankBG style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }} />
@@ -235,7 +256,7 @@ const ScoreBoard = ({}) => {
               resizeMode={FastImage.resizeMode.cover}
             />
           </ImageBackground>
-          <Text numberOfLines={2} style={_styles.nameText}>
+          <Text numberOfLines={2} style={_styles.nameText} onPress={() => console.log(userProfile?.user_profile?.image)}>
             {userProfile?.name ? userProfile?.name?.replace(" ", "\n") : "You"}
           </Text>
         </View>
@@ -256,6 +277,7 @@ const ScoreBoard = ({}) => {
     fetchARUserProfile();
     getScoreboard();
     getMyRankPoints();
+    fetchProfileDetails();
   }, []);
 
   React.useEffect(() => {
