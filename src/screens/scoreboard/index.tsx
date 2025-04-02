@@ -256,7 +256,7 @@ const ScoreBoard = ({}) => {
               resizeMode={FastImage.resizeMode.cover}
             />
           </ImageBackground>
-          <Text numberOfLines={2} style={_styles.nameText} onPress={() => console.log(userProfile?.user_profile?.image)}>
+          <Text numberOfLines={2} style={_styles.nameText}>
             {userProfile?.name ? userProfile?.name?.replace(" ", "\n") : "You"}
           </Text>
         </View>
