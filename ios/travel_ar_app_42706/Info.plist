@@ -9,7 +9,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleGetInfoString</key>
-	<string/>
+	<string></string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -27,7 +27,7 @@
 		<dict>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>aw5g4n448236v4uh</string>
+				<string>fb1735456000569385</string>
 			</array>
 		</dict>
 		<dict>
@@ -36,38 +36,28 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>com.googleusercontent.apps.220585435352-6rs34650r35gm2m5i9a7n1rpl4t6jkog</string>
-				<string>fb1425164828425408</string>
-				<string>awx8jb1brvngfo5m</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>FacebookAppID</key>
+	<string>1735456000569385</string>
+	<key>FacebookClientToken</key>
+	<string>139558e05df1de4fe52add1dffba141f</string>
+	<key>FacebookDisplayName</key>
+	<string>Roam Reality</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>LSApplicationCategoryType</key>
-	<string/>
+	<string></string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>fb</string>
-		<string>tiktok</string>
-		<string>facebook-stories</string>
 		<string>fbapi</string>
 		<string>fb-messenger-share-api</string>
-		<string>fbauth2</string>
-		<string>fbshareextension</string>
-		<string>tel</string>
-		<string>telprompt</string>
-		<string>https</string>
-		<string>http</string>
-		<string>mailto</string>
-		<string>tiktokopensdk</string>
-		<string>tiktoksharesdk</string>
-		<string>snssdk1180</string>
-		<string>snssdk1233</string>
-		<string>instagram</string>
-		<string>instagram-stories</string>
 	</array>
+	<key>LSMinimumSystemVersion</key>
+	<string>12.0.0</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -129,7 +119,7 @@
 		<string>remote-notification</string>
 	</array>
 	<key>UILaunchStoryboardName</key>
-	<string/>
+	<string></string>
 	<key>UIRequiredDeviceCapabilities</key>
 	<array>
 		<string>armv7</string>
@@ -142,54 +132,5 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>LSMinimumSystemVersion</key>
-	<string>12.0.0</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>comgooglemaps</string>
-		<string>citymapper</string>
-		<string>uber</string>
-		<string>lyft</string>
-		<string>transit</string>
-		<string>truckmap</string>
-		<string>waze</string>
-		<string>yandexnavi</string>
-		<string>moovit</string>
-		<string>yandextaxi</string>
-		<string>yandexmaps</string>
-		<string>kakaomap</string>
-		<string>tmap</string>
-		<string>szn-mapy</string>
-		<string>mapsme</string>
-		<string>osmandmaps</string>
-		<string>gett</string>
-		<string>nmap</string>
-		<string>dgis</string>
-		<string>lftgpas</string>
-		<string>sygic</string>
-		<string>itms-apps</string>
-		<string>instagram</string>
-		<string>facebook</string>
-	</array>
-	<key>CFBundleURLTypes</key>
-	<array>
-		<dict>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>fb1735456000569385</string>
-			</array>
-		</dict>
-	</array>
-	<key>FacebookAppID</key>
-	<string>1735456000569385</string>
-	<key>FacebookClientToken</key>
-	<string>139558e05df1de4fe52add1dffba141f</string>
-	<key>FacebookDisplayName</key>
-	<string>Roam Reality</string>
-	<key>LSApplicationQueriesSchemes</key>
-	<array>
-		<string>fbapi</string>
-		<string>fb-messenger-share-api</string>
-	</array>
 </dict>
 </plist>
