@@ -347,6 +347,17 @@ class StarCollectionAdmin(admin.ModelAdmin):
     pass
 
 
+@admin.register(ARUserProfile)
+class ARUserProfileAdmin(GeoArChallengeAdmin):
+    search_fields = ["user__id", "user__name", "user__email"]
+
+    def user_name(self, obj):
+        return obj.user.name
+
+    def user_email(self, obj):
+        return obj.user.email
+
+
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
@@ -359,7 +370,7 @@ admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 # admin.site.register(StarCollection, GeoArChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 admin.site.register(DestinationFacts, GeoArChallengeAdmin)
-admin.site.register(ARUserProfile, GeoArChallengeAdmin)
+# admin.site.register(ARUserProfile, GeoArChallengeAdmin)
 
 class PanicMessageAdmin(GeoArChallengeAdmin):
     

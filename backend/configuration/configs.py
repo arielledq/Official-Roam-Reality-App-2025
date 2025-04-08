@@ -43,6 +43,11 @@ CURRENT_APP_VERSION = ConfigKey(
     is_public=True,
 )
 
+CURRENT_APP_VERSION_TESTFLIGHT = ConfigKey(
+    value="",
+    verbose_name='Current app version testflight',
+    is_public=True,
+)
 
 
 

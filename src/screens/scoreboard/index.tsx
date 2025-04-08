@@ -32,7 +32,6 @@ const ScoreBoard = ({}) => {
   const dispatch = useDispatch();
   const desRef = useRef();
   const navigation = useNavigation();
-
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
   const arProfile = useSelector((state: any) => state?.ar?.arProfile);
 
@@ -56,11 +55,6 @@ const ScoreBoard = ({}) => {
   const filterDestinations = (o: any, index: number) => {
     setSelectedDestination(o);
     getScoreboard(o.id);
-    // // @ts-ignore
-    // desRef?.current?.scrollToIndex({
-    //   animated: true,
-    //   index: index,
-    // });
   };
 
   const ARDestinations = () => {
@@ -273,7 +267,6 @@ const ScoreBoard = ({}) => {
         />
 
         <View style={{ height: 50 }}>
-          {/*<DestinationItem index={0} obj={GLOBAL_DESTINATION} />*/}
           <FlatList
             horizontal
             // @ts-ignore
