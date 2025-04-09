@@ -24,8 +24,8 @@ const BaseConfig: ConfigBaseProps = {
    */
   exitRoutes: ["Welcome"],
 
-  APP_IOS_PROD_VERSION: "1.0.18",
-  APP_IOS_DEV_VERSION: "1.18.6",
+  APP_IOS_PROD_VERSION: "1.0.19",
+  APP_IOS_DEV_VERSION: "1.19.1",
 };
 
 export default BaseConfig;
