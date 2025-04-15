@@ -55,6 +55,7 @@ const ScoreBoard = ({}) => {
   const filterDestinations = (o: any, index: number) => {
     setSelectedDestination(o);
     getScoreboard(o.id);
+    getMyRankPoints(o.id);
   };
 
   const ARDestinations = () => {
@@ -199,6 +200,7 @@ const ScoreBoard = ({}) => {
     const destination = selectedDestination?.id;
     const isFirstLoad = false;
     getScoreboard(destination, isFirstLoad);
+    getMyRankPoints(destination);
   };
 
   const myRank = () => {
@@ -208,7 +210,7 @@ const ScoreBoard = ({}) => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ marginStart: 10, alignItems: "center" }}>
             <Text style={_styles.rankText}>Rank</Text>
-            <Text style={_styles.rankTextNumber}>{rankMine?.my_rank}</Text>
+            <Text style={_styles.rankTextNumber}>{rankMine?.my_rank || "-"}</Text>
           </View>
           <ImageBackground
             source={Images.BGBlur}
@@ -251,6 +253,7 @@ const ScoreBoard = ({}) => {
     const destination = "";
     const isFirstLoad = true;
     getScoreboard(destination, isFirstLoad);
+    getMyRankPoints(destination)
   }, []);
 
   return (

@@ -239,6 +239,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "challenge_approval",
             "created_at",
             "points",
+            "geo_location",
         )
 
 
@@ -543,6 +544,7 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
             "points",
             "geo_challenge",
             "challenge_details",
+            "geo_location",
         )
 
 
