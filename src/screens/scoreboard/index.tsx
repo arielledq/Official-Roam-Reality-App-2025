@@ -210,7 +210,7 @@ const ScoreBoard = ({}) => {
         <View style={{ flexDirection: "row", alignItems: "center" }}>
           <View style={{ marginStart: 10, alignItems: "center" }}>
             <Text style={_styles.rankText}>Rank</Text>
-            <Text style={_styles.rankTextNumber}>{rankMine?.my_rank}</Text>
+            <Text style={_styles.rankTextNumber}>{rankMine?.my_rank || "-"}</Text>
           </View>
           <ImageBackground
             source={Images.BGBlur}
