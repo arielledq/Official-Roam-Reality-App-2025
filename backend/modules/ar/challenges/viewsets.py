@@ -224,6 +224,7 @@ class ARMemoriesViewSet(ViewSet):
         criterion2 = Q(geo_challenge=geo_challenge_id)
         results = ARMemories.objects.filter(criterion1 & criterion2)
         challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
+        request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
         serializer = ARMemoriesSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -240,6 +241,7 @@ class ARMemoriesViewSet(ViewSet):
         challengeObj = Challenges.objects.get(pk=challenges_id)
         # if len(results) < challengeObj.challenge_attempt:
         request.data['points'] = challengeObj.points
+        request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
         serializer = ARMemoriesSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
@@ -533,6 +535,7 @@ class ARSitePinCheckInViewSet(ViewSet):
         challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
         geosite = GeoArSite.objects.get(pk=geo_site)
         request.data['points'] = challengeObj.points
+        request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
         serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()

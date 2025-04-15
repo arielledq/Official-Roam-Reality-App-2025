@@ -55,6 +55,7 @@ const ScoreBoard = ({}) => {
   const filterDestinations = (o: any, index: number) => {
     setSelectedDestination(o);
     getScoreboard(o.id);
+    getMyRankPoints(o.id);
   };
 
   const ARDestinations = () => {
@@ -199,6 +200,7 @@ const ScoreBoard = ({}) => {
     const destination = selectedDestination?.id;
     const isFirstLoad = false;
     getScoreboard(destination, isFirstLoad);
+    getMyRankPoints(destination);
   };
 
   const myRank = () => {
@@ -251,6 +253,7 @@ const ScoreBoard = ({}) => {
     const destination = "";
     const isFirstLoad = true;
     getScoreboard(destination, isFirstLoad);
+    getMyRankPoints(destination)
   }, []);
 
   return (
