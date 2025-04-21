@@ -189,6 +189,7 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "ar_filters",
             "info",
             "user_attempts",
+            "allow_upload_image",
         )
 
 
