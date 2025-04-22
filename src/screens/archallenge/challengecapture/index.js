@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
-import { requestMultiple, PERMISSIONS } from "react-native-permissions";
+// import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import ChallengeScreen from "components/ChallengeScreen";
@@ -285,19 +285,19 @@ const ArChallengeCapture = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    requestMultiple([
-      PERMISSIONS.ANDROID.CAMERA,
-      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-      PERMISSIONS.ANDROID.RECORD_AUDIO,
-      PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    ]).then(() => {
-      if (openGallery) {
-        pickFromGallery();
-      }else{
-        setIsUnityLoaded(true)
-      }
-    });
+    // requestMultiple([
+    //   PERMISSIONS.ANDROID.CAMERA,
+    //   PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+    //   PERMISSIONS.ANDROID.RECORD_AUDIO,
+    //   PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+    //   PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+    // ]).then(() => {
+    //   if (openGallery) {
+    //     pickFromGallery();
+    //   }else{
+    //     setIsUnityLoaded(true)
+    //   }
+    // });
   }, []);
 
   const retakeButtonHandler = () => {

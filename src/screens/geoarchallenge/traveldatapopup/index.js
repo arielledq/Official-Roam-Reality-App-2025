@@ -7,7 +7,9 @@ import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util
 //   ViroText,
 //   ViroFlexView
 // } from '@reactvision/react-viro';
-import CompassHeading from "react-native-compass-heading";
+// import CompassHeading from "react-native-compass-heading";
+// TODO: Replace https://github.com/babeone/react-native-compass-heading
+// since it was updated '6 years ago'
 import { getLocationDistance, transformGpsToAR } from "../../../util/LocationLib";
 import { getNearbyPlaces } from "../../../util/PlacesAPI";
 
@@ -71,12 +73,12 @@ const TravelDataPopUp = ({ currentLocation }) => {
 
   useEffect(() => {
     loadPlaces();
-    CompassHeading.start(3, heading => {
-      setCompassHeading(heading);
-    });
-    return () => {
-      CompassHeading.stop();
-    };
+    // CompassHeading.start(3, heading => {
+    //   setCompassHeading(heading);
+    // });
+    // return () => {
+    //   CompassHeading.stop();
+    // };
   }, []);
 
   return <>{placeARObjects()}</>;

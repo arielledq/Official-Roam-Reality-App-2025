@@ -9,7 +9,8 @@ import {
   ImageBackground,
   Keyboard,
 } from "react-native";
-import Contacts from "react-native-contacts";
+// TODO: Library is giving errors on latest ios sdk
+// import Contacts from "react-native-contacts";
 import { useNavigation } from "@react-navigation/native";
 import FastImage from "react-native-fast-image";
 import theme from "../../assets/theme";
@@ -87,37 +88,35 @@ const ContactsTab = () => {
 
   const fetchContacts = async () => {
     try {
-      const contactArr = await Contacts.getAll();
-      const contactsList: Contact[] = [];
-
-      contactArr?.forEach(contact => {
-        if (!contact || typeof contact !== "object") return;
-        const emailAddresses = contact.emailAddresses || [];
-        if (Array.isArray(emailAddresses) && emailAddresses.length) {
-          emailAddresses.forEach(email => {
-            if (email && typeof email === "object" && email.email) {
-              let name = "";
-              if (contact.displayName) {
-                name = contact.displayName;
-              } else if (contact.givenName) {
-                name = contact?.givenName + " " + contact?.familyName;
-              } else {
-                name = email.email;
-              }
-              const newContact = {
-                id: `${contact.recordID || Math.random().toString()}-${email.email}`,
-                user_profile: { image: null },
-                name: name,
-                email: email.email,
-              };
-              contactsList.push(newContact);
-            }
-          });
-        }
-      });
-
-      setContacts(contactsList);
-      setFilteredUsers(contactsList);
+      // const contactArr = await Contacts.getAll();
+      // const contactsList: Contact[] = [];
+      // contactArr?.forEach(contact => {
+      //   if (!contact || typeof contact !== "object") return;
+      //   const emailAddresses = contact.emailAddresses || [];
+      //   if (Array.isArray(emailAddresses) && emailAddresses.length) {
+      //     emailAddresses.forEach(email => {
+      //       if (email && typeof email === "object" && email.email) {
+      //         let name = "";
+      //         if (contact.displayName) {
+      //           name = contact.displayName;
+      //         } else if (contact.givenName) {
+      //           name = contact?.givenName + " " + contact?.familyName;
+      //         } else {
+      //           name = email.email;
+      //         }
+      //         const newContact = {
+      //           id: `${contact.recordID || Math.random().toString()}-${email.email}`,
+      //           user_profile: { image: null },
+      //           name: name,
+      //           email: email.email,
+      //         };
+      //         contactsList.push(newContact);
+      //       }
+      //     });
+      //   }
+      // });
+      // setContacts(contactsList);
+      // setFilteredUsers(contactsList);
     } catch (err) {
       showMessage(JSON.stringify(err, null, 2), "error", "Error fetching contacts");
       setError("Failed to fetch contacts");

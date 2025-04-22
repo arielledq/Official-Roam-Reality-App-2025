@@ -143,7 +143,9 @@
     android:roundIcon="@mipmap/ic_launcher_round"
     android:hardwareAccelerated="true"
     android:usesCleartextTraffic="true"
-    android:allowBackup="false" android:theme="@style/AppTheme">
+    android:allowBackup="false" 
+    android:theme="@style/AppTheme"
+    android:supportsRtl="true">
 
 <!--    <meta-data android:name="com.google.ar.core" android:value="optional" />-->
 
