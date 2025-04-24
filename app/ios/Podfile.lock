@@ -108,6 +108,7 @@ PODS:
     - React-RCTText (= 0.79.1)
     - React-RCTVibration (= 0.79.1)
   - React-callinvoker (0.79.1)
+  - React-Codegen (0.1.0)
   - React-Core (0.79.1):
     - glog
     - hermes-engine
@@ -1417,6 +1418,31 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-contacts (8.0.4):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Codegen
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-date-picker (5.0.12):
     - DoubleConversion
     - glog
@@ -2591,6 +2617,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
   - "react-native-geolocation (from `../node_modules/@react-native-community/geolocation`)"
@@ -2679,6 +2706,7 @@ SPEC REPOS:
     - MapboxMaps
     - MapboxMobileEvents
     - OneSignalXCFramework
+    - React-Codegen
     - SDWebImage
     - SDWebImageWebPCoder
     - SocketRocket
@@ -2767,6 +2795,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-contacts:
+    :path: "../node_modules/react-native-contacts"
   react-native-date-picker:
     :path: "../node_modules/react-native-date-picker"
   react-native-fbsdk-next:
@@ -2937,6 +2967,7 @@ SPEC CHECKSUMS:
   RCTTypeSafety: 01b27f48153eb2d222c0ad4737fe291e9549946a
   React: 1195b4ef93124e47a492ec43d8aceb770618ceb0
   React-callinvoker: f8d4f94d6d5da7230803fa4fce2da27c9c843478
+  React-Codegen: 4b8b4817cea7a54b83851d4c1f91f79aa73de30a
   React-Core: b5a77faf86a0da01bce62f0b9bd1e3e77020090d
   React-CoreModules: 597e6f05526da8c133f726961f333d62becd97bf
   React-cxxreact: 25b20d44eaf2ef8774c7fefa3517cbfa18b16d7b
@@ -2963,6 +2994,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 8df5296f9d9a61f980d293b55026cfebcd8dfb0a
   React-microtasksnativemodule: c8ed30f8ec30affbc73411c54207bd67b1125bbb
   react-native-blur: 06d0f9906ecd6cde3a42de16c6cd829a2bf0710c
+  react-native-contacts: bee8a72e5f475c386813edb80d0c974ff82d4bf2
   react-native-date-picker: d0f7b5c8c7c85932dec43c4e4725abc45b309ef1
   react-native-fbsdk-next: 52f81e60eb3e8e0e06cf9728b4572d3509ca9d01
   react-native-geolocation: d43962eb0be1b0056ba5c1f95e94fb7907494268

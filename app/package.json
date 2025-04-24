@@ -44,6 +44,7 @@
     "postinstall-postinstall": "^2.1.0",
     "react": "19.0.0",
     "react-native": "0.79.1",
+    "react-native-contacts": "^8.0.4",
     "react-native-date-picker": "^5.0.12",
     "react-native-device-info": "^14.0.4",
     "react-native-devsettings": "^1.0.5",

@@ -1,6 +1,6 @@
 import React, {useState, useEffect} from "react";
 import {View, Text, Button, ActivityIndicator} from "react-native";
-import {Request} from "./src/network/request"; // Adjust the path to your request.js
+import {Request} from "./src/network/request";
 import axios from "axios";
 
 const App = () => {

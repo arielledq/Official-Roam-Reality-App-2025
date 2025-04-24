@@ -1,4 +1,4 @@
-import { Insets } from 'react-native';
+import {Insets} from "react-native";
 
 /**
  * Defines how far your touch can start away from the button
@@ -10,7 +10,7 @@ import { Insets } from 'react-native';
  * @returns
  */
 type getHitSlopFunction = (size: number) => Insets;
-export const getHitSlop: getHitSlopFunction = (size) => {
+export const getHitSlop: getHitSlopFunction = size => {
   return {
     top: size,
     bottom: size,
