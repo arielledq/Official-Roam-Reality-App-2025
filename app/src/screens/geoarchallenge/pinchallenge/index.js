@@ -3,7 +3,7 @@ import {Platform} from "react-native";
 
 import {useSelector} from "react-redux";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
-// import { requestMultiple, PERMISSIONS } from "react-native-permissions";
+import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
 import Sound from "react-native-sound";
 import RNFetchBlob from "rn-fetch-blob";
@@ -196,22 +196,22 @@ const PinChallenge = () => {
   ]); // Add all dependencies
 
   const checkPermission = () => {
-    // if (Platform.OS === "android") {
-    //   requestMultiple([
-    //     PERMISSIONS.ANDROID.CAMERA,
-    //     PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-    //     PERMISSIONS.ANDROID.RECORD_AUDIO,
-    //     PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-    //     PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    //   ]);
-    // } else if (Platform.OS === "ios") {
-    //   requestMultiple([
-    //     PERMISSIONS.IOS.CAMERA,
-    //     PERMISSIONS.IOS.MICROPHONE,
-    //     PERMISSIONS.IOS.PHOTO_LIBRARY,
-    //     PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-    //   ]);
-    // }
+    if (Platform.OS === "android") {
+      requestMultiple([
+        PERMISSIONS.ANDROID.CAMERA,
+        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+        PERMISSIONS.ANDROID.RECORD_AUDIO,
+        PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+      ]);
+    } else if (Platform.OS === "ios") {
+      requestMultiple([
+        PERMISSIONS.IOS.CAMERA,
+        PERMISSIONS.IOS.MICROPHONE,
+        PERMISSIONS.IOS.PHOTO_LIBRARY,
+        PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+      ]);
+    }
   };
 
   const getLocation = async () => {

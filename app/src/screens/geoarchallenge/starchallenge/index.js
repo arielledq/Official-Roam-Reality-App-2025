@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from "react";
 import {ScrollView, Platform} from "react-native";
 
 import {useNavigation} from "@react-navigation/native";
-// import { requestMultiple, PERMISSIONS } from "react-native-permissions";
+import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
 // import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
@@ -40,22 +40,22 @@ const StarChallenge = ({route}) => {
 
   // Check and request permissions
   const checkPermission = () => {
-    // if (Platform.OS === "android") {
-    //   requestMultiple([
-    //     PERMISSIONS.ANDROID.CAMERA,
-    //     PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-    //     PERMISSIONS.ANDROID.RECORD_AUDIO,
-    //     PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-    //     PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    //   ]);
-    // } else if (Platform.OS === "ios") {
-    //   requestMultiple([
-    //     PERMISSIONS.IOS.CAMERA,
-    //     PERMISSIONS.IOS.MICROPHONE,
-    //     PERMISSIONS.IOS.PHOTO_LIBRARY,
-    //     PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-    //   ]);
-    // }
+    if (Platform.OS === "android") {
+      requestMultiple([
+        PERMISSIONS.ANDROID.CAMERA,
+        PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+        PERMISSIONS.ANDROID.RECORD_AUDIO,
+        PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+        PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+      ]);
+    } else if (Platform.OS === "ios") {
+      requestMultiple([
+        PERMISSIONS.IOS.CAMERA,
+        PERMISSIONS.IOS.MICROPHONE,
+        PERMISSIONS.IOS.PHOTO_LIBRARY,
+        PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+      ]);
+    }
   };
 
   // Download and unzip model files for each star
