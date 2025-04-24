@@ -73,3 +73,10 @@ yarn-error.log
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+# Configurations
+config.dev.ts
+
+# Unity builds
+unity/builds/android/*
+unity/builds/ios/*

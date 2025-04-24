@@ -53,8 +53,6 @@ target 'travel_ar_app_42706' do
   pod 'react-native-fbsdk-next', :path => '../node_modules/react-native-fbsdk-next'
   pod 'react-native-google-maps', :path => '../node_modules/react-native-maps'
   pod 'GoogleMaps'
-  pod 'boost', :podspec => '../node_modules/react-native/third-party-podspecs/boost.podspec', :modular_headers => false
-  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec', :modular_headers => false
 
   pre_install do |installer|
     $RNMapboxMaps.pre_install(installer)

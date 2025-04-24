@@ -9,10 +9,36 @@
 /* Begin PBXBuildFile section */
 		0C80B921A6F3F58F76C31292 /* libPods-travel_ar_app_42706.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-travel_ar_app_42706.a */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
+		5323A6AEF295D11A1C03C6EF /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		A44F5573F10BC46B742D1025 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		DC0CBAEE2DB81AC70028089D /* MvnCorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAEC2DB81AC60028089D /* MvnCorder.framework */; };
+		DC0CBAEF2DB81AC70028089D /* MvnCorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAEC2DB81AC60028089D /* MvnCorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DC0CBAF02DB81AC70028089D /* NativeScreenRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */; };
+		DC0CBAF12DB81AC70028089D /* NativeScreenRecorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		DC0CBAFB2DB81B8B0028089D /* NunitoSans10ptExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAF72DB81B8A0028089D /* NunitoSans10ptExtraLight.ttf */; };
+		DC0CBAFC2DB81B8B0028089D /* NunitoSans10ptRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAF82DB81B8A0028089D /* NunitoSans10ptRegular.ttf */; };
+		DC0CBAFD2DB81B8B0028089D /* NunitoSans10ptBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAF92DB81B8A0028089D /* NunitoSans10ptBold.ttf */; };
+		DC0CBAFE2DB81B8B0028089D /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAFA2DB81B8A0028089D /* index.js */; };
+		DC0CBB002DB81BAF0028089D /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAFF2DB81BAF0028089D /* camera-sound.mp3 */; };
+		DC0CBB022DB81C260028089D /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBB012DB81C260028089D /* record.mp3 */; };
+		DC0CBB042DB81C3C0028089D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		DC0CBAF22DB81AC70028089D /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				DC0CBAEF2DB81AC70028089D /* MvnCorder.framework in Embed Frameworks */,
+				DC0CBAF12DB81AC70028089D /* NativeScreenRecorder.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		13B07F961A680F5B00A75B9A /* travel_ar_app_42706.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = travel_ar_app_42706.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -24,6 +50,20 @@
 		5DCACB8F33CDC322A6C60F78 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = travel_ar_app_42706/AppDelegate.swift; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		DC0CBAEC2DB81AC60028089D /* MvnCorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MvnCorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/MvnCorder.framework; sourceTree = "<group>"; };
+		DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NativeScreenRecorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/NativeScreenRecorder.framework; sourceTree = "<group>"; };
+		DC0CBAF32DB81AD20028089D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		DC0CBAF42DB81AD20028089D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		DC0CBAF62DB81AF70028089D /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
+		DC0CBAF72DB81B8A0028089D /* NunitoSans10ptExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptExtraLight.ttf; path = ../src/assets/fonts/NunitoSans10ptExtraLight.ttf; sourceTree = "<group>"; };
+		DC0CBAF82DB81B8A0028089D /* NunitoSans10ptRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptRegular.ttf; path = ../src/assets/fonts/NunitoSans10ptRegular.ttf; sourceTree = "<group>"; };
+		DC0CBAF92DB81B8A0028089D /* NunitoSans10ptBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptBold.ttf; path = ../src/assets/fonts/NunitoSans10ptBold.ttf; sourceTree = "<group>"; };
+		DC0CBAFA2DB81B8A0028089D /* index.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
+		DC0CBAFF2DB81BAF0028089D /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
+		DC0CBB012DB81C260028089D /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../src/assets/ar/record.mp3; sourceTree = "<group>"; };
+		DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		DC0CBB062DB81C930028089D /* MvnCorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MvnCorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/MvnCorder.framework; sourceTree = "<group>"; };
+		DC0CBB072DB81C930028089D /* NativeScreenRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NativeScreenRecorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/NativeScreenRecorder.framework; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -33,6 +73,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0C80B921A6F3F58F76C31292 /* libPods-travel_ar_app_42706.a in Frameworks */,
+				DC0CBAF02DB81AC70028089D /* NativeScreenRecorder.framework in Frameworks */,
+				DC0CBAEE2DB81AC70028089D /* MvnCorder.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -42,6 +84,7 @@
 		13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */ = {
 			isa = PBXGroup;
 			children = (
+				DC0CBAF62DB81AF70028089D /* travel_ar_app_42706.entitlements */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				761780EC2CA45674006654EE /* AppDelegate.swift */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
@@ -54,6 +97,9 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				DC0CBAF52DB81AD20028089D /* OneSignalNotificationServiceExtension */,
+				DC0CBAEC2DB81AC60028089D /* MvnCorder.framework */,
+				DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				5DCACB8F33CDC322A6C60F78 /* libPods-travel_ar_app_42706.a */,
 			);
@@ -70,6 +116,15 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				DC0CBB062DB81C930028089D /* MvnCorder.framework */,
+				DC0CBB072DB81C930028089D /* NativeScreenRecorder.framework */,
+				DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */,
+				DC0CBB012DB81C260028089D /* record.mp3 */,
+				DC0CBAFF2DB81BAF0028089D /* camera-sound.mp3 */,
+				DC0CBAFA2DB81B8A0028089D /* index.js */,
+				DC0CBAF92DB81B8A0028089D /* NunitoSans10ptBold.ttf */,
+				DC0CBAF72DB81B8A0028089D /* NunitoSans10ptExtraLight.ttf */,
+				DC0CBAF82DB81B8A0028089D /* NunitoSans10ptRegular.ttf */,
 				13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
@@ -98,6 +153,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
+		DC0CBAF52DB81AD20028089D /* OneSignalNotificationServiceExtension */ = {
+			isa = PBXGroup;
+			children = (
+				DC0CBAF32DB81AD20028089D /* Info.plist */,
+				DC0CBAF42DB81AD20028089D /* NotificationService.swift */,
+			);
+			path = OneSignalNotificationServiceExtension;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -112,6 +176,8 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				DC0CBAF22DB81AC70028089D /* Embed Frameworks */,
+				DC0CBB0A2DB81CA30028089D /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -158,9 +224,16 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC0CBB042DB81C3C0028089D /* GoogleService-Info.plist in Resources */,
+				DC0CBB022DB81C260028089D /* record.mp3 in Resources */,
+				DC0CBB002DB81BAF0028089D /* camera-sound.mp3 in Resources */,
+				DC0CBAFB2DB81B8B0028089D /* NunitoSans10ptExtraLight.ttf in Resources */,
+				DC0CBAFC2DB81B8B0028089D /* NunitoSans10ptRegular.ttf in Resources */,
+				DC0CBAFD2DB81B8B0028089D /* NunitoSans10ptBold.ttf in Resources */,
+				DC0CBAFE2DB81B8B0028089D /* index.js in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				A44F5573F10BC46B742D1025 /* PrivacyInfo.xcprivacy in Resources */,
+				5323A6AEF295D11A1C03C6EF /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +295,23 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		DC0CBB0A2DB81CA30028089D /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "cd \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/\"\nif [[ -d \"Frameworks\" ]]; then\n    rm -fr Frameworks\nfi\n";
+		};
 		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -259,22 +349,69 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
 				ENABLE_BITCODE = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/FBAEMKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit_Basics/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKGamingServicesKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKLoginKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKShareKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/MapboxCommon\"",
+					"\"${PODS_ROOT}/MapboxCoreMaps\"",
+					"\"${PODS_ROOT}/MapboxMobileEvents\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Core\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_InAppMessages\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_LiveActivities\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Location\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Notifications\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_OSCore\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Outcomes\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_User\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_XCFramework\"",
+					"\"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/universal\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKGamingServicesKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCommon\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCoreMaps\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxMobileEvents\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignal\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalInAppMessages\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalLiveActivities\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalLocation\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalNotifications\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOSCore\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOutcomes\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalUser\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built\"",
+					"/Users/rod/development/GitInnovatica/room-reality/app/unity/builds/ios/UnityFramework.framework/Frameworks/**",
+				);
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.19;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
 				PRODUCT_NAME = travel_ar_app_42706;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -288,21 +425,68 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_ENTITLEMENTS = travel_ar_app_42706/travel_ar_app_42706.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = AB35BNBR3J;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"${PODS_ROOT}/FBAEMKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKCoreKit_Basics/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKGamingServicesKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKLoginKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/FBSDKShareKit/XCFrameworks\"",
+					"\"${PODS_ROOT}/MapboxCommon\"",
+					"\"${PODS_ROOT}/MapboxCoreMaps\"",
+					"\"${PODS_ROOT}/MapboxMobileEvents\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Core\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_InAppMessages\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_LiveActivities\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Location\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Notifications\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_OSCore\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Outcomes\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_User\"",
+					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_XCFramework\"",
+					"\"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/universal\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBAEMKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKCoreKit_Basics\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKGamingServicesKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCommon\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCoreMaps\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxMobileEvents\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignal\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalInAppMessages\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalLiveActivities\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalLocation\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalNotifications\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOSCore\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalOutcomes\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalUser\"",
+					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/hermes-engine/Pre-built\"",
+					"/Users/rod/development/GitInnovatica/room-reality/app/unity/builds/ios/UnityFramework.framework/Frameworks/**",
+				);
 				INFOPLIST_FILE = travel_ar_app_42706/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = "Travel AR";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.travel";
 				IPHONEOS_DEPLOYMENT_TARGET = 15.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.19;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = com.roam.reality;
 				PRODUCT_NAME = travel_ar_app_42706;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
