@@ -7,7 +7,6 @@ import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
 import Sound from "react-native-sound";
 import RNFetchBlob from "rn-fetch-blob";
-// import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import theme from "assets/theme";
 
@@ -15,7 +14,7 @@ import CameraControls from "../../../components/CameraControls";
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 
-import {showMessage} from "../../../util/helpers";
+import {handleUnzipProcess, showMessage} from "../../../util/helpers";
 import {
   convertMetersToFeets,
   findNearestLocationPoint,
@@ -88,44 +87,31 @@ const PinChallenge = () => {
       .catch(console.error);
   };
 
-  const unzipModelFile = (sourcePath, targetPath) => {
-    const charset = "UTF-8";
-    // unzip(sourcePath, targetPath, charset)
-    //   .then(path => {
-    //     RNFS.readDir(path).then(result => {
-    //       const sourcesArray = [];
-    //       let objFile = null;
-    //       let mtlFile = null;
-    //       let baseTexture = null;
-    //       let emissionTexture = null;
+  const unzipModelFile = async (sourcePath, targetPath) => {
+    setLoading(true);
 
-    //       result.forEach(file => {
-    //         const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-    //         if (file.name.includes(".obj")) {
-    //           objFile = filePath;
-    //         } else if (file.name.includes(".mtl")) {
-    //           mtlFile = filePath;
-    //         } else if (file.name.toLowerCase().includes("diffuse")) {
-    //           baseTexture = filePath;
-    //         } else if (file.name.toLowerCase().includes("emission")) {
-    //           emissionTexture = filePath;
-    //         } else {
-    //           sourcesArray.push({ uri: filePath });
-    //         }
-    //       });
+    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
 
-    //       setModelOBJ(objFile);
-    //       setModelResource(mtlFile);
-    //       setTextureBase(baseTexture);
-    //       setTextureEmission(emissionTexture);
-    //       setSourcesFiles(sourcesArray);
-    //       setFoldefile(result);
-    //       setLoading(false);
-    //     });
-    //   })
-    //   .catch(err => {
-    //     console.error("Error descomprimiendo el archivo:", err);
-    //   });
+    if (extractedData.success) {
+      setModelOBJ(extractedData.objFile);
+      setModelResource(extractedData.mtlFile);
+      setTextureBase(extractedData.baseTexture);
+      setTextureEmission(extractedData.emissionTexture);
+      setSourcesFiles(extractedData.sourcesFiles);
+      setFoldefile(extractedData.foldefile);
+      console.log("Model file unzipped and state updated successfully.");
+    } else {
+      console.error("Failed to unzip model file:", extractedData.error);
+
+      setModelOBJ(null);
+      setModelResource(null);
+      setTextureBase(null);
+      setTextureEmission(null);
+      setSourcesFiles([]);
+      setFoldefile([]);
+    }
+
+    setLoading(false);
   };
 
   const checkIfModelExist = () => {

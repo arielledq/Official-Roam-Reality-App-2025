@@ -1,6 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
 import RNFS from "react-native-fs";
+import JSZip from "jszip";
 import {Alert, Linking, Platform} from "react-native";
 import {PERMISSIONS, RESULTS, request, requestMultiple} from "react-native-permissions";
 import {CameraRoll} from "@react-native-camera-roll/camera-roll";
@@ -496,5 +497,107 @@ export const copyFileForDisplay = async (capturedDataUri: string | null) => {
     // The file likely didn't exist at the source when copying was attempted
     // (timing issue with temporary files)
     return null; // Return null or a placeholder URI on error
+  }
+};
+
+export const handleUnzipProcess = async (sourcePath, targetPath) => {
+  try {
+    // Ensure the target directory exists
+    await RNFS.mkdir(targetPath);
+    console.log(`Target directory created/exists at: ${targetPath}`);
+
+    // 1. Read the zip file content using react-native-fs
+    const zipContentBase64 = await RNFS.readFile(sourcePath, "base64");
+    console.log(`Zip file "${sourcePath}" read into memory.`);
+
+    // 2. Load the content into JSZip
+    const zip = await JSZip.loadAsync(zipContentBase64, {base64: true});
+    console.log("Zip content loaded into JSZip.");
+
+    const fileExtractionPromises = [];
+
+    // 3. Iterate through the files in the zip and extract/write them
+    zip.forEach((relativePath, zipEntry) => {
+      if (!zipEntry.dir) {
+        const fullTargetPath = `${targetPath}/${relativePath}`;
+        const directory = fullTargetPath.substring(0, fullTargetPath.lastIndexOf("/"));
+
+        // Ensure the directory for the file exists before writing
+        fileExtractionPromises.push(
+          RNFS.mkdir(directory)
+            .then(() => {
+              // Extract the file content as base64
+              return zipEntry.async("base64").then(fileContentBase64 => {
+                // 4. Write the extracted file content to the target path
+                return RNFS.writeFile(fullTargetPath, fileContentBase64, "base64").then(() => {
+                  console.log(`Extracted and wrote: ${relativePath} to ${fullTargetPath}`);
+                });
+              });
+            })
+            .catch(mkdirErr => {
+              console.error(`Error creating directory for ${relativePath}:`, mkdirErr);
+              throw mkdirErr; // Propagate the error to stop Promise.all
+            })
+        );
+      } else {
+        console.log(`Skipping directory entry: ${relativePath}`); // Optional: log directories
+      }
+    });
+
+    // 5. Wait for all file extraction and writing promises to complete
+    await Promise.all(fileExtractionPromises);
+    console.log("All files extracted and written to target directory.");
+
+    // 6. Read the contents of the target directory
+    const result = await RNFS.readDir(targetPath); // Await readDir
+    console.log("Reading target directory:", targetPath);
+
+    const sourcesArray = [];
+    let objFile = null;
+    let mtlFile = null;
+    let baseTexture = null;
+    let emissionTexture = null;
+
+    result.forEach(file => {
+      const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
+      console.log(`Found file in target directory: ${file.name} at ${filePath}`);
+
+      if (file.name.includes(".obj")) {
+        objFile = filePath;
+      } else if (file.name.includes(".mtl")) {
+        mtlFile = filePath;
+      } else if (file.name.toLowerCase().includes("diffuse")) {
+        baseTexture = filePath;
+      } else if (file.name.toLowerCase().includes("emission")) {
+        emissionTexture = filePath;
+      } else {
+        sourcesArray.push({uri: filePath});
+      }
+    });
+
+    // 7. Return the extracted data
+    return {
+      objFile,
+      mtlFile,
+      baseTexture,
+      emissionTexture,
+      sourcesFiles: sourcesArray,
+      foldefile: result, // Returning the readDir result might be useful
+      success: true, // Indicate success
+    };
+  } catch (err) {
+    // Handle errors and return an object indicating failure
+    console.error("Error during zip processing or extraction:", err);
+    console.error("Error descomprimiendo el archivo:", err);
+    return {
+      objFile: null,
+      mtlFile: null,
+      baseTexture: null,
+      emissionTexture: null,
+      sourcesFiles: [],
+      foldefile: [],
+      success: false, // Indicate failure
+      error: err,
+    };
   }
 };

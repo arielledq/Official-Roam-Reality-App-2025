@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useRef, useState} from "react";
 import {Platform} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
 import RNFetchBlob from "rn-fetch-blob";
-// import { unzip } from "react-native-zip-archive";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
@@ -12,7 +11,7 @@ import {launchImageLibrary} from "react-native-image-picker";
 
 import {CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE} from "../../../constants";
 import {CAMERA_NOTIFICATION} from "constants";
-import {copyFileForDisplay} from "util/helpers";
+import {copyFileForDisplay, handleUnzipProcess} from "util/helpers";
 
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
@@ -77,45 +76,31 @@ const ArChallengeCapture = ({route, navigation}) => {
       .catch(console.error);
   };
 
-  const unzipModelFile = (sourcePath, targetPath) => {
-    const charset = "UTF-8";
+  const unzipModelFile = async (sourcePath, targetPath) => {
+    setLoading(true);
 
-    // unzip(sourcePath, targetPath, charset)
-    //   .then(path => {
-    //     RNFS.readDir(path).then(result => {
-    //       const sourcesArray = [];
-    //       let objFile = null;
-    //       let mtlFile = null;
-    //       let baseTexture = null;
-    //       let emissionTexture = null;
+    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
 
-    //       result.forEach(file => {
-    //         const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-    //         if (file.name.includes(".obj")) {
-    //           objFile = filePath;
-    //         } else if (file.name.includes(".mtl")) {
-    //           mtlFile = filePath;
-    //         } else if (file.name.toLowerCase().includes("diffuse")) {
-    //           baseTexture = filePath;
-    //         } else if (file.name.toLowerCase().includes("emission")) {
-    //           emissionTexture = filePath;
-    //         } else {
-    //           sourcesArray.push({ uri: filePath });
-    //         }
-    //       });
+    if (extractedData.success) {
+      setModelOBJ(extractedData.objFile);
+      setModelResource(extractedData.mtlFile);
+      setTextureBase(extractedData.baseTexture);
+      setTextureEmission(extractedData.emissionTexture);
+      setSourcesFiles(extractedData.sourcesFiles);
+      setFoldefile(extractedData.foldefile);
+      console.log("Model file unzipped and state updated successfully.");
+    } else {
+      console.error("Failed to unzip model file:", extractedData.error);
 
-    //       setModelOBJ(objFile);
-    //       setModelResource(mtlFile);
-    //       setTextureBase(baseTexture);
-    //       setTextureEmission(emissionTexture);
-    //       setSourcesFiles(sourcesArray);
-    //       setFoldefile(result);
-    //       setLoading(false);
-    //     });
-    //   })
-    //   .catch(err => {
-    //     console.error("Error descomprimiendo el archivo:", err);
-    //   });
+      setModelOBJ(null);
+      setModelResource(null);
+      setTextureBase(null);
+      setTextureEmission(null);
+      setSourcesFiles([]);
+      setFoldefile([]);
+    }
+
+    setLoading(false);
   };
 
   useEffect(() => {
