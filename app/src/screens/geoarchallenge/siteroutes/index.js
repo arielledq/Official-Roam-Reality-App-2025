@@ -120,7 +120,7 @@ const GeoArSiteRoutes = ({route}) => {
       lat: starChallengeObj?.location?.coordinates[1],
       lon: starChallengeObj?.location?.coordinates[0],
       title: "",
-      icon: <CirclePinIcon />, // TODO: Update to a cicle icon
+      icon: <CirclePinIcon />,
     };
   } else {
     screenTitle = selectedGeoSite.name;

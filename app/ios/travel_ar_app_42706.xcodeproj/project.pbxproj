@@ -16,13 +16,12 @@
 		DC0CBAEF2DB81AC70028089D /* MvnCorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAEC2DB81AC60028089D /* MvnCorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DC0CBAF02DB81AC70028089D /* NativeScreenRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */; };
 		DC0CBAF12DB81AC70028089D /* NativeScreenRecorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		DC0CBAFB2DB81B8B0028089D /* NunitoSans10ptExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAF72DB81B8A0028089D /* NunitoSans10ptExtraLight.ttf */; };
-		DC0CBAFC2DB81B8B0028089D /* NunitoSans10ptRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAF82DB81B8A0028089D /* NunitoSans10ptRegular.ttf */; };
-		DC0CBAFD2DB81B8B0028089D /* NunitoSans10ptBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAF92DB81B8A0028089D /* NunitoSans10ptBold.ttf */; };
-		DC0CBAFE2DB81B8B0028089D /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAFA2DB81B8A0028089D /* index.js */; };
-		DC0CBB002DB81BAF0028089D /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBAFF2DB81BAF0028089D /* camera-sound.mp3 */; };
-		DC0CBB022DB81C260028089D /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBB012DB81C260028089D /* record.mp3 */; };
 		DC0CBB042DB81C3C0028089D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */; };
+		DCC84F922DBBD7AC00CE38ED /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F902DBBD7AC00CE38ED /* camera-sound.mp3 */; };
+		DCC84F932DBBD7AC00CE38ED /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F912DBBD7AC00CE38ED /* record.mp3 */; };
+		DCC84F972DBBD7E000CE38ED /* NunitoSans10ptBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */; };
+		DCC84F982DBBD7E000CE38ED /* NunitoSans10ptRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F952DBBD7DF00CE38ED /* NunitoSans10ptRegular.ttf */; };
+		DCC84F992DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F962DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -55,15 +54,12 @@
 		DC0CBAF32DB81AD20028089D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC0CBAF42DB81AD20028089D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		DC0CBAF62DB81AF70028089D /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
-		DC0CBAF72DB81B8A0028089D /* NunitoSans10ptExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptExtraLight.ttf; path = ../src/assets/fonts/NunitoSans10ptExtraLight.ttf; sourceTree = "<group>"; };
-		DC0CBAF82DB81B8A0028089D /* NunitoSans10ptRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptRegular.ttf; path = ../src/assets/fonts/NunitoSans10ptRegular.ttf; sourceTree = "<group>"; };
-		DC0CBAF92DB81B8A0028089D /* NunitoSans10ptBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptBold.ttf; path = ../src/assets/fonts/NunitoSans10ptBold.ttf; sourceTree = "<group>"; };
-		DC0CBAFA2DB81B8A0028089D /* index.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
-		DC0CBAFF2DB81BAF0028089D /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../src/assets/ar/camera-sound.mp3"; sourceTree = "<group>"; };
-		DC0CBB012DB81C260028089D /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../src/assets/ar/record.mp3; sourceTree = "<group>"; };
 		DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		DC0CBB062DB81C930028089D /* MvnCorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MvnCorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/MvnCorder.framework; sourceTree = "<group>"; };
-		DC0CBB072DB81C930028089D /* NativeScreenRecorder.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = NativeScreenRecorder.framework; path = ../unity/builds/ios/UnityFramework.framework/Frameworks/NativeScreenRecorder.framework; sourceTree = "<group>"; };
+		DCC84F902DBBD7AC00CE38ED /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../src/assets/ar/camera-sound.mp3"; sourceTree = SOURCE_ROOT; };
+		DCC84F912DBBD7AC00CE38ED /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../src/assets/ar/record.mp3; sourceTree = SOURCE_ROOT; };
+		DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptBold.ttf; path = ../src/assets/fonts/NunitoSans10ptBold.ttf; sourceTree = "<group>"; };
+		DCC84F952DBBD7DF00CE38ED /* NunitoSans10ptRegular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptRegular.ttf; path = ../src/assets/fonts/NunitoSans10ptRegular.ttf; sourceTree = "<group>"; };
+		DCC84F962DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptExtraLight.ttf; path = ../src/assets/fonts/NunitoSans10ptExtraLight.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -116,20 +112,17 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				DC0CBB062DB81C930028089D /* MvnCorder.framework */,
-				DC0CBB072DB81C930028089D /* NativeScreenRecorder.framework */,
-				DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */,
-				DC0CBB012DB81C260028089D /* record.mp3 */,
-				DC0CBAFF2DB81BAF0028089D /* camera-sound.mp3 */,
-				DC0CBAFA2DB81B8A0028089D /* index.js */,
-				DC0CBAF92DB81B8A0028089D /* NunitoSans10ptBold.ttf */,
-				DC0CBAF72DB81B8A0028089D /* NunitoSans10ptExtraLight.ttf */,
-				DC0CBAF82DB81B8A0028089D /* NunitoSans10ptRegular.ttf */,
+				DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */,
+				DCC84F962DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf */,
+				DCC84F952DBBD7DF00CE38ED /* NunitoSans10ptRegular.ttf */,
+				DCC84F902DBBD7AC00CE38ED /* camera-sound.mp3 */,
+				DCC84F912DBBD7AC00CE38ED /* record.mp3 */,
 				13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
+				DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -224,13 +217,12 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DCC84F972DBBD7E000CE38ED /* NunitoSans10ptBold.ttf in Resources */,
+				DCC84F982DBBD7E000CE38ED /* NunitoSans10ptRegular.ttf in Resources */,
+				DCC84F992DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf in Resources */,
 				DC0CBB042DB81C3C0028089D /* GoogleService-Info.plist in Resources */,
-				DC0CBB022DB81C260028089D /* record.mp3 in Resources */,
-				DC0CBB002DB81BAF0028089D /* camera-sound.mp3 in Resources */,
-				DC0CBAFB2DB81B8B0028089D /* NunitoSans10ptExtraLight.ttf in Resources */,
-				DC0CBAFC2DB81B8B0028089D /* NunitoSans10ptRegular.ttf in Resources */,
-				DC0CBAFD2DB81B8B0028089D /* NunitoSans10ptBold.ttf in Resources */,
-				DC0CBAFE2DB81B8B0028089D /* index.js in Resources */,
+				DCC84F922DBBD7AC00CE38ED /* camera-sound.mp3 in Resources */,
+				DCC84F932DBBD7AC00CE38ED /* record.mp3 in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				5323A6AEF295D11A1C03C6EF /* PrivacyInfo.xcprivacy in Resources */,
@@ -264,9 +256,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -320,9 +316,13 @@
 			inputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
+			inputPaths = (
+			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -562,10 +562,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -634,10 +631,7 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = (
-					"$(inherited)",
-					" ",
-				);
+				OTHER_LDFLAGS = "$(inherited)  ";
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

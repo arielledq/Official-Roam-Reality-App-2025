@@ -80,3 +80,6 @@ config.dev.ts
 # Unity builds
 unity/builds/android/*
 unity/builds/ios/*
+
+ios-orig/
+bkp/

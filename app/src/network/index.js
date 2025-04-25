@@ -1,6 +1,6 @@
-import { Request } from "./request";
-import { BASE_URL, commonApiRoute } from "./config";
-import { removeItemWithListener } from "../util/EventsListener";
+import {Request} from "./request";
+import {BASE_URL, commonApiRoute} from "./config";
+import {removeItemWithListener} from "../util/EventsListener";
 
 /**
  * Login APIS
@@ -168,7 +168,7 @@ export const getARChallenges = () =>
     logoutFunc
   );
 
-export const getARSiteCategories = (filter = { is_band: false }) =>
+export const getARSiteCategories = (filter = {is_band: false}) =>
   Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-site-categories/?is_band=${!!filter?.is_band}`,
@@ -195,10 +195,6 @@ export const updateARSiteLocation = (site_id = 0, lat = 0, long = 0) => {
   if (!site_id) {
     return;
   }
-
-  // NOTE: 2025-02-27 - Band Sites will remain visible when the 'Band' user turns off their location
-  // to the latest location they shared. These type of sites will only be deactivated
-  // from the admin panel.
 
   if (lat && long) {
     const data = {

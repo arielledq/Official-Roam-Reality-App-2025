@@ -12,6 +12,7 @@ import {launchImageLibrary} from "react-native-image-picker";
 
 import {CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE} from "../../../constants";
 import {CAMERA_NOTIFICATION} from "constants";
+import {copyFileForDisplay} from "util/helpers";
 
 const RNFS = require("react-native-fs");
 const Sound = require("react-native-sound");
@@ -249,17 +250,25 @@ const ArChallengeCapture = ({route, navigation}) => {
   //   EnviarComandoAUnity('close');  // Para cerrar Unity
 
   const playCameraSound = () => {
-    Sound.setCategory("Playback");
-    let cameraSound = new Sound("camerasound.mp3", Sound.MAIN_BUNDLE, error => {
-      if (!error) cameraSound.play();
-    });
+    try {
+      Sound.setCategory("Playback");
+      let cameraSound = new Sound("camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
+        if (!error) cameraSound.play();
+      });
+    } catch (error) {
+      console.error("playCameraSound", error);
+    }
   };
 
   const playRecordSound = () => {
-    Sound.setCategory("Playback");
-    let recordSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
-      if (!error) recordSound.play();
-    });
+    try {
+      Sound.setCategory("Playback");
+      let recordSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
+        if (!error) recordSound.play();
+      });
+    } catch (error) {
+      console.error("playRecordSound", error);
+    }
   };
 
   const doneButtonHandler = async () => {
@@ -275,6 +284,10 @@ const ArChallengeCapture = ({route, navigation}) => {
         console.error("Error capturando la imagen con filtros:", error);
       }
     }
+
+    updatedData = await copyFileForDisplay(updatedData);
+
+    console.log("updatedData", updatedData);
 
     // Navegar y pasar la captura actualizada
     navigation.replace("ArChallengeShare", {
@@ -329,13 +342,15 @@ const ArChallengeCapture = ({route, navigation}) => {
   };
 
   const eraseFile = async () => {
-    try {
-      const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
-      const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
+    if (Platform.OS === "android") {
+      try {
+        const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
+        const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
 
-      await keepFileMostRecent(androidFilePath, ".png");
-    } catch (error) {
-      console.error(error);
+        await keepFileMostRecent(androidFilePath, ".png");
+      } catch (error) {
+        console.error(error);
+      }
     }
   };
 
@@ -357,7 +372,7 @@ const ArChallengeCapture = ({route, navigation}) => {
         await RNFS.unlink(file.path);
       }
     } catch (error) {
-      console.error(error);
+      console.error("keepFileMostRecent", error);
     }
   };
 
@@ -372,8 +387,8 @@ const ArChallengeCapture = ({route, navigation}) => {
   //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton;
-    buttonBack = data.backPress;
+    const buttonInfo = data.enableButton;
+    const buttonBack = data.backPress;
 
     if (buttonBack) {
       navigation?.goBack();

@@ -3,7 +3,7 @@ import Toast from "react-native-toast-message";
 import RNFS from "react-native-fs";
 import {Alert, Linking, Platform} from "react-native";
 import {PERMISSIONS, RESULTS, request, requestMultiple} from "react-native-permissions";
-// import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import {CameraRoll} from "@react-native-camera-roll/camera-roll";
 import {getConfiguration} from "network";
 import Config from "config";
 
@@ -324,9 +324,9 @@ const cameraRollSaveAsset = async (
     return;
   }
 
-  // await CameraRoll.saveAsset(asset, {
-  //   type: fileExt == "mp4" ? "video" : "photo",
-  // });
+  await CameraRoll.saveAsset(asset, {
+    type: fileExt == "mp4" ? "video" : "photo",
+  });
 
   showMessage("Saved to Camera Roll.", "success", "AR Memories!");
 };
@@ -459,5 +459,42 @@ export const checkAppLatestUpdate = async () => {
     return isUpdated;
   } else {
     return true;
+  }
+};
+
+export const copyFileForDisplay = async (capturedDataUri: string | null) => {
+  if (!capturedDataUri) {
+    console.error("No URI provided to copyImageForDisplay");
+    return null;
+  }
+
+  // Ensure the source URI has the file:// prefix for RNFS on iOS
+  // RNFS on Android often works with direct paths, but file:// is safer
+  const sourceUri = capturedDataUri.startsWith("file://")
+    ? capturedDataUri
+    : `file://${capturedDataUri}`;
+
+  // Extract the file extension from the original URI
+  const lastDotIndex = capturedDataUri.lastIndexOf(".");
+  const extension = lastDotIndex > -1 ? capturedDataUri.substring(lastDotIndex) : ""; // Get .png, .mp4, etc.
+  const fileExtension = extension.toLowerCase() || ".tmp"; // Use lowercase, fallback to .tmp
+
+  // Generate a unique file name with the correct extension
+  const newFileName = `my_media_${Date.now()}${fileExtension}`;
+
+  // Define the new path in the cache directory
+  const newPath = `${RNFS.CachesDirectoryPath}/${newFileName}`;
+
+  try {
+    console.log(`Attempting to copy from ${sourceUri} to ${newPath}`);
+    await RNFS.copyFile(sourceUri, newPath);
+    const fileUriForDisplay = `file://${newPath}`; // Ensure file:// prefix for Image source
+    console.log("Media copied successfully to:", fileUriForDisplay);
+    return fileUriForDisplay; // Return the new URI for the Image source
+  } catch (error) {
+    console.error(`Error copying media from ${sourceUri} to ${newPath}:`, error);
+    // The file likely didn't exist at the source when copying was attempted
+    // (timing issue with temporary files)
+    return null; // Return null or a placeholder URI on error
   }
 };

@@ -1418,6 +1418,30 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
+  - react-native-cameraroll (7.10.0):
+    - DoubleConversion
+    - glog
+    - hermes-engine
+    - RCT-Folly (= 2024.11.18.00)
+    - RCTRequired
+    - RCTTypeSafety
+    - React-Core
+    - React-debug
+    - React-Fabric
+    - React-featureflags
+    - React-graphics
+    - React-hermes
+    - React-ImageManager
+    - React-jsi
+    - React-NativeModulesApple
+    - React-RCTFabric
+    - React-renderercss
+    - React-rendererdebug
+    - React-utils
+    - ReactCodegen
+    - ReactCommon/turbomodule/bridging
+    - ReactCommon/turbomodule/core
+    - Yoga
   - react-native-contacts (8.0.4):
     - DoubleConversion
     - glog
@@ -2617,6 +2641,7 @@ DEPENDENCIES:
   - React-Mapbuffer (from `../node_modules/react-native/ReactCommon`)
   - React-microtasksnativemodule (from `../node_modules/react-native/ReactCommon/react/nativemodule/microtasks`)
   - "react-native-blur (from `../node_modules/@react-native-community/blur`)"
+  - "react-native-cameraroll (from `../node_modules/@react-native-camera-roll/camera-roll`)"
   - react-native-contacts (from `../node_modules/react-native-contacts`)
   - react-native-date-picker (from `../node_modules/react-native-date-picker`)
   - react-native-fbsdk-next (from `../node_modules/react-native-fbsdk-next`)
@@ -2795,6 +2820,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/react/nativemodule/microtasks"
   react-native-blur:
     :path: "../node_modules/@react-native-community/blur"
+  react-native-cameraroll:
+    :path: "../node_modules/@react-native-camera-roll/camera-roll"
   react-native-contacts:
     :path: "../node_modules/react-native-contacts"
   react-native-date-picker:
@@ -2994,6 +3021,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 8df5296f9d9a61f980d293b55026cfebcd8dfb0a
   React-microtasksnativemodule: c8ed30f8ec30affbc73411c54207bd67b1125bbb
   react-native-blur: 06d0f9906ecd6cde3a42de16c6cd829a2bf0710c
+  react-native-cameraroll: a3087d488f91fb4494fe642f4b616d22f70272c9
   react-native-contacts: bee8a72e5f475c386813edb80d0c974ff82d4bf2
   react-native-date-picker: d0f7b5c8c7c85932dec43c4e4725abc45b309ef1
   react-native-fbsdk-next: 52f81e60eb3e8e0e06cf9728b4572d3509ca9d01
@@ -3056,7 +3084,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: f3168a11bf7c59eaa34a1b466e2b372f1e5ca95a
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59
   rnmapbox-maps: 0e88ce4f854bf624612e5255d1a2d61edf3c605f
-  RNPermissions: aa1218854e3d2a896ac778da95a51a993b35971f
+  RNPermissions: dd6c0197126879f177135b44fa9a88701802a85d
   RNReanimated: 2313402fe27fecb7237619e9c6fcee3177f08a65
   RNScreens: 5621e3ad5a329fbd16de683344ac5af4192b40d3
   RNShare: 43faaefd287ef344e8379caeaca12d112f713295
@@ -3070,6 +3098,6 @@ SPEC CHECKSUMS:
   Turf: aa2ede4298009639d10db36aba1a7ebaad072a5e
   Yoga: d15f5aa644c466e917569ac43b19cbf17975239a
 
-PODFILE CHECKSUM: 082bcd4aafc47ca221c80813e289fff0d53d0043
+PODFILE CHECKSUM: 10320aa210540f69a330e7ba6a1d7e780b5ad0e4
 
 COCOAPODS: 1.15.2

@@ -1,31 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import {
-  Dimensions,
-  Image,
-  Platform,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import {Dimensions, Image, Platform, ScrollView, Text, TouchableOpacity, View} from "react-native";
 import BackgroundWithImage from "../../../components/background";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import AppHeader from "../../../components/header";
 import AppText from "../../../components/text";
 import useStyles from "./styles";
 import AppButton from "../../../components/button";
 import moment from "moment";
-import { getARProfile, postGeoArMemory, socialPointsARUpdateAPI } from "../../../network";
-import { handleError, showMessage } from "../../../util/helpers";
+import {getARProfile, postGeoArMemory, socialPointsARUpdateAPI} from "../../../network";
+import {handleError, showMessage} from "../../../util/helpers";
 import Video from "react-native-video";
-import { useDispatch } from "react-redux";
-import { updateARUserData } from "../../../redux/AR";
+import {useDispatch} from "react-redux";
+import {updateARUserData} from "../../../redux/AR";
 import Share from "react-native-share";
 import RNFS from "react-native-fs";
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import DownloadImg from "../../../assets/ar/download.svg";
-// import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+import {CameraRoll} from "@react-native-camera-roll/camera-roll";
 
 const UniqueArChallengeShare = ({}) => {
   const getPathFromUrl = url => {
@@ -130,15 +122,15 @@ const UniqueArChallengeShare = ({}) => {
   };
 
   const checkPermission = () => {
-    // CameraRoll.saveAsset(correctedCaptureData, {
-    //   type: fileExt == "mp4" ? "video" : "photo",
-    // })
-    //   .then(() => {
-    //     showMessage("Saved to Camera Roll.");
-    //   })
-    //   .catch(err => {
-    //     showMessage("Not able to save, please check permission.", "error");
-    //   });
+    CameraRoll.saveAsset(correctedCaptureData, {
+      type: fileExt == "mp4" ? "video" : "photo",
+    })
+      .then(() => {
+        showMessage("Saved to Camera Roll.");
+      })
+      .catch(err => {
+        showMessage("Not able to save, please check permission.", "error");
+      });
   };
 
   return (
@@ -151,11 +143,11 @@ const UniqueArChallengeShare = ({}) => {
         }}
         backgroundColor="transparent"
       />
-      <ScrollView showsVerticalScrollIndicator={false} style={{ flex: 1, overflow: "hidden" }}>
+      <ScrollView showsVerticalScrollIndicator={false} style={{flex: 1, overflow: "hidden"}}>
         <AppText numberOfLines={3} style={[styles.headerText]}>
           Congrats on completing the {challengeObj?.sponsored?.name} Photo AR Experience!{" "}
         </AppText>
-        <View style={[styles.detailContainer, { minHeight: fileExt == "mp4" ? 500 : 0 }]}>
+        <View style={[styles.detailContainer, {minHeight: fileExt == "mp4" ? 500 : 0}]}>
           {fileExt == "mp4" ? (
             <Video
               resizeMode={"cover"}
@@ -172,7 +164,7 @@ const UniqueArChallengeShare = ({}) => {
           ) : (
             <Image
               resizeMode={"contain"}
-              source={{ uri: correctedCaptureData }}
+              source={{uri: correctedCaptureData}}
               style={{
                 backgroundColor: "transparent",
                 width: "70%",
@@ -197,7 +189,7 @@ const UniqueArChallengeShare = ({}) => {
               <AppText style={styles.pointCount}>{challengeObj.points}</AppText>
               <AppText style={styles.pointCountText}>Points</AppText>
             </View>
-            <View style={{ paddingHorizontal: 10, flex: 1 }}>
+            <View style={{paddingHorizontal: 10, flex: 1}}>
               <View
                 style={{
                   flexDirection: "row",
@@ -206,12 +198,12 @@ const UniqueArChallengeShare = ({}) => {
                 }}
               >
                 <Image
-                  style={{ width: 24, height: 24, marginEnd: 10 }}
-                  source={{ uri: challengeObj.sponsored.image }}
+                  style={{width: 24, height: 24, marginEnd: 10}}
+                  source={{uri: challengeObj.sponsored.image}}
                 />
                 <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
               </View>
-              <View style={{ width: "100%" }}>
+              <View style={{width: "100%"}}>
                 <Text style={styles.challengeSponsorTipText}>
                   Share your content to earn points!
                 </Text>
@@ -239,7 +231,7 @@ const UniqueArChallengeShare = ({}) => {
           <Text style={styles.shareText}>Tap the icons to share and earn points</Text>
         </View>
         {!hideBottomTab && (
-          <View style={{ justifyContent: "flex-end" }}>
+          <View style={{justifyContent: "flex-end"}}>
             <TouchableOpacity
               onPress={() => {
                 navigation.navigate("Settings");
@@ -259,7 +251,7 @@ const UniqueArChallengeShare = ({}) => {
               onPress={() => {
                 navigation.reset({
                   index: 0,
-                  routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+                  routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
                 });
               }}
               buttonStyle={styles.buttonStyle}

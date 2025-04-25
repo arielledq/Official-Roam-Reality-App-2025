@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {
   Alert,
   StyleSheet,
@@ -9,32 +9,32 @@ import {
   TextStyle,
 } from "react-native";
 
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import {useDispatch, useSelector} from "react-redux";
+import {useNavigation} from "@react-navigation/native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { BlurView } from "@react-native-community/blur";
+import {BlurView} from "@react-native-community/blur";
 
-import { resetState } from "../../../redux/Login";
-import { deleteAccount, logout } from "../../../network";
+import {resetState} from "../../../redux/Login";
+import {deleteAccount, logout} from "../../../network";
 import {
   ExperienceTypeChoices,
   RootStackParamList,
   ScreenStackComponent,
 } from "../../../constants/types";
 
-import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
-import { showMessage } from "../../../util/helpers";
-import { screenHorizontalPadding } from "../../../util/AppDimensions";
+import {FontLineHeights, FontSizes, fontGroup} from "../../../util/FontUtils";
+import {showMessage} from "../../../util/helpers";
+import {screenHorizontalPadding} from "../../../util/AppDimensions";
 
-import { AppHeader, AppText } from "../../../components";
+import {AppHeader, AppText} from "../../../components";
 
 import useStyles from "./styles";
 import theme from "../../../assets/theme";
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
 // @ts-ignore
-import { EXPERIENCE_TYPE_CHOICES } from "constants";
+import {EXPERIENCE_TYPE_CHOICES} from "constants";
 
-const GeoArOutdoor = ({ route }: any) => {
+const GeoArOutdoor = ({route}: any) => {
   const [openBottomSheet, setOpenBottomSheet] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -90,7 +90,7 @@ const GeoArOutdoor = ({ route }: any) => {
 
   const navigateToGeoARChallenge = (isEvent = false, experienceType = "") => {
     // @ts-ignore
-    navigation.navigate("GeoArChallengeDetails", { isEvent, experienceType });
+    navigation.navigate("GeoArChallengeDetails", {isEvent, experienceType});
   };
 
   const cardPressHandler = (experienceType: ExperienceTypeChoices) => {
@@ -152,7 +152,6 @@ const GeoArOutdoor = ({ route }: any) => {
     }
   }, [route.params]);
 
-  // INFO: Temporarily update loading by just checking the length of the FlatList's data
   useEffect(() => {
     if (selectedDestination?.ar_experiences?.length) {
       setIsLoading(false);
@@ -162,14 +161,14 @@ const GeoArOutdoor = ({ route }: any) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.blurView}>
-        <BlurView blurType="regular" style={{ backgroundColor: "transparent" }}>
+        <BlurView blurType="regular" style={{backgroundColor: "transparent"}}>
           <AppHeader title={"AR Experiences"} containerStyle={styles.headerContainer} />
         </BlurView>
       </View>
 
       <View style={styles.container}>
         {isLoading ? (
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+          <View style={{flex: 1, justifyContent: "center", alignItems: "center"}}>
             <ActivityIndicator size="large" />
           </View>
         ) : (
@@ -177,7 +176,7 @@ const GeoArOutdoor = ({ route }: any) => {
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={selectedDestination?.ar_experiences}
-            renderItem={({ item }) => <HomeScreenARItem {...item} />}
+            renderItem={({item}) => <HomeScreenARItem {...item} />}
             keyExtractor={item => item?.id?.toString()}
             showsVerticalScrollIndicator={false}
           />

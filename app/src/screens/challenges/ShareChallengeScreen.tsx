@@ -1,13 +1,14 @@
-import React, { useContext, useRef, useState } from "react";
-import { Image, Platform, Text, View, Dimensions } from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import React, {useContext, useEffect, useRef, useState} from "react";
+import {Image, Platform, Text, View, Dimensions} from "react-native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import moment from "moment";
+import RNFS from "react-native-fs";
 // @ts-ignore
 import Video from "react-native-video";
-import { useDispatch } from "react-redux";
-import { RouteProp } from "@react-navigation/native";
+import {useDispatch} from "react-redux";
+import {RouteProp} from "@react-navigation/native";
 
-import { SHARE_CONDITIONS_TEXT, SSNN } from "../../constants";
+import {SHARE_CONDITIONS_TEXT, SSNN} from "../../constants";
 import {
   getARProfile,
   postArMemory,
@@ -15,11 +16,11 @@ import {
   starFoundAndSaveApi,
   getNextStar as getNextStarApi,
 } from "network";
-import { fontGroup, FontSizes } from "util/FontUtils";
-import { getFileExtension, handleError, saveToGallery, showMessage } from "util/helpers";
+import {fontGroup, FontSizes} from "util/FontUtils";
+import {getFileExtension, handleError, saveToGallery, showMessage} from "util/helpers";
 // @ts-ignore
-import { CHALLENGES_TYPE } from "constants";
-import { updateARUserData } from "../../redux/AR";
+import {CHALLENGES_TYPE} from "constants";
+import {updateARUserData} from "../../redux/AR";
 
 import BackgroundWithImage from "components/background";
 import AppText from "components/text";
@@ -30,7 +31,7 @@ import ShareToSocialsModal from "components/ShareToSocialsModal";
 import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
-import { GeolocationContext } from "GeolocationProvider";
+import {GeolocationContext} from "GeolocationProvider";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 
 interface ShareChallengeRouteParams {
@@ -54,14 +55,14 @@ const ArChallengeShare = () => {
   const [viewWidth, setViewWidth] = useState(0);
   const viewRef = useRef(null);
 
-  const { userLocation } = useContext(GeolocationContext);
+  const {userLocation} = useContext(GeolocationContext);
   const dispatch = useDispatch();
 
   const width = Dimensions.get("screen").width;
 
   // Update the route type
   const route =
-    useRoute<RouteProp<{ ShareChallenge: ShareChallengeRouteParams }, "ShareChallenge">>();
+    useRoute<RouteProp<{ShareChallenge: ShareChallengeRouteParams}, "ShareChallenge">>();
   const navigation = useNavigation();
 
   const challengeObj = route?.params?.challengeObj;
@@ -115,10 +116,45 @@ const ArChallengeShare = () => {
       break;
   }
 
+  // const [capturedDataUri, setCapturedDataUri] = useState<string | null>();
+
+  // useEffect(() => {
+  //   const updateLocalFile = async (capturedDataUri: string | null) => {
+  //     const newUri = await copyImageForDisplay(capturedDataUri);
+  //     setCapturedDataUri(newUri);
+  //   };
+  //   if (captureData) {
+  //     if (isMemory) {
+  //       setCapturedDataUri(captureData);
+  //     } else {
+  //       updateLocalFile(captureData);
+  //     }
+  //   }
+  // }, [captureData]);
+
   const capturedDataUri = captureData;
-  const isVideo = capturedDataUri.includes(".mp4");
-  const filePath = isMemory ? captureData : capturedDataUri.split("?")[0];
-  const fileExt = isMemory ? getFileExtension(captureData) : filePath.split(".").pop() || "";
+  //   ? captureData
+  //   : captureData.startsWith("file://")
+  //   ? captureData
+  //   : `file://${captureData}`;
+  // const capturedDataUri = isMemory
+  //   ? captureData
+  //   : captureData.startsWith("file://")
+  //   ? captureData
+  //   : `file://${captureData}`;
+  // console.log("capturedDataUri", capturedDataUri);
+  // const test = async () => {
+  //   console.log("exists", await RNFS.exists(capturedDataUri));
+  // };
+  // test();
+  const isVideo = capturedDataUri?.includes(".mp4");
+  const filePath = isMemory ? captureData : capturedDataUri?.split("?")[0];
+  const fileExt = isMemory ? getFileExtension(captureData) : filePath?.split(".").pop() || "";
+
+  console.log("capturedDataUri", capturedDataUri);
+  console.log("isVideo", isVideo);
+  console.log("filePath", filePath);
+  console.log("fileExt", fileExt);
 
   const countSocialPoints = (
     selectedSSNN: string,
@@ -203,7 +239,7 @@ const ArChallengeShare = () => {
     navigation.reset({
       index: 0,
       // @ts-ignore
-      routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
     });
   };
 
@@ -214,7 +250,7 @@ const ArChallengeShare = () => {
       if (remainingStars > 1) {
         const updatedChallengeObj = await getNextStar();
         // @ts-ignore
-        navigation.navigate("GeoArSiteRoutes", { starsChallenge: updatedChallengeObj });
+        navigation.navigate("GeoArSiteRoutes", {starsChallenge: updatedChallengeObj});
       } else {
         resetNavigation();
       }
@@ -317,7 +353,7 @@ const ArChallengeShare = () => {
   };
 
   const handleLayout = (event: any) => {
-    const { width, height } = event.nativeEvent.layout;
+    const {width, height} = event.nativeEvent.layout;
     setViewWidth(width);
   };
 
@@ -355,16 +391,24 @@ const ArChallengeShare = () => {
     </>
   );
 
+  const toggleLoading = (value: boolean) => {
+    if (isMemory) {
+      setIsLoadingDisplay(value);
+    } else {
+      setIsLoadingDisplay(false);
+    }
+  };
+
   return (
     <ChallengeScreen
       title={screenTitle}
-      style={{ justifyContent: "space-between", flex: 1 }}
+      style={{justifyContent: "space-between", flex: 1}}
       modals={screenModals}
     >
-      <View style={{ flex: 1, paddingHorizontal: 32 }}>
-        <View style={{ flex: 1 }}>
+      <View style={{flex: 1, paddingHorizontal: 32}}>
+        <View style={{flex: 1}}>
           {challengeTitle && (
-            <View style={{ flexDirection: "row", gap: 12 }}>
+            <View style={{flexDirection: "row", gap: 12}}>
               {/* Points box */}
               <View
                 style={{
@@ -440,12 +484,12 @@ const ArChallengeShare = () => {
             onLayout={handleLayout}
           >
             <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
-            <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1 }}>
+            <View style={{flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1}}>
               {fileExt == "mp4" || isVideo ? (
                 <Video
                   resizeMode={"contain"}
-                  onLoadStart={() => setIsLoadingDisplay(true)}
-                  onReadyForDisplay={() => setIsLoadingDisplay(false)}
+                  onLoadStart={() => toggleLoading(true)}
+                  onReadyForDisplay={() => toggleLoading(false)}
                   repeat={true}
                   style={{
                     width: mediaContainerWidth,
@@ -460,9 +504,9 @@ const ArChallengeShare = () => {
               ) : (
                 <Image
                   resizeMode={"contain"}
-                  source={{ uri: capturedDataUri }}
-                  onLoadStart={() => setIsLoadingDisplay(true)}
-                  onLoad={() => setIsLoadingDisplay(false)}
+                  source={{uri: capturedDataUri}}
+                  onLoadStart={() => toggleLoading(true)}
+                  onLoad={() => toggleLoading(false)}
                   style={{
                     width: mediaContainerWidth,
                     height: mediaContainerHeight,
@@ -472,7 +516,7 @@ const ArChallengeShare = () => {
               )}
             </View>
 
-            <View style={{ alignItems: "center" }}>
+            <View style={{alignItems: "center"}}>
               {/* Sponsor row */}
               <View
                 style={{
@@ -481,10 +525,7 @@ const ArChallengeShare = () => {
                   justifyContent: "center",
                 }}
               >
-                <Image
-                  style={{ width: 20, height: 20, marginEnd: 8 }}
-                  source={{ uri: sponsorImage }}
-                />
+                <Image style={{width: 20, height: 20, marginEnd: 8}} source={{uri: sponsorImage}} />
                 <Text
                   style={{
                     ...fontGroup.nunitoBold,
@@ -534,7 +575,7 @@ const ArChallengeShare = () => {
             )}
           </View>
         </View>
-        <View style={{ gap: 8 }}>
+        <View style={{gap: 8}}>
           <View
             style={{
               flexDirection: "row",
@@ -547,24 +588,24 @@ const ArChallengeShare = () => {
             {/* Share to socials button */}
             <AppButton
               onPress={shareToSocialMediaButtonHandler}
-              containerStyle={{ flex: 1, justifyContent: "center" }}
-              titleStyle={{ fontSize: shareButtonTextSize, fontWeight: "bold" }}
+              containerStyle={{flex: 1, justifyContent: "center"}}
+              titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
               title={"Share To Socials"}
             />
 
             <AppButton
               onPress={saveToGalleryButtonHandler}
-              containerStyle={{ flex: 1, justifyContent: "center" }}
-              titleStyle={{ fontSize: shareButtonTextSize, fontWeight: "bold" }}
+              containerStyle={{flex: 1, justifyContent: "center"}}
+              titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
               title={"Save Image"}
             />
           </View>
           {!isMemory && (
             <AppButton
               onPress={endShareProfileButtonHandler}
-              buttonStyle={{ height: 55 }}
+              buttonStyle={{height: 55}}
               containerStyle={{}}
-              titleStyle={{ fontSize: FontSizes.S18, fontWeight: "bold" }}
+              titleStyle={{fontSize: FontSizes.S18, fontWeight: "bold"}}
               title={endChallengeButtonText}
               loading={isLoading}
             />

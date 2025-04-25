@@ -223,18 +223,6 @@ const GeoArSiteDetails = ({route}) => {
   };
 
   const navigateButtonHandler = async () => {
-    // INFO: Commented out temporarily
-    // try {
-    //   const metadata = {
-    //     destinationId: selectedDestination?.id,
-    //   }
-    //   await sendRoamingNotification({
-    //     metadata: metadata,
-    //   })
-    // } catch (error) {
-    //   console.error('There was an error sending the notification to friends:', error)
-    // }
-
     // Open external navigation app
     if (!selectedGeoSite?.lat_long?.coordinates?.length) {
       return;
