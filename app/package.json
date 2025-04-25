@@ -10,7 +10,7 @@
     "test": "jest",
     "postinstall": "patch-package",
     "clean-ios": "rm -rf node_modules yarn.lock ios/Pods ios/Podfile.lock ios/build ios/DerivedData ios/travel_ar_app_42706.xcodeproj/xcuserdata ios/travel_ar_app_42706.xcworkspace/xcuserdata; cd ios && xcodebuild -workspace travel_ar_app_42706.xcworkspace -scheme travel_ar_app_42706 -configuration Debug clean && cd ..",
-    "reinstall-ios": "yarn install && cd ios && bundle exec pod install && cd .. && yarn start --reset-cache"
+    "reinstall-ios": "yarn clean-ios && yarn install && cd ios && bundle exec pod install && cd .. && yarn start --reset-cache"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.11",
@@ -69,6 +69,7 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.5",
     "react-native-linear-gradient": "^2.8.3",
     "react-native-map-link": "^3.9.0",
+    "react-native-maps": "^1.22.6",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-onesignal": "^4.5.1",
     "react-native-pager-view": "^6.7.1",
@@ -93,6 +94,7 @@
     "react-native-video": "^6.13.0",
     "react-native-view-shot": "^4.0.3",
     "react-native-webview": "^13.13.5",
+    "react-native-zip-archive": "^7.0.1",
     "react-redux": "^9.2.0",
     "reactotron-react-native": "^5.1.13",
     "redux": "^5.0.1",

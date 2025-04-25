@@ -4,7 +4,7 @@ import {FlatList, Platform, ScrollView, Text, TouchableOpacity, View, Image} fro
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import {useNavigation, useRoute} from "@react-navigation/native";
-// import MapView, { Marker, PROVIDER_GOOGLE, Callout } from "react-native-maps";
+import MapView, {Marker, PROVIDER_GOOGLE, Callout} from "react-native-maps";
 import Geocoder from "react-native-geocoding";
 import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg";
 import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg";
@@ -191,42 +191,41 @@ const GeoArChallengeDetails = ({}) => {
       o?.user_ar_profile?.current_location &&
       o?.user_ar_profile?.current_location?.coordinates?.length
     ) {
-      return null;
-      // return (
-      //   <Marker
-      //     key={o.id}
-      //     coordinate={{
-      //       latitude: o?.user_ar_profile?.current_location.coordinates[1],
-      //       longitude: o?.user_ar_profile?.current_location.coordinates[0],
-      //     }}
-      //     title={o.name}
-      //     onCalloutPress={() => {
-      //       navigation.navigate("PublicProfile", { userData: o });
-      //     }}
-      //     pinColor={pinColor}
-      //     tracksViewChanges={tracksViewChanges}
-      //   >
-      //     {Platform.OS === "ios" && (
-      //       <Callout
-      //         onPress={() => {
-      //           navigation.navigate("PublicProfile", { userData: o });
-      //         }}
-      //         style={{
-      //           backgroundColor: "#fff",
-      //           minWidth: 100,
-      //           alignItems: "center",
-      //         }}
-      //       >
-      //         <Text>{o.name}</Text>
-      //       </Callout>
-      //     )}
-      //     {useCustomMarkers && (
-      //       <View style={{ width: 30, height: 30 }}>
-      //         <FriendsMarkerIcon />
-      //       </View>
-      //     )}
-      //   </Marker>
-      // );
+      return (
+        <Marker
+          key={o.id}
+          coordinate={{
+            latitude: o?.user_ar_profile?.current_location.coordinates[1],
+            longitude: o?.user_ar_profile?.current_location.coordinates[0],
+          }}
+          title={o.name}
+          onCalloutPress={() => {
+            navigation.navigate("PublicProfile", {userData: o});
+          }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
+        >
+          {Platform.OS === "ios" && (
+            <Callout
+              onPress={() => {
+                navigation.navigate("PublicProfile", {userData: o});
+              }}
+              style={{
+                backgroundColor: "#fff",
+                minWidth: 100,
+                alignItems: "center",
+              }}
+            >
+              <Text>{o.name}</Text>
+            </Callout>
+          )}
+          {useCustomMarkers && (
+            <View style={{width: 30, height: 30}}>
+              <FriendsMarkerIcon />
+            </View>
+          )}
+        </Marker>
+      );
     }
   };
 
@@ -240,56 +239,55 @@ const GeoArChallengeDetails = ({}) => {
 
   const _markerView = o => {
     if (o?.lat_long) {
-      return null;
-      // return (
-      //   <Marker
-      //     key={`marker-${o.id}`}
-      //     coordinate={{
-      //       latitude: o?.lat_long.coordinates[1],
-      //       longitude: o?.lat_long.coordinates[0],
-      //     }}
-      //     title={o?.name}
-      //     onCalloutPress={() => navigateToNextScreen(o)}
-      //     pinColor={pinColor}
-      //     tracksViewChanges={tracksViewChanges}
-      //   >
-      //     {Platform.OS === "ios" && (
-      //       <Callout
-      //         onPress={() => navigateToNextScreen(o)}
-      //         style={{
-      //           backgroundColor: "#fff",
-      //           minWidth: 100,
-      //           alignItems: "center",
-      //         }}
-      //       >
-      //         <Text>{o.name}</Text>
-      //       </Callout>
-      //     )}
-      //     {useCustomMarkers && (
-      //       <View
-      //         style={{
-      //           width: 30,
-      //           height: 30,
-      //           alignItems: "center",
-      //           justifyContent: "flex-start",
-      //         }}
-      //       >
-      //         <Image
-      //           resizeMode="cover"
-      //           style={{
-      //             width: 19,
-      //             height: 19,
-      //             position: "absolute",
-      //             top: 2.5,
-      //             borderRadius: 100,
-      //           }}
-      //           source={{ uri: o.localFilePath }}
-      //         />
-      //         <MarkerIcon color={o?.category?.color} />
-      //       </View>
-      //     )}
-      //   </Marker>
-      // );
+      return (
+        <Marker
+          key={`marker-${o.id}`}
+          coordinate={{
+            latitude: o?.lat_long.coordinates[1],
+            longitude: o?.lat_long.coordinates[0],
+          }}
+          title={o?.name}
+          onCalloutPress={() => navigateToNextScreen(o)}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
+        >
+          {Platform.OS === "ios" && (
+            <Callout
+              onPress={() => navigateToNextScreen(o)}
+              style={{
+                backgroundColor: "#fff",
+                minWidth: 100,
+                alignItems: "center",
+              }}
+            >
+              <Text>{o.name}</Text>
+            </Callout>
+          )}
+          {useCustomMarkers && (
+            <View
+              style={{
+                width: 30,
+                height: 30,
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <Image
+                resizeMode="cover"
+                style={{
+                  width: 19,
+                  height: 19,
+                  position: "absolute",
+                  top: 2.5,
+                  borderRadius: 100,
+                }}
+                source={{uri: o.localFilePath}}
+              />
+              <MarkerIcon color={o?.category?.color} />
+            </View>
+          )}
+        </Marker>
+      );
     }
 
     return null;
@@ -712,10 +710,10 @@ const GeoArChallengeDetails = ({}) => {
           overflow: "hidden",
         }}
       >
-        {/* <MapView
+        <MapView
           provider={PROVIDER_GOOGLE}
           ref={mapView}
-          style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
+          style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
           initialRegion={initialRegion}
         >
           {!!filteredUpdatedMarkers?.length &&
@@ -726,7 +724,7 @@ const GeoArChallengeDetails = ({}) => {
             friendList.map(o => {
               return f_markerView(o);
             })}
-        </MapView> */}
+        </MapView>
         {loadingCustomMarkers && (
           <View
             style={{

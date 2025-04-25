@@ -4,7 +4,7 @@ import {Dimensions, Text, TouchableOpacity, View} from "react-native";
 import {useSelector} from "react-redux";
 import {useIsFocused, useNavigation} from "@react-navigation/native";
 import moment from "moment";
-// import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 // import MapViewDirections from "react-native-maps-directions";
 import Tts from "react-native-tts";
 import {useNetInfo} from "@react-native-community/netinfo";
@@ -646,7 +646,7 @@ const GeoArSiteNavigation = ({route}) => {
           width: "100%",
         }}
       >
-        {/* {isConnected && (
+        {isConnected && (
           <MapView
             customMapStyle={mapCustomStyle}
             provider={PROVIDER_GOOGLE}
@@ -680,7 +680,7 @@ const GeoArSiteNavigation = ({route}) => {
               tracksViewChanges={tracksViewChanges}
             >
               {useCustomMarkers && (
-                <View style={{ width: 30, height: 30 }}>
+                <View style={{width: 30, height: 30}}>
                   <MarkerIcon />
                 </View>
               )}
@@ -697,7 +697,7 @@ const GeoArSiteNavigation = ({route}) => {
                 tracksViewChanges={tracksViewChanges}
               >
                 {useCustomMarkers && (
-                  <View style={{ width: 30, height: 30 }}>
+                  <View style={{width: 30, height: 30}}>
                     <MarkerIcon />
                   </View>
                 )}
@@ -738,7 +738,7 @@ const GeoArSiteNavigation = ({route}) => {
               />
             )}
           </MapView>
-        )} */}
+        )}
         {!isConnected && (
           <MapboxGL.MapView
             ref={mapViewRef}

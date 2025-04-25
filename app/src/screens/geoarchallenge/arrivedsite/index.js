@@ -3,7 +3,7 @@ import {ScrollView, Text, TouchableOpacity, View} from "react-native";
 
 import {useSelector} from "react-redux";
 import {useNavigation} from "@react-navigation/native";
-// import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 
 import AppHeader from "../../../components/header";
 import mapCustomStyle from "../../../constants/MapCustomStyles";
@@ -69,7 +69,7 @@ const GeoArSiteArrived = ({route}) => {
         />
       </View>
 
-      {/* <MapView
+      <MapView
         customMapStyle={mapCustomStyle}
         provider={PROVIDER_GOOGLE}
         style={{
@@ -94,12 +94,12 @@ const GeoArSiteArrived = ({route}) => {
           tracksViewChanges={tracksViewChanges}
         >
           {useCustomMarkers && (
-            <View style={{ width: 30, height: 30 }}>
+            <View style={{width: 30, height: 30}}>
               {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
             </View>
           )}
         </Marker>
-      </MapView> */}
+      </MapView>
 
       <View style={_styles.bottomActionsContainer}>
         <TouchableOpacity

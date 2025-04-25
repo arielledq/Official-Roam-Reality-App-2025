@@ -12,7 +12,7 @@ import {
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
 import {useNavigation} from "@react-navigation/native";
-// import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
+import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg";
 import GradientDownPNG from "../../../assets/geoar/gradient_down.png";
@@ -243,7 +243,7 @@ const GeoArSiteDetails = ({route}) => {
       }
     });
 
-    // Keeping for reference
+    // NOTE: Keeping for reference
     // navigation.navigate("GeoArSiteNavigation", {
     //   experience_type,
     //   coolDown: {
@@ -309,7 +309,7 @@ const GeoArSiteDetails = ({route}) => {
             overflow: "hidden",
           }}
         >
-          {/* <MapView
+          <MapView
             provider={PROVIDER_GOOGLE}
             style={{
               position: "absolute",
@@ -347,13 +347,13 @@ const GeoArSiteDetails = ({route}) => {
                       top: 2.5,
                       borderRadius: 100,
                     }}
-                    source={{ uri: selectedGeoSite?.localFilePath }}
+                    source={{uri: selectedGeoSite?.localFilePath}}
                   />
                   <MarkerIcon color={selectedGeoSite?.category?.color} />
                 </View>
               )}
             </Marker>
-          </MapView> */}
+          </MapView>
         </View>
 
         <View

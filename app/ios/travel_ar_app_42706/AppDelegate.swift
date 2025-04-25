@@ -3,9 +3,14 @@ import React
 import React_RCTAppDelegate
 import ReactAppDependencyProvider
 
+// INFO: react-native-fbsdk-next setup
 import FBSDKCoreKit
+
+// INFO: @react-native-google-signin/google-signin setup
 import GoogleSignIn
-// import GoogleMaps
+
+// INFO: react-native-maps setup
+import GoogleMaps
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -18,6 +23,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
   ) -> Bool {
+    // INFO: react-native-maps setup
+    GMSServices.provideAPIKey("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA")
+
     let delegate = ReactNativeDelegate()
     let factory = RCTReactNativeFactory(delegate: delegate)
     delegate.dependencyProvider = RCTAppDependencyProvider()
@@ -33,14 +41,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
       launchOptions: launchOptions
     )
 
-    // Initialize Facebook SDK
+    // INFO: react-native-fbsdk-next setup
     ApplicationDelegate.shared.application(
         application,
         didFinishLaunchingWithOptions: launchOptions
     )
-
-    // Initialize Google Maps
-    // GMSServices.provideAPIKey("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA")
 
     // RNSplashScreen.show()
 
