@@ -2390,7 +2390,7 @@ PODS:
     - ReactCommon/turbomodule/core
     - Turf
     - Yoga
-  - RNPermissions (5.3.0):
+  - RNPermissions (5.4.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3182,7 +3182,7 @@ SPEC CHECKSUMS:
   RNGoogleSignin: f3168a11bf7c59eaa34a1b466e2b372f1e5ca95a
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59
   rnmapbox-maps: 0e88ce4f854bf624612e5255d1a2d61edf3c605f
-  RNPermissions: dd6c0197126879f177135b44fa9a88701802a85d
+  RNPermissions: f62536ead8f8406a3c2a741a0ffa62e811255ff2
   RNReanimated: 2313402fe27fecb7237619e9c6fcee3177f08a65
   RNScreens: 5621e3ad5a329fbd16de683344ac5af4192b40d3
   RNShare: 43faaefd287ef344e8379caeaca12d112f713295

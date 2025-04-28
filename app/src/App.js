@@ -4,7 +4,7 @@ import {LogBox, StyleSheet, StatusBar} from "react-native";
 import {Provider} from "react-redux";
 import "react-native-devsettings/withAsyncStorage";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
-import SplashScreen from "react-native-splash-screen";
+// import SplashScreen from "react-native-splash-screen";
 import Geocoder from "react-native-geocoding";
 import Toast, {ErrorToast, SuccessToast} from "react-native-toast-message";
 import OneSignal from "react-native-onesignal";
@@ -45,7 +45,7 @@ const App = () => {
     LogBox.ignoreLogs(["Warning: ..."]);
     LogBox.ignoreAllLogs();
     setTimeout(() => {
-      SplashScreen.hide();
+      // SplashScreen.hide();
     }, 100);
   }, []);
 

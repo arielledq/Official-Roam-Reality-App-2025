@@ -47,8 +47,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions: launchOptions
     )
 
-    // RNSplashScreen.show()
-
     return true
   }
 
