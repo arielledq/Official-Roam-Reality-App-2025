@@ -1,10 +1,10 @@
 // MapIconSkeletonLoader.js (Corrected Icon Visibility & Shimmer Color)
-import React, { useRef, useEffect } from "react";
-import Icon from "react-native-vector-icons/FontAwesome";
-import { View, StyleSheet, Animated, Easing } from "react-native";
+import React, {useRef, useEffect} from "react";
+import {View, StyleSheet, Animated, Easing} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
+import Icon from "./Icon";
 
-const MapIconSkeletonLoader = ({ shimmerBaseColor }) => {
+const MapIconSkeletonLoader = ({shimmerBaseColor}) => {
   const translateXAnim = useRef(new Animated.Value(-1)).current;
   const baseColor = "#E0E0E0"; // Default base icon color
 
@@ -26,16 +26,16 @@ const MapIconSkeletonLoader = ({ shimmerBaseColor }) => {
 
   return (
     <View style={styles.container}>
-      <Icon name="map-o" size={50} color={baseColor} style={styles.icon} />
+      <Icon name="find" size={50} color={baseColor} style={styles.icon} />
       <View style={styles.shimmerContainer}>
         <Animated.View
-          style={[styles.shimmerElement, { transform: [{ translateX: shimmerTranslateX }] }]}
+          style={[styles.shimmerElement, {transform: [{translateX: shimmerTranslateX}]}]}
         >
           <LinearGradient
             colors={["transparent", shimmerBaseColor, "transparent"]}
             style={StyleSheet.absoluteFill}
-            start={{ x: 0, y: 0.5 }}
-            end={{ x: 1, y: 0.5 }}
+            start={{x: 0, y: 0.5}}
+            end={{x: 1, y: 0.5}}
           />
         </Animated.View>
       </View>
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
     width: "150%",
     height: "100%",
     backgroundColor: "transparent", // Shimmer element itself is transparent
-    transform: [{ skewX: "0deg" }],
+    transform: [{skewX: "0deg"}],
     position: "absolute",
     top: 0,
     left: "-150%",

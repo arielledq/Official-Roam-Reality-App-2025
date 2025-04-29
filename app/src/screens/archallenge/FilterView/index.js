@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, ImageBackground } from "react-native";
+import React, {useEffect, useState} from "react";
+import {View, Text, ImageBackground} from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import useStyles from "./styles";
 import LinearGradient from "react-native-linear-gradient";
@@ -7,12 +7,12 @@ import ViewShot from "react-native-view-shot";
 import GetLocation from "react-native-get-location";
 import PagerView from "react-native-pager-view";
 import Geocoder from "react-native-geocoding";
-import { CHALLENGES_TYPE } from "constants";
+import {CHALLENGES_TYPE} from "constants";
 import theme from "assets/theme";
 
 Geocoder.init("AIzaSyAd_EZRrfSjO2OS6p-h89wrT3y8xyREpTA");
 
-const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
+const ARFilter = ({challengeObj, captureData, viewShotRef}) => {
   const styles = useStyles();
   const ar_filters = challengeObj?.ar_filters;
   const correctedCaptureData = captureData.startsWith("file://")
@@ -22,6 +22,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
   const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
 
   const [fullLocation, setFullLocation] = useState(null);
+  const [currentPage, setCurrentPage] = useState(0);
 
   const getLocation = () => {
     GetLocation.getCurrentPosition({
@@ -43,7 +44,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
           .catch(error => console.warn(error));
       })
       .catch(error => {
-        const { code, message } = error;
+        const {code, message} = error;
         console.warn(code, message);
       });
   };
@@ -169,18 +170,27 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
     getLocation();
   }, []);
 
+  useEffect(() => {
+    console.log("Now viewing page:", currentPage);
+    console.log("FILTER:", ar_filters[currentPage]);
+  }, [currentPage]);
+
   return (
     <ViewShot
       ref={viewShotRef}
       style={styles.mainContainer}
-      options={{ fileName: "filtered_share", format: "png", quality: 0.9 }}
+      options={{fileName: "filtered_share", format: "png", quality: 0.9}}
     >
       <BackgroundWithImage
         borderRadius={16}
-        source={{ uri: correctedCaptureData }}
+        source={{uri: correctedCaptureData}}
         style={styles.mainContainer}
       >
-        <PagerView style={styles.pagerView} initialPage={0}>
+        <PagerView
+          style={styles.pagerView}
+          initialPage={0}
+          onPageSelected={e => setCurrentPage(e.nativeEvent.position)}
+        >
           {is_pin_challenge ? (
             <View
               style={[
@@ -218,7 +228,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
             ar_filters.map(filter => {
               const isTopToBottom = filter?.gradient_direction === "TOP_TO_BOTTOM";
               return (
-                <View key={filter?.id} style={{ position: "relative", flex: 1 }}>
+                <View key={filter?.id} style={{position: "relative", flex: 1}}>
                   {filter.gradient_colors && (
                     // grandient
                     <View
@@ -252,7 +262,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                   {filter?.image && (
                     <ImageBackground
                       borderRadius={16}
-                      source={{ uri: filter.image }}
+                      source={{uri: filter.image}}
                       resizeMode="stretch"
                       style={{
                         height: "100%",
@@ -315,7 +325,7 @@ const ARFilter = ({ challengeObj, captureData, viewShotRef }) => {
                     <View
                       style={[
                         styles.textFilterView,
-                        { justifyContent: "flex-start", paddingTop: "10%" },
+                        {justifyContent: "flex-start", paddingTop: "10%"},
                       ]}
                     >
                       {!filter?.text_form_image && (
