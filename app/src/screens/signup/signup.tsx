@@ -1,28 +1,28 @@
-import React, { useRef, useState } from "react";
+import React, {useRef, useState} from "react";
 
-import { Alert, Keyboard, Text, TouchableOpacity, View } from "react-native";
+import {Alert, Keyboard, Text, TouchableOpacity, View} from "react-native";
 
-import { Formik } from "formik";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {Formik} from "formik";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import AppButton from "../../components/button";
 import AppInput from "../../components/input";
-import { LockIcon, MailIcon } from "../../assets/svg";
+import {LockIcon, MailIcon} from "../../assets/svg";
 import AppHeader from "../../components/header";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
 import AppText from "../../components/text";
 import Icon from "../../components/Icon";
-import { signUp } from "../../network";
-import fontGroup, { fonts } from "../../assets/fonts";
-import { handleError, showMessage } from "../../util/helpers";
-import { SignUpSchema } from "../../util/ValidationSchemas";
+import {signUp} from "../../network";
+import fontGroup, {fonts} from "../../assets/fonts";
+import {handleError, showMessage} from "../../util/helpers";
+import {SignUpSchema} from "../../util/ValidationSchemas";
 import SocialSignin from "../../components/socialSignin";
-import { useNavigation } from "@react-navigation/native";
-import { useDispatch } from "react-redux";
-import { updateAsOldUser } from "../../redux/Persist";
-import { FontFamily, FontSizes } from "util/FontUtils";
+import {useNavigation} from "@react-navigation/native";
+import {useDispatch} from "react-redux";
+import {updateAsOldUser} from "../../redux/Persist";
+import {FontFamily, FontSizes} from "util/FontUtils";
 
 const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   const _styles = useStyles();
@@ -34,7 +34,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   const resData = useRef({});
 
   const navigateToVerifyMail = (email, resetForm) => {
-    navigation.navigate("EmailVerification", { email: email.toLowerCase(), data: resData.current });
+    navigation.navigate("EmailVerification", {email: email.toLowerCase(), data: resData.current});
     resetForm();
   };
 
@@ -66,7 +66,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={[_styles.headerText, { ...fontGroup.nunitoBold }]}>Sign up</AppText>
+      <AppText style={[_styles.headerText, {...fontGroup.nunitoBold}]}>Sign up</AppText>
       <AppText style={_styles.subHeaderText}>
         Create an account to ROAM a new dimension with captivating AR experiences.
       </AppText>
@@ -77,14 +77,14 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
             password: "",
             confirmPassword: "",
           }}
-          onSubmit={(v, { resetForm }) => handleSignup(v, resetForm)}
+          onSubmit={(v, {resetForm}) => handleSignup(v, resetForm)}
           validationSchema={SignUpSchema}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+          {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
             <View style={_styles.container}>
               <AppInput
                 inputContainerStyle={[_styles.input]}
-                containerStyle={{ marginBottom: -10 }}
+                containerStyle={{marginBottom: -10}}
                 placeholder={"Email Address"}
                 placeholderTextColor={theme.lightColors?.grey0}
                 value={values.email}
@@ -96,7 +96,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
                 autoCorrect={false}
                 textContentType="emailAddress"
                 autoComplete="email"
-                leftIconContainerStyle={{ marginRight: 5 }}
+                leftIconContainerStyle={{marginRight: 5}}
                 leftIcon={<MailIcon />}
               />
               <AppInput
@@ -117,8 +117,8 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
                     onPress={() => {
                       setPasswordVisibility(p => !p);
                     }}
-                    name={passwordVisibility ? "eye" : "eye-off"}
-                    family="feather"
+                    name={passwordVisibility ? "eye" : "minus"}
+                    family="antdesign"
                     color={"#9CA3AF"}
                     size={23}
                   />
@@ -126,7 +126,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
               />
               <AppInput
                 inputContainerStyle={[_styles.input]}
-                containerStyle={{ marginTop: -10, marginBottom: -15 }}
+                containerStyle={{marginTop: -10, marginBottom: -15}}
                 secureTextEntry={rePasswordVisibility && true}
                 onSubmitEditing={Keyboard.dismiss}
                 placeholder="Confirm Password"
@@ -147,8 +147,8 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
                     onPress={() => {
                       setRePasswordVisibility(p => !p);
                     }}
-                    name={rePasswordVisibility ? "eye" : "eye-off"}
-                    family="feather"
+                    name={rePasswordVisibility ? "eye" : "minus"}
+                    family="antdesign"
                     color={"#9CA3AF"}
                     size={23}
                   />

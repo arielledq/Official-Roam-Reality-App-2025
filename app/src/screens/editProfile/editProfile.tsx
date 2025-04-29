@@ -1,32 +1,32 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Keyboard, Pressable, Text, View } from "react-native";
-import { Formik } from "formik";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { Dropdown } from "react-native-element-dropdown";
+import React, {useEffect, useRef, useState} from "react";
+import {Keyboard, Pressable, Text, View} from "react-native";
+import {Formik} from "formik";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {Dropdown} from "react-native-element-dropdown";
 import DatePicker from "react-native-date-picker";
 import axios from "axios";
-import { Asset, CameraOptions, launchImageLibrary } from "react-native-image-picker";
-import { useDispatch, useSelector } from "react-redux";
+import {Asset, CameraOptions, launchImageLibrary} from "react-native-image-picker";
+import {useDispatch, useSelector} from "react-redux";
 
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
-import { DateFormat, formatDate } from "../../util/DateUtils";
-import { FontSizes } from "../../util/FontUtils";
-import { updateProfile } from "../../network";
-import { accountSetupIsComplete, handleError, showMessage } from "../../util/helpers";
-import { updateAccountFlag } from "../../redux/Login";
-import { EditProfileSchema } from "../../util/ValidationSchemas";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
+import {DateFormat, formatDate} from "../../util/DateUtils";
+import {FontSizes} from "../../util/FontUtils";
+import {updateProfile} from "../../network";
+import {accountSetupIsComplete, handleError, showMessage} from "../../util/helpers";
+import {updateAccountFlag} from "../../redux/Login";
+import {EditProfileSchema} from "../../util/ValidationSchemas";
 
 import AppButton from "../../components/button";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import AppInput from "../../components/input";
-import { AppText, ProfileAvatar } from "../../components";
+import {AppText, ProfileAvatar} from "../../components";
 import Icon from "../../components/Icon";
 
 import useStyles from "./styles";
 
 import theme from "../../assets/theme";
-import { Icons } from "../../assets/Icons";
+import {Icons} from "../../assets/Icons";
 import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
 
 interface ImageData {
@@ -36,9 +36,9 @@ interface ImageData {
 }
 
 const GENDERS = [
-  { label: "Female", value: 1 },
-  { label: "Male", value: 2 },
-  { label: "Prefer not to say", value: 3 },
+  {label: "Female", value: 1},
+  {label: "Male", value: 2},
+  {label: "Prefer not to say", value: 3},
 ];
 
 const dateToString = (date: Date | null) => {
@@ -234,7 +234,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     setTimeout(() => {
       navigation.reset({
         index: 0,
-        routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+        routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
       });
     }, 250);
   };
@@ -274,7 +274,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
           enableReinitialize
           validationSchema={EditProfileSchema}
         >
-          {({ handleSubmit, values, errors, touched, setFieldValue }) => {
+          {({handleSubmit, values, errors, touched, setFieldValue}) => {
             return (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
@@ -308,7 +308,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     leftIcon={
                       <Icon
                         name={"user"}
-                        family="feather"
+                        family="antdesign"
                         color={
                           (touched.name && errors?.name) || isNameInputFocused
                             ? theme.lightColors?.white
@@ -367,7 +367,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       renderLeftIcon={() => (
                         <Icon
                           name={"meh"}
-                          family="feather"
+                          family="antdesign"
                           color={
                             (touched.gender && errors?.gender && !gender?.value) ||
                             isGenderDropDownFocused
@@ -411,7 +411,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     leftIcon={
                       <Icon
                         name={"phone"}
-                        family="feather"
+                        family="antdesign"
                         color={
                           (touched.phoneNumber && errors?.phoneNumber) || isMobileInputFocused
                             ? theme.lightColors?.white
@@ -445,8 +445,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     autoCapitalize="none"
                     leftIcon={
                       <Icon
-                        name={"map-pin"}
-                        family="feather"
+                        name={"enviromento"}
+                        family="antdesign"
                         color={
                           (touched.address && errors?.address) || isAddressInputFocused
                             ? theme.lightColors?.white
@@ -504,8 +504,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       }}
                       renderLeftIcon={() => (
                         <Icon
-                          name={"map-pin"}
-                          family="feather"
+                          name={"enviromento"}
+                          family="antdesign"
                           color={
                             (touched.country && errors?.country && !country?.value) ||
                             isCountryDropDownFocused
@@ -535,8 +535,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       <View style={_styles.iconContainer}>
                         <Icon
                           onPress={() => {}}
-                          name={"aperture"}
-                          family="feather"
+                          name={"camerao"}
+                          family="antdesign"
                           color={
                             touched.date_of_birth && errors?.date_of_birth && !bDate
                               ? theme.lightColors?.white
@@ -573,7 +573,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       <Icon
                         onPress={() => {}}
                         name={"calendar"}
-                        family="feather"
+                        family="antdesign"
                         color={
                           touched.date_of_birth && errors?.date_of_birth && !bDate
                             ? theme.lightColors?.white
@@ -583,7 +583,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       />
                     </Pressable>
                     {touched.date_of_birth && errors?.date_of_birth && !bDate ? (
-                      <Text style={[_styles.errorText, { marginTop: 5 }]}>
+                      <Text style={[_styles.errorText, {marginTop: 5}]}>
                         Date of birth is required
                       </Text>
                     ) : undefined}
@@ -598,7 +598,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   />
 
                   <View style={_styles.privacyContainer}>
-                    <View style={{ marginRight: 10 }}>
+                    <View style={{marginRight: 10}}>
                       <Icons.Shield />
                     </View>
                     <AppText style={_styles.privacyText}>

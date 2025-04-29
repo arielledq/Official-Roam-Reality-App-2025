@@ -1,18 +1,18 @@
-import React, { useState } from "react";
-import { Alert, Keyboard, TouchableOpacity, View } from "react-native";
-import { Formik } from "formik";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import React, {useState} from "react";
+import {Alert, Keyboard, TouchableOpacity, View} from "react-native";
+import {Formik} from "formik";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import theme from "../../assets/theme";
 import AppButton from "../../components/button";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import AppInput from "../../components/input";
 import Icon from "../../components/Icon";
-import { ChangePasswordSchema } from "../../util/ValidationSchemas";
-import { changePassword } from "../../network";
-import { showMessage } from "../../util/helpers";
+import {ChangePasswordSchema} from "../../util/ValidationSchemas";
+import {changePassword} from "../../network";
+import {showMessage} from "../../util/helpers";
 
 type ChangePasswordFormValues = {
   oldPassword: string;
@@ -68,12 +68,12 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
             onSubmit={handleChangePassword}
             validationSchema={ChangePasswordSchema}
           >
-            {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+            {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
                   <AppInput
                     inputContainerStyle={[_styles.input]}
-                    containerStyle={{ marginBottom: -10 }}
+                    containerStyle={{marginBottom: -10}}
                     secureTextEntry={oldpasswordVisibility}
                     placeholder="Old Password"
                     onSubmitEditing={Keyboard.dismiss}
@@ -90,16 +90,16 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         onPress={() => {
                           setOldPasswordVisibility(p => !p);
                         }}
-                        name={oldpasswordVisibility ? "eye" : "eye-off"}
-                        family="feather"
+                        name={oldpasswordVisibility ? "eye" : "minus"}
+                        family="antdesign"
                         color={theme.lightColors?.grey0}
                         size={23}
                       />
                     }
                     leftIcon={
                       <Icon
-                        name={"lock"}
-                        family="feather"
+                        name={"lock1"}
+                        family="antdesign"
                         color={theme.lightColors?.grey0}
                         size={24}
                       />
@@ -108,7 +108,7 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                   <AppInput
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={newpasswordVisibility}
-                    containerStyle={{ marginBottom: -10 }}
+                    containerStyle={{marginBottom: -10}}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="Password"
                     placeholderTextColor={theme.lightColors?.grey0}
@@ -124,16 +124,16 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         onPress={() => {
                           setNewPasswordVisibility(p => !p);
                         }}
-                        name={newpasswordVisibility ? "eye" : "eye-off"}
-                        family="feather"
+                        name={newpasswordVisibility ? "eye" : "minus"}
+                        family="antdesign"
                         color={theme.lightColors?.grey0}
                         size={23}
                       />
                     }
                     leftIcon={
                       <Icon
-                        name={"lock"}
-                        family="feather"
+                        name={"lock1"}
+                        family="antdesign"
                         color={theme.lightColors?.grey0}
                         size={24}
                       />
@@ -159,16 +159,16 @@ const ChangePassword: ScreenStackComponent<RootStackParamList, "ChangePassword">
                         onPress={() => {
                           setConfirmNewPasswordVisibility(p => !p);
                         }}
-                        name={confirmnewpasswordVisibility ? "eye" : "eye-off"}
-                        family="feather"
+                        name={confirmnewpasswordVisibility ? "eye" : "minus"}
+                        family="antdesign"
                         color={theme.lightColors?.grey0}
                         size={23}
                       />
                     }
                     leftIcon={
                       <Icon
-                        name={"lock"}
-                        family="feather"
+                        name={"lock1"}
+                        family="antdesign"
                         color={theme.lightColors?.grey0}
                         size={24}
                       />

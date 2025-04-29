@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 import {
   Image,
   Modal,
@@ -8,23 +8,23 @@ import {
   View,
   ActivityIndicator,
 } from "react-native";
-import { StyleSheet } from "react-native";
+import {StyleSheet} from "react-native";
 
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigation } from "@react-navigation/native";
+import {useDispatch, useSelector} from "react-redux";
+import {useNavigation} from "@react-navigation/native";
 
-import { FontFamily, FontSizes } from "util/FontUtils";
-import { ENABLED_LOCATION_TEXT, DISABLED_LOCATION_TEXT } from "../../constants";
+import {FontFamily, FontSizes} from "util/FontUtils";
+import {ENABLED_LOCATION_TEXT, DISABLED_LOCATION_TEXT} from "../../constants";
 
 import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
 import Icon from "components/Icon";
-import { AppButton } from "components";
+import {AppButton} from "components";
 import AppSwitch from "components/Switch";
 
 import userLocationHook from "screens/drawerContent/location.hook";
-import { logout } from "network";
-import { resetState } from "redux/Login";
+import {logout} from "network";
+import {resetState} from "redux/Login";
 
 import theme from "../../assets/theme";
 
@@ -34,7 +34,7 @@ const pinOff = require("../../assets/images/material-symbols_location-off-rounde
 const BandHome = ({}) => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const { loading, locationIsEnabled, toggleUserLocation } = userLocationHook();
+  const {loading, locationIsEnabled, toggleUserLocation} = userLocationHook();
   const loginState = useSelector((state: any) => state.login);
   const user = loginState?.data?.user;
   const [isSettingsModalVisible, setIsSettingsModalVisible] = useState(false);
@@ -71,7 +71,7 @@ const BandHome = ({}) => {
           leftComponent={<></>}
           rightComponent={
             <TouchableOpacity onPress={toggleSettingsModalHandler}>
-              <Icon name="settings" family="feather" color={"white"} size={20} />
+              <Icon name="setting" family="antdesign" color={"white"} size={20} />
             </TouchableOpacity>
           }
           centerComponent={{
@@ -115,7 +115,7 @@ const BandHome = ({}) => {
               ) : (
                 <Image
                   source={locationIsEnabled ? pinOn : pinOff}
-                  style={{ width: 100, height: 100 }}
+                  style={{width: 100, height: 100}}
                 />
               )}
             </View>
@@ -175,8 +175,8 @@ const BandHome = ({}) => {
                   title={
                     <>
                       <Icon
-                        name="log-out"
-                        family="feather"
+                        name="logout"
+                        family="antdesign"
                         size={24}
                         color={theme.lightColors?.white}
                       />
@@ -226,7 +226,7 @@ const styles = StyleSheet.create({
     gap: 16,
     flex: 1,
   },
-  locationTitleContainer: { gap: 8 },
+  locationTitleContainer: {gap: 8},
   locationTitle: {
     fontSize: FontSizes.S18,
     fontFamily: FontFamily.NunitoSansBold,
@@ -238,8 +238,8 @@ const styles = StyleSheet.create({
     fontFamily: FontFamily.NunitoSansRegular,
     color: theme.lightColors?.grey0,
   },
-  locationFieldContainer: { flexDirection: "row" },
-  locationTextLabelContainer: { flex: 1 },
+  locationFieldContainer: {flexDirection: "row"},
+  locationTextLabelContainer: {flex: 1},
   locationLabel: {
     fontSize: FontSizes.S16,
     fontFamily: FontFamily.NunitoSansRegular,
@@ -280,7 +280,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  appButtonContainerStyle: { padding: 4 },
+  appButtonContainerStyle: {padding: 4},
   appButtonLabelStyle: {
     marginLeft: 8,
     color: theme.lightColors?.white,

@@ -508,7 +508,7 @@ const GeoArSiteDetails = ({route}) => {
             >
               <Icon
                 name={"info"}
-                family="feather"
+                family="antdesign"
                 color={theme.lightColors?.inputBlue}
                 size={32}
                 // style={styles.verificationIcon}

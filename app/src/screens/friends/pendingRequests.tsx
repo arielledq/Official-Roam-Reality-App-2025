@@ -1,18 +1,14 @@
 // PendingRequests.tsx
-import { useFocusEffect } from "@react-navigation/native";
-import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, Pressable, ImageBackground } from "react-native";
-import {
-  acceptFriendRequests,
-  getPendingFriendRequests,
-  rejectFriendRequests,
-} from "../../network";
+import {useFocusEffect} from "@react-navigation/native";
+import React, {useCallback, useState} from "react";
+import {View, Text, FlatList, Pressable, ImageBackground} from "react-native";
+import {acceptFriendRequests, getPendingFriendRequests, rejectFriendRequests} from "../../network";
 import useStyles from "./styles";
 import theme from "../../assets/theme";
-import { Icon } from "@rneui/base";
+import {Icon} from "@rneui/base";
 import FastImage from "react-native-fast-image";
 import Images from "../../assets/images";
-import { showMessage, truncateText } from "../../util/helpers";
+import {showMessage, truncateText} from "../../util/helpers";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 
 const PendingRequests = () => {
@@ -86,7 +82,7 @@ const PendingRequests = () => {
       <FlatList
         data={pendingRequests}
         keyExtractor={item => item.id.toString()}
-        renderItem={({ item }) => renderFriendItem(item, onAccept, onReject)}
+        renderItem={({item}) => renderFriendItem(item, onAccept, onReject)}
         contentContainerStyle={_styles.scroll}
         onRefresh={() => onRefresh()}
         refreshing={isFetching}
@@ -97,7 +93,7 @@ const PendingRequests = () => {
 };
 
 const renderFriendItem = (item, onAccept, onReject) => {
-  const { from_user } = item;
+  const {from_user} = item;
   return (
     <View
       style={{
@@ -121,23 +117,21 @@ const renderFriendItem = (item, onAccept, onReject) => {
         <ImageBackground source={Images.BGBlur} style={localStyles.imageBg} resizeMode="stretch">
           <FastImage
             style={localStyles.image}
-            source={{ uri: from_user?.user_profile?.image }}
+            source={{uri: from_user?.user_profile?.image}}
             resizeMode={FastImage.resizeMode.cover}
           />
         </ImageBackground>
         <View>
-          <Text style={{ color: theme.lightColors?.white }}>{from_user.name}</Text>
-          <Text style={{ color: theme.lightColors?.white }}>
-            {truncateText(from_user.email, 18)}
-          </Text>
+          <Text style={{color: theme.lightColors?.white}}>{from_user.name}</Text>
+          <Text style={{color: theme.lightColors?.white}}>{truncateText(from_user.email, 18)}</Text>
         </View>
       </View>
-      <View style={{ flexDirection: "row" }}>
-        <Pressable style={{ marginRight: 20, padding: 8 }} onPress={() => onReject(item)}>
-          <Icon name="times" type="font-awesome" color="red" size={25} />
+      <View style={{flexDirection: "row"}}>
+        <Pressable style={{marginRight: 20, padding: 8}} onPress={() => onReject(item)}>
+          <Icon name="close" type="antdesign" color="red" size={25} />
         </Pressable>
-        <Pressable onPress={() => onAccept(item)} style={{ padding: 8 }}>
-          <Icon name="check" type="font-awesome" color="green" size={25} />
+        <Pressable onPress={() => onAccept(item)} style={{padding: 8}}>
+          <Icon name="check" type="antdesign" color="green" size={25} />
         </Pressable>
       </View>
     </View>

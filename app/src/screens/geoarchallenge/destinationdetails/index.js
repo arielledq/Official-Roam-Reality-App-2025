@@ -595,7 +595,7 @@ const GeoArChallengeDetails = ({}) => {
         }}
       >
         <TouchableOpacity onPress={scrollRegionsPressHandler}>
-          <Icon name={"angle-double-right"} family="font-awesome" size={25} color="gray" />
+          <Icon name={"doubleright"} family="antdesign" size={25} color="gray" />
         </TouchableOpacity>
 
         {isEvent ? (
@@ -691,12 +691,7 @@ const GeoArChallengeDetails = ({}) => {
           <TouchableOpacity style={_styles.selectionsContainer} onPress={refreshMapButtonHandler}>
             <View style={{flexDirection: "row", gap: 16, justifyContent: "center"}}>
               <Text style={_styles.selectionTextHeading}>Refresh map</Text>
-              <Icon
-                name="refresh-cw"
-                family="feather"
-                color={theme.lightColors.magenta}
-                size={20}
-              />
+              <Icon name="refresh" family="antdesign" color={theme.lightColors.magenta} size={20} />
             </View>
           </TouchableOpacity>
         )}

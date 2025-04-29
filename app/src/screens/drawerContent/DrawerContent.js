@@ -1,44 +1,44 @@
-import React, { useState } from "react";
-import { View, StyleSheet, Image, TouchableOpacity } from "react-native";
-import { DrawerContentScrollView } from "@react-navigation/drawer";
+import React, {useState} from "react";
+import {View, StyleSheet, Image, TouchableOpacity} from "react-native";
+import {DrawerContentScrollView} from "@react-navigation/drawer";
 import theme from "../../assets/theme";
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import Images from "../../assets/images";
 import Icon from "../../components/Icon";
 import AppText from "../../components/text";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 import ConfirmationPopUp from "../../components/confirmationPopUp";
-import { deleteAccount, logout } from "../../network";
-import { useDispatch } from "react-redux";
-import { resetState } from "../../redux/Login";
+import {deleteAccount, logout} from "../../network";
+import {useDispatch} from "react-redux";
+import {resetState} from "../../redux/Login";
 import LinearGradient from "react-native-linear-gradient";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { removeItem, showMessage } from "../../util/helpers";
+import {GoogleSignin} from "@react-native-google-signin/google-signin";
+import {removeItem, showMessage} from "../../util/helpers";
 import AppSwitch from "../../components/Switch";
 import userLocationHook from "./location.hook";
 
 const DrawerList = [
-  { icon: "target", label: "AR Challenges", navigateTo: "ARChallenge" },
+  {icon: "earth", label: "AR Challenges", navigateTo: "ARChallenge"},
   {
     icon: "pin",
     label: "My Live Location",
     description: "Allows your friends to see your live location",
     navigateTo: "toggleLocation",
   },
-  { icon: "users", label: "Friends", navigateTo: "Friends" },
-  { icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends" },
-  { icon: "Folder", label: "Legal", navigateTo: "Legal" },
-  { icon: "info", label: "Support & Feedback", navigateTo: "SendFeedback" },
-  { icon: "settings", label: "Settings", navigateTo: "Settings" },
-  { icon: "log-out", label: "Logout", navigateTo: "logout" },
+  {icon: "user", label: "Friends", navigateTo: "Friends"},
+  {icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends"},
+  {icon: "Folder", label: "Legal", navigateTo: "Legal"},
+  {icon: "infocirlceo", label: "Support & Feedback", navigateTo: "SendFeedback"},
+  {icon: "setting", label: "Settings", navigateTo: "Settings"},
+  {icon: "logout", label: "Logout", navigateTo: "logout"},
 ];
 
-const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index, onPress }) => {
-  const { loading, locationIsEnabled, toggleUserLocation } = userLocationHook();
+const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, onPress}) => {
+  const {loading, locationIsEnabled, toggleUserLocation} = userLocationHook();
 
   function getIconFamily(icon) {
     const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet", "pin"];
-    return customIcons.includes(icon) ? "custom" : "feather";
+    return customIcons.includes(icon) ? "custom" : "antdesign";
   }
 
   const toggleLiveLocationButtonHandler = () => {
@@ -52,10 +52,11 @@ const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
+          flex: 1,
         }}
       >
         <Icon name={icon} family={getIconFamily(icon)} color={"white"} size={20} />
-        <View style={{ flex: 1 }}>
+        <View style={{flex: 1}}>
           <AppText style={styles.Text}>{label}</AppText>
           {description && <AppText style={styles.Description}>{description}</AppText>}
         </View>
@@ -68,22 +69,38 @@ const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index,
         ) : isLastItem ? (
           <></>
         ) : (
-          <Icon name="chevron-right" family="entypo" color={theme.darkColors?.white} size={20} />
+          <Icon name="right" family="antdesign" color={theme.darkColors?.white} size={20} />
         )}
       </View>
     );
   };
+
   return (
     <>
       {index === 0 ? (
         <TouchableOpacity onPress={() => onPress(navigateTo)}>
           <LinearGradient
             colors={["#9003E0", "#1158F4", "#9003E0"]}
-            style={styles.linearGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
+            style={[
+              styles.linearGradient,
+              {
+                padding: 0,
+                minHeight: 50,
+              },
+            ]}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
           >
-            {renderDrawerItem()}
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 10,
+              }}
+            >
+              {renderDrawerItem()}
+            </View>
           </LinearGradient>
         </TouchableOpacity>
       ) : (
@@ -95,7 +112,7 @@ const DrawerLayout = ({ icon, label, description, navigateTo, isLastItem, index,
   );
 };
 
-const DrawerItems = ({ onPress }) => {
+const DrawerItems = ({onPress}) => {
   return DrawerList.map((el, i) => {
     return (
       <DrawerLayout
@@ -142,7 +159,7 @@ function DrawerContent(props) {
       case "Home": {
         navigation.reset({
           index: 0,
-          routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+          routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
         });
         break;
       }
@@ -175,7 +192,7 @@ function DrawerContent(props) {
   };
   return (
     <>
-      <View style={{ flex: 1, backgroundColor: theme.darkColors?.drawerBG }}>
+      <View style={{flex: 1, backgroundColor: theme.darkColors?.drawerBG}}>
         <DrawerContentScrollView {...props}>
           <View style={styles.drawerContent}>
             <View style={styles.checkIcon}>

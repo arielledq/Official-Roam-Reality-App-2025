@@ -1,19 +1,19 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import React, {useState} from "react";
+import {StyleSheet, Text, TouchableOpacity, View} from "react-native";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
-import { AppButton, AppHeader } from "../../components";
+import {AppButton, AppHeader} from "../../components";
 import Icon from "../../components/Icon";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
-import { useNavigation } from "@react-navigation/native";
-import { deleteAccount, logout } from "network";
-import { removeItem, showMessage } from "util/helpers";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { resetState } from "redux/Login";
-import { useDispatch } from "react-redux";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {useNavigation} from "@react-navigation/native";
+import {deleteAccount, logout} from "network";
+import {removeItem, showMessage} from "util/helpers";
+import {GoogleSignin} from "@react-native-google-signin/google-signin";
+import {resetState} from "redux/Login";
+import {useDispatch} from "react-redux";
 import ConfirmationPopUp from "components/confirmationPopUp";
 
-function SettingsItem({ label, onPress, icon }) {
+function SettingsItem({label, onPress, icon}) {
   return (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -39,7 +39,7 @@ function SettingsItem({ label, onPress, icon }) {
         <Icon name={icon} family="custom" size={24} />
         <Text style={styles.text}>{label}</Text>
       </View>
-      <Icon name="chevron-right" family="entypo" color={theme.darkColors?.white} size={24} />
+      <Icon name="right" family="right" color={theme.darkColors?.white} size={24} />
     </TouchableOpacity>
   );
 }
@@ -81,7 +81,7 @@ const Settings = () => {
       <AppHeader title={"Settings"} backgroundColor="transparent" />
       <SettingsItem icon="lock" label={"Change password"} onPress={handleChangePassword} />
       <SettingsItem icon="privacy" label={"Privacy"} onPress={handlePrivacy} />
-      <View style={{ width: "100%", paddingHorizontal: 24 }}>
+      <View style={{width: "100%", paddingHorizontal: 24}}>
         <AppButton
           onPress={() => setIsOpenDeleteModal(true)}
           // buttonStyle={styles.buttonStyle}

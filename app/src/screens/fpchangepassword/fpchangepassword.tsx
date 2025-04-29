@@ -1,26 +1,26 @@
-import React, { useState } from "react";
-import { Keyboard, View } from "react-native";
-import { Formik } from "formik";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import React, {useState} from "react";
+import {Keyboard, View} from "react-native";
+import {Formik} from "formik";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import theme from "../../assets/theme";
 import AppButton from "../../components/button";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import AppInput from "../../components/input";
-import { LockIcon } from "../../assets/svg";
-import { FPChangePasswordSchema } from "../../util/ValidationSchemas";
+import {LockIcon} from "../../assets/svg";
+import {FPChangePasswordSchema} from "../../util/ValidationSchemas";
 import Icon from "../../components/Icon";
-import { resetPassword } from "../../network";
-import { handleError } from "../../util/helpers";
+import {resetPassword} from "../../network";
+import {handleError} from "../../util/helpers";
 
 const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePassword"> = ({
   navigation,
   route,
 }) => {
   const _styles = useStyles();
-  const { token, uid } = route.params;
+  const {token, uid} = route.params;
   const [isLoading, setIsLoading] = useState(false);
   const [newpasswordVisibility, setNewPasswordVisibility] = useState(true);
   const [confirmnewpasswordVisibility, setConfirmNewPasswordVisibility] = useState(true);
@@ -36,7 +36,7 @@ const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePasswo
       .then(res => {
         {
           if (res.status == 1) {
-            navigation.navigate("VerificationSuccess", { ChangePassword: true });
+            navigation.navigate("VerificationSuccess", {ChangePassword: true});
           } else {
             handleError(res);
           }
@@ -64,13 +64,13 @@ const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePasswo
             onSubmit={values => handleChangePassword(values)}
             validationSchema={FPChangePasswordSchema}
           >
-            {({ handleChange, handleSubmit, values, errors, touched }) => (
+            {({handleChange, handleSubmit, values, errors, touched}) => (
               <View style={_styles.container}>
                 <View style={_styles.chidlView}>
                   <AppInput
                     inputContainerStyle={[_styles.input]}
                     secureTextEntry={newpasswordVisibility}
-                    containerStyle={{ marginBottom: -10 }}
+                    containerStyle={{marginBottom: -10}}
                     onSubmitEditing={Keyboard.dismiss}
                     placeholder="New Password"
                     placeholderTextColor={theme.lightColors?.grey0}
@@ -86,8 +86,8 @@ const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePasswo
                         onPress={() => {
                           setNewPasswordVisibility(p => !p);
                         }}
-                        name={newpasswordVisibility ? "eye" : "eye-off"}
-                        family="feather"
+                        name={newpasswordVisibility ? "eye" : "minus"}
+                        family="antdesign"
                         color={"#9CA3AF"}
                         size={23}
                       />
@@ -114,8 +114,8 @@ const FPChangePassword: ScreenStackComponent<RootStackParamList, "FPChangePasswo
                         onPress={() => {
                           setConfirmNewPasswordVisibility(p => !p);
                         }}
-                        name={confirmnewpasswordVisibility ? "eye" : "eye-off"}
-                        family="feather"
+                        name={confirmnewpasswordVisibility ? "eye" : "minus"}
+                        family="antdesign"
                         color={"#9CA3AF"}
                         size={23}
                       />

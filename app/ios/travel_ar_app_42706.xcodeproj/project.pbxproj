@@ -17,6 +17,7 @@
 		DC0CBAF02DB81AC70028089D /* NativeScreenRecorder.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */; };
 		DC0CBAF12DB81AC70028089D /* NativeScreenRecorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DC0CBAED2DB81AC70028089D /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DC0CBB042DB81C3C0028089D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */; };
+		DC9325EF2DC1491A008D2FD2 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC9325EE2DC1491A008D2FD2 /* AntDesign.ttf */; };
 		DCC84F922DBBD7AC00CE38ED /* camera-sound.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F902DBBD7AC00CE38ED /* camera-sound.mp3 */; };
 		DCC84F932DBBD7AC00CE38ED /* record.mp3 in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F912DBBD7AC00CE38ED /* record.mp3 */; };
 		DCC84F972DBBD7E000CE38ED /* NunitoSans10ptBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */; };
@@ -55,6 +56,7 @@
 		DC0CBAF42DB81AD20028089D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
 		DC0CBAF62DB81AF70028089D /* travel_ar_app_42706.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = travel_ar_app_42706.entitlements; path = travel_ar_app_42706/travel_ar_app_42706.entitlements; sourceTree = "<group>"; };
 		DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		DC9325EE2DC1491A008D2FD2 /* AntDesign.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = AntDesign.ttf; path = "../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf"; sourceTree = "<group>"; };
 		DCC84F902DBBD7AC00CE38ED /* camera-sound.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = "camera-sound.mp3"; path = "../src/assets/ar/camera-sound.mp3"; sourceTree = SOURCE_ROOT; };
 		DCC84F912DBBD7AC00CE38ED /* record.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; name = record.mp3; path = ../src/assets/ar/record.mp3; sourceTree = SOURCE_ROOT; };
 		DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NunitoSans10ptBold.ttf; path = ../src/assets/fonts/NunitoSans10ptBold.ttf; sourceTree = "<group>"; };
@@ -112,6 +114,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				DC9325EE2DC1491A008D2FD2 /* AntDesign.ttf */,
 				DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */,
 				DCC84F962DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf */,
 				DCC84F952DBBD7DF00CE38ED /* NunitoSans10ptRegular.ttf */,
@@ -217,6 +220,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DC9325EF2DC1491A008D2FD2 /* AntDesign.ttf in Resources */,
 				DCC84F972DBBD7E000CE38ED /* NunitoSans10ptBold.ttf in Resources */,
 				DCC84F982DBBD7E000CE38ED /* NunitoSans10ptRegular.ttf in Resources */,
 				DCC84F992DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf in Resources */,

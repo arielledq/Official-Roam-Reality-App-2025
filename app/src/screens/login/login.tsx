@@ -1,30 +1,30 @@
-import React, { useState } from "react";
+import React, {useState} from "react";
 
-import { Keyboard, Text, TouchableOpacity, View } from "react-native";
+import {Keyboard, Text, TouchableOpacity, View} from "react-native";
 
-import { Formik } from "formik";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {Formik} from "formik";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import AppButton from "../../components/button";
 import AppInput from "../../components/input";
-import { LockIcon, MailIcon } from "../../assets/svg";
+import {LockIcon, MailIcon} from "../../assets/svg";
 import AppHeader from "../../components/header";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
 import AppText from "../../components/text";
-import { login, setDevice } from "../../network";
-import { useDispatch, useSelector } from "react-redux";
-import { updateUserData } from "../../redux/Login";
-import { SigninSchema } from "../../util/ValidationSchemas";
+import {login, setDevice} from "../../network";
+import {useDispatch, useSelector} from "react-redux";
+import {updateUserData} from "../../redux/Login";
+import {SigninSchema} from "../../util/ValidationSchemas";
 import Icon from "../../components/Icon";
-import { handleError } from "../../util/helpers";
+import {handleError} from "../../util/helpers";
 import SocialSignin from "../../components/socialSignin";
-import { updateAsOldUser } from "../../redux/Persist";
+import {updateAsOldUser} from "../../redux/Persist";
 import OneSignal from "react-native-onesignal";
-import { setItemWithListener } from "../../util/EventsListener";
-import { fonts } from "assets/fonts";
-import { FontSizes } from "util/FontUtils";
+import {setItemWithListener} from "../../util/EventsListener";
+import {fonts} from "assets/fonts";
+import {FontSizes} from "util/FontUtils";
 import Config from "config";
 
 const LOGIN_INITIAL_VALUES = {
@@ -32,7 +32,7 @@ const LOGIN_INITIAL_VALUES = {
   password: __DEV__ ? Config?.DEV_PASSWORD || "" : "",
 };
 
-const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }) => {
+const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const newUser = useSelector(state => state.persist.newUser);
@@ -42,7 +42,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
   const setOnesignalDevice = () => {
     OneSignal.getDeviceState().then(deviceData => {
       if (deviceData?.userId) {
-        setDevice({ ...deviceData, active: true });
+        setDevice({...deviceData, active: true});
       }
     });
   };
@@ -85,8 +85,9 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
       <AppText style={_styles.subHeaderText}>
         Login to ROAM a new dimension with captivating AR experiences.
       </AppText>
+
       <KeyboardAwareScrollView
-        style={{ flex: 1 }}
+        style={{flex: 1}}
         nestedScrollEnabled={false}
         keyboardShouldPersistTaps="always"
       >
@@ -98,11 +99,11 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
           onSubmit={v => handleLogin(v)}
           validationSchema={SigninSchema}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+          {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
             <View style={_styles.container}>
               <AppInput
                 inputContainerStyle={[_styles.input]}
-                containerStyle={{ marginBottom: -10 }}
+                containerStyle={{marginBottom: -10}}
                 placeholder={"Email Address"}
                 placeholderTextColor={theme.lightColors?.grey0}
                 value={values.email}
@@ -113,7 +114,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
                 autoCorrect={false}
                 textContentType="emailAddress"
                 autoComplete="email"
-                leftIconContainerStyle={{ marginRight: 5 }}
+                leftIconContainerStyle={{marginRight: 5}}
                 leftIcon={<MailIcon />}
               />
               <AppInput
@@ -133,8 +134,8 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({ navigation }
                     onPress={() => {
                       setPasswordVisibility(p => !p);
                     }}
-                    name={passwordVisibility ? "eye" : "eye-off"}
-                    family="feather"
+                    name={passwordVisibility ? "eye" : "minus"}
+                    family="antdesign"
                     color={"#9CA3AF"}
                     size={23}
                   />

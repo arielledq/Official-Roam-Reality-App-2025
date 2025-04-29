@@ -1,13 +1,13 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, Image, Platform, TouchableOpacity, View } from "react-native";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+import {FlatList, Image, Platform, TouchableOpacity, View} from "react-native";
 import useStyles from "./styles";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
-import { MenuIcon } from "../../assets/svg";
+import {MenuIcon} from "../../assets/svg";
 import UserInfoCard from "../../components/userInfoCard";
-import { AppButton, AppText } from "../../components";
+import {AppButton, AppText} from "../../components";
 import StatContainer from "../../components/statContainer";
 import BoxStatContainer from "../../components/boxStatContainer";
 import Images from "../../assets/images";
@@ -24,14 +24,14 @@ import {
   getUserRankCount,
   sendCode,
 } from "../../network";
-import { useDispatch, useSelector } from "react-redux";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import {useDispatch, useSelector} from "react-redux";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import FastImage from "react-native-fast-image";
 import ScreenLoader from "../../components/screenLoader";
-import { updateARUserData } from "../../redux/AR";
-import { BlurView } from "@react-native-community/blur";
+import {updateARUserData} from "../../redux/AR";
+import {BlurView} from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
-import { height } from "util/AppDimensions";
+import {height} from "util/AppDimensions";
 
 const SCROLL_AMOUNT = 150;
 
@@ -54,7 +54,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const flatListRef = useRef(null);
 
   const handleScroll = (event: any) => {
-    const { contentOffset } = event.nativeEvent;
+    const {contentOffset} = event.nativeEvent;
     const currentScrollPosition = contentOffset.x;
 
     // Update the ref directly
@@ -66,7 +66,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
     // Scroll to the new position
     // @ts-ignore
-    flatListRef.current?.scrollToOffset({ offset: newPosition, animated: true });
+    flatListRef.current?.scrollToOffset({offset: newPosition, animated: true});
 
     // Update the ref with the new position immediately
     scrollPositionRef.current = newPosition;
@@ -216,10 +216,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
 
   const data = [
-    { id: 1, value: myCheckIns, property: "Sites Visited" },
-    { id: 2, value: starsCount, property: "Stars" },
-    { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
-    { id: 4, value: profileDetails?.friends?.length, property: "Friends" },
+    {id: 1, value: myCheckIns, property: "Sites Visited"},
+    {id: 2, value: starsCount, property: "Stars"},
+    {id: 3, value: arProfile?.challenge_completed, property: "AR Challenges"},
+    {id: 4, value: profileDetails?.friends?.length, property: "Friends"},
   ];
   // Split the data into chunks of 3 for each row
   const rows = [];
@@ -227,7 +227,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     rows.push(data.slice(i, i + 3));
   }
   const navigateToVerifyMail = (email: string) => {
-    sendCode({ email: email.toLowerCase() });
+    sendCode({email: email.toLowerCase()});
     setIsTransitioning(true);
     // @ts-expect-error
     navigation.navigate("EmailVerification", {
@@ -247,13 +247,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
                 height: height * 0.5,
               }}
               //  @ts-ignore
-              source={{ uri: profileDetails?.image }}
+              source={{uri: profileDetails?.image}}
               resizeMode={FastImage.resizeMode.cover}
             />
             <LinearGradient
               colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-              start={{ x: 0.5, y: 1 }}
-              end={{ x: 0.5, y: 0.7 }}
+              start={{x: 0.5, y: 1}}
+              end={{x: 0.5, y: 0.7}}
               style={{
                 position: "absolute",
                 top: 0,
@@ -293,7 +293,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             });
           }}
         >
-          <Icon name={"edit-2"} family="feather" color={"white"} size={16} />
+          <Icon name={"edit"} family="antdesign" color={"white"} size={16} />
           {/* @ts-ignore */}
           <AppText style={_styles.buttonText}>Edit Profile </AppText>
         </AppButton>
@@ -347,30 +347,30 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <Image source={Images.ForwardIcon} />
         </TouchableOpacity>
       </View>
-      <View style={{ marginHorizontal: -10, marginBottom: 50 }}>
+      <View style={{marginHorizontal: -10, marginBottom: 50}}>
         <FlatList
           ref={flatListRef}
           onScroll={handleScroll}
           scrollEventThrottle={32} // Adjust this value for performance
-          style={{ width: "100%" }}
-          contentContainerStyle={{ paddingHorizontal: 20, gap: 18 }}
+          style={{width: "100%"}}
+          contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => <MemoryContainer item={item} onPressAction={navigateToShare} />}
+          renderItem={({item}) => <MemoryContainer item={item} onPressAction={navigateToShare} />}
           keyExtractor={(item: any) => item?.id?.toString()}
         />
       </View>
     </View>
   );
 
-  const renderItem = ({ item }: any) => (
+  const renderItem = ({item}: any) => (
     <BoxStatContainer key={item.id} boxId={item.id} value={item.value} property={item.property} />
   );
 
   return (
-    <ScreenContainer style={{ ..._styles.mainContainer, paddingHorizontal: 0, paddingTop: 0 }}>
+    <ScreenContainer style={{..._styles.mainContainer, paddingHorizontal: 0, paddingTop: 0}}>
       <>
         {loading ? (
           <ScreenLoader style={{}} />

@@ -1,9 +1,9 @@
-import React from 'react'
-import { Pressable, View } from 'react-native'
-import useStyles from './styles'
-import AppText from '../text'
-import Icon from '../Icon'
-import theme from '../../assets/theme'
+import React from "react";
+import {Pressable, View} from "react-native";
+import useStyles from "./styles";
+import AppText from "../text";
+import Icon from "../Icon";
+import theme from "../../assets/theme";
 
 const UserInfoCard = ({
   name,
@@ -12,14 +12,14 @@ const UserInfoCard = ({
   verifyAction,
   image = false,
 }: {
-  name: string | null
-  email: string | null
-  isVerified: boolean
-  verifyAction: () => void
+  name: string | null;
+  email: string | null;
+  isVerified: boolean;
+  verifyAction: () => void;
 }) => {
-  const styles = useStyles()
+  const styles = useStyles();
 
-  const truncatedEmail = email?.length > 22 && !isVerified ? `${email?.slice(0, 22)}...` : email
+  const truncatedEmail = email?.length > 22 && !isVerified ? `${email?.slice(0, 22)}...` : email;
 
   return (
     <View style={styles.row}>
@@ -31,8 +31,8 @@ const UserInfoCard = ({
           {!isVerified && (
             <>
               <Icon
-                name={'info'}
-                family='feather'
+                name={"info"}
+                family="antdesign"
                 color={theme.lightColors?.yellow}
                 size={16}
                 style={styles.verificationIcon}
@@ -48,7 +48,7 @@ const UserInfoCard = ({
         </View>
       </View>
     </View>
-  )
-}
+  );
+};
 
-export default UserInfoCard
+export default UserInfoCard;
