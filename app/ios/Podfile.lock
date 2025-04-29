@@ -1748,8 +1748,6 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-splash-screen (3.3.0):
-    - React-Core
   - react-native-unity (1.0.11):
     - DoubleConversion
     - glog
@@ -2740,7 +2738,6 @@ DEPENDENCIES:
   - react-native-pager-view (from `../node_modules/react-native-pager-view`)
   - react-native-render-html (from `../node_modules/react-native-render-html`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
-  - react-native-splash-screen (from `../node_modules/react-native-splash-screen`)
   - "react-native-unity (from `../node_modules/@azesmway/react-native-unity`)"
   - react-native-video (from `../node_modules/react-native-video`)
   - react-native-view-shot (from `../node_modules/react-native-view-shot`)
@@ -2941,8 +2938,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-render-html"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
-  react-native-splash-screen:
-    :path: "../node_modules/react-native-splash-screen"
   react-native-unity:
     :path: "../node_modules/@azesmway/react-native-unity"
   react-native-video:
@@ -3133,7 +3128,6 @@ SPEC CHECKSUMS:
   react-native-pager-view: f238ed7fb53458bd03366944a33686f067c83e9a
   react-native-render-html: 5afc4751f1a98621b3009432ef84c47019dcb2bd
   react-native-safe-area-context: 562163222d999b79a51577eda2ea8ad2c32b4d06
-  react-native-splash-screen: 95994222cc95c236bd3cdc59fe45ed5f27969594
   react-native-unity: 9bf992c92225077eca177f71734e54d0a9a65444
   react-native-video: 8bc2483058ab667a70d3516109d6759214f5fa2f
   react-native-view-shot: 57c7b8158751f19f32cb885109574712955ea016
