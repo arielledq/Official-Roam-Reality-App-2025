@@ -7,12 +7,12 @@
  */
 export default {
   APPLE_CLIENT_ID: "com.roam.reality.services",
-  // BASE_URL: "https://travel-ar-app-42706.azurewebsites.net/",
-  // APPLE_REDIRECT_URL:
-  //   "https://travel-ar-app-42706.azurewebsites.net/accounts/apple/login/callback/",
-  BASE_URL: "https://travel-ar-app-42706-staging.botics.co/",
+  BASE_URL: "https://travel-ar-app-42706.azurewebsites.net/",
   APPLE_REDIRECT_URL:
-    "https://travel-ar-app-42706-staging.botics.co/accounts/apple/login/callback/",
+    "https://travel-ar-app-42706.azurewebsites.net/accounts/apple/login/callback/",
+  // BASE_URL: "https://travel-ar-app-42706-staging.botics.co/",
+  // APPLE_REDIRECT_URL:
+  //   "https://travel-ar-app-42706-staging.botics.co/accounts/apple/login/callback/",
   // BASE_URL: "https://travel-ar-app-42706.botics.co/",
   // APPLE_REDIRECT_URL: "https://travel-ar-app-42706.botics.co/accounts/apple/login/callback/",
   ONE_SIGNAL_APP_ID: "ceda5dd2-8fd2-4180-9532-7b7f127a612d",
