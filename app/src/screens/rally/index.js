@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { ActivityIndicator, ImageBackground, StyleSheet, View } from "react-native";
+import React, {useState} from "react";
+import {ActivityIndicator, ImageBackground, StyleSheet, View} from "react-native";
 
 import theme from "assets/theme";
 
@@ -15,7 +15,7 @@ const Rally = () => {
       onLoadEnd={() => setLoading(false)}
     >
       {loading && (
-        <View style={[styles.loadingOverlay, { backgroundColor: theme.lightColors.inputBG }]}>
+        <View style={[styles.loadingOverlay, {backgroundColor: theme.lightColors.inputBG}]}>
           <ActivityIndicator size="large" color={theme.lightColors.purple} />
         </View>
       )}
@@ -28,7 +28,6 @@ export default Rally;
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
-    marginBottom: 50,
   },
   loadingOverlay: {
     ...StyleSheet.absoluteFillObject, // Covers the entire ImageBackground

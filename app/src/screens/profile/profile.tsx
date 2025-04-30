@@ -387,13 +387,24 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           />
         )}
         <View style={_styles.blurView}>
-          <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
-            <AppHeader
-              containerStyle={_styles.headerContainer}
-              title={"Profile"}
-              leftComponent={handleMenuButton()}
-            />
-          </BlurView>
+          <BlurView
+            blurType="light"
+            overlayColor="#00000050"
+            enabled={!isTransitioning}
+            style={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              right: 0,
+            }}
+          />
+
+          <AppHeader
+            containerStyle={_styles.headerContainer}
+            title={"Profile"}
+            leftComponent={handleMenuButton()}
+          />
         </View>
       </>
     </ScreenContainer>

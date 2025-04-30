@@ -170,11 +170,6 @@ const ARFilter = ({challengeObj, captureData, viewShotRef}) => {
     getLocation();
   }, []);
 
-  useEffect(() => {
-    console.log("Now viewing page:", currentPage);
-    console.log("FILTER:", ar_filters[currentPage]);
-  }, [currentPage]);
-
   return (
     <ViewShot
       ref={viewShotRef}

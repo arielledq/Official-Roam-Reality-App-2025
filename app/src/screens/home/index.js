@@ -1,15 +1,15 @@
-import React, { useEffect, useState } from "react";
-import { FlatList, Image, ImageBackground, Text, TouchableOpacity, View } from "react-native";
+import React, {useEffect, useState} from "react";
+import {FlatList, Image, ImageBackground, Text, TouchableOpacity, View} from "react-native";
 
 import OneSignal from "react-native-onesignal";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
-import { useDispatch, useSelector } from "react-redux";
+import {DrawerActions, useNavigation} from "@react-navigation/native";
+import {useDispatch, useSelector} from "react-redux";
 
 import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
 import PanicPopUp from "../geoarchallenge/panicpopup";
 
-import { accountSetupIsComplete, handleError, showMessage } from "../../util/helpers";
+import {accountSetupIsComplete, handleError, showMessage} from "../../util/helpers";
 import {
   getGeoARDestinations,
   getARProfile,
@@ -32,11 +32,11 @@ import StarSiteIcon from "../../assets/geoar/starsite.svg";
 import GradientDownPNG from "../../assets/geoar/gradient_down.png";
 import SOSIcon from "../../assets/Icons/sos.svg";
 import ArIcon from "../../assets/geoar/aricon.svg";
-import { MenuIcon } from "../../assets/svg";
+import {MenuIcon} from "../../assets/svg";
 
 import useStyles from "./styles";
-import { GIFT_POINTS } from "../../constants";
-import { updateUserProperties } from "redux/Login/reducer";
+import {GIFT_POINTS} from "../../constants";
+import {updateUserProperties} from "redux/Login/reducer";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -50,7 +50,7 @@ const GeoArChallenge = ({}) => {
   const user = useSelector(state => state?.login?.data?.user);
 
   const navigateToGeoChanllenge = additionalData => {
-    const { destinationId } = additionalData;
+    const {destinationId} = additionalData;
     if (destinationId && destinationData?.length) {
       const selectedDestination = destinationData.find(
         destination => destination?.id === destinationId
@@ -69,7 +69,7 @@ const GeoArChallenge = ({}) => {
   const setOnesignalDevice = () => {
     OneSignal.getDeviceState().then(deviceData => {
       if (deviceData?.userId) {
-        setDevice({ ...deviceData, active: true })
+        setDevice({...deviceData, active: true})
           .then(res => {})
           .catch(err => {
             console.error("Device Data Update Error", err);
@@ -147,9 +147,9 @@ const GeoArChallenge = ({}) => {
   };
 
   const getARStarSites = async id => {
-    const res = await getARSitesStars({ id });
+    const res = await getARSitesStars({id});
     starSitesCount[id] = res.data[0];
-    setStarSitesCount({ ...starSitesCount });
+    setStarSitesCount({...starSitesCount});
   };
 
   const getStarCount = id => {
@@ -159,11 +159,11 @@ const GeoArChallenge = ({}) => {
   const updatePointsNotification = () => {
     updateProfile({
       id: user?.user_profile?.id,
-      data: { has_receive_points: true },
+      data: {has_receive_points: true},
     })
       .then(res => {
         if (res.status == 1) {
-          dispatch(updateUserProperties({ has_receive_points: true }));
+          dispatch(updateUserProperties({has_receive_points: true}));
           showMessage(
             `Surprise! We’ve added ${GIFT_POINTS} bonus points to your Roam Reality account!`,
             "success",
@@ -181,12 +181,12 @@ const GeoArChallenge = ({}) => {
 
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj));
-    navigation.navigate("GeoArOutdoor", { challengeObj: obj });
+    navigation.navigate("GeoArOutdoor", {challengeObj: obj});
   };
 
-  const Item = ({ obj }) => (
-    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{ width: "100%" }}>
-      <ImageBackground style={_styles.containerView} resizeMode="cover" source={{ uri: obj.image }}>
+  const Item = ({obj}) => (
+    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{width: "100%"}}>
+      <ImageBackground style={_styles.containerView} resizeMode="cover" source={{uri: obj.image}}>
         <Image
           source={GradientDownPNG}
           resizeMode="cover"
@@ -199,7 +199,7 @@ const GeoArChallenge = ({}) => {
             width: "110%",
           }}
         />
-        <View style={{ width: "100%", marginBottom: 10 }}>
+        <View style={{width: "100%", marginBottom: 10}}>
           <Text style={_styles.list_title}>{obj.name}</Text>
           <View
             style={{
@@ -210,8 +210,8 @@ const GeoArChallenge = ({}) => {
               marginTop: 20,
             }}
           >
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <SiteIcon style={{ width: 48, height: 48 }} />
+            <View style={{alignItems: "center", justifyContent: "center"}}>
+              <SiteIcon style={{width: 48, height: 48}} />
               <Text style={_styles.s_list_count}>{obj.star_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>Sites</Text>
             </View>
@@ -223,12 +223,12 @@ const GeoArChallenge = ({}) => {
                 marginEnd: 10,
               }}
             >
-              <StarSiteIcon style={{ width: 48, height: 48 }} />
+              <StarSiteIcon style={{width: 48, height: 48}} />
               <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
               <Text style={_styles.s_list_text}>Star Sites</Text>
             </View>
-            <View style={{ alignItems: "center", justifyContent: "center" }}>
-              <ArIcon style={{ width: 48, height: 48 }} />
+            <View style={{alignItems: "center", justifyContent: "center"}}>
+              <ArIcon style={{width: 48, height: 48}} />
               <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
               <Text style={_styles.s_list_text}>AR Challenges</Text>
             </View>
@@ -241,7 +241,7 @@ const GeoArChallenge = ({}) => {
     return (
       <TouchableOpacity
         onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
-        style={{ paddingLeft: 5 }}
+        style={{paddingLeft: 5}}
       >
         <MenuIcon />
       </TouchableOpacity>
@@ -254,7 +254,7 @@ const GeoArChallenge = ({}) => {
         onPress={() => {
           setOpenPanicPopup(true);
         }}
-        style={{ paddingRight: 5 }}
+        style={{paddingRight: 5}}
       >
         <SOSIcon width={30} height={30} />
       </TouchableOpacity>
@@ -263,14 +263,14 @@ const GeoArChallenge = ({}) => {
 
   const getUserProfile = async userProfileId => {
     try {
-      const response = await getProfieDetails({ id: userProfileId });
+      const response = await getProfieDetails({id: userProfileId});
 
       if (response.status == 1) {
         const accountIsComplete = accountSetupIsComplete(response);
         if (!accountIsComplete) {
           setTimeout(() => {
             // @ts-ignore
-            navigation.replace("EditProfile", { profileDetails: response });
+            navigation.replace("EditProfile", {profileDetails: response});
           }, 300);
         }
       } else {
@@ -286,7 +286,7 @@ const GeoArChallenge = ({}) => {
     setOnesignalDevice();
 
     OneSignal.setNotificationOpenedHandler(notification => {
-      const { additionalData } = notification.notification;
+      const {additionalData} = notification.notification;
 
       if (additionalData) {
         navigateToGeoChanllenge(additionalData);
@@ -307,8 +307,6 @@ const GeoArChallenge = ({}) => {
     getUserProfile(userProfileId);
   }, [user]);
 
-  // state.data.user.user_ar_profile.
-
   return (
     <ScreenContainer>
       <AppHeader
@@ -323,18 +321,18 @@ const GeoArChallenge = ({}) => {
       />
       <FlatList
         showsVerticalScrollIndicator={false}
-        style={{ flex: 1, marginTop: 15 }}
+        style={{flex: 1, marginTop: 15}}
         data={destinationData}
         numColumns={1}
         refreshing={isLoading}
         onRefresh={() => {
           loadDestinations();
         }}
-        renderItem={({ item }) => <Item obj={item} />}
+        renderItem={({item}) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
       {openPanicPopUp && (
-        <View style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}>
+        <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
           <PanicPopUp
             onClose={() => {
               setOpenPanicPopup(false);

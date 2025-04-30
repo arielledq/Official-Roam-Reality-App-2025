@@ -1,5 +1,5 @@
-import { makeStyles } from "@rneui/themed";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 
 const useStyles = makeStyles(theme => ({
   heading: {
@@ -13,7 +13,7 @@ const useStyles = makeStyles(theme => ({
     borderBottomWidth: 0,
     alignItems: "center",
   },
-  backIcon: { paddingHorizontal: 5 },
+  backIcon: {paddingHorizontal: 5},
 }));
 
 export default useStyles;

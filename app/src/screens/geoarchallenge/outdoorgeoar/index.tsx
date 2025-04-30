@@ -161,9 +161,18 @@ const GeoArOutdoor = ({route}: any) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.blurView}>
-        <BlurView blurType="regular" style={{backgroundColor: "transparent"}}>
-          <AppHeader title={"AR Experiences"} containerStyle={styles.headerContainer} />
-        </BlurView>
+        <BlurView
+          blurType="regular"
+          style={{
+            backgroundColor: "transparent",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+          }}
+        />
+        <AppHeader title={"AR Experiences"} containerStyle={styles.headerContainer} />
       </View>
 
       <View style={styles.container}>

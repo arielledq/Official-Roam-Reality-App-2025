@@ -1,11 +1,11 @@
-import React, { useCallback, useState } from "react";
-import { FlatList, Image, Pressable, TouchableOpacity, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import React, {useCallback, useState} from "react";
+import {FlatList, Image, Pressable, TouchableOpacity, View} from "react-native";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
-import { AppText } from "../../components";
+import {AppText} from "../../components";
 import StatContainer from "../../components/statContainer";
 import BoxStatContainer from "../../components/boxStatContainer";
 import Images from "../../assets/images";
@@ -20,15 +20,15 @@ import {
   removeUserFromFriends,
   reportContentOrUser,
 } from "../../network";
-import { useDispatch } from "react-redux";
-import { useFocusEffect, useNavigation, useRoute } from "@react-navigation/native";
+import {useDispatch} from "react-redux";
+import {useFocusEffect, useNavigation, useRoute} from "@react-navigation/native";
 import FastImage from "react-native-fast-image";
-import { height } from "../../util/AppDimensions";
+import {height} from "../../util/AppDimensions";
 import ScreenLoader from "../../components/screenLoader";
-import { BlurView } from "@react-native-community/blur";
+import {BlurView} from "@react-native-community/blur";
 import UserReportCard from "../../components/userInfoCard";
 import ReportUserModal from "../reportUser/ReportUser";
-import { showMessage } from "../../util/helpers";
+import {showMessage} from "../../util/helpers";
 import ConfirmationPopUp from "../../components/confirmationPopUp";
 
 const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> = () => {
@@ -135,10 +135,10 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   );
 
   const data = [
-    { id: 1, value: arProfile?.check_ins, property: "Sites Visited" },
-    { id: 2, value: starsCount, property: "Stars" },
-    { id: 3, value: arProfile?.challenge_completed, property: "AR Challenges" },
-    { id: 4, value: 0, property: "Friends" },
+    {id: 1, value: arProfile?.check_ins, property: "Sites Visited"},
+    {id: 2, value: starsCount, property: "Stars"},
+    {id: 3, value: arProfile?.challenge_completed, property: "AR Challenges"},
+    {id: 4, value: 0, property: "Friends"},
     // { id: 5, value: 0, property: "Credits" },
     // { id: 6, value: 0, property: "Tokens" },
     // { id: 7, value: 0, property: "Rallies" },
@@ -181,13 +181,13 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
               width: "100%",
               height: height * 0.5,
             }}
-            source={{ uri: userProfile?.user_profile?.image }}
+            source={{uri: userProfile?.user_profile?.image}}
             resizeMode={FastImage.resizeMode.cover}
           />
           <LinearGradient
             colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-            start={{ x: 0.5, y: 1 }}
-            end={{ x: 0.5, y: 0.7 }}
+            start={{x: 0.5, y: 1}}
+            end={{x: 0.5, y: 0.7}}
             style={{
               position: "absolute",
               top: 0,
@@ -247,21 +247,21 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
           <Image source={Images.ForwardIcon} />
         </View>
       </TouchableOpacity>
-      <View style={{ marginHorizontal: -22 }}>
+      <View style={{marginHorizontal: -22}}>
         <FlatList
-          contentContainerStyle={{ marginBottom: 50 }}
+          contentContainerStyle={{marginBottom: 50}}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({ item }) => <MemoryContainer onPressAction={navigateToShare} item={item} />}
+          renderItem={({item}) => <MemoryContainer onPressAction={navigateToShare} item={item} />}
           keyExtractor={item => item.id.toString()}
         />
       </View>
     </View>
   );
 
-  const renderItem = ({ item }) => (
+  const renderItem = ({item}) => (
     <BoxStatContainer key={item.id} boxId={item.id} value={item.value} property={item.property} />
   );
 
@@ -298,17 +298,27 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
         />
       )}
       <View style={_styles.blurView}>
-        <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
-          <AppHeader
-            containerStyle={_styles.headerContainer}
-            title={""}
-            rightComponent={
-              <Pressable style={_styles.removeBtnContainer} onPress={onRemoveFriendClick}>
-                <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
-              </Pressable>
-            }
-          />
-        </BlurView>
+        <BlurView
+          blurType="light"
+          overlayColor="#00000050"
+          enabled={!isTransitioning}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+          }}
+        />
+        <AppHeader
+          containerStyle={_styles.headerContainer}
+          title={""}
+          rightComponent={
+            <Pressable style={_styles.removeBtnContainer} onPress={onRemoveFriendClick}>
+              <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
+            </Pressable>
+          }
+        />
       </View>
       <ConfirmationPopUp
         title={"Remove Friend"}

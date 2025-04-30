@@ -1,20 +1,20 @@
-import React, { useContext, useEffect, useState } from "react";
-import { StyleSheet, TouchableOpacity, View, ActivityIndicator, FlatList } from "react-native";
+import React, {useContext, useEffect, useState} from "react";
+import {StyleSheet, TouchableOpacity, View, ActivityIndicator, FlatList} from "react-native";
 
-import { BlurView } from "@react-native-community/blur";
-import { useIsFocused, useNavigation } from "@react-navigation/native";
-import { useSelector } from "react-redux";
+import {BlurView} from "@react-native-community/blur";
+import {useIsFocused, useNavigation} from "@react-navigation/native";
+import {useSelector} from "react-redux";
 
-import { GeolocationContext } from "GeolocationProvider";
+import {GeolocationContext} from "GeolocationProvider";
 
 import {
   getARChallenges as getARChallengesApi,
   getNextStar as getNextStarApi,
 } from "../../../network";
-import { FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
-import { handleError, showMessage } from "../../../util/helpers";
+import {FontLineHeights, FontSizes, fontGroup} from "../../../util/FontUtils";
+import {handleError, showMessage} from "../../../util/helpers";
 
-import { AppHeader, AppText } from "../../../components";
+import {AppHeader, AppText} from "../../../components";
 
 import SiteIcon from "../../../assets/geoar/siteicon.svg";
 import StarSiteIcon from "../../../assets/geoar/starsite.svg";
@@ -24,7 +24,7 @@ import Images from "../../../assets/images";
 import RightArrowIcon from "../../../assets/svg/RightArrowIcon";
 
 const HomeScreenData = [
-  { id: -1, blank: true },
+  {id: -1, blank: true},
   {
     id: 1,
     title: "Geo Check-Ins",
@@ -55,7 +55,7 @@ const HomeScreenData = [
   },
 ];
 
-const ChallengeSelection = ({ route }) => {
+const ChallengeSelection = ({route}) => {
   const experience_type = route.params?.experience_type;
   const coolDown = route.params?.coolDown;
   const checkIns = route.params?.checkIns;
@@ -69,7 +69,7 @@ const ChallengeSelection = ({ route }) => {
 
   const navigation = useNavigation();
   const isFocused = useIsFocused();
-  const { userLocation } = useContext(GeolocationContext);
+  const {userLocation} = useContext(GeolocationContext);
 
   const latitude = userLocation?.latitude;
   const longitude = userLocation?.longitude;
@@ -117,7 +117,7 @@ const ChallengeSelection = ({ route }) => {
           return;
         }
         if (!starsChallenge) return;
-        navigation.navigate("GeoArSiteRoutes", { starsChallenge });
+        navigation.navigate("GeoArSiteRoutes", {starsChallenge});
         break;
       case "PinChallenge":
         if (!selectedGeoSite?.pin_challenge) {
@@ -146,8 +146,8 @@ const ChallengeSelection = ({ route }) => {
       <TouchableOpacity style={styles.imageBg} onPress={() => goToRoute(item.navigation)}>
         <View style={styles.row}>
           <View style={styles.innerView}>
-            <View style={{ flexDirection: "row", alignItems: "center", width: "100%" }}>
-              {item?.Icon && <item.Icon style={{ width: 48, height: 48, marginRight: 20 }} />}
+            <View style={{flexDirection: "row", alignItems: "center", width: "100%"}}>
+              {item?.Icon && <item.Icon style={{width: 48, height: 48, marginRight: 20}} />}
               <AppText style={styles.headerText}>
                 {item?.title}
                 {item?.title1}
@@ -161,7 +161,7 @@ const ChallengeSelection = ({ route }) => {
                 flex: 1,
               }}
             >
-              <View style={{ flex: 1 }}>
+              <View style={{flex: 1}}>
                 <AppText style={styles.subtitleText}>{item?.subtitle}</AppText>
                 {item?.id === 1 && (
                   <AppText style={styles.challengesText}>My Check-ins: {checkIns}</AppText>
@@ -204,8 +204,8 @@ const ChallengeSelection = ({ route }) => {
             style={styles.list}
             contentContainerStyle={styles.containerStyle}
             data={HomeScreenData}
-            renderItem={({ item }) =>
-              item?.blank ? <View style={{ minHeight: 120 }} /> : <HomeScreenARItem {...item} />
+            renderItem={({item}) =>
+              item?.blank ? <View style={{minHeight: 120}} /> : <HomeScreenARItem {...item} />
             }
             keyExtractor={item => item.id}
             showsVerticalScrollIndicator={false}
@@ -216,10 +216,16 @@ const ChallengeSelection = ({ route }) => {
         <BlurView
           blurType="regular"
           overlayColor="transparent"
-          style={{ backgroundColor: "transparent" }}
-        >
-          <AppHeader title={"Explore The Site"} containerStyle={styles.headerContainer} />
-        </BlurView>
+          style={{
+            backgroundColor: "transparent",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            bottom: 0,
+            right: 0,
+          }}
+        />
+        <AppHeader title={"Explore The Site"} containerStyle={styles.headerContainer} />
       </View>
     </View>
   );

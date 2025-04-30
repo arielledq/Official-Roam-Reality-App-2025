@@ -4,13 +4,13 @@ import {LogBox, StyleSheet, StatusBar} from "react-native";
 import {Provider} from "react-redux";
 import "react-native-devsettings/withAsyncStorage";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
-// import SplashScreen from "react-native-splash-screen";
 import Geocoder from "react-native-geocoding";
 import Toast, {ErrorToast, SuccessToast} from "react-native-toast-message";
 import OneSignal from "react-native-onesignal";
 import MapboxGL from "@rnmapbox/maps";
 import "react-native-get-random-values";
 import {PersistGate} from "redux-persist/integration/react";
+import {Provider as PaperProvider} from "react-native-paper";
 
 import Config from "./config";
 import {persistor, store} from "./store";
@@ -44,25 +44,24 @@ const App = () => {
   useEffect(() => {
     LogBox.ignoreLogs(["Warning: ..."]);
     LogBox.ignoreAllLogs();
-    setTimeout(() => {
-      // SplashScreen.hide();
-    }, 100);
   }, []);
 
   return (
-    <NotificationProvider>
-      <Provider store={store}>
-        <GestureHandlerRootView style={styles.root}>
-          <PersistGate loading={null} persistor={persistor}>
-            <GeolocationProvider>
-              <StatusBar hidden={true} />
-              <Navigation />
-            </GeolocationProvider>
-          </PersistGate>
-        </GestureHandlerRootView>
-        <Toast config={toastConfig} />
-      </Provider>
-    </NotificationProvider>
+    <PaperProvider>
+      <NotificationProvider>
+        <Provider store={store}>
+          <GestureHandlerRootView style={styles.root}>
+            <PersistGate loading={null} persistor={persistor}>
+              <GeolocationProvider>
+                <StatusBar hidden={true} />
+                <Navigation />
+              </GeolocationProvider>
+            </PersistGate>
+          </GestureHandlerRootView>
+          <Toast config={toastConfig} />
+        </Provider>
+      </NotificationProvider>
+    </PaperProvider>
   );
 };
 

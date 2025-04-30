@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View, Image, SafeAreaView } from "react-native";
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
-import { useTheme } from "react-native-paper";
+import {StyleSheet, Text, View, Image, SafeAreaView} from "react-native";
+import {createMaterialBottomTabNavigator} from "react-native-paper/react-navigation";
+import {useTheme} from "react-native-paper";
+import {SafeAreaProvider} from "react-native-safe-area-context";
 
 import ARTipsScreen from "../screens/arTips";
 import Profile from "../screens/profile/profile";
@@ -9,8 +10,7 @@ import GeoArChallenge from "../screens/home";
 import ScoreBoard from "../screens/scoreboard";
 
 import Icon from "../components/Icon";
-import { Icons } from "../assets/Icons";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import {Icons} from "../assets/Icons";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -21,11 +21,12 @@ const BottomTabNavigator = () => {
   const glowEffect = () => {
     return (
       <Image
-        style={{ position: "absolute", top: -15, left: -30, height: 60, width: 90 }}
+        style={{position: "absolute", top: -15, left: -30, height: 60, width: 90}}
         source={Icons.IconBGHome}
       />
     );
   };
+
   return (
     <SafeAreaProvider style={styles.container}>
       <Tab.Navigator
@@ -41,8 +42,8 @@ const BottomTabNavigator = () => {
           options={{
             // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Home</Text>,
-            tabBarIcon: ({ focused }) => (
-              <View style={{ position: "relative" }}>
+            tabBarIcon: ({focused}) => (
+              <View style={{position: "relative"}}>
                 {focused && glowEffect()}
                 <Icon name={"UnselectedHomeIcon"} family="custom" size={25} />
               </View>
@@ -55,8 +56,8 @@ const BottomTabNavigator = () => {
           options={{
             // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
-            tabBarIcon: ({ focused }) => (
-              <View style={{ position: "relative" }}>
+            tabBarIcon: ({focused}) => (
+              <View style={{position: "relative"}}>
                 {focused && glowEffect()}
                 <Icon name={"UnselectedBadgeIcon"} family="custom" size={28} />
               </View>
@@ -69,7 +70,7 @@ const BottomTabNavigator = () => {
           component={ARTipsScreen}
           options={{
             tabBarLabel: "",
-            tabBarIcon: ({ focused }) => (
+            tabBarIcon: ({focused}) => (
               <Icon
                 name={"SelectedCamera"}
                 family="custom"
@@ -85,8 +86,8 @@ const BottomTabNavigator = () => {
           options={{
             // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
-            tabBarIcon: ({ focused }) => (
-              <View style={{ position: "relative" }}>
+            tabBarIcon: ({focused}) => (
+              <View style={{position: "relative"}}>
                 {focused && glowEffect()}
                 <Icon name={"UnselectedFlagIcon"} family="custom" size={25} />
               </View>
@@ -100,8 +101,8 @@ const BottomTabNavigator = () => {
           options={{
             // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Profile</Text>,
-            tabBarIcon: ({ focused }) => (
-              <View style={{ position: "relative" }}>
+            tabBarIcon: ({focused}) => (
+              <View style={{position: "relative"}}>
                 {focused && glowEffect()}
                 <Icon name={"UnselectedProfile"} family="custom" size={25} />
               </View>
@@ -121,7 +122,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#090A16",
   },
   tabBarStyle: {
-    position: "absolute",
     backgroundColor: "#090A16",
     borderTopStartRadius: 20,
     borderTopEndRadius: 20,
