@@ -1,16 +1,16 @@
-import React, { useRef, useState } from "react";
-import { Text, View, ImageBackground, TouchableOpacity } from "react-native";
+import React, {useRef, useState} from "react";
+import {Text, View, ImageBackground, TouchableOpacity} from "react-native";
 
-import { FlatList } from "react-native-gesture-handler";
+import {FlatList} from "react-native-gesture-handler";
 import FastImage from "react-native-fast-image";
-import { useDispatch, useSelector } from "react-redux";
-import { DrawerActions, useNavigation } from "@react-navigation/native";
+import {useDispatch, useSelector} from "react-redux";
+import {DrawerActions, useNavigation} from "@react-navigation/native";
 
-import { getARProfile, getGeoARDestinations, getMyRank, getScoreboardList } from "../../network";
-import { handleError } from "util/helpers";
-import { updateARUserData } from "../../redux/AR";
+import {getARProfile, getGeoARDestinations, getMyRank, getScoreboardList} from "../../network";
+import {handleError} from "util/helpers";
+import {updateARUserData} from "../../redux/AR";
 
-import { AppHeader } from "../../components";
+import {AppHeader} from "../../components";
 import ScreenContainer from "components/ScreenContainer";
 
 import useStyles from "./styles";
@@ -18,14 +18,14 @@ import useStyles from "./styles";
 import Images from "../../assets/images";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
-import { MenuIcon } from "assets/svg";
+import {MenuIcon} from "assets/svg";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 
 const ScoreBoard = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [users, setUsers] = React.useState([]);
   const [rankMine, setRankMine] = useState<any>();
-  const [destinationData, setDestinationData] = useState([{ name: "Global" }]);
+  const [destinationData, setDestinationData] = useState([{name: "Global"}]);
   const [selectedDestination, setSelectedDestination] = useState<any>();
 
   const _styles = useStyles();
@@ -55,6 +55,7 @@ const ScoreBoard = ({}) => {
   const filterDestinations = (o: any, index: number) => {
     setSelectedDestination(o);
     getScoreboard(o.id);
+    getMyRankPoints(o.id);
   };
 
   const ARDestinations = () => {
@@ -96,7 +97,7 @@ const ScoreBoard = ({}) => {
       });
   };
 
-  const DestinationItem = ({ obj, index }: { obj: any; index: number }) => (
+  const DestinationItem = ({obj, index}: {obj: any; index: number}) => (
     <TouchableOpacity
       onPress={() => filterDestinations(obj, index)}
       style={{
@@ -120,7 +121,7 @@ const ScoreBoard = ({}) => {
           overflow: "hidden",
           marginEnd: 8,
         }}
-        source={{ uri: obj?.flag_image }}
+        source={{uri: obj?.flag_image}}
         resizeMode={FastImage.resizeMode.cover}
       />
       <View>
@@ -130,7 +131,7 @@ const ScoreBoard = ({}) => {
     </TouchableOpacity>
   );
 
-  const Item = ({ obj, rank }: { obj: any; rank: number }) => {
+  const Item = ({obj, rank}: {obj: any; rank: number}) => {
     return (
       <View
         style={{
@@ -142,8 +143,8 @@ const ScoreBoard = ({}) => {
           marginVertical: 4,
         }}
       >
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View style={{ marginStart: 10, alignItems: "center" }}>
+        <View style={{flexDirection: "row", alignItems: "center"}}>
+          <View style={{marginStart: 10, alignItems: "center"}}>
             <Text style={_styles.rankText}>Rank</Text>
             <Text style={_styles.rankTextNumber}>{rank + 1}</Text>
           </View>
@@ -164,7 +165,7 @@ const ScoreBoard = ({}) => {
                 borderRadius: 5,
                 height: 40,
               }}
-              source={{ uri: obj?.user_profile?.image }}
+              source={{uri: obj?.user_profile?.image}}
               resizeMode={FastImage.resizeMode.cover}
             />
           </ImageBackground>
@@ -172,11 +173,11 @@ const ScoreBoard = ({}) => {
             {obj?.name?.replace(" ", "\n")}
           </Text>
         </View>
-        <View style={{ alignItems: "center" }}>
+        <View style={{alignItems: "center"}}>
           <Text style={_styles.rankText}>Site Visited</Text>
           <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.check_ins}</Text>
         </View>
-        <View style={{ marginEnd: 10, alignItems: "center" }}>
+        <View style={{marginEnd: 10, alignItems: "center"}}>
           <Text style={_styles.rankText}>Points</Text>
           <Text style={_styles.rankTextNumber}>{obj?.user_ar_profile?.points}</Text>
         </View>
@@ -188,7 +189,7 @@ const ScoreBoard = ({}) => {
     return (
       <TouchableOpacity
         onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
-        style={{ paddingLeft: 5 }}
+        style={{paddingLeft: 5}}
       >
         <MenuIcon />
       </TouchableOpacity>
@@ -199,14 +200,15 @@ const ScoreBoard = ({}) => {
     const destination = selectedDestination?.id;
     const isFirstLoad = false;
     getScoreboard(destination, isFirstLoad);
+    getMyRankPoints(destination);
   };
 
   const myRank = () => {
     return (
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
-        <RankBG style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }} />
-        <View style={{ flexDirection: "row", alignItems: "center" }}>
-          <View style={{ marginStart: 10, alignItems: "center" }}>
+      <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+        <RankBG style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}} />
+        <View style={{flexDirection: "row", alignItems: "center"}}>
+          <View style={{marginStart: 10, alignItems: "center"}}>
             <Text style={_styles.rankText}>Rank</Text>
             <Text style={_styles.rankTextNumber}>{rankMine?.my_rank}</Text>
           </View>
@@ -227,7 +229,7 @@ const ScoreBoard = ({}) => {
                 borderRadius: 5,
                 height: 40,
               }}
-              source={{ uri: userProfile?.image }}
+              source={{uri: userProfile?.image}}
               resizeMode={FastImage.resizeMode.cover}
             />
           </ImageBackground>
@@ -235,11 +237,11 @@ const ScoreBoard = ({}) => {
             {userProfile?.name ? userProfile?.name?.replace(" ", "\n") : "You"}
           </Text>
         </View>
-        <View style={{ alignItems: "center" }}>
+        <View style={{alignItems: "center"}}>
           <Text style={_styles.rankText}>Site Visited</Text>
           <Text style={_styles.rankTextNumber}>{arProfile?.check_ins}</Text>
         </View>
-        <View style={{ marginEnd: 10, alignItems: "center" }}>
+        <View style={{marginEnd: 10, alignItems: "center"}}>
           <Text style={_styles.rankText}>Points</Text>
           <Text style={_styles.rankTextNumber}>{rankMine?.my_points}</Text>
         </View>
@@ -251,6 +253,7 @@ const ScoreBoard = ({}) => {
     const destination = "";
     const isFirstLoad = true;
     getScoreboard(destination, isFirstLoad);
+    getMyRankPoints(destination);
   }, []);
 
   return (
@@ -266,7 +269,7 @@ const ScoreBoard = ({}) => {
           isBottomTab
         />
 
-        <View style={{ height: 50 }}>
+        <View style={{height: 50}}>
           <FlatList
             horizontal
             // @ts-ignore
@@ -274,7 +277,7 @@ const ScoreBoard = ({}) => {
             data={destinationData}
             showsHorizontalScrollIndicator={false}
             showsVerticalScrollIndicator={false}
-            renderItem={({ item, index }) => <DestinationItem index={index} obj={item} />}
+            renderItem={({item, index}) => <DestinationItem index={index} obj={item} />}
           />
         </View>
         <Text style={_styles.subTitle}>Your rank</Text>
@@ -282,11 +285,11 @@ const ScoreBoard = ({}) => {
         <Text style={_styles.subTitle}>Leaderboard</Text>
 
         <FlatList
-          style={{ flex: 1, marginTop: 15 }}
+          style={{flex: 1, marginTop: 15}}
           data={users}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => <Item obj={item} rank={index} />}
+          renderItem={({item, index}) => <Item obj={item} rank={index} />}
           keyExtractor={(item: any) => item?.id}
           onRefresh={handlePullDownToRefresh}
           refreshing={isLoading}
