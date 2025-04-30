@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, {useEffect} from "react";
 import {
   View,
   Text,
@@ -10,20 +10,20 @@ import {
   Keyboard,
 } from "react-native";
 import Contacts from "react-native-contacts";
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import FastImage from "react-native-fast-image";
 import theme from "../../assets/theme";
 import useStyles from "./styles";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { AppInput } from "../../components";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {AppInput} from "../../components";
 import useDebounce from "../../hooks/debounce";
-import { DEBOUNCE_TIME, showMessage, truncateText } from "../../util/helpers";
-import { Icon } from "react-native-elements";
+import {DEBOUNCE_TIME, showMessage, truncateText} from "../../util/helpers";
 import Images from "../../assets/images";
+import Icon from "components/Icon";
 
 interface Contact {
   id?: string;
-  user_profile?: { image?: string | null };
+  user_profile?: {image?: string | null};
   name?: string;
   email?: string;
 }
@@ -105,7 +105,7 @@ const ContactsTab = () => {
               }
               const newContact = {
                 id: `${contact.recordID || Math.random().toString()}-${email.email}`,
-                user_profile: { image: null },
+                user_profile: {image: null},
                 name: name,
                 email: email.email,
               };
@@ -127,13 +127,13 @@ const ContactsTab = () => {
   const onAddFriendClick = (user: Contact) => {
     if (user.email) {
       // @ts-ignore
-      navigation.navigate("InviteFriends", { email: user.email });
+      navigation.navigate("InviteFriends", {email: user.email});
     } else {
       showMessage("Cannot add friend: email is missing", "error", "Add Friend Error");
     }
   };
 
-  const renderContact = ({ item }: { item: Contact }) => {
+  const renderContact = ({item}: {item: Contact}) => {
     if (!item || typeof item !== "object") return null;
 
     return (
@@ -144,7 +144,7 @@ const ContactsTab = () => {
               style={localStyle.image}
               source={
                 item.user_profile && item.user_profile.image
-                  ? { uri: item.user_profile.image }
+                  ? {uri: item.user_profile.image}
                   : Images.BGBlur
               }
               resizeMode={FastImage.resizeMode.cover}
@@ -154,7 +154,7 @@ const ContactsTab = () => {
           <View>
             <Text style={_styles.title || {}}>{truncateText(item.name || "Unknown", 18)}</Text>
             <Text
-              style={[_styles.subTitle || {}, { marginVertical: 5, maxWidth: 180 }]}
+              style={[_styles.subTitle || {}, {marginVertical: 5, maxWidth: 180}]}
               ellipsizeMode="tail"
               numberOfLines={1}
             >
@@ -162,7 +162,7 @@ const ContactsTab = () => {
             </Text>
           </View>
         </View>
-        <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10, padding: 16 }}>
+        <Pressable onPress={() => onAddFriendClick(item)} style={{marginLeft: 10, padding: 16}}>
           <Text style={localStyle.addButton}>Add as friend</Text>
         </Pressable>
       </View>
@@ -171,7 +171,7 @@ const ContactsTab = () => {
 
   if (error) {
     return (
-      <View style={[_styles.container || {}, { justifyContent: "center", alignItems: "center" }]}>
+      <View style={[_styles.container || {}, {justifyContent: "center", alignItems: "center"}]}>
         <Text style={_styles.title || {}}>{error}</Text>
       </View>
     );
@@ -210,7 +210,7 @@ const ContactsTab = () => {
           keyExtractor={item => (item && item.id ? item.id : Math.random().toString())}
           renderItem={renderContact}
           ListEmptyComponent={
-            <Text style={[_styles.title || {}, { textAlign: "center", marginTop: 20 }]}>
+            <Text style={[_styles.title || {}, {textAlign: "center", marginTop: 20}]}>
               No contacts found
             </Text>
           }

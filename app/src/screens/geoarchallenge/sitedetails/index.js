@@ -507,7 +507,7 @@ const GeoArSiteDetails = ({route}) => {
               }}
             >
               <Icon
-                name={"info"}
+                name={"infocirlceo"}
                 family="antdesign"
                 color={theme.lightColors?.inputBlue}
                 size={32}

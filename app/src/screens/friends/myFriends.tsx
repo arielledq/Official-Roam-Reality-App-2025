@@ -1,17 +1,17 @@
 // MyFriends.tsx
-import React, { useCallback, useState } from "react";
-import { View, Text, FlatList, Keyboard, ImageBackground, Pressable } from "react-native";
-import { AppInput } from "../../components";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import React, {useCallback, useState} from "react";
+import {View, Text, FlatList, Keyboard, ImageBackground, Pressable} from "react-native";
+import {AppInput} from "../../components";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
 import theme from "../../assets/theme";
-import { Icon } from "react-native-elements";
-import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { getUserFriendList } from "../../network";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
+import {getUserFriendList} from "../../network";
 import FastImage from "react-native-fast-image";
 import useDebounce from "../../hooks/debounce";
-import { DEBOUNCE_TIME } from "../../util/helpers";
+import {DEBOUNCE_TIME} from "../../util/helpers";
 import Images from "../../assets/images";
+import Icon from "components/Icon";
 
 const MyFriends = () => {
   const [searchText, setSearchText] = React.useState("");
@@ -75,7 +75,7 @@ const MyFriends = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => renderFriendItem(item, _styles, navigation)}
+          renderItem={({item}) => renderFriendItem(item, _styles, navigation)}
           onRefresh={() => onRefresh()}
           refreshing={isFetching}
         />
@@ -93,7 +93,7 @@ const renderFriendItem = (item, styles, navigation) => {
             style={localStyle.image}
             source={
               item?.user_profile?.image
-                ? { uri: item?.user_profile?.image }
+                ? {uri: item?.user_profile?.image}
                 : Images.ProfileImgGradient
             }
             resizeMode={FastImage.resizeMode.stretch}
@@ -102,7 +102,7 @@ const renderFriendItem = (item, styles, navigation) => {
         <View>
           <Text style={styles.title}>{item?.name}</Text>
           <Text
-            style={[styles.subTitle, { marginVertical: 5, maxWidth: 180 }]}
+            style={[styles.subTitle, {marginVertical: 5, maxWidth: 180}]}
             ellipsizeMode="tail"
             numberOfLines={1}
           >
@@ -112,9 +112,9 @@ const renderFriendItem = (item, styles, navigation) => {
       </View>
       <Pressable
         onPress={() => {
-          navigation.navigate("PublicProfile", { userData: item });
+          navigation.navigate("PublicProfile", {userData: item});
         }}
-        style={{ marginLeft: 10, padding: 16 }}
+        style={{marginLeft: 10, padding: 16}}
       >
         <Icon name="right" type="antdesign" color={theme.lightColors?.white} />
       </Pressable>

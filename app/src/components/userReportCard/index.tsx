@@ -31,7 +31,7 @@ const UserInfoCard = ({
           {!isVerified && (
             <>
               <Icon
-                name={"info"}
+                name={"infocirlceo"}
                 family="antdesign"
                 color={theme.lightColors?.yellow}
                 size={16}

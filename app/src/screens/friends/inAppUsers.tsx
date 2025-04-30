@@ -1,20 +1,20 @@
 import * as React from "react";
-import { Text, View, StyleSheet, Keyboard, Pressable, ImageBackground, Alert } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { AppInput } from "../../components";
-import { FlatList } from "react-native-gesture-handler";
+import {Text, View, StyleSheet, Keyboard, Pressable, ImageBackground, Alert} from "react-native";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {AppInput} from "../../components";
+import {FlatList} from "react-native-gesture-handler";
 import useStyles from "./styles";
 import theme from "../../assets/theme";
-import { Icon } from "react-native-elements";
-import { searchUsers, sendFriendRequest } from "../../network";
+import {searchUsers, sendFriendRequest} from "../../network";
 import FastImage from "react-native-fast-image";
-import { color } from "@rneui/base";
+import {color} from "@rneui/base";
 import Images from "../../assets/images";
 import fontGroup from "../../assets/fonts";
-import { FontSizes } from "../../util/FontUtils";
+import {FontSizes} from "../../util/FontUtils";
 import useDebounce from "../../hooks/debounce";
-import { DEBOUNCE_TIME, showMessage } from "../../util/helpers";
+import {DEBOUNCE_TIME, showMessage} from "../../util/helpers";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
+import Icon from "components/Icon";
 
 const InAppUsers = () => {
   const _styles = useStyles();
@@ -41,7 +41,7 @@ const InAppUsers = () => {
   const onAddFriendClick = (userObj: any) => {
     setLoading(true);
     // Call api to send friend request to user
-    sendFriendRequest({ to_user: userObj?.id })
+    sendFriendRequest({to_user: userObj?.id})
       .then(response => {
         if (response) {
           showMessage("Friend request sent successfully");
@@ -88,7 +88,7 @@ const InAppUsers = () => {
         <FlatList
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
-          renderItem={({ item }) => renderFriendItem(item, onAddFriendClick, _styles)}
+          renderItem={({item}) => renderFriendItem(item, onAddFriendClick, _styles)}
         />
       </View>
       <FullScreenLoadingSpinner isLoading={loading} />
@@ -134,7 +134,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
               aspectRatio: 1,
               borderRadius: 5,
             }}
-            source={{ uri: item?.user_profile?.image }}
+            source={{uri: item?.user_profile?.image}}
             resizeMode={FastImage.resizeMode.cover}
           />
         </ImageBackground>
@@ -149,7 +149,7 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
           </Text> */}
         </View>
       </View>
-      <Pressable onPress={() => onAddFriendClick(item)} style={{ marginLeft: 10, padding: 16 }}>
+      <Pressable onPress={() => onAddFriendClick(item)} style={{marginLeft: 10, padding: 16}}>
         <Text style={localStyle.addButton}>Add as friend</Text>
       </Pressable>
     </View>
