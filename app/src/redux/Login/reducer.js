@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
   data: {},
@@ -13,45 +13,33 @@ export const sliceLogin = createSlice({
       state.data = action.payload;
     },
     updateUserProperties: (state, action) => {
-      return (state = {
-        ...state,
-        data: {
-          ...state?.data,
-          user: {
-            ...state?.data?.user,
-            ...action.payload,
-          },
-        },
-      });
+      state.data.user = {
+        ...state.data.user,
+        ...action.payload,
+      };
     },
     updateUserLocationData: (state, action) => {
-      let coordinates = [];
-      if (!isNaN(action.payload?.longitude) && !isNaN(action.payload?.latitude)) {
-        coordinates = [action.payload.longitude, action.payload.latitude];
+      const {longitude, latitude} = action.payload || {};
+      if (
+        !state?.data?.user?.user_ar_profile ||
+        typeof longitude !== "number" ||
+        typeof latitude !== "number"
+      ) {
+        return;
       }
+
       state.data.user.user_ar_profile.current_location = {
         ...state.data.user.user_ar_profile.current_location,
-        coordinates: coordinates,
+        coordinates: [longitude, latitude],
       };
     },
     updateAccountFlag: (state, action) => {
-      console.log("updateAccountFlag", action);
-      return (state = {
-        ...state,
-        data: {
-          ...state?.data,
-          user: {
-            ...state?.data?.user,
-            user_profile: {
-              ...state?.data?.user?.user_profile,
-              account_setup: action.payload,
-            },
-          },
-        },
-      });
+      state.data.user.user_profile.account_setup = action.payload;
     },
     updateVerified: (state, action) => {
-      state.data.user.user_profile.is_verified = action.payload;
+      if (state?.data?.user?.user_profile) {
+        state.data.user.user_profile.is_verified = action.payload;
+      }
     },
   },
 });

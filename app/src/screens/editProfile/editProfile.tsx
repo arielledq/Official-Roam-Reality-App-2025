@@ -236,7 +236,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         index: 0,
         routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
       });
-    }, 250);
+    }, 500);
   };
 
   const formikRef = useRef(null);
