@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { Dimensions, Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import React, {useEffect, useState} from "react";
+import {Dimensions, Image, ScrollView, Text, TouchableOpacity, View} from "react-native";
 
-import { useIsFocused } from "@react-navigation/native";
+import {useIsFocused} from "@react-navigation/native";
 import RenderHtml from "react-native-render-html";
 import moment from "moment";
 
-import { FontSizes } from "../../../util/FontUtils";
-import { checkARChallengeDoneAPI, getAnyARExamples, getGeoARExamples } from "../../../network";
-import { processCoolDownPeriod, processMyCheckIns, showMessage } from "../../../util/helpers";
+import {FontSizes} from "../../../util/FontUtils";
+import {checkARChallengeDoneAPI, getAnyARExamples, getGeoARExamples} from "../../../network";
+import {processCoolDownPeriod, processMyCheckIns, showMessage} from "../../../util/helpers";
 
-import { RootStackParamList, ScreenStackComponent } from "../../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../../constants/types";
 // @ts-ignore
-import { EXPERIENCE_TYPE_CHOICES } from "constants";
+import {EXPERIENCE_TYPE_CHOICES} from "constants";
 
 import useStyles from "./styles";
 
@@ -23,7 +23,7 @@ import AppButton from "../../../components/button";
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import theme from "assets/theme";
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 
 const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetails"> = ({
   navigation,
@@ -76,7 +76,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     })
       .then(res => {
         if (res.errorStatus == 403) {
-          const { remainingText } = processCoolDownPeriod(res?.message?.remaining);
+          const {remainingText} = processCoolDownPeriod(res?.message?.remaining);
           setCoolDownHoursText(remainingText);
           setIsChallengeDone(true);
         } else {
@@ -113,19 +113,19 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       switch (experience_type) {
         case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
           // @ts-ignore
-          navigation.navigate("ArChallengeCapture", { challengeObj, ...cameraOptions });
+          navigation.navigate("ArChallengeCapture", {challengeObj, ...cameraOptions});
           break;
         case EXPERIENCE_TYPE_CHOICES.GEO_AR_CHALLENGE:
           // @ts-ignore
-          navigation.navigate("PinChallenge", { ...cameraOptions });
+          navigation.navigate("PinChallenge", {...cameraOptions});
           break;
         case EXPERIENCE_TYPE_CHOICES.EVENT:
           // @ts-ignore
-          navigation.navigate("PinChallenge", { ...cameraOptions });
+          navigation.navigate("PinChallenge", {...cameraOptions});
           break;
         case EXPERIENCE_TYPE_CHOICES.BAND:
           // @ts-ignore
-          navigation.navigate("PinChallenge", { ...cameraOptions });
+          navigation.navigate("PinChallenge", {...cameraOptions});
           break;
 
         default:
@@ -176,11 +176,14 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     const examplesList = examples?.length ? examples[0] : null;
     if (examplesList) {
       // @ts-ignore
-      navigation.navigate("ChallengeExamples", { examples: examplesList });
+      navigation.navigate("ChallengeExamples", {examples: examplesList});
     } else {
       showMessage("We are working on adding examples to this challenge.", "info");
     }
   };
+
+  const canUploadPicture =
+    experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE && !!challengeObj?.allow_upload_image;
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -217,12 +220,9 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           <Text style={styles.pointCount}>{challengeObj?.points}</Text>
           <Text style={styles.pointCountText}>Points</Text>
         </View>
-        <View style={{ flex: 1, justifyContent: "center", padding: 8 }}>
-          <View style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
-            <Image
-              style={{ width: 24, height: 24 }}
-              source={{ uri: challengeObj?.sponsored?.image }}
-            />
+        <View style={{flex: 1, justifyContent: "center", padding: 8}}>
+          <View style={{flexDirection: "row", alignItems: "center", gap: 12}}>
+            <Image style={{width: 24, height: 24}} source={{uri: challengeObj?.sponsored?.image}} />
             <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
           </View>
           <View
@@ -261,13 +261,13 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               }}
             >
               {myCheckInsText && (
-                <Text style={[styles.challengeSponsorStartDateText, { flex: 1 }]}>
+                <Text style={[styles.challengeSponsorStartDateText, {flex: 1}]}>
                   My Check-Ins:{" "}
                   <Text style={styles.challengeSponsorStartDateTextValue}>{myCheckInsText}</Text>
                 </Text>
               )}
               {coolDownHoursText && (
-                <Text style={[styles.challengeSponsorStartDateText, { flex: 1 }]}>
+                <Text style={[styles.challengeSponsorStartDateText, {flex: 1}]}>
                   Cool Down:{" "}
                   <Text style={styles.challengeSponsorStartDateTextValue}>{coolDownHoursText}</Text>
                 </Text>
@@ -277,9 +277,9 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
         </View>
       </View>
       <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
+        contentContainerStyle={{paddingBottom: 100}}
         showsVerticalScrollIndicator={false}
-        style={{ marginHorizontal: 20, flex: 1 }}
+        style={{marginHorizontal: 20, flex: 1}}
       >
         <RenderHtml
           contentWidth={width}
@@ -300,32 +300,32 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           }}
         />
       </ScrollView>
-      <View style={{ height: 152 }}>
+      <View style={{height: 152}}>
         <TouchableOpacity onPress={openExample}>
           <Text style={styles.bottomText}>Let's see an example</Text>
         </TouchableOpacity>
-        {experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE ? (
-          <View style={{ flexDirection: "row", gap: 16 }}>
-            <View style={{ flex: 1 }}>
+        {canUploadPicture ? (
+          <View style={{flexDirection: "row", gap: 16}}>
+            <View style={{flex: 1}}>
               <AppButton
                 onPress={() => navigateToChallengeCapture(true)}
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 title={
-                  <Text style={{ fontSize: 14, fontWeight: 500, color: theme.lightColors?.white }}>
+                  <Text style={{fontSize: 14, fontWeight: 500, color: theme.lightColors?.white}}>
                     Upload from Gallery
                   </Text>
                 }
                 disabled={isLoading}
               />
             </View>
-            <View style={{ flex: 1 }}>
+            <View style={{flex: 1}}>
               <AppButton
                 onPress={() => navigateToChallengeCapture(false)}
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 title={
-                  <Text style={{ fontSize: 14, fontWeight: 500, color: theme.lightColors?.white }}>
+                  <Text style={{fontSize: 14, fontWeight: 500, color: theme.lightColors?.white}}>
                     Capture from Camera
                   </Text>
                 }
