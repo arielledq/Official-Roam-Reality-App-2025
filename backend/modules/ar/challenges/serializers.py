@@ -189,6 +189,7 @@ class ChallengesSerializer(serializers.ModelSerializer):
             "ar_filters",
             "info",
             "user_attempts",
+            "allow_upload_image",
         )
 
 
@@ -239,6 +240,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "challenge_approval",
             "created_at",
             "points",
+            "geo_location",
         )
 
 
@@ -543,6 +545,7 @@ class ARSitePinCheckInSerializer(serializers.ModelSerializer):
             "points",
             "geo_challenge",
             "challenge_details",
+            "geo_location",
         )
 
 

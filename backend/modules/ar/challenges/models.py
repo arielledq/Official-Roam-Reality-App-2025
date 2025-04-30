@@ -380,6 +380,7 @@ class Challenges(models.Model):
         _("Order"), default=0
     )
     is_active = models.BooleanField(_("Active"), default=True)
+    allow_upload_image = models.BooleanField(_("Allow Upload Image"), default=True)
 
     def save(self, *args, **kwargs):
         return super(Challenges, self).save(*args, **kwargs)

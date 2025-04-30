@@ -27,10 +27,13 @@ const InAppUsers = () => {
     const payload = {
       search: debounceQuery,
     };
+    setLoading(true)
     searchUsers(payload).then(response => {
       if (response) {
         setFilteredUsers(response?.data);
       }
+    }).finally(() => {
+      setLoading(false)
     });
   }, [debounceQuery]);
 
@@ -86,6 +89,8 @@ const InAppUsers = () => {
           }
         />
         <FlatList
+          refreshing={loading}
+          onRefresh={fetchUsers}
           data={filteredUsers}
           keyExtractor={item => item.id.toString()}
           renderItem={({ item }) => renderFriendItem(item, onAddFriendClick, _styles)}
