@@ -14,7 +14,6 @@ import {subscribeToStorageChanges, unsubscribeFromStorageChanges} from "../util/
 import {navigationRef} from "../services/navigationService";
 import BottomTabNavigator from "./BottomTabNavigator";
 import {resetState} from "../redux/Login";
-// import useCheckAppUpdates from "../hooks/useCheckAppUpdates";
 
 //
 // Screens
@@ -62,12 +61,12 @@ import UniqueArChallengeCapture from "../screens/geoarchallenge/uniquechallengec
 import UniqueArChallengeShare from "../screens/geoarchallenge/uniquechallengeshare";
 import Friends from "../screens/friends";
 import AddFriendScreen from "../screens/friends/addFriend";
-import NotificationList from "../screens/notificationList";
 import PublicProfile from "../screens/publicProfile/publicprofile";
 import ArStarChallengeShare from "../screens/geoarchallenge/starshare";
 import Legal from "../screens/legal";
 import ScoreBoard from "../screens/scoreboard";
 import BandHome from "screens/bandHome";
+import Notifications from "screens/notifications";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -200,7 +199,7 @@ const Navigation = () => {
             <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
             <Stack.Screen name="FAQ" component={FAQ} />
-            <Stack.Screen name="Notifications" component={NotificationList} />
+            <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Legal" component={Legal} />
             {sharedRoutes}
           </>

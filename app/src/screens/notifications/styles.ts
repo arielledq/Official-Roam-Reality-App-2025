@@ -1,5 +1,5 @@
-import { makeStyles } from "@rneui/themed";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 
 const useStyles = makeStyles(theme => ({
   mainContainer: {

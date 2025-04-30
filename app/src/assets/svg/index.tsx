@@ -7,15 +7,17 @@ import GoogleIcon from "./GoogleIcon";
 import LockIcon from "./LockIcon";
 import MailIcon from "./MailIcon";
 import MenuIcon from "./MenuIcon";
+import MoreMenuIcon from "./MoreMenuIcon";
 
-export{
-MailIcon,
-LockIcon,
-EyeIcon,
-BackArrowIcon,
-FacebookIcon,
-GoogleIcon,
-AppleIcon,
-CubeIcon,
-MenuIcon,
-}
+export {
+  MailIcon,
+  LockIcon,
+  EyeIcon,
+  BackArrowIcon,
+  FacebookIcon,
+  GoogleIcon,
+  AppleIcon,
+  CubeIcon,
+  MenuIcon,
+  MoreMenuIcon,
+};

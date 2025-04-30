@@ -26,6 +26,7 @@ const DrawerList = [
     navigateTo: "toggleLocation",
   },
   {icon: "user", label: "Friends", navigateTo: "Friends"},
+  {icon: "bells", label: "Notifications", navigateTo: "Notifications"},
   {icon: "Invite", label: "Invite Friends", navigateTo: "InviteFriends"},
   {icon: "Folder", label: "Legal", navigateTo: "Legal"},
   {icon: "infocirlceo", label: "Support & Feedback", navigateTo: "SendFeedback"},
