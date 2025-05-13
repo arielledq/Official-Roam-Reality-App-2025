@@ -560,7 +560,7 @@ export const markAllNotificationAsRead = () =>
   Request.callWithToken(
     {
       url: `${commonApiRoute}notifications/read-all/`,
-      method: "PATCH",
+      method: "POST",
     },
     logoutFunc
   );
