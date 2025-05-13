@@ -1,0 +1,23 @@
+import AppleIcon from "./AppleIcon";
+import BackArrowIcon from "./BackArrowIcon";
+import CubeIcon from "./CubeIcon";
+import EyeIcon from "./EyeIcon";
+import FacebookIcon from "./FacebookIcon";
+import GoogleIcon from "./GoogleIcon";
+import LockIcon from "./LockIcon";
+import MailIcon from "./MailIcon";
+import MenuIcon from "./MenuIcon";
+import MoreMenuIcon from "./MoreMenuIcon";
+
+export {
+  MailIcon,
+  LockIcon,
+  EyeIcon,
+  BackArrowIcon,
+  FacebookIcon,
+  GoogleIcon,
+  AppleIcon,
+  CubeIcon,
+  MenuIcon,
+  MoreMenuIcon,
+};

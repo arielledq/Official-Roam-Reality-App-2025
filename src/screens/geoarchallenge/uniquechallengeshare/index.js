@@ -25,7 +25,7 @@ import Share from "react-native-share";
 import RNFS from "react-native-fs";
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import DownloadImg from "../../../assets/ar/download.svg";
-import { CameraRoll } from "@react-native-camera-roll/camera-roll";
+// import { CameraRoll } from "@react-native-camera-roll/camera-roll";
 
 const UniqueArChallengeShare = ({}) => {
   const getPathFromUrl = url => {
@@ -130,15 +130,15 @@ const UniqueArChallengeShare = ({}) => {
   };
 
   const checkPermission = () => {
-    CameraRoll.saveAsset(correctedCaptureData, {
-      type: fileExt == "mp4" ? "video" : "photo",
-    })
-      .then(() => {
-        showMessage("Saved to Camera Roll.");
-      })
-      .catch(err => {
-        showMessage("Not able to save, please check permission.", "error");
-      });
+    // CameraRoll.saveAsset(correctedCaptureData, {
+    //   type: fileExt == "mp4" ? "video" : "photo",
+    // })
+    //   .then(() => {
+    //     showMessage("Saved to Camera Roll.");
+    //   })
+    //   .catch(err => {
+    //     showMessage("Not able to save, please check permission.", "error");
+    //   });
   };
 
   return (

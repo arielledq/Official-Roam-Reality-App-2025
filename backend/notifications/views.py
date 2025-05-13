@@ -50,11 +50,9 @@ class NotificationsView(viewsets.ModelViewSet):
         notification.save()
         return Response()
 
-    @action(detail=False, methods=["POST"])
+    @action(detail=False, methods=["POST"], url_path="read-all")
     @may_fail(Notification.DoesNotExist, 'Notification not found')
     def read_all(self, request, pk=None):
-        notifications_to_mark_as_read = Notification.objects.filter(targets=request.user)
+        notifications_to_mark_as_read = Notification.objects.filter(targets=request.user, is_read=False)
         notifications_to_mark_as_read.update(is_read=True)
-
         return Response()
-

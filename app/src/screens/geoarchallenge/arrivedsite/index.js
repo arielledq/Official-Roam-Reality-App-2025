@@ -1,0 +1,136 @@
+import React from "react";
+import {ScrollView, Text, TouchableOpacity, View} from "react-native";
+
+import {useSelector} from "react-redux";
+import {useNavigation} from "@react-navigation/native";
+import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
+
+import AppHeader from "../../../components/header";
+import mapCustomStyle from "../../../constants/MapCustomStyles";
+import BackgroundWithImage from "../../../components/background";
+
+import MoveForwardIcon from "../../../assets/geoar/large-step.svg";
+import MarkerIcon from "../../../assets/geoar/marker_img.svg";
+import CircleMarkerIcon from "../../../assets/geoar/circle_marker_img.svg";
+
+import useStyles from "./styles";
+import {pinColor, tracksViewChanges, useCustomMarkers} from "util/helpers";
+
+// Navigation Step 3
+const GeoArSiteArrived = ({route}) => {
+  const starChallengeObj = route.params?.starsChallenge;
+  const isStarChallenge = !!starChallengeObj?.id;
+
+  const experience_type = route.params?.experience_type;
+  const coolDown = route.params?.coolDown;
+  const checkIns = route.params?.checkIns;
+
+  const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
+
+  const _styles = useStyles();
+  const navigation = useNavigation();
+
+  let latitude = 0;
+  let longitude = 0;
+
+  if (isStarChallenge) {
+    latitude = starChallengeObj?.location?.coordinates[1];
+    longitude = starChallengeObj?.location?.coordinates[0];
+  } else if (selectedGeoSite) {
+    latitude = selectedGeoSite?.lat_long?.coordinates[1];
+    longitude = selectedGeoSite?.lat_long?.coordinates[0];
+  }
+
+  const arrivedButtonHandler = () => {
+    if (isStarChallenge) {
+      navigation.navigate("StarChallenge", {
+        starChallenge: starChallengeObj,
+        // INFO: Optionally pass it in the future
+        // experience_type: experience_type,
+      });
+    } else {
+      navigation.navigate("ChallengeSelection", {
+        experience_type: experience_type,
+        coolDown,
+        checkIns,
+      });
+    }
+  };
+
+  return (
+    <BackgroundWithImage style={_styles.mainContainer}>
+      <View style={_styles.headingContainer}>
+        <AppHeader
+          centerComponent={{
+            text: "You have Arrived",
+            style: [_styles.heading],
+          }}
+          backgroundColor="transparent"
+        />
+      </View>
+
+      <MapView
+        customMapStyle={mapCustomStyle}
+        provider={PROVIDER_GOOGLE}
+        style={{
+          width: "100%",
+          height: "100%",
+        }}
+        zoomEnabled={true}
+        scrollEnabled={true}
+        initialRegion={{
+          latitude: latitude,
+          longitude: longitude,
+          latitudeDelta: 0.0032,
+          longitudeDelta: 0.0032,
+        }}
+      >
+        <Marker
+          coordinate={{
+            latitude: latitude,
+            longitude: longitude,
+          }}
+          pinColor={pinColor}
+          tracksViewChanges={tracksViewChanges}
+        >
+          {useCustomMarkers && (
+            <View style={{width: 30, height: 30}}>
+              {isStarChallenge ? <CircleMarkerIcon /> : <MarkerIcon />}
+            </View>
+          )}
+        </Marker>
+      </MapView>
+
+      <View style={_styles.bottomActionsContainer}>
+        <TouchableOpacity
+          onPress={arrivedButtonHandler}
+          style={{
+            backgroundColor: "#131422",
+            borderRadius: 16,
+            padding: 20,
+            paddingBottom: 20,
+            marginVertical: 20,
+            alignItems: "center",
+            flexDirection: "row",
+          }}
+        >
+          <View style={{flex: 1, marginEnd: 12}}>
+            <Text style={_styles.arrivedText}>Arrived</Text>
+            <Text style={_styles.exploringText}>Begin exploring</Text>
+            {!isStarChallenge && (
+              <Text style={_styles.infoText}>
+                Explore with your camera to find Augmented Reality Experiences at this site!
+                Remember to Geo-Check in anywhere you go!
+              </Text>
+            )}
+          </View>
+          <View>
+            <MoveForwardIcon style={{width: 56, height: 56}} />
+          </View>
+        </TouchableOpacity>
+      </View>
+    </BackgroundWithImage>
+  );
+};
+
+export default GeoArSiteArrived;
