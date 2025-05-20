@@ -376,7 +376,7 @@ const ArChallengeShare = () => {
   const mediaContainerHeight = aspectHeight;
 
   let shareButtonTextSize = FontSizes.S16;
-  if (width < 400) {
+  if (width < 420) {
     shareButtonTextSize = FontSizes.S14;
   }
 
