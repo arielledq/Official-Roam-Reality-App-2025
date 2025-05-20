@@ -95,13 +95,13 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
         .then(res => {
           setExamples(res.data);
         })
-        .finally(() => {});
+        .finally(() => { });
     } else {
       getGeoARExamples(challengeObj?.id)
         .then(res => {
           setExamples(res.data);
         })
-        .finally(() => {});
+        .finally(() => { });
     }
   };
 
@@ -181,6 +181,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       showMessage("We are working on adding examples to this challenge.", "info");
     }
   };
+
+  const canUploadPicture = experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE && !!challengeObj?.allow_upload_image
 
   return (
     <BackgroundWithImage style={styles.mainContainer}>
@@ -304,7 +306,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
         <TouchableOpacity onPress={openExample}>
           <Text style={styles.bottomText}>Let's see an example</Text>
         </TouchableOpacity>
-        {experience_type === EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE ? (
+        {canUploadPicture ? (
           <View style={{ flexDirection: "row", gap: 16 }}>
             <View style={{ flex: 1 }}>
               <AppButton

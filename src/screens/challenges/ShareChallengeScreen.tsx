@@ -329,6 +329,10 @@ const ArChallengeShare = () => {
   if (viewWidth >= 300 && viewWidth < 320) {
     offset = baseOffset - (viewWidth / 300) * 24;
   }
+  if (viewWidth < 300) {
+    offset = 125;
+  }
+
   const aspectWidth = viewWidth - offset;
   const aspectHeight = (aspectWidth * 16) / 9; // Calculate height based on 9:16 aspect ratio
 

@@ -7,7 +7,8 @@ import moment from "moment";
 import MapView, { Marker, PROVIDER_GOOGLE } from "react-native-maps";
 import MapViewDirections from "react-native-maps-directions";
 import Tts from "react-native-tts";
-import { activateKeepAwake, deactivateKeepAwake } from "@sayem314/react-native-keep-awake";
+// import { activateKeepAwake, deactivateKeepAwake } from "@sayem314/react-native-keep-awake";
+// TODO: Review @sayem314/react-native-keep-awake so that it works with the new RN version
 import { useNetInfo } from "@react-native-community/netinfo";
 import MapboxGL from "@rnmapbox/maps";
 import OfflineManager from "@rnmapbox/maps/src/modules/offline/offlineManager";
@@ -517,11 +518,11 @@ const GeoArSiteNavigation = ({ route }) => {
     if (isFocused) {
       downloadOfflineRegion();
       getFirstLocation();
-      activateKeepAwake();
+      // activateKeepAwake();
       mapBoxGetRoute();
       getLocationUpdates();
     } else {
-      deactivateKeepAwake();
+      // deactivateKeepAwake();
       stopLocationUpdates();
     }
   }, [isFocused]);

@@ -1,0 +1,99 @@
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+# INFO: react-native-permissions setup
+require_relative '../node_modules/react-native-permissions/scripts/setup'
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+# INFO: react-native-permissions setup
+# ⬇️ uncomment the permissions you need
+setup_permissions([
+  # 'AppTrackingTransparency',
+  # 'Bluetooth',
+  # 'Calendars',
+  # 'CalendarsWriteOnly',
+  'Camera',
+  'Contacts',
+  # 'FaceID',
+  'LocationAccuracy',
+  'LocationAlways',
+  'LocationWhenInUse',
+  # 'MediaLibrary',
+  'Microphone',
+  # 'Motion',
+  'Notifications',
+  'PhotoLibrary',
+  'PhotoLibraryAddOnly',
+  # 'Reminders',
+  # 'Siri',
+  # 'SpeechRecognition',
+  # 'StoreKit',
+])
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+target 'travel_ar_app_42706' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+  # INFO: react-native-fbsdk-next setup
+  pod 'react-native-fbsdk-next', :path => '../node_modules/react-native-fbsdk-next'
+
+  # INFO: react-native-maps setup
+  rn_maps_path = '../node_modules/react-native-maps'
+  pod 'react-native-maps', :path => rn_maps_path
+  pod 'react-native-google-maps', :path => rn_maps_path
+  pod 'react-native-maps-generated', :path => rn_maps_path
+
+  # pod 'GoogleMaps'
+
+  post_install do |installer|
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+
+    # INFO: react-native-maps setup
+    # Replace @import GoogleMaps; with #import <GoogleMaps/GoogleMaps.h> in specific files
+    specific_files = [
+      "#{Pod::Config.instance.installation_root}/Pods/Google-Maps-iOS-Utils/Sources/GoogleMapsUtilsObjC/include/GMSMarker+GMUClusteritem.h",
+      "#{Pod::Config.instance.installation_root}/Pods/Google-Maps-iOS-Utils/Sources/GoogleMapsUtilsObjC/include/GMUGeoJSONParser.h",
+      "#{Pod::Config.instance.installation_root}/Pods/Google-Maps-iOS-Utils/Sources/GoogleMapsUtilsObjC/include/GMUPolygon.h",
+      "#{Pod::Config.instance.installation_root}/Pods/Google-Maps-iOS-Utils/Sources/GoogleMapsUtilsObjC/include/GMUWeightedLatLng.h",
+      "#{Pod::Config.instance.installation_root}/Pods/GoogleMaps/Maps/Sources/GMSEmpty.h"
+    ]
+    specific_files.each do |file|
+      if File.exist?(file)
+        text = File.read(file)
+        if text.include?("@import GoogleMaps;")
+          new_text = text.gsub("@import GoogleMaps;", "#import <GoogleMaps/GoogleMaps.h>")
+          File.open(file, "w") { |f| f.write(new_text) }
+          puts "🔧 Patched @import in: #{file}"
+        else
+          puts "ℹ️ No @import GoogleMaps; found in: #{file}"
+        end
+      else
+        puts "⚠️ File not found: #{file}"
+      end
+    end
+
+  end
+end
