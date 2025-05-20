@@ -33,6 +33,7 @@ class SetDeviceViewset(PostViewsetMixin, viewsets.GenericViewSet):
 
 class NotificationsView(viewsets.ModelViewSet):
     serializer_class = NotificationSerializer
+    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     queryset = Notification.objects.all()
     pagination_class = None

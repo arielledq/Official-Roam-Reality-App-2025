@@ -8,7 +8,6 @@ from home.api.v1.viewsets import (
     FindFriendsAPIView,
     FriendshipViewSet,
     InviteFriendAPIview,
-    NotificationViewset,
     SendEmailOtpViewset,
     SignupViewSet,
     LoginViewSet, ScoreViewSet,
@@ -22,8 +21,6 @@ router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_e
 router.register("account-setup", AccountSetupViewset, basename="account-setup")
 router.register("scoreboard", ScoreViewSet, basename="scoreboard")
 router.register("friends", FriendshipViewSet, basename="friends")
-router.register("notifications", NotificationViewset, basename="friends")
-
 
 urlpatterns = [
     path("", include(router.urls)),
