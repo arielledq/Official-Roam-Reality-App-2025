@@ -22,7 +22,7 @@ const StatContainer = ({
       case "Points":
         return Images.PointsIcon;
       case "Sites Visited":
-        return Images.RankIcon;
+        return Images.SitesIcon;
       default:
         break;
     }
