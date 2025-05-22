@@ -5,7 +5,7 @@ import { useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 // import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
-import Sound from "react-native-sound";
+// import Sound from "react-native-sound";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
@@ -296,24 +296,24 @@ const PinChallenge = () => {
     setDistanceInFeet(convertMetersToFeets(distance));
   };
 
-  const playCameraSound = () => {
-    Sound.setCategory("Playback");
-    let cameraSound = new Sound(
-      Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
-      Sound.MAIN_BUNDLE,
-      error => {
-        if (error) {
-          console.error("failed to load the sound", error);
-        } else {
-          cameraSound.play();
-        }
-      }
-    );
-  };
+  // const playCameraSound = () => {
+  //   Sound.setCategory("Playback");
+  //   let cameraSound = new Sound(
+  //     Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
+  //     Sound.MAIN_BUNDLE,
+  //     error => {
+  //       if (error) {
+  //         console.error("failed to load the sound", error);
+  //       } else {
+  //         cameraSound.play();
+  //       }
+  //     }
+  //   );
+  // };
 
   const _takeScreenshot = async () => {
-    if (isMeInsideInSite) {
-      playCameraSound();
+    // if (isMeInsideInSite) {
+    //   playCameraSound();
 
       if (unityRef.current) {
         unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
@@ -358,9 +358,9 @@ const PinChallenge = () => {
             });
         }, 2000); // Asegúrate de que el archivo esté listo
       }
-    } else {
-      showMessage("Pin Not Found.", "error");
-    }
+    // } else {
+    //   showMessage("Pin Not Found.", "error");
+    // }
   };
 
   const onDonePress = async () => {

@@ -10,7 +10,7 @@ import Tts from "react-native-tts";
 // import { activateKeepAwake, deactivateKeepAwake } from "@sayem314/react-native-keep-awake";
 // TODO: Review @sayem314/react-native-keep-awake so that it works with the new RN version
 import { useNetInfo } from "@react-native-community/netinfo";
-import MapboxGL from "@rnmapbox/maps";
+// import MapboxGL from "@rnmapbox/maps";
 import OfflineManager from "@rnmapbox/maps/src/modules/offline/offlineManager";
 import Geolocation from "react-native-geolocation-service";
 

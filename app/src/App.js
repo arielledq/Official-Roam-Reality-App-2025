@@ -7,7 +7,7 @@ import {GestureHandlerRootView} from "react-native-gesture-handler";
 import Geocoder from "react-native-geocoding";
 import Toast, {ErrorToast, SuccessToast} from "react-native-toast-message";
 import OneSignal from "react-native-onesignal";
-import MapboxGL from "@rnmapbox/maps";
+// import MapboxGL from "@rnmapbox/maps";
 import "react-native-get-random-values";
 import {PersistGate} from "redux-persist/integration/react";
 import {Provider as PaperProvider} from "react-native-paper";
@@ -22,7 +22,7 @@ if (__DEV__) {
   require("../ReactotronConfig"); // Import before any other code
 }
 
-MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY);
+// MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY);
 
 Geocoder.init(Config.GEOCODER_API_KEY);
 
