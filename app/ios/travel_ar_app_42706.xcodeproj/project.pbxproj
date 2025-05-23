@@ -172,6 +172,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				DCFA04DD2DDFB467008D786B /* ShellScript */,
 				DC0CBAF22DB81AC70028089D /* Embed Frameworks */,
 				DC0CBB0A2DB81CA30028089D /* ShellScript */,
 			);
@@ -308,6 +309,23 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/\"\nif [[ -d \"Frameworks\" ]]; then\n    rm -fr Frameworks\nfi\n";
 		};
+		DCFA04DD2DDFB467008D786B /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "HERMES_DSYM_PATH=\"$PODS_ROOT/hermes-engine/dSYM/hermes.framework.dSYM\"\nif [ -d \"$HERMES_DSYM_PATH\" ]; then\n  cp -rf \"$HERMES_DSYM_PATH\" \"${DWARF_DSYM_FOLDER_PATH}/${DWARF_DSYM_FILE_NAME}/Resources/\"\nfi\n";
+		};
 		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -357,9 +375,6 @@
 					"\"${PODS_ROOT}/FBSDKGamingServicesKit/XCFrameworks\"",
 					"\"${PODS_ROOT}/FBSDKLoginKit/XCFrameworks\"",
 					"\"${PODS_ROOT}/FBSDKShareKit/XCFrameworks\"",
-					"\"${PODS_ROOT}/MapboxCommon\"",
-					"\"${PODS_ROOT}/MapboxCoreMaps\"",
-					"\"${PODS_ROOT}/MapboxMobileEvents\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Core\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_InAppMessages\"",
@@ -377,9 +392,6 @@
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKGamingServicesKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCommon\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCoreMaps\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxMobileEvents\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignal\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
@@ -436,9 +448,6 @@
 					"\"${PODS_ROOT}/FBSDKGamingServicesKit/XCFrameworks\"",
 					"\"${PODS_ROOT}/FBSDKLoginKit/XCFrameworks\"",
 					"\"${PODS_ROOT}/FBSDKShareKit/XCFrameworks\"",
-					"\"${PODS_ROOT}/MapboxCommon\"",
-					"\"${PODS_ROOT}/MapboxCoreMaps\"",
-					"\"${PODS_ROOT}/MapboxMobileEvents\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Core\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_Extension\"",
 					"\"${PODS_ROOT}/OneSignalXCFramework/iOS_SDK/OneSignalSDK/OneSignal_InAppMessages\"",
@@ -456,9 +465,6 @@
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKGamingServicesKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKLoginKit\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/FBSDKShareKit\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCommon\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxCoreMaps\"",
-					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/MapboxMobileEvents\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignal\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalCore\"",
 					"\"${PODS_XCFRAMEWORKS_BUILD_DIR}/OneSignalXCFramework/OneSignalExtension\"",
@@ -529,7 +535,6 @@
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
 				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -557,7 +562,6 @@
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
 					"-DFOLLY_NO_CONFIG",
