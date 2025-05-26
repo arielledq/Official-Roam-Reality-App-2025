@@ -1,11 +1,9 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 
 import { useSelector } from "react-redux";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-// import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import Geolocation from "react-native-geolocation-service";
-// import Sound from "react-native-sound";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
@@ -52,7 +50,7 @@ const PinChallenge = () => {
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
 
-  const unityRef = useRef(null); // Unity reference
+  const unityRef = useRef(null);
   const watchIdRef = useRef(null);
   const viewShotRef = useRef();
 
@@ -148,7 +146,7 @@ const PinChallenge = () => {
     }
   };
 
-  const sendModelDataToUnitySpawn = useCallback(() => {
+  const sendModelDataToUnitySpawn = () => {
     if (
       unityRef.current &&
       modelOBJ &&
@@ -183,17 +181,7 @@ const PinChallenge = () => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
     }
-  }, [
-    unityRef,
-    modelOBJ,
-    textureBase,
-    emissionValue,
-    textureEmission,
-    scale,
-    rotation,
-    challengeObjParameters,
-    modelResource,
-  ]); // Add all dependencies
+  };
 
   const checkPermission = () => {
     // if (Platform.OS === "android") {
@@ -315,49 +303,49 @@ const PinChallenge = () => {
     // if (isMeInsideInSite) {
     //   playCameraSound();
 
-      if (unityRef.current) {
-        unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
+    if (unityRef.current) {
+      unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
 
-        // Obtén la ruta base según la plataforma
-        const basePath =
-          Platform.OS === "android"
-            ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
-            : RNFS.DocumentDirectoryPath; // Ruta de Documentos en iOS
+      // Obtén la ruta base según la plataforma
+      const basePath =
+        Platform.OS === "android"
+          ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
+          : RNFS.DocumentDirectoryPath; // Ruta de Documentos en iOS
 
-        setProcessingMedia(true);
+      setProcessingMedia(true);
 
-        // Agregar un retraso para asegurarse de que la captura se ha guardado
-        setTimeout(() => {
-          RNFS.readDir(basePath)
-            .then(files => {
-              console.info("Archivos encontrados en el directorio:", files);
+      // Agregar un retraso para asegurarse de que la captura se ha guardado
+      setTimeout(() => {
+        RNFS.readDir(basePath)
+          .then(files => {
+            console.info("Archivos encontrados en el directorio:", files);
 
-              if (Array.isArray(files) && files.length > 0) {
-                // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
-                const foundFile = files.find(
-                  file =>
-                    file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
-                );
+            if (Array.isArray(files) && files.length > 0) {
+              // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
+              const foundFile = files.find(
+                file =>
+                  file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
+              );
 
-                if (foundFile) {
-                  console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
-                  setCapturedImage(foundFile.path); // Actualiza capturedImage
-                  setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
-                } else {
-                  console.error("No se encontró ningún archivo .png en el directorio.");
-                }
+              if (foundFile) {
+                console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                setCapturedImage(foundFile.path); // Actualiza capturedImage
+                setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
               } else {
-                console.error("El directorio está vacío o 'files' no es un array válido.");
+                console.error("No se encontró ningún archivo .png en el directorio.");
               }
-            })
-            .catch(err => {
-              console.error("Error leyendo el directorio:", err);
-            })
-            .finally(() => {
-              setProcessingMedia(false);
-            });
-        }, 2000); // Asegúrate de que el archivo esté listo
-      }
+            } else {
+              console.error("El directorio está vacío o 'files' no es un array válido.");
+            }
+          })
+          .catch(err => {
+            console.error("Error leyendo el directorio:", err);
+          })
+          .finally(() => {
+            setProcessingMedia(false);
+          });
+      }, 2000); // Asegúrate de que el archivo esté listo
+    }
     // } else {
     //   showMessage("Pin Not Found.", "error");
     // }
@@ -417,65 +405,17 @@ const PinChallenge = () => {
     }
   }, [challengeObjParameters]);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (unityRef.current || isUnityLoaded) {
-        sendBloomValuesToUnity();
-        PointsCount();
-        unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleButton",
-          JSON.stringify({
-            setVisibleButtonPosition: true,
-          })
-        );
-      }
-      if (unityRef.current && isUnityLoaded && isMeInsideInSite) {
-        // Check all dependencies here
-        enableButtonPhoto();
-      }
-    }, [
-      unityRef,
-      isUnityLoaded,
-      isMeInsideInSite,
-      sendBloomValuesToUnity,
-      PointsCount,
-      enableButtonPhoto,
-    ])
-  );
 
-  const sendBloomValuesToUnity = useCallback(() => {
-    const bloomData = { threshold, intensity };
+
+  const sendBloomValuesToUnity = () => {
+    const bloomData = { threshold: 0.5, intensity: 5 };
 
     if (unityRef.current) {
       unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
     }
-  }, [unityRef, threshold, intensity]);
-  useFocusEffect(
-    useCallback(() => {
-      if (
-        unityRef.current &&
-        modelOBJ &&
-        textureBase &&
-        emissionValue &&
-        textureEmission &&
-        isUnityLoaded
-      ) {
-        sendBloomValuesToUnity();
-        sendModelDataToUnitySpawn();
-      }
-    }, [
-      sendBloomValuesToUnity,
-      unityRef,
-      unityRef.current,
-      modelOBJ,
-      textureBase,
-      emissionValue,
-      textureEmission,
-      isUnityLoaded,
-      sendModelDataToUnitySpawn,
-    ])
-  );
+  };
+ console.log("blooo,", threshold, intensity);
+
 
   const eraseFile = async () => {
     try {
@@ -508,7 +448,7 @@ const PinChallenge = () => {
     }
   };
 
-  const enableButtonPhoto = useCallback(async () => {
+  const enableButtonPhoto = async () => {
     if (unityRef.current) {
       const messageData = {
         typeChallenge: "PHOTO",
@@ -528,9 +468,9 @@ const PinChallenge = () => {
 
       unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
     }
-  }, [unityRef, isMeInsideInSite, dataNotificationUnity]);
+  };
 
-  const PointsCount = useCallback(async () => {
+  const PointsCount = async () => {
     if (unityRef.current && challengeObj?.points) {
       const pointData = {
         points: challengeObj.points,
@@ -538,7 +478,7 @@ const PinChallenge = () => {
       };
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
     }
-  }, [unityRef, challengeObj]);
+  };
 
   const keepFileMostRecent = async (ruta, extension = "") => {
     try {
@@ -611,6 +551,34 @@ const PinChallenge = () => {
     screenPadding = { paddingBottom: 24 };
   }
 
+  useFocusEffect(() => {
+    const timer = setTimeout(() => {
+      if (unityRef.current) {
+        PointsCount();
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({
+            setVisibleButtonPosition: true,
+          })
+        );
+        if (
+          modelOBJ &&
+          textureBase &&
+          emissionValue &&
+          textureEmission &&
+          isUnityLoaded
+        ) {
+          sendModelDataToUnitySpawn();
+          sendBloomValuesToUnity();
+        }
+        if (isUnityLoaded && isMeInsideInSite) {
+          enableButtonPhoto();
+        }
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  });
   return (
     <ChallengeScreen
       title={`Location Check In\n${selectedGeoSite.name}`}
