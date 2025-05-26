@@ -408,7 +408,7 @@ const PinChallenge = () => {
 
 
   const sendBloomValuesToUnity = () => {
-    const bloomData = { threshold: 0.5, intensity: 5 };
+    const bloomData = { threshold, intensity };
 
     if (unityRef.current) {
       unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
@@ -576,7 +576,7 @@ const PinChallenge = () => {
           enableButtonPhoto();
         }
       }
-    }, 500);
+    }, 700);
     return () => clearTimeout(timer);
   });
   return (
