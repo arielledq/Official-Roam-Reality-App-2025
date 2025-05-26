@@ -45,6 +45,9 @@ const dummyNotifications = [
     created_at: "2025-04-30T08:15:00Z",
     is_read: false,
     image_url: "https://placehold.co/300x600?text=Third+Rejection",
+    extra_data: {
+      image: "https://placehold.co/300x600?text=Third+Rejection"
+    },
     location_label: "Chaguanas Main Road",
   },
 ];
@@ -76,8 +79,8 @@ const Notifications: React.FC = () => {
       .then(response => {
         if (response && response?.data?.length > 0) {
           // Show only unread notifications
-          const unreadNotifications = response.data.filter(notification => !notification?.is_read);
-          setNotifications(unreadNotifications);
+          // const unreadNotifications = response.data.filter(notification => !notification?.is_read);
+          setNotifications(response?.data);
         }
       })
       .catch(error => console.error(error));
@@ -101,7 +104,8 @@ const Notifications: React.FC = () => {
     markAllNotificationAsRead()
       .then(response => {
         if (response) {
-          setNotifications([]);
+          getUserNotifications()
+          // setNotifications([]);
         }
       })
       .catch(error => console.error(error));
