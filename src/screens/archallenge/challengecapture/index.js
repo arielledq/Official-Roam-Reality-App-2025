@@ -171,10 +171,20 @@ const ArChallengeCapture = ({ route, navigation }) => {
     }
   };
 
+  // useEffect(() => {
+  //   viewNotification(true);
+  //   setTimeout(() => {
+  //     viewNotification(false)
+  //   }, 5000);
+  //  }, []);
+
   useEffect(() => {
     viewNotification(true);
-    setTimeout(() => {
-      viewNotification(false)
+
+    const timerId = setTimeout(() => {
+      if (unityRef.current) {
+        viewNotification(false);
+      }
     }, 5000);
   }, []);
 
