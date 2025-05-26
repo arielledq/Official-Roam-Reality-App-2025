@@ -135,10 +135,10 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   );
 
   const data = [
-    {id: 1, value: arProfile?.check_ins, property: "Sites Visited"},
-    {id: 2, value: starsCount, property: "Stars"},
-    {id: 3, value: arProfile?.challenge_completed, property: "AR Challenges"},
-    {id: 4, value: 0, property: "Friends"},
+    // {id: 1, value: arProfile?.check_ins, property: "Sites Visited"},
+    {id: 1, value: starsCount, property: "Stars"},
+    {id: 2, value: arProfile?.challenge_completed, property: "AR Challenges"},
+    {id: 3, value: 0, property: "Friends"},
     // { id: 5, value: 0, property: "Credits" },
     // { id: 6, value: 0, property: "Tokens" },
     // { id: 7, value: 0, property: "Rallies" },
@@ -220,7 +220,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"" + globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
-          <StatContainer value={"0"} property={"TT Rank"} />
+          <StatContainer value={arProfile?.check_ins} property={"Sites Visited"} />
         </View>
         <ReportUserModal
           isVisible={modalVisible}

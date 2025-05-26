@@ -216,10 +216,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
 
   const data = [
-    {id: 1, value: myCheckIns, property: "Sites Visited"},
-    {id: 2, value: starsCount, property: "Stars"},
-    {id: 3, value: arProfile?.challenge_completed, property: "AR Challenges"},
-    {id: 4, value: profileDetails?.friends?.length, property: "Friends"},
+    {id: 1, value: starsCount, property: "Stars"},
+    {id: 2, value: arProfile?.challenge_completed, property: "AR Challenges"},
+    {id: 3, value: profileDetails?.friends?.length, property: "Friends"},
   ];
   // Split the data into chunks of 3 for each row
   const rows = [];
@@ -323,7 +322,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         <View style={_styles.statContainerStyle}>
           <StatContainer value={"" + globalRank} property={"Global Rank"} />
           <StatContainer value={arProfile?.points} property={"Points"} />
-          <StatContainer value={"0"} property={"TT Rank"} />
+          <StatContainer value={myCheckIns?.toString()} property={"Sites Visited"} />
         </View>
       </View>
     </KeyboardAwareScrollView>
