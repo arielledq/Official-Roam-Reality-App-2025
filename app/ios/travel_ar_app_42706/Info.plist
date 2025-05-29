@@ -77,6 +77,8 @@
 	<string>Room Reality needs access to your camera roll to allow you to save photos and videos and update your profile picture.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Room Reality needs access to your camera roll to allow you to save photos and videos and update your profile picture.</string>
+	<key>OneSignal_app_groups_key</key>
+	<string>group.com.roam.reality.onesignal</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AntDesign.ttf</string>

@@ -6,7 +6,7 @@ import "react-native-devsettings/withAsyncStorage";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import Geocoder from "react-native-geocoding";
 import Toast, {ErrorToast, SuccessToast} from "react-native-toast-message";
-import OneSignal from "react-native-onesignal";
+import {OneSignal} from "react-native-onesignal";
 import "react-native-get-random-values";
 import {PersistGate} from "redux-persist/integration/react";
 import {Provider as PaperProvider} from "react-native-paper";
@@ -23,13 +23,12 @@ if (__DEV__) {
 
 Geocoder.init(Config.GEOCODER_API_KEY);
 
+// INFO: react-native-onesignal setup
 OneSignal.setAppId(Config.ONE_SIGNAL_APP_ID);
-
-OneSignal.promptForPushNotificationsWithUserResponse();
-
-OneSignal.setNotificationWillShowInForegroundHandler(notificationReceivedEvent => {
-  const notification = notificationReceivedEvent.getNotification();
-  notificationReceivedEvent.complete(notification);
+OneSignal.Notifications.requestPermission(true);
+OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
+  const notification = event.getNotification();
+  event.complete(notification);
 });
 
 const toastConfig = {
