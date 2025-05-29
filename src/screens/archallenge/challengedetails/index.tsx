@@ -105,10 +105,11 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
     }
   };
 
-  const navigateToChallengeCapture = (openGallery = false) => {
+  const navigateToChallengeCapture = ({ openGallery = true , unityLoad = false}) => {
     if (!isChallengeDone) {
       const cameraOptions = {
         openGallery: openGallery,
+        unityLoad: unityLoad
       };
       switch (experience_type) {
         case EXPERIENCE_TYPE_CHOICES.AR_CHALLENGE:
@@ -310,7 +311,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           <View style={{ flexDirection: "row", gap: 16 }}>
             <View style={{ flex: 1 }}>
               <AppButton
-                onPress={() => navigateToChallengeCapture(true)}
+                onPress={() => navigateToChallengeCapture({ openGallery: true, unityLoad: false })}
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 title={
@@ -323,7 +324,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
             </View>
             <View style={{ flex: 1 }}>
               <AppButton
-                onPress={() => navigateToChallengeCapture(false)}
+                onPress={() => navigateToChallengeCapture({ openGallery: false, unityLoad: true })}
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 title={
@@ -337,7 +338,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           </View>
         ) : (
           <AppButton
-            onPress={() => navigateToChallengeCapture(false)}
+            onPress={() => navigateToChallengeCapture({ openGallery: false, unityLoad: true })}
             buttonStyle={styles.buttonStyle}
             containerStyle={styles.buttonContainerStyle}
             title={"Start Challenge"}
