@@ -24,7 +24,7 @@ if (__DEV__) {
 Geocoder.init(Config.GEOCODER_API_KEY);
 
 // INFO: react-native-onesignal setup
-OneSignal.setAppId(Config.ONE_SIGNAL_APP_ID);
+OneSignal.initialize(Config.ONE_SIGNAL_APP_ID);
 OneSignal.Notifications.requestPermission(true);
 OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
   const notification = event.getNotification();
