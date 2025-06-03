@@ -10,26 +10,14 @@ import ViewInfoModal from "components/ViewInfoModal";
 import {launchImageLibrary} from "react-native-image-picker";
 
 import {CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE} from "../../../constants";
-import {CAMERA_NOTIFICATION} from "constants";
+import {CAMERA_NOTIFICATION} from "../../../constants";
 import {copyFileForDisplay, handleUnzipProcess} from "util/helpers";
 
 const RNFS = require("react-native-fs");
-const Sound = require("react-native-sound");
+// const Sound = require("react-native-sound");
 
 const ArChallengeCapture = ({route, navigation}) => {
   const [unityViewDimensions, setUnityViewDimensions] = useState({width: 0, height: 0});
-  const [modelOBJ, setModelOBJ] = useState(null);
-  const [modelResource, setModelResource] = useState(null);
-  const [textureBase, setTextureBase] = useState(null);
-  const [textureEmission, setTextureEmission] = useState(null);
-  const [foldefile, setFoldefile] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [sourcesFiles, setSourcesFiles] = useState([]);
-  const [scale, setScale] = useState({x: 1, y: 1, z: 1});
-  const [position, setPosition] = useState({x: 0, y: 0, z: 0});
-  const [threshold, setThreshold] = useState(0);
-  const [intensity, setIntensity] = useState(1);
-  const [emissionValue, setEmissionValue] = useState(1);
   const [recordingStart, setRecordingStart] = useState(false);
   const [timer, setTimer] = useState("00:00");
   const [challengeInformationView, setChallengeInformationView] = useState(false);
@@ -51,6 +39,8 @@ const ArChallengeCapture = ({route, navigation}) => {
   const challengeType = challengeObj?.challenge_requirement;
   const viewInfoModalContent = challengeObj?.info;
 
+  const initialLoadTime = useRef(0);
+
   // FILTERS PENDING
   //  const ar_filters = challengeObj?.ar_filters;
   //  const imageUrls = ar_filters.map(filter => filter.image);
@@ -63,96 +53,84 @@ const ArChallengeCapture = ({route, navigation}) => {
     // console.log(`UnityView dimensiones: ${width} x ${height}`);
   };
 
-  // Descargar modelo y gestionar archivos
-  const downloadModelFile = (sourcePath, targetPath) => {
-    RNFetchBlob.config({
-      fileCache: true,
-      path: sourcePath,
-    })
-      .fetch("GET", modelFile)
-      .then(res => {
-        unzipModelFile(res.path(), targetPath);
-      })
-      .catch(console.error);
-  };
+  // const downloadModelFile = (sourcePath, targetPath) => {
+  //   RNFetchBlob.config({
+  //     fileCache: true,
+  //     path: sourcePath,
+  //   })
+  //     .fetch("GET", modelFile)
+  //     .then(res => {
+  //       unzipModelFile(res.path(), targetPath);
+  //     })
+  //     .catch(console.error);
+  // };
+  //
+  // const unzipModelFile = (sourcePath, targetPath) => {
+  //   const charset = "UTF-8";
+  //
+  //   unzip(sourcePath, targetPath, charset)
+  //       .then(path => {
+  //         RNFS.readDir(path).then(result => {
+  //           const sourcesArray = [];
+  //           let objFile = null;
+  //           let mtlFile = null;
+  //           let baseTexture = null;
+  //           let emissionTexture = null;
+  //
+  //           result.forEach(file => {
+  //             const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
+  //             if (file.name.includes(".obj")) {
+  //               objFile = filePath;
+  //             } else if (file.name.includes(".mtl")) {
+  //               mtlFile = filePath;
+  //             } else if (file.name.toLowerCase().includes("diffuse")) {
+  //               baseTexture = filePath;
+  //             } else if (file.name.toLowerCase().includes("emission")) {
+  //               emissionTexture = filePath;
+  //             } else {
+  //               sourcesArray.push({ uri: filePath });
+  //             }
+  //           });
+  //
+  //           setModelOBJ(objFile);
+  //           setModelResource(mtlFile);
+  //           setTextureBase(baseTexture);
+  //           setTextureEmission(emissionTexture);
+  //           setSourcesFiles(sourcesArray);
+  //           setFoldefile(result);
+  //           setLoading(false);
+  //         });
+  //       })
+  //       .catch(err => {
+  //         console.error("Error descomprimiendo el archivo:", err);
+  //       });
+  // };
 
-  const unzipModelFile = async (sourcePath, targetPath) => {
-    setLoading(true);
+  // useEffect(() => {
+  //   if (challengeObj && modelFile) {
+  //     checkIfModelExist();
+  //   }
+  // }, [challengeObj]);
+  //
+  // const checkIfModelExist = () => {
+  //   if (challengeObj && modelFile) {
+  //     const filename = modelFile.split("/").pop().split("?")[0];
+  //     const withoutExtFilename = filename.split(".")[0];
+  //     const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+  //     const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+  //
+  //     RNFS.exists(sourcePath)
+  //       .then(exists => {
+  //         if (exists) {
+  //           unzipModelFile(sourcePath, targetPath);
+  //         } else {
+  //           downloadModelFile(sourcePath, targetPath);
+  //         }
+  //       })
+  //       .catch(console.error);
+  //   }
+  // };
 
-    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
-
-    if (extractedData.success) {
-      setModelOBJ(extractedData.objFile);
-      setModelResource(extractedData.mtlFile);
-      setTextureBase(extractedData.baseTexture);
-      setTextureEmission(extractedData.emissionTexture);
-      setSourcesFiles(extractedData.sourcesFiles);
-      setFoldefile(extractedData.foldefile);
-      console.log("Model file unzipped and state updated successfully.");
-    } else {
-      console.error("Failed to unzip model file:", extractedData.error);
-
-      setModelOBJ(null);
-      setModelResource(null);
-      setTextureBase(null);
-      setTextureEmission(null);
-      setSourcesFiles([]);
-      setFoldefile([]);
-    }
-
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (challengeObj && modelFile) {
-      checkIfModelExist();
-    }
-  }, [challengeObj]);
-
-  const checkIfModelExist = () => {
-    if (challengeObj && modelFile) {
-      const filename = modelFile.split("/").pop().split("?")[0];
-      const withoutExtFilename = filename.split(".")[0];
-      const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-      const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-
-      RNFS.exists(sourcePath)
-        .then(exists => {
-          if (exists) {
-            unzipModelFile(sourcePath, targetPath);
-          } else {
-            downloadModelFile(sourcePath, targetPath);
-          }
-        })
-        .catch(console.error);
-    }
-  };
-
-  useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(challengeObjParameters?.bloom_threshold || 0.9);
-      setIntensity(challengeObjParameters?.bloom_intensity || 5);
-      setPosition({
-        x: parseFloat(challengeObjParameters?.positionX) || 0,
-        y: parseFloat(challengeObjParameters?.positionY) || 0,
-        z: parseFloat(challengeObjParameters?.positionZ) || 0,
-      });
-      setScale({
-        x: parseFloat(challengeObjParameters?.scale_object) || 1,
-        y: parseFloat(challengeObjParameters?.scale_object) || 1,
-        z: parseFloat(challengeObjParameters?.scale_object) || 1,
-      });
-      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
-    }
-  }, [challengeObjParameters]);
-
-  const sendBloomValuesToUnity = useCallback(() => {
-    const bloomData = {threshold: 1, intensity: 1};
-
-    if (unityRef.current) {
-      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
-    }
-  }, [unityRef, threshold, intensity]);
 
   const viewNotification = isNotification => {
     if (unityRef.current) {
@@ -165,79 +143,62 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
   };
 
+  // useEffect(() => {
+  //   viewNotification(true);
+  //   setTimeout(() => {
+  //     viewNotification(false)
+  //   }, 5000);
+  //  }, []);
+
   useEffect(() => {
     viewNotification(true);
-    setTimeout(() => {
-      viewNotification(false);
+
+    const timerId = setTimeout(() => {
+      if (unityRef.current) {
+        viewNotification(false);
+      }
     }, 5000);
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!unityRef.current) return;
-
-      sendBloomValuesToUnity();
-      isLoadingUnity();
-      PointsCount();
-      unityRef.current.postMessage(
-        "Scriptposition",
-        "SetVisibleButton",
-        JSON.stringify({
-          setVisibleButtonPosition: false,
-        })
-      );
-
-      if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: challengeType,
-            arChallenge: true,
-            isLocation: false,
-          })
-        );
-      }
-    }, [unityRef.current, isLoadingUnity, PointsCount, isUnityLoaded])
-  );
-
-  const PointsCount = useCallback(async () => {
+  const pointsCount = async () => {
     if (unityRef.current) {
-      console.log("useCall==== POINTSCOUNT");
-      // Enviar mensaje a Unity para iniciar la grabación
       const pointData = {
         points: challengeObj?.points,
         isPointView: true,
       };
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
     }
-  }, [unityRef.current]);
+  };
 
-  const isLoadingUnity = useCallback(() => {
+  const isLoadingUnity = () => {
     if (!unityRef.current) return;
-    console.log("useCall==== ISLOADING");
-    unityRef.current.postMessage(
-      "OBJImport",
-      "SetLoadingVisibility",
-      JSON.stringify({isVisible: false})
-    );
-  }, [unityRef.current]);
-  // useEffect(() => {
-  //   if (unityRef.current && challengeHasFilters) {
-  //     loadingFalse();
-  //   }
-  // }, [isUnityLoaded]);
-
-  // Ejemplos de uso:
-  //   EnviarComandoAUnity('pause');  // Para pausar el juego
-  //   EnviarComandoAUnity('resume'); // Para reanudar el juego
-  //   EnviarComandoAUnity('restart'); // Para reiniciar la escena
-  //   EnviarComandoAUnity('close');  // Para cerrar Unity
+    const currentTime = Date.now();
+    if (initialLoadTime.current === 0) {
+      initialLoadTime.current = currentTime;
+      setTimeout(() => {
+        if (unityRef.current) {
+          unityRef.current.postMessage(
+              "OBJImport",
+              "SetLoadingVisibility",
+              JSON.stringify({ isVisible: false })
+          );
+        }
+      }, 2000);
+    } else {
+      if (unityRef.current) {
+        unityRef.current.postMessage(
+            "OBJImport",
+            "SetLoadingVisibility",
+            JSON.stringify({ isVisible: false })
+        );
+      }
+    }
+  };
 
   const playCameraSound = () => {
     try {
       Sound.setCategory("Playback");
-      let cameraSound = new Sound("camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
+      const cameraSound = new Sound("camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
         if (!error) cameraSound.play();
       });
     } catch (error) {
@@ -248,7 +209,7 @@ const ArChallengeCapture = ({route, navigation}) => {
   const playRecordSound = () => {
     try {
       Sound.setCategory("Playback");
-      let recordSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
+      const recordSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
         if (!error) recordSound.play();
       });
     } catch (error) {
@@ -256,15 +217,15 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
   };
 
+
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
     let updatedData = capturedImage ? capturedImage : capturedVideo;
 
     if (hasFilters) {
       try {
-        // Capturar la vista dentro de ViewShot
         const capturedUri = await viewShotRef.current.capture();
-        updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
+        updatedData = capturedUri;
       } catch (error) {
         console.error("Error capturando la imagen con filtros:", error);
       }
@@ -369,7 +330,6 @@ const ArChallengeCapture = ({route, navigation}) => {
     />
   );
 
-  //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
     const buttonInfo = data.enableButton;
@@ -382,11 +342,9 @@ const ArChallengeCapture = ({route, navigation}) => {
     if (data.photoVideoButton?.isPhoto) {
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
-      playCameraSound();
       eraseFile();
     }
     if (data.photoVideoButton?.isPhoto == false) {
-      playRecordSound();
       setCapturedVideo(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
     }
@@ -404,13 +362,10 @@ const ArChallengeCapture = ({route, navigation}) => {
       switch (challengeType) {
         case CAPTURE_CHALLENGE_TYPE.VIDEO:
           mediaType = "video";
-
           break;
         case CAPTURE_CHALLENGE_TYPE.PHOTOVIDEO:
           mediaType = "mixed";
-
           break;
-
         default:
           mediaType = "photo";
           break;
@@ -438,54 +393,48 @@ const ArChallengeCapture = ({route, navigation}) => {
     }, 250);
   }
 
-  // Pending //
-
-  // const sendImageUrlsToUnity = () => {
-  //   // Datos que quieres enviar a Unity
-  //   const data = {
-  //     urls: imageUrls,
-  //   };
-
-  //   // Convertir el objeto a JSON
-  //   const jsonData = JSON.stringify(data);
-
-  //   // Enviar el JSON a Unity
-  //   unityRef.current.postMessage(
-  //     "Scroll View", // Nombre del GameObject en Unity
-  //     "SetImageUrls",       // Método en el script de Unity
-  //     jsonData              // Datos en formato JSON
-  //   );
-  // };
-  // const Gradientes = () => {
-  //   // Datos que quieres enviar a Unity
-  //   const data = {
-  //     gradientsColors: gradientColors, // Colores para el gradiente
-  //     topBottom: gradientDirection, // Dirección del gradiente
-  //     startAlpha: 1.0, // Opacidad inicial
-  //     endAlpha: 0.0 // Opacidad final
-  //   };
-
-  //   // Convertir el objeto a JSON
-  //   const jsonData = JSON.stringify(data);
-
-  //   // Enviar el JSON a Unity
-  //   unityRef.current.postMessage(
-  //     "Image", // Nombre del GameObject en Unity
-  //     "SetFilterData",       // Método en el script de Unity
-  //     {urls: imageUrls  }            // Datos en formato JSON
-  //   );
-  // };
-  // useEffect(() => {
-  //   if (challengeObj && modelFile) {
-  //     Gradientes();
-  //     sendImageUrlsToUnity()
-  //   }
-  // }, []);
-
   let screenPadding = {};
   if (!isUnityLoaded) {
     screenPadding = {paddingBottom: 24};
   }
+
+  if (!isUnityLoaded) {
+    screenPadding = { paddingBottom: 24 };
+  }
+
+  useFocusEffect(() => {
+    // Only run these operations if unityRef.current is available
+    if (unityRef.current) {
+      // Use a setTimeout to give Unity a moment to fully initialize
+      const timer = setTimeout(() => {
+        pointsCount();
+        isLoadingUnity();
+
+        unityRef.current.postMessage(
+            "Scriptposition",
+            "SetVisibleButton",
+            JSON.stringify({
+              setVisibleButtonPosition: false,
+            })
+        );
+
+        if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
+          unityRef.current.postMessage(
+              "screen",
+              "SetTypeChallenge",
+              JSON.stringify({
+                typeChallenge: challengeType,
+                arChallenge: true,
+                isLocation: false,
+              })
+          );
+        }
+      }, 500); // 500ms delay
+
+      // Clean up the timer when the component unmounts or loses focus
+      return () => clearTimeout(timer);
+    }
+  });
 
   return (
     <ChallengeScreen

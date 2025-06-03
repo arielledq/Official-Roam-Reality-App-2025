@@ -46,7 +46,7 @@ import GeoArChallenge from "../screens/home";
 import GeoArChallengeDetails from "../screens/geoarchallenge/destinationdetails";
 import GeoArSiteDetails from "../screens/geoarchallenge/sitedetails";
 import GeoArSiteRoutes from "../screens/geoarchallenge/siteroutes";
-// import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
+import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
 import GeoArOutdoor from "../screens/geoarchallenge/outdoorgeoar";
 import ARFilter from "../screens/archallenge/FilterView";
 import Feedback from "../screens/support-send-feedback/Feedback";
