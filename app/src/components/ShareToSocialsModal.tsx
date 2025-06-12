@@ -1,5 +1,5 @@
-import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, Linking, Alert, Platform } from "react-native";
+import React, {useState} from "react";
+import {View, Text, TouchableOpacity, Image, Alert, Platform} from "react-native";
 import RNFS from "react-native-fs";
 
 import Share from "react-native-share";
@@ -7,14 +7,14 @@ import ReactNativeModal from "react-native-modal";
 
 import AppButton from "./button";
 import theme from "assets/theme";
-import { FontFamily, FontSizes } from "util/FontUtils";
-import { socialPointsARUpdateAPI } from "network";
+import {FontFamily, FontSizes} from "util/FontUtils";
+import {socialPointsARUpdateAPI} from "network";
 import Images from "assets/images";
-import { showMessage } from "util/helpers";
+import {showMessage} from "util/helpers";
 import Config from "config";
-import { SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE } from "../constants";
+import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../constants";
 
-import { ShareDialog } from "react-native-fbsdk-next";
+import {ShareDialog} from "react-native-fbsdk-next";
 import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
 
 /**
@@ -44,11 +44,11 @@ const getBase64DataUri = async (fileUri = "", fileExt = "") => {
 
 interface IGPostTypeButtonProps {
   onPress: () => {};
-  imageSource: any | { uri: string };
+  imageSource: any | {uri: string};
   text: string;
 }
 
-const IGPostTypeButton = ({ onPress, imageSource, text }: IGPostTypeButtonProps) => {
+const IGPostTypeButton = ({onPress, imageSource, text}: IGPostTypeButtonProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -64,10 +64,10 @@ const IGPostTypeButton = ({ onPress, imageSource, text }: IGPostTypeButtonProps)
         width: 124,
       }}
     >
-      <View style={{ height: 64, width: 64, justifyContent: "center", alignItems: "center" }}>
+      <View style={{height: 64, width: 64, justifyContent: "center", alignItems: "center"}}>
         <Image source={imageSource} />
       </View>
-      <Text style={{ color: theme.lightColors?.white, fontSize: 12 }}>{text}</Text>
+      <Text style={{color: theme.lightColors?.white, fontSize: 12}}>{text}</Text>
     </TouchableOpacity>
   );
 };
@@ -81,7 +81,7 @@ interface ShareToSocialsModalProps {
   ) => void;
   fileUri?: string | undefined;
   fileExt?: string | undefined;
-  sponsor?: { description: string; tags: string } | undefined;
+  sponsor?: {description: string; tags: string} | undefined;
   isMemory?: boolean;
 }
 
@@ -159,9 +159,9 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           appId: Config.FACEBOOK_APP_ID,
         };
         if (fileExt === "mp4") {
-          shareOptions = { ...shareOptions, backgroundVideo: updatedFileUri };
+          shareOptions = {...shareOptions, backgroundVideo: updatedFileUri};
         } else {
-          shareOptions = { ...shareOptions, backgroundImage: updatedFileUri };
+          shareOptions = {...shareOptions, backgroundImage: updatedFileUri};
         }
         break;
       case SSNN.FACEBOOK:
@@ -197,7 +197,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             return;
           }
 
-          shareOptions = { ...shareOptions, url: dataUri };
+          shareOptions = {...shareOptions, url: dataUri};
         }
 
         break;
@@ -213,11 +213,11 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         break;
     }
 
-    let hasShared = false;
+    let hasSharedToSSNN = false;
     try {
       if (selectedSSNN === SSNN.OTHERS) {
         await Share.open(shareOptions);
-        hasShared = true;
+        hasSharedToSSNN = true;
       } else {
         if (Platform.OS === "ios" && selectedSSNN === SSNN.FACEBOOK) {
           await ShareDialog.canShow(shareOptions);
@@ -225,11 +225,11 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           if (resultDialog?.isCancelled) {
             throw new Error("Share cancelled");
           }
-          hasShared = true;
+          hasSharedToSSNN = true;
         } else {
           // @ts-ignore
           await Share.shareSingle(shareOptions);
-          hasShared = true;
+          hasSharedToSSNN = true;
         }
       }
     } catch (error: any) {
@@ -237,7 +237,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     } finally {
       setShowChooseIGPostType(false);
     }
-    if (!isMemory && hasShared) {
+
+    if (!isMemory && hasSharedToSSNN) {
       try {
         const grantSocialPointsHandler = async (selectedSSNN: string) => {
           await socialPointsARUpdateAPI({
@@ -261,31 +262,29 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
   const ChooseSocialNetwork = (
     <>
-      <Text
-        style={{ fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white }}
-      >
+      <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}>
         Share To Socials
       </Text>
 
-      <Text style={{ fontSize: FontSizes.S12, color: theme.lightColors?.grey0 }}>
+      <Text style={{fontSize: FontSizes.S12, color: theme.lightColors?.grey0}}>
         {SHARE_CONDITIONS_TEXT}
       </Text>
 
-      <View style={{ flexDirection: "row", justifyContent: "center", gap: 32 }}>
+      <View style={{flexDirection: "row", justifyContent: "center", gap: 32}}>
         <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
-          <Image source={Images.Instagram} style={{ height: 40, width: 40 }} />
+          <Image source={Images.Instagram} style={{height: 40, width: 40}} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
-          <Image source={Images.Facebook} style={{ height: 40, width: 40 }} />
+          <Image source={Images.Facebook} style={{height: 40, width: 40}} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
-          <Image source={Images.TikTokShare} style={{ height: 40, width: 68 }} />
+          <Image source={Images.TikTokShare} style={{height: 40, width: 68}} />
         </TouchableOpacity>
       </View>
 
       <AppButton
         onPress={onClose}
-        buttonStyle={{ height: 45, width: 95 }}
+        buttonStyle={{height: 45, width: 95}}
         containerStyle={{}}
         title={"Done"}
       />
@@ -294,10 +293,10 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
   const ChooseInstagramPostType = (
     <>
-      <View style={{ alignItems: "center", gap: 16 }}>
-        <Text style={{ color: theme.lightColors?.white }}>Choose how to share on Instagram</Text>
+      <View style={{alignItems: "center", gap: 16}}>
+        <Text style={{color: theme.lightColors?.white}}>Choose how to share on Instagram</Text>
 
-        <View style={{ flexDirection: "row", gap: 16 }}>
+        <View style={{flexDirection: "row", gap: 16}}>
           <IGPostTypeButton
             onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM_STORIES)}
             text="Share to Stories"
@@ -315,7 +314,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   );
 
   return (
-    <View style={{ flex: 1, position: "absolute" }}>
+    <View style={{flex: 1, position: "absolute"}}>
       <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
         <View
           style={{

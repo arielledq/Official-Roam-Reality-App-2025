@@ -312,7 +312,14 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 title={
-                  <Text style={{fontSize: 14, fontWeight: 500, color: theme.lightColors?.white}}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: theme.lightColors?.white,
+                      textAlign: "center",
+                    }}
+                  >
                     Upload from Gallery
                   </Text>
                 }
@@ -325,7 +332,14 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 title={
-                  <Text style={{fontSize: 14, fontWeight: 500, color: theme.lightColors?.white}}>
+                  <Text
+                    style={{
+                      fontSize: 14,
+                      fontWeight: 500,
+                      color: theme.lightColors?.white,
+                      textAlign: "center",
+                    }}
+                  >
                     Capture from Camera
                   </Text>
                 }

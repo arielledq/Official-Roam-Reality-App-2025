@@ -51,6 +51,7 @@ const ArChallengeShare = () => {
     instagram: 0,
     others: 0,
   });
+  const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
 
   const [viewWidth, setViewWidth] = useState(0);
   const viewRef = useRef(null);
@@ -215,6 +216,85 @@ const ArChallengeShare = () => {
     }
   };
 
+  const shareToRoamProfile = async (endExperienceHandler?: () => void) => {
+    setIsLoading(true);
+    let filename = capturedDataUri.split("/").pop();
+    let shareFile = {
+      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
+      type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
+      name: filename,
+    };
+
+    const formData = new FormData();
+    let res;
+
+    try {
+      // let successMessage = "Successfully, completed your challenge.";
+      switch (challengeType) {
+        case CHALLENGES_TYPE.PHOTO_VIDEO:
+          formData.append("challenges", challengeObj.id);
+          formData.append("memory_file", shareFile);
+          formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+          res = await postArMemory(formData);
+          break;
+
+        case CHALLENGES_TYPE.PIN_CHECK_IN:
+          formData.append("geo_challenge", challengeObj.id);
+          formData.append("geo_site", challengeObj?.geo_site?.id);
+          formData.append("memory_file", shareFile);
+
+          res = await postGeoPinCheckIn(formData);
+          break;
+        // case CHALLENGES_TYPE.STAR:
+        //   res = await starFoundAndSaveApi({
+        //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+        //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
+        //     geo_ar_star_point: challengeObj?.id, // id de la estrella
+        //     latitude: userLocation?.latitude,
+        //     longitude: userLocation?.longitude,
+        //   });
+
+        //   const remainingStars = challengeObj?.remaining_stars;
+        //   // if (remainingStars > 1) {
+        //   //   successMessage = "Success, continue to the next Star.";
+        //   // }
+
+        //   break;
+
+        default:
+          break;
+      }
+
+      setHasSharedToRoamProfile(true);
+      ARUserProfile();
+
+      if (res.status === 1) {
+        if (endExperienceHandler) {
+          endExperienceHandler();
+        }
+      } else {
+        console.error("Success - Error al compartir el desafío:", res);
+        handleError("There was an error sharing your challenge: " + res?.message);
+      }
+    } catch (error) {
+      console.error("Catch - Error al compartir el desafío:", error);
+      handleError("There was an error sharing your challenge: " + error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (
+      !hasSharedToRoamProfile &&
+      (socialPointsCounter.facebook === 1 ||
+        socialPointsCounter.instagram === 1 ||
+        socialPointsCounter.others === 1)
+    ) {
+      shareToRoamProfile();
+    }
+  }, [socialPointsCounter, hasSharedToRoamProfile]);
+
   const ARUserProfile = () => {
     getARProfile()
       .then(res => {
@@ -271,68 +351,10 @@ const ArChallengeShare = () => {
   };
 
   const endShareProfileButtonHandler = async () => {
-    setIsLoading(true);
-    let filename = capturedDataUri.split("/").pop();
-    let shareFile = {
-      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
-      type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
-      name: filename,
-    };
-
-    const formData = new FormData();
-    let res;
-
-    try {
-      let successMessage = "Successfully, completed your challenge.";
-      switch (challengeType) {
-        case CHALLENGES_TYPE.PHOTO_VIDEO:
-          formData.append("challenges", challengeObj.id);
-          formData.append("memory_file", shareFile);
-          formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
-          res = await postArMemory(formData);
-          break;
-
-        case CHALLENGES_TYPE.PIN_CHECK_IN:
-          formData.append("geo_challenge", challengeObj.id);
-          formData.append("geo_site", challengeObj?.geo_site?.id);
-          formData.append("memory_file", shareFile);
-
-          res = await postGeoPinCheckIn(formData);
-          break;
-        case CHALLENGES_TYPE.STAR:
-          res = await starFoundAndSaveApi({
-            geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-            geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
-            geo_ar_star_point: challengeObj?.id, // id de la estrella
-            latitude: userLocation?.latitude,
-            longitude: userLocation?.longitude,
-          });
-
-          const remainingStars = challengeObj?.remaining_stars;
-          if (remainingStars > 1) {
-            successMessage = "Success, continue to the next Star.";
-          }
-
-          break;
-
-        default:
-          break;
-      }
-
-      ARUserProfile();
-
-      if (res.status === 1) {
-        showMessage(successMessage, "success", `${screenTitle} Share!`);
-        endExperience();
-      } else {
-        console.error("Success - Error al compartir el desafío:", res);
-        handleError("There was an error sharing your challenge: " + res?.message);
-      }
-    } catch (error) {
-      console.error("Catch - Error al compartir el desafío:", error);
-      handleError("There was an error sharing your challenge: " + error);
-    } finally {
-      setIsLoading(false);
+    if (hasSharedToRoamProfile) {
+      endExperience();
+    } else {
+      shareToRoamProfile(() => endExperience());
     }
   };
 
@@ -388,7 +410,7 @@ const ArChallengeShare = () => {
 
   let shareButtonTextSize = FontSizes.S16;
   if (width < 420) {
-    shareButtonTextSize = FontSizes.S14;
+    shareButtonTextSize = FontSizes.S12;
   }
 
   const screenModals = (
@@ -422,7 +444,7 @@ const ArChallengeShare = () => {
 
   return (
     <ChallengeScreen
-      hideBackButton={!isMemory}
+      // hideBackButton={!isMemory}
       title={screenTitle}
       style={{justifyContent: "space-between", flex: 1}}
       modals={screenModals}
