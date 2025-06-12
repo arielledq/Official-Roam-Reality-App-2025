@@ -42,7 +42,7 @@ const MyFriends = () => {
 
   const onChangeText = () => {
     const filtered = friendList?.filter(item =>
-      item?.user?.name?.toLowerCase().includes(debounceQuery.toLowerCase())
+      item?.name?.toLowerCase().includes(debounceQuery.toLowerCase())
     );
     setFilteredUsers(filtered);
   };
