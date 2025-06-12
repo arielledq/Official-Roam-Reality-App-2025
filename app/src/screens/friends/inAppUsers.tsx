@@ -98,7 +98,7 @@ const InAppUsers = () => {
           renderItem={({item}) => renderFriendItem(item, onAddFriendClick, _styles)}
         />
       </View>
-      <FullScreenLoadingSpinner isLoading={loading} />
+      <FullScreenLoadingSpinner isLoading={loading} isTransparent />
     </KeyboardAwareScrollView>
   );
 };

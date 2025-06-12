@@ -1,6 +1,6 @@
 import { ActivityIndicator, View } from 'react-native';
 
-const FullScreenLoadingSpinner = ({ isLoading = false }) => {
+const FullScreenLoadingSpinner = ({ isLoading = false, isTransparent = false }) => {
     if (!isLoading) return null;
     return (
         <View
@@ -13,7 +13,7 @@ const FullScreenLoadingSpinner = ({ isLoading = false }) => {
                 flex: 1,
                 justifyContent: 'center',
                 alignItems: 'center',
-                backgroundColor: '#00000050',
+                backgroundColor: isTransparent ? 'transparent' : '#00000050',
                 zIndex: 1,
             }}>
             <ActivityIndicator size="large" color="#FFFFFF" />
