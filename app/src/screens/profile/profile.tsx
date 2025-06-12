@@ -21,8 +21,8 @@ import {
   getAllMemories,
   getProfieDetails,
   getUserCollectedStarCount,
-  getUserRankCount,
   sendCode,
+  getMyRank,
 } from "../../network";
 import {useDispatch, useSelector} from "react-redux";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
@@ -49,6 +49,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const [starsCount, setStarsCount] = useState(0);
   const [countryCount, setCountryCount] = useState(0);
   const [globalRank, setGlobalRank] = useState(0);
+  const [globalPoints, setGlobalPoints] = useState(0);
   const [myCheckIns, setMyCheckIns] = useState(0);
   const scrollPositionRef = useRef(0); // Ref to hold the scroll position
   const flatListRef = useRef(null);
@@ -128,19 +129,20 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       .finally(() => setloading(false));
   };
 
-  const getRank = async () => {
-    getUserRankCount({
-      user_id: userProfile.id,
-    })
-      .then(res => {
-        if (res.status == 1) {
-          setGlobalRank(res.rank);
+  const getMyRankPoints = (destination = "") => {
+    getMyRank(destination)
+      .then(response => {
+        if (response) {
+          console.log("response", JSON.stringify(response, null, 2));
+          setGlobalRank(response?.my_rank || 0);
+          setGlobalPoints(response?.my_points || 0);
+
+          // setRankMine(response);
         }
       })
-      .catch(err => {
-        console.error("Error", "Error fetching ar memories: ");
-      })
-      .finally(() => setloading(false));
+      .finally(() => {
+        fetchARUserProfile();
+      });
   };
 
   const getCountry = async () => {
@@ -186,7 +188,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getProfieARMemories();
       fetchARUserProfile();
       getUserCollectedStar();
-      getRank();
+      getMyRankPoints();
       getCountry();
     }, [])
   );
@@ -320,8 +322,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"" + globalRank} property={"Global Rank"} />
-          <StatContainer value={arProfile?.points} property={"Points"} />
+          <StatContainer value={globalRank?.toString()} property={"Global Rank"} />
+          <StatContainer value={globalPoints?.toString()} property={"Points"} />
           <StatContainer value={myCheckIns?.toString()} property={"Sites Visited"} />
         </View>
       </View>
