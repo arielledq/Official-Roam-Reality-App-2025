@@ -691,7 +691,7 @@ const GeoArChallengeDetails = ({}) => {
           <TouchableOpacity style={_styles.selectionsContainer} onPress={refreshMapButtonHandler}>
             <View style={{flexDirection: "row", gap: 16, justifyContent: "center"}}>
               <Text style={_styles.selectionTextHeading}>Refresh map</Text>
-              <Icon name="refresh" family="antdesign" color={theme.lightColors.magenta} size={20} />
+              <Icon name="reload1" family="antdesign" color={theme.lightColors.magenta} size={20} />
             </View>
           </TouchableOpacity>
         )}
