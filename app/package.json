@@ -9,8 +9,8 @@
     "start": "react-native start",
     "test": "jest",
     "postinstall": "patch-package",
-    "clean-ios": "rm -rf ./node_modules ./yarn.lock ./ios/Pods ./ios/Podfile.lock ./ios/build ./ios/DerivedData ./ios/travel_ar_app_42706.xcodeproj/xcuserdata ./ios/travel_ar_app_42706.xcworkspace/xcuserdata; cd ios && xcodebuild -workspace travel_ar_app_42706.xcworkspace -scheme travel_ar_app_42706 -configuration Debug clean && cd .. && rm -rf ~/Library/Developer/Xcode/DerivedData;",
-    "reinstall-ios": "yarn clean-ios && yarn install && cd ios && bundle exec pod install && cd .. && yarn start --reset-cache"
+    "clean": "./scripts/clean.sh",
+    "reinstall": "./scripts/reinstall.sh"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.11",
