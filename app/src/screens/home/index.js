@@ -174,7 +174,7 @@ const GeoArChallenge = ({}) => {
 
   const navigateToChallengeDetails = obj => {
     dispatch(updateSelectedDestination(obj));
-    navigation.navigate("GeoArOutdoor", {challengeObj: obj});
+    navigation.navigate("GeoArOutdoor");
   };
 
   const Item = ({obj}) => (

@@ -12,15 +12,10 @@ import {
 import {useDispatch, useSelector} from "react-redux";
 import {useNavigation} from "@react-navigation/native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import {BlurView} from "@react-native-community/blur";
 
 import {resetState} from "../../../redux/Login";
 import {deleteAccount, logout} from "../../../network";
-import {
-  ExperienceTypeChoices,
-  RootStackParamList,
-  ScreenStackComponent,
-} from "../../../constants/types";
+import {ExperienceTypeChoices} from "../../../constants/types";
 
 import {FontLineHeights, FontSizes, fontGroup} from "../../../util/FontUtils";
 import {showMessage} from "../../../util/helpers";
@@ -142,7 +137,7 @@ const GeoArOutdoor = ({route}: any) => {
         navigation.replace("EditProfile");
       }, 300);
     }
-  }, []);
+  }, [account_setup]);
 
   useEffect(() => {
     if (route.params?.openBottomSheet === true) {
@@ -161,17 +156,6 @@ const GeoArOutdoor = ({route}: any) => {
   return (
     <View style={styles.mainContainer}>
       <View style={styles.blurView}>
-        <BlurView
-          blurType="regular"
-          style={{
-            backgroundColor: "transparent",
-            position: "absolute",
-            top: 0,
-            left: 0,
-            bottom: 0,
-            right: 0,
-          }}
-        />
         <AppHeader title={"AR Experiences"} containerStyle={styles.headerContainer} />
       </View>
 
