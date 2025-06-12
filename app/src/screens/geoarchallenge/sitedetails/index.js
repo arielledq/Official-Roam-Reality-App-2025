@@ -56,6 +56,9 @@ const GeoArSiteDetails = ({route}) => {
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
   const selectedGeoARSiteStars = useSelector(state => state.ar?.selectedGeoARSiteStars);
 
+  const userIsAllowedToCheckIn =
+    (selectedGeoSite?.user_attempts || 0) < (selectedGeoSite?.challenge_attempt || 0);
+
   const _styles = useStyles();
   const dispatch = useDispatch();
   const navigation = useNavigation();
@@ -527,6 +530,7 @@ const GeoArSiteDetails = ({route}) => {
               }}
             >
               <AppButton
+                disabled={!userIsAllowedToCheckIn}
                 onPress={navigateButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{fontWeight: "bold"}}
@@ -536,6 +540,7 @@ const GeoArSiteDetails = ({route}) => {
               />
 
               <AppButton
+                disabled={!userIsAllowedToCheckIn}
                 onPress={skipNavigationButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{fontWeight: "bold"}}
