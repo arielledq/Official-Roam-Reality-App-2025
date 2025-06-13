@@ -52,6 +52,8 @@ yarn start
 
 ## Unity Configuration
 
+Unity Version 6000.1.3f1
+
 ### Opening the Project
 
 1. Open the `ARReactNative` folder with Unity
@@ -62,6 +64,21 @@ yarn start
 
 1. In Unity, go to `File > Build Settings`
 2. Follow the integration guide [here](https://medium.com/@selvaannies/integrating-unity-into-react-native-android-using-azesmway-react-native-unity-2905f47aa14d)
+3. If you encounter issues with the build.gradle file in the unityLibrary module, comment out lines 6 to 10 and update the dependencies block to include .aar files in the libs directory, like so:
+
+```
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+    // Comment out the lines below if they exist and are causing issues
+    // implementation(name: 'MvnCorder', ext:'aar')
+    // implementation(name: 'arcore_client', ext:'aar')
+    // implementation(name: 'ARPresto', ext:'aar')
+    // implementation(name: 'unityandroidpermissions', ext:'aar')
+    // implementation(name: 'UnityARCore', ext:'aar')
+
+    implementation project(':unityLibrary:xrmanifest.androidlib')
+}
+```
 
 ### Building for iOS
 
