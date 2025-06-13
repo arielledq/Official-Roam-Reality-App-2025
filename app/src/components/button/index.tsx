@@ -12,6 +12,7 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     titleStyle = {},
     containerStyle = {},
     customColors,
+      radius,
     ...otherProps
   } = props;
 
@@ -21,13 +22,13 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     <LinearGradient
       colors={colors}
       start={{x: 0, y: 1}}
-      end={{x: 1, y: 1}}
+      end={{x: 1, y: 3}}
       style={[
         styles.containerStyle,
+          { minHeight: 50 },
         containerStyle,
         {
           padding: 0,
-          minHeight: 50,
         },
       ]}
     >
@@ -36,7 +37,7 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
           flex: 1,
           justifyContent: "center",
           alignItems: "center",
-          paddingHorizontal: 10,
+          // paddingHorizontal: 10,
         }}
       >
         <Button
@@ -65,7 +66,7 @@ const styles = StyleSheet.create({
     lineHeight: FontLineHeights.LH20,
     color: theme.darkColors?.white,
   },
-  containerStyle: {borderRadius: BORDER_RADIUS},
+  containerStyle: {borderRadius: BORDER_RADIUS,},
 });
 
 export default AppButton;

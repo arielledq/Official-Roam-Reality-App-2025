@@ -7,4 +7,6 @@ export {
   updateSelectedSites,
   updateSelectedGeoARSiteStars,
   updateSelectedDestinationBandLocation,
+  updateDestinationData,
+  updateStarSitesCount,
 } from "./reducer";

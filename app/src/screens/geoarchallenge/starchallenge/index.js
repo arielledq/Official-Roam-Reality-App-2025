@@ -1,9 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {ScrollView, Platform} from "react-native";
 
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
+import {useSelector} from "react-redux";
 // import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
@@ -16,9 +17,13 @@ import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader"
 
 import {CHALLENGES_TYPE} from "constants";
 import useStyles from "./styles";
+import ChallengeScreen from "components/ChallengeScreen";
+import ARModeModal from "components/ARModeModal";
 
-const StarChallenge = ({route}) => {
-  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
+const StarChallenge = () => {
+  const destinationData = useSelector(state => state.ar.destinationData);
+  const selectedDestination = useSelector(state => state.ar);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [starModels, setStarModels] = useState();
@@ -28,15 +33,28 @@ const StarChallenge = ({route}) => {
   const [modelResource, setModelResource] = useState();
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
-
   const _styles = useStyles();
   const navigation = useNavigation();
+  const [openModalARMode, setOpenModalARMode] = useState(false);
 
   const unityRef = useRef(null); // Unity reference
 
-  const starChallengeObj = route.params?.starChallenge;
-  const challengeObjParameters = route.params?.starChallenge?.geo_ar_star?.geo_site?.pin_challenge;
+  const starChallengeObj = selectedDestination.starChallenge;
+  const challengeObjParameters = selectedDestination.geo_ar_star?.geo_site?.pin_challenge;
   const isStarChallenge = !!starChallengeObj?.id;
+
+
+  useFocusEffect(
+      useCallback(() => {
+        console.log("destinationData CCCCCCCCCCC", destinationData);
+        console.log("starSitesCount DDDDDDDDDDDD", selectedDestination);
+
+        // Si necesitas limpiar algo cuando pierde foco, puedes retornar una función:
+        return () => {
+          console.log("Screen blurred (lost focus)");
+        };
+      }, [destinationData, selectedDestination]) // <- se vuelve a ejecutar si cambian
+  );
 
   // Check and request permissions
   const checkPermission = () => {
@@ -326,50 +344,91 @@ const StarChallenge = ({route}) => {
     checkPermission();
     downloadAndPrepareModels();
   }, []);
+  const handleUnityViewLayout = event => {
+    const {width, height} = event.nativeEvent.layout;
+    setUnityViewDimensions({width, height});
+    // console.log(`UnityView dimensiones: ${width} x ${height}`);
+  };
 
+  const closeModalARMode = () => {
+    setOpenModalARMode(false);
+    setIsUnityLoaded(true);
+  };
+
+  const handleUnityMessage = result => {
+
+    const data = JSON.parse(result.nativeEvent.message);
+    console.log("DATA, BBBBBBBBBBBBBB",data);
+    // const buttonInfo = data.enableButton;
+    const buttonBack = data.backPress;
+    const buttonARMode = data?.ARMode
+    //
+    if (buttonBack) {
+      navigation?.goBack();
+    }
+    if (buttonARMode){
+      console.log('entroaqui ',openModalARMode )
+      setOpenModalARMode(true)
+    }
+    //
+    // if (data.photoVideoButton?.isPhoto) {
+    //   setCapturedImage(data.photoVideoButton?.filepath);
+    //   setIsUnityLoaded(false);
+    //   eraseFile();
+    // }
+    // if (data.photoVideoButton?.isPhoto == false) {
+    //   setCapturedVideo(data.photoVideoButton?.filepath);
+    //   setIsUnityLoaded(false);
+    // }
+    // if (data.infoButton?.isButton) {
+    //   setChallengeInformationView(data.infoButton?.isButton);
+    //   setIsUnityLoaded(true);
+    // }
+  };
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        centerComponent={{
-          text: "AR Star Hunt " + starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.name,
-          numberOfLines: 2,
-          style: [_styles.heading],
-        }}
-        backgroundColor="transparent"
-      />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{width: "100%"}}
-        contentContainerStyle={{paddingBottom: 40}}
+      <ChallengeScreen
+          title="AR Star Hunt "
+          // modals={modals}
+          appHeader={false}
+          style={{
+            paddingHorizontal: 0,
+            paddingTop: "11%",
+            height: "100%",
+            backgroundColor: "#000",
+            // ...screenPadding,
+          }}
       >
-        {/* First View (Stars Collected and Points) */}
-        <ChallengeFoundCaptureHeader
-          leftTitle="Stars Collected"
-          leftValue={`${starChallengeObj?.captured_stars} / ${starChallengeObj?.total_stars}`}
-          points={starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points}
-          isStarChallenge
-        />
-
-        {/* Unity AR Camera */}
+    {/*<BackgroundWithImage style={_styles.mainContainer}>*/}
+    {/*  <AppHeader*/}
+    {/*    centerComponent={{*/}
+    {/*      text: "AR Star Hunt " + starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.name,*/}
+    {/*      numberOfLines: 2,*/}
+    {/*      style: [_styles.heading],*/}
+    {/*    }}*/}
+    {/*    backgroundColor="transparent"*/}
+    {/*  />*/}
         <UnityARCamera
-          unityRef={unityRef}
-          isProcessingMedia={processingMedia}
-          isUnityLoaded={isUnityLoaded}
-          capturedImage={capturedImage}
-          capturedVideo={capturedVideo}
+            width={"100%"}
+            height={"100%"}
+            unityRef={unityRef}
+            isProcessingMedia={processingMedia}
+            // onUnityLayout={handleUnityViewLayout}
+            onUnityMessage={handleUnityMessage}
+            isUnityLoaded={isUnityLoaded}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
         />
-
-        {/* Footer Info Box */}
-        <CameraControls
-          onRetake={retakeButtonHandler}
-          onDone={onDonePress}
-          onCameraPress={takeScreenshot}
-          hasCapturedContent={!!capturedImage}
-          customInstructions="Stand next to the Star, resize as needed, snap your photo"
+        <ARModeModal
+            // fileUri={filePath}
+            // fileExt={fileExt}
+            selectedDestination={destinationData}
+            isVisible={openModalARMode}
+            // isMemory={isMemory}
+            // sponsor={sponsor}
+            // onPointsGranted={countSocialPoints}
+            onClose={closeModalARMode}
         />
-      </ScrollView>
-    </BackgroundWithImage>
+    </ChallengeScreen>
   );
 };
 

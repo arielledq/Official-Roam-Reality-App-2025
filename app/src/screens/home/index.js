@@ -25,6 +25,8 @@ import {
   updateARSettings,
   updateSelectedDestination,
   updateAnyWhereChallenges,
+  updateDestinationData,
+  updateStarSitesCount,
 } from "../../redux/AR";
 
 import SiteIcon from "../../assets/geoar/siteicon.svg";
@@ -84,6 +86,7 @@ const GeoArChallenge = ({}) => {
       .then(res => {
         if (res.status == 1) {
           setDestinationData(res.data);
+          dispatch(updateDestinationData(res.data));
           for (let i = 0; i < res.data.length; i++) {
             const d = res.data[i];
             getARStarSites(d.id);
@@ -150,6 +153,7 @@ const GeoArChallenge = ({}) => {
     const res = await getARSitesStars({id});
     starSitesCount[id] = res.data[0];
     setStarSitesCount({...starSitesCount});
+    dispatch(updateStarSitesCount({[id]: res.data[0]}));
   };
 
   const getStarCount = id => {

@@ -11,6 +11,7 @@ import ScoreBoard from "../screens/scoreboard";
 
 import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
+import StarChallenge from "screens/geoarchallenge/starchallenge";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -67,7 +68,7 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="Go Navigate"
           // @ts-ignore
-          component={ARTipsScreen}
+          component={StarChallenge}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (

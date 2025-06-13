@@ -13,6 +13,16 @@ export const CAPTURE_CHALLENGE_TYPE = {
   PHOTO: "PHOTO",
 };
 
+export const MODES = {
+  AR: 'ar',
+  SCAN: 'scan',
+  HUNT: 'hunt',
+  CHECKIN: 'checkin',
+} as const;
+
+export type ModeType = typeof MODES[keyof typeof MODES];
+
+
 export type SSNN_TYPE = "INSTAGRAM" | "FACEBOOK" | "OTHERS";
 
 export const SSNN: {

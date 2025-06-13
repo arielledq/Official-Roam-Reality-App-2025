@@ -12,6 +12,8 @@ import {launchImageLibrary} from "react-native-image-picker";
 import {CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE} from "../../../constants";
 import {CAMERA_NOTIFICATION} from "../../../constants";
 import {copyFileForDisplay, handleUnzipProcess} from "util/helpers";
+import ShareToSocialsModal from "components/ShareToSocialsModal";
+import ARModeModal from "components/ARModeModal";
 
 const RNFS = require("react-native-fs");
 // const Sound = require("react-native-sound");
@@ -26,6 +28,7 @@ const ArChallengeCapture = ({route, navigation}) => {
   const [processingMedia, setProcessingMedia] = useState(false);
   const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [isVideo, setIsvideo] = useState(false);
+  const [openModalARMode, setOpenModalARMode] = useState(false);
 
   const unityRef = useRef(null);
   const viewShotRef = useRef();
@@ -286,6 +289,10 @@ const ArChallengeCapture = ({route, navigation}) => {
     setChallengeInformationView(false);
     setIsUnityLoaded(true);
   };
+  const closeModalARMode = () => {
+    setOpenModalARMode(false);
+    setIsUnityLoaded(true);
+  };
 
   const eraseFile = async () => {
     if (Platform.OS === "android") {
@@ -330,13 +337,27 @@ const ArChallengeCapture = ({route, navigation}) => {
     />
   );
 
+  const modalARMode = (
+      <ViewInfoModal
+      isVisible={openModalARMode}
+      onClose={closeModalARMode}
+      content = {'Modal prueba'}/>
+  )
+
   const handleUnityMessage = result => {
+
     const data = JSON.parse(result.nativeEvent.message);
     const buttonInfo = data.enableButton;
     const buttonBack = data.backPress;
+    const buttonARMode = data?.ARMode
 
     if (buttonBack) {
       navigation?.goBack();
+    }
+    if (buttonARMode){
+      console.log('entroaqui ',openModalARMode )
+
+      setOpenModalARMode(true)
     }
 
     if (data.photoVideoButton?.isPhoto) {
@@ -394,9 +415,6 @@ const ArChallengeCapture = ({route, navigation}) => {
   }
 
   let screenPadding = {};
-  if (!isUnityLoaded) {
-    screenPadding = {paddingBottom: 24};
-  }
 
   if (!isUnityLoaded) {
     screenPadding = { paddingBottom: 24 };
@@ -449,6 +467,7 @@ const ArChallengeCapture = ({route, navigation}) => {
         ...screenPadding,
       }}
     >
+
       <UnityARCamera
         width="100%"
         height="100%"
@@ -461,6 +480,15 @@ const ArChallengeCapture = ({route, navigation}) => {
         imageFilter={{challengeObj: challengeObj, viewShotRef: viewShotRef}}
         capturedVideo={capturedVideo}
         isVideo={isVideo}
+      />
+      <ARModeModal
+          // fileUri={filePath}
+          // fileExt={fileExt}
+          isVisible={openModalARMode}
+          // isMemory={isMemory}
+          // sponsor={sponsor}
+          // onPointsGranted={countSocialPoints}
+          onClose={closeModalARMode}
       />
       {!isUnityLoaded && (
         <CameraControls

@@ -39,6 +39,8 @@ import IconBGHome from "./icon_bg.png";
 import close from "./close.svg";
 import closeModal from "./closeModal.svg";
 import pin from "./pin.svg";
+import walkingIcon from "./walkingIcon.svg";
+import pinrosa from "./pinrosa.svg";
 export const Icons = {
   password,
   lock,
@@ -81,4 +83,6 @@ export const Icons = {
   close,
   closeModal,
   pin,
+  walkingIcon,
+  pinrosa,
 };
