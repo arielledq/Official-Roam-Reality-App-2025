@@ -17,7 +17,7 @@ react {
     // codegenDir = file("../../node_modules/@react-native/codegen")
     //   The cli.js file which is the React Native CLI entrypoint. Default is ../../node_modules/react-native/cli.js
     // cliFile = file("../../node_modules/react-native/cli.js")
- 
+
     /* Variants */
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
@@ -93,8 +93,8 @@ android {
         applicationId "com.roam_reality"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 22
-        versionName "1.0.22"
+        versionCode 45
+        versionName "1.0.45"
         multiDexEnabled true
     }
 
@@ -135,7 +135,7 @@ dependencies {
     implementation project(':react-native-splash-screen')
 
     implementation "com.google.android.gms:play-services-location:21.0.1"
-    
+
     implementation 'com.facebook.android:facebook-android-sdk:latest.release'
 
     implementation 'com.facebook.fresco:fresco:3.1.0'

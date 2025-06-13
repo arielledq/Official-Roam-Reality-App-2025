@@ -1,30 +1,30 @@
 buildscript {
     ext {
-        buildToolsVersion = "35.0.0"
+        buildToolsVersion = '35.0.0'
         minSdkVersion = 24
         compileSdkVersion = 35
         targetSdkVersion = 35
-        ndkVersion = "27.1.12297006"
-        kotlinVersion = "2.0.21"
+        ndkVersion = '27.1.12297006'
+        kotlinVersion = '2.0.21'
 
-        googlePlayServicesAuthVersion = "20.7.0"
-        playServicesLocationVersion = "21.0.1"
+        googlePlayServicesAuthVersion = '20.7.0'
+        playServicesLocationVersion = '21.0.1'
     }
     repositories {
         google()
         mavenCentral()
     }
     dependencies {
-        classpath("com.android.tools.build:gradle")
-        classpath("com.facebook.react:react-native-gradle-plugin")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin")
-        
+        classpath('com.android.tools.build:gradle')
+        classpath('com.facebook.react:react-native-gradle-plugin')
+        classpath('org.jetbrains.kotlin:kotlin-gradle-plugin')
+
         classpath 'com.google.gms:google-services:4.4.0'
-        classpath("io.sentry:sentry-android-gradle-plugin:4.14.1")
+        classpath('io.sentry:sentry-android-gradle-plugin:4.14.1')
     }
 }
 
-apply plugin: "com.facebook.react.rootproject"
+apply plugin: 'com.facebook.react.rootproject'
 
 allprojects {
     repositories {
@@ -42,19 +42,6 @@ allprojects {
 
         google()
         maven { url 'https://www.jitpack.io' }
-        maven { url "https://artifact.bytedance.com/repository/AwemeOpenSDK" }
-        maven {
-            url 'https://api.mapbox.com/downloads/v2/releases/maven'
-            authentication {
-                basic(BasicAuthentication)
-            }
-            credentials {
-                // Do not change the username below.
-                // This should always be `mapbox` (not your username).
-                username = 'mapbox'
-                // Use the secret token you stored in gradle.properties as the password
-                password = "sk.eyJ1Ijoicm9hbXJlYWxpdHkiLCJhIjoiY202OXJtY3h5MHNveDJqbjM5eW1mMW5vMCJ9.8Ivku3yuAlTiUPJqEHUtPw"
-            }
-        }
+        maven { url 'https://artifact.bytedance.com/repository/AwemeOpenSDK' }
     }
 }

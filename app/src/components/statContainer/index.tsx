@@ -1,13 +1,13 @@
-import React from 'react';
-import { Image, TouchableOpacity, View } from 'react-native';
-import useStyles from './styles';
-import AppText from '../text';
-import Images from '../../assets/images';
+import React from "react";
+import {Image, TouchableOpacity, View} from "react-native";
+import useStyles from "./styles";
+import AppText from "../text";
+import Images from "../../assets/images";
 
 const StatContainer = ({
   value,
   property,
-  onPressAction
+  onPressAction,
 }: {
   value: string;
   property: string;
@@ -17,29 +17,28 @@ const StatContainer = ({
 
   const getIcon = () => {
     switch (property) {
-      case 'Global Rank':
+      case "Global Rank":
         return Images.GlobalIcon;
-      case 'Points':
+      case "Points":
         return Images.PointsIcon;
-      case 'TT Rank':
-        return Images.RankIcon;
+      case "Sites Visited":
+        return Images.SitesIcon;
       default:
         break;
     }
   };
 
-
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPressAction}>
       <View style={styles.cardInner}>
-      <Image style={styles.iconStyle} source={getIcon()} />
+        <Image style={styles.iconStyle} source={getIcon()} />
         <View style={styles.cardBottomContent}>
           <AppText style={styles.Text}>{property}</AppText>
           <AppText style={styles.valueStyle}>{value}</AppText>
-        </View>        
+        </View>
       </View>
     </TouchableOpacity>
   );
 };
 
-export default StatContainer ;
+export default StatContainer;

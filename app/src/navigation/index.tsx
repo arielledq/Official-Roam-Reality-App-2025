@@ -46,7 +46,7 @@ import GeoArChallenge from "../screens/home";
 import GeoArChallengeDetails from "../screens/geoarchallenge/destinationdetails";
 import GeoArSiteDetails from "../screens/geoarchallenge/sitedetails";
 import GeoArSiteRoutes from "../screens/geoarchallenge/siteroutes";
-import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
+// import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
 import GeoArOutdoor from "../screens/geoarchallenge/outdoorgeoar";
 import ARFilter from "../screens/archallenge/FilterView";
 import Feedback from "../screens/support-send-feedback/Feedback";
@@ -181,7 +181,7 @@ const Navigation = () => {
             <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
             <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
             <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
-            <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
+            {/* <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} /> */}
             <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
             <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
             <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />

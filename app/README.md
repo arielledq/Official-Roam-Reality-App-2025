@@ -1,97 +1,121 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# AR React Native Project Setup
 
-# Getting Started
+## Prerequisites
 
-> **Note**: Make sure you have completed the [Set Up Your Environment](https://reactnative.dev/docs/set-up-your-environment) guide before proceeding.
+- Node.js and Yarn installed
+- Unity Hub
+- Xcode (for iOS development)
+- Android Studio (for Android development)
 
-## Step 1: Start Metro
+## Getting Started
 
-First, you will need to run **Metro**, the JavaScript build tool for React Native.
+### Initial Setup
 
-To start the Metro dev server, run the following command from the root of your React Native project:
+1. Install dependencies:
 
-```sh
-# Using npm
-npm start
+```bash
+yarn install
+```
 
-# OR using Yarn
+2. Fix dependencies:
+
+```bash
+yarn fix-deps
+```
+
+3. Start the development server:
+
+```bash
 yarn start
 ```
 
-## Step 2: Build and run your app
+### iOS Additional Setup
 
-With Metro running, open a new terminal window/pane from the root of your React Native project, and use one of the following commands to build and run your Android or iOS app:
+#### iOS Add frameworks
 
-### Android
+1.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`.
+2.  Add `New Copy Files Phase`.
+3.  Select `Add Other...` and then the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
+4.  Choose the `Frameworks` option.
+5.  Move the added files into the `Frameworks`.
+6.  Add a `Run script` with the following code:
 
-```sh
-# Using npm
-npm run android
-
-# OR using Yarn
-yarn android
+```
+   cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/"
+   if [[ -d "Frameworks" ]]; then
+      rm -fr Frameworks
+   fi
 ```
 
-### iOS
+7.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`.
+8.  Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields.
 
-For iOS, remember to install CocoaPods dependencies (this only needs to be run on first clone or after updating native deps).
+## Unity Configuration
 
-The first time you create a new project, run the Ruby bundler to install CocoaPods itself:
+### Opening the Project
 
-```sh
-bundle install
+1. Open the `ARReactNative` folder with Unity
+2. Navigate to the `Scenes` folder in the Project tab
+3. Open `ArReactNativeUnity.unity` scene
+
+### Building for Android
+
+1. In Unity, go to `File > Build Settings`
+2. Follow the integration guide [here](https://medium.com/@selvaannies/integrating-unity-into-react-native-android-using-azesmway-react-native-unity-2905f47aa14d)
+
+### Building for iOS
+
+1. In Unity, go to `File > Build Settings`
+2. Follow the integration steps from the [official documentation](https://github.com/azesmway/react-native-unity?tab=readme-ov-file#export-ios-unity-project)
+3. Important: Add required descriptions for:
+   - Microphone usage
+   - Location usage in Player Settings
+
+### iOS Additional Setup
+
+1. In Xcode, configure the Marevo framework:
+   - Navigate to `Unity-iPhone > Frameworks > Marevo`
+   - Set the full path to the appropriate folder
+2. Configure framework embedding:
+   - Navigate to `Unity-iPhone > Targets > UnityFramework > General > Frameworks and Libraries`
+   - Set the following frameworks to 'Embed & Sign':
+     - `MvnCorder.framework`
+     - `NativeScreenRecorder.framework`
+
+## Release Builds
+
+### Android Release
+
+#### Debug APK
+
+```bash
+yarn build-apk
 ```
 
-Then, and every time you update your native dependencies, run:
+#### Production AAB
 
-```sh
-bundle exec pod install
+1. Ensure the keystore file is present at `android/app/rooamar.keystore`
+2. Configure Gradle variables for signing:
+   - Follow the [React Native documentation](https://reactnative.dev/docs/signed-apk-android#setting-up-gradle-variables)
+3. Build the AAB:
+
+```bash
+yarn build-aab
 ```
 
-For more information, please visit [CocoaPods Getting Started guide](https://guides.cocoapods.org/using/getting-started.html).
+### iOS Release
 
-```sh
-# Using npm
-npm run ios
+Follow standard iOS release procedures through Xcode.
 
-# OR using Yarn
-yarn ios
-```
+## Troubleshooting
 
-If everything is set up correctly, you should see your new app running in the Android Emulator, iOS Simulator, or your connected device.
+If you encounter any issues during setup or building, please check the following:
 
-This is one way to run your app — you can also build it directly from Android Studio or Xcode.
+- Ensure all dependencies are correctly installed
+- Verify Unity version compatibility
+- Check that all required frameworks are properly linked
+- Confirm signing certificates are properly configured
 
-## Step 3: Modify your app
+## Contributing
 
-Now that you have successfully run the app, let's make changes!
-
-Open `App.tsx` in your text editor of choice and make some changes. When you save, your app will automatically update and reflect these changes — this is powered by [Fast Refresh](https://reactnative.dev/docs/fast-refresh).
-
-When you want to forcefully reload, for example to reset the state of your app, you can perform a full reload:
-
-- **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Dev Menu**, accessed via <kbd>Ctrl</kbd> + <kbd>M</kbd> (Windows/Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (macOS).
-- **iOS**: Press <kbd>R</kbd> in iOS Simulator.
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [docs](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you're having issues getting the above steps to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Please follow the project's coding standards and submit PRs for any improvements.

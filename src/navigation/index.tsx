@@ -176,7 +176,7 @@ const Navigation = () => {
             <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
             <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
             <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
-            <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />
+            {/*<Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} />*/}
             <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
             <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
             <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />

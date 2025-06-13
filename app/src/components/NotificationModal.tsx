@@ -10,8 +10,8 @@ interface NotificationModalProps {
   onClose: () => void;
   notification: {
     title: string;
-    message: string;
-    image_url: any;
+    description: string;
+    extra_data: any;
   };
 }
 
@@ -35,9 +35,8 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
   onClose,
   notification,
 }) => {
-  console.log(notification);
   if (!isVisible) return null;
-  const media_url = notification?.image_url;
+  const media_url = notification?.extra_data?.image;
   const mediaType = getMediaTypeFromUrl(media_url);
 
   const renderMedia = () => {
@@ -75,8 +74,8 @@ const NotificationModal: React.FC<NotificationModalProps> = ({
     >
       <View style={styles.container}>
         <Text style={styles.title}>{notification.title}</Text>
-        <Text style={styles.message}>{notification.message}</Text>
-        <View style={styles.mediaContainer}>{renderMedia()}</View>
+        <Text style={styles.message}>{notification.description}</Text>
+        {media_url && <View style={styles.mediaContainer}>{renderMedia()}</View>}
 
         <TouchableOpacity onPress={onClose} style={styles.closeButton}>
           <Text style={styles.closeButtonText}>Close</Text>
@@ -125,6 +124,7 @@ const styles = StyleSheet.create({
   media: {
     width: "100%",
     height: "100%",
+    maxWidth: 300,
   },
   closeButton: {
     paddingVertical: 10,

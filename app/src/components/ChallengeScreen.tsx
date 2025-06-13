@@ -1,15 +1,16 @@
 import * as React from "react";
 import BackgroundWithImage from "./background";
-import { screenHorizontalPadding } from "util/AppDimensions";
+import {screenHorizontalPadding} from "util/AppDimensions";
 import AppHeader from "./header";
-import { fontGroup, FontLineHeights, FontSizes } from "util/FontUtils";
+import {fontGroup, FontLineHeights, FontSizes} from "util/FontUtils";
 import theme from "assets/theme";
-import { ScrollView, StyleSheet, useWindowDimensions, View, ViewStyle } from "react-native";
+import {ScrollView, StyleSheet, useWindowDimensions, View, ViewStyle} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
 interface CaptureChallengeScreenProps {
   appHeader?: boolean;
   title?: string;
+  hideBackButton?: boolean;
   headerRightComponent?: React.ReactNode;
   modals?: React.ReactNode;
   children: React.ReactNode;
@@ -19,6 +20,7 @@ interface CaptureChallengeScreenProps {
 
 const ChallengeScreen = ({
   title = "",
+  hideBackButton = false,
   headerRightComponent,
   modals,
   children,
@@ -26,7 +28,7 @@ const ChallengeScreen = ({
   appHeader = true,
   scrollable = true,
 }: CaptureChallengeScreenProps) => {
-  const { height, width } = useWindowDimensions();
+  const {height, width} = useWindowDimensions();
 
   const screenContainerStyle = {
     paddingBottom: 40,
@@ -39,24 +41,25 @@ const ChallengeScreen = ({
     </ScrollView>
   );
   if (!scrollable) {
-    screenContainer = <View style={{ ...screenContainerStyle, flex: 1 }}>{children}</View>;
+    screenContainer = <View style={{...screenContainerStyle, flex: 1}}>{children}</View>;
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.darkColors?.inputBG }}>
+    <View style={{flex: 1, backgroundColor: theme.darkColors?.inputBG}}>
       <BackgroundWithImage
-        style={[{ width: width, height: height / 2 }, styles.backgroundStyle]}
+        style={[{width: width, height: height / 2}, styles.backgroundStyle]}
         imageStyle={styles.backgroundImage}
       >
         <LinearGradient
           colors={["rgba(0, 0, 0, 0)", `${theme.darkColors?.inputBG}`]} // Transparent to semi-black
           style={styles.gradient}
-          start={{ x: 0.5, y: 0.5 }} // Middle
-          end={{ x: 0.5, y: 1 }} // Bottom
+          start={{x: 0.5, y: 0.5}} // Middle
+          end={{x: 0.5, y: 1}} // Bottom
         />
       </BackgroundWithImage>
       {appHeader && (
         <AppHeader
+          hideBackButton={hideBackButton}
           centerComponent={{
             text: title,
             numberOfLines: 2,
@@ -69,7 +72,7 @@ const ChallengeScreen = ({
               ...fontGroup.nunitoBold,
             },
           }}
-          centerContainerStyle={{ alignItems: "center", justifyContent: "center" }}
+          centerContainerStyle={{alignItems: "center", justifyContent: "center"}}
           backgroundColor="transparent"
           // @ts-expect-error
           rightComponent={headerRightComponent}

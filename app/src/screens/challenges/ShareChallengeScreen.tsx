@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Image, Platform, Text, View, Dimensions} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import moment from "moment";
-import RNFS from "react-native-fs";
 // @ts-ignore
 import Video from "react-native-video";
 import {useDispatch} from "react-redux";
@@ -15,6 +14,7 @@ import {
   postGeoPinCheckIn,
   starFoundAndSaveApi,
   getNextStar as getNextStarApi,
+  updateUserPointAPI,
 } from "network";
 import {fontGroup, FontSizes} from "util/FontUtils";
 import {getFileExtension, handleError, saveToGallery, showMessage} from "util/helpers";
@@ -165,8 +165,11 @@ const ArChallengeShare = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.facebook;
           if (currCounter.facebook === 0) {
+            console.log("granting points for facebook");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
+          } else {
+            console.log(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -178,8 +181,11 @@ const ArChallengeShare = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.instagram;
           if (currCounter.instagram === 0) {
+            console.log("granting points for instagram");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
+          } else {
+            console.log(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -190,8 +196,13 @@ const ArChallengeShare = () => {
       case SSNN.OTHERS:
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.others;
-          updatedCounter += 1;
-          grantSocialPointsHandler(selectedSSNN);
+          if (currCounter.others === 0) {
+            console.log("granting points for others");
+            updatedCounter = 1;
+            grantSocialPointsHandler(selectedSSNN);
+          } else {
+            console.log(" not counting more points but allowing to share... ");
+          }
           return {
             ...currCounter,
             others: updatedCounter,
@@ -366,7 +377,7 @@ const ArChallengeShare = () => {
     offset = baseOffset - (viewWidth / 300) * 24;
   }
   if (viewWidth < 300) {
-    offset = 125;
+    offset = 150;
   }
 
   const aspectWidth = viewWidth - offset;
@@ -376,7 +387,7 @@ const ArChallengeShare = () => {
   const mediaContainerHeight = aspectHeight;
 
   let shareButtonTextSize = FontSizes.S16;
-  if (width < 400) {
+  if (width < 420) {
     shareButtonTextSize = FontSizes.S14;
   }
 
@@ -403,8 +414,15 @@ const ArChallengeShare = () => {
     }
   };
 
+  useEffect(() => {
+    if (!isMemory) {
+      updateUserPointAPI({points: challengePoints});
+    }
+  }, [isMemory]);
+
   return (
     <ChallengeScreen
+      hideBackButton={!isMemory}
       title={screenTitle}
       style={{justifyContent: "space-between", flex: 1}}
       modals={screenModals}

@@ -13,10 +13,10 @@ import OneSignal from "react-native-onesignal";
 import { NotificationProvider } from "./NotificationProvider";
 import Config from "./config";
 import { GeolocationProvider } from "./GeolocationProvider";
-import MapboxGL from "@rnmapbox/maps";
-if (__DEV__) {
-  require("../ReactotronConfig"); // Import before any other code
-}
+// import MapboxGL from "@rnmapbox/maps";
+// if (__DEV__) {
+//   require("../ReactotronConfig"); // Import before any other code
+// }
 // import * as Sentry from '@sentry/react-native';
 
 // if(!__DEV__) {
@@ -25,7 +25,7 @@ if (__DEV__) {
 //   });
 // }
 
-MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY);
+// MapboxGL.setAccessToken(Config.MAPBOX_PUBLIC_KEY);
 
 Geocoder.init(Config.GEOCODER_API_KEY);
 

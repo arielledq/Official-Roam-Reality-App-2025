@@ -1,20 +1,18 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Platform } from "react-native";
 import { useFocusEffect } from "@react-navigation/native";
 import RNFetchBlob from "rn-fetch-blob";
 import { unzip } from "react-native-zip-archive";
-// import { requestMultiple, PERMISSIONS } from "react-native-permissions";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
 import ChallengeScreen from "components/ChallengeScreen";
 import ViewInfoModal from "components/ViewInfoModal";
 import { launchImageLibrary } from "react-native-image-picker";
-
 import { CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE } from "../../../constants";
 import { CAMERA_NOTIFICATION } from "constants";
 
 const RNFS = require("react-native-fs");
-const Sound = require("react-native-sound");
+// const Sound = require("react-native-sound");
 
 const ArChallengeCapture = ({ route, navigation }) => {
   const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
@@ -36,34 +34,28 @@ const ArChallengeCapture = ({ route, navigation }) => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
-  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
   const [isVideo, setIsvideo] = useState(false);
-
   const unityRef = useRef(null);
-  const viewShotRef = useRef();
 
+  const viewShotRef = useRef();
   const challengeObj = route?.params?.challengeObj;
+
   const challengeObjParameters = route?.params?.challengeObj?.parameters;
   const modelFile = route?.params?.challengeObj?.model_file;
   const openGallery = route?.params?.openGallery;
-
+  const unityLoad = route?.params?.unityLoad;
+  const [isUnityLoaded, setIsUnityLoaded] = useState(unityLoad);
   const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
   const challengeType = challengeObj?.challenge_requirement;
   const viewInfoModalContent = challengeObj?.info;
 
-  // FILTERS PENDING
-  //  const ar_filters = challengeObj?.ar_filters;
-  //  const imageUrls = ar_filters.map(filter => filter.image);
-  //  const gradientColors = ar_filters[0]?.gradient_colors || ["#FF0000", "#00FF00"];
-  //  const gradientDirection = ar_filters[0]?.gradient_direction === "TOP_TO_BOTTOM";
+  const initialLoadTime = useRef(0);
 
   const handleUnityViewLayout = event => {
     const { width, height } = event.nativeEvent.layout;
     setUnityViewDimensions({ width, height });
-    // console.log(`UnityView dimensiones: ${width} x ${height}`);
   };
 
-  // Descargar modelo y gestionar archivos
   const downloadModelFile = (sourcePath, targetPath) => {
     RNFetchBlob.config({
       fileCache: true,
@@ -160,13 +152,13 @@ const ArChallengeCapture = ({ route, navigation }) => {
     }
   }, [challengeObjParameters]);
 
-  const sendBloomValuesToUnity = useCallback(() => {
+  const sendBloomValuesToUnity = () => {
     const bloomData = { threshold: 1, intensity: 1 };
 
     if (unityRef.current) {
       unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
     }
-  }, [unityRef, threshold, intensity]);
+  };
 
   const viewNotification = isNotification => {
     if (unityRef.current) {
@@ -179,87 +171,58 @@ const ArChallengeCapture = ({ route, navigation }) => {
     }
   };
 
+  // useEffect(() => {
+  //   viewNotification(true);
+  //   setTimeout(() => {
+  //     viewNotification(false)
+  //   }, 5000);
+  //  }, []);
+
   useEffect(() => {
     viewNotification(true);
-    setTimeout(() => {
-      viewNotification(false);
+
+    const timerId = setTimeout(() => {
+      if (unityRef.current) {
+        viewNotification(false);
+      }
     }, 5000);
   }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (!unityRef.current) return;
-
-      sendBloomValuesToUnity();
-      isLoadingUnity();
-      PointsCount();
-      unityRef.current.postMessage(
-        "Scriptposition",
-        "SetVisibleButton",
-        JSON.stringify({
-          setVisibleButtonPosition: false,
-        })
-      );
-
-      if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: challengeType,
-            arChallenge: true,
-            isLocation: false,
-          })
-        );
-      }
-    }, [unityRef.current, isLoadingUnity, PointsCount, isUnityLoaded])
-  );
-
-  const PointsCount = useCallback(async () => {
+  const pointsCount = async () => {
     if (unityRef.current) {
-      console.log("useCall==== POINTSCOUNT");
-      // Enviar mensaje a Unity para iniciar la grabación
       const pointData = {
         points: challengeObj?.points,
         isPointView: true,
       };
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
     }
-  }, [unityRef.current]);
-
-  const isLoadingUnity = useCallback(() => {
-    if (!unityRef.current) return;
-    console.log("useCall==== ISLOADING");
-    unityRef.current.postMessage(
-      "OBJImport",
-      "SetLoadingVisibility",
-      JSON.stringify({ isVisible: false })
-    );
-  }, [unityRef.current]);
-  // useEffect(() => {
-  //   if (unityRef.current && challengeHasFilters) {
-  //     loadingFalse();
-  //   }
-  // }, [isUnityLoaded]);
-
-  // Ejemplos de uso:
-  //   EnviarComandoAUnity('pause');  // Para pausar el juego
-  //   EnviarComandoAUnity('resume'); // Para reanudar el juego
-  //   EnviarComandoAUnity('restart'); // Para reiniciar la escena
-  //   EnviarComandoAUnity('close');  // Para cerrar Unity
-
-  const playCameraSound = () => {
-    Sound.setCategory("Playback");
-    let cameraSound = new Sound("camerasound.mp3", Sound.MAIN_BUNDLE, error => {
-      if (!error) cameraSound.play();
-    });
   };
 
-  const playRecordSound = () => {
-    Sound.setCategory("Playback");
-    let recordSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
-      if (!error) recordSound.play();
-    });
+  const isLoadingUnity = () => {
+    if (!unityRef.current) return;
+    const currentTime = Date.now();
+    if (initialLoadTime.current === 0) {
+      initialLoadTime.current = currentTime;
+      // First load, show for 2 seconds
+      setTimeout(() => {
+        if (unityRef.current) {
+          unityRef.current.postMessage(
+            "OBJImport",
+            "SetLoadingVisibility",
+            JSON.stringify({ isVisible: false })
+          );
+        }
+      }, 2000);
+    } else {
+      // Subsequent loads, hide instantly
+      if (unityRef.current) {
+        unityRef.current.postMessage(
+          "OBJImport",
+          "SetLoadingVisibility",
+          JSON.stringify({ isVisible: false })
+        );
+      }
+    }
   };
 
   const doneButtonHandler = async () => {
@@ -268,15 +231,13 @@ const ArChallengeCapture = ({ route, navigation }) => {
 
     if (hasFilters) {
       try {
-        // Capturar la vista dentro de ViewShot
         const capturedUri = await viewShotRef.current.capture();
-        updatedData = capturedUri; // Actualizar con la imagen capturada con filtro
+        updatedData = capturedUri;
       } catch (error) {
         console.error("Error capturando la imagen con filtros:", error);
       }
     }
 
-    // Navegar y pasar la captura actualizada
     navigation.replace("ArChallengeShare", {
       challengeObj: challengeObj,
       captureData: updatedData,
@@ -285,19 +246,11 @@ const ArChallengeCapture = ({ route, navigation }) => {
   };
 
   useEffect(() => {
-    // requestMultiple([
-    //   PERMISSIONS.ANDROID.CAMERA,
-    //   PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-    //   PERMISSIONS.ANDROID.RECORD_AUDIO,
-    //   PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-    //   PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    // ]).then(() => {
-    //   if (openGallery) {
-    //     pickFromGallery();
-    //   }else{
-    //     setIsUnityLoaded(true)
-    //   }
-    // });
+    if (openGallery) {
+      pickFromGallery();
+    } else {
+      setIsUnityLoaded(true);
+    }
   }, []);
 
   const retakeButtonHandler = () => {
@@ -369,11 +322,10 @@ const ArChallengeCapture = ({ route, navigation }) => {
     />
   );
 
-  //###Captura y Graba###//
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    buttonInfo = data.enableButton;
-    buttonBack = data.backPress;
+    let buttonInfo = data.enableButton;
+    let buttonBack = data.backPress;
 
     if (buttonBack) {
       navigation?.goBack();
@@ -382,11 +334,9 @@ const ArChallengeCapture = ({ route, navigation }) => {
     if (data.photoVideoButton?.isPhoto) {
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
-      playCameraSound();
       eraseFile();
     }
     if (data.photoVideoButton?.isPhoto == false) {
-      playRecordSound();
       setCapturedVideo(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
     }
@@ -404,13 +354,10 @@ const ArChallengeCapture = ({ route, navigation }) => {
       switch (challengeType) {
         case CAPTURE_CHALLENGE_TYPE.VIDEO:
           mediaType = "video";
-
           break;
         case CAPTURE_CHALLENGE_TYPE.PHOTOVIDEO:
           mediaType = "mixed";
-
           break;
-
         default:
           mediaType = "photo";
           break;
@@ -438,54 +385,49 @@ const ArChallengeCapture = ({ route, navigation }) => {
     }, 250);
   }
 
-  // Pending //
-
-  // const sendImageUrlsToUnity = () => {
-  //   // Datos que quieres enviar a Unity
-  //   const data = {
-  //     urls: imageUrls,
-  //   };
-
-  //   // Convertir el objeto a JSON
-  //   const jsonData = JSON.stringify(data);
-
-  //   // Enviar el JSON a Unity
-  //   unityRef.current.postMessage(
-  //     "Scroll View", // Nombre del GameObject en Unity
-  //     "SetImageUrls",       // Método en el script de Unity
-  //     jsonData              // Datos en formato JSON
-  //   );
-  // };
-  // const Gradientes = () => {
-  //   // Datos que quieres enviar a Unity
-  //   const data = {
-  //     gradientsColors: gradientColors, // Colores para el gradiente
-  //     topBottom: gradientDirection, // Dirección del gradiente
-  //     startAlpha: 1.0, // Opacidad inicial
-  //     endAlpha: 0.0 // Opacidad final
-  //   };
-
-  //   // Convertir el objeto a JSON
-  //   const jsonData = JSON.stringify(data);
-
-  //   // Enviar el JSON a Unity
-  //   unityRef.current.postMessage(
-  //     "Image", // Nombre del GameObject en Unity
-  //     "SetFilterData",       // Método en el script de Unity
-  //     {urls: imageUrls  }            // Datos en formato JSON
-  //   );
-  // };
-  // useEffect(() => {
-  //   if (challengeObj && modelFile) {
-  //     Gradientes();
-  //     sendImageUrlsToUnity()
-  //   }
-  // }, []);
-
   let screenPadding = {};
   if (!isUnityLoaded) {
     screenPadding = { paddingBottom: 24 };
   }
+
+  if (!isUnityLoaded) {
+    screenPadding = { paddingBottom: 24 };
+  }
+
+  useFocusEffect(() => {
+    // Only run these operations if unityRef.current is available
+    if (unityRef.current) {
+      // Use a setTimeout to give Unity a moment to fully initialize
+      const timer = setTimeout(() => {
+        pointsCount();
+        sendBloomValuesToUnity();
+        isLoadingUnity();
+
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({
+            setVisibleButtonPosition: false,
+          })
+        );
+
+        if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
+          unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: challengeType,
+              arChallenge: true,
+              isLocation: false,
+            })
+          );
+        }
+      }, 500); // 500ms delay
+
+      // Clean up the timer when the component unmounts or loses focus
+      return () => clearTimeout(timer);
+    }
+  });
 
   return (
     <ChallengeScreen

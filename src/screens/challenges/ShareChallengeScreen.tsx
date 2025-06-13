@@ -443,7 +443,7 @@ const ArChallengeShare = () => {
             ref={viewRef}
             onLayout={handleLayout}
           >
-            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
+
             <View style={{ flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1 }}>
               {fileExt == "mp4" || isVideo ? (
                 <Video
@@ -475,7 +475,7 @@ const ArChallengeShare = () => {
                 />
               )}
             </View>
-
+            <FullScreenLoadingSpinner isLoading={false} />
             <View style={{ alignItems: "center" }}>
               {/* Sponsor row */}
               <View
