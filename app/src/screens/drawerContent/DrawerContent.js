@@ -134,6 +134,7 @@ function DrawerContent(props) {
   const dispatch = useDispatch();
   const [popupDetails, setPopupDetails] = useState({});
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
+
   const onPressHandler = navigateTo => {
     switch (navigateTo) {
       case "delete": {
@@ -170,17 +171,41 @@ function DrawerContent(props) {
         break;
     }
   };
+
   const handleLogOutButton = async () => {
-    await GoogleSignin.revokeAccess().catch(err => console.error(err));
-    await GoogleSignin.signOut().catch(err => console.error(err));
-    await removeItem("fbToken");
-    await removeItem("instaToken");
-    logout();
-    dispatch(resetState());
+    try {
+      await GoogleSignin.revokeAccess();
+      await GoogleSignin.signOut();
+    } catch (error) {
+      console.error("GoogleSignin error", error);
+    }
+    try {
+      await removeItem("fbToken");
+      await removeItem("instaToken");
+    } catch (error) {
+      console.error("removeItem error", error);
+    }
+    try {
+      logout();
+    } catch (error) {
+      console.error("logout error", error);
+    }
+    try {
+      dispatch(resetState());
+    } catch (error) {
+      console.error("dispatch error", error);
+    }
+
+    navigation.reset({
+      index: 0,
+      routes: [{name: "Login"}],
+    });
   };
+
   const closeModalHandler = () => {
     setConfirmationVisible(false);
   };
+
   const handleDeleteAccount = () => {
     deleteAccount().then(res => {
       if (res.status == 1) {
@@ -191,6 +216,7 @@ function DrawerContent(props) {
       }
     });
   };
+
   return (
     <>
       <View style={{flex: 1, backgroundColor: theme.darkColors?.drawerBG}}>
@@ -204,16 +230,19 @@ function DrawerContent(props) {
             </View>
           </View>
         </DrawerContentScrollView>
+
+        <ConfirmationPopUp
+          title={popupDetails?.title}
+          description={popupDetails?.description}
+          confirmText={popupDetails?.title}
+          cancelText={"Cancel"}
+          confirmHandler={
+            popupDetails?.title == "Log Out" ? handleLogOutButton : handleDeleteAccount
+          }
+          cancelHandler={closeModalHandler}
+          isVisible={isConfirmationVisible}
+        />
       </View>
-      <ConfirmationPopUp
-        title={popupDetails?.title}
-        description={popupDetails?.description}
-        confirmText={popupDetails?.title}
-        confirmHandler={popupDetails?.title == "Log Out" ? handleLogOutButton : handleDeleteAccount}
-        isVisible={isConfirmationVisible}
-        cancelText={"Cancel"}
-        cancelHandler={closeModalHandler}
-      />
     </>
   );
 }

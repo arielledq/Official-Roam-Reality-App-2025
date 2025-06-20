@@ -1,10 +1,10 @@
-import { StyleSheet, TouchableOpacity, View, Modal } from "react-native";
-import React, { useState } from "react";
+import {StyleSheet, TouchableOpacity, View, Modal, TouchableWithoutFeedback} from "react-native";
+import React from "react";
 import AppText from "../text";
 import AppButton from "../button";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 import theme from "../../assets/theme";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
+import {screenHorizontalPadding} from "../../util/AppDimensions";
 
 const ConfirmationPopUp = ({
   title,
@@ -17,34 +17,39 @@ const ConfirmationPopUp = ({
 }) => {
   return (
     <Modal visible={isVisible} transparent animationType="slide" onRequestClose={cancelHandler}>
-      <View style={styles.modalContainer}>
-        {/* Header */}
-        <View style={styles.header}>
-          <AppText style={styles.headerText}>{title}</AppText>
-          <View style={styles.horizontalLine} />
+      <TouchableWithoutFeedback onPress={cancelHandler}>
+        <View style={styles.backdrop}>
+          <TouchableWithoutFeedback>
+            <View style={styles.modalContainer}>
+              <View style={styles.modalContainer}>
+                {/* Header */}
+                <View style={styles.header}>
+                  <AppText style={styles.headerText}>{title}</AppText>
+                  <View style={styles.horizontalLine} />
+                </View>
+                {/* Button Header */}
+                <View style={styles.buttonheaderContainer}>
+                  <AppText style={styles.logoutText}>{description}</AppText>
+                </View>
+                <View style={styles.buttonContainer}>
+                  {/* Confirm Button */}
+                  <AppButton
+                    buttonStyle={styles.buttonStyle}
+                    containerStyle={styles.buttonContainerStyle}
+                    titleStyle={styles.buttonTitle}
+                    title={confirmText}
+                    onPress={confirmHandler}
+                  />
+                  {/* Cancel Button */}
+                  <TouchableOpacity style={styles.cancelButton} onPress={cancelHandler}>
+                    <AppText style={styles.cancelButtonText}>{cancelText}</AppText>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </View>
+          </TouchableWithoutFeedback>
         </View>
-
-        {/* Button Header */}
-        <View style={styles.buttonheaderContainer}>
-          <AppText style={styles.logoutText}>{description}</AppText>
-        </View>
-
-        <View style={styles.buttonContainer}>
-          {/* Confirm Button */}
-          <AppButton
-            buttonStyle={styles.buttonStyle}
-            containerStyle={styles.buttonContainerStyle}
-            titleStyle={styles.buttonTitle}
-            title={confirmText}
-            onPress={confirmHandler}
-          />
-
-          {/* Cancel Button */}
-          <TouchableOpacity style={styles.cancelButton} onPress={cancelHandler}>
-            <AppText style={styles.cancelButtonText}>{cancelText}</AppText>
-          </TouchableOpacity>
-        </View>
-      </View>
+      </TouchableWithoutFeedback>
     </Modal>
   );
 };
@@ -52,13 +57,17 @@ const ConfirmationPopUp = ({
 export default ConfirmationPopUp;
 
 const styles = StyleSheet.create({
+  backdrop: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.5)",
+    justifyContent: "flex-end",
+  },
   modalContainer: {
     backgroundColor: theme.lightColors.inputBG,
-    justifyContent: "flex-end",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: "auto",
   },
   header: {
     alignItems: "center",

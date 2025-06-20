@@ -242,8 +242,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const formikRef = useRef(null);
 
   useEffect(() => {
-    console.log("accountSetupIsComplete", accountSetupIsComplete(userData));
-    console.log("userData", userData);
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
       formikRef.current.setValues({
