@@ -134,6 +134,7 @@ const Navigation = () => {
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+        <Stack.Screen name="TabNavigator" component={DrawerNav} />
       </>
     );
   };

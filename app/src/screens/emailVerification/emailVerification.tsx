@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
-import { Alert, View } from "react-native";
+import {Alert, View} from "react-native";
 
-import { Formik } from "formik";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import {Formik} from "formik";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
-import { RootStackParamList, ScreenStackComponent } from "../../constants/types";
+import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import AppButton from "../../components/button";
 import AppInput from "../../components/input";
-import { CubeIcon } from "../../assets/svg";
+import {CubeIcon} from "../../assets/svg";
 import AppHeader from "../../components/header";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
 import AppText from "../../components/text";
-import { useNavigation, useRoute } from "@react-navigation/native";
-import { confirmCode, sendCode } from "../../network";
-import { handleError, showMessage } from "../../util/helpers";
-import { useDispatch } from "react-redux";
-import { updateUserData } from "../../redux/Login";
+import {useNavigation, useRoute} from "@react-navigation/native";
+import {confirmCode, sendCode} from "../../network";
+import {handleError, showMessage} from "../../util/helpers";
+import {useDispatch} from "react-redux";
+import {updateUserData} from "../../redux/Login";
 import Timer from "../../components/timer";
 
 const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerification"> = () => {
@@ -33,11 +33,14 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   const [firstEmailSent, setFirstEmailSent] = useState(false);
 
   const navigateToSuccess = () => {
-    navigation.replace("VerificationSuccess", { ChangePassword: false, data, profile });
+    dispatch(updateUserData(data));
+    setTimeout(() => {
+      navigation.replace("VerificationSuccess", {ChangePassword: false});
+    }, 250);
   };
 
   const handleResend = () => {
-    sendCode({ email }).then(res => {
+    sendCode({email}).then(res => {
       if (res.status == 1) {
         setTimerVisible(true);
         showMessage("Code sent successfully");
@@ -53,7 +56,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
       return;
     }
     setIsLoading(true);
-    confirmCode({ email: email, otp: values.code })
+    confirmCode({email: email, otp: values.code})
       .then(res => {
         if (res.status == 1) {
           navigateToSuccess();
@@ -95,7 +98,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
             verifyEmail(values);
           }}
         >
-          {({ handleChange, handleBlur, handleSubmit, values, errors, touched }) => (
+          {({handleChange, handleBlur, handleSubmit, values, errors, touched}) => (
             <View style={_styles.formContainer}>
               <View style={_styles.childView}>
                 <AppText style={_styles.headerText}>Verify Your Email</AppText>
@@ -105,7 +108,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
                 </AppText>
                 <AppInput
                   inputContainerStyle={[_styles.input]}
-                  containerStyle={{ marginTop: 20 }}
+                  containerStyle={{marginTop: 20}}
                   placeholder={"Email Verification code"}
                   placeholderTextColor={theme.lightColors?.grey0}
                   value={values.code}
@@ -116,7 +119,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
                   autoCorrect={false}
                   textContentType="oneTimeCode"
                   autoComplete="sms-otp"
-                  leftIconContainerStyle={{ marginRight: 5 }}
+                  leftIconContainerStyle={{marginRight: 5}}
                   keyboardType="numeric"
                   leftIcon={<CubeIcon />}
                 />
@@ -148,8 +151,8 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
                   buttonStyle={_styles.buttonStyle}
                   containerStyle={[
                     _styles.buttonContainerStyle,
-                    { marginTop: 10 },
-                    profile && { marginTop: 24 },
+                    {marginTop: 10},
+                    profile && {marginTop: 24},
                   ]}
                   title={"Verify Now"}
                   onPress={handleSubmit}
