@@ -7,6 +7,7 @@ import {
   ScrollView,
   Text,
   TouchableOpacity,
+  useWindowDimensions,
   View,
 } from "react-native";
 import BackgroundWithImage from "../../../components/background";
@@ -62,6 +63,7 @@ const GeoArSiteDetails = ({route}) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const navigation = useNavigation();
+  const {width} = useWindowDimensions();
 
   const checkIfChallengeIsDone = () => {
     setIsLoading(true);
@@ -514,18 +516,13 @@ const GeoArSiteDetails = ({route}) => {
                 family="antdesign"
                 color={theme.lightColors?.inputBlue}
                 size={32}
-                // style={styles.verificationIcon}
               />
-              {/* <ProTipIcon style={{ width: 24, height: 24 }} source={ProTipIcon} /> */}
-              {/* <Text style={_styles.protip_text}>
-                {selectedGeoSite?.category?.id ? "Useful\nLinks" : "Pro Tips"}
-              </Text> */}
             </TouchableOpacity>
 
             <View
               style={{
                 flexDirection: "row",
-                gap: 16,
+                gap: width <= 400 ? 8 : 16,
                 alignItems: "center",
               }}
             >
@@ -534,7 +531,6 @@ const GeoArSiteDetails = ({route}) => {
                 onPress={navigateButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{fontWeight: "bold"}}
-                containerStyle={_styles.buttonContainerStyle}
                 title={"Navigate"}
                 loading={isLoading}
               />
@@ -544,7 +540,6 @@ const GeoArSiteDetails = ({route}) => {
                 onPress={skipNavigationButtonHandler}
                 buttonStyle={_styles.buttonStyle}
                 titleStyle={{fontWeight: "bold"}}
-                containerStyle={_styles.buttonContainerStyle}
                 title={"Geo Check-In"}
                 loading={isLoading}
               />
