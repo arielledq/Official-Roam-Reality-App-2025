@@ -350,10 +350,22 @@ const PinChallenge = () => {
       console.error("Error capturando la imagen con filtros:", error);
     }
 
-    navigation.replace("ArChallengeShare", {
-      challengeObj: {...challengeObj, geo_site: {...selectedGeoSite, pin_challenge: undefined}},
-      captureData: updatedData,
-      challengeType: CHALLENGES_TYPE.PIN_CHECK_IN,
+    navigation.reset({
+      index: 0,
+      // @ts-ignore
+      routes: [
+        {
+          name: "ArChallengeShare",
+          params: {
+            challengeObj: {
+              ...challengeObj,
+              geo_site: {...selectedGeoSite, pin_challenge: undefined},
+            },
+            captureData: updatedData,
+            challengeType: CHALLENGES_TYPE.PIN_CHECK_IN,
+          },
+        },
+      ],
     });
   };
 

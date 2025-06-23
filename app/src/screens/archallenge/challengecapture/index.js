@@ -239,10 +239,19 @@ const ArChallengeCapture = ({route, navigation}) => {
     console.log("updatedData", updatedData);
 
     // Navegar y pasar la captura actualizada
-    navigation.replace("ArChallengeShare", {
-      challengeObj: challengeObj,
-      captureData: updatedData,
-      challengeType: CHALLENGES_TYPE.PHOTO_VIDEO,
+    navigation.reset({
+      index: 0,
+      // @ts-ignore
+      routes: [
+        {
+          name: "ArChallengeShare",
+          params: {
+            challengeObj: challengeObj,
+            captureData: updatedData,
+            challengeType: CHALLENGES_TYPE.PHOTO_VIDEO,
+          },
+        },
+      ],
     });
   };
 

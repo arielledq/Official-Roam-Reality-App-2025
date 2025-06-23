@@ -2,7 +2,6 @@ import React, {useContext, useEffect, useRef, useState} from "react";
 import {Image, Platform, Text, View, Dimensions} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import moment from "moment";
-import RNFS from "react-native-fs";
 // @ts-ignore
 import Video from "react-native-video";
 import {useDispatch} from "react-redux";
@@ -417,7 +416,6 @@ const ArChallengeShare = () => {
 
   useEffect(() => {
     if (!isMemory) {
-      console.log("screen loaded for a completed challenge, call updateUserPointAPI ");
       updateUserPointAPI({points: challengePoints});
     }
   }, [isMemory]);

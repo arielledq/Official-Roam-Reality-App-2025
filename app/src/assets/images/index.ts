@@ -7,7 +7,7 @@ const Images = {
   ProfileImgGradient: require("./ProfileImageGradient.png"),
   GlobalIcon: require("./GlobalIcon.png"),
   PointsIcon: require("./PointsIcon.png"),
-  RankIcon: require("./RankIcon.png"),
+  SitesIcon: require("./SitesIcon.png"),
   ForwardIcon: require("./ForwardIcon.png"),
   AppSettingsIcon: require("./AppSettingsIcon.png"),
   Onboarding1: require("./Onboarding1.png"),

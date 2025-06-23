@@ -452,13 +452,21 @@ export const inviteFriendByEmail = data =>
     logoutFunc
   );
 export const getGeoARDestinations = () =>
-  Request.callWithToken(
-    {
-      url: `modules/challenges/geo-ar-location/`,
-      method: "GET",
-    },
-    logoutFunc
-  );
+    Request.callWithToken(
+        {
+            url: `modules/challenges/geo-ar-location/`,
+            method: "GET",
+        },
+        logoutFunc
+    );
+export const getGeoARDestinationsMini = () =>
+    Request.callWithToken(
+        {
+            url: `modules/challenges/geo-ar-location-mini/`,
+            method: "GET",
+        },
+        logoutFunc
+    );
 export const searchUsers = payload =>
   Request.callWithToken(
     {

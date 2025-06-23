@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react";
 import {FlatList, Image, ImageBackground, Text, TouchableOpacity, View} from "react-native";
 
-import OneSignal from "react-native-onesignal";
+import {OneSignal} from "react-native-onesignal";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 import {useDispatch, useSelector} from "react-redux";
 
@@ -16,7 +16,6 @@ import {
   getARStettings,
   getARChallenges,
   getARSitesStars,
-  setDevice,
   updateProfile,
   getProfieDetails,
 } from "../../network";
@@ -39,6 +38,7 @@ import {MenuIcon} from "../../assets/svg";
 import useStyles from "./styles";
 import {GIFT_POINTS} from "../../constants";
 import {updateUserProperties} from "redux/Login/reducer";
+import {useOneSignal} from "../../hooks/useOneSignal";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -48,6 +48,11 @@ const GeoArChallenge = ({}) => {
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
+
+  const oneSignalClickHandler = additionalData => {
+    navigateToGeoChallenge(additionalData);
+  };
+  const {setOnesignalDevice} = useOneSignal(oneSignalClickHandler);
 
   const user = useSelector(state => state?.login?.data?.user);
 
@@ -66,18 +71,6 @@ const GeoArChallenge = ({}) => {
         }, 500);
       }
     }
-  };
-
-  const setOnesignalDevice = () => {
-    OneSignal.getDeviceState().then(deviceData => {
-      if (deviceData?.userId) {
-        setDevice({...deviceData, active: true})
-          .then(res => {})
-          .catch(err => {
-            console.error("Device Data Update Error", err);
-          });
-      }
-    });
   };
 
   const ARSposored = () => {
@@ -289,16 +282,21 @@ const GeoArChallenge = ({}) => {
     loadDestinations();
     setOnesignalDevice();
 
-    OneSignal.setNotificationOpenedHandler(notification => {
-      const {additionalData} = notification.notification;
+    const clickListener = event => {
+      console.log("OneSignal: notification clicked:", event);
+
+      const notification = event.getNotification();
+      const additionalData = notification?.additionalData;
 
       if (additionalData) {
         navigateToGeoChanllenge(additionalData);
       }
-    });
+    };
+
+    OneSignal.Notifications.addEventListener("click", clickListener);
 
     return () => {
-      OneSignal.clearHandlers();
+      OneSignal.Notifications.removeEventListener("click", clickListener);
     };
   }, []);
 

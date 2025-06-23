@@ -13,7 +13,7 @@ import AppHeader from "../../components/header";
 import BackgroundWithImage from "../../components/background";
 import theme from "../../assets/theme";
 import AppText from "../../components/text";
-import {login, setDevice} from "../../network";
+import {login} from "../../network";
 import {useDispatch, useSelector} from "react-redux";
 import {updateUserData} from "../../redux/Login";
 import {SigninSchema} from "../../util/ValidationSchemas";
@@ -21,11 +21,11 @@ import Icon from "../../components/Icon";
 import {handleError} from "../../util/helpers";
 import SocialSignin from "../../components/socialSignin";
 import {updateAsOldUser} from "../../redux/Persist";
-import OneSignal from "react-native-onesignal";
 import {setItemWithListener} from "../../util/EventsListener";
 import {fonts} from "assets/fonts";
 import {FontSizes} from "util/FontUtils";
 import Config from "config";
+import {useOneSignal} from "../../hooks/useOneSignal";
 
 const LOGIN_INITIAL_VALUES = {
   email: __DEV__ ? Config?.DEV_EMAIL || "" : "",
@@ -38,14 +38,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
   const newUser = useSelector(state => state.persist.newUser);
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-
-  const setOnesignalDevice = () => {
-    OneSignal.getDeviceState().then(deviceData => {
-      if (deviceData?.userId) {
-        setDevice({...deviceData, active: true});
-      }
-    });
-  };
+  const {setOnesignalDevice} = useOneSignal();
 
   const handleLogin = v => {
     setIsLoading(true);
