@@ -4,5 +4,5 @@
 
 # Bundle AAB file
 cd android && ./gradlew bundleRelease && wait;
-cp ./app/build/outputs/bundle/release/app-release.aab ../somaticsfitness.aab && wait;
+cp ./app/build/outputs/bundle/release/app-release.aab ../roam_reality.aab && wait;
 cd ..

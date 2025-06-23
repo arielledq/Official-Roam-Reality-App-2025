@@ -9,6 +9,8 @@
     "start": "react-native start",
     "test": "jest",
     "postinstall": "patch-package",
+    "build-aab": "./scripts/build-aab.sh",
+    "build-apk": "./scripts/build-apk.sh",
     "clean": "./scripts/clean.sh",
     "reinstall": "./scripts/reinstall.sh"
   },
