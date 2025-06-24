@@ -48,7 +48,6 @@ const Notifications: React.FC = () => {
     try {
       setRefreshing(true);
       const response = await getUserNotificationList();
-      console.log(response?.data);
       if (response && response?.data?.length > 0) {
         setNotifications(response?.data);
       }
