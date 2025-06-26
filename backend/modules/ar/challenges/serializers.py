@@ -452,6 +452,55 @@ class GeoLocationSerializer(GeoModelSerializer):
         serializer = ARExperienceSerializer(ar_experiences, many=True,  context=self.context)
         return serializer.data
 
+class GeoLocationMiniSerializer(GeoModelSerializer):
+    image = serializers.ImageField()
+    regions = GeoRegionSerializer(read_only=True, many=True)
+    unique_ar_sites_cnt = serializers.SerializerMethodField()
+    star_ar_sites_cnt = serializers.SerializerMethodField()
+    ar_event_sites_cnt = serializers.SerializerMethodField()
+    ar_experiences_cnt = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GeoLocation
+        geo_field = 'geo_location'
+        fields = (
+            "id",
+            "created_at",
+            "updated_at",
+            "name",
+            "image",
+            "flag_image",
+            "geo_location",#
+            "border",
+            "event_borders",
+            "band_borders",
+            "regions",
+            "sequence_number",
+            "map_longitude_delta",
+            "map_latitude_delta",
+
+            "unique_ar_sites_cnt",
+            "star_ar_sites_cnt",
+            "ar_event_sites_cnt",
+            "ar_experiences_cnt",
+        )
+
+    def get_star_ar_sites_cnt(self, instance):
+        return  instance.geo_location_ar_site.filter(is_active=True).exclude(
+            category__isnull=False,
+        ).count()
+
+    def get_ar_event_sites_cnt(self, instance):
+        return instance.geo_location_ar_site.filter(is_active=True).exclude(
+            category__isnull=True,
+        ).count()
+
+    def get_unique_ar_sites_cnt(self, instance):
+        return sum([x.challenges.count() for x in instance.ar_experiences.filter(experience_type="AR_CHALLENGE").all()], 0)
+
+    def get_ar_experiences_cnt(self, instance):
+        return instance.ar_experiences.exclude(is_active=False).count()
+
 
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)

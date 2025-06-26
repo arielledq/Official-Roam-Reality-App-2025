@@ -363,6 +363,12 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     serializer_class = GeoLocationSerializer
     http_method_names = ["get"]
 
+class GeoLocationMiniViewSet(GeoLocationViewSet):
+        """
+        A simple ViewSet for viewing and editing GeoLocation.
+        """
+        serializer_class = GeoLocationMiniSerializer
+
 
 class GeoArSiteCategoryViewSet(viewsets.ModelViewSet):
     """
