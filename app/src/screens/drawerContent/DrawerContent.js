@@ -235,7 +235,7 @@ function DrawerContent(props) {
           title={popupDetails?.title}
           description={popupDetails?.description}
           confirmText={popupDetails?.title}
-          cancelText={"Cancel"}
+          cancelText={popupDetails?.cancelText}
           confirmHandler={
             popupDetails?.title == "Log Out" ? handleLogOutButton : handleDeleteAccount
           }

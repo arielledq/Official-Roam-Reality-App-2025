@@ -81,9 +81,6 @@ const GeoArChallenge = ({}) => {
             const d = res.data[i];
             getARStarSites(d.id);
           }
-        } else {
-          res.message.message = "Error in loading Challenges.";
-          handleError(res);
         }
       })
       .finally(() => {
@@ -97,9 +94,6 @@ const GeoArChallenge = ({}) => {
       .then(res => {
         if (res.status == 1) {
           dispatch(updateARUserData(res));
-        } else {
-          res.message.message = "Error in loading Challenges.";
-          handleError(res);
         }
       })
       .finally(() => {
@@ -129,9 +123,6 @@ const GeoArChallenge = ({}) => {
       .then(res => {
         if (res.status == 1) {
           dispatch(updateAnyWhereChallenges(res?.data));
-        } else {
-          res.message.message = "Error in loading Challenges.";
-          handleError(res);
         }
       })
       .finally(() => {

@@ -79,6 +79,7 @@ const Drawer = createDrawerNavigator();
 const Navigation = () => {
   const splashShown = useSelector((state: any) => state.splash?.splashShown);
   const token = useSelector((state: any) => state.login?.data?.token);
+
   const loginState = useSelector((state: any) => state.login);
   const {newUser} = useSelector((state: any) => state.persist);
   const dispatch = useDispatch();
@@ -107,6 +108,16 @@ const Navigation = () => {
       unsubscribeFromStorageChanges(handleStorageChange);
     };
   }, []);
+
+  useEffect(() => {
+    if (!token && navigationRef.current?.isReady()) {
+      console.log("Token is missing, resetting to Login");
+      navigationRef.current?.reset({
+        index: 0,
+        routes: [{name: "Login"}],
+      });
+    }
+  }, [token]);
 
   const renderAuthStack = () => {
     return (
