@@ -231,12 +231,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
     if (edit) return;
 
-    setTimeout(() => {
-      navigation.reset({
-        index: 0,
-        routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
-      });
-    }, 500);
+    navigation.reset({
+      index: 0,
+      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+    });
   };
 
   const formikRef = useRef(null);

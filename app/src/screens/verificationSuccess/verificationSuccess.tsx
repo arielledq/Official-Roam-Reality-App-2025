@@ -24,12 +24,16 @@ const VerificationSuccess: ScreenStackComponent<RootStackParamList, "Verificatio
 
   const handleContinue = () => {
     if (ChangePassword) {
-      navigation.replace("Login");
+      navigation.reset({
+        index: 0,
+        routes: [{name: "Login"}],
+      });
     } else {
       dispatch(updateVerified(true));
-      setTimeout(() => {
-        navigation.replace("TabNavigator");
-      }, 250);
+      navigation.reset({
+        index: 0,
+        routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+      });
     }
   };
 

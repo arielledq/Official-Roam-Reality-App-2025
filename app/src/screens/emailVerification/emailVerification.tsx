@@ -32,11 +32,15 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   const [timerVisible, setTimerVisible] = useState(false);
   const [firstEmailSent, setFirstEmailSent] = useState(false);
 
-  const navigateToSuccess = () => {
+  useEffect(() => {
     dispatch(updateUserData(data));
-    setTimeout(() => {
-      navigation.replace("VerificationSuccess", {ChangePassword: false});
-    }, 250);
+  }, [data]);
+
+  const navigateToSuccess = () => {
+    navigation.reset({
+      index: 0,
+      routes: [{name: "VerificationSuccess", params: {ChangePassword: false}}],
+    });
   };
 
   const handleResend = () => {
@@ -70,10 +74,12 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   };
 
   const handleSkip = () => {
-    dispatch(updateUserData(data));
-    setTimeout(() => {
-      navigation.replace("TabNavigator");
-    }, 250);
+    console.log("navigating to TabNavigator");
+
+    navigation.reset({
+      index: 0,
+      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+    });
   };
 
   useEffect(() => {
