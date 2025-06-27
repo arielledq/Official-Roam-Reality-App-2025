@@ -577,10 +577,10 @@ const GeoArChallengeDetails = ({}) => {
 
   useFocusEffect(
     useCallback(() => {
-      setShouldShowMap(true); // Remontás el mapa al entrar
+      setShouldShowMap(true);
 
       return () => {
-        setShouldShowMap(false); // Lo desmontás al salir
+        setShouldShowMap(false);
       };
     }, [])
   );
