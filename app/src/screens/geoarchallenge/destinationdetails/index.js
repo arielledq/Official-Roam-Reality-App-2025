@@ -1,16 +1,21 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useRef, useState} from "react";
 
 import {FlatList, Platform, ScrollView, Text, TouchableOpacity, View, Image} from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
-import {useNavigation, useRoute} from "@react-navigation/native";
+import {useFocusEffect, useNavigation, useRoute} from "@react-navigation/native";
 import MapView, {Marker, PROVIDER_GOOGLE, Callout} from "react-native-maps";
 import Geocoder from "react-native-geocoding";
 import ARSiteCountBG from "../../../assets/geoar/ar_site_count_bg.svg";
 import FriendsMarkerIcon from "../../../assets/geoar/friend_marker.svg";
 import {useDispatch, useSelector} from "react-redux";
 import useStyles from "./styles";
-import {updateSelectedSites, updateSelectedDestinationBandLocation} from "../../../redux/AR";
+import {
+  updateSelectedSites,
+  updateSelectedDestinationBandLocation,
+  updateMapRegion,
+  updateMapMarkers,
+} from "../../../redux/AR";
 import {
   getARSiteCategories,
   getARSiteLocation,
@@ -63,6 +68,7 @@ const GeoArChallengeDetails = ({}) => {
   const [updatedMarkers, setUpdatedMarkers] = useState([]);
   const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
   const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
+  const [shouldShowMap, setShouldShowMap] = useState(false);
 
   const bandLocationUpdatesIntervalId = useRef(null);
   const friendsLocationUpdatesIntervalId = useRef(null);
@@ -569,13 +575,15 @@ const GeoArChallengeDetails = ({}) => {
     }
   }, [arSitesOn]);
 
-  useEffect(() => {
-    if (updatedMarkers?.length) {
-      getArSiteCategories();
-    } else {
-      setCategories(INITIAL_CATEGORIES);
-    }
-  }, [updatedMarkers]);
+  useFocusEffect(
+    useCallback(() => {
+      setShouldShowMap(true); // Remontás el mapa al entrar
+
+      return () => {
+        setShouldShowMap(false); // Lo desmontás al salir
+      };
+    }, [])
+  );
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
@@ -639,23 +647,24 @@ const GeoArChallengeDetails = ({}) => {
             >
               <Text style={_styles.buttonSelectText}>Full</Text>
             </TouchableOpacity>
-            {regions.map(e => {
-              if (e.geo_region)
-                return (
-                  <TouchableOpacity
-                    key={e.id}
-                    activeOpacity={0.5}
-                    onPress={() => moveToRegion(e)}
-                    style={
-                      selectedRegionName == e.name
-                        ? _styles.selectButtonStyle
-                        : _styles.unSelectButtonStyle
-                    }
-                  >
-                    <Text style={_styles.buttonSelectText}>{e.name}</Text>
-                  </TouchableOpacity>
-                );
-            })}
+            {regions?.length &&
+              regions.map(e => {
+                if (e.geo_region)
+                  return (
+                    <TouchableOpacity
+                      key={e.id}
+                      activeOpacity={0.5}
+                      onPress={() => moveToRegion(e)}
+                      style={
+                        selectedRegionName == e.name
+                          ? _styles.selectButtonStyle
+                          : _styles.unSelectButtonStyle
+                      }
+                    >
+                      <Text style={_styles.buttonSelectText}>{e.name}</Text>
+                    </TouchableOpacity>
+                  );
+              })}
           </ScrollView>
         )}
       </View>
@@ -705,21 +714,23 @@ const GeoArChallengeDetails = ({}) => {
           overflow: "hidden",
         }}
       >
-        <MapView
-          provider={PROVIDER_GOOGLE}
-          ref={mapView}
-          style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
-          initialRegion={initialRegion}
-        >
-          {!!filteredUpdatedMarkers?.length &&
-            filteredUpdatedMarkers.map(marker => {
-              return _markerView(marker);
-            })}
-          {friendsLocationSitesOn &&
-            friendList.map(o => {
-              return f_markerView(o);
-            })}
-        </MapView>
+        {shouldShowMap && (
+          <MapView
+            provider={PROVIDER_GOOGLE}
+            ref={mapView}
+            style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}
+            initialRegion={initialRegion}
+          >
+            {!!filteredUpdatedMarkers?.length &&
+              filteredUpdatedMarkers.map(marker => {
+                return _markerView(marker);
+              })}
+            {friendsLocationSitesOn &&
+              friendList.map(o => {
+                return f_markerView(o);
+              })}
+          </MapView>
+        )}
         {loadingCustomMarkers && (
           <View
             style={{

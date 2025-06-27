@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useState} from "react";
 
 import {
   ActivityIndicator,
@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import BackgroundWithImage from "../../../components/background";
 import AppHeader from "../../../components/header";
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import MapView, {Marker, PROVIDER_GOOGLE} from "react-native-maps";
 import CloseBIcon from "../../../assets/geoar/close-square.svg";
 import ProTipIcon from "../../../assets/geoar/pro-tip.svg";
@@ -22,7 +22,6 @@ import {showLocation} from "react-native-map-link";
 
 import {useDispatch, useSelector} from "react-redux";
 import useStyles from "./styles";
-import {width} from "../../../util/AppDimensions";
 import {AppButton} from "../../../components";
 import RenderHTML from "react-native-render-html";
 import {FontSizes, fontGroup} from "../../../util/FontUtils";
@@ -52,6 +51,7 @@ const GeoArSiteDetails = ({route}) => {
   const [coolDownFinished, setCoolDownFinished] = useState(false);
   const [coolDownHoursText, setCoolDownHoursText] = useState("");
   const [myCheckInsText, setMyCheckInsText] = useState("");
+  const [shouldShowMap, setShouldShowMap] = useState(false);
 
   const selectedDestination = useSelector(state => state.ar?.selectedDestination);
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
@@ -292,6 +292,16 @@ const GeoArSiteDetails = ({route}) => {
     setStarCounts();
   }, [selectedGeoARSiteStars]);
 
+  useFocusEffect(
+    useCallback(() => {
+      setShouldShowMap(true); // Remontás el mapa al entrar
+
+      return () => {
+        setShouldShowMap(false); // Lo desmontás al salir
+      };
+    }, [])
+  );
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -314,51 +324,53 @@ const GeoArSiteDetails = ({route}) => {
             overflow: "hidden",
           }}
         >
-          <MapView
-            provider={PROVIDER_GOOGLE}
-            style={{
-              position: "absolute",
-              top: 0,
-              bottom: 0,
-              left: 0,
-              right: 0,
-            }}
-            initialRegion={initialRegion}
-          >
-            <Marker
-              coordinate={{
-                latitude: selectedGeoSite.lat_long.coordinates[1],
-                longitude: selectedGeoSite.lat_long.coordinates[0],
+          {shouldShowMap && (
+            <MapView
+              provider={PROVIDER_GOOGLE}
+              style={{
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
               }}
-              title={selectedGeoSite.name}
-              pinColor={pinColor}
-              tracksViewChanges={tracksViewChanges}
+              initialRegion={initialRegion}
             >
-              {useCustomMarkers && (
-                <View
-                  style={{
-                    width: 30,
-                    height: 30,
-                    alignItems: "center",
-                    justifyContent: "flex-start",
-                  }}
-                >
-                  <Image
-                    resizeMode="cover"
+              <Marker
+                coordinate={{
+                  latitude: selectedGeoSite.lat_long.coordinates[1],
+                  longitude: selectedGeoSite.lat_long.coordinates[0],
+                }}
+                title={selectedGeoSite.name}
+                pinColor={pinColor}
+                tracksViewChanges={tracksViewChanges}
+              >
+                {useCustomMarkers && (
+                  <View
                     style={{
-                      width: 19,
-                      height: 19,
-                      position: "absolute",
-                      top: 2.5,
-                      borderRadius: 100,
+                      width: 30,
+                      height: 30,
+                      alignItems: "center",
+                      justifyContent: "flex-start",
                     }}
-                    source={{uri: selectedGeoSite?.localFilePath}}
-                  />
-                  <MarkerIcon color={selectedGeoSite?.category?.color} />
-                </View>
-              )}
-            </Marker>
-          </MapView>
+                  >
+                    <Image
+                      resizeMode="cover"
+                      style={{
+                        width: 19,
+                        height: 19,
+                        position: "absolute",
+                        top: 2.5,
+                        borderRadius: 100,
+                      }}
+                      source={{uri: selectedGeoSite?.localFilePath}}
+                    />
+                    <MarkerIcon color={selectedGeoSite?.category?.color} />
+                  </View>
+                )}
+              </Marker>
+            </MapView>
+          )}
         </View>
 
         <View
