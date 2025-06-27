@@ -213,19 +213,13 @@ const StarChallenge = ({route}) => {
   };
 
   const onDonePress = () => {
-    navigation.reset({
-      index: 0,
-      // @ts-ignore
-      routes: [
-        {
-          name: "ArChallengeShare",
-          params: {
-            challengeObj: starChallengeObj,
-            captureData: capturedImage,
-            challengeType: CHALLENGES_TYPE.STAR,
-          },
-        },
-      ],
+    navigation.navigate({
+      name: "ArChallengeShare",
+      params: {
+        challengeObj: starChallengeObj,
+        captureData: capturedImage,
+        challengeType: CHALLENGES_TYPE.STAR,
+      },
     });
   };
 

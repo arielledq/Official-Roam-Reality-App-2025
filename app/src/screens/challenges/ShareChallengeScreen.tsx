@@ -117,45 +117,10 @@ const ArChallengeShare = () => {
       break;
   }
 
-  // const [capturedDataUri, setCapturedDataUri] = useState<string | null>();
-
-  // useEffect(() => {
-  //   const updateLocalFile = async (capturedDataUri: string | null) => {
-  //     const newUri = await copyImageForDisplay(capturedDataUri);
-  //     setCapturedDataUri(newUri);
-  //   };
-  //   if (captureData) {
-  //     if (isMemory) {
-  //       setCapturedDataUri(captureData);
-  //     } else {
-  //       updateLocalFile(captureData);
-  //     }
-  //   }
-  // }, [captureData]);
-
   const capturedDataUri = captureData;
-  //   ? captureData
-  //   : captureData.startsWith("file://")
-  //   ? captureData
-  //   : `file://${captureData}`;
-  // const capturedDataUri = isMemory
-  //   ? captureData
-  //   : captureData.startsWith("file://")
-  //   ? captureData
-  //   : `file://${captureData}`;
-  // console.log("capturedDataUri", capturedDataUri);
-  // const test = async () => {
-  //   console.log("exists", await RNFS.exists(capturedDataUri));
-  // };
-  // test();
   const isVideo = capturedDataUri?.includes(".mp4");
   const filePath = isMemory ? captureData : capturedDataUri?.split("?")[0];
   const fileExt = isMemory ? getFileExtension(captureData) : filePath?.split(".").pop() || "";
-
-  console.log("capturedDataUri", capturedDataUri);
-  console.log("isVideo", isVideo);
-  console.log("filePath", filePath);
-  console.log("fileExt", fileExt);
 
   const countSocialPoints = (
     selectedSSNN: string,
@@ -444,7 +409,6 @@ const ArChallengeShare = () => {
 
   return (
     <ChallengeScreen
-      // hideBackButton={!isMemory}
       title={screenTitle}
       style={{justifyContent: "space-between", flex: 1}}
       modals={screenModals}
