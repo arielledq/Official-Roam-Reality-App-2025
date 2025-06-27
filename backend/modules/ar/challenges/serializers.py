@@ -540,6 +540,8 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "remaining_stars",
             "captured_stars",
             "total_stars",
+            "fun_facts",
+            "elevation",
         )
 
     def get_remaining_stars(self, instance):

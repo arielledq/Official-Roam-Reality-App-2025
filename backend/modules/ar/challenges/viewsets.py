@@ -11,7 +11,7 @@ from .serializers import ARMemoriesSerializerGet, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, \
-    GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer
+    GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer
 from rest_framework import viewsets
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -362,6 +362,7 @@ class GeoLocationViewSet(viewsets.ModelViewSet):
     queryset = GeoLocation.objects.filter(is_active=True).order_by('sequence_number')
     serializer_class = GeoLocationSerializer
     http_method_names = ["get"]
+
 
 class GeoLocationMiniViewSet(GeoLocationViewSet):
         """
