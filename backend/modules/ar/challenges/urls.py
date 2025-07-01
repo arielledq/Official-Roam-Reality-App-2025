@@ -6,7 +6,7 @@ from .viewsets import ChallengesViewSet, ChallengesUploadView, \
     SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
     ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet, ARSitePinCheckInViewSet, \
     StarCollectionViewSet, GoldStarCollectionViewSet, DestinationFactsViewSet, PanicMessageViewSet, \
-    MemoryCheckinViewSet, GeoArSiteCategoryViewSet
+    MemoryCheckinViewSet, GeoArSiteCategoryViewSet, GeoLocationMiniViewSet
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
