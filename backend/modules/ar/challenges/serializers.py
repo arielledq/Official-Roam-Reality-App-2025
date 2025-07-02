@@ -338,7 +338,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     category = GeoArSiteCategorySerializer(read_only=True)
     check_ins = serializers.SerializerMethodField()
     user_attempts = serializers.SerializerMethodField()
-    sponsors = SponsorSerializer(read_only=True, many=True)
+    sponsor = SponsorSerializer(read_only=True)
 
     class Meta:
         model = GeoArSite
@@ -362,7 +362,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "category",
             "challenge_attempt",
             "user_attempts",
-            "sponsors",
+            "sponsor",
             "is_active",
             "band_user",
         )
