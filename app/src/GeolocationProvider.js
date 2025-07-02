@@ -46,7 +46,7 @@ export const GeolocationProvider = ({children}) => {
 
   useEffect(() => {
     if (userLocation && !openDestinationFactModal) {
-      for (let i = 0; i < destinationFactsAll.length; i++) {
+      for (let i = 0; i < destinationFactsAll?.length; i++) {
         const isInside = isPointInPolygon(
           [userLocation?.longitude, userLocation?.latitude],
           destinationFactsAll[i].border.coordinates
