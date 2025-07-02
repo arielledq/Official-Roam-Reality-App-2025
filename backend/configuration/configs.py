@@ -49,6 +49,11 @@ CURRENT_APP_VERSION_TESTFLIGHT = ConfigKey(
     is_public=True,
 )
 
+METER_RADIUS = ConfigKey(
+    value=500,
+    verbose_name='Radius of user in meters',
+)
+
 
 
 
