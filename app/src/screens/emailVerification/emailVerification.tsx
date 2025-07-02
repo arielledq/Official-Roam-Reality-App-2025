@@ -33,6 +33,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   const [firstEmailSent, setFirstEmailSent] = useState(false);
 
   useEffect(() => {
+    if (!data) return;
     dispatch(updateUserData(data));
   }, [data]);
 
@@ -83,7 +84,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   };
 
   useEffect(() => {
-    if (profile && !firstEmailSent) {
+    if (profile && !firstEmailSent && email) {
       setFirstEmailSent(true);
       handleResend();
     }

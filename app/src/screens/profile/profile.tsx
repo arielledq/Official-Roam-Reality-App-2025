@@ -228,6 +228,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     rows.push(data.slice(i, i + 3));
   }
   const navigateToVerifyMail = (email: string) => {
+    if (!email) return;
     sendCode({email: email.toLowerCase()});
     setIsTransitioning(true);
     // @ts-expect-error
@@ -306,7 +307,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           image={profileDetails?.image ? true : false}
           name={profileDetails?.user.name}
           email={profileDetails?.user.email}
-          verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
+          verifyAction={() => navigateToVerifyMail(profileDetails?.user?.email)}
           isVerified={userProfile?.user_profile?.is_verified}
         />
         <View style={_styles.scoreboardContainer}>
