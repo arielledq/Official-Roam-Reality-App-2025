@@ -45,20 +45,20 @@ class ScoreboardAdmin(admin.ModelAdmin):
         "row_number",
         "user",
         "points",                # Ar profile points
-        "memories_points",
-        "checkin_points",
+        # "memories_points",
+        # "checkin_points",
         "destination_points",    # memories_points + checkin_points
-        "sponsor_points",    # memories_points + checkin_points
+        # "sponsor_points",    # memories_points + checkin_points
         "updated_at",
         "add_ar_memory"
     )
-    list_filter = (DestinationFilter,)
+    list_filter = (DestinationFilter, SponsorFilter)
     # ordering = ("-points", "-updated_at")
     readonly_fields = (
-        "memories_points",
-        "checkin_points",
+        # "memories_points",
+        # "checkin_points",
         "destination_points",
-        "sponsor_points",
+        # "sponsor_points",
     )
 
     def changelist_view(self, request, extra_context=None):
@@ -138,15 +138,15 @@ class ScoreboardAdmin(admin.ModelAdmin):
     row_number.short_description = "#"
     row_number.admin_order_field = None
 
-    def memories_points(self, obj):
-        return getattr(obj, "memories_points", 0)
-    memories_points.short_description = "Memories Points"
-    memories_points.admin_order_field = "memories_points"
-
-    def checkin_points(self, obj):
-        return getattr(obj, "checkin_points", 0)
-    checkin_points.short_description = "Check-in Points"
-    checkin_points.admin_order_field = "checkin_points"
+    # def memories_points(self, obj):
+    #     return getattr(obj, "memories_points", 0)
+    # memories_points.short_description = "Memories Points"
+    # memories_points.admin_order_field = "memories_points"
+    #
+    # def checkin_points(self, obj):
+    #     return getattr(obj, "checkin_points", 0)
+    # checkin_points.short_description = "Check-in Points"
+    # checkin_points.admin_order_field = "checkin_points"
 
     def destination_points(self, obj):
         return getattr(obj, "destination_points", 0)
