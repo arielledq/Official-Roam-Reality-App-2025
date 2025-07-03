@@ -1,3 +1,2 @@
-# cp "./scripts/hash.hpp" "./ios/Pods/boost/boost/container_hash/hash.hpp" && wait;
-# cp "./scripts/RNDateTimePickerShadowView.m" "./node_modules/@react-native-community/datetimepicker/ios/RNDateTimePickerShadowView.m" && wait;
+cp "./scripts/UPlayer.java" "./android/app/src/main/java/com/azesmwayreactnativeunity/UPlayer.java" && wait;
 echo 'Updated broken dependencies files'
