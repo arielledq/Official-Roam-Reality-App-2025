@@ -532,6 +532,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
     remaining_stars = serializers.SerializerMethodField()
     captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
+    image = serializers.ImageField()
 
     class Meta:
         model = GeoARStarPoint
@@ -544,6 +545,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "remaining_stars",
             "captured_stars",
             "total_stars",
+            "image",
             "fun_facts",
             "elevation",
         )
