@@ -1,31 +1,22 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {ScrollView, Platform} from "react-native";
+import {Platform} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
 import {useSelector} from "react-redux";
-// import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
-
-import BackgroundWithImage from "../../../components/background";
-import AppHeader from "../../../components/header";
-import UnityARCamera from "components/UnityArView";
-import CameraControls from "components/CameraControls";
-import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader";
+import {unzip} from "react-native-zip-archive";
+import Geolocation from "react-native-geolocation-service";
 
 import {CHALLENGES_TYPE} from "constants";
 import useStyles from "./styles";
-import ChallengeScreen from "components/ChallengeScreen";
-import ARModeModal from "components/ARModal/ARModeModal";
-import {unzip} from "react-native-zip-archive";
-import {GeolocationContext} from "GeolocationProvider";
-import { getNextStar as getNextStarApi, deleteAccount, logout } from "../../../network";
-import Geolocation from "react-native-geolocation-service";
-import NotificationModal from "components/ARModal/NotificationModal";
-import pinchallenge from "screens/geoarchallenge/pinchallenge";
 
+import UnityARCamera from "components/UnityArView";
+import ChallengeScreen from "components/ChallengeScreen";
+import ARModeModal from "components/ARModeModal/index.tsx";
+import NotificationModal from "components/ARModeModal/NotificationModal";
 
 const StarChallenge = () => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -75,14 +66,13 @@ const StarChallenge = () => {
 
   const dataGpsChallegen = (selectedSSNN, challengeData) => {
     setSelectedChallengeOverride(challengeData); // Guarda challengeData para usarlo como nuevo "pin_challenge"
-
   };
   console.log("selectedChallengeOverride", selectedChallengeOverride);
 
   // Download and unzip model files for each star
   const downloadAndPrepareModels = () => {
     // setLoading(true);
-    const challengeObj = selectedChallengeOverride
+    const challengeObj = selectedChallengeOverride;
     const modelFile = challengeObj?.model_file;
     if (challengeObj?.challenge_requirement === "PHOTO" && modelFile) {
       const filename = modelFile.split("/").pop().split("?")[0];
@@ -131,13 +121,12 @@ const StarChallenge = () => {
                   } else if (file.name.toLowerCase().includes("emission")) {
                     emissionTexture = filePath;
                   } else {
-                    sourcesArray.push({ uri: filePath });
+                    sourcesArray.push({uri: filePath});
                   }
                   setStarModels(objFile || ""); // Manejar valores nulos
                   setModelResource(mtlFile);
                   setTextureBase(baseTexture);
                   setTextureEmission(emissionTexture);
-
                 });
               })
               .catch(error => {
@@ -245,27 +234,27 @@ const StarChallenge = () => {
 
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
-        (position) => {
-          const newLocation = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy,
-          };
-          setUserLocation(newLocation); // ✅ Estado local
-          updateUnityLocation(newLocation); // Enviás a Unity
+      position => {
+        const newLocation = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        };
+        setUserLocation(newLocation); // ✅ Estado local
+        updateUnityLocation(newLocation); // Enviás a Unity
+      },
+      error => {
+        console.error("Error obteniendo ubicación:", error);
+      },
+      {
+        accuracy: {
+          android: "high",
+          ios: "best",
         },
-        (error) => {
-          console.error("Error obteniendo ubicación:", error);
-        },
-        {
-          accuracy: {
-            android: "high",
-            ios: "best",
-          },
-          enableHighAccuracy: true,
-          distanceFilter: 0,
-          interval: 5000,
-        }
+        enableHighAccuracy: true,
+        distanceFilter: 0,
+        interval: 5000,
+      }
     );
 
     return () => {
@@ -273,10 +262,10 @@ const StarChallenge = () => {
     };
   }, [unityRef]);
 
-  const updateUnityLocation = (location) => {
+  const updateUnityLocation = location => {
     if (unityRef?.current) {
       if (location.latitude && location.longitude && starModels) {
-        console.log("Enviando posicion del usuario")
+        console.log("Enviando posicion del usuario");
         const jsonData = JSON.stringify({
           latitude: location?.latitude,
           longitude: location?.longitude,
@@ -350,15 +339,15 @@ const StarChallenge = () => {
           z: 2 || 0.4,
         },
         distanceCamera: 2,
-          // useGPS: false,
-          // gpsLatitude:  -25.296689,
-          // gpsLongitude: -57.589390,
+        // useGPS: false,
+        // gpsLatitude:  -25.296689,
+        // gpsLongitude: -57.589390,
       };
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
 
-      setSendModelData(true)
+      setSendModelData(true);
 
       // setTimeout(() => {
       //   sendSpawnData()
@@ -426,7 +415,7 @@ const StarChallenge = () => {
   };
   const PointsCount = async () => {
     if (unityRef.current && selectedChallengeOverride?.points) {
-      console.log("selectedDestination?.points", selectedChallengeOverride?.points)
+      console.log("selectedDestination?.points", selectedChallengeOverride?.points);
       const pointData = {
         points: selectedChallengeOverride?.points,
         isPointView: true,
@@ -439,7 +428,7 @@ const StarChallenge = () => {
       return;
     }
 
-    if (starModels && textureBase && unityRef.current ) {
+    if (starModels && textureBase && unityRef.current) {
       sendModelDataToUnity();
       setTimeout(() => {
         const spawnData = {
@@ -479,9 +468,9 @@ const StarChallenge = () => {
 
         // Primer envío de objetos
         unityRef.current.postMessage(
-            "ObjectSpawner",
-            "SpawnObjectsFromReact",
-            JSON.stringify(spawnData)
+          "ObjectSpawner",
+          "SpawnObjectsFromReact",
+          JSON.stringify(spawnData)
         );
 
         // Segundo envío + conteo de puntos (opcional, si querés reforzar que se cargue)
@@ -531,27 +520,25 @@ const StarChallenge = () => {
     downloadAndPrepareModels();
   }, [selectedChallengeOverride]);
 
-
   const closeModalARMode = () => {
     setOpenModalARMode(false);
     setIsUnityLoaded(true);
   };
 
   const handleUnityMessage = result => {
-
     const data = JSON.parse(result.nativeEvent.message);
-    console.log("DATA UNITY",data);
+    console.log("DATA UNITY", data);
     // const buttonInfo = data.enableButton;
     const buttonBack = data.backPress;
-    const buttonARMode = data?.ARMode
+    const buttonARMode = data?.ARMode;
     //
     if (buttonBack) {
       navigation?.goBack();
       unityRef.current?.unloadUnity?.();
-      unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena", );
+      unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena");
     }
-    if (buttonARMode){
-      setOpenModalARMode(true)
+    if (buttonARMode) {
+      setOpenModalARMode(true);
     }
     // if (
     //     data?.objectDetect &&
@@ -599,88 +586,74 @@ const StarChallenge = () => {
   // notificationUnity()
 
   useFocusEffect(
-      useCallback(() => {
-        unityRef.current?.resumeUnity?.();
-        unityRef.current?.windowFocusChanged?.(true);
-
-      }, [unityRef, isUnityLoaded])
+    useCallback(() => {
+      unityRef.current?.resumeUnity?.();
+      unityRef.current?.windowFocusChanged?.(true);
+    }, [unityRef, isUnityLoaded])
   );
 
   useEffect(() => {
-
     if (unityRef.current) {
       const spawnData = {
-        isDetectionEnabled : true,
-        detectionDistance : 80
-      }
+        isDetectionEnabled: true,
+        detectionDistance: 80,
+      };
 
       unityRef.current.postMessage(
-          "Main Camera",
-          "SetDetectObjectState",
-          JSON.stringify(spawnData)
+        "Main Camera",
+        "SetDetectObjectState",
+        JSON.stringify(spawnData)
       );
 
-    unityRef.current.postMessage(
+      unityRef.current.postMessage(
         "OBJImport",
         "SetLoadingVisibility",
         JSON.stringify({isVisible: false})
-    );
-  }
-    console.log('Esto se ejecuta una vez Detector de objeto y Loading')
+      );
+    }
+    console.log("Esto se ejecuta una vez Detector de objeto y Loading");
   }, []);
 
-
-
   return (
-      <ChallengeScreen
-          title="AR Star Hunt "
-          // modals={modals}
-          appHeader={false}
-          style={{
-            paddingHorizontal: 0,
-            paddingTop: "11%",
-            height: "100%",
-            backgroundColor: "#000",
-            // ...screenPadding,
-          }}
-      >
-    {/*<BackgroundWithImage style={_styles.mainContainer}>*/}
-    {/*  <AppHeader*/}
-    {/*    centerComponent={{*/}
-    {/*      text: "AR Star Hunt " + starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.name,*/}
-    {/*      numberOfLines: 2,*/}
-    {/*      style: [_styles.heading],*/}
-    {/*    }}*/}
-    {/*    backgroundColor="transparent"*/}
-    {/*  />*/}
-        <UnityARCamera
-            width={"100%"}
-            height={"100%"}
-            unityRef={unityRef}
-            isProcessingMedia={processingMedia}
-            // onUnityLayout={handleUnityViewLayout}
-            onUnityMessage={handleUnityMessage}
-            isUnityLoaded={isUnityLoaded}
-            capturedImage={capturedImage}
-            capturedVideo={capturedVideo}
-        />
-        <ARModeModal
-            selectedDestination={destinationData}
-            isVisible={openModalARMode}
-            onPointsGranted={dataGpsChallegen}
-            onClose={closeModalARMode}
-            setShowNotification={setShowNotification}
-            setNotificationMode={setNotificationMode}
-        />
+    <ChallengeScreen
+      title="AR Star Hunt "
+      appHeader={false}
+      style={{
+        paddingHorizontal: 0,
+        paddingTop: "11%",
+        height: "100%",
+        backgroundColor: "#000",
+        // ...screenPadding,
+      }}
+    >
+      <UnityARCamera
+        width={"100%"}
+        height={"100%"}
+        unityRef={unityRef}
+        isProcessingMedia={processingMedia}
+        // onUnityLayout={handleUnityViewLayout}
+        onUnityMessage={handleUnityMessage}
+        isUnityLoaded={isUnityLoaded}
+        capturedImage={capturedImage}
+        capturedVideo={capturedVideo}
+      />
+      <ARModeModal
+        selectedDestination={destinationData}
+        isVisible={openModalARMode}
+        onPointsGranted={dataGpsChallegen}
+        onClose={closeModalARMode}
+        setShowNotification={setShowNotification}
+        setNotificationMode={setNotificationMode}
+      />
 
-        <NotificationModal
-            isVisible={showNotification}
-            onClose={() => setShowNotification(false)}
-            // selectedDestination={destinationData}
-            // sponsor={selectedDestination?.geo_ar_star?.geo_site?.pin_challenge?.sponsored}
-            // onPointsGranted={dataGpsChallegen}
-            selectedMode={notificationMode}
-        />
+      <NotificationModal
+        isVisible={showNotification}
+        onClose={() => setShowNotification(false)}
+        // selectedDestination={destinationData}
+        // sponsor={selectedDestination?.geo_ar_star?.geo_site?.pin_challenge?.sponsored}
+        // onPointsGranted={dataGpsChallegen}
+        selectedMode={notificationMode}
+      />
     </ChallengeScreen>
   );
 };

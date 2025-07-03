@@ -14,14 +14,13 @@ export const CAPTURE_CHALLENGE_TYPE = {
 };
 
 export const MODES = {
-  AR: 'ar',
-  SCAN: 'scan',
-  HUNT: 'hunt',
-  CHECKIN: 'checkin',
+  AR: "ar",
+  SCAN: "scan",
+  HUNT: "hunt",
+  CHECKIN: "checkin",
 } as const;
 
-export type ModeType = typeof MODES[keyof typeof MODES];
-
+export type ModeType = (typeof MODES)[keyof typeof MODES];
 
 export type SSNN_TYPE = "INSTAGRAM" | "FACEBOOK" | "OTHERS";
 
@@ -86,3 +85,26 @@ export const SCOREBOARD_TYPE = {
   DESTINATION: "DESTINATION",
   SPONSOR: "SPONSOR",
 };
+
+export const AR_MODES = {
+  GEO_TAG_MODE: "geo_tag_mode",
+  SCAN_MODE: "scan_mode",
+  HUNT_MODE: "hunt_mode",
+};
+
+export type ARModeType = (typeof AR_MODES)[keyof typeof AR_MODES];
+
+export const AR_MODES_MENU = [
+  {
+    id: AR_MODES.GEO_TAG_MODE,
+    name: "Geo-Tag Mode",
+  },
+  {
+    id: AR_MODES.SCAN_MODE,
+    name: "Scan Mode",
+  },
+  {
+    id: AR_MODES.HUNT_MODE,
+    name: "Hunt Mode",
+  },
+];
