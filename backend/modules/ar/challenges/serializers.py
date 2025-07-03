@@ -228,6 +228,7 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
 
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
+    sponsor = SponsorSerializer
 
     class Meta:
         model = ARMemories
@@ -244,6 +245,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "challenge_approval",
             "created_at",
             "points",
+            "sponsor",
             "geo_location",
         )
 

@@ -1,6 +1,6 @@
 from django.db.models.functions import Coalesce
 from django_filters import rest_framework as filters
-from django.db.models import Q, Sum, Value, F, OuterRef, Subquery, IntegerField, ExpressionWrapper
+from django.db.models import Q, Sum, Value, F, OuterRef, Subquery, IntegerField, ExpressionWrapper, Case, When
 from modules.ar.challenges.models import ARMemories, ARSitePinCheckIn
 from users.models import User
 
@@ -29,7 +29,23 @@ class ScoreFilterSet(filters.FilterSet):
                 challenge_approval__in=["UNAPPROVED", "APPROVED"],
             )
             .values('user')
-            .annotate(total=Sum('points'))
+            .annotate(total=Sum(
+                Case(
+                    When(
+                        memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
+                        then=F('points')
+                    ),
+                    When(
+                        memory_type='DEDUCTED',
+                        then=ExpressionWrapper(
+                            F('points') * Value(-1),
+                            output_field=IntegerField()
+                        )
+                    ),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            ))
             .values('total')
         )
 
@@ -58,18 +74,34 @@ class ScoreFilterSet(filters.FilterSet):
 
     def filter_by_sponsor(self, queryset, name, value):
         queryset = queryset.filter(
-            Q(user_ar_memories__challenges__sponsor=value)
+            Q(user_ar_memories__sponsor=value)
             | Q(user_ar_site_checkin__geo_challenge__sponsor=value)
         ).distinct()
 
         memories_subquery = (
             ARMemories.objects.filter(
                 user=OuterRef('pk'),
-                challenges__sponsor=value,
+                sponsor=value,
                 challenge_approval__in=["UNAPPROVED", "APPROVED"],
             )
             .values('user')
-            .annotate(total=Sum('points'))
+            .annotate(total=Sum(
+                Case(
+                    When(
+                        memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
+                        then=F('points')
+                    ),
+                    When(
+                        memory_type='DEDUCTED',
+                        then=ExpressionWrapper(
+                            F('points') * Value(-1),
+                            output_field=IntegerField()
+                        )
+                    ),
+                    default=Value(0),
+                    output_field=IntegerField(),
+                )
+            ))
             .values('total')
         )
 

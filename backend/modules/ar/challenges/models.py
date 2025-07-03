@@ -31,6 +31,8 @@ CHALLENGE_REQUIREMENT = (
 AR_MEMORY_CHOICES = (
     ("PHOTO", "PHOTO"),
     ("VIDEO", "VIDEO"),
+    ("BONUS", "BONUS"),
+    ("DEDUCTED", "DEDUCTED"),
 )
 
 GRADIENT_DIRECTION = (
@@ -117,6 +119,8 @@ class Sponsor(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
     tags = models.CharField(_("Tags (optional)"), max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    is_active = models.BooleanField(_("Active"), default=True)
 
     class Meta:
         verbose_name_plural = "AR Sponsor"
@@ -503,6 +507,14 @@ class ARMemories(models.Model):
         null=True,
         blank=True,
     )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="ar_memories",
+    )
     geo_location = models.ForeignKey(
         GeoLocation,
         on_delete=models.CASCADE,
@@ -511,7 +523,7 @@ class ARMemories(models.Model):
         verbose_name="Geo Destination",
         related_name="ar_memories",
     )
-    declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
+    declined_reason = models.TextField(_("Reason"), blank=True, null=True)
     challenge_approval = models.CharField(
         max_length=50,
         choices=CHALLENGE_APPROVAL_CHOICES,
@@ -531,9 +543,9 @@ class ARMemories(models.Model):
                 raise ValidationError(
                     "Declined Reason is mandatory, When challenge is declined!"
                 )
-        elif self.challenges is None:
+        elif self.sponsor is None:
             raise ValidationError(
-                "Challenge is mandatory."
+                "Sponsor is mandatory."
             )
         elif self.geo_location is None:
             raise ValidationError(

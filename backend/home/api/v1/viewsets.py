@@ -16,7 +16,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from home.api.v1.filters import ScoreFilterSet
-from modules.ar.challenges.models import ARUserProfile
+from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
@@ -62,6 +62,14 @@ class SignupViewSet(ModelViewSet):
             if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
                 profileObj.points += configs.POINTS_GIFT
                 profileObj.save()
+                sponsor = Sponsor.objects.get(name='BONUS')
+                geo_location = GeoLocation.objects.get(name='BONUS')
+                ARMemories.objects.create(
+                    points=configs.POINTS_GIFT,
+                    sponsor=sponsor,
+                    geo_location=geo_location,
+                    memory_type='BONUS'
+                )
                 configs.NUMBER_USER_POINT_GIFT += 1
 
                 send_notification(
