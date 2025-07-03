@@ -11,8 +11,10 @@ def get_modules():
         modules = []
         python_package_separator = "."
         for app in APPS:
+            if "build/lib" in app.as_posix():
+                continue
             app_name = app.as_posix().replace(MODULES_DIR, f"{MODULES_PACKAGE_NAME}/")
-            app_name = python_package_separator.join(app_name.split("/")[:-1])
+            app_name = app.parent.as_posix().replace("/".join(MODULES_DIR.split("/")[:-2]) + "/", "").replace("/", ".")
             modules.append(app_name)
         return modules
     except (ImportError, IndexError):

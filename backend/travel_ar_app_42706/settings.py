@@ -224,7 +224,7 @@ AUTHENTICATION_BACKENDS = (
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'web_build')]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
@@ -340,3 +340,4 @@ if GS_BUCKET_NAME:
 
 
 DOMAIN=env.str("DOMAIN", "")
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

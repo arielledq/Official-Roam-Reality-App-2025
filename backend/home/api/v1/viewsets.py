@@ -21,7 +21,7 @@ from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
 from home.utils import EmailOTP
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator as token_generator
 from home.api.v1.serializers import (
