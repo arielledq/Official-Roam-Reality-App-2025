@@ -92,6 +92,12 @@ export const AR_MODES = {
   HUNT_MODE: "hunt_mode",
 };
 
+export const AR_MODES_TYPE_ID = {
+  GEO_TAG_MODE: 1,
+  SCAN_MODE: 2,
+  HUNT_MODE: 3,
+};
+
 export type ARModeType = (typeof AR_MODES)[keyof typeof AR_MODES];
 
 export const AR_MODES_MENU = [

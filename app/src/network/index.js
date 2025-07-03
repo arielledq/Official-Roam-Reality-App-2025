@@ -263,6 +263,22 @@ export const getARSitesStars = payload =>
     },
     logoutFunc
   );
+export const getSponsors = () =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/sponsor/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+export const getARSites = payload =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/sites/?lat=${payload.lat}&lon=${payload.lon}&site_type=${payload.site_type}&sponsor=${payload.sponsor}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
 export const getARProfile = () =>
   Request.callWithToken(
     {

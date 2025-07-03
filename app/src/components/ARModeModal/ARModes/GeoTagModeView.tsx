@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useContext, useEffect} from "react";
 import {View, Text, Image, TouchableOpacity, ScrollView, StyleSheet} from "react-native";
 
 import AppDropdown from "components/Dropdown";
@@ -6,6 +6,9 @@ import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
 import Images from "assets/images";
 import Icon from "components/Icon";
+import {AR_MODES_TYPE_ID} from "constants";
+import {GeolocationContext} from "GeolocationProvider";
+import {getARSites as getSitesApi} from "network";
 
 const GeoTagModeView = ({
   selectedSponsors,
@@ -21,8 +24,27 @@ const GeoTagModeView = ({
   setShowNotification,
   setNotificationMode,
 }) => {
+  const {userLocation} = useContext(GeolocationContext);
+
+  const getSites = async () => {
+    const payload = {
+      lat: userLocation?.latitude,
+      lon: userLocation?.longitude,
+      site_type: AR_MODES_TYPE_ID.GEO_TAG_MODE,
+      sponsor: selectedSponsors,
+    };
+
+    const response = await getSitesApi(payload);
+    console.log("🚀 ~ getSites ~ response:", response);
+  };
+
+  useEffect(() => {
+    console.log("🚀 ~ useEffect ~ selectedSponsors:", selectedSponsors);
+    getSites();
+  }, [selectedSponsors]);
+
   const SITE = [
-    {label: "All", value: "ALL"},
+    {label: "ALL GEO-TAGS", value: "ALL"},
     ...allSponsors.map(site => ({
       label: site.location,
       value: site.id,
