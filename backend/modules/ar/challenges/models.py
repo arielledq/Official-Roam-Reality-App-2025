@@ -529,8 +529,16 @@ class ARMemories(models.Model):
         if self.challenge_approval == "DECLINED":
             if self.declined_reason == "":
                 raise ValidationError(
-                    "Declined Reason is mandotory, When challenge is declined!"
+                    "Declined Reason is mandatory, When challenge is declined!"
                 )
+        elif self.challenges is None:
+            raise ValidationError(
+                "Challenge is mandatory."
+            )
+        elif self.geo_location is None:
+            raise ValidationError(
+                "Geo Destination is mandatory."
+            )
 
     def __str__(self):
         return str(

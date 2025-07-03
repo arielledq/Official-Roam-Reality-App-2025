@@ -5,6 +5,7 @@ from django.db.models import (
     Sum, Value, F, OuterRef, Subquery,
     IntegerField, ExpressionWrapper, Q
 )
+from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -26,6 +27,29 @@ class DestinationFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         return queryset
 
+    def choices(self, changelist):
+        """
+        Rewriting choices() to make the filter mutually exclusive.
+        """
+        # “All”
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(
+                remove=[self.parameter_name, "sponsor"]
+            ),
+            "display": _("All"),
+        }
+        # For each destination
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == str(lookup),
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup},
+                    ["sponsor"],  # remove 'sponsor'
+                ),
+                "display": title,
+            }
+
 
 class SponsorFilter(admin.SimpleListFilter):
     title = "Sponsor"
@@ -37,6 +61,29 @@ class SponsorFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         return queryset
+
+    def choices(self, changelist):
+        """
+        Rewriting choices() to make the filter mutually exclusive.
+        """
+        # “All”
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(
+                remove=[self.parameter_name, "destination"]
+            ),
+            "display": _("All"),
+        }
+        # For each sponsor
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == str(lookup),
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup},
+                    ["destination"],  # remove 'destination'
+                ),
+                "display": title,
+            }
 
 
 @admin.register(ScoreboardModel)
