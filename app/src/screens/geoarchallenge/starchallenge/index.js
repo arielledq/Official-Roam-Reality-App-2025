@@ -308,28 +308,28 @@ const StarChallenge = () => {
   //   }
   // }
   //
-  const sendSpawnData= () => {
-    console.log("entroaqui")
-    if (!unityRef?.current ) return;
-    console.log("paso a spawndata")
-    const spawnData = {
-      objects: [
-        {
-          id: "1",
-          latitude: -25.296175132051676,
-          longitude: -57.58900607168004,
-          scale: 1.0,
-          height: 1,
-          isVisible : true,
-          updateRadius: 14.0,
-        },
-      ]
-    }
-
-
-    unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
-
-  };
+  // const sendSpawnData= () => {
+  //   console.log("entroaqui")
+  //   if (!unityRef?.current ) return;
+  //   console.log("paso a spawndata")
+  //   const spawnData = {
+  //     objects: [
+  //       {
+  //         id: "1",
+  //         latitude: -25.296175132051676,
+  //         longitude: -57.58900607168004,
+  //         scale: 1.0,
+  //         height: 1,
+  //         isVisible : true,
+  //         updateRadius: 14.0,
+  //       },
+  //     ]
+  //   }
+  //
+  //
+  //   unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
+  //
+  // };
 
   const sendModelDataToUnity = () => {
     if (unityRef.current && textureBase && starModels && userLocation) {
@@ -445,20 +445,41 @@ const StarChallenge = () => {
       return;
     }
 
-    if (starModels && textureBase && unityRef.current && userLocation) {
+    if (starModels && textureBase && unityRef.current ) {
       sendModelDataToUnity();
       setTimeout(() => {
         const spawnData = {
           objects: [
+            // {
+            //   id: "1",
+            //   latitude: -25.29677932051676,
+            //   longitude: -57.58965607168004,
+            //   scale: 1.0,
+            //   height: 1,
+            //   isVisible: true,
+            //   updateRadius: 14.0,
+            // },
+            // {
+            //   id: "2",
+            //   latitude: -25.29677932051676,
+            //   longitude: -57.589567607168004,
+            //   scale: 1.0,
+            //   height: 1,
+            //   isVisible: true,
+            //   updateRadius: 14.0,
+            // },
+            // -25.296501167394688, -57.58929377457572
+            // -25.296201, -57.589002 ogaucho
             {
-              id: "1",
-              latitude: -25.296175132051676,
-              longitude: -57.58900607168004,
+              id: "3",
+              latitude: -25.29672605035726,
+              longitude: -57.58988597325399,
               scale: 1.0,
               height: 1,
               isVisible: true,
               updateRadius: 14.0,
             },
+            // -25.29672605035726, -57.58988597325399
           ],
         };
 
@@ -475,12 +496,12 @@ const StarChallenge = () => {
 
           // 💡 Este segundo `SpawnObjectsFromReact` probablemente NO sea necesario
           // a menos que lo estés usando como "refuerzo" por si no cargó antes.
-          unityRef.current.postMessage(
-              "ObjectSpawner",
-              "SpawnObjectsFromReact",
-              JSON.stringify(spawnData)
-          );
-        }, 8000); // 8 segundos después del primero
+          // unityRef.current.postMessage(
+          //     "ObjectSpawner",
+          //     "SpawnObjectsFromReact",
+          //     JSON.stringify(spawnData)
+          // );
+        }, 1000); // 8 segundos después del primero
       }, 500); // Espera 0.5s después del modelo
     }
     // if (starModels && textureBase && unityRef.current && userLocation
@@ -503,7 +524,7 @@ const StarChallenge = () => {
     //     );
     //   }, 1000);
     // }
-  }, [isUnityLoaded, starModels, textureBase,notificationMode]);
+  }, [isUnityLoaded, starModels, textureBase]);
 
   useEffect(() => {
     if (challengeObjParameters) {
@@ -532,10 +553,29 @@ const StarChallenge = () => {
     //
     if (buttonBack) {
       navigation?.goBack();
+      unityRef.current?.unloadUnity?.();
       unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena", );
     }
     if (buttonARMode){
       setOpenModalARMode(true)
+    }
+    // if (
+    //     data?.objectDetect &&
+    //     Array.isArray(data.objectDetect) &&
+    //     data.objectDetect.length > 0 &&
+    //     data.objectDetect[0]?.ObjectDetecte === true
+    // ) {
+    //   console.log("Objeto detectado:", data.objectDetect[0].Name);
+    //   setOpenModalARMode(true);
+    // }
+    // else {
+    //   // setOpenModalARMode(false)
+    //   console.log("hihi")
+    // }
+    if (data?.objectTapped?.tappedObject === true) {
+      console.log("Objeto fue tocado por el usuario:", data.objectTapped.name);
+      // podés abrir modal, dar puntos, animar, lo que necesites
+      setOpenModalARMode(true);
     }
     //
     // if (data.photoVideoButton?.isPhoto) {
@@ -563,6 +603,40 @@ const StarChallenge = () => {
   //   }
   // }
   // notificationUnity()
+
+  useFocusEffect(
+      useCallback(() => {
+        unityRef.current?.resumeUnity?.();
+        unityRef.current?.windowFocusChanged?.(true);
+
+      }, [unityRef, isUnityLoaded])
+  );
+
+  useEffect(() => {
+
+    if (unityRef.current) {
+      const spawnData = {
+        isDetectionEnabled : true,
+        detectionDistance : 80
+      }
+
+      unityRef.current.postMessage(
+          "Main Camera",
+          "SetDetectObjectState",
+          JSON.stringify(spawnData)
+      );
+
+    unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({isVisible: false})
+    );
+  }
+    console.log('Esto se ejecuta una vez Detector de objeto y Loading')
+  }, []);
+
+
+
   return (
       <ChallengeScreen
           title="AR Star Hunt "
