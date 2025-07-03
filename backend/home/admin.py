@@ -3,8 +3,9 @@ from itertools import count
 from django.contrib import admin
 from django.db.models import (
     Sum, Value, F, OuterRef, Subquery,
-    IntegerField, ExpressionWrapper, Q
+    IntegerField, ExpressionWrapper, Q, Case, When
 )
+from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.http import urlencode
@@ -26,6 +27,29 @@ class DestinationFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         return queryset
 
+    def choices(self, changelist):
+        """
+        Rewriting choices() to make the filter mutually exclusive.
+        """
+        # “All”
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(
+                remove=[self.parameter_name, "sponsor"]
+            ),
+            "display": _("All"),
+        }
+        # For each destination
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == str(lookup),
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup},
+                    ["sponsor"],  # remove 'sponsor'
+                ),
+                "display": title,
+            }
+
 
 class SponsorFilter(admin.SimpleListFilter):
     title = "Sponsor"
@@ -37,6 +61,29 @@ class SponsorFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         return queryset
+
+    def choices(self, changelist):
+        """
+        Rewriting choices() to make the filter mutually exclusive.
+        """
+        # “All”
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(
+                remove=[self.parameter_name, "destination"]
+            ),
+            "display": _("All"),
+        }
+        # For each sponsor
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == str(lookup),
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup},
+                    ["destination"],  # remove 'destination'
+                ),
+                "display": title,
+            }
 
 
 @admin.register(ScoreboardModel)
@@ -93,8 +140,24 @@ class ScoreboardAdmin(admin.ModelAdmin):
                     challenge_approval__in=["UNAPPROVED", "APPROVED"]
                 )
                 .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
+                .annotate(total=Sum(
+                    Case(
+                        When(
+                            memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
+                            then=F('points')
+                        ),
+                        When(
+                            memory_type='DEDUCTED',
+                            then=ExpressionWrapper(
+                                F('points') * Value(-1),
+                                output_field=IntegerField()
+                            )
+                        ),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
+                ))
+                .values('total')
             )
             # Sum calculation check-ins
             checkins_sq = (
@@ -110,7 +173,7 @@ class ScoreboardAdmin(admin.ModelAdmin):
             )
         elif sponsor:
             qs = qs.filter(
-                Q(user__user_ar_memories__challenges__sponsor=sponsor) |
+                Q(user__user_ar_memories__sponsor=sponsor) |
                 Q(user__user_ar_site_checkin__geo_challenge__sponsor=sponsor)
             ).distinct()
 
@@ -119,11 +182,27 @@ class ScoreboardAdmin(admin.ModelAdmin):
                 ARMemories.objects
                 .filter(
                     user=OuterRef("user"),
-                    challenges__sponsor=sponsor,
+                    sponsor=sponsor,
                     challenge_approval__in=["UNAPPROVED", "APPROVED"]
                 )
                 .values("user")
-                .annotate(total=Sum("points"))
+                .annotate(total=Sum(
+                    Case(
+                        When(
+                            memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
+                            then=F('points')
+                        ),
+                        When(
+                            memory_type='DEDUCTED',
+                            then=ExpressionWrapper(
+                                F('points') * Value(-1),
+                                output_field=IntegerField()
+                            )
+                        ),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
+                ))
                 .values("total")
             )
             # Sum calculation check-ins

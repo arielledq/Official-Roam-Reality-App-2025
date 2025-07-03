@@ -31,6 +31,8 @@ CHALLENGE_REQUIREMENT = (
 AR_MEMORY_CHOICES = (
     ("PHOTO", "PHOTO"),
     ("VIDEO", "VIDEO"),
+    ("BONUS", "BONUS"),
+    ("DEDUCTED", "DEDUCTED"),
 )
 
 GRADIENT_DIRECTION = (
@@ -117,6 +119,8 @@ class Sponsor(models.Model):
     description = RichTextField(_("Description"), blank=True, null=True)
     tags = models.CharField(_("Tags (optional)"), max_length=200, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
+
+    is_active = models.BooleanField(_("Active"), default=True)
 
     class Meta:
         verbose_name_plural = "AR Sponsor"
@@ -503,6 +507,14 @@ class ARMemories(models.Model):
         null=True,
         blank=True,
     )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="ar_memories",
+    )
     geo_location = models.ForeignKey(
         GeoLocation,
         on_delete=models.CASCADE,
@@ -511,7 +523,7 @@ class ARMemories(models.Model):
         verbose_name="Geo Destination",
         related_name="ar_memories",
     )
-    declined_reason = models.TextField(_("Declined Reason"), blank=True, null=True)
+    declined_reason = models.TextField(_("Reason"), blank=True, null=True)
     challenge_approval = models.CharField(
         max_length=50,
         choices=CHALLENGE_APPROVAL_CHOICES,
@@ -529,8 +541,16 @@ class ARMemories(models.Model):
         if self.challenge_approval == "DECLINED":
             if self.declined_reason == "":
                 raise ValidationError(
-                    "Declined Reason is mandotory, When challenge is declined!"
+                    "Declined Reason is mandatory, When challenge is declined!"
                 )
+        elif self.sponsor is None:
+            raise ValidationError(
+                "Sponsor is mandatory."
+            )
+        elif self.geo_location is None:
+            raise ValidationError(
+                "Geo Destination is mandatory."
+            )
 
     def __str__(self):
         return str(
@@ -710,6 +730,7 @@ class GeoARStarPoint(models.Model):
         default=0,
         help_text="Order of the star when following mode is 'SPECIFIC ORDER'"
     )
+    image = models.FileField(upload_to="ar/geo_star_point/", blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     elevation = models.IntegerField(null=True)
 

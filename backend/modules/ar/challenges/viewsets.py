@@ -42,7 +42,7 @@ class SponsorViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing sponsors.
     """
-    queryset = Sponsor.objects.all()
+    queryset = Sponsor.objects.filter(is_active=True)
     serializer_class = SponsorSerializer
     http_method_names = ["get"]
 
