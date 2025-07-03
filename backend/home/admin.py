@@ -44,11 +44,12 @@ class ScoreboardAdmin(admin.ModelAdmin):
     list_display = (
         "row_number",
         "user",
-        "points",                # Ar profile points
+        # "points",                # Ar profile points
         # "memories_points",
         # "checkin_points",
-        "destination_points",    # memories_points + checkin_points
+        # "destination_points",    # memories_points + checkin_points
         # "sponsor_points",    # memories_points + checkin_points
+        "calculated_points",    # memories_points + checkin_points
         "updated_at",
         "add_ar_memory"
     )
@@ -57,8 +58,8 @@ class ScoreboardAdmin(admin.ModelAdmin):
     readonly_fields = (
         # "memories_points",
         # "checkin_points",
-        "destination_points",
-        # "sponsor_points",
+        # "destination_points",
+        "calculated_points",
     )
 
     def changelist_view(self, request, extra_context=None):
@@ -73,8 +74,10 @@ class ScoreboardAdmin(admin.ModelAdmin):
             memories_points=Value(0, output_field=IntegerField()),
             checkin_points=Value(0, output_field=IntegerField()),
         )
-
+        memories_sq = None
+        checkins_sq = None
         destination = request.GET.get("destination")
+        sponsor = request.GET.get("sponsor")
         if destination:
             qs = qs.filter(
                 Q(user__user_ar_memories__geo_location=destination) |
@@ -105,7 +108,37 @@ class ScoreboardAdmin(admin.ModelAdmin):
                 .annotate(total=Sum("points"))
                 .values("total")
             )
+        elif sponsor:
+            qs = qs.filter(
+                Q(user__user_ar_memories__challenges__sponsor=sponsor) |
+                Q(user__user_ar_site_checkin__geo_challenge__sponsor=sponsor)
+            ).distinct()
 
+            # Sum calculation memories
+            memories_sq = (
+                ARMemories.objects
+                .filter(
+                    user=OuterRef("user"),
+                    challenges__sponsor=sponsor,
+                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
+                )
+                .values("user")
+                .annotate(total=Sum("points"))
+                .values("total")
+            )
+            # Sum calculation check-ins
+            checkins_sq = (
+                ARSitePinCheckIn.objects
+                .filter(
+                    user=OuterRef("user"),
+                    geo_challenge__sponsor=sponsor,
+                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
+                )
+                .values("user")
+                .annotate(total=Sum("points"))
+                .values("total")
+            )
+        if memories_sq is not None and checkins_sq is not None:
             qs = qs.annotate(
                 memories_points=Coalesce(
                     Subquery(memories_sq, output_field=IntegerField()),
@@ -117,17 +150,17 @@ class ScoreboardAdmin(admin.ModelAdmin):
                 ),
             )
 
-        # Sum both memories_points and checkin_points
-        qs = qs.annotate(
-            destination_points=ExpressionWrapper(
-                F("memories_points") + F("checkin_points"),
-                output_field=IntegerField(),
+            # Sum both memories_points and checkin_points
+            qs = qs.annotate(
+                calculated_points=ExpressionWrapper(
+                    F("memories_points") + F("checkin_points"),
+                    output_field=IntegerField(),
+                )
             )
-        )
 
         # Order by destination_points if there is a filter else use ar profile points
-        if destination:
-            qs = qs.order_by("-destination_points", "-updated_at")
+        if destination or sponsor:
+            qs = qs.order_by("-calculated_points", "-updated_at")
         else:
             qs = qs.order_by("-points", "-updated_at")
 
@@ -148,10 +181,20 @@ class ScoreboardAdmin(admin.ModelAdmin):
     # checkin_points.short_description = "Check-in Points"
     # checkin_points.admin_order_field = "checkin_points"
 
-    def destination_points(self, obj):
-        return getattr(obj, "destination_points", 0)
-    destination_points.short_description = "Destination Points"
-    destination_points.admin_order_field = "destination_points"
+    def calculated_points(self, obj):
+        return getattr(obj, "calculated_points", obj.points)
+    calculated_points.short_description = "Calculated Points"
+    calculated_points.admin_order_field = "calculated_points"
+
+    # def destination_points(self, obj):
+    #     return getattr(obj, "destination_points", 0)
+    # destination_points.short_description = "Destination Points"
+    # destination_points.admin_order_field = "destination_points"
+    #
+    # def sponsor_points(self, obj):
+    #     return getattr(obj, "sponsor_points", 0)
+    # sponsor_points.short_description = "Sponsor Points"
+    # sponsor_points.admin_order_field = "sponsor_points"
 
     def add_ar_memory(self, obj):
         info = (ARMemories._meta.app_label, ARMemories._meta.model_name)
