@@ -466,8 +466,18 @@ class ARUserProfile(models.Model):
         return str(self.user.name)
 
 
+from django.utils.translation import gettext_lazy as _
+
+
+class ARUserProfileScoreboard(ARUserProfile):
+    class Meta:
+        proxy = True
+        verbose_name = _("Scoreboard")
+        verbose_name_plural = _("Scoreboard")
+
+
 class ARMemories(models.Model):
-    memory_file = models.FileField(upload_to="ar/memories/")
+    memory_file = models.FileField(upload_to="ar/memories/", blank=True, null=True)
     thumbnail_memory_video_file = models.ImageField(upload_to="ar/memories/thumbnails/", blank=True, null=True)
     description = models.TextField(_("Description"), blank=True, null=True)
     user = models.ForeignKey(

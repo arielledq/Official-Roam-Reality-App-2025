@@ -232,6 +232,13 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
                 Q(destination_points__gt=user_points) |
                 Q(destination_points=user_points, user_ar_profile__updated_at__gt=user_updated)
             ).count() + 1
+        elif request.query_params.get('sponsor'):
+            user_points = annotated_user.sponsor_points if annotated_user else 0
+            user_updated = annotated_user.user_ar_profile.updated_at
+            rank = qs.filter(
+                Q(sponsor_points__gt=user_points) |
+                Q(sponsor_points=user_points, user_ar_profile__updated_at__gt=user_updated)
+            ).count() + 1
         else:
             user_points = annotated_user.user_ar_profile.points
             user_updated = annotated_user.user_ar_profile.updated_at
