@@ -1,9 +1,10 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {ScrollView, Platform} from "react-native";
 
-import {useNavigation} from "@react-navigation/native";
+import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
+import {useSelector} from "react-redux";
 // import { unzip } from "react-native-zip-archive";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
@@ -16,9 +17,20 @@ import ChallengeFoundCaptureHeader from "components/ChallengeFoundCaptureHeader"
 
 import {CHALLENGES_TYPE} from "constants";
 import useStyles from "./styles";
+import ChallengeScreen from "components/ChallengeScreen";
+import ARModeModal from "components/ARModal/ARModeModal";
+import {unzip} from "react-native-zip-archive";
+import {GeolocationContext} from "GeolocationProvider";
+import { getNextStar as getNextStarApi, deleteAccount, logout } from "../../../network";
+import Geolocation from "react-native-geolocation-service";
+import NotificationModal from "components/ARModal/NotificationModal";
+import pinchallenge from "screens/geoarchallenge/pinchallenge";
 
-const StarChallenge = ({route}) => {
-  const [isUnityLoaded, setIsUnityLoaded] = useState(false);
+
+const StarChallenge = () => {
+  const destinationData = useSelector(state => state.ar.destinationData);
+  const selectedDestination = useSelector(state => state.ar);
+  const [isUnityLoaded, setIsUnityLoaded] = useState(true);
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [starModels, setStarModels] = useState();
@@ -28,15 +40,18 @@ const StarChallenge = ({route}) => {
   const [modelResource, setModelResource] = useState();
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
-
   const _styles = useStyles();
   const navigation = useNavigation();
-
+  const [openModalARMode, setOpenModalARMode] = useState(false);
+  const [selectedChallengeOverride, setSelectedChallengeOverride] = useState(null);
   const unityRef = useRef(null); // Unity reference
-
-  const starChallengeObj = route.params?.starChallenge;
-  const challengeObjParameters = route.params?.starChallenge?.geo_ar_star?.geo_site?.pin_challenge;
+  const [userLocation, setUserLocation] = useState(null);
+  const starChallengeObj = selectedDestination.starChallenge;
+  const challengeObjParameters = selectedDestination.geo_ar_star?.geo_site?.pin_challenge;
   const isStarChallenge = !!starChallengeObj?.id;
+  const [sendModelData, setSendModelData] = useState(false);
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMode, setNotificationMode] = useState("scan");
 
   // Check and request permissions
   const checkPermission = () => {
@@ -58,12 +73,18 @@ const StarChallenge = ({route}) => {
     }
   };
 
+  const dataGpsChallegen = (selectedSSNN, challengeData) => {
+    setSelectedChallengeOverride(challengeData); // Guarda challengeData para usarlo como nuevo "pin_challenge"
+
+  };
+  console.log("selectedChallengeOverride", selectedChallengeOverride);
+
   // Download and unzip model files for each star
   const downloadAndPrepareModels = () => {
     // setLoading(true);
-    const challengeObj = starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge;
+    const challengeObj = selectedChallengeOverride
     const modelFile = challengeObj?.model_file;
-    if (challengeObj?.challenge_choice === "IMAGE" && modelFile) {
+    if (challengeObj?.challenge_requirement === "PHOTO" && modelFile) {
       const filename = modelFile.split("/").pop().split("?")[0];
       const withoutExtFilename = filename.split(".")[0];
       const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
@@ -76,61 +97,60 @@ const StarChallenge = ({route}) => {
           .fetch("GET", modelFile)
           .progress((received, total) => {
             const progress = Math.trunc((received / total) * 100);
-            console.log("Progreso de descarga:", progress, "%");
           })
           .then(res => {
             unzipModelFile(res.path(), targetPath);
           });
       };
       const unzipModelFile = (sourcePath, targetPath) => {
-        // unzip(sourcePath, targetPath, "UTF-8")
-        //   .then(path => {
-        //     RNFS.readDir(path)
-        //       .then(result => {
-        //         if (!result || !Array.isArray(result)) {
-        //           return;
-        //         }
-        //         const sourcesArray = [];
-        //         let objFile = null;
-        //         let mtlFile = null;
-        //         let baseTexture = null;
-        //         let emissionTexture = null;
-        //         result.forEach(file => {
-        //           if (!file.name || !file.path) {
-        //             console.warn("Archivo inválido encontrado:", file);
-        //             return;
-        //           }
-        //           const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-        //           // Procesar cada tipo de archivo
-        //           if (file.name.includes(".obj")) {
-        //             objFile = filePath;
-        //           } else if (file.name.includes(".mtl")) {
-        //             mtlFile = filePath;
-        //           } else if (file.name.toLowerCase().includes("diffuse")) {
-        //             baseTexture = filePath;
-        //           } else if (file.name.toLowerCase().includes("emission")) {
-        //             emissionTexture = filePath;
-        //           } else {
-        //             sourcesArray.push({ uri: filePath });
-        //           }
-        //           setStarModels(objFile || ""); // Manejar valores nulos
-        //           setModelResource(mtlFile);
-        //           setTextureBase(baseTexture);
-        //           setTextureEmission(emissionTexture);
-        //         });
-        //       })
-        //       .catch(error => {
-        //         console.error("Error leyendo el directorio descomprimido:", error);
-        //       });
-        //   })
-        //   .catch(error => {
-        //     console.error("Error durante la descompresión:", error);
-        //   });
+        unzip(sourcePath, targetPath, "UTF-8")
+          .then(path => {
+            RNFS.readDir(path)
+              .then(result => {
+                if (!result || !Array.isArray(result)) {
+                  return;
+                }
+                const sourcesArray = [];
+                let objFile = null;
+                let mtlFile = null;
+                let baseTexture = null;
+                let emissionTexture = null;
+                result.forEach(file => {
+                  if (!file.name || !file.path) {
+                    console.warn("Archivo inválido encontrado:", file);
+                    return;
+                  }
+                  const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
+                  // Procesar cada tipo de archivo
+                  if (file.name.includes(".obj")) {
+                    objFile = filePath;
+                  } else if (file.name.includes(".mtl")) {
+                    mtlFile = filePath;
+                  } else if (file.name.toLowerCase().includes("diffuse")) {
+                    baseTexture = filePath;
+                  } else if (file.name.toLowerCase().includes("emission")) {
+                    emissionTexture = filePath;
+                  } else {
+                    sourcesArray.push({ uri: filePath });
+                  }
+                  setStarModels(objFile || ""); // Manejar valores nulos
+                  setModelResource(mtlFile);
+                  setTextureBase(baseTexture);
+                  setTextureEmission(emissionTexture);
+
+                });
+              })
+              .catch(error => {
+                console.error("Error leyendo el directorio descomprimido:", error);
+              });
+          })
+          .catch(error => {
+            console.error("Error durante la descompresión:", error);
+          });
       };
 
       RNFS.exists(sourcePath)
         .then(exists => {
-          console.log("Archivo existe:", exists);
           if (exists) {
             unzipModelFile(sourcePath, targetPath);
           } else {
@@ -223,80 +243,178 @@ const StarChallenge = ({route}) => {
     });
   };
 
+  useEffect(() => {
+    const watchId = Geolocation.watchPosition(
+        (position) => {
+          const newLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          };
+          setUserLocation(newLocation); // ✅ Estado local
+          updateUnityLocation(newLocation); // Enviás a Unity
+        },
+        (error) => {
+          console.error("Error obteniendo ubicación:", error);
+        },
+        {
+          accuracy: {
+            android: "high",
+            ios: "best",
+          },
+          enableHighAccuracy: true,
+          distanceFilter: 0,
+          interval: 5000,
+        }
+    );
+
+    return () => {
+      Geolocation.clearWatch(watchId);
+    };
+  }, [unityRef]);
+
+  const updateUnityLocation = (location) => {
+    if (unityRef?.current) {
+      if (location.latitude && location.longitude && starModels) {
+        console.log("Enviando posicion del usuario")
+        const jsonData = JSON.stringify({
+          latitude: location?.latitude,
+          longitude: location?.longitude,
+          accuracy: location?.accuracy,
+          scaleFactor: 1,
+          smoothingFactor: 5,
+        });
+        unityRef.current.postMessage("ObjectSpawner", "SetUserLocationFromReact", jsonData);
+      }
+    }
+  };
+
+  // const Gpsobjectmanager () => {
+  // if (starModels){
+  //   const data ={
+  //     deviceLatitude: location?.latitude,
+  //     deviceLongitude: location?.longitude,
+  //     objectLatitude: -25.296670,
+  //     objectLongitude: -57.589656,
+  //   }
+  //
+  //   unityRef.current.postMessage("GpsObjectManager", "SetLocationsFromReact", JSON.stringify(data));
+  //   }
+  // }
+  //
+  // const sendSpawnData= () => {
+  //   console.log("entroaqui")
+  //   if (!unityRef?.current ) return;
+  //   console.log("paso a spawndata")
+  //   const spawnData = {
+  //     objects: [
+  //       {
+  //         id: "1",
+  //         latitude: -25.296175132051676,
+  //         longitude: -57.58900607168004,
+  //         scale: 1.0,
+  //         height: 1,
+  //         isVisible : true,
+  //         updateRadius: 14.0,
+  //       },
+  //     ]
+  //   }
+  //
+  //
+  //   unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
+  //
+  // };
+
   const sendModelDataToUnity = () => {
-    console.log("Entro en modeldata");
-    if (unityRef.current && textureBase && starModels) {
-      console.log("Datos Enviados:", modelData);
-      // Datos del modelo 3D
+    if (unityRef.current && textureBase && starModels && userLocation) {
       const modelData = {
         objFile: starModels.replace("file://", ""),
-        mtlFile: modelResource ? modelResource.replace("file://", "") : null,
+        mtlFile: modelResource ? modelResource.replace("file://", "") : "",
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
         scale: {
-          x: challengeObjParameters?.scale_object
-            ? Number(challengeObjParameters?.scale_object)
-            : 0.05,
-          y: challengeObjParameters?.scale_object
-            ? Number(challengeObjParameters?.scale_object)
-            : 0.05,
-          z: challengeObjParameters?.scale_object
-            ? Number(challengeObjParameters?.scale_object)
-            : 0.05,
+          x: 1,
+          y: 1,
+          z: 1,
         },
-        emissionIntensity: parseFloat(challengeObjParameters?.emission_value) || 1,
-        rotationSpeed: Number(challengeObjParameters?.loop_delay) || 1,
-        scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
-        minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
-        maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
+        emissionIntensity: parseFloat(selectedChallengeOverride.parameters?.emission_value) || 1,
+        rotationSpeed: Number(selectedChallengeOverride.parameters?.loop_delay) || 1,
+        scaleSpeed: Number(selectedChallengeOverride.parameters?.scale_sensitivity) || 0.01,
+        minScale: Number(selectedChallengeOverride.parameters?.min_pinch_scale) || 1,
+        maxScale: Number(selectedChallengeOverride.parameters?.max_pinch_scale) || 1,
+        // isVisible: notificationMode === 'scan',
+        isVisible: false,
+        position: {
+          x: parseFloat(selectedChallengeOverride.parameters?.positionX) || 0, // No optional chaining here, already checked above
+          y: parseFloat(selectedChallengeOverride.parameters?.positionY) || 0,
+          z: 2 || 0.4,
+        },
+        distanceCamera: 2,
+          // useGPS: false,
+          // gpsLatitude:  -25.296689,
+          // gpsLongitude: -57.589390,
       };
-      // Enviar datos del modelo a Unity
-      unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+      setTimeout(() => {
+        unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+      }, 500);
+
+      setSendModelData(true)
+
+      // setTimeout(() => {
+      //   sendSpawnData()
+      //   PointsCount()
+      // }, 2000);
+      // const GpsHandlerConfig={
+      //   minGPSAccuracy: 10,
+      //   scaleFactor: 1,
+      //   isVisibleObject: true
+      // }
+      // setTimeout(() => {
+      //   unityRef.current.postMessage("OBJImport", "ConfigureGPSFromReact", JSON.stringify(GpsHandlerConfig));
+      // }, 1000);
 
       // Parámetros adicionales para el GPSHandler en Unity
-      const parameters = {
-        smoothing: 0.5, // Factor de suavizado
-        scale: 1, // Factor de escala
-        autoUpdate: false, // Control de actualización automática
-      };
-
-      unityRef.current.postMessage(
-        "ObjectSpawner",
-        "ConfigureParameters",
-        JSON.stringify(parameters)
-      );
-
-      // Datos de los objetos GPS
-      const start_site = starChallengeObj.location.coordinates;
-      console.log("----", start_site);
-      const objects = {
-        objects: start_site.map(coord => ({
-          latitude: coord[1], // Índice 1 corresponde a la latitud
-          longitude: coord[0], // Índice 0 corresponde a la longitud
-          isVisible: true,
-          scale: 1,
-          height: 0,
-          updateRadius: 30.0,
-        })),
-      };
-
-      console.log("Datos de los objetos GPS a enviar:", objects);
+      // const parameters = {
+      //   smoothing: 0.5, // Factor de suavizado
+      //   scale: 1, // Factor de escala
+      //   autoUpdate: false, // Control de actualización automática
+      // };
+      //
+      // unityRef.current.postMessage(
+      //   "ObjectSpawner",
+      //   "ConfigureParameters",
+      //   JSON.stringify(parameters)
+      // );
+      //
+      // // Datos de los objetos GPS
+      // const start_site = selectedChallengeOverride.lat_long.coordinates;
+      // const objects = {
+      //   objects: start_site.map(coord => ({
+      //     latitude: coord[1], // Índice 1 corresponde a la latitud
+      //     longitude: coord[0], // Índice 0 corresponde a la longitud
+      //     isVisible: true,
+      //     scale: 1,
+      //     height: 0,
+      //     updateRadius: 30.0,
+      //   })),
+      // };
+      //
 
       // Enviar datos de objetos a Unity
-      unityRef.current.postMessage(
-        "ObjectSpawner",
-        "SpawnObjectsFromReact",
-        JSON.stringify(objects)
-      );
-      const visibilityConfig = {
-        isVisible: true,
-      };
-
-      unityRef.current.postMessage(
-        "OBJImport", // Nombre del script en Unity
-        "SetVisibilityFromReact", // Método que se llamará
-        JSON.stringify(visibilityConfig)
-      );
+      // unityRef.current.postMessage(
+      //   "ObjectSpawner",
+      //   "SpawnObjectsFromReact",
+      //   JSON.stringify(objects)
+      // );
+      // const visibilityConfig = {
+      //   isVisible: true,
+      // };
+      //
+      // unityRef.current.postMessage(
+      //   "OBJImport", // Nombre del script en Unity
+      //   "SetVisibilityFromReact", // Método que se llamará
+      //   JSON.stringify(visibilityConfig)
+      // );
     }
   };
 
@@ -306,17 +424,101 @@ const StarChallenge = ({route}) => {
       unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
     }
   };
-
+  const PointsCount = async () => {
+    if (unityRef.current && selectedChallengeOverride?.points) {
+      console.log("selectedDestination?.points", selectedChallengeOverride?.points)
+      const pointData = {
+        points: selectedChallengeOverride?.points,
+        isPointView: true,
+      };
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
+    }
+  };
   useEffect(() => {
     if (!unityRef.current) {
       return;
     }
 
-    if (starModels && textureBase && unityRef.current) {
+    if (starModels && textureBase && unityRef.current ) {
       sendModelDataToUnity();
-      sendBloomValuesToUnity();
+      setTimeout(() => {
+        const spawnData = {
+          objects: [
+            // {
+            //   id: "1",
+            //   latitude: -25.29677932051676,
+            //   longitude: -57.58965607168004,
+            //   scale: 1.0,
+            //   height: 1,
+            //   isVisible: true,
+            //   updateRadius: 14.0,
+            // },
+            // {
+            //   id: "2",
+            //   latitude: -25.29677932051676,
+            //   longitude: -57.589567607168004,
+            //   scale: 1.0,
+            //   height: 1,
+            //   isVisible: true,
+            //   updateRadius: 14.0,
+            // },
+            // -25.296501167394688, -57.58929377457572
+            // -25.296201, -57.589002 ogaucho
+            {
+              id: "3",
+              latitude: -25.29672605035726,
+              longitude: -57.58988597325399,
+              scale: 1.0,
+              height: 1,
+              isVisible: true,
+              updateRadius: 14.0,
+            },
+            // -25.29672605035726, -57.58988597325399
+          ],
+        };
+
+        // Primer envío de objetos
+        unityRef.current.postMessage(
+            "ObjectSpawner",
+            "SpawnObjectsFromReact",
+            JSON.stringify(spawnData)
+        );
+
+        // Segundo envío + conteo de puntos (opcional, si querés reforzar que se cargue)
+        setTimeout(() => {
+          PointsCount(); // Esto es correcto
+
+          // 💡 Este segundo `SpawnObjectsFromReact` probablemente NO sea necesario
+          // a menos que lo estés usando como "refuerzo" por si no cargó antes.
+          // unityRef.current.postMessage(
+          //     "ObjectSpawner",
+          //     "SpawnObjectsFromReact",
+          //     JSON.stringify(spawnData)
+          // );
+        }, 1000); // 8 segundos después del primero
+      }, 500); // Espera 0.5s después del modelo
     }
-  }, [isUnityLoaded]);
+    // if (starModels && textureBase && unityRef.current && userLocation
+    //     // && notificationMode === "hunt"
+    // ) {
+    //   setTimeout(() => {
+    //     sendSpawnData()
+    //     PointsCount()
+    //   }, 2000);
+    // }
+    // if (starModels && textureBase && unityRef.current && userLocation && notificationMode === "scan") {
+    //   setTimeout(() => {
+    //     PointsCount()
+    //     unityRef.current.postMessage(
+    //         "Scriptposition",
+    //         "SetVisibleButton",
+    //         JSON.stringify({
+    //           setVisibleButtonPosition: true,
+    //         })
+    //     );
+    //   }, 1000);
+    // }
+  }, [isUnityLoaded, starModels, textureBase]);
 
   useEffect(() => {
     if (challengeObjParameters) {
@@ -324,55 +526,162 @@ const StarChallenge = ({route}) => {
       setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
     }
   }, [challengeObjParameters]);
-
   useEffect(() => {
     checkPermission();
     downloadAndPrepareModels();
+  }, [selectedChallengeOverride]);
+
+
+  const closeModalARMode = () => {
+    setOpenModalARMode(false);
+    setIsUnityLoaded(true);
+  };
+
+  const handleUnityMessage = result => {
+
+    const data = JSON.parse(result.nativeEvent.message);
+    console.log("DATA UNITY",data);
+    // const buttonInfo = data.enableButton;
+    const buttonBack = data.backPress;
+    const buttonARMode = data?.ARMode
+    //
+    if (buttonBack) {
+      navigation?.goBack();
+      unityRef.current?.unloadUnity?.();
+      unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena", );
+    }
+    if (buttonARMode){
+      setOpenModalARMode(true)
+    }
+    // if (
+    //     data?.objectDetect &&
+    //     Array.isArray(data.objectDetect) &&
+    //     data.objectDetect.length > 0 &&
+    //     data.objectDetect[0]?.ObjectDetecte === true
+    // ) {
+    //   console.log("Objeto detectado:", data.objectDetect[0].Name);
+    //   setOpenModalARMode(true);
+    // }
+    // else {
+    //   // setOpenModalARMode(false)
+    //   console.log("hihi")
+    // }
+    if (data?.objectTapped?.tappedObject === true) {
+      console.log("Objeto fue tocado por el usuario:", data.objectTapped.name);
+      // podés abrir modal, dar puntos, animar, lo que necesites
+      setOpenModalARMode(true);
+    }
+    //
+    // if (data.photoVideoButton?.isPhoto) {
+    //   setCapturedImage(data.photoVideoButton?.filepath);
+    //   setIsUnityLoaded(false);
+    //   eraseFile();
+    // }
+    // if (data.photoVideoButton?.isPhoto == false) {
+    //   setCapturedVideo(data.photoVideoButton?.filepath);
+    //   setIsUnityLoaded(false);
+    // }
+    // if (data.infoButton?.isButton) {
+    //   setChallengeInformationView(data.infoButton?.isButton);
+    //   setIsUnityLoaded(true);
+    // }
+  };
+  // const notificationUnity = () => {
+  //   if (unityRef.current) {
+  //     const data = {
+  //       isNotification: true,
+  //       textNotification: "Users can scan their environment or QR Code to trigger the AR.",
+  //       titleNotification: "Scan Mode"
+  //     }
+  //     unityRef.current.postMessage("Scriptposition", "SetVisibleNotification", JSON.stringify(data));
+  //   }
+  // }
+  // notificationUnity()
+
+  useFocusEffect(
+      useCallback(() => {
+        unityRef.current?.resumeUnity?.();
+        unityRef.current?.windowFocusChanged?.(true);
+
+      }, [unityRef, isUnityLoaded])
+  );
+
+  useEffect(() => {
+
+    if (unityRef.current) {
+      const spawnData = {
+        isDetectionEnabled : true,
+        detectionDistance : 80
+      }
+
+      unityRef.current.postMessage(
+          "Main Camera",
+          "SetDetectObjectState",
+          JSON.stringify(spawnData)
+      );
+
+    unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({isVisible: false})
+    );
+  }
+    console.log('Esto se ejecuta una vez Detector de objeto y Loading')
   }, []);
 
+
+
   return (
-    <BackgroundWithImage style={_styles.mainContainer}>
-      <AppHeader
-        centerComponent={{
-          text: "AR Star Hunt " + starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.name,
-          numberOfLines: 2,
-          style: [_styles.heading],
-        }}
-        backgroundColor="transparent"
-      />
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={{width: "100%"}}
-        contentContainerStyle={{paddingBottom: 40}}
+      <ChallengeScreen
+          title="AR Star Hunt "
+          // modals={modals}
+          appHeader={false}
+          style={{
+            paddingHorizontal: 0,
+            paddingTop: "11%",
+            height: "100%",
+            backgroundColor: "#000",
+            // ...screenPadding,
+          }}
       >
-        {/* First View (Stars Collected and Points) */}
-        <ChallengeFoundCaptureHeader
-          leftTitle="Stars Collected"
-          leftValue={`${starChallengeObj?.captured_stars} / ${starChallengeObj?.total_stars}`}
-          points={starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points}
-          isStarChallenge
-        />
-
-        {/* Unity AR Camera */}
+    {/*<BackgroundWithImage style={_styles.mainContainer}>*/}
+    {/*  <AppHeader*/}
+    {/*    centerComponent={{*/}
+    {/*      text: "AR Star Hunt " + starChallengeObj?.geo_ar_star?.geo_site?.pin_challenge?.name,*/}
+    {/*      numberOfLines: 2,*/}
+    {/*      style: [_styles.heading],*/}
+    {/*    }}*/}
+    {/*    backgroundColor="transparent"*/}
+    {/*  />*/}
         <UnityARCamera
-          unityRef={unityRef}
-          isProcessingMedia={processingMedia}
-          isUnityLoaded={isUnityLoaded}
-          capturedImage={capturedImage}
-          capturedVideo={capturedVideo}
+            width={"100%"}
+            height={"100%"}
+            unityRef={unityRef}
+            isProcessingMedia={processingMedia}
+            // onUnityLayout={handleUnityViewLayout}
+            onUnityMessage={handleUnityMessage}
+            isUnityLoaded={isUnityLoaded}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
+        />
+        <ARModeModal
+            selectedDestination={destinationData}
+            isVisible={openModalARMode}
+            onPointsGranted={dataGpsChallegen}
+            onClose={closeModalARMode}
+            setShowNotification={setShowNotification}
+            setNotificationMode={setNotificationMode}
         />
 
-        {/* Footer Info Box */}
-        <CameraControls
-          onRetake={retakeButtonHandler}
-          onDone={onDonePress}
-          onCameraPress={takeScreenshot}
-          hasCapturedContent={!!capturedImage}
-          customInstructions="Stand next to the Star, resize as needed, snap your photo"
+        <NotificationModal
+            isVisible={showNotification}
+            onClose={() => setShowNotification(false)}
+            // selectedDestination={destinationData}
+            // sponsor={selectedDestination?.geo_ar_star?.geo_site?.pin_challenge?.sponsored}
+            // onPointsGranted={dataGpsChallegen}
+            selectedMode={notificationMode}
         />
-      </ScrollView>
-    </BackgroundWithImage>
+    </ChallengeScreen>
   );
 };
 

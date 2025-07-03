@@ -23,8 +23,10 @@ import {
   isLocationPointInPolygon,
 } from "../../../util/LocationLib";
 import {CHALLENGES_TYPE} from "../../../constants";
+import {CHALLENGES_TYPE} from "../../../constants";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
+import {PIN_CHALLENGE_CONFIG} from "../../../constants";
 import {PIN_CHALLENGE_CONFIG} from "../../../constants";
 
 const PinChallenge = () => {
@@ -136,12 +138,12 @@ const PinChallenge = () => {
 
   const sendModelDataToUnitySpawn = () => {
     if (
-      unityRef.current &&
-      modelOBJ &&
-      textureBase &&
-      emissionValue &&
-      textureEmission &&
-      challengeObjParameters
+        unityRef.current &&
+        modelOBJ &&
+        textureBase &&
+        emissionValue &&
+        textureEmission &&
+        challengeObjParameters
     ) {
       // Add challengeObjParameters
       const modelData = {
@@ -547,13 +549,19 @@ const PinChallenge = () => {
       if (unityRef.current) {
         PointsCount();
         unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleButton",
-          JSON.stringify({
-            setVisibleButtonPosition: true,
-          })
+            "Scriptposition",
+            "SetVisibleButton",
+            JSON.stringify({
+              setVisibleButtonPosition: true,
+            })
         );
-        if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded) {
+        if (
+            modelOBJ &&
+            textureBase &&
+            emissionValue &&
+            textureEmission &&
+            isUnityLoaded
+        ) {
           sendModelDataToUnitySpawn();
           sendBloomValuesToUnity();
         }

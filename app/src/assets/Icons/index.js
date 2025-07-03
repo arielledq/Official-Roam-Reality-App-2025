@@ -36,9 +36,15 @@ import Invite from "./invite.svg";
 import Folder from "./folder.svg";
 import Wallet from "./wallet.svg";
 import IconBGHome from "./icon_bg.png";
-import close from "./close.svg";
+import closes from "./close.svg";
 import closeModal from "./closeModal.svg";
 import pin from "./pin.svg";
+import walkingIcon from "./walkingIcon.svg";
+import pinrosa from "./pinrosa.svg";
+import scan from "./scan.svg";
+import huntMode from "./huntMode.svg";
+import pinlocation from "./pinlocation.svg";
+
 export const Icons = {
   password,
   lock,
@@ -78,7 +84,12 @@ export const Icons = {
   Folder,
   Wallet,
   IconBGHome,
-  close,
+  closes,
   closeModal,
   pin,
+  walkingIcon,
+  pinrosa,
+  scan,
+  huntMode,
+  pinlocation,
 };

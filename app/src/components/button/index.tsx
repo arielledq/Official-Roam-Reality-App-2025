@@ -12,6 +12,7 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     titleStyle = {},
     containerStyle = {},
     customColors,
+      radius,
     ...otherProps
   } = props;
 
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     lineHeight: FontLineHeights.LH20,
     color: theme.darkColors?.white,
   },
-  containerStyle: {borderRadius: BORDER_RADIUS},
+  containerStyle: {borderRadius: BORDER_RADIUS,},
 });
 
 export default AppButton;
