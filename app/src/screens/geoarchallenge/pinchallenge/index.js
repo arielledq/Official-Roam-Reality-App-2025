@@ -23,10 +23,8 @@ import {
   isLocationPointInPolygon,
 } from "../../../util/LocationLib";
 import {CHALLENGES_TYPE} from "../../../constants";
-import {CHALLENGES_TYPE} from "../../../constants";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
-import {PIN_CHALLENGE_CONFIG} from "../../../constants";
 import {PIN_CHALLENGE_CONFIG} from "../../../constants";
 
 const PinChallenge = () => {

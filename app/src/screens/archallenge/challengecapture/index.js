@@ -11,9 +11,7 @@ import {launchImageLibrary} from "react-native-image-picker";
 
 import {CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE} from "../../../constants";
 import {CAMERA_NOTIFICATION} from "../../../constants";
-import {CAMERA_NOTIFICATION} from "../../../constants";
 import {copyFileForDisplay, handleUnzipProcess} from "util/helpers";
-
 
 const RNFS = require("react-native-fs");
 // const Sound = require("react-native-sound");
@@ -219,7 +217,6 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
   };
 
-
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
     let updatedData = capturedImage ? capturedImage : capturedVideo;
@@ -357,7 +354,6 @@ const ArChallengeCapture = ({route, navigation}) => {
   );
 
   const handleUnityMessage = result => {
-
     const data = JSON.parse(result.nativeEvent.message);
     const buttonInfo = data.enableButton;
     const buttonBack = data.backPress;
@@ -429,7 +425,7 @@ const ArChallengeCapture = ({route, navigation}) => {
   let screenPadding = {};
 
   if (!isUnityLoaded) {
-    screenPadding = { paddingBottom: 24 };
+    screenPadding = {paddingBottom: 24};
   }
 
   useFocusEffect(() => {
