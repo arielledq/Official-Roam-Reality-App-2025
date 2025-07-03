@@ -4,7 +4,14 @@ import {useSafeAreaInsets} from "react-native-safe-area-context";
 import BackgroundWithImage from "./background";
 import {screenHorizontalPadding} from "util/AppDimensions";
 
-const ScreenContainer = ({children = <></>, style = {}}) => {
+import {StyleProp, ViewStyle} from "react-native";
+
+interface ScreenContainerProps {
+  children?: React.ReactNode;
+  style?: StyleProp<ViewStyle>;
+}
+
+const ScreenContainer = ({children, style}: ScreenContainerProps) => {
   const insets = useSafeAreaInsets();
 
   return (
