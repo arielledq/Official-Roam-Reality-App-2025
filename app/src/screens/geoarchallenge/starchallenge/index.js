@@ -10,12 +10,14 @@ import Sound from "react-native-sound";
 // import {unzip} from "react-native-zip-archive";
 import Geolocation from "react-native-geolocation-service";
 
-import {CHALLENGES_TYPE} from "constants";
+import {CHALLENGES_TYPE} from "../../../constants";
 import useStyles from "./styles";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
+import {handleUnzipProcess, showMessage} from "../../../util/helpers";
+
 import NotificationModal from "components/ARModeModal/NotificationModal";
 
 const StarChallenge = () => {
@@ -43,6 +45,7 @@ const StarChallenge = () => {
   const [sendModelData, setSendModelData] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMode, setNotificationMode] = useState("scan");
+  const [loading, setLoading] = useState(false);
 
   const challengeObj = selectedChallengeOverride;
   const modelFile = challengeObj?.model_file;
@@ -70,7 +73,6 @@ const StarChallenge = () => {
   const dataGpsChallegen = (selectedSSNN, challengeData) => {
     setSelectedChallengeOverride(challengeData); // Guarda challengeData para usarlo como nuevo "pin_challenge"
   };
-  console.log("selectedChallengeOverride", selectedChallengeOverride);
 
   // Download and unzip model files for each star
   // const downloadAndPrepareModels = () => {
@@ -154,7 +156,48 @@ const StarChallenge = () => {
   //       });
   //   }
   // };
+  useEffect(() => {
+    if (challengeObj && modelFile) {
+      checkIfModelExist();
+    }
+  }, [challengeObj]);
+  const downloadModelFile = (sourcePath, targetPath) => {
+    RNFetchBlob.config({
+      fileCache: true,
+      path: sourcePath,
+    })
+        .fetch("GET", modelFile)
+        .then(res => {
+          unzipModelFile(res.path(), targetPath);
+        })
+        .catch(console.error);
+  };
+  const unzipModelFile = async (sourcePath, targetPath) => {
+    setLoading(true);
 
+    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
+
+    if (extractedData.success) {
+      setStarModels(extractedData.objFile);
+      setModelResource(extractedData.mtlFile);
+      setTextureBase(extractedData.baseTexture);
+      setTextureEmission(extractedData.emissionTexture);
+      // setSourcesFiles(extractedData.sourcesFiles);
+      // setFoldefile(extractedData.foldefile);
+      console.log("Model file unzipped and state updated successfully.");
+    } else {
+      console.error("Failed to unzip model file:", extractedData.error);
+
+      setModelOBJ(null);
+      setModelResource(null);
+      setTextureBase(null);
+      setTextureEmission(null);
+      setSourcesFiles([]);
+      setFoldefile([]);
+    }
+
+    setLoading(false);
+  };
   const checkIfModelExist = () => {
     if (challengeObj && modelFile) {
       const filename = modelFile.split("/").pop().split("?")[0];
@@ -173,33 +216,6 @@ const StarChallenge = () => {
         })
         .catch(console.error);
     }
-  };
-
-  const unzipModelFile = async (sourcePath, targetPath) => {
-    setLoading(true);
-
-    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
-
-    if (extractedData.success) {
-      setModelOBJ(extractedData.objFile);
-      setModelResource(extractedData.mtlFile);
-      setTextureBase(extractedData.baseTexture);
-      setTextureEmission(extractedData.emissionTexture);
-      setSourcesFiles(extractedData.sourcesFiles);
-      setFoldefile(extractedData.foldefile);
-      console.log("Model file unzipped and state updated successfully.");
-    } else {
-      console.error("Failed to unzip model file:", extractedData.error);
-
-      setModelOBJ(null);
-      setModelResource(null);
-      setTextureBase(null);
-      setTextureEmission(null);
-      setSourcesFiles([]);
-      setFoldefile([]);
-    }
-
-    setLoading(false);
   };
 
   const retakeButtonHandler = () => {
@@ -328,42 +344,23 @@ const StarChallenge = () => {
     }
   };
 
-  // const Gpsobjectmanager () => {
-  // if (starModels){
-  //   const data ={
-  //     deviceLatitude: location?.latitude,
-  //     deviceLongitude: location?.longitude,
-  //     objectLatitude: -25.296670,
-  //     objectLongitude: -57.589656,
-  //   }
-  //
-  //   unityRef.current.postMessage("GpsObjectManager", "SetLocationsFromReact", JSON.stringify(data));
-  //   }
-  // }
-  //
-  // const sendSpawnData= () => {
-  //   console.log("entroaqui")
-  //   if (!unityRef?.current ) return;
-  //   console.log("paso a spawndata")
-  //   const spawnData = {
-  //     objects: [
-  //       {
-  //         id: "1",
-  //         latitude: -25.296175132051676,
-  //         longitude: -57.58900607168004,
-  //         scale: 1.0,
-  //         height: 1,
-  //         isVisible : true,
-  //         updateRadius: 14.0,
-  //       },
-  //     ]
-  //   }
-  //
-  //
-  //   unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
-  //
-  // };
+  useEffect(() => {
+    if (challengeObjParameters) {
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
+    }
+  }, [challengeObjParameters]);
+  useEffect(() => {
+    checkPermission();
+  }, [selectedChallengeOverride]);
 
+  const sendBloomValuesToUnity = () => {
+    const bloomData = {threshold, intensity};
+    if (unityRef.current) {
+      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
+    }
+
+  };
   const sendModelDataToUnity = () => {
     if (unityRef.current && textureBase && starModels && userLocation) {
       const modelData = {
@@ -382,90 +379,46 @@ const StarChallenge = () => {
         minScale: Number(selectedChallengeOverride.parameters?.min_pinch_scale) || 1,
         maxScale: Number(selectedChallengeOverride.parameters?.max_pinch_scale) || 1,
         // isVisible: notificationMode === 'scan',
-        isVisible: false,
+        isVisible: true,
         position: {
           x: parseFloat(selectedChallengeOverride.parameters?.positionX) || 0, // No optional chaining here, already checked above
           y: parseFloat(selectedChallengeOverride.parameters?.positionY) || 0,
           z: 2 || 0.4,
         },
         distanceCamera: 2,
-        // useGPS: false,
-        // gpsLatitude:  -25.296689,
-        // gpsLongitude: -57.589390,
+        isHuntMode: false,
+        allowScale: true,
+          // useGPS: false,
+          // gpsLatitude:  -25.296689,
+          // gpsLongitude: -57.589390,
       };
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
-
-      setSendModelData(true);
-
-      // setTimeout(() => {
-      //   sendSpawnData()
-      //   PointsCount()
-      // }, 2000);
-      // const GpsHandlerConfig={
-      //   minGPSAccuracy: 10,
-      //   scaleFactor: 1,
-      //   isVisibleObject: true
-      // }
-      // setTimeout(() => {
-      //   unityRef.current.postMessage("OBJImport", "ConfigureGPSFromReact", JSON.stringify(GpsHandlerConfig));
-      // }, 1000);
-
-      // Parámetros adicionales para el GPSHandler en Unity
-      // const parameters = {
-      //   smoothing: 0.5, // Factor de suavizado
-      //   scale: 1, // Factor de escala
-      //   autoUpdate: false, // Control de actualización automática
-      // };
-      //
-      // unityRef.current.postMessage(
-      //   "ObjectSpawner",
-      //   "ConfigureParameters",
-      //   JSON.stringify(parameters)
-      // );
-      //
-      // // Datos de los objetos GPS
-      // const start_site = selectedChallengeOverride.lat_long.coordinates;
-      // const objects = {
-      //   objects: start_site.map(coord => ({
-      //     latitude: coord[1], // Índice 1 corresponde a la latitud
-      //     longitude: coord[0], // Índice 0 corresponde a la longitud
-      //     isVisible: true,
-      //     scale: 1,
-      //     height: 0,
-      //     updateRadius: 30.0,
-      //   })),
-      // };
-      //
-
-      // Enviar datos de objetos a Unity
-      // unityRef.current.postMessage(
-      //   "ObjectSpawner",
-      //   "SpawnObjectsFromReact",
-      //   JSON.stringify(objects)
-      // );
-      // const visibilityConfig = {
-      //   isVisible: true,
-      // };
-      //
-      // unityRef.current.postMessage(
-      //   "OBJImport", // Nombre del script en Unity
-      //   "SetVisibilityFromReact", // Método que se llamará
-      //   JSON.stringify(visibilityConfig)
-      // );
+      setSendModelData(true)
     }
+
   };
-
-  const sendBloomValuesToUnity = () => {
-    const bloomData = {threshold, intensity};
-    if (unityRef.current) {
-      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
+  const sendSpawnData= () => {
+    if (!unityRef?.current ) return;
+    const spawnData = {
+      objects: [
+        {
+          id: "1",
+          latitude: -25.29674605035726,
+          longitude: -57.58958597325399,
+          scale: 1.0,
+          height: 1,
+          isVisible : true,
+          updateRadius: 14.0,
+        },
+      ]
     }
+    unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
   };
   const PointsCount = async () => {
     if (unityRef.current && selectedChallengeOverride?.points) {
-      console.log("selectedDestination?.points", selectedChallengeOverride?.points);
+      console.log("selectedDestination?.points", selectedChallengeOverride?.points)
       const pointData = {
         points: selectedChallengeOverride?.points,
         isPointView: true,
@@ -474,102 +427,18 @@ const StarChallenge = () => {
     }
   };
   useEffect(() => {
-    if (!unityRef.current) {
-      return;
-    }
+    if (!unityRef.current || !starModels || !textureBase) return;
+    sendModelDataToUnity();
+    console.log("SendModel1 - ")
 
-    if (starModels && textureBase && unityRef.current) {
-      sendModelDataToUnity();
+    if (sendModelData && userLocation) {
       setTimeout(() => {
-        const spawnData = {
-          objects: [
-            // {
-            //   id: "1",
-            //   latitude: -25.29677932051676,
-            //   longitude: -57.58965607168004,
-            //   scale: 1.0,
-            //   height: 1,
-            //   isVisible: true,
-            //   updateRadius: 14.0,
-            // },
-            // {
-            //   id: "2",
-            //   latitude: -25.29677932051676,
-            //   longitude: -57.589567607168004,
-            //   scale: 1.0,
-            //   height: 1,
-            //   isVisible: true,
-            //   updateRadius: 14.0,
-            // },
-            // -25.296501167394688, -57.58929377457572
-            // -25.296201, -57.589002 ogaucho
-            {
-              id: "3",
-              latitude: -25.29672605035726,
-              longitude: -57.58988597325399,
-              scale: 1.0,
-              height: 1,
-              isVisible: true,
-              updateRadius: 14.0,
-            },
-            // -25.29672605035726, -57.58988597325399
-          ],
-        };
-
-        // Primer envío de objetos
-        unityRef.current.postMessage(
-          "ObjectSpawner",
-          "SpawnObjectsFromReact",
-          JSON.stringify(spawnData)
-        );
-
-        // Segundo envío + conteo de puntos (opcional, si querés reforzar que se cargue)
-        setTimeout(() => {
-          PointsCount(); // Esto es correcto
-
-          // 💡 Este segundo `SpawnObjectsFromReact` probablemente NO sea necesario
-          // a menos que lo estés usando como "refuerzo" por si no cargó antes.
-          // unityRef.current.postMessage(
-          //     "ObjectSpawner",
-          //     "SpawnObjectsFromReact",
-          //     JSON.stringify(spawnData)
-          // );
-        }, 1000); // 8 segundos después del primero
-      }, 500); // Espera 0.5s después del modelo
+        PointsCount();
+        console.log("send data model 2 ---------------- bbbbbbbbbbbbbb")
+        setTimeout(sendSpawnData, 1000);
+      }, 500);
     }
-    // if (starModels && textureBase && unityRef.current && userLocation
-    //     // && notificationMode === "hunt"
-    // ) {
-    //   setTimeout(() => {
-    //     sendSpawnData()
-    //     PointsCount()
-    //   }, 2000);
-    // }
-    // if (starModels && textureBase && unityRef.current && userLocation && notificationMode === "scan") {
-    //   setTimeout(() => {
-    //     PointsCount()
-    //     unityRef.current.postMessage(
-    //         "Scriptposition",
-    //         "SetVisibleButton",
-    //         JSON.stringify({
-    //           setVisibleButtonPosition: true,
-    //         })
-    //     );
-    //   }, 1000);
-    // }
-  }, [isUnityLoaded, starModels, textureBase]);
-
-  useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
-    }
-  }, [challengeObjParameters]);
-  useEffect(() => {
-    checkPermission();
-    // downloadAndPrepareModels();
-    checkIfModelExist();
-  }, [selectedChallengeOverride]);
+  }, [isUnityLoaded, starModels, textureBase, sendModelData, userLocation]);
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -578,7 +447,7 @@ const StarChallenge = () => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    console.log("DATA UNITY", data);
+    console.log("DATA UNITY",data);
     // const buttonInfo = data.enableButton;
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
@@ -606,8 +475,8 @@ const StarChallenge = () => {
     //   // setOpenModalARMode(false)
     //   console.log("hihi")
     // }
-    if (data?.objectTapped?.tappedObject === true) {
-      console.log("Objeto fue tocado por el usuario:", data.objectTapped.name);
+    if (data?.touchEvent?.objectTouched === true) {
+      console.log("Objeto fue tocado por el usuario:", data.touchEvent.name);
       // podés abrir modal, dar puntos, animar, lo que necesites
       setOpenModalARMode(true);
     }
@@ -626,17 +495,16 @@ const StarChallenge = () => {
     //   setIsUnityLoaded(true);
     // }
   };
-  // const notificationUnity = () => {
-  //   if (unityRef.current) {
-  //     const data = {
-  //       isNotification: true,
-  //       textNotification: "Users can scan their environment or QR Code to trigger the AR.",
-  //       titleNotification: "Scan Mode"
-  //     }
-  //     unityRef.current.postMessage("Scriptposition", "SetVisibleNotification", JSON.stringify(data));
-  //   }
-  // }
-  // notificationUnity()
+  const notificationUnity = () => {
+    if (unityRef.current) {
+      const data = {
+        isNotification: true,
+        textNotification: "Presionar sobre la estrella.",
+        titleNotification: "Estrella encontrada"
+      }
+      unityRef.current.postMessage("Scriptposition", "SetVisibleNotification", JSON.stringify(data));
+    }
+  }
 
   useFocusEffect(
     useCallback(() => {
@@ -653,11 +521,21 @@ const StarChallenge = () => {
         isDetectionEnabled: true,
         detectionDistance: 80,
       };
+    unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({isVisible: false})
+    );
+
+      const distanceDetect = {
+        isDetectionEnabled : true,
+        detectionDistance : 80
+      }
 
       unityRef.current.postMessage(
         "Main Camera",
         "SetDetectObjectState",
-        JSON.stringify(spawnData)
+        JSON.stringify(distanceDetect)
       );
 
       unityRef.current.postMessage(

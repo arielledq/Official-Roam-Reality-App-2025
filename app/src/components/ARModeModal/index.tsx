@@ -32,7 +32,7 @@ interface Option {
 interface ARModeModalProps {
   isVisible: boolean;
   onClose: () => void;
-  // onPointsGranted: () => void;
+  onPointsGranted: () => void;
   // sponsor: any;
   selectedDestination: any;
   setShowNotification: () => void;
@@ -42,12 +42,12 @@ interface ARModeModalProps {
 const ARModeModal = ({
   isVisible = false,
   onClose,
-  // onPointsGranted,
+  onPointsGranted,
   // sponsor,
   setShowNotification,
   setNotificationMode,
   selectedDestination = [],
-}: 
+}:
 ARModeModalProps) => {
   const [selectedMode, setSelectedMode] = useState<Option | null>(null);
   const [loading, setLoading] = useState(false);
@@ -136,7 +136,7 @@ ARModeModalProps) => {
       selectedChallengeData,
       setSelectedChallengeData,
       closeModalHandler,
-      // onPointsGranted,
+      onPointsGranted,
       allSponsors:
         selectedMode === MODES.HUNT
           ? updatedSponsorsData
