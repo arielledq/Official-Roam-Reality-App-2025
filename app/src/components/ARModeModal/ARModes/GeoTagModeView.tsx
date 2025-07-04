@@ -18,7 +18,7 @@ const GeoTagModeView = ({
   expandedSites,
   setExpandedSites,
   allSponsors,
-  onClose,
+  closeModalHandler,
   onPointsGranted,
   setSelectedChallengeData,
   setShowNotification,
@@ -169,8 +169,8 @@ const GeoTagModeView = ({
                         setSelectedChallengeData(challengeData);
 
                         // Cerrar primero el modal actual
-                        onClose();
-                        onPointsGranted("scan", () => challengeData);
+                        closeModalHandler();
+                        // onPointsGranted("scan", () => challengeData);
 
                         // Mostrar la notificación luego de un pequeño delay
                         setTimeout(() => {

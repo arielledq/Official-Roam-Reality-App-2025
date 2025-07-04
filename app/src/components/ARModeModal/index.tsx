@@ -35,8 +35,8 @@ interface ARModeModalProps {
   // onPointsGranted: () => void;
   // sponsor: any;
   selectedDestination: any;
-  // setShowNotification: () => void;
-  // setNotificationMode: () => void;
+  setShowNotification: () => void;
+  setNotificationMode: () => void;
 }
 
 const ARModeModal = ({
@@ -44,9 +44,10 @@ const ARModeModal = ({
   onClose,
   // onPointsGranted,
   // sponsor,
+  setShowNotification,
+  setNotificationMode,
   selectedDestination = [],
-}: // setShowNotification,
-// setNotificationMode,
+}: 
 ARModeModalProps) => {
   const [selectedMode, setSelectedMode] = useState<Option | null>(null);
   const [loading, setLoading] = useState(false);
@@ -140,8 +141,8 @@ ARModeModalProps) => {
         selectedMode === MODES.HUNT
           ? updatedSponsorsData
           : mapAllDestinationsToSponsors(selectedDestination),
-      // setShowNotification,
-      // setNotificationMode,
+      setShowNotification,
+      setNotificationMode,
     };
 
     switch (selectedMode?.id) {
@@ -172,7 +173,7 @@ ARModeModalProps) => {
             styles.modalContent,
             {
               backgroundColor: theme.lightColors?.boxStatBG,
-              height: selectedMode === "ar" ? 270 : "auto",
+              height: selectedMode === null ? 270 : "auto",
             },
           ]}
         >

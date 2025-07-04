@@ -18,7 +18,7 @@ const HuntModeView = ({
   expandedSites,
   setExpandedSites,
   allSponsors,
-  onClose,
+  closeModalHandler,
   unityRef,
   onChallengeSelect,
   setSelectedChallengeData,
@@ -217,15 +217,15 @@ const HuntModeView = ({
                           parameters: challenge.pin_challenge?.parameters,
                           points: challenge.pin_challenge?.points,
                         };
-                        setSelectedChallengeData(challengeData);
-                        onClose();
+                        // setSelectedChallengeData(challengeData);
+                        closeModalHandler();
                         setTimeout(() => {
                           setNotificationMode("hunt");
                           setShowNotification(true);
-                          onPointsGranted("hunt", () => challengeData);
+                          // onPointsGranted("hunt", () => challengeData);
                         }, 300); // 300ms funciona bien visualmente
 
-                        onPointsGranted("hunt", () => challengeData);
+                        // onPointsGranted("hunt", () => challengeData);
                       }}
                       style={{
                         backgroundColor: "#1E1F30",
