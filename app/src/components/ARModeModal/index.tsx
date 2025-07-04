@@ -119,6 +119,11 @@ ARModeModalProps) => {
     }));
   };
 
+  const closeModalHandler = () => {
+    setSelectedMode(null);
+    onClose();
+  };
+
   const renderModeComponent = () => {
     const props = {
       selectedSponsors,
@@ -129,7 +134,7 @@ ARModeModalProps) => {
       setExpandedSites,
       selectedChallengeData,
       setSelectedChallengeData,
-      onClose,
+      closeModalHandler,
       // onPointsGranted,
       allSponsors:
         selectedMode === MODES.HUNT
@@ -157,7 +162,11 @@ ARModeModalProps) => {
 
   return (
     <View style={{flex: 1, position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
-      <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
+      <ReactNativeModal
+        isVisible={isVisible}
+        onDismiss={closeModalHandler}
+        onBackdropPress={closeModalHandler}
+      >
         <View
           style={[
             styles.modalContent,
@@ -178,7 +187,7 @@ ARModeModalProps) => {
             }}
           >
             <AppButton
-              onPress={onClose}
+              onPress={closeModalHandler}
               customColors={["transparent", "transparent"]}
               icon={<Icon name="closes" color="#C881F0" family="custom" size={30} />}
             ></AppButton>

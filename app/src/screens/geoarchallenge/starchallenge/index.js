@@ -7,7 +7,7 @@ import RNFetchBlob from "rn-fetch-blob";
 import {useSelector} from "react-redux";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
-import {unzip} from "react-native-zip-archive";
+// import {unzip} from "react-native-zip-archive";
 import Geolocation from "react-native-geolocation-service";
 
 import {CHALLENGES_TYPE} from "constants";
@@ -44,6 +44,9 @@ const StarChallenge = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMode, setNotificationMode] = useState("scan");
 
+  const challengeObj = selectedChallengeOverride;
+  const modelFile = challengeObj?.model_file;
+
   // Check and request permissions
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -70,86 +73,133 @@ const StarChallenge = () => {
   console.log("selectedChallengeOverride", selectedChallengeOverride);
 
   // Download and unzip model files for each star
-  const downloadAndPrepareModels = () => {
-    // setLoading(true);
-    const challengeObj = selectedChallengeOverride;
-    const modelFile = challengeObj?.model_file;
-    if (challengeObj?.challenge_requirement === "PHOTO" && modelFile) {
+  // const downloadAndPrepareModels = () => {
+  //   // setLoading(true);
+  //   const challengeObj = selectedChallengeOverride;
+  //   const modelFile = challengeObj?.model_file;
+  //   if (challengeObj?.challenge_requirement === "PHOTO" && modelFile) {
+  //     const filename = modelFile.split("/").pop().split("?")[0];
+  //     const withoutExtFilename = filename.split(".")[0];
+  //     const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+  //     const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+  //     const downloadModelFile = (sourcePath, targetPath, modelFile) => {
+  //       RNFetchBlob.config({
+  //         fileCache: true,
+  //         path: sourcePath,
+  //       })
+  //         .fetch("GET", modelFile)
+  //         .progress((received, total) => {
+  //           const progress = Math.trunc((received / total) * 100);
+  //         })
+  //         .then(res => {
+  //           unzipModelFile(res.path(), targetPath);
+  //         });
+  //     };
+  //     const unzipModelFile = (sourcePath, targetPath) => {
+  //       unzip(sourcePath, targetPath, "UTF-8")
+  //         .then(path => {
+  //           RNFS.readDir(path)
+  //             .then(result => {
+  //               if (!result || !Array.isArray(result)) {
+  //                 return;
+  //               }
+  //               const sourcesArray = [];
+  //               let objFile = null;
+  //               let mtlFile = null;
+  //               let baseTexture = null;
+  //               let emissionTexture = null;
+  //               result.forEach(file => {
+  //                 if (!file.name || !file.path) {
+  //                   console.warn("Archivo inválido encontrado:", file);
+  //                   return;
+  //                 }
+  //                 const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
+  //                 // Procesar cada tipo de archivo
+  //                 if (file.name.includes(".obj")) {
+  //                   objFile = filePath;
+  //                 } else if (file.name.includes(".mtl")) {
+  //                   mtlFile = filePath;
+  //                 } else if (file.name.toLowerCase().includes("diffuse")) {
+  //                   baseTexture = filePath;
+  //                 } else if (file.name.toLowerCase().includes("emission")) {
+  //                   emissionTexture = filePath;
+  //                 } else {
+  //                   sourcesArray.push({uri: filePath});
+  //                 }
+  //                 setStarModels(objFile || ""); // Manejar valores nulos
+  //                 setModelResource(mtlFile);
+  //                 setTextureBase(baseTexture);
+  //                 setTextureEmission(emissionTexture);
+  //               });
+  //             })
+  //             .catch(error => {
+  //               console.error("Error leyendo el directorio descomprimido:", error);
+  //             });
+  //         })
+  //         .catch(error => {
+  //           console.error("Error durante la descompresión:", error);
+  //         });
+  //     };
+
+  //     RNFS.exists(sourcePath)
+  //       .then(exists => {
+  //         if (exists) {
+  //           unzipModelFile(sourcePath, targetPath);
+  //         } else {
+  //           downloadModelFile(sourcePath, targetPath, modelFile);
+  //         }
+  //       })
+  //       .catch(error => {
+  //         console.error("Error verificando existencia del archivo:", error);
+  //       });
+  //   }
+  // };
+
+  const checkIfModelExist = () => {
+    if (challengeObj && modelFile) {
       const filename = modelFile.split("/").pop().split("?")[0];
       const withoutExtFilename = filename.split(".")[0];
       const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-      const downloadModelFile = (sourcePath, targetPath, modelFile) => {
-        RNFetchBlob.config({
-          fileCache: true,
-          path: sourcePath,
-        })
-          .fetch("GET", modelFile)
-          .progress((received, total) => {
-            const progress = Math.trunc((received / total) * 100);
-          })
-          .then(res => {
-            unzipModelFile(res.path(), targetPath);
-          });
-      };
-      const unzipModelFile = (sourcePath, targetPath) => {
-        unzip(sourcePath, targetPath, "UTF-8")
-          .then(path => {
-            RNFS.readDir(path)
-              .then(result => {
-                if (!result || !Array.isArray(result)) {
-                  return;
-                }
-                const sourcesArray = [];
-                let objFile = null;
-                let mtlFile = null;
-                let baseTexture = null;
-                let emissionTexture = null;
-                result.forEach(file => {
-                  if (!file.name || !file.path) {
-                    console.warn("Archivo inválido encontrado:", file);
-                    return;
-                  }
-                  const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-                  // Procesar cada tipo de archivo
-                  if (file.name.includes(".obj")) {
-                    objFile = filePath;
-                  } else if (file.name.includes(".mtl")) {
-                    mtlFile = filePath;
-                  } else if (file.name.toLowerCase().includes("diffuse")) {
-                    baseTexture = filePath;
-                  } else if (file.name.toLowerCase().includes("emission")) {
-                    emissionTexture = filePath;
-                  } else {
-                    sourcesArray.push({uri: filePath});
-                  }
-                  setStarModels(objFile || ""); // Manejar valores nulos
-                  setModelResource(mtlFile);
-                  setTextureBase(baseTexture);
-                  setTextureEmission(emissionTexture);
-                });
-              })
-              .catch(error => {
-                console.error("Error leyendo el directorio descomprimido:", error);
-              });
-          })
-          .catch(error => {
-            console.error("Error durante la descompresión:", error);
-          });
-      };
 
       RNFS.exists(sourcePath)
         .then(exists => {
+          console.log("exists", exists);
           if (exists) {
             unzipModelFile(sourcePath, targetPath);
           } else {
-            downloadModelFile(sourcePath, targetPath, modelFile);
+            downloadModelFile(sourcePath, targetPath);
           }
         })
-        .catch(error => {
-          console.error("Error verificando existencia del archivo:", error);
-        });
+        .catch(console.error);
     }
+  };
+
+  const unzipModelFile = async (sourcePath, targetPath) => {
+    setLoading(true);
+
+    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
+
+    if (extractedData.success) {
+      setModelOBJ(extractedData.objFile);
+      setModelResource(extractedData.mtlFile);
+      setTextureBase(extractedData.baseTexture);
+      setTextureEmission(extractedData.emissionTexture);
+      setSourcesFiles(extractedData.sourcesFiles);
+      setFoldefile(extractedData.foldefile);
+      console.log("Model file unzipped and state updated successfully.");
+    } else {
+      console.error("Failed to unzip model file:", extractedData.error);
+
+      setModelOBJ(null);
+      setModelResource(null);
+      setTextureBase(null);
+      setTextureEmission(null);
+      setSourcesFiles([]);
+      setFoldefile([]);
+    }
+
+    setLoading(false);
   };
 
   const retakeButtonHandler = () => {
@@ -517,7 +567,8 @@ const StarChallenge = () => {
   }, [challengeObjParameters]);
   useEffect(() => {
     checkPermission();
-    downloadAndPrepareModels();
+    // downloadAndPrepareModels();
+    checkIfModelExist();
   }, [selectedChallengeOverride]);
 
   const closeModalARMode = () => {
@@ -534,8 +585,10 @@ const StarChallenge = () => {
     //
     if (buttonBack) {
       navigation?.goBack();
-      unityRef.current?.unloadUnity?.();
-      unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena");
+      if (Platform.OS === "android") {
+        unityRef.current?.unloadUnity?.();
+        unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena");
+      }
     }
     if (buttonARMode) {
       setOpenModalARMode(true);
@@ -587,8 +640,10 @@ const StarChallenge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      unityRef.current?.resumeUnity?.();
-      unityRef.current?.windowFocusChanged?.(true);
+      if (Platform.OS === "android") {
+        unityRef.current?.resumeUnity?.();
+        unityRef.current?.windowFocusChanged?.(true);
+      }
     }, [unityRef, isUnityLoaded])
   );
 
