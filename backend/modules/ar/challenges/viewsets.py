@@ -2,7 +2,8 @@ import json
 from itertools import chain
 from operator import attrgetter
 
-from .filters import CategoryFilterSet
+from configuration import configs
+from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
     DestinationFacts, PanicMessage, GeoArSiteCategory
@@ -12,7 +13,7 @@ from .serializers import ARMemoriesSerializerGet, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, \
     GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer
-from rest_framework import viewsets
+from rest_framework import viewsets, exceptions
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
 from rest_framework.views import APIView
@@ -672,3 +673,40 @@ class MemoryCheckinViewSet(ViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ArSiteViewSet(viewsets.GenericViewSet,
+                    viewsets.mixins.ListModelMixin,):
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = ArSiteFilterSet
+
+    def get_serializer_class(self):
+        site_type = int(self.request.query_params.get("site_type"))
+        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
+            return GeoArSiteSerializer
+        return ChallengesSerializer
+
+    def get_queryset(self):
+        try:
+            site_type = int(self.request.query_params.get("site_type"))
+        except:
+            raise exceptions.ValidationError({
+                "detail": "site_type is required ?site_type=<int>"
+            })
+
+        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
+            return GeoArSite.objects.all()
+
+        qs = Challenges.objects.filter(
+                is_active=True
+            )
+
+        if sponsor := self.request.query_params.get("sponsor"):
+            qs = qs.filter(sponsor=sponsor)
+
+        return qs
+
+    def filter_queryset(self, qs):
+        if int(self.request.query_params.get("site_type")) in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
+            return super().filter_queryset(qs)
+        return qs

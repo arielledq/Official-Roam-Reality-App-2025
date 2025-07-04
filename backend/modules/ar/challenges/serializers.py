@@ -34,7 +34,11 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
         return ARSitePinCheckIn.objects.filter(user=instance.user).count()
 
     def get_points(self, instance):
-        return getattr(instance.user, 'destination_points', instance.user.user_ar_profile.points)
+        if hasattr(instance.user, 'destination_points'):
+            return instance.user.destination_points
+        elif hasattr(instance.user, 'sponsor_points'):
+            return instance.user.sponsor_points
+        return instance.user.user_ar_profile.points
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -338,7 +342,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     category = GeoArSiteCategorySerializer(read_only=True)
     check_ins = serializers.SerializerMethodField()
     user_attempts = serializers.SerializerMethodField()
-    sponsors = SponsorSerializer(read_only=True, many=True)
+    sponsor = SponsorSerializer(read_only=True)
 
     class Meta:
         model = GeoArSite
@@ -362,7 +366,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "category",
             "challenge_attempt",
             "user_attempts",
-            "sponsors",
+            "sponsor",
             "is_active",
             "band_user",
         )

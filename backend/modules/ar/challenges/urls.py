@@ -6,7 +6,7 @@ from .viewsets import ChallengesViewSet, ChallengesUploadView, \
     SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
     ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet, ARSitePinCheckInViewSet, \
     StarCollectionViewSet, GoldStarCollectionViewSet, DestinationFactsViewSet, PanicMessageViewSet, \
-    MemoryCheckinViewSet, GeoArSiteCategoryViewSet, GeoLocationMiniViewSet
+    MemoryCheckinViewSet, GeoArSiteCategoryViewSet, GeoLocationMiniViewSet, ArSiteViewSet
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
@@ -26,6 +26,7 @@ router.register(r'geo-ar-star-collect', StarCollectionViewSet, basename="ar-star
 router.register(r'geo-ar-gold-star', GoldStarCollectionViewSet, basename="ar-gold-stars")
 router.register(r'geo-destination-fact', DestinationFactsViewSet, basename="geo-destination-fact")
 router.register(r'panic-message', PanicMessageViewSet, basename="panic-message")
+router.register(r'sites', ArSiteViewSet, basename="sites")
 
 urlpatterns = [
     path('', include(router.urls)),
