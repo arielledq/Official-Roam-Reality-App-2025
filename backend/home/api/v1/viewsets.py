@@ -16,12 +16,16 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from home.api.v1.filters import ScoreFilterSet
-from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation
+from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation, ARSitePinCheckIn
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
 from home.utils import EmailOTP
 from django.utils.translation import ugettext_lazy as _
+from django.db.models import (
+    OuterRef, Subquery, Sum, Case, When, Value, F, IntegerField, Q
+)
+from django.db.models.functions import Coalesce
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator as token_generator
 from home.api.v1.serializers import (
@@ -216,14 +220,59 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     search_fields = ['name', ]
 
     def get_queryset(self):
-        queryset = (super().get_queryset()
-                    .exclude(id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS).
-                    order_by('-user_ar_profile__points', '-user_ar_profile__updated_at'))
-        return queryset
+        qs = super().get_queryset().exclude(
+            id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS
+        )
+
+        # Subquery ARMemories
+        memories_sq = (
+            ARMemories.objects
+            .filter(
+                user=OuterRef('pk'),
+                challenge_approval__in=["UNAPPROVED", "APPROVED"],
+            )
+            .values('user')
+            .annotate(total=Sum(
+                Case(
+                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS'], then=F('points')),
+                    When(memory_type='DEDUCTED', then=F('points') * Value(-1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            ))
+            .values('total')
+        )
+
+        # Subquery ARSitePinCheckIn
+        checkins_sq = (
+            ARSitePinCheckIn.objects
+            .filter(
+                user=OuterRef('pk'),
+                challenge_approval__in=["UNAPPROVED", "APPROVED"],
+            )
+            .values('user')
+            .annotate(total=Sum('points'))
+            .values('total')
+        )
+
+        # Sum
+        qs = qs.annotate(
+            memories_points=Coalesce(
+                Subquery(memories_sq, output_field=IntegerField()),
+                Value(0)
+            ),
+            checkin_points=Coalesce(
+                Subquery(checkins_sq, output_field=IntegerField()),
+                Value(0)
+            ),
+        ).annotate(
+            calculated_points=F('memories_points') + F('checkin_points')
+        )
+
+        return qs.order_by('-calculated_points', '-user_ar_profile__updated_at')
 
     def list(self, request, *args, **kwargs):
-        qs = self.filter_queryset(self.get_queryset())
-        qs = qs[:1000]
+        qs = self.filter_queryset(self.get_queryset())[:1000]
         serializer = self.get_serializer(qs, many=True)
         return Response(serializer.data)
 
@@ -233,27 +282,39 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
         user = request.user
 
         annotated_user = qs.filter(pk=user.pk).first()
-        if request.query_params.get('destination'):
-            user_points = annotated_user.destination_points if annotated_user else 0
-            user_updated = annotated_user.user_ar_profile.updated_at
-            rank = qs.filter(
-                Q(destination_points__gt=user_points) |
-                Q(destination_points=user_points, user_ar_profile__updated_at__gt=user_updated)
-            ).count() + 1
-        elif request.query_params.get('sponsor'):
-            user_points = annotated_user.sponsor_points if annotated_user else 0
-            user_updated = annotated_user.user_ar_profile.updated_at
-            rank = qs.filter(
-                Q(sponsor_points__gt=user_points) |
-                Q(sponsor_points=user_points, user_ar_profile__updated_at__gt=user_updated)
-            ).count() + 1
-        else:
-            user_points = annotated_user.user_ar_profile.points
-            user_updated = annotated_user.user_ar_profile.updated_at
-            rank = qs.filter(
-                Q(user_ar_profile__points__gt=user_points) |
-                Q(user_ar_profile__points=user_points, user_ar_profile__updated_at__gt=user_updated)
-            ).count() + 1
+
+        user_points = annotated_user.calculated_points if annotated_user else 0
+        user_updated = annotated_user.user_ar_profile.updated_at if annotated_user else None
+
+        rank = qs.filter(
+            Q(calculated_points__gt=user_points) |
+            Q(
+                calculated_points=user_points,
+                user_ar_profile__updated_at__gt=user_updated
+            )
+        ).count() + 1
+
+        # if request.query_params.get('destination'):
+        #     user_points = annotated_user.destination_points if annotated_user else 0
+        #     user_updated = annotated_user.user_ar_profile.updated_at
+        #     rank = qs.filter(
+        #         Q(destination_points__gt=user_points) |
+        #         Q(destination_points=user_points, user_ar_profile__updated_at__gt=user_updated)
+        #     ).count() + 1
+        # elif request.query_params.get('sponsor'):
+        #     user_points = annotated_user.sponsor_points if annotated_user else 0
+        #     user_updated = annotated_user.user_ar_profile.updated_at
+        #     rank = qs.filter(
+        #         Q(sponsor_points__gt=user_points) |
+        #         Q(sponsor_points=user_points, user_ar_profile__updated_at__gt=user_updated)
+        #     ).count() + 1
+        # else:
+        #     user_points = annotated_user.user_ar_profile.points
+        #     user_updated = annotated_user.user_ar_profile.updated_at
+        #     rank = qs.filter(
+        #         Q(user_ar_profile__points__gt=user_points) |
+        #         Q(user_ar_profile__points=user_points, user_ar_profile__updated_at__gt=user_updated)
+        #     ).count() + 1
 
         return Response({
             'my_rank': rank,
