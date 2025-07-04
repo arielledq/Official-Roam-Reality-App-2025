@@ -239,7 +239,7 @@ class ARChallengeFilters(models.Model):
     )
     image = models.ImageField(_("Filter Image"), upload_to="filters/img/", null=True, blank=True)
     text_form_image = models.BooleanField(_("Load Image Text"), default=False)
-    gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False)
+    gradient_colors = TaggableManager(verbose_name="Gradient Colours", blank=False, related_name="ar_challenge_filters_gradient_colors")
     gradient_direction = models.CharField(
         max_length=50, choices=GRADIENT_DIRECTION, default="TOP_TO_BOTTOM", blank=False, null=False
     )
@@ -453,7 +453,7 @@ class ARUserProfile(models.Model):
     check_ins = models.BigIntegerField(verbose_name="Check-ins", default=0)
     challenge_completed = models.IntegerField(verbose_name="Challenge Completed", default=0)
     user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="user_ar_profile"
+        User, on_delete=models.CASCADE, related_name="ar_user_profile_user"
     )
     current_location = gis_models.PointField(_("Current Location"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
@@ -471,7 +471,7 @@ class ARMemories(models.Model):
     thumbnail_memory_video_file = models.ImageField(upload_to="ar/memories/thumbnails/", blank=True, null=True)
     description = models.TextField(_("Description"), blank=True, null=True)
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_ar_memories"
+        User, on_delete=models.CASCADE, related_name="ar_memories_user"
     )
     memory_type = models.CharField(
         max_length=50, choices=AR_MEMORY_CHOICES, default="PHOTO", blank=True, null=True
@@ -632,7 +632,7 @@ class GeoArSite(models.Model):
     )
     is_active = models.BooleanField(_("Active"), default=True)
     band_user = models.OneToOneField(
-        User, on_delete=models.CASCADE, related_name="geo_site", null=True, blank=True
+        User, on_delete=models.CASCADE, related_name="geo_ar_site_band_user", null=True, blank=True
     )
 
     class Meta:
@@ -774,7 +774,7 @@ class GeoARSiteActivity(models.Model):
         related_name="geo_acitivity_ar_site",
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_ar_site_acitivity"
+        User, on_delete=models.CASCADE, related_name="geo_ar_site_activity_user"
     )
     description = models.TextField(_("Description"), blank=True, null=True)
 
@@ -796,7 +796,7 @@ class ARSitePinCheckIn(models.Model):
         related_name="geo_star_checkin_ar_site",
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_ar_site_checkin"
+        User, on_delete=models.CASCADE, related_name="ar_site_pin_checkin_user"
     )
     memory_file = models.ImageField(upload_to="geoar/checkinimg/", null=True, blank=True)
     challenge_approval = models.CharField(
@@ -868,7 +868,7 @@ class StarCollection(models.Model):
         related_name="geo_star_collect_ar_star_point",
     )
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_ar_site_star"
+        User, on_delete=models.CASCADE, related_name="star_collection_user"
     )
     point = gis_models.PointField(_("Point"), blank=True, null=True)
 
@@ -953,7 +953,7 @@ class GeoARGoldStar(models.Model):
 
 class PanicMessage(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name="user_panic_message"
+        User, on_delete=models.CASCADE, related_name="panic_message_user"
     )
     message = RichTextField(_("Message"), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

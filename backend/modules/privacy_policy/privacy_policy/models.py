@@ -9,6 +9,7 @@ class PrivacyPolicy(models.Model):
 	author = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.PROTECT,
+		related_name="privacy_policies"
 		)
 	is_active = models.BooleanField(
 		default=True
