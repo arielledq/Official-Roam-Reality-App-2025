@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
   arProfile: {},
@@ -13,6 +13,7 @@ const initialState = {
   destinationData: [],
   starSitesCount: {},
 
+  sponsors: [],
 };
 
 export const sliceAR = createSlice({
@@ -74,6 +75,9 @@ export const sliceAR = createSlice({
         ...action.payload,
       };
     },
+    updateSponsors: (state, action) => {
+      state.sponsors = action.payload;
+    },
   },
 });
 
@@ -91,5 +95,5 @@ export const {
 
   updateDestinationData,
   updateStarSitesCount,
-
+  updateSponsors,
 } = sliceAR.actions;

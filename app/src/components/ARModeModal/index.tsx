@@ -32,8 +32,6 @@ interface Option {
 interface ARModeModalProps {
   isVisible: boolean;
   onClose: () => void;
-  // onPointsGranted: () => void;
-  // sponsor: any;
   selectedDestination: any;
   setShowNotification: () => void;
   setNotificationMode: () => void;
@@ -50,13 +48,11 @@ const ARModeModal = ({
 }: 
 ARModeModalProps) => {
   const [selectedMode, setSelectedMode] = useState<Option | null>(null);
-  const [loading, setLoading] = useState(false);
   const [selectedSponsors, setSelectedSponsors] = useState<string[]>([]);
-  const [selectedDropdownValue, setSelectedDropdownValue] = useState<number | null>(null);
-  const [expandedSites, setExpandedSites] = useState<string[]>([]);
+
+  const [loading, setLoading] = useState(false);
   const [selectedChallengeData, setSelectedChallengeData] = useState(null);
   const [updatedSponsorsData, setUpdatedSponsorsData] = useState([]);
-  const selectedDestinations = useSelector(state => state);
   const {userLocation} = useContext(GeolocationContext);
 
   // console.log(selectedDestinations);
@@ -129,25 +125,26 @@ ARModeModalProps) => {
     const props = {
       selectedSponsors,
       setSelectedSponsors,
-      selectedDropdownValue,
-      setSelectedDropdownValue,
-      expandedSites,
-      setExpandedSites,
+      // selectedDropdownValue,
+      // setSelectedDropdownValue,
+      // expandedSites,
+      // setExpandedSites,
       selectedChallengeData,
       setSelectedChallengeData,
       closeModalHandler,
       // onPointsGranted,
-      allSponsors:
-        selectedMode === MODES.HUNT
-          ? updatedSponsorsData
-          : mapAllDestinationsToSponsors(selectedDestination),
+      // allSponsors:
+      //   selectedMode === MODES.HUNT
+      //     ? updatedSponsorsData
+      //     : mapAllDestinationsToSponsors(selectedDestination),
       setShowNotification,
       setNotificationMode,
+      onClose: closeModalHandler,
     };
 
     switch (selectedMode?.id) {
       case AR_MODES.GEO_TAG_MODE:
-        return <GeoTagModeView {...props} />;
+        return <GeoTagModeView {...props} />; // DONE
       case AR_MODES.SCAN_MODE:
         return <ScanModeView {...props} />;
       case AR_MODES.HUNT_MODE:

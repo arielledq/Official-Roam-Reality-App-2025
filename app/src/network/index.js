@@ -274,7 +274,9 @@ export const getSponsors = () =>
 export const getARSites = payload =>
   Request.callWithToken(
     {
-      url: `modules/challenges/sites/?lat=${payload.lat}&lon=${payload.lon}&site_type=${payload.site_type}&sponsor=${payload.sponsor}`,
+      url: `modules/challenges/sites/?lat=${payload.lat}&lng=${payload.lon}&site_type=${
+        payload.site_type
+      }${payload?.sponsor ? `&sponsor=${payload.sponsor}` : ""}`,
       method: "GET",
     },
     logoutFunc

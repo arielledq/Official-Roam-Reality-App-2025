@@ -9,4 +9,5 @@ export {
   updateSelectedDestinationBandLocation,
   updateDestinationData,
   updateStarSitesCount,
+  updateSponsors,
 } from "./reducer";
