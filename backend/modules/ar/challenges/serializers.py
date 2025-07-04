@@ -34,11 +34,7 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
         return ARSitePinCheckIn.objects.filter(user=instance.user).count()
 
     def get_points(self, instance):
-        if hasattr(instance.user, 'destination_points'):
-            return instance.user.destination_points
-        elif hasattr(instance.user, 'sponsor_points'):
-            return instance.user.sponsor_points
-        return instance.user.user_ar_profile.points
+        return getattr(instance.user, 'calculated_points', 0)
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -228,6 +224,7 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
 
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
+    sponsor = SponsorSerializer
 
     class Meta:
         model = ARMemories
@@ -244,6 +241,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "challenge_approval",
             "created_at",
             "points",
+            "sponsor",
             "geo_location",
         )
 
@@ -609,6 +607,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
     remaining_stars = serializers.SerializerMethodField()
     captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
+    image = serializers.ImageField()
 
     class Meta:
         model = GeoARStarPoint
@@ -621,6 +620,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "remaining_stars",
             "captured_stars",
             "total_stars",
+            "image",
             "fun_facts",
             "elevation",
         )

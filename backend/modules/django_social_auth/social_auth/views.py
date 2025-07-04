@@ -23,7 +23,7 @@ from home.api.v1.serializers import UserSerializer
 from rest_auth.social_serializers import TwitterLoginSerializer
 from rest_framework import status
 
-from ...ar.challenges.models import ARUserProfile
+from ...ar.challenges.models import ARUserProfile, Sponsor, GeoLocation, ARMemories
 
 try:
     APP_DOMAIN = f"https://{get_current_site(None)}"
@@ -54,6 +54,14 @@ class FacebookLogin(SocialLoginView):
         if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
+            sponsor = Sponsor.objects.get(name='BONUS')
+            geo_location = GeoLocation.objects.get(name='BONUS')
+            ARMemories.objects.create(
+                points=configs.POINTS_GIFT,
+                sponsor=sponsor,
+                geo_location=geo_location,
+                memory_type='BONUS'
+            )
             configs.NUMBER_USER_POINT_GIFT += 1
             send_notification(
                 NotificationTypes.DEFAULT,
@@ -90,6 +98,14 @@ class GoogleLogin(SocialLoginView):
         if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
+            sponsor = Sponsor.objects.get(name='BONUS')
+            geo_location = GeoLocation.objects.get(name='BONUS')
+            ARMemories.objects.create(
+                points=configs.POINTS_GIFT,
+                sponsor=sponsor,
+                geo_location=geo_location,
+                memory_type='BONUS'
+            )
             configs.NUMBER_USER_POINT_GIFT += 1
             send_notification(
                 NotificationTypes.DEFAULT,
@@ -127,6 +143,14 @@ class AppleLogin(SocialLoginView):
         if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
+            sponsor = Sponsor.objects.get(name='BONUS')
+            geo_location = GeoLocation.objects.get(name='BONUS')
+            ARMemories.objects.create(
+                points=configs.POINTS_GIFT,
+                sponsor=sponsor,
+                geo_location=geo_location,
+                memory_type='BONUS'
+            )
             configs.NUMBER_USER_POINT_GIFT += 1
             send_notification(
                 NotificationTypes.DEFAULT,
