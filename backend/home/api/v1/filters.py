@@ -6,9 +6,7 @@ from users.models import User
 
 
 class ScoreFilterSet(filters.FilterSet):
-    """
-    Specific filters for FriendsViewSet.
-    """
+
     destination = filters.NumberFilter(method='filter_by_destination')
     sponsor = filters.NumberFilter(method='filter_by_sponsor')
 
@@ -17,13 +15,14 @@ class ScoreFilterSet(filters.FilterSet):
         fields = ['destination', 'sponsor']
 
     def filter_by_destination(self, queryset, name, value):
-        queryset = queryset.filter(
-            Q(user_ar_memories__geo_location=value)
-            | Q(user_ar_site_checkin__geo_location=value)
+        qs = queryset.filter(
+            Q(user_ar_memories__geo_location=value) |
+            Q(user_ar_site_checkin__geo_location=value)
         ).distinct()
 
-        memories_subquery = (
-            ARMemories.objects.filter(
+        memories_sq = (
+            ARMemories.objects
+            .filter(
                 user=OuterRef('pk'),
                 geo_location=value,
                 challenge_approval__in=["UNAPPROVED", "APPROVED"],
@@ -31,26 +30,18 @@ class ScoreFilterSet(filters.FilterSet):
             .values('user')
             .annotate(total=Sum(
                 Case(
-                    When(
-                        memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
-                        then=F('points')
-                    ),
-                    When(
-                        memory_type='DEDUCTED',
-                        then=ExpressionWrapper(
-                            F('points') * Value(-1),
-                            output_field=IntegerField()
-                        )
-                    ),
+                    When(memory_type__in=['PHOTO','VIDEO','BONUS'], then=F('points')),
+                    When(memory_type='DEDUCTED', then=F('points') * Value(-1)),
                     default=Value(0),
-                    output_field=IntegerField(),
+                    output_field=IntegerField()
                 )
             ))
             .values('total')
         )
 
-        checkin_subquery = (
-            ARSitePinCheckIn.objects.filter(
+        checkins_sq = (
+            ARSitePinCheckIn.objects
+            .filter(
                 user=OuterRef('pk'),
                 geo_location=value,
                 challenge_approval__in=["UNAPPROVED", "APPROVED"],
@@ -60,26 +51,24 @@ class ScoreFilterSet(filters.FilterSet):
             .values('total')
         )
 
-        queryset = queryset.annotate(
-            memories_points=Coalesce(Subquery(memories_subquery, output_field=IntegerField()), Value(0, output_field=IntegerField())),
-            checkin_points=Coalesce(Subquery(checkin_subquery, output_field=IntegerField()), Value(0, output_field=IntegerField()))
+        qs = qs.annotate(
+            memories_points=Coalesce(Subquery(memories_sq,   output_field=IntegerField()), Value(0)),
+            checkin_points=Coalesce(Subquery(checkins_sq,   output_field=IntegerField()), Value(0)),
         ).annotate(
-            destination_points=ExpressionWrapper(
-                F('memories_points') + F('checkin_points'),
-                output_field=IntegerField()
-            )
+            calculated_points=F('memories_points') + F('checkin_points')
         )
 
-        return queryset.order_by('-destination_points', '-user_ar_profile__updated_at')
+        return qs.order_by('-calculated_points', '-user_ar_profile__updated_at')
 
     def filter_by_sponsor(self, queryset, name, value):
-        queryset = queryset.filter(
-            Q(user_ar_memories__sponsor=value)
-            | Q(user_ar_site_checkin__geo_challenge__sponsor=value)
+        qs = queryset.filter(
+            Q(user_ar_memories__sponsor=value) |
+            Q(user_ar_site_checkin__geo_challenge__sponsor=value)
         ).distinct()
 
-        memories_subquery = (
-            ARMemories.objects.filter(
+        memories_sq = (
+            ARMemories.objects
+            .filter(
                 user=OuterRef('pk'),
                 sponsor=value,
                 challenge_approval__in=["UNAPPROVED", "APPROVED"],
@@ -87,26 +76,18 @@ class ScoreFilterSet(filters.FilterSet):
             .values('user')
             .annotate(total=Sum(
                 Case(
-                    When(
-                        memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
-                        then=F('points')
-                    ),
-                    When(
-                        memory_type='DEDUCTED',
-                        then=ExpressionWrapper(
-                            F('points') * Value(-1),
-                            output_field=IntegerField()
-                        )
-                    ),
+                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS'], then=F('points')),
+                    When(memory_type='DEDUCTED', then=F('points') * Value(-1)),
                     default=Value(0),
-                    output_field=IntegerField(),
+                    output_field=IntegerField()
                 )
             ))
             .values('total')
         )
 
-        checkin_subquery = (
-            ARSitePinCheckIn.objects.filter(
+        checkins_sq = (
+            ARSitePinCheckIn.objects
+            .filter(
                 user=OuterRef('pk'),
                 geo_challenge__sponsor=value,
                 challenge_approval__in=["UNAPPROVED", "APPROVED"],
@@ -116,14 +97,11 @@ class ScoreFilterSet(filters.FilterSet):
             .values('total')
         )
 
-        queryset = queryset.annotate(
-            memories_points=Coalesce(Subquery(memories_subquery, output_field=IntegerField()), Value(0, output_field=IntegerField())),
-            checkin_points=Coalesce(Subquery(checkin_subquery, output_field=IntegerField()), Value(0, output_field=IntegerField()))
+        qs = qs.annotate(
+            memories_points=Coalesce(Subquery(memories_sq, output_field=IntegerField()), Value(0)),
+            checkin_points=Coalesce(Subquery(checkins_sq, output_field=IntegerField()), Value(0)),
         ).annotate(
-            sponsor_points=ExpressionWrapper(
-                F('memories_points') + F('checkin_points'),
-                output_field=IntegerField()
-            )
+            calculated_points=F('memories_points') + F('checkin_points')
         )
 
-        return queryset.order_by('-sponsor_points', '-user_ar_profile__updated_at')
+        return qs.order_by('-calculated_points', '-user_ar_profile__updated_at')

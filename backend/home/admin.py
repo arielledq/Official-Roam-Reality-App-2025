@@ -116,133 +116,65 @@ class ScoreboardAdmin(admin.ModelAdmin):
     def get_queryset(self, request):
         self._row_counter = count(start=1)
         qs = super().get_queryset(request).select_related("user")
-        # Using 0 when there is no filter
-        qs = qs.annotate(
-            memories_points=Value(0, output_field=IntegerField()),
-            checkin_points=Value(0, output_field=IntegerField()),
-        )
-        memories_sq = None
-        checkins_sq = None
         destination = request.GET.get("destination")
         sponsor = request.GET.get("sponsor")
+        # Subquerys
+        memories_filter = Q(user=OuterRef("user"),
+                            challenge_approval__in=["UNAPPROVED", "APPROVED"])
+        checkins_filter = Q(user=OuterRef("user"),
+                            challenge_approval__in=["UNAPPROVED", "APPROVED"])
+
         if destination:
-            qs = qs.filter(
-                Q(user__user_ar_memories__geo_location=destination) |
-                Q(user__user_ar_site_checkin__geo_location=destination)
-            ).distinct()
-
-            # Sum calculation memories
-            memories_sq = (
-                ARMemories.objects
-                .filter(
-                    user=OuterRef("user"),
-                    geo_location=destination,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum(
-                    Case(
-                        When(
-                            memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
-                            then=F('points')
-                        ),
-                        When(
-                            memory_type='DEDUCTED',
-                            then=ExpressionWrapper(
-                                F('points') * Value(-1),
-                                output_field=IntegerField()
-                            )
-                        ),
-                        default=Value(0),
-                        output_field=IntegerField(),
-                    )
-                ))
-                .values('total')
-            )
-            # Sum calculation check-ins
-            checkins_sq = (
-                ARSitePinCheckIn.objects
-                .filter(
-                    user=OuterRef("user"),
-                    geo_location=destination,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
-            )
+            memories_filter &= Q(geo_location=destination)
+            checkins_filter &= Q(geo_location=destination)
         elif sponsor:
-            qs = qs.filter(
-                Q(user__user_ar_memories__sponsor=sponsor) |
-                Q(user__user_ar_site_checkin__geo_challenge__sponsor=sponsor)
-            ).distinct()
+            memories_filter &= Q(sponsor=sponsor)
+            checkins_filter &= Q(geo_challenge__sponsor=sponsor)
 
-            # Sum calculation memories
-            memories_sq = (
-                ARMemories.objects
-                .filter(
-                    user=OuterRef("user"),
-                    sponsor=sponsor,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum(
+        # Sum ARMemories
+        memories_sq = (
+            ARMemories.objects
+            .filter(memories_filter)
+            .values("user")
+            .annotate(
+                total=Sum(
                     Case(
-                        When(
-                            memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
-                            then=F('points')
-                        ),
-                        When(
-                            memory_type='DEDUCTED',
-                            then=ExpressionWrapper(
-                                F('points') * Value(-1),
-                                output_field=IntegerField()
-                            )
-                        ),
+                        When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
+                             then=F('points')),
+                        When(memory_type='DEDUCTED',
+                             then=F('points') * Value(-1)),
                         default=Value(0),
                         output_field=IntegerField(),
                     )
-                ))
-                .values("total")
-            )
-            # Sum calculation check-ins
-            checkins_sq = (
-                ARSitePinCheckIn.objects
-                .filter(
-                    user=OuterRef("user"),
-                    geo_challenge__sponsor=sponsor,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
-            )
-        if memories_sq is not None and checkins_sq is not None:
-            qs = qs.annotate(
-                memories_points=Coalesce(
-                    Subquery(memories_sq, output_field=IntegerField()),
-                    Value(0),
-                ),
-                checkin_points=Coalesce(
-                    Subquery(checkins_sq, output_field=IntegerField()),
-                    Value(0),
-                ),
-            )
-
-            # Sum both memories_points and checkin_points
-            qs = qs.annotate(
-                calculated_points=ExpressionWrapper(
-                    F("memories_points") + F("checkin_points"),
-                    output_field=IntegerField(),
                 )
             )
+            .values("total")
+        )
 
-        # Order by destination_points if there is a filter else use ar profile points
-        if destination or sponsor:
-            qs = qs.order_by("-calculated_points", "-updated_at")
-        else:
-            qs = qs.order_by("-points", "-updated_at")
+        # Sum ARSitePinCheckIn
+        checkins_sq = (
+            ARSitePinCheckIn.objects
+            .filter(checkins_filter)
+            .values("user")
+            .annotate(total=Sum("points"))
+            .values("total")
+        )
 
+        # Save totals and sum
+        qs = qs.annotate(
+            memories_points=Coalesce(
+                Subquery(memories_sq, output_field=IntegerField()),
+                Value(0),
+            ),
+            checkin_points=Coalesce(
+                Subquery(checkins_sq, output_field=IntegerField()),
+                Value(0),
+            ),
+        ).annotate(
+            calculated_points=F("memories_points") + F("checkin_points")
+        )
+
+        qs = qs.order_by("-calculated_points", "-updated_at")
         return qs
 
     def row_number(self, obj):

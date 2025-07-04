@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.gis.db import models as gis_models
 from taggit.managers import TaggableManager
 from django.core.validators import MaxValueValidator, MinValueValidator
+from django.utils.translation import gettext_lazy as _
+
 
 User = get_user_model()
 
@@ -468,9 +470,6 @@ class ARUserProfile(models.Model):
 
     def __str__(self):
         return str(self.user.name)
-
-
-from django.utils.translation import gettext_lazy as _
 
 
 class ARUserProfileScoreboard(ARUserProfile):
