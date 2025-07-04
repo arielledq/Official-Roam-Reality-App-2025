@@ -1,0 +1,48 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}
+    <link href='https://api.mapbox.com/mapbox-gl-js/v3.13.0/mapbox-gl.css' rel='stylesheet'/>
+{#    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.css"#}
+{#          type="text/css">#}
+    <link rel="stylesheet" href="https://unpkg.com/tachyons@4.12.0/css/tachyons.min.css"/>
+{#    <link rel="stylesheet"#}
+{#          href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/css/bootstrap-slider.min.css"/>#}
+
+    <link href="{% static 'pin_editor/' %}fontaw.all.min.css" rel="stylesheet">
+    {% block extrastyles %}
+
+    {% endblock %}
+
+{% endblock %}
+
+{% block page_content %}
+    <div id='preactapp'></div>
+{% endblock %}
+
+{% block extrajs %}
+    <script src='https://api.mapbox.com/mapbox-gl-js/v3.13.0/mapbox-gl.js'></script>
+{#    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-draw/v1.3.0/mapbox-gl-draw.js"></script>#}
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+{#    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-slider/11.0.2/bootstrap-slider.min.js"></script>#}
+
+    {% block appvars %}
+    <script>
+        window.app_vars = {
+            mapbox_token: '{{MAPBOX_TOKEN}}',
+            {#mapbox_style : 'mapbox://styles/valerydeleon/ckzrb1c3f000h14ns6ez6uxmt',#}
+            mapbox_style: 'mapbox://styles/jmpy/cl3ts7w60002416o3h6s9dpyq',
+
+            {#mapbox_style : 'mapbox://styles/mapbox/streets-v10',#}
+
+            {#marina_id: {{ marina_id }},#}
+            {#marina_lines: '{{ marina_extra_lines | escapejs }}',#}
+            {#marina_name: '{{ marina_name }}',#}
+            {#marina_center: '{{ marina_center }}',#}
+            static_root: '{% static 'pin_editor/images/svg/' %}'.slice(0,-1),
+        }
+    </script>
+    {% endblock %}
+    {% block appjs %}{% endblock %}
+{% endblock %}
+

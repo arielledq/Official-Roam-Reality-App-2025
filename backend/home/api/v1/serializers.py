@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.http import HttpRequest
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.hashers import check_password
 from allauth.account import app_settings as allauth_settings
 from allauth.account.forms import ResetPasswordForm
