@@ -6,25 +6,19 @@ import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
 import Images from "assets/images";
 import Icon from "components/Icon";
-// @ts-ignore
-import {AR_MODES_TYPE_ID} from "constants";
 import useArScreenHook from "hooks/useArScreenHook";
 import fontGroup from "assets/fonts";
 import userLocationHook from "screens/drawerContent/location.hook";
+// @ts-ignore
+import {AR_MODES} from "constants";
 
 interface ARModeSiteListProps {
   selectedMode: any;
+  onStartChallenge: (site: any) => void;
   onClose: () => void;
-  setShowNotification: (value: boolean) => void;
-  setNotificationMode: (value: string) => void;
 }
 
-const ARModeSiteList = ({
-  selectedMode,
-  onClose,
-  setShowNotification,
-  setNotificationMode,
-}: ARModeSiteListProps) => {
+const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteListProps) => {
   const DEFAULT_SPONSOR = {
     label: `ALL ${selectedMode?.listLabel?.toUpperCase()}`,
     value: 0,
@@ -41,25 +35,8 @@ const ARModeSiteList = ({
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
 
   const startChallengeHandler = (site: any) => {
-    const challengeData = {
-      lat_long: site.lat_long,
-      challenge_requirement: site.pin_challenge?.challenge_requirement,
-      challenge_id: site.pin_challenge?.id,
-      model_file: site.pin_challenge?.model_file,
-      parameters: site.pin_challenge?.parameters,
-      points: site.pin_challenge?.points,
-    };
-
-    // setSelectedChallengeData(challengeData);
-
-    // Cerrar primero el modal actual
+    onStartChallenge({...site, selectedMode});
     onClose();
-
-    // Mostrar la notificación luego de un pequeño delay
-    setTimeout(() => {
-      setNotificationMode("scan");
-      setShowNotification(true);
-    }, 1000); // 300ms funciona bien visualmente
   };
 
   const getSitesHandler = useCallback(() => {
@@ -164,22 +141,22 @@ const ARModeSiteList = ({
             let challengeTitle = "";
             let attemptsDetails = "";
             let sponsorImage = "";
-            switch (selectedMode?.id) {
-              case AR_MODES_TYPE_ID.GEO_TAG_MODE:
+            switch (selectedMode?.mode) {
+              case AR_MODES.GEO_TAG_MODE:
                 challengeTitle = site?.pin_challenge?.name;
                 attemptsDetails = `${site?.user_attempts || 0}/${
                   site?.challenge_attempt || 0
                 } Check-Ins`;
                 sponsorImage = site?.sponsor?.image;
                 break;
-              case AR_MODES_TYPE_ID.SCAN_MODE:
+              case AR_MODES.SCAN_MODE:
                 challengeTitle = site?.sponsored?.name;
                 attemptsDetails = `${site?.user_attempts || 0}/${
                   site?.challenge_attempt || 0
                 } Gems`;
                 sponsorImage = site?.sponsored?.image;
                 break;
-              case AR_MODES_TYPE_ID.HUNT_MODE:
+              case AR_MODES.HUNT_MODE:
                 challengeTitle = site?.pin_challenge?.name;
                 attemptsDetails = `${site?.user_attempts || 0}/${
                   site?.challenge_attempt || 0

@@ -17,6 +17,7 @@ import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
 import NotificationModal from "components/ARModeModal/NotificationModal";
+import {AR_MODES} from "constants";
 
 const StarChallenge = () => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -669,6 +670,39 @@ const StarChallenge = () => {
     console.log("Esto se ejecuta una vez Detector de objeto y Loading");
   }, []);
 
+  const startChallengeHandler = site => {
+    switch (site?.selectedMode?.mode) {
+      case AR_MODES.GEO_TAG_MODE:
+        break;
+      case AR_MODES.SCAN_MODE:
+        break;
+      case AR_MODES.HUNT_MODE:
+        break;
+      default:
+        break;
+    }
+
+    const challengeData = {
+      lat_long: site.lat_long,
+      challenge_requirement: site.pin_challenge?.challenge_requirement,
+      challenge_id: site.pin_challenge?.id,
+      model_file: site.pin_challenge?.model_file,
+      parameters: site.pin_challenge?.parameters,
+      points: site.pin_challenge?.points,
+    };
+
+    // setSelectedChallengeData(challengeData);
+
+    // Cerrar primero el modal actual
+    closeModalARMode();
+
+    // Mostrar la notificación luego de un pequeño delay
+    setTimeout(() => {
+      setNotificationMode("scan");
+      setShowNotification(true);
+    }, 1000); // 300ms funciona bien visualmente
+  };
+
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -693,10 +727,10 @@ const StarChallenge = () => {
         capturedVideo={capturedVideo}
       />
       <ARModeModal
-        selectedDestination={destinationData}
         isVisible={openModalARMode}
-        onPointsGranted={dataGpsChallegen}
         onClose={closeModalARMode}
+        selectedDestination={destinationData}
+        onStartChallenge={startChallengeHandler}
         setShowNotification={setShowNotification}
         setNotificationMode={setNotificationMode}
       />

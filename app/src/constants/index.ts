@@ -88,39 +88,31 @@ export const SCOREBOARD_TYPE = {
 
 export const AR_MODES = {
   GEO_TAG_MODE: "geo_tag_mode",
-  SCAN_MODE: "scan_mode",
   HUNT_MODE: "hunt_mode",
+  SCAN_MODE: "scan_mode",
 };
-
-export const AR_MODES_TYPE_ID = {
-  GEO_TAG_MODE: 1,
-  SCAN_MODE: 3,
-  HUNT_MODE: 2,
-};
-
-export type ARModeType = (typeof AR_MODES)[keyof typeof AR_MODES];
 
 export const AR_MODES_MENU = [
   {
-    id: AR_MODES_TYPE_ID.GEO_TAG_MODE,
+    id: 1,
     label: "Geo-Tag Mode",
     name: "Geo-Tag",
     listLabel: "Geo-Tags",
-    type_id: AR_MODES.GEO_TAG_MODE,
+    mode: AR_MODES.GEO_TAG_MODE,
   },
   {
-    id: AR_MODES_TYPE_ID.SCAN_MODE,
-    label: "Scan Mode",
-    name: "Scan",
-    listLabel: "Hidden Gems",
-    type_id: AR_MODES.SCAN_MODE,
-  },
-  {
-    id: AR_MODES_TYPE_ID.HUNT_MODE,
+    id: 2,
     label: "Hunt Mode",
     name: "Hunt",
     listLabel: "Hunts",
-    type_id: AR_MODES.HUNT_MODE,
+    mode: AR_MODES.HUNT_MODE,
+  },
+  {
+    id: 3,
+    label: "Scan Mode",
+    name: "Scan",
+    listLabel: "Hidden Gems",
+    mode: AR_MODES.SCAN_MODE,
   },
 ];
 

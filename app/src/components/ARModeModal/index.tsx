@@ -13,45 +13,28 @@ import {getNextStar as getNextStarApi} from "network";
 import {FontSizes} from "util/FontUtils";
 import theme from "assets/theme";
 // @ts-ignore
-import {AR_MODES_MENU, MODES} from "constants";
+import {AR_MODES_MENU, MODES, ARModeMenuType} from "constants";
 
 import {AppButton} from "components";
-import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner.tsx";
 import Icon from "components/Icon";
 
 import ARModeMenu from "./ARModeMenu.tsx";
-// import ScanModeView from "./ARModes/ScanModeView.tsx";
-// import HuntModeView from "./ARModes/HuntModeView.tsx";
-// import GeoTagModeView from "./ARModes/ARModeView.tsx";
 import ARModeSiteList from "./ARModeSiteList.tsx";
-
-interface Option {
-  id: string;
-  name: string;
-}
 
 interface ARModeModalProps {
   isVisible: boolean;
   onClose: () => void;
   selectedDestination: any;
-  setShowNotification: () => void;
-  setNotificationMode: () => void;
+  onStartChallenge: () => void;
 }
 
 const ARModeModal = ({
   isVisible = false,
   onClose,
-  // onPointsGranted,
-  // sponsor,
-  setShowNotification,
-  setNotificationMode,
   selectedDestination = [],
+  onStartChallenge,
 }: ARModeModalProps) => {
-  const [selectedMode, setSelectedMode] = useState<Option | null>(null);
-  const [selectedSponsors, setSelectedSponsors] = useState<string[]>([]);
-
-  const [loading, setLoading] = useState(false);
-  // const [selectedChallengeData, setSelectedChallengeData] = useState(null);
+  const [selectedMode, setSelectedMode] = useState<ARModeMenuType | null>(null);
   const [updatedSponsorsData, setUpdatedSponsorsData] = useState<any>([]);
   const {userLocation} = useContext(GeolocationContext);
 
@@ -119,33 +102,6 @@ const ARModeModal = ({
     onClose();
   };
 
-  const renderModeComponent = () => {
-    if (selectedMode?.id) {
-      return (
-        <ARModeSiteList
-          selectedMode={selectedMode}
-          onClose={closeModalHandler}
-          setShowNotification={setShowNotification}
-          setNotificationMode={setNotificationMode}
-        />
-      );
-    } else {
-      return (
-        <ARModeMenu options={AR_MODES_MENU} onPress={(mode: Option) => setSelectedMode(mode)} />
-      );
-    }
-    // switch (selectedMode?.id) {
-    //   case AR_MODES.GEO_TAG_MODE:
-
-    //   case AR_MODES.SCAN_MODE:
-    //     return <ScanModeView {...props} />;
-    //   case AR_MODES.HUNT_MODE:
-    //     return <HuntModeView {...props} />;
-    //   default:
-
-    // }
-  };
-
   if (!isVisible) return null;
 
   return (
@@ -183,8 +139,18 @@ const ARModeModal = ({
           <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: "#fff"}}>
             {selectedMode?.name || "AR MODE"}
           </Text>
-          {renderModeComponent()}
-          <FullScreenLoadingSpinner isLoading={loading} />
+          {selectedMode?.id ? (
+            <ARModeSiteList
+              selectedMode={selectedMode}
+              onClose={closeModalHandler}
+              onStartChallenge={onStartChallenge}
+            />
+          ) : (
+            <ARModeMenu
+              options={AR_MODES_MENU}
+              onPress={(mode: ARModeMenuType) => setSelectedMode(mode)}
+            />
+          )}
         </View>
       </ReactNativeModal>
     </View>
