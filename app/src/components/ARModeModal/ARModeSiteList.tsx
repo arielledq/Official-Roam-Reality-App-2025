@@ -25,10 +25,17 @@ const ARModeSiteList = ({
   setShowNotification,
   setNotificationMode,
 }: ARModeSiteListProps) => {
-  const DEFAULT_SPONSOR = {label: `ALL ${selectedMode?.listLabel?.toUpperCase()}`, value: 0};
+  const DEFAULT_SPONSOR = {
+    label: `ALL ${selectedMode?.listLabel?.toUpperCase()}`,
+    value: 0,
+    image: "",
+    description: "",
+    tags: "",
+    created_at: "",
+  };
 
   const {initialUserLocation, getLocation} = userLocationHook();
-  const {getSites, sites, sponsors} = useArScreenHook();
+  const {getSites, sites, sponsors}: any = useArScreenHook();
   const [sponsorData, setSponsorData] = useState([DEFAULT_SPONSOR]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
@@ -150,7 +157,7 @@ const ARModeSiteList = ({
 
       <ScrollView style={{marginTop: 15}}>
         {sites?.length > 0 &&
-          sites?.map(site => {
+          sites?.map((site: any) => {
             if (!site?.name) return;
             const isExpanded = expandedSites.includes(site.id);
 
