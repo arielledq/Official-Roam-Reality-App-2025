@@ -23,8 +23,9 @@ from users.models import FriendshipRequest, Notification, UserProfile
 from home.utils import EmailOTP
 from django.utils.translation import gettext_lazy as _
 from django.db.models import (
-    OuterRef, Subquery, Sum, Case, When, Value, F, IntegerField, Q
+    OuterRef, Subquery, Sum, Case, When, Value, F, IntegerField, Q, Window
 )
+from django.db.models.functions import RowNumber
 from django.db.models.functions import Coalesce
 from django.utils.http import urlsafe_base64_encode
 from django.contrib.auth.tokens import default_token_generator as token_generator
@@ -42,6 +43,7 @@ from functools import reduce
 from django.db.models import F, Value
 from django.db.models.functions import Replace
 from configuration import configs
+from utils.pagination import GenericPagination
 
 logger = logging.getLogger('django')
 
@@ -214,7 +216,8 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     permission_classes = [IsAuthenticated]
     serializer_class = UserSerializer
     http_method_names = ["get",]
-    queryset = User.objects.filter(is_superuser=False, is_active=True, user_ar_profile__isnull=False)
+    queryset = User.objects.filter(is_superuser=False, is_active=True, ar_user_profile_user__isnull=False)
+    pagination_class = GenericPagination
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filterset_class = ScoreFilterSet
     search_fields = ['name', ]
@@ -269,44 +272,24 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
             calculated_points=F('memories_points') + F('checkin_points')
         )
 
-        return qs.order_by('-calculated_points', '-user_ar_profile__updated_at')
-
-    def list(self, request, *args, **kwargs):
-        qs = self.filter_queryset(self.get_queryset())[:1000]
-        serializer = self.get_serializer(qs, many=True)
-        return Response(serializer.data)
+        return qs.order_by('-calculated_points', '-ar_user_profile_user__updated_at', 'id')  #, 'id'
 
     @action(detail=False, methods=['get'], url_path='my-rank')
     def my_rank(self, request):
-        qs = self.filter_queryset(self.get_queryset())
+        qs = self.filter_queryset(self.get_queryset()).values_list('pk', 'calculated_points')
         user = request.user
 
-        annotated_user = qs.filter(pk=user.pk).first()
-        if request.query_params.get('destination'):
-            user_points = annotated_user.destination_points if annotated_user else 0
-            user_updated = annotated_user.user_ar_profile.updated_at
-            rank = qs.filter(
-                Q(destination_points__gt=user_points) |
-                Q(destination_points=user_points, user_ar_profile__updated_at__gt=user_updated)
-            ).count() + 1
-        elif request.query_params.get('sponsor'):
-            user_points = annotated_user.sponsor_points if annotated_user else 0
-            user_updated = annotated_user.user_ar_profile.updated_at
-            rank = qs.filter(
-                Q(sponsor_points__gt=user_points) |
-                Q(sponsor_points=user_points, user_ar_profile__updated_at__gt=user_updated)
-            ).count() + 1
-        else:
-            user_points = annotated_user.user_ar_profile.points
-            user_updated = annotated_user.user_ar_profile.updated_at
-            rank = qs.filter(
-                Q(user_ar_profile__points__gt=user_points) |
-                Q(user_ar_profile__points=user_points, user_ar_profile__updated_at__gt=user_updated)
-            ).count() + 1
+        rank = None
+        points = 0
+        for idx, user_data in enumerate(qs, start=1):
+            if user_data[0] == user.id:
+                rank = idx
+                points = user_data[1]
+                break
 
         return Response({
             'my_rank': rank,
-            'my_points': user_points
+            'my_points': points
         })
 
 
