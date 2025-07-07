@@ -8,21 +8,22 @@ import React, {useState, useEffect, useContext} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import ReactNativeModal from "react-native-modal";
 import {GeolocationContext} from "GeolocationProvider";
-import {useSelector} from "react-redux";
 
 import {getNextStar as getNextStarApi} from "network";
 import {FontSizes} from "util/FontUtils";
 import theme from "assets/theme";
-import {AR_MODES, AR_MODES_MENU, ARModeType, MODES, ModeType} from "constants";
+// @ts-ignore
+import {AR_MODES_MENU, MODES} from "constants";
 
 import {AppButton} from "components";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner.tsx";
 import Icon from "components/Icon";
 
 import ARModeMenu from "./ARModeMenu.tsx";
-import ScanModeView from "./ARModes/ScanModeView.tsx";
-import HuntModeView from "./ARModes/HuntModeView.tsx";
-import GeoTagModeView from "./ARModes/GeoTagModeView.tsx";
+// import ScanModeView from "./ARModes/ScanModeView.tsx";
+// import HuntModeView from "./ARModes/HuntModeView.tsx";
+// import GeoTagModeView from "./ARModes/ARModeView.tsx";
+import ARModeSiteList from "./ARModeSiteList.tsx";
 
 interface Option {
   id: string;
@@ -45,17 +46,14 @@ const ARModeModal = ({
   setShowNotification,
   setNotificationMode,
   selectedDestination = [],
-}: 
-ARModeModalProps) => {
+}: ARModeModalProps) => {
   const [selectedMode, setSelectedMode] = useState<Option | null>(null);
   const [selectedSponsors, setSelectedSponsors] = useState<string[]>([]);
 
   const [loading, setLoading] = useState(false);
-  const [selectedChallengeData, setSelectedChallengeData] = useState(null);
-  const [updatedSponsorsData, setUpdatedSponsorsData] = useState([]);
+  // const [selectedChallengeData, setSelectedChallengeData] = useState(null);
+  const [updatedSponsorsData, setUpdatedSponsorsData] = useState<any>([]);
   const {userLocation} = useContext(GeolocationContext);
-
-  // console.log(selectedDestinations);
 
   useEffect(() => {
     if (isVisible) {
@@ -70,7 +68,7 @@ ARModeModalProps) => {
         const updated = await Promise.all(
           mapped.map(async sponsor => {
             const siteWithUpdates = await Promise.all(
-              sponsor.challenges.map(async challenge => {
+              sponsor.challenges.map(async (challenge: any) => {
                 try {
                   const response = await getNextStarApi({
                     geo_site_id: 772,
@@ -96,15 +94,15 @@ ARModeModalProps) => {
   }, [selectedMode]);
 
   const mapAllDestinationsToSponsors = (destinations = []) => {
-    return destinations.map(destination => ({
+    return destinations.map((destination: any) => ({
       id: destination?.id?.toString(),
       location: destination?.name,
       backgroundImage: {uri: destination?.image},
       hunts: 5,
       miles: 100,
       challenges: (destination?.star_ar_sites || [])
-        .filter(site => site?.pin_challenge && site?.pin_challenge?.sponsored)
-        .map(site => ({
+        .filter((site: any) => site?.pin_challenge && site?.pin_challenge?.sponsored)
+        .map((site: any) => ({
           ...site,
           id: site?.id?.toString(),
           title: site?.name,
@@ -122,38 +120,30 @@ ARModeModalProps) => {
   };
 
   const renderModeComponent = () => {
-    const props = {
-      selectedSponsors,
-      setSelectedSponsors,
-      // selectedDropdownValue,
-      // setSelectedDropdownValue,
-      // expandedSites,
-      // setExpandedSites,
-      selectedChallengeData,
-      setSelectedChallengeData,
-      closeModalHandler,
-      // onPointsGranted,
-      // allSponsors:
-      //   selectedMode === MODES.HUNT
-      //     ? updatedSponsorsData
-      //     : mapAllDestinationsToSponsors(selectedDestination),
-      setShowNotification,
-      setNotificationMode,
-      onClose: closeModalHandler,
-    };
-
-    switch (selectedMode?.id) {
-      case AR_MODES.GEO_TAG_MODE:
-        return <GeoTagModeView {...props} />; // DONE
-      case AR_MODES.SCAN_MODE:
-        return <ScanModeView {...props} />;
-      case AR_MODES.HUNT_MODE:
-        return <HuntModeView {...props} />;
-      default:
-        return (
-          <ARModeMenu options={AR_MODES_MENU} onPress={(mode: Option) => setSelectedMode(mode)} />
-        );
+    if (selectedMode?.id) {
+      return (
+        <ARModeSiteList
+          selectedMode={selectedMode}
+          onClose={closeModalHandler}
+          setShowNotification={setShowNotification}
+          setNotificationMode={setNotificationMode}
+        />
+      );
+    } else {
+      return (
+        <ARModeMenu options={AR_MODES_MENU} onPress={(mode: Option) => setSelectedMode(mode)} />
+      );
     }
+    // switch (selectedMode?.id) {
+    //   case AR_MODES.GEO_TAG_MODE:
+
+    //   case AR_MODES.SCAN_MODE:
+    //     return <ScanModeView {...props} />;
+    //   case AR_MODES.HUNT_MODE:
+    //     return <HuntModeView {...props} />;
+    //   default:
+
+    // }
   };
 
   if (!isVisible) return null;

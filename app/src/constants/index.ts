@@ -94,23 +94,34 @@ export const AR_MODES = {
 
 export const AR_MODES_TYPE_ID = {
   GEO_TAG_MODE: 1,
-  SCAN_MODE: 2,
-  HUNT_MODE: 3,
+  SCAN_MODE: 3,
+  HUNT_MODE: 2,
 };
 
 export type ARModeType = (typeof AR_MODES)[keyof typeof AR_MODES];
 
 export const AR_MODES_MENU = [
   {
-    id: AR_MODES.GEO_TAG_MODE,
-    name: "Geo-Tag Mode",
+    id: AR_MODES_TYPE_ID.GEO_TAG_MODE,
+    label: "Geo-Tag Mode",
+    name: "Geo-Tag",
+    listLabel: "Geo-Tags",
+    type_id: AR_MODES.GEO_TAG_MODE,
   },
   {
-    id: AR_MODES.SCAN_MODE,
-    name: "Scan Mode",
+    id: AR_MODES_TYPE_ID.SCAN_MODE,
+    label: "Scan Mode",
+    name: "Scan",
+    listLabel: "Hidden Gems",
+    type_id: AR_MODES.SCAN_MODE,
   },
   {
-    id: AR_MODES.HUNT_MODE,
-    name: "Hunt Mode",
+    id: AR_MODES_TYPE_ID.HUNT_MODE,
+    label: "Hunt Mode",
+    name: "Hunt",
+    listLabel: "Hunts",
+    type_id: AR_MODES.HUNT_MODE,
   },
 ];
+
+export type ARModeMenuType = (typeof AR_MODES_MENU)[keyof typeof AR_MODES_MENU];
