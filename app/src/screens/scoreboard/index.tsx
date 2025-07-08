@@ -45,7 +45,7 @@ const ScoreBoard = ({}) => {
       const myRankResponse = await getMyRank(destination);
 
       setUsers(scoreBoardResponse?.data || []);
-      setRankMine(myRankResponse?.data || {});
+      setRankMine(myRankResponse || {});
     } catch (error) {
       console.error(error);
     } finally {
@@ -189,6 +189,8 @@ const ScoreBoard = ({}) => {
   React.useEffect(() => {
     getInitialData();
   }, []);
+
+  console.log("rankMine", rankMine);
 
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
