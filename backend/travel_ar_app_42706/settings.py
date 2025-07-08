@@ -349,7 +349,7 @@ if GS_BUCKET_NAME:
 
 
 DOMAIN=env.str("DOMAIN", "")
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
 JAZZMIN_SETTINGS = {
