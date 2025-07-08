@@ -601,3 +601,38 @@ export const handleUnzipProcess = async (sourcePath, targetPath) => {
     };
   }
 };
+
+export const keepFileMostRecent = async (ruta, extension = "") => {
+  try {
+    const files = await RNFS.readDir(ruta);
+    const filteredFiles = files.filter(
+      file => file.isFile() && (extension === "" || file.name.endsWith(extension))
+    );
+
+    if (filteredFiles.length <= 0) {
+      return;
+    }
+    filteredFiles.sort((a, b) => b.mtime - a.mtime);
+
+    const archivosParaEliminar = filteredFiles.slice(1);
+
+    for (const file of archivosParaEliminar) {
+      await RNFS.unlink(file.path);
+    }
+  } catch (error) {
+    console.error("keepFileMostRecent", error);
+  }
+};
+
+export const eraseFile = async () => {
+  if (Platform.OS === "android") {
+    try {
+      const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
+      const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
+
+      await keepFileMostRecent(androidFilePath, ".png");
+    } catch (error) {
+      console.error(error);
+    }
+  }
+};

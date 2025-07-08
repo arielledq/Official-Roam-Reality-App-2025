@@ -1,7 +1,6 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Platform} from "react-native";
 import {useFocusEffect} from "@react-navigation/native";
-import RNFetchBlob from "rn-fetch-blob";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import UnityARCamera from "components/UnityArView";
 import CameraControls from "components/CameraControls";
@@ -11,15 +10,14 @@ import {launchImageLibrary} from "react-native-image-picker";
 
 import {CHALLENGES_TYPE, CAPTURE_CHALLENGE_TYPE} from "../../../constants";
 import {CAMERA_NOTIFICATION} from "../../../constants";
-import {copyFileForDisplay, handleUnzipProcess} from "util/helpers";
+import {copyFileForDisplay, eraseFile} from "util/helpers";
 
-const RNFS = require("react-native-fs");
 // const Sound = require("react-native-sound");
 
 const ArChallengeCapture = ({route, navigation}) => {
   const [unityViewDimensions, setUnityViewDimensions] = useState({width: 0, height: 0});
-  const [recordingStart, setRecordingStart] = useState(false);
-  const [timer, setTimer] = useState("00:00");
+  // const [recordingStart, setRecordingStart] = useState(false);
+  // const [timer, setTimer] = useState("00:00");
   const [challengeInformationView, setChallengeInformationView] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
@@ -32,8 +30,6 @@ const ArChallengeCapture = ({route, navigation}) => {
   const viewShotRef = useRef();
 
   const challengeObj = route?.params?.challengeObj;
-  const challengeObjParameters = route?.params?.challengeObj?.parameters;
-  const modelFile = route?.params?.challengeObj?.model_file;
   const openGallery = route?.params?.openGallery;
 
   const challengeHasFilters = challengeObj?.ar_filters?.length > 0;
@@ -42,99 +38,16 @@ const ArChallengeCapture = ({route, navigation}) => {
 
   const initialLoadTime = useRef(0);
 
-  // FILTERS PENDING
-  //  const ar_filters = challengeObj?.ar_filters;
-  //  const imageUrls = ar_filters.map(filter => filter.image);
-  //  const gradientColors = ar_filters[0]?.gradient_colors || ["#FF0000", "#00FF00"];
-  //  const gradientDirection = ar_filters[0]?.gradient_direction === "TOP_TO_BOTTOM";
-
   const handleUnityViewLayout = event => {
     const {width, height} = event.nativeEvent.layout;
     setUnityViewDimensions({width, height});
-    // console.log(`UnityView dimensiones: ${width} x ${height}`);
   };
   useEffect(() => {
-    if(unityRef.current){
+    if (unityRef.current) {
       console.log("cambio de scena");
-      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");}
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");
+    }
   }, [unityRef.current]);
-  // const downloadModelFile = (sourcePath, targetPath) => {
-  //   RNFetchBlob.config({
-  //     fileCache: true,
-  //     path: sourcePath,
-  //   })
-  //     .fetch("GET", modelFile)
-  //     .then(res => {
-  //       unzipModelFile(res.path(), targetPath);
-  //     })
-  //     .catch(console.error);
-  // };
-  //
-  // const unzipModelFile = (sourcePath, targetPath) => {
-  //   const charset = "UTF-8";
-  //
-  //   unzip(sourcePath, targetPath, charset)
-  //       .then(path => {
-  //         RNFS.readDir(path).then(result => {
-  //           const sourcesArray = [];
-  //           let objFile = null;
-  //           let mtlFile = null;
-  //           let baseTexture = null;
-  //           let emissionTexture = null;
-  //
-  //           result.forEach(file => {
-  //             const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-  //             if (file.name.includes(".obj")) {
-  //               objFile = filePath;
-  //             } else if (file.name.includes(".mtl")) {
-  //               mtlFile = filePath;
-  //             } else if (file.name.toLowerCase().includes("diffuse")) {
-  //               baseTexture = filePath;
-  //             } else if (file.name.toLowerCase().includes("emission")) {
-  //               emissionTexture = filePath;
-  //             } else {
-  //               sourcesArray.push({ uri: filePath });
-  //             }
-  //           });
-  //
-  //           setModelOBJ(objFile);
-  //           setModelResource(mtlFile);
-  //           setTextureBase(baseTexture);
-  //           setTextureEmission(emissionTexture);
-  //           setSourcesFiles(sourcesArray);
-  //           setFoldefile(result);
-  //           setLoading(false);
-  //         });
-  //       })
-  //       .catch(err => {
-  //         console.error("Error descomprimiendo el archivo:", err);
-  //       });
-  // };
-
-  // useEffect(() => {
-  //   if (challengeObj && modelFile) {
-  //     checkIfModelExist();
-  //   }
-  // }, [challengeObj]);
-  //
-  // const checkIfModelExist = () => {
-  //   if (challengeObj && modelFile) {
-  //     const filename = modelFile.split("/").pop().split("?")[0];
-  //     const withoutExtFilename = filename.split(".")[0];
-  //     const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-  //     const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-  //
-  //     RNFS.exists(sourcePath)
-  //       .then(exists => {
-  //         if (exists) {
-  //           unzipModelFile(sourcePath, targetPath);
-  //         } else {
-  //           downloadModelFile(sourcePath, targetPath);
-  //         }
-  //       })
-  //       .catch(console.error);
-  //   }
-  // };
 
   const viewNotification = isNotification => {
     if (unityRef.current) {
@@ -146,23 +59,6 @@ const ArChallengeCapture = ({route, navigation}) => {
       );
     }
   };
-
-  // useEffect(() => {
-  //   viewNotification(true);
-  //   setTimeout(() => {
-  //     viewNotification(false)
-  //   }, 5000);
-  //  }, []);
-
-  useEffect(() => {
-    viewNotification(true);
-
-    const timerId = setTimeout(() => {
-      if (unityRef.current) {
-        viewNotification(false);
-      }
-    }, 5000);
-  }, []);
 
   const pointsCount = async () => {
     if (unityRef.current) {
@@ -246,34 +142,7 @@ const ArChallengeCapture = ({route, navigation}) => {
       },
     });
   };
-  useEffect(() => {
-    const requestPermissions = async () => {
-      if (Platform.OS === "android") {
-        await requestMultiple([
-          PERMISSIONS.ANDROID.CAMERA,
-          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-          PERMISSIONS.ANDROID.RECORD_AUDIO,
-          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-        ]);
-      } else if (Platform.OS === "ios") {
-        await requestMultiple([
-          PERMISSIONS.IOS.CAMERA,
-          PERMISSIONS.IOS.MICROPHONE,
-          PERMISSIONS.IOS.PHOTO_LIBRARY,
-          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-        ]);
-      }
 
-      if (openGallery) {
-        pickFromGallery();
-      } else {
-        setIsUnityLoaded(true);
-      }
-    };
-
-    requestPermissions();
-  }, []);
   const retakeButtonHandler = () => {
     setCapturedImage(null);
     setCapturedVideo(null);
@@ -284,18 +153,18 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
   };
 
-  const startRecordVideoHandler = () => {
-    if (capturedImage || capturedVideo) {
-      return;
-    }
-    startRecordVideo();
-  };
+  // const startRecordVideoHandler = () => {
+  //   if (capturedImage || capturedVideo) {
+  //     return;
+  //   }
+  //   startRecordVideo();
+  // };
 
-  const stopRecordVideoHandler = () => {
-    if (recordingStart) {
-      stopRecordVideo();
-    }
-  };
+  // const stopRecordVideoHandler = () => {
+  //   if (recordingStart) {
+  //     stopRecordVideo();
+  //   }
+  // };
 
   const closeViewInfoButtonHandler = () => {
     setChallengeInformationView(false);
@@ -304,41 +173,6 @@ const ArChallengeCapture = ({route, navigation}) => {
   const closeModalARMode = () => {
     setOpenModalARMode(false);
     setIsUnityLoaded(true);
-  };
-
-  const eraseFile = async () => {
-    if (Platform.OS === "android") {
-      try {
-        const basePath = RNFS.ExternalStorageDirectoryPath || RNFS.DocumentDirectoryPath;
-        const androidFilePath = `${basePath}/Android/data/com.roam_reality/files`;
-
-        await keepFileMostRecent(androidFilePath, ".png");
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const keepFileMostRecent = async (ruta, extension = "") => {
-    try {
-      const files = await RNFS.readDir(ruta);
-      const filteredFiles = files.filter(
-        file => file.isFile() && (extension === "" || file.name.endsWith(extension))
-      );
-
-      if (filteredFiles.length <= 0) {
-        return;
-      }
-      filteredFiles.sort((a, b) => b.mtime - a.mtime);
-
-      const archivosParaEliminar = filteredFiles.slice(1);
-
-      for (const file of archivosParaEliminar) {
-        await RNFS.unlink(file.path);
-      }
-    } catch (error) {
-      console.error("keepFileMostRecent", error);
-    }
   };
 
   const modals = (
@@ -432,6 +266,45 @@ const ArChallengeCapture = ({route, navigation}) => {
     screenPadding = {paddingBottom: 24};
   }
 
+  useEffect(() => {
+    viewNotification(true);
+
+    const timerId = setTimeout(() => {
+      if (unityRef.current) {
+        viewNotification(false);
+      }
+    }, 5000);
+  }, []);
+
+  useEffect(() => {
+    const requestPermissions = async () => {
+      if (Platform.OS === "android") {
+        await requestMultiple([
+          PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        ]);
+      } else if (Platform.OS === "ios") {
+        await requestMultiple([
+          PERMISSIONS.IOS.CAMERA,
+          PERMISSIONS.IOS.MICROPHONE,
+          PERMISSIONS.IOS.PHOTO_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+        ]);
+      }
+
+      if (openGallery) {
+        pickFromGallery();
+      } else {
+        setIsUnityLoaded(true);
+      }
+    };
+
+    requestPermissions();
+  }, []);
+
   useFocusEffect(() => {
     // Only run these operations if unityRef.current is available
     if (unityRef.current) {
@@ -497,10 +370,10 @@ const ArChallengeCapture = ({route, navigation}) => {
           hasCapturedContent={!!capturedImage || !!capturedVideo}
           onRetake={retakeButtonHandler}
           onDone={doneButtonHandler}
-          startRecordVideo={startRecordVideoHandler}
-          stopRecordVideo={stopRecordVideoHandler}
-          isRecording={!!recordingStart}
-          timer={timer}
+          // startRecordVideo={startRecordVideoHandler}
+          // stopRecordVideo={stopRecordVideoHandler}
+          // isRecording={!!recordingStart}
+          // timer={timer}
           isVideo={!!capturedVideo}
           challengeHasFilters={challengeHasFilters}
         />

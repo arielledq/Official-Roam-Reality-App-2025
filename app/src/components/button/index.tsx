@@ -12,14 +12,14 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     titleStyle = {},
     containerStyle = {},
     customColors,
-      radius,
+    radius,
     ...otherProps
   } = props;
 
   const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
   const colors = customColors || defaultColors;
   return (
-    <TouchableOpacity onPress={otherProps.onPress}>
+    <TouchableOpacity onPress={otherProps.onPress} style={[styles.containerStyle, containerStyle]}>
       <LinearGradient
         colors={colors}
         start={{x: 0, y: 1}}
@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     lineHeight: FontLineHeights.LH20,
     color: theme.darkColors?.white,
   },
-  containerStyle: {borderRadius: BORDER_RADIUS,},
+  containerStyle: {borderRadius: BORDER_RADIUS},
 });
 
 export default AppButton;

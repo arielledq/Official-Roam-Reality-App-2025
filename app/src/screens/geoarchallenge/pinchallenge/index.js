@@ -73,11 +73,6 @@ const PinChallenge = () => {
     siteLatitude = selectedGeoSite.lat_long.coordinates[1];
     siteLongitude = selectedGeoSite.lat_long.coordinates[0];
   }
-  useEffect(() => {
-    if(unityRef.current){
-      console.log("cambio de scena");
-      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");}
-  }, [unityRef.current]);
 
   // Descargar modelo y gestionar archivos
   const downloadModelFile = (sourcePath, targetPath) => {
@@ -141,12 +136,12 @@ const PinChallenge = () => {
 
   const sendModelDataToUnitySpawn = () => {
     if (
-        unityRef.current &&
-        modelOBJ &&
-        textureBase &&
-        emissionValue &&
-        textureEmission &&
-        challengeObjParameters
+      unityRef.current &&
+      modelOBJ &&
+      textureBase &&
+      emissionValue &&
+      textureEmission &&
+      challengeObjParameters
     ) {
       // Add challengeObjParameters
       const modelData = {
@@ -374,37 +369,6 @@ const PinChallenge = () => {
     setIsUnityLoaded(true);
   };
 
-  useEffect(() => {
-    checkPermission();
-    getLocation();
-    getLocationUpdates();
-    return () => stopLocationUpdates();
-  }, []);
-
-  useEffect(() => {
-    if (challengeObj && modelFile) {
-      checkIfModelExist();
-    }
-  }, [challengeObj]);
-
-  useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.9);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 3);
-      setPosition({
-        x: parseFloat(challengeObjParameters?.positionX) || 0,
-        y: parseFloat(challengeObjParameters?.positionY) || 0,
-        z: parseFloat(challengeObjParameters?.positionZ) || 0,
-      });
-      setScale({
-        x: parseFloat(challengeObjParameters?.scale_object) || 1,
-        y: parseFloat(challengeObjParameters?.scale_object) || 1,
-        z: parseFloat(challengeObjParameters?.scale_object) || 1,
-      });
-      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
-    }
-  }, [challengeObjParameters]);
-
   const sendBloomValuesToUnity = () => {
     const bloomData = {threshold, intensity};
 
@@ -547,24 +511,56 @@ const PinChallenge = () => {
     screenPadding = {paddingBottom: 24};
   }
 
+  useEffect(() => {
+    if (unityRef.current) {
+      console.log("cambio de scena");
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");
+    }
+  }, [unityRef.current]);
+
+  useEffect(() => {
+    checkPermission();
+    getLocation();
+    getLocationUpdates();
+    return () => stopLocationUpdates();
+  }, []);
+
+  useEffect(() => {
+    if (challengeObj && modelFile) {
+      checkIfModelExist();
+    }
+  }, [challengeObj]);
+
+  useEffect(() => {
+    if (challengeObjParameters) {
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.9);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 3);
+      setPosition({
+        x: parseFloat(challengeObjParameters?.positionX) || 0,
+        y: parseFloat(challengeObjParameters?.positionY) || 0,
+        z: parseFloat(challengeObjParameters?.positionZ) || 0,
+      });
+      setScale({
+        x: parseFloat(challengeObjParameters?.scale_object) || 1,
+        y: parseFloat(challengeObjParameters?.scale_object) || 1,
+        z: parseFloat(challengeObjParameters?.scale_object) || 1,
+      });
+      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
+    }
+  }, [challengeObjParameters]);
+
   useFocusEffect(() => {
     const timer = setTimeout(() => {
       if (unityRef.current) {
         PointsCount();
         unityRef.current.postMessage(
-            "Scriptposition",
-            "SetVisibleButton",
-            JSON.stringify({
-              setVisibleButtonPosition: true,
-            })
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({
+            setVisibleButtonPosition: true,
+          })
         );
-        if (
-            modelOBJ &&
-            textureBase &&
-            emissionValue &&
-            textureEmission &&
-            isUnityLoaded
-        ) {
+        if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded) {
           sendModelDataToUnitySpawn();
           sendBloomValuesToUnity();
         }

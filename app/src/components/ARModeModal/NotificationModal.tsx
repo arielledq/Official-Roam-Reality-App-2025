@@ -1,55 +1,23 @@
-import React, {useEffect, useState} from "react";
+import React from "react";
 import {View, Text, StyleSheet} from "react-native";
 import ReactNativeModal from "react-native-modal";
 
-import {AR_MODES, ModeType} from "../../constants/index.ts";
+import {AR_MODES} from "../../constants/index.ts";
 import {FontSizes} from "util/FontUtils.ts";
 
 import {AppButton} from "components";
 import Icon from "components/Icon";
 
-const NotificationModal = ({
-  isVisible = false,
-  onClose,
-  onPointsGranted,
-  sponsor,
-  selectedDestination = [],
-  selectedMode = AR_MODES.SCAN_MODE,
-}) => {
-  const [mode, setMode] = useState<ModeType>(selectedMode);
+interface NotificationModalProps {
+  isVisible: boolean;
+  onClose: () => void;
+  selectedMode: any;
+}
 
-  useEffect(() => {
-    if (isVisible && selectedMode) {
-      setMode(selectedMode);
-    }
-  }, [isVisible, selectedMode]);
-
-  const MODE_TITLES: Record<ModeType, string> = {
-    ar: "AR MODE",
-    scan: "Scan Mode",
-    hunt: "Hunt Mode",
-    checkin: "Check-In Mode",
-  };
-  const MODE_SUBTITLES: Record<ModeType, string> = {
-    ar: "AR MODE",
-    scan: "Users can scan their environment or QR Code to trigger the AR.",
-    hunt: "Users are to follow the arrows to find hidden gems",
-    checkin: "The Geo Tag is anchored in front of you, size and position fully customisable",
-  };
-  const MODE_SUBTITLES2: Record<ModeType, string> = {
-    ar: "AR MODE",
-    scan: "Snap a photo/video with the AR",
-    hunt: "TAP the AR to Capture",
-    checkin: "Snap a creative photo/video with the Geo-Tag",
-  };
-  const IconName: Record<ModeType, string> = {
-    ar: "scan",
-    scan: "scan",
-    hunt: "huntMode",
-    checkin: "pinlocation",
-  };
-
+const NotificationModal = ({isVisible = false, onClose, selectedMode}: NotificationModalProps) => {
   if (!isVisible) return null;
+
+  const isHuntMode = selectedMode?.mode === AR_MODES.HUNT_MODE;
 
   return (
     <View style={{flex: 1, position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
@@ -60,16 +28,16 @@ const NotificationModal = ({
         onBackdropPress={onClose}
       >
         <View style={[styles.modalContent, {backgroundColor: "#000000AA"}]}>
-          <View style={{height: mode === "hunt" ? 20 : "auto", justifyContent: "center"}}>
-            <Icon name={IconName[mode]} family="custom" size={mode === "hunt" ? 90 : 60} />
+          <View style={{height: isHuntMode ? 20 : "auto", justifyContent: "center"}}>
+            <Icon name={selectedMode?.icon} family="custom" size={isHuntMode ? 90 : 60} />
           </View>
           <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: "#C881F0"}}>
-            {MODE_TITLES[mode]}
+            {selectedMode?.listLabel}
           </Text>
           <Text
             style={{fontSize: FontSizes.S15, fontWeight: "500", color: "#fff", textAlign: "center"}}
           >
-            {MODE_SUBTITLES[mode]}
+            {selectedMode?.modeSubTitle1}
           </Text>
           <Text
             style={{
@@ -80,7 +48,7 @@ const NotificationModal = ({
               fontStyle: "italic",
             }}
           >
-            {MODE_SUBTITLES2[mode]}
+            {selectedMode?.modeSubTitle2}
           </Text>
           <AppButton
             size={"sm"}

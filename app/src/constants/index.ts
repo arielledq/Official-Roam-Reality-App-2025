@@ -99,6 +99,9 @@ export const AR_MODES_MENU = [
     name: "Geo-Tag",
     listLabel: "Geo-Tags",
     mode: AR_MODES.GEO_TAG_MODE,
+    modeSubTitle1: "The Geo Tag is anchored in front of you, size and position fully customisable",
+    modeSubTitle2: "Snap a creative photo/video with the Geo-Tag",
+    icon: "pinlocation",
   },
   {
     id: 2,
@@ -106,6 +109,9 @@ export const AR_MODES_MENU = [
     name: "Hunt",
     listLabel: "Hunts",
     mode: AR_MODES.HUNT_MODE,
+    modeSubTitle1: "Users are to follow the arrows to find hidden gems",
+    modeSubTitle2: "TAP the AR to Capture",
+    icon: "huntMode",
   },
   {
     id: 3,
@@ -113,6 +119,9 @@ export const AR_MODES_MENU = [
     name: "Scan",
     listLabel: "Hidden Gems",
     mode: AR_MODES.SCAN_MODE,
+    modeSubTitle1: "Users can scan their environment or QR Code to trigger the AR.",
+    modeSubTitle2: "Snap a photo/video with the AR",
+    icon: "scan",
   },
 ];
 
