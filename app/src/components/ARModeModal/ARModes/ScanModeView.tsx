@@ -156,7 +156,7 @@ const ScanModeView = ({
                         setTimeout(() => {
                           setNotificationMode("scan");
                           setShowNotification(true);
-                        }, 1000); // 300ms funciona bien visualmente
+                        }, 800); // 300ms funciona bien visualmente
                       }}
                       style={{
                         backgroundColor: "#1E1F30",
