@@ -16,8 +16,8 @@ class ScoreFilterSet(filters.FilterSet):
 
     def filter_by_destination(self, queryset, name, value):
         qs = queryset.filter(
-            Q(user_ar_memories__geo_location=value) |
-            Q(user_ar_site_checkin__geo_location=value)
+            Q(ar_memories_user__geo_location=value) |
+            Q(ar_site_pin_checkin_user__geo_location=value)
         ).distinct()
 
         memories_sq = (
@@ -58,12 +58,12 @@ class ScoreFilterSet(filters.FilterSet):
             calculated_points=F('memories_points') + F('checkin_points')
         )
 
-        return qs.order_by('-calculated_points', '-user_ar_profile__updated_at')
+        return qs.order_by('-calculated_points', '-ar_user_profile_user__updated_at')
 
     def filter_by_sponsor(self, queryset, name, value):
         qs = queryset.filter(
-            Q(user_ar_memories__sponsor=value) |
-            Q(user_ar_site_checkin__geo_challenge__sponsor=value)
+            Q(ar_memories_user__sponsor=value) |
+            Q(ar_site_pin_checkin_user__geo_challenge__sponsor=value)
         ).distinct()
 
         memories_sq = (
@@ -104,4 +104,4 @@ class ScoreFilterSet(filters.FilterSet):
             calculated_points=F('memories_points') + F('checkin_points')
         )
 
-        return qs.order_by('-calculated_points', '-user_ar_profile__updated_at')
+        return qs.order_by('-calculated_points', '-ar_user_profile_user__updated_at')

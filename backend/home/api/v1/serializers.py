@@ -82,17 +82,17 @@ class UserProfileSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     user_profile = UserProfileSerializer()
-    user_ar_profile = ARUserProfileSerializer()
+    ar_user_profile_user = ARUserProfileSerializer()
     is_band_location_active = serializers.SerializerMethodField()
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'user_profile', 'user_ar_profile', 'type', 'geo_site',
+        fields = ['id', 'email', 'name', 'user_profile', 'ar_user_profile_user', 'type', 'geo_ar_site_band_user',
                   'is_band_location_active', 'has_receive_points',]
 
     def get_is_band_location_active(self, instance):
-        if hasattr(instance, 'geo_site'):
-            return instance.geo_site.is_active
+        if hasattr(instance, 'geo_ar_site_band_user'):
+            return instance.geo_ar_site_band_user.is_active
         return False
 
 
@@ -133,8 +133,8 @@ class AccountSetupSerializer(serializers.ModelSerializer):
     # ar_memories = serializers.SerializerMethodField()
 
     # def get_ar_memories(self, obj):
-    #     user_ar_memories = ARMemories.objects.filter(user=self.context['request'].user)
-    #     return ARMemoriesSerializer(user_ar_memories, many=True).data if user_ar_memories.exists() else []
+    #     ar_memories_user = ARMemories.objects.filter(user=self.context['request'].user)
+    #     return ARMemoriesSerializer(ar_memories_user, many=True).data if ar_memories_user.exists() else []
 
     class Meta:
         model = UserProfile

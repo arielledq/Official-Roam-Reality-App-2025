@@ -76,8 +76,8 @@ def reject_and_notify(self, request, queryset):
                 memory_checkin.challenge_approval = "DECLINED"
                 memory_checkin.save()
 
-                user.user_ar_profile.points -= memory_checkin.points
-                user.user_ar_profile.save()
+                user.ar_user_profile_user.points -= memory_checkin.points
+                user.ar_user_profile_user.save()
             notification = Notification.objects.create(
                 title="Your submission was declined",
                 description=memory_checkin.declined_reason if memory_checkin.declined_reason else 'Your submission '
