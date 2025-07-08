@@ -53,7 +53,11 @@ const ArChallengeCapture = ({route, navigation}) => {
     setUnityViewDimensions({width, height});
     // console.log(`UnityView dimensiones: ${width} x ${height}`);
   };
-
+  useEffect(() => {
+    if(unityRef.current){
+      console.log("cambio de scena");
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");}
+  }, [unityRef.current]);
   // const downloadModelFile = (sourcePath, targetPath) => {
   //   RNFetchBlob.config({
   //     fileCache: true,

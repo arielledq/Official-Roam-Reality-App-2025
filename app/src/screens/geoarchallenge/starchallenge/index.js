@@ -1,4 +1,4 @@
-import React, {useCallback, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState, useCallback} from "react"; // Keep useCallback if you're using it elsewhere
 import {Platform} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
@@ -7,15 +7,16 @@ import RNFetchBlob from "rn-fetch-blob";
 import {useSelector} from "react-redux";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
-// import {unzip} from "react-native-zip-archive";
 import Geolocation from "react-native-geolocation-service";
 
-import {CHALLENGES_TYPE} from "constants";
+import {CHALLENGES_TYPE} from "../../../constants";
 import useStyles from "./styles";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
+import {handleUnzipProcess, showMessage} from "../../../util/helpers";
+
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 
@@ -43,12 +44,18 @@ const StarChallenge = () => {
   const isStarChallenge = !!starChallengeObj?.id;
   const [sendModelData, setSendModelData] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [notificationMode, setNotificationMode] = useState("scan");
+  const [notificationMode, setNotificationMode] = useState("scan"); // Puede ser "scan", "hunt", u otros
+  const [loading, setLoading] = useState(false);
+  const [sendLocation, setSendLocation] = useState(false);
+  const [hasSentModelDataOnce, setHasSentModelDataOnce] = useState(false);
+  const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false); // New state to track if location is obtained for hunt mode
+
+  const lastSentLocationRef = useRef(null);
 
   const challengeObj = selectedChallengeOverride;
   const modelFile = challengeObj?.model_file;
+  const [initialDataSent, setInitialDataSent] = useState(false);
 
-  // Check and request permissions
   const checkPermission = () => {
     if (Platform.OS === "android") {
       requestMultiple([
@@ -69,92 +76,53 @@ const StarChallenge = () => {
   };
 
   const dataGpsChallegen = (selectedSSNN, challengeData) => {
-    setSelectedChallengeOverride(challengeData); // Guarda challengeData para usarlo como nuevo "pin_challenge"
+    setSelectedChallengeOverride(challengeData);
   };
-  console.log("selectedChallengeOverride", selectedChallengeOverride);
+  useEffect(() => {
+    if(unityRef.current){
+      console.log("cambio de scena");
+    unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");}
 
-  // Download and unzip model files for each star
-  // const downloadAndPrepareModels = () => {
-  //   // setLoading(true);
-  //   const challengeObj = selectedChallengeOverride;
-  //   const modelFile = challengeObj?.model_file;
-  //   if (challengeObj?.challenge_requirement === "PHOTO" && modelFile) {
-  //     const filename = modelFile.split("/").pop().split("?")[0];
-  //     const withoutExtFilename = filename.split(".")[0];
-  //     const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-  //     const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
-  //     const downloadModelFile = (sourcePath, targetPath, modelFile) => {
-  //       RNFetchBlob.config({
-  //         fileCache: true,
-  //         path: sourcePath,
-  //       })
-  //         .fetch("GET", modelFile)
-  //         .progress((received, total) => {
-  //           const progress = Math.trunc((received / total) * 100);
-  //         })
-  //         .then(res => {
-  //           unzipModelFile(res.path(), targetPath);
-  //         });
-  //     };
-  //     const unzipModelFile = (sourcePath, targetPath) => {
-  //       unzip(sourcePath, targetPath, "UTF-8")
-  //         .then(path => {
-  //           RNFS.readDir(path)
-  //             .then(result => {
-  //               if (!result || !Array.isArray(result)) {
-  //                 return;
-  //               }
-  //               const sourcesArray = [];
-  //               let objFile = null;
-  //               let mtlFile = null;
-  //               let baseTexture = null;
-  //               let emissionTexture = null;
-  //               result.forEach(file => {
-  //                 if (!file.name || !file.path) {
-  //                   console.warn("Archivo inválido encontrado:", file);
-  //                   return;
-  //                 }
-  //                 const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-  //                 // Procesar cada tipo de archivo
-  //                 if (file.name.includes(".obj")) {
-  //                   objFile = filePath;
-  //                 } else if (file.name.includes(".mtl")) {
-  //                   mtlFile = filePath;
-  //                 } else if (file.name.toLowerCase().includes("diffuse")) {
-  //                   baseTexture = filePath;
-  //                 } else if (file.name.toLowerCase().includes("emission")) {
-  //                   emissionTexture = filePath;
-  //                 } else {
-  //                   sourcesArray.push({uri: filePath});
-  //                 }
-  //                 setStarModels(objFile || ""); // Manejar valores nulos
-  //                 setModelResource(mtlFile);
-  //                 setTextureBase(baseTexture);
-  //                 setTextureEmission(emissionTexture);
-  //               });
-  //             })
-  //             .catch(error => {
-  //               console.error("Error leyendo el directorio descomprimido:", error);
-  //             });
-  //         })
-  //         .catch(error => {
-  //           console.error("Error durante la descompresión:", error);
-  //         });
-  //     };
+  }, [unityRef.current]);
+  useEffect(() => {
+    console.log("useEffect: [challengeObj]");
+    if (challengeObj && modelFile) {
+      checkIfModelExist();
+    }
+  }, [challengeObj, modelFile]);
 
-  //     RNFS.exists(sourcePath)
-  //       .then(exists => {
-  //         if (exists) {
-  //           unzipModelFile(sourcePath, targetPath);
-  //         } else {
-  //           downloadModelFile(sourcePath, targetPath, modelFile);
-  //         }
-  //       })
-  //       .catch(error => {
-  //         console.error("Error verificando existencia del archivo:", error);
-  //       });
-  //   }
-  // };
+  const downloadModelFile = (sourcePath, targetPath) => {
+    RNFetchBlob.config({
+      fileCache: true,
+      path: sourcePath,
+    })
+        .fetch("GET", modelFile)
+        .then(res => {
+          unzipModelFile(res.path(), targetPath);
+        })
+        .catch(console.error);
+  };
+
+  const unzipModelFile = async (sourcePath, targetPath) => {
+    setLoading(true);
+
+    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
+
+    if (extractedData.success) {
+      setStarModels(extractedData.objFile);
+      setModelResource(extractedData.mtlFile);
+      setTextureBase(extractedData.baseTexture);
+      setTextureEmission(extractedData.emissionTexture);
+      console.log("Model file unzipped and state updated successfully.");
+    } else {
+      console.error("Failed to unzip model file:", extractedData.error);
+
+      setModelResource(null);
+      setTextureBase(null);
+      setTextureEmission(null);
+    }
+    setLoading(false);
+  };
 
   const checkIfModelExist = () => {
     if (challengeObj && modelFile) {
@@ -164,43 +132,16 @@ const StarChallenge = () => {
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
 
       RNFS.exists(sourcePath)
-        .then(exists => {
-          console.log("exists", exists);
-          if (exists) {
-            unzipModelFile(sourcePath, targetPath);
-          } else {
-            downloadModelFile(sourcePath, targetPath);
-          }
-        })
-        .catch(console.error);
+          .then(exists => {
+            console.log("exists", exists);
+            if (exists) {
+              unzipModelFile(sourcePath, targetPath);
+            } else {
+              downloadModelFile(sourcePath, targetPath);
+            }
+          })
+          .catch(console.error);
     }
-  };
-
-  const unzipModelFile = async (sourcePath, targetPath) => {
-    setLoading(true);
-
-    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
-
-    if (extractedData.success) {
-      setModelOBJ(extractedData.objFile);
-      setModelResource(extractedData.mtlFile);
-      setTextureBase(extractedData.baseTexture);
-      setTextureEmission(extractedData.emissionTexture);
-      setSourcesFiles(extractedData.sourcesFiles);
-      setFoldefile(extractedData.foldefile);
-      console.log("Model file unzipped and state updated successfully.");
-    } else {
-      console.error("Failed to unzip model file:", extractedData.error);
-
-      setModelOBJ(null);
-      setModelResource(null);
-      setTextureBase(null);
-      setTextureEmission(null);
-      setSourcesFiles([]);
-      setFoldefile([]);
-    }
-
-    setLoading(false);
   };
 
   const retakeButtonHandler = () => {
@@ -212,15 +153,15 @@ const StarChallenge = () => {
   const playCameraSound = () => {
     Sound.setCategory("Playback");
     let cameraSound = new Sound(
-      Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
-      Sound.MAIN_BUNDLE,
-      error => {
-        if (error) {
-          console.error("failed to load the sound", error);
-        } else {
-          cameraSound.play();
+        Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
+        Sound.MAIN_BUNDLE,
+        error => {
+          if (error) {
+            console.error("failed to load the sound", error);
+          } else {
+            cameraSound.play();
+          }
         }
-      }
     );
   };
 
@@ -230,45 +171,42 @@ const StarChallenge = () => {
     if (unityRef?.current) {
       unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
 
-      // Obtén la ruta base según la plataforma
       const basePath =
-        Platform.OS === "android"
-          ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
-          : RNFS.DocumentDirectoryPath; // Ruta de Documentos en iOS
+          Platform.OS === "android"
+              ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
+              : RNFS.DocumentDirectoryPath;
 
       setProcessingMedia(true);
 
-      // Agregar un retraso para asegurarse de que la captura se ha guardado
       setTimeout(() => {
         RNFS.readDir(basePath)
-          .then(files => {
-            console.info("Archivos encontrados en el directorio:", files);
+            .then(files => {
+              console.info("Archivos encontrados en el directorio:", files);
 
-            if (Array.isArray(files) && files.length > 0) {
-              // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
-              const foundFile = files.find(
-                file =>
-                  file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
-              );
+              if (Array.isArray(files) && files.length > 0) {
+                const foundFile = files.find(
+                    file =>
+                        file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
+                );
 
-              if (foundFile) {
-                console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
-                setCapturedImage(foundFile.path); // Actualiza capturedImage
-                setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
+                if (foundFile) {
+                  console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                  setCapturedImage(foundFile.path);
+                  setIsUnityLoaded(false);
+                } else {
+                  console.error("No se encontró ningún archivo .png en el directorio.");
+                }
               } else {
-                console.error("No se encontró ningún archivo .png en el directorio.");
+                console.error("El directorio está vacío o 'files' no es un array válido.");
               }
-            } else {
-              console.error("El directorio está vacío o 'files' no es un array válido.");
-            }
-          })
-          .catch(err => {
-            console.error("Error leyendo el directorio:", err);
-          })
-          .finally(() => {
-            setProcessingMedia(false);
-          });
-      }, 2000); // Asegúrate de que el archivo esté listo
+            })
+            .catch(err => {
+              console.error("Error leyendo el directorio:", err);
+            })
+            .finally(() => {
+              setProcessingMedia(false);
+            });
+      }, 2000);
     }
   };
 
@@ -285,37 +223,60 @@ const StarChallenge = () => {
 
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
-      position => {
-        const newLocation = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-          accuracy: position.coords.accuracy,
-        };
-        setUserLocation(newLocation); // ✅ Estado local
-        updateUnityLocation(newLocation); // Enviás a Unity
-      },
-      error => {
-        console.error("Error obteniendo ubicación:", error);
-      },
-      {
-        accuracy: {
-          android: "high",
-          ios: "best",
+        position => {
+          if (
+              position.coords.latitude === 0 ||
+              position.coords.longitude === 0 ||
+              position.coords.latitude === undefined ||
+              position.coords.longitude === undefined
+          ) {
+            return;
+          }
+          const newLocation = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          };
+          setUserLocation(newLocation);
+
+          const LOCATION_THRESHOLD = 0.00001;
+
+          // if (
+          //     notificationMode === "hunt" && // Only execute updateUnityLocation if notificationMode is "hunt"
+          //     (!lastSentLocationRef.current ||
+          //         Math.abs(newLocation.latitude - lastSentLocationRef.current.latitude) > LOCATION_THRESHOLD ||
+          //         Math.abs(newLocation.longitude - lastSentLocationRef.current.longitude) > LOCATION_THRESHOLD)
+          // ) {
+          //   console.log('ejecutando envio de posicion');
+            updateUnityLocation(newLocation);
+            lastSentLocationRef.current = newLocation;
+          // }
+          // if (notificationMode === "scan") { // For scan mode, still update location but don't set `locationObtainedForHunt`
+          //   updateUnityLocation(newLocation);
+          //   lastSentLocationRef.current = newLocation;
+          // }
         },
-        enableHighAccuracy: true,
-        distanceFilter: 0,
-        interval: 5000,
-      }
+        error => {
+        },
+        {
+          accuracy: {
+            android: "high",
+            ios: "best",
+          },
+          enableHighAccuracy: true,
+          distanceFilter: 0,
+          interval: 5000,
+        }
     );
 
     return () => {
       Geolocation.clearWatch(watchId);
     };
-  }, [unityRef]);
+  }, [unityRef, notificationMode]);
 
   const updateUnityLocation = location => {
     if (unityRef?.current) {
-      if (location.latitude && location.longitude && starModels) {
+      if (location.latitude && location.longitude) {
         console.log("Enviando posicion del usuario");
         const jsonData = JSON.stringify({
           latitude: location?.latitude,
@@ -329,44 +290,27 @@ const StarChallenge = () => {
     }
   };
 
-  // const Gpsobjectmanager () => {
-  // if (starModels){
-  //   const data ={
-  //     deviceLatitude: location?.latitude,
-  //     deviceLongitude: location?.longitude,
-  //     objectLatitude: -25.296670,
-  //     objectLongitude: -57.589656,
-  //   }
-  //
-  //   unityRef.current.postMessage("GpsObjectManager", "SetLocationsFromReact", JSON.stringify(data));
-  //   }
-  // }
-  //
-  // const sendSpawnData= () => {
-  //   console.log("entroaqui")
-  //   if (!unityRef?.current ) return;
-  //   console.log("paso a spawndata")
-  //   const spawnData = {
-  //     objects: [
-  //       {
-  //         id: "1",
-  //         latitude: -25.296175132051676,
-  //         longitude: -57.58900607168004,
-  //         scale: 1.0,
-  //         height: 1,
-  //         isVisible : true,
-  //         updateRadius: 14.0,
-  //       },
-  //     ]
-  //   }
-  //
-  //
-  //   unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
-  //
-  // };
+  useEffect(() => {
+    if (challengeObjParameters) {
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
+    }
+  }, [challengeObjParameters]);
+
+  useEffect(() => {
+    checkPermission();
+  }, [selectedChallengeOverride]);
+
+  const sendBloomValuesToUnity = () => {
+    const bloomData = {threshold, intensity};
+    if (unityRef.current) {
+      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
+    }
+  };
 
   const sendModelDataToUnity = () => {
-    if (unityRef.current && textureBase && starModels && userLocation) {
+    if (unityRef.current && textureBase && starModels && userLocation && !hasSentModelDataOnce &&
+        (notificationMode === "scan" || notificationMode === "hunt")) {
       const modelData = {
         objFile: starModels.replace("file://", ""),
         mtlFile: modelResource ? modelResource.replace("file://", "") : "",
@@ -382,91 +326,44 @@ const StarChallenge = () => {
         scaleSpeed: Number(selectedChallengeOverride.parameters?.scale_sensitivity) || 0.01,
         minScale: Number(selectedChallengeOverride.parameters?.min_pinch_scale) || 1,
         maxScale: Number(selectedChallengeOverride.parameters?.max_pinch_scale) || 1,
-        // isVisible: notificationMode === 'scan',
-        isVisible: false,
+        isVisible: notificationMode !== "hunt",
         position: {
-          x: parseFloat(selectedChallengeOverride.parameters?.positionX) || 0, // No optional chaining here, already checked above
+          x: parseFloat(selectedChallengeOverride.parameters?.positionX) || 0,
           y: parseFloat(selectedChallengeOverride.parameters?.positionY) || 0,
           z: 2 || 0.4,
         },
         distanceCamera: 2,
-        // useGPS: false,
-        // gpsLatitude:  -25.296689,
-        // gpsLongitude: -57.589390,
+        isHuntMode: notificationMode === "hunt",
+        allowScale: notificationMode === "hunt",
       };
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
-
       setSendModelData(true);
-
-      // setTimeout(() => {
-      //   sendSpawnData()
-      //   PointsCount()
-      // }, 2000);
-      // const GpsHandlerConfig={
-      //   minGPSAccuracy: 10,
-      //   scaleFactor: 1,
-      //   isVisibleObject: true
-      // }
-      // setTimeout(() => {
-      //   unityRef.current.postMessage("OBJImport", "ConfigureGPSFromReact", JSON.stringify(GpsHandlerConfig));
-      // }, 1000);
-
-      // Parámetros adicionales para el GPSHandler en Unity
-      // const parameters = {
-      //   smoothing: 0.5, // Factor de suavizado
-      //   scale: 1, // Factor de escala
-      //   autoUpdate: false, // Control de actualización automática
-      // };
-      //
-      // unityRef.current.postMessage(
-      //   "ObjectSpawner",
-      //   "ConfigureParameters",
-      //   JSON.stringify(parameters)
-      // );
-      //
-      // // Datos de los objetos GPS
-      // const start_site = selectedChallengeOverride.lat_long.coordinates;
-      // const objects = {
-      //   objects: start_site.map(coord => ({
-      //     latitude: coord[1], // Índice 1 corresponde a la latitud
-      //     longitude: coord[0], // Índice 0 corresponde a la longitud
-      //     isVisible: true,
-      //     scale: 1,
-      //     height: 0,
-      //     updateRadius: 30.0,
-      //   })),
-      // };
-      //
-
-      // Enviar datos de objetos a Unity
-      // unityRef.current.postMessage(
-      //   "ObjectSpawner",
-      //   "SpawnObjectsFromReact",
-      //   JSON.stringify(objects)
-      // );
-      // const visibilityConfig = {
-      //   isVisible: true,
-      // };
-      //
-      // unityRef.current.postMessage(
-      //   "OBJImport", // Nombre del script en Unity
-      //   "SetVisibilityFromReact", // Método que se llamará
-      //   JSON.stringify(visibilityConfig)
-      // );
+      setHasSentModelDataOnce(true);
     }
   };
 
-  const sendBloomValuesToUnity = () => {
-    const bloomData = {threshold, intensity};
-    if (unityRef.current) {
-      unityRef.current.postMessage("PosProcessing", "UpdateBloomValues", JSON.stringify(bloomData));
+  const sendSpawnData = () => {
+    if (!unityRef?.current || notificationMode !== "hunt") return;
+    const spawnData = {
+      objects: [
+        {
+          id: "1",
+          latitude: -25.29674605035726,
+          longitude: -57.58958597325399,
+          scale: 1.0,
+          height: 1,
+          isVisible: true,
+          updateRadius: 14.0,
+        },
+      ]
     }
+    unityRef.current.postMessage("ObjectSpawner", "SpawnObjectsFromReact", JSON.stringify(spawnData));
   };
+
   const PointsCount = async () => {
     if (unityRef.current && selectedChallengeOverride?.points) {
-      console.log("selectedDestination?.points", selectedChallengeOverride?.points);
       const pointData = {
         points: selectedChallengeOverride?.points,
         isPointView: true,
@@ -474,103 +371,23 @@ const StarChallenge = () => {
       unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
     }
   };
-  useEffect(() => {
-    if (!unityRef.current) {
-      return;
-    }
 
-    if (starModels && textureBase && unityRef.current) {
+  useEffect(() => {
+    if (unityRef.current && starModels && textureBase && userLocation && !hasSentModelDataOnce &&
+        (notificationMode === "scan" || notificationMode === "hunt")) {
       sendModelDataToUnity();
+    }
+  }, [unityRef, starModels, textureBase, userLocation, notificationMode, hasSentModelDataOnce, selectedChallengeOverride, modelResource]); // Added dependencies for sendModelDataToUnity logic
+
+  useEffect(() => {
+    if (notificationMode === "hunt") {
+      console.log("se envio sendSpawnData");
       setTimeout(() => {
-        const spawnData = {
-          objects: [
-            // {
-            //   id: "1",
-            //   latitude: -25.29677932051676,
-            //   longitude: -57.58965607168004,
-            //   scale: 1.0,
-            //   height: 1,
-            //   isVisible: true,
-            //   updateRadius: 14.0,
-            // },
-            // {
-            //   id: "2",
-            //   latitude: -25.29677932051676,
-            //   longitude: -57.589567607168004,
-            //   scale: 1.0,
-            //   height: 1,
-            //   isVisible: true,
-            //   updateRadius: 14.0,
-            // },
-            // -25.296501167394688, -57.58929377457572
-            // -25.296201, -57.589002 ogaucho
-            {
-              id: "3",
-              latitude: -25.29672605035726,
-              longitude: -57.58988597325399,
-              scale: 1.0,
-              height: 1,
-              isVisible: true,
-              updateRadius: 14.0,
-            },
-            // -25.29672605035726, -57.58988597325399
-          ],
-        };
-
-        // Primer envío de objetos
-        unityRef.current.postMessage(
-          "ObjectSpawner",
-          "SpawnObjectsFromReact",
-          JSON.stringify(spawnData)
-        );
-
-        // Segundo envío + conteo de puntos (opcional, si querés reforzar que se cargue)
-        setTimeout(() => {
-          PointsCount(); // Esto es correcto
-
-          // 💡 Este segundo `SpawnObjectsFromReact` probablemente NO sea necesario
-          // a menos que lo estés usando como "refuerzo" por si no cargó antes.
-          // unityRef.current.postMessage(
-          //     "ObjectSpawner",
-          //     "SpawnObjectsFromReact",
-          //     JSON.stringify(spawnData)
-          // );
-        }, 1000); // 8 segundos después del primero
-      }, 500); // Espera 0.5s después del modelo
+        sendSpawnData();
+        PointsCount();
+      }, 1500);
     }
-    // if (starModels && textureBase && unityRef.current && userLocation
-    //     // && notificationMode === "hunt"
-    // ) {
-    //   setTimeout(() => {
-    //     sendSpawnData()
-    //     PointsCount()
-    //   }, 2000);
-    // }
-    // if (starModels && textureBase && unityRef.current && userLocation && notificationMode === "scan") {
-    //   setTimeout(() => {
-    //     PointsCount()
-    //     unityRef.current.postMessage(
-    //         "Scriptposition",
-    //         "SetVisibleButton",
-    //         JSON.stringify({
-    //           setVisibleButtonPosition: true,
-    //         })
-    //     );
-    //   }, 1000);
-    // }
-  }, [isUnityLoaded, starModels, textureBase]);
-
-  useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 2);
-    }
-  }, [challengeObjParameters]);
-  useEffect(() => {
-    checkPermission();
-    // downloadAndPrepareModels();
-    checkIfModelExist();
-  }, [selectedChallengeOverride]);
+  }, [notificationMode, locationObtainedForHunt, unityRef, selectedChallengeOverride]); // Added dependencies for sendSpawnData and PointsCount logic
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -579,11 +396,10 @@ const StarChallenge = () => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    console.log("DATA UNITY", data);
-    // const buttonInfo = data.enableButton;
+    console.log("DATA UNIT", data);
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
-    //
+
     if (buttonBack) {
       navigation?.goBack();
       if (Platform.OS === "android") {
@@ -594,58 +410,34 @@ const StarChallenge = () => {
     if (buttonARMode) {
       setOpenModalARMode(true);
     }
-    // if (
-    //     data?.objectDetect &&
-    //     Array.isArray(data.objectDetect) &&
-    //     data.objectDetect.length > 0 &&
-    //     data.objectDetect[0]?.ObjectDetecte === true
-    // ) {
-    //   console.log("Objeto detectado:", data.objectDetect[0].Name);
-    //   setOpenModalARMode(true);
-    // }
-    // else {
-    //   // setOpenModalARMode(false)
-    //   console.log("hihi")
-    // }
-    if (data?.objectTapped?.tappedObject === true) {
-      console.log("Objeto fue tocado por el usuario:", data.objectTapped.name);
-      // podés abrir modal, dar puntos, animar, lo que necesites
+    if (data?.touchEvent?.objectTouched === true) {
+      setNotificationMode("hunt");
       setOpenModalARMode(true);
     }
-    //
-    // if (data.photoVideoButton?.isPhoto) {
-    //   setCapturedImage(data.photoVideoButton?.filepath);
-    //   setIsUnityLoaded(false);
-    //   eraseFile();
-    // }
-    // if (data.photoVideoButton?.isPhoto == false) {
-    //   setCapturedVideo(data.photoVideoButton?.filepath);
-    //   setIsUnityLoaded(false);
-    // }
-    // if (data.infoButton?.isButton) {
-    //   setChallengeInformationView(data.infoButton?.isButton);
-    //   setIsUnityLoaded(true);
-    // }
+    if (data?.notificationMode) {
+      setNotificationMode(data.notificationMode);
+    }
   };
-  // const notificationUnity = () => {
-  //   if (unityRef.current) {
-  //     const data = {
-  //       isNotification: true,
-  //       textNotification: "Users can scan their environment or QR Code to trigger the AR.",
-  //       titleNotification: "Scan Mode"
-  //     }
-  //     unityRef.current.postMessage("Scriptposition", "SetVisibleNotification", JSON.stringify(data));
-  //   }
-  // }
-  // notificationUnity()
+  const notificationUnity = () => {
+    if (unityRef.current) {
+      const data = {
+        isNotification: true,
+        textNotification: "Presionar sobre la estrella.",
+        titleNotification: "Estrella encontrada"
+      }
+      unityRef.current.postMessage("Scriptposition", "SetVisibleNotification", JSON.stringify(data));
+    }
+  }
 
   useFocusEffect(
-    useCallback(() => {
-      if (Platform.OS === "android") {
-        unityRef.current?.resumeUnity?.();
-        unityRef.current?.windowFocusChanged?.(true);
-      }
-    }, [unityRef, isUnityLoaded])
+      useCallback(() => {
+        console.log("useFocusEffect: [unityRef, isUnitLoaded]");
+
+        if (Platform.OS === "android") {
+          unityRef.current?.resumeUnity?.();
+          unityRef.current?.windowFocusChanged?.(true);
+        }
+      }, [unityRef, isUnityLoaded])
   );
 
   useEffect(() => {
@@ -654,20 +446,27 @@ const StarChallenge = () => {
         isDetectionEnabled: true,
         detectionDistance: 80,
       };
-
       unityRef.current.postMessage(
-        "Main Camera",
-        "SetDetectObjectState",
-        JSON.stringify(spawnData)
+          "OBJImport",
+          "SetLoadingVisibility",
+          JSON.stringify({isVisible: false})
       );
 
+      const distanceDetect = {
+        isDetectionEnabled: true,
+        detectionDistance: 80
+      }
       unityRef.current.postMessage(
-        "OBJImport",
-        "SetLoadingVisibility",
-        JSON.stringify({isVisible: false})
+          "Main Camera",
+          "SetDetectObjectState",
+          JSON.stringify(distanceDetect)
+      );
+      unityRef.current.postMessage(
+          "OBJImport",
+          "SetLoadingVisibility",
+          JSON.stringify({isVisible: false})
       );
     }
-    console.log("Esto se ejecuta una vez Detector de objeto y Loading");
   }, []);
 
   const startChallengeHandler = site => {
@@ -704,46 +503,41 @@ const StarChallenge = () => {
   };
 
   return (
-    <ChallengeScreen
-      title="AR Star Hunt "
-      appHeader={false}
-      style={{
-        paddingHorizontal: 0,
-        paddingTop: "11%",
-        height: "100%",
-        backgroundColor: "#000",
-        // ...screenPadding,
-      }}
-    >
-      <UnityARCamera
-        width={"100%"}
-        height={"100%"}
-        unityRef={unityRef}
-        isProcessingMedia={processingMedia}
-        // onUnityLayout={handleUnityViewLayout}
-        onUnityMessage={handleUnityMessage}
-        isUnityLoaded={isUnityLoaded}
-        capturedImage={capturedImage}
-        capturedVideo={capturedVideo}
-      />
-      <ARModeModal
-        isVisible={openModalARMode}
-        onClose={closeModalARMode}
-        selectedDestination={destinationData}
+      <ChallengeScreen
+          title="AR Star Hunt "
+          appHeader={false}
+          style={{
+            paddingHorizontal: 0,
+            paddingTop: "11%",
+            height: "100%",
+            backgroundColor: "#000",
+          }}
+      >
+        <UnityARCamera
+            width={"100%"}
+            height={"100%"}
+            unityRef={unityRef}
+            isProcessingMedia={processingMedia}
+            onUnityMessage={handleUnityMessage}
+            isUnityLoaded={isUnityLoaded}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
+        />
+        <ARModeModal
+                isVisible={openModalARMode}
+                onClose={closeModalARMode}
+            selectedDestination={destinationData}
         onStartChallenge={startChallengeHandler}
         setShowNotification={setShowNotification}
-        setNotificationMode={setNotificationMode}
-      />
+            setNotificationMode={setNotificationMode}
+        />
 
-      <NotificationModal
-        isVisible={showNotification}
-        onClose={() => setShowNotification(false)}
-        // selectedDestination={destinationData}
-        // sponsor={selectedDestination?.geo_ar_star?.geo_site?.pin_challenge?.sponsored}
-        // onPointsGranted={dataGpsChallegen}
-        selectedMode={notificationMode}
-      />
-    </ChallengeScreen>
+        <NotificationModal
+            isVisible={showNotification}
+            onClose={() => setShowNotification(false)}
+            selectedMode={notificationMode}
+        />
+      </ChallengeScreen>
   );
 };
 

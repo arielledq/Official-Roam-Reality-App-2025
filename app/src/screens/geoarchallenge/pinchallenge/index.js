@@ -73,6 +73,11 @@ const PinChallenge = () => {
     siteLatitude = selectedGeoSite.lat_long.coordinates[1];
     siteLongitude = selectedGeoSite.lat_long.coordinates[0];
   }
+  useEffect(() => {
+    if(unityRef.current){
+      console.log("cambio de scena");
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");}
+  }, [unityRef.current]);
 
   // Descargar modelo y gestionar archivos
   const downloadModelFile = (sourcePath, targetPath) => {

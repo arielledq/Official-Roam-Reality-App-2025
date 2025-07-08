@@ -150,13 +150,13 @@ const ScanModeView = ({
 
                         // Cerrar primero el modal actual
                         closeModalHandler();
-                        // onPointsGranted("scan", () => challengeData);
+                        onPointsGranted("scan", () => challengeData);
 
                         // Mostrar la notificación luego de un pequeño delay
                         setTimeout(() => {
                           setNotificationMode("scan");
                           setShowNotification(true);
-                        }, 1000); // 300ms funciona bien visualmente
+                        }, 800); // 300ms funciona bien visualmente
                       }}
                       style={{
                         backgroundColor: "#1E1F30",
