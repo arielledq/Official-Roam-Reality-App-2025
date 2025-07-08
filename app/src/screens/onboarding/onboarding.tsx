@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from "react";
-import {Image} from "react-native";
+import {Image, View} from "react-native";
 
 import BackgroundWithImage from "../../components/background";
 import {AppButton, AppText} from "../../components";
