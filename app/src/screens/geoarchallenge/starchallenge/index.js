@@ -424,6 +424,8 @@ const StarChallenge = () => {
     // // Primero reiniciar la escena de unity
     // resetUnityScene();
 
+    console.log("site", site);
+
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -438,11 +440,8 @@ const StarChallenge = () => {
         break;
       case AR_MODES.SCAN_MODE:
         challengeData = {
-          // lat_long: site.lat_long,
           challenge_requirement: site?.challenge_requirement,
           challenge_id: site?.id,
-          // model_file: site.pin_challenge?.model_file,
-          // parameters: site.pin_challenge?.parameters,
           points: site?.points,
           setVisibleButtonPosition: false,
           arChallenge: true,
@@ -457,6 +456,9 @@ const StarChallenge = () => {
           model_file: site.pin_challenge?.model_file,
           parameters: site.pin_challenge?.parameters,
           points: site.pin_challenge?.points,
+          setVisibleButtonPosition: false,
+          arChallenge: false,
+          isLocation: true,
         };
         break;
       default:
