@@ -11,6 +11,7 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
     buttonStyle = {},
     titleStyle = {},
     containerStyle = {},
+    innerContainerStyle = {},
     customColors,
     radius,
     ...otherProps
@@ -26,11 +27,11 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
         end={{x: 1, y: 1}}
         style={[
           styles.containerStyle,
-          containerStyle,
           {
             padding: 0,
             minHeight: 50,
           },
+          containerStyle,
         ]}
       >
         <View
@@ -39,6 +40,7 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
             justifyContent: "center",
             alignItems: "center",
             paddingHorizontal: 10,
+            ...innerContainerStyle,
           }}
         >
           <Button

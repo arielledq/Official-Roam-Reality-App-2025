@@ -115,7 +115,7 @@ const ARModeModal = ({
           style={[
             styles.modalContent,
             {
-              backgroundColor: theme.lightColors?.boxStatBG,
+              backgroundColor: "#131422",
               height: selectedMode === null ? 270 : "auto",
             },
           ]}
@@ -137,7 +137,7 @@ const ARModeModal = ({
             ></AppButton>
           </View>
           <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: "#fff"}}>
-            {selectedMode?.name || "AR MODE"}
+            {selectedMode?.name?.toUpperCase() || "AR MODE"}
           </Text>
           {selectedMode?.id ? (
             <ARModeSiteList

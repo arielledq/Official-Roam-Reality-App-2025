@@ -85,7 +85,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             height: 75,
             width: 75,
             borderRadius: 110,
-            backgroundColor: "#3D3E58",
+            backgroundColor: "#27273F",
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -102,9 +102,21 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           labelField="label"
           valueField="value"
           selectedTextStyle={{fontSize: 14, ...fontGroup.nunitoBold, fontWeight: "bold"}}
-          placeholder="Select Sponsor"
-          activeColor="#3D3E58"
-          value={selectedSponsor.value}
+          itemTextStyle={{
+            ...fontGroup.nunitoBold,
+            textTransform: "uppercase",
+            fontWeight: "bold",
+            color: "#fff",
+            fontSize: 14,
+          }}
+          placeholder={selectedSponsor?.label || ""}
+          placeholderStyle={{
+            ...fontGroup.nunitoBold,
+            textTransform: "uppercase",
+            fontWeight: "bold",
+          }}
+          activeColor="#C881F0"
+          value={selectedSponsor?.value?.toString().toUpperCase() || ""}
           onChange={item => {
             setSelectedSponsor(item);
           }}
@@ -123,12 +135,26 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           {selectedMode?.listLabel} Available
         </Text>
         <AppButton
-          customColors={["#222", "#222"]}
-          buttonStyle={{paddingHorizontal: 10, borderRadius: 15}}
-          titleStyle={{fontSize: 10, color: "#7e8493"}}
+          customColors={["#27273F", "#27273F"]}
+          containerStyle={{
+            paddingHorizontal: 0,
+            borderRadius: 8,
+            paddingVertical: 0,
+            paddingRight: 5,
+            width: 90,
+            minHeight: 35,
+          }}
+          iconContainerStyle={{
+            padding: 0,
+          }}
+          titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold"}}
           onPress={getSitesHandler}
           title="Refresh"
-          icon={<RefreshIcon />}
+          icon={
+            <View style={{paddingHorizontal: 5}}>
+              <RefreshIcon />
+            </View>
+          }
         />
       </View>
 
@@ -176,7 +202,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                     )
                   }
                   style={{
-                    backgroundColor: "#2C2D3F",
+                    backgroundColor: "#27273F",
                     borderRadius: 10,
                     padding: 12,
                     flexDirection: "row",
@@ -205,7 +231,13 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       </View>
                     </View>
                   </View>
-                  <Text style={{color: "white", fontSize: 18}}>{isExpanded ? "▲" : "▼"}</Text>
+                  <View>
+                    {isExpanded ? (
+                      <Icon name="up" size={20} color="white" />
+                    ) : (
+                      <Icon name="down" size={20} color="white" />
+                    )}
+                  </View>
                 </TouchableOpacity>
 
                 {isExpanded && (
@@ -215,7 +247,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       activeOpacity={0.8}
                       onPress={() => startChallengeHandler(site)}
                       style={{
-                        backgroundColor: "#1E1F30",
+                        backgroundColor: "#27273F",
                         borderRadius: 10,
                         flexDirection: "row",
                         alignItems: "center",
