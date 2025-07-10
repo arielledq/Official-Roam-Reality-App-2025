@@ -524,8 +524,11 @@ export const getUserFriendList = () =>
     logoutFunc
   );
 
-export const getScoreboardList = (pageNumber = 1, destination = "") => {
-  const queryParams = `?page=${pageNumber}` + (destination ? `&destination=${destination}` : "");
+export const getScoreboardList = (pageNumber = 1, destination = "", sponsor = "") => {
+  const queryParams =
+    `?page=${pageNumber}` +
+    (sponsor ? `&sponsor=${sponsor}` : "") +
+    (destination ? `&destination=${destination}` : "");
   return Request.callWithToken(
     {
       url: `${commonApiRoute}scoreboard/${queryParams}`,

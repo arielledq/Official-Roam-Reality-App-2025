@@ -6,7 +6,7 @@ import {useSelector} from "react-redux";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 
 import {getGeoARDestinations, getMyRank, getScoreboardList} from "../../network";
-import {handleError} from "util/helpers";
+import {handleError, truncateText} from "util/helpers";
 
 import {AppHeader} from "../../components";
 import ScreenContainer from "components/ScreenContainer";
@@ -21,9 +21,9 @@ import Icon from "components/Icon";
 import {FontSizes} from "util/FontUtils";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
+import useScoreboardHook from "hooks/useScoreboardHook";
 
 const SCROLL_AMOUNT = 70;
-const ITEMS_PER_PAGE = 100;
 
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
@@ -33,27 +33,26 @@ const ScoreBoard = ({}) => {
   const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const {sponsors} = useScoreboardHook();
 
   const _styles = useStyles();
-  const desRef = useRef(null);
+  const desRef = useRef<FlatList>(null);
   const navigation = useNavigation();
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
 
-  const getScoreboard = async (pageNumber = 1, destination = "") => {
+  const getScoreboard = async (pageNumber = 1, destination = "", sponsor = "") => {
     setRefreshing(true);
     // Get the logged in user rank
-    if (!rankMine?.my_points) {
-      try {
-        const myRankResponse = await getMyRank(destination);
-        setRankMine(myRankResponse || {});
-      } catch (error) {
-        console.error(error);
-      }
+    try {
+      const myRankResponse = await getMyRank(destination);
+      setRankMine(myRankResponse || {});
+    } catch (error) {
+      console.error(error);
     }
 
     // Get the leaderboard list
     try {
-      const scoreBoardResponse = await getScoreboardList(pageNumber, destination);
+      const scoreBoardResponse = await getScoreboardList(pageNumber, destination, sponsor);
       const scoreboardUsers = scoreBoardResponse?.results || [];
       setUsers((prevUsers: any) =>
         pageNumber === 1 ? scoreboardUsers : [...prevUsers, ...scoreboardUsers]
@@ -68,7 +67,14 @@ const ScoreBoard = ({}) => {
   const filterDestinations = (o: any) => {
     setSelectedDestination(o);
     const newPage = 1;
-    getScoreboard(newPage, o.id);
+    let destination = "";
+    let sponsor = "";
+    if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
+      destination = o.id || "";
+    } else {
+      sponsor = o.id || "";
+    }
+    getScoreboard(newPage, destination, sponsor);
   };
 
   const ARDestinations = async () => {
@@ -102,21 +108,32 @@ const ScoreBoard = ({}) => {
 
   const handlePullDownToRefresh = () => {
     const newPage = 1;
-    const destination = selectedDestination?.id || "";
-    getScoreboard(newPage, destination);
+    let destination = "";
+    let sponsor = "";
+    if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
+      destination = selectedDestination?.id || "";
+    } else {
+      sponsor = selectedDestination?.id || "";
+    }
+    getScoreboard(newPage, destination, sponsor);
   };
 
   const scrollRegionsPressHandler = () => {
     const newPosition = scrollPosition + SCROLL_AMOUNT;
-    // @ts-ignore
-    desRef.current?.scrollTo({x: newPosition, y: 0, animated: true});
+    desRef.current?.scrollToOffset({offset: newPosition, animated: true});
     setScrollPosition(newPosition);
   };
 
   const getInitialData = () => {
     const newPage = 1;
-    const destination = "";
-    getScoreboard(newPage, destination);
+    let destination = "";
+    let sponsor = "";
+    if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
+      destination = selectedDestination?.id || "";
+    } else {
+      sponsor = selectedDestination?.id || "";
+    }
+    getScoreboard(newPage, destination, sponsor);
     ARDestinations();
   };
 
@@ -125,12 +142,18 @@ const ScoreBoard = ({}) => {
   }, []);
 
   const DestinationItem = React.memo(({obj}: {obj: any}) => {
+    let filterImage = "";
+    if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
+      filterImage = obj?.flag_image;
+    } else {
+      filterImage = obj?.image;
+    }
     return (
       <TouchableOpacity
         onPress={() => filterDestinations(obj)}
         style={[
           _styles.countryButtonStyle,
-          obj.id == selectedDestination?.id
+          obj.id === selectedDestination?.id
             ? _styles.countrySelectedButtonStyle
             : _styles.countryUnSelectedButtonStyle,
         ]}
@@ -145,7 +168,7 @@ const ScoreBoard = ({}) => {
               borderRadius: 80,
             }}
             source={{
-              uri: obj?.flag_image,
+              uri: filterImage,
               priority: FastImage.priority.normal,
               cache: FastImage.cacheControl.immutable,
             }}
@@ -154,8 +177,13 @@ const ScoreBoard = ({}) => {
         ) : (
           <Image source={Images.Earth} style={{width: 40, height: 40, aspectRatio: 1}} />
         )}
-        <Text style={[_styles.buttonSelectText, {fontSize: FontSizes.S8, fontWeight: "normal"}]}>
-          {obj?.name}
+        <Text
+          style={[
+            _styles.buttonSelectText,
+            {fontSize: FontSizes.S8, fontWeight: "normal", textAlign: "center"},
+          ]}
+        >
+          {truncateText(obj?.name, 10)}
         </Text>
       </TouchableOpacity>
     );
@@ -251,7 +279,7 @@ const ScoreBoard = ({}) => {
         <FlatList
           horizontal
           ref={desRef}
-          data={destinationData}
+          data={challengeChoice == SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           renderItem={({item}) => <DestinationItem obj={item} />}
