@@ -43,7 +43,7 @@ const useStyles = makeStyles(theme => ({
   },
   rankTextPosition: {
     ...fontGroup.nunitoBold,
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S18,
     color: theme.colors.white,
   },
   pointsText: {

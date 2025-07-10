@@ -1,5 +1,5 @@
 import React, {useRef, useState} from "react";
-import {Text, View, ImageBackground, TouchableOpacity, FlatList} from "react-native";
+import {Text, View, ImageBackground, TouchableOpacity, FlatList, Image} from "react-native";
 
 import FastImage from "react-native-fast-image";
 import {useSelector} from "react-redux";
@@ -27,7 +27,7 @@ const SCROLL_AMOUNT = 70;
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState([]);
   const [rankMine, setRankMine] = useState<any>();
-  const [destinationData, setDestinationData] = useState([{name: "Global"}]);
+  const [destinationData, setDestinationData] = useState<any>();
   const [selectedDestination, setSelectedDestination] = useState<any>();
   const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -59,10 +59,14 @@ const ScoreBoard = ({}) => {
   };
 
   const ARDestinations = async () => {
+    if (destinationData?.length) return;
+    setRefreshing(true);
     try {
       const res = await getGeoARDestinations();
       if (res.status == 1) {
-        setDestinationData(currDestinations => [...currDestinations, ...res.data]);
+        const defaultDestination = {name: "Global", id: "", flag_image: ""};
+        const updatedDestinations = [defaultDestination, ...res.data];
+        setDestinationData(updatedDestinations);
       } else {
         res.message.message = "Error in loading Destinations.";
         handleError(res);
@@ -90,11 +94,15 @@ const ScoreBoard = ({}) => {
           overflow: "hidden",
           borderRadius: 80,
         }}
-        source={{
-          uri: obj?.flag_image,
-          priority: FastImage.priority.normal,
-          cache: FastImage.cacheControl.immutable,
-        }}
+        source={
+          obj?.id
+            ? {
+                uri: obj?.flag_image,
+                priority: FastImage.priority.normal,
+                cache: FastImage.cacheControl.immutable,
+              }
+            : Images.GlobalIcon
+        }
         resizeMode={FastImage.resizeMode.cover}
       />
       <Text style={[_styles.buttonSelectText, {fontSize: FontSizes.S8, fontWeight: "normal"}]}>
@@ -190,8 +198,6 @@ const ScoreBoard = ({}) => {
     getInitialData();
   }, []);
 
-  console.log("rankMine", rankMine);
-
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
       {/* Tabs */}
@@ -228,7 +234,7 @@ const ScoreBoard = ({}) => {
           data={destinationData}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          renderItem={({item, index}) => <DestinationItem index={index} obj={item} />}
+          renderItem={({item}) => <DestinationItem obj={item} />}
           contentContainerStyle={{gap: 4}}
         />
         <TouchableOpacity
