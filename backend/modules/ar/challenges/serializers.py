@@ -738,3 +738,8 @@ class ARAllMemoriesSerializer(serializers.Serializer):
         elif isinstance(instance, ARSitePinCheckIn):
             return ARSitePinCheckInSerializer(instance, context=self.context).data
         return {}
+
+
+class ElevationRequestSerializer(serializers.Serializer):
+    lat = serializers.FloatField()
+    lng = serializers.FloatField()

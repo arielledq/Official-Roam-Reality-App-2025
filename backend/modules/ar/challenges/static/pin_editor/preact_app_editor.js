@@ -138,12 +138,12 @@ function App(props) {
     const handleStarMarkerDragEnd = (star, map) => {
         return (ev) => {
             const lngLat = ev.target.getLngLat();
-            const elevation = parseInt(map.queryTerrainElevation(lngLat));
+            // const elevation = parseInt(map.queryTerrainElevation(lngLat));
             setStarChanges((prev) => ({
                 ...prev,
                 [star.id]: {
                     location: [lngLat.lat, lngLat.lng],
-                    elevation: elevation
+                    // elevation: null
                 }
             }))
         }

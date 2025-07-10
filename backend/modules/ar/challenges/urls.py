@@ -6,7 +6,7 @@ from .viewsets import ChallengesViewSet, ChallengesUploadView, \
     SponsorViewSet, ARProfileViewSet, ARMemoriesViewSet, ARSettingsViewSet, \
     ARExamplesViewSet, GeoArSiteViewSet, GeoLocationViewSet, GeoArStarViewSet, ARSitePinCheckInViewSet, \
     StarCollectionViewSet, GoldStarCollectionViewSet, DestinationFactsViewSet, PanicMessageViewSet, \
-    MemoryCheckinViewSet, GeoArSiteCategoryViewSet, GeoLocationMiniViewSet, ArSiteViewSet
+    MemoryCheckinViewSet, GeoArSiteCategoryViewSet, GeoLocationMiniViewSet, ArSiteViewSet, ElevationAPIView
 
 router = routers.DefaultRouter()
 router.register(r'user', ChallengesViewSet)
@@ -31,4 +31,5 @@ router.register(r'sites', ArSiteViewSet, basename="sites")
 urlpatterns = [
     path('', include(router.urls)),
     path('upload_model/', ChallengesUploadView.as_view()),
+    path('api/elevation/', ElevationAPIView.as_view(), name='elevation'),
 ]
