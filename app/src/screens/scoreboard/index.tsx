@@ -23,9 +23,10 @@ import {FontSizes} from "util/FontUtils";
 import RankBG from "../../assets/geoar/rank_bg.svg";
 
 const SCROLL_AMOUNT = 70;
+const ITEMS_PER_PAGE = 100;
 
 const ScoreBoard = ({}) => {
-  const [users, setUsers] = React.useState([]);
+  const [users, setUsers] = React.useState<any>([]);
   const [rankMine, setRankMine] = useState<any>();
   const [destinationData, setDestinationData] = useState<any>();
   const [selectedDestination, setSelectedDestination] = useState<any>();
@@ -38,14 +39,25 @@ const ScoreBoard = ({}) => {
   const navigation = useNavigation();
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
 
-  const getScoreboard = async (destination = "") => {
+  const getScoreboard = async (pageNumber = 1, destination = "") => {
     setRefreshing(true);
-    try {
-      const scoreBoardResponse = await getScoreboardList(destination);
-      const myRankResponse = await getMyRank(destination);
+    // Get the logged in user rank
+    if (!rankMine?.my_points) {
+      try {
+        const myRankResponse = await getMyRank(destination);
+        setRankMine(myRankResponse || {});
+      } catch (error) {
+        console.error(error);
+      }
+    }
 
-      setUsers(scoreBoardResponse?.data || []);
-      setRankMine(myRankResponse || {});
+    // Get the leaderboard list
+    try {
+      const scoreBoardResponse = await getScoreboardList(pageNumber, destination);
+      const scoreboardUsers = scoreBoardResponse?.results || [];
+      setUsers((prevUsers: any) =>
+        pageNumber === 1 ? scoreboardUsers : [...prevUsers, ...scoreboardUsers]
+      );
     } catch (error) {
       console.error(error);
     } finally {
@@ -55,7 +67,8 @@ const ScoreBoard = ({}) => {
 
   const filterDestinations = (o: any) => {
     setSelectedDestination(o);
-    getScoreboard(o.id);
+    const newPage = 1;
+    getScoreboard(newPage, o.id);
   };
 
   const ARDestinations = async () => {
@@ -76,42 +89,81 @@ const ScoreBoard = ({}) => {
     }
   };
 
-  const DestinationItem = React.memo(({obj}: {obj: any}) => (
-    <TouchableOpacity
-      onPress={() => filterDestinations(obj)}
-      style={[
-        _styles.countryButtonStyle,
-        obj.id == selectedDestination?.id
-          ? _styles.countrySelectedButtonStyle
-          : _styles.countryUnSelectedButtonStyle,
-      ]}
-    >
-      <FastImage
-        style={{
-          width: 40,
-          height: 40,
-          aspectRatio: 1,
-          overflow: "hidden",
-          borderRadius: 80,
-        }}
-        source={
-          obj?.id
-            ? {
-                uri: obj?.flag_image,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.immutable,
-              }
-            : Images.GlobalIcon
-        }
-        resizeMode={FastImage.resizeMode.cover}
-      />
-      <Text style={[_styles.buttonSelectText, {fontSize: FontSizes.S8, fontWeight: "normal"}]}>
-        {obj?.name}
-      </Text>
-    </TouchableOpacity>
-  ));
+  const handleMenuButton = () => {
+    return (
+      <TouchableOpacity
+        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
+        style={{paddingLeft: 5}}
+      >
+        <MenuIcon />
+      </TouchableOpacity>
+    );
+  };
 
-  const Item = React.memo(({obj, rank}: {obj: any; rank: number}) => {
+  const handlePullDownToRefresh = () => {
+    const newPage = 1;
+    const destination = selectedDestination?.id || "";
+    getScoreboard(newPage, destination);
+  };
+
+  const scrollRegionsPressHandler = () => {
+    const newPosition = scrollPosition + SCROLL_AMOUNT;
+    // @ts-ignore
+    desRef.current?.scrollTo({x: newPosition, y: 0, animated: true});
+    setScrollPosition(newPosition);
+  };
+
+  const getInitialData = () => {
+    const newPage = 1;
+    const destination = "";
+    getScoreboard(newPage, destination);
+    ARDestinations();
+  };
+
+  React.useEffect(() => {
+    getInitialData();
+  }, []);
+
+  const DestinationItem = React.memo(({obj}: {obj: any}) => {
+    return (
+      <TouchableOpacity
+        onPress={() => filterDestinations(obj)}
+        style={[
+          _styles.countryButtonStyle,
+          obj.id == selectedDestination?.id
+            ? _styles.countrySelectedButtonStyle
+            : _styles.countryUnSelectedButtonStyle,
+        ]}
+      >
+        {obj?.id ? (
+          <FastImage
+            style={{
+              width: 40,
+              height: 40,
+              aspectRatio: 1,
+              overflow: "hidden",
+              borderRadius: 80,
+            }}
+            source={{
+              uri: obj?.flag_image,
+              priority: FastImage.priority.normal,
+              cache: FastImage.cacheControl.immutable,
+            }}
+            resizeMode={FastImage.resizeMode.cover}
+          />
+        ) : (
+          <Image source={Images.Earth} style={{width: 40, height: 40, aspectRatio: 1}} />
+        )}
+        <Text style={[_styles.buttonSelectText, {fontSize: FontSizes.S8, fontWeight: "normal"}]}>
+          {obj?.name}
+        </Text>
+      </TouchableOpacity>
+    );
+  });
+
+  const Item = React.memo(({obj, index}: {obj: any; index: number}) => {
+    const userPosition = index + 1;
+    const userRank = userPosition;
     return (
       <View
         style={{
@@ -127,7 +179,7 @@ const ScoreBoard = ({}) => {
         <View style={{flexDirection: "row", alignItems: "center"}}>
           <View style={{alignItems: "center"}}>
             <Text style={_styles.rankText}>Rank</Text>
-            <Text style={_styles.rankTextPosition}>{rankMine?.my_rank || "-"}</Text>
+            <Text style={_styles.rankTextPosition}>{userRank || "-"}</Text>
           </View>
           <ImageBackground
             source={Images.BGBlur}
@@ -160,43 +212,11 @@ const ScoreBoard = ({}) => {
         </View>
         <View style={{marginEnd: 10, alignItems: "center"}}>
           <Text style={_styles.rankText}>Points</Text>
-          <Text style={_styles.pointsText}>{obj?.user_ar_profile?.points}</Text>
+          <Text style={_styles.pointsText}>{obj?.ar_user_profile_user?.points}</Text>
         </View>
       </View>
     );
   });
-
-  const handleMenuButton = () => {
-    return (
-      <TouchableOpacity
-        onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
-        style={{paddingLeft: 5}}
-      >
-        <MenuIcon />
-      </TouchableOpacity>
-    );
-  };
-
-  const handlePullDownToRefresh = () => {
-    const destination = selectedDestination?.id || "";
-    getScoreboard(destination);
-  };
-
-  const scrollRegionsPressHandler = () => {
-    const newPosition = scrollPosition + SCROLL_AMOUNT;
-    desRef.current?.scrollTo({x: newPosition, y: 0, animated: true});
-    setScrollPosition(newPosition);
-  };
-
-  const getInitialData = () => {
-    const destination = "";
-    getScoreboard(destination);
-    ARDestinations();
-  };
-
-  React.useEffect(() => {
-    getInitialData();
-  }, []);
 
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
@@ -317,7 +337,7 @@ const ScoreBoard = ({}) => {
         data={users}
         showsHorizontalScrollIndicator={false}
         showsVerticalScrollIndicator={false}
-        renderItem={({item, index}) => <Item obj={item} rank={index} />}
+        renderItem={({item, index}) => <Item obj={item} index={index} />}
         keyExtractor={(item: any, index: number) => item?.id?.toString() || index.toString()}
         refreshing={refreshing}
         onRefresh={handlePullDownToRefresh}
