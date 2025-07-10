@@ -28,6 +28,7 @@ const Images = {
   BGBlur: require("./blurImageBg.png"),
   CloseModal: require("./closeModal.png"),
   TikTokShare: require("./tiktok-share.png"),
+  Earth: require("./Earth.png"),
 };
 
 export default Images;

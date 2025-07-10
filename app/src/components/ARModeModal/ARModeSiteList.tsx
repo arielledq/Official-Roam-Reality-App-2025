@@ -29,7 +29,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   };
 
   const {initialUserLocation, getLocation} = userLocationHook();
-  const {getSites, sites, sponsors}: any = useArScreenHook();
+  const {getSites, sites}: any = useArScreenHook();
   const [sponsorData, setSponsorData] = useState([DEFAULT_SPONSOR]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
@@ -39,39 +39,55 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     onClose();
   };
 
-  const getSitesHandler = useCallback(() => {
-    if (
-      typeof initialUserLocation?.latitude === "number" &&
-      isFinite(initialUserLocation?.latitude) &&
-      typeof initialUserLocation?.longitude === "number" &&
-      isFinite(initialUserLocation?.longitude) &&
-      !sites?.length
-    ) {
-      const payload = {
-        lat: initialUserLocation?.latitude,
-        lon: initialUserLocation?.longitude,
-        site_type: selectedMode?.id,
-        sponsor: selectedSponsor?.value || "",
-      };
-      getSites(payload);
-    }
-  }, [initialUserLocation, selectedSponsor, selectedMode]);
+  const getSitesHandler = useCallback(
+    (sponsorId: string = "") => {
+      if (
+        typeof initialUserLocation?.latitude === "number" &&
+        isFinite(initialUserLocation?.latitude) &&
+        typeof initialUserLocation?.longitude === "number" &&
+        isFinite(initialUserLocation?.longitude)
+      ) {
+        const payload = {
+          lat: initialUserLocation?.latitude,
+          lon: initialUserLocation?.longitude,
+          site_type: selectedMode?.id,
+          sponsor: sponsorId || "",
+        };
+        getSites(payload);
+      }
+    },
+    [initialUserLocation, selectedMode, getSites]
+  );
 
   useEffect(() => {
-    if (!sponsors.length) return;
+    if (!sites?.length) return;
 
-    const updatedSponsorsData = sponsors.map((sponsor: any) => ({
-      label: sponsor.name === "ALL" ? DEFAULT_SPONSOR.label : sponsor.name,
-      value: sponsor.id,
-      ...sponsor,
+    const defaultSponsor = {
+      label: DEFAULT_SPONSOR.label,
+      value: DEFAULT_SPONSOR.value,
+    };
+    const sponsorsData = sites.map((site: any) => ({
+      label: site?.sponsor?.name || site?.sponsored?.name,
+      value: site?.sponsor?.id || site?.sponsored?.id,
+      ...site?.sponsor,
+      ...site?.sponsored,
     }));
+    const updatedSponsorsData = [defaultSponsor, ...sponsorsData];
     setSponsorData(updatedSponsorsData);
     setSelectedSponsor(updatedSponsorsData[0]);
-  }, [sponsors]);
+  }, [sites]);
 
   useEffect(() => {
+    console.log("selectedSponsor", selectedSponsor);
+    if (!selectedSponsor?.value) return;
+    console.log("selectedSponsor.value", selectedSponsor.value);
+    getSitesHandler(selectedSponsor?.value?.toString());
+  }, [selectedSponsor]);
+
+  useEffect(() => {
+    if (!sites?.length) return;
     getSitesHandler();
-  }, [getSitesHandler]);
+  }, [sites]);
 
   useEffect(() => {
     getLocation();
