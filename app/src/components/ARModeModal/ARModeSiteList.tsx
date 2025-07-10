@@ -78,9 +78,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   }, [sites]);
 
   useEffect(() => {
-    console.log("selectedSponsor", selectedSponsor);
     if (!selectedSponsor?.value) return;
-    console.log("selectedSponsor.value", selectedSponsor.value);
     getSitesHandler(selectedSponsor?.value?.toString());
   }, [selectedSponsor]);
 
@@ -164,7 +162,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             padding: 0,
           }}
           titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold"}}
-          onPress={getSitesHandler}
+          onPress={() => getSitesHandler()}
           title="Refresh"
           icon={
             <View style={{paddingHorizontal: 5}}>

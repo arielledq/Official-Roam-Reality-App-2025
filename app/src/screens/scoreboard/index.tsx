@@ -53,7 +53,7 @@ const ScoreBoard = ({}) => {
 
     // Get the leaderboard list
     try {
-      const scoreBoardResponse = await getScoreboardList(pageNumber, ITEMS_PER_PAGE, destination);
+      const scoreBoardResponse = await getScoreboardList(pageNumber, destination);
       const scoreboardUsers = scoreBoardResponse?.results || [];
       setUsers((prevUsers: any) =>
         pageNumber === 1 ? scoreboardUsers : [...prevUsers, ...scoreboardUsers]
@@ -108,6 +108,7 @@ const ScoreBoard = ({}) => {
 
   const scrollRegionsPressHandler = () => {
     const newPosition = scrollPosition + SCROLL_AMOUNT;
+    // @ts-ignore
     desRef.current?.scrollTo({x: newPosition, y: 0, animated: true});
     setScrollPosition(newPosition);
   };
@@ -124,7 +125,6 @@ const ScoreBoard = ({}) => {
   }, []);
 
   const DestinationItem = React.memo(({obj}: {obj: any}) => {
-    console.log("obj", obj);
     return (
       <TouchableOpacity
         onPress={() => filterDestinations(obj)}
