@@ -26,6 +26,9 @@ import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
 
+import {getNextStar as getNextStarApi} from "network";
+
+
 const StarChallenge = () => {
   const destinationData = useSelector(state => state.ar.destinationData);
   const selectedDestination = useSelector(state => state.ar);
@@ -302,8 +305,8 @@ const StarChallenge = () => {
       objects: [
         {
           id: "1",
-          latitude: -25.29674605035726,
-          longitude: -57.58958597325399,
+          latitude: selectedSite.starData.coordinates[1],
+          longitude: selectedSite.starData.coordinates[0],
           scale: 1.0,
           height: 1,
           isVisible: true,
@@ -316,6 +319,7 @@ const StarChallenge = () => {
       "SpawnObjectsFromReact",
       JSON.stringify(spawnData)
     );
+    console.log("spawnData", spawnData)
   };
 
   const PointsCount = async () => {
@@ -454,9 +458,28 @@ const StarChallenge = () => {
     }
   };
 
-  const startChallengeHandler = site => {
+  const startChallengeHandler = async site => {
     // // Primero reiniciar la escena de unity
     // resetUnityScene();
+    if (site?.selectedMode?.mode === AR_MODES.HUNT_MODE && userLocation && site?.id) {
+      try {
+        const response = await getNextStarApi({
+          geo_site_id: site.id,
+          lat: userLocation.latitude,
+          lon: userLocation.longitude,
+        });
+
+        if (response?.id) {
+          console.log("⭐ Star data recibida desde startChallengeHandler:", response);
+          site = {
+            ...site,
+            starData: response.location,
+          };
+        }
+      } catch (error) {
+        console.error("❌ Error al obtener la estrella en startChallengeHandler", error);
+      }
+    }
 
     console.log("site", site);
 
@@ -732,6 +755,39 @@ const StarChallenge = () => {
         };
       }, [])
   );
+
+  // useEffect(() => {
+  //   const fetchNextStarData = async () => {
+  //     if (
+  //         selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE &&
+  //         userLocation &&
+  //         selectedSite?.id
+  //     ) {
+  //       console.log("entro para estrella")
+  //       try {
+  //         const response = await getNextStarApi({
+  //           geo_site_id: selectedSite.id,
+  //           lat: userLocation.latitude,
+  //           lon: userLocation.longitude,
+  //         });
+  //
+  //         if (response?.id) {
+  //           console.log("⭐ Star data recibida:", response);
+  //           // Puedes guardar esto en otro estado si lo necesitas:
+  //           setSelectedSite(prev => ({
+  //             ...prev,
+  //             starData: response,
+  //           }));
+  //         }
+  //       } catch (error) {
+  //         console.error("❌ Error en getNextStarApi", error);
+  //       }
+  //     }
+  //   };
+  //
+  //   fetchNextStarData();
+  // }, [selectedSite, userLocation]);
+  //
 
   console.log('shouldRenderUnity, unitySceneLoaded', shouldRenderUnity, unitySceneLoaded, isUnityLoaded)
   return (
