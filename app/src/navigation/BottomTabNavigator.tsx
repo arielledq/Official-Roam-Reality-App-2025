@@ -12,6 +12,7 @@ import ScoreBoard from "../screens/scoreboard";
 import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
 import StarChallenge from "screens/geoarchallenge/starchallenge";
+import FunFactsScreen from "screens/challenges/FunFactsScreen";
 // import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
 
 const Tab = createMaterialBottomTabNavigator();

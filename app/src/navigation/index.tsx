@@ -67,6 +67,7 @@ import Legal from "../screens/legal";
 import ScoreBoard from "../screens/scoreboard";
 import BandHome from "screens/bandHome";
 import Notifications from "screens/notifications";
+import FunFactsScreen from "screens/challenges/FunFactsScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -213,6 +214,7 @@ const Navigation = () => {
             <Stack.Screen name="FAQ" component={FAQ} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Legal" component={Legal} />
+            <Stack.Screen name="FunFactsScreen" component={FunFactsScreen} />
             {sharedRoutes}
           </>
         );

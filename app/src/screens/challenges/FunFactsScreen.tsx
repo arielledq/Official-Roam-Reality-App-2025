@@ -41,7 +41,7 @@ interface ShareChallengeRouteParams {
   isMemory: boolean;
 }
 
-const ArChallengeShare = () => {
+const FunFactsScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
@@ -84,8 +84,8 @@ const ArChallengeShare = () => {
   let sponsor = challengeObj?.sponsored;
   console.log("challengeObj", challengeObj);
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-  let sponsorImage = sponsor?.image || "";
-  let sponsorName = sponsor?.name || "";
+  // let sponsorImage = sponsor?.image || "";
+
   let startDate = moment().format("MM-DD-YYYY");
   let endChallengeButtonText = "End & Share to Roam Profile";
   switch (challengeType) {
@@ -101,8 +101,8 @@ const ArChallengeShare = () => {
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
 
       sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
-      sponsorImage = sponsor?.image;
-      sponsorName = sponsor?.name;
+      siteImage = sponsor?.image;
+      siteName = sponsor?.name;
       if (isMemory) startDate = "-";
       const remainingStars = challengeObj?.remaining_stars;
       if (remainingStars > 1) {
@@ -250,16 +250,16 @@ const ArChallengeShare = () => {
     }
   };
 
-  useEffect(() => {
-    if (
-      !hasSharedToRoamProfile &&
-      (socialPointsCounter.facebook === 1 ||
-        socialPointsCounter.instagram === 1 ||
-        socialPointsCounter.others === 1)
-    ) {
-      shareToRoamProfile();
-    }
-  }, [socialPointsCounter, hasSharedToRoamProfile]);
+  // useEffect(() => {
+  //   if (
+  //     !hasSharedToRoamProfile &&
+  //     (socialPointsCounter.facebook === 1 ||
+  //       socialPointsCounter.instagram === 1 ||
+  //       socialPointsCounter.others === 1)
+  //   ) {
+  //     shareToRoamProfile();
+  //   }
+  // }, [socialPointsCounter, hasSharedToRoamProfile]);
 
   const ARUserProfile = () => {
     getARProfile()
@@ -324,6 +324,10 @@ const ArChallengeShare = () => {
     }
   };
 
+  const endFunFactsButtonHandler = () => {
+    endExperience();
+  };
+
   const shareToSocialMediaButtonHandler = () => {
     setShareToSocialsIsOpen(true);
   };
@@ -368,12 +372,6 @@ const ArChallengeShare = () => {
     offset = 150;
   }
 
-  const aspectWidth = viewWidth - offset;
-  const aspectHeight = (aspectWidth * 16) / 9; // Calculate height based on 9:16 aspect ratio
-
-  const mediaContainerWidth = aspectWidth;
-  const mediaContainerHeight = aspectHeight;
-
   let shareButtonTextSize = FontSizes.S16;
   if (width < 420) {
     shareButtonTextSize = FontSizes.S12;
@@ -402,228 +400,214 @@ const ArChallengeShare = () => {
     }
   };
 
-  useEffect(() => {
-    if (!isMemory) {
-      updateUserPointAPI({points: challengePoints});
-    }
-  }, [isMemory]);
+  // useEffect(() => {
+  //   if (!isMemory) {
+  //     updateUserPointAPI({points: challengePoints});
+  //   }
+  // }, [isMemory]);
+
+  const funFactImage = "https://placehold.co/400x400.png";
+  const siteImage = "https://placehold.co/80x80.png";
+  const siteName = "Fort James Tobago";
+  const funFactDetail =
+    "Built by the British in 1770, Fort James was named after King James Il of England. It was one of the main military outposts in Tobago, guarding the western coastline from invaders and pirates";
+  const funFactSponsors = [];
 
   return (
     <ChallengeScreen
-      title={screenTitle}
-      style={{justifyContent: "space-between", flex: 1}}
+      title="Fun Facts"
+      style={{
+        justifyContent: "space-between",
+        gap: 16,
+        paddingHorizontal: 24,
+        paddingBottom: 50,
+      }}
       modals={screenModals}
+      hideBackButton
+      scrollable
     >
-      <View style={{flex: 1, paddingHorizontal: 32}}>
-        <View style={{flex: 1}}>
-          {challengeTitle && (
-            <View style={{flexDirection: "row", gap: 12}}>
-              {/* Points box */}
-              <View
-                style={{
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: 8,
-                  backgroundColor: "transparent",
-                  width: 55,
-                  height: 55,
-                }}
-              >
-                <BackgroundWithImage
-                  imageSource={BGArShare}
-                  style={{
-                    backgroundColor: "transparent",
-                    position: "absolute",
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                  }}
-                ></BackgroundWithImage>
-                <AppText
-                  style={{
-                    ...fontGroup.nunitoBold,
-                    fontWeight: "900",
-                    fontSize: FontSizes.S24,
-                    color: theme.lightColors?.white,
-                    margin: 0,
-                  }}
-                >
-                  {challengePoints}
-                </AppText>
-                <AppText
-                  style={{
-                    ...fontGroup.nunitoRegular,
-                    fontWeight: "400",
-                    fontSize: FontSizes.S10,
-                    color: theme.lightColors?.white,
-                  }}
-                >
-                  Points
-                </AppText>
-              </View>
-              <AppText
-                numberOfLines={3}
-                style={{
-                  ...fontGroup.nunitoBold,
-                  fontWeight: "900",
-                  fontSize: FontSizes.S18,
-                  color: theme.lightColors?.white,
-                  flex: 1,
-                }}
-              >
-                {challengeTitle}
-              </AppText>
-            </View>
-          )}
+      {/* <View style={{flex: 1, gap: 16, paddingHorizontal: 8}}> */}
+      <View
+        style={{
+          backgroundColor: "#272741",
+          gap: 16,
+          borderRadius: 12,
+          overflow: "hidden",
+          paddingBottom: 16,
+        }}
+      >
+        {/* Card Image */}
+        <Image
+          resizeMode={"contain"}
+          source={{uri: funFactImage}}
+          onLoadStart={() => toggleLoading(true)}
+          onLoad={() => toggleLoading(false)}
+          style={{
+            minWidth: 300,
+            maxWidth: "100%",
+            minHeight: 300,
+            aspectRatio: 1,
+            resizeMode: "cover",
+            backgroundColor: "transparent",
+          }}
+        />
 
+        {/* Card Content */}
+        <View style={{paddingHorizontal: 16, gap: 16}}>
           <View
             style={{
-              flex: 1,
-              backgroundColor: "#272741",
-              gap: 8,
-              paddingVertical: 8,
-              marginTop: 16,
-              marginBottom: 8,
-              borderRadius: 12,
+              flexDirection: "row",
               alignItems: "center",
-            }}
-            ref={viewRef}
-            onLayout={handleLayout}
-          >
-            <View style={{flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1}}>
-              {fileExt == "mp4" || isVideo ? (
-                <Video
-                  resizeMode={"contain"}
-                  onLoadStart={() => toggleLoading(true)}
-                  onReadyForDisplay={() => toggleLoading(false)}
-                  repeat={true}
-                  style={{
-                    width: mediaContainerWidth,
-                    height: mediaContainerHeight,
-                    justifyContent: "flex-end",
-                    alignItems: "flex-end",
-                  }}
-                  source={{
-                    uri: capturedDataUri,
-                  }}
-                />
-              ) : (
-                <Image
-                  resizeMode={"contain"}
-                  source={{uri: capturedDataUri}}
-                  onLoadStart={() => toggleLoading(true)}
-                  onLoad={() => toggleLoading(false)}
-                  style={{
-                    width: mediaContainerWidth,
-                    height: mediaContainerHeight,
-                    backgroundColor: "transparent",
-                  }}
-                />
-              )}
-            </View>
-            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
-
-            <View style={{alignItems: "center"}}>
-              {/* Sponsor row */}
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Image style={{width: 20, height: 20, marginEnd: 8}} source={{uri: sponsorImage}} />
-                <Text
-                  style={{
-                    ...fontGroup.nunitoBold,
-                    fontWeight: "700",
-                    fontSize: FontSizes.S20,
-                    color: theme.lightColors?.white,
-                  }}
-                >
-                  {sponsorName}
-                </Text>
-              </View>
-
-              {/* Completion date */}
-              {!isMemory && challengeTitle && (
-                <Text
-                  style={{
-                    ...fontGroup.nunitoLight,
-                    fontWeight: "300",
-                    fontSize: FontSizes.S10,
-                    color: theme.lightColors?.white,
-                  }}
-                >
-                  Completed on: {startDate}
-                </Text>
-              )}
-            </View>
-          </View>
-
-          <View
-            style={{
-              flexDirection: "column",
               gap: 16,
-              alignItems: "center",
-              marginTop: 8,
-              marginBottom: 16,
             }}
           >
-            {!isMemory && (
-              <Text
-                style={{
-                  fontSize: FontSizes.S12,
-                  color: theme.lightColors?.grey0,
-                }}
-              >
-                {SHARE_CONDITIONS_TEXT}
-              </Text>
-            )}
+            <Image style={{width: 25, height: 25, borderRadius: 25}} source={{uri: siteImage}} />
+            <Text
+              style={{
+                ...fontGroup.nunitoBold,
+                fontWeight: "700",
+                fontSize: FontSizes.S20,
+                color: theme.lightColors?.white,
+              }}
+            >
+              {siteName}
+            </Text>
           </View>
-        </View>
-        <View style={{gap: 8, height: 110}}>
+
+          <View>
+            <Text
+              style={{color: theme.lightColors?.white, fontSize: FontSizes.S14, lineHeight: 20}}
+            >
+              {funFactDetail}
+            </Text>
+          </View>
+
           <View
             style={{
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "space-between",
-              gap: 16,
-              marginTop: isMemory ? 16 : 0,
-              flex: 1,
             }}
           >
-            {/* Share to socials button */}
-            <AppButton
-              onPress={shareToSocialMediaButtonHandler}
-              containerStyle={{flex: 1, justifyContent: "center"}}
-              titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
-              title={"Share To Socials"}
-            />
-
-            <AppButton
-              onPress={saveToGalleryButtonHandler}
-              containerStyle={{flex: 1, justifyContent: "center"}}
-              titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
-              title={"Save Image"}
-            />
+            <Text
+              style={{
+                ...fontGroup.nunitoBold,
+                fontWeight: "700",
+                fontSize: FontSizes.S14,
+                color: theme.lightColors?.white,
+              }}
+            >
+              Brought to you by
+            </Text>
+            <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
+              <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+              <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+              <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+            </View>
           </View>
-          {!isMemory && (
-            <AppButton
-              onPress={endShareProfileButtonHandler}
-              buttonStyle={{height: 55}}
-              containerStyle={{flex: 1}}
-              titleStyle={{fontSize: FontSizes.S18, fontWeight: "bold"}}
-              title={endChallengeButtonText}
-              loading={isLoading}
-            />
-          )}
         </View>
       </View>
+
+      <View
+        style={{
+          backgroundColor: "#272741",
+          gap: 16,
+          borderRadius: 12,
+          overflow: "hidden",
+          padding: 16,
+        }}
+      >
+        {/* Points */}
+        <View style={{flexDirection: "row", gap: 16}}>
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              borderRadius: 8,
+              backgroundColor: "transparent",
+              width: 55,
+              height: 55,
+            }}
+          >
+            <BackgroundWithImage
+              imageSource={BGArShare}
+              style={{
+                backgroundColor: "transparent",
+                position: "absolute",
+                top: 0,
+                bottom: 0,
+                left: 0,
+                right: 0,
+              }}
+            ></BackgroundWithImage>
+            <AppText
+              style={{
+                ...fontGroup.nunitoBold,
+                fontWeight: "900",
+                fontSize: FontSizes.S24,
+                color: theme.lightColors?.white,
+                margin: 0,
+              }}
+            >
+              {challengePoints}
+            </AppText>
+            <AppText
+              style={{
+                ...fontGroup.nunitoRegular,
+                fontWeight: "400",
+                fontSize: FontSizes.S10,
+                color: theme.lightColors?.white,
+              }}
+            >
+              Points
+            </AppText>
+          </View>
+
+          <View style={{flex: 1}}>
+            <AppText
+              style={{
+                ...fontGroup.nunitoBold,
+                fontSize: FontSizes.S18,
+                fontWeight: "900",
+                color: theme.lightColors?.white,
+              }}
+            >
+              Share this fun fact!
+            </AppText>
+            <AppText
+              style={{
+                ...fontGroup.nunitoRegular,
+                fontSize: FontSizes.S12,
+                fontWeight: "400",
+                color: theme.lightColors?.white,
+              }}
+            >
+              Users will not earn any points unless they share to social media & tag @roamreality
+            </AppText>
+          </View>
+        </View>
+
+        {/* Buttons */}
+        <View style={{flexDirection: "row", gap: 12}}>
+          <AppButton
+            onPress={shareToSocialMediaButtonHandler}
+            containerStyle={{flex: 1, height: 55, justifyContent: "center"}}
+            titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
+            title={"Share To Socials"}
+          />
+
+          <AppButton
+            onPress={endFunFactsButtonHandler}
+            containerStyle={{flex: 1, height: 55, justifyContent: "center"}}
+            titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
+            title={"End"}
+          />
+        </View>
+      </View>
+      {/* </View> */}
     </ChallengeScreen>
   );
 };
 
-export default ArChallengeShare;
+export default FunFactsScreen;
