@@ -9,6 +9,7 @@ from django.http import HttpResponse
 
 from notifications.models import Notification, NotificationTypes
 from onesignal_client.utils import send_notification
+from travel_ar_app_42706 import settings
 from ..models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
@@ -154,6 +155,34 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
         else:
             self.formfield_overrides = self.mapFields
         return form_class
+
+
+class GeoARStarPointForm(forms.ModelForm):
+    class Meta:
+        model = GeoARStarPoint
+        fields = '__all__'
+
+    class Media:
+        js = (
+            'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js',
+            '../static/geoarstarpoint/geoarstarpoint_elevation.js',
+        )
+
+
+@admin.register(GeoARStarPoint)
+class GeoARStarPointAdmin(GeoArChallengeAdmin):
+    form = GeoARStarPointForm
+    change_form_template = 'admin/geoarstarpoint/change_form.html'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['MAPBOX_TOKEN'] = settings.MAPBOX_TOKEN
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['MAPBOX_TOKEN'] = settings.MAPBOX_TOKEN
+        return super().add_view(request, form_url, extra_context)
 
 
 @admin.register(GeoLocation)
@@ -356,7 +385,7 @@ admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
 # admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(ARExample, ARExampleAdmin)
-admin.site.register(GeoARStarPoint, GeoArChallengeAdmin)
+# admin.site.register(GeoARStarPoint, GeoArChallengeAdmin)
 # admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARGoldStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
