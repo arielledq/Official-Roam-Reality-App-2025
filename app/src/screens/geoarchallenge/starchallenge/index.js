@@ -360,7 +360,7 @@ const StarChallenge = () => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    console.log("DATA UNIT", data);
+    // console.log("DATA UNIT", data);
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
 
@@ -377,13 +377,11 @@ const StarChallenge = () => {
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
       console.log("✅ Escena ARReactNative 1 cargada correctamente desde Unity");
       setUnitySceneLoaded(false);
-
-
     }
-    // if (data?.touchEvent?.objectTouched === true) {
-    //   setNotificationMode("hunt");
-    //   setOpenModalARMode(true);
-    // }
+    if (data?.touchEvent?.objectTouched === true) {
+      notificationUnity('Se Presiono sobre la estrella', 'Auxiliooooooooooooooo')
+      console.log('Estrella encontrada')
+    }
     // if (data?.notificationMode) {
     //   setNotificationMode(data.notificationMode);
     // }
@@ -441,12 +439,12 @@ const StarChallenge = () => {
     });
   };
 
-  const notificationUnity = () => {
+  const notificationUnity = (title, text ) => {
     if (unityRef.current) {
       const data = {
         isNotification: true,
-        textNotification: "Presionar sobre la estrella.",
-        titleNotification: "Estrella encontrada",
+        titleNotification: title,
+        textNotification: text,
       };
       unityRef.current.postMessage(
         "Scriptposition",
@@ -535,8 +533,6 @@ const StarChallenge = () => {
 
         return () => clearTimeout(timeout);
     }, [unityLoading, isUnityLoaded]); // cambia cuando Unity termina de cargar
-
-
 
     // Verificar si el modelo existe
   useEffect(() => {
