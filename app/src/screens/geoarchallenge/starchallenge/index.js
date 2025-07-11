@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState, useCallback, useLayoutEffect} from "react"; // Keep useCallback if you're using it elsewhere
-import {Platform} from "react-native";
+import React, {useEffect, useRef, useState, useCallback, useLayoutEffect} from "react";
+import {Platform, View, ActivityIndicator, Text} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
@@ -30,6 +30,7 @@ const StarChallenge = () => {
   const destinationData = useSelector(state => state.ar.destinationData);
   const selectedDestination = useSelector(state => state.ar);
   const [isUnityLoaded, setIsUnityLoaded] = useState(true);
+  const [shouldRenderUnity, setShouldRenderUnity] = useState(true); // Controla la visibilidad y carga de Unity
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [starModels, setStarModels] = useState();
@@ -43,18 +44,19 @@ const StarChallenge = () => {
   const navigation = useNavigation();
   const [openModalARMode, setOpenModalARMode] = useState(false);
   const [selectedChallengeOverride, setSelectedChallengeOverride] = useState(null);
-  const unityRef = useRef(null); // Unity reference
+  const unityRef = useRef(null);
   const [userLocation, setUserLocation] = useState(null);
   const starChallengeObj = selectedDestination.starChallenge;
   const challengeObjParameters = selectedDestination.geo_ar_star?.geo_site?.pin_challenge;
   const isStarChallenge = !!starChallengeObj?.id;
   const [sendModelData, setSendModelData] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
-  const [notificationMode, setNotificationMode] = useState("scan"); // Puede ser "scan", "hunt", u otros
+  const [notificationMode, setNotificationMode] = useState("scan");
   const [loading, setLoading] = useState(false);
-  // const [sendLocation, setSendLocation] = useState(false);
+    // const [sendLocation, setSendLocation] = useState(false);
+  const [unityLoading, setUnityLoading] = useState(true); // Nuevo estado para el loading de Unity al volver
   const [hasSentModelDataOnce, setHasSentModelDataOnce] = useState(false);
-  const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false); // New state to track if location is obtained for hunt mode
+  const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false);
 
   const lastSentLocationRef = useRef(null);
   const viewShotRef = useRef();
@@ -62,6 +64,8 @@ const StarChallenge = () => {
   const challengeObj = selectedChallengeOverride;
   const modelFile = challengeObj?.model_file;
   const [initialDataSent, setInitialDataSent] = useState(false);
+  const isFocusedRef = useRef(false);
+  const [unitySceneLoaded, setUnitySceneLoaded] = useState(false);
 
   const [selectedSite, setSelectedSite] = useState(null);
 
@@ -150,7 +154,10 @@ const StarChallenge = () => {
   const retakeButtonHandler = () => {
     setCapturedImage(null);
     setCapturedVideo(null);
-    setIsUnityLoaded(true);
+    setIsUnityLoaded(true)
+    setShouldRenderUnity(true);
+    setUnityLoading(true);
+    setUnitySceneLoaded(true)
   };
 
   const playCameraSound = () => {
@@ -195,7 +202,7 @@ const StarChallenge = () => {
               if (foundFile) {
                 console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
                 setCapturedImage(foundFile.path);
-                setIsUnityLoaded(false);
+                setShouldRenderUnity(false);
               } else {
                 console.error("No se encontró ningún archivo .png en el directorio.");
               }
@@ -321,9 +328,28 @@ const StarChallenge = () => {
     }
   };
 
+  useEffect(() => {
+    if (unityRef.current && starModels && textureBase && userLocation && !hasSentModelDataOnce &&
+        (notificationMode === "scan" || notificationMode === "hunt")) {
+      sendModelDataToUnity();
+    }
+  }, [isUnityLoaded, starModels, textureBase, userLocation, notificationMode, hasSentModelDataOnce, selectedChallengeOverride, modelResource]);
+
+  useEffect(() => {
+    if (notificationMode === "hunt") {
+      console.log("se envio sendSpawnData");
+      setTimeout(() => {
+        sendSpawnData();
+        PointsCount();
+      }, 1500);
+    }
+  }, [notificationMode, locationObtainedForHunt, isUnityLoaded, selectedChallengeOverride]);
+
   const closeModalARMode = () => {
     setOpenModalARMode(false);
     setIsUnityLoaded(true);
+    setShouldRenderUnity(true);
+    setUnityLoading(true);
   };
 
   const resetUnityScene = () => {
@@ -341,12 +367,18 @@ const StarChallenge = () => {
     if (buttonBack) {
       navigation?.goBack();
       if (Platform.OS === "android") {
-        unityRef.current?.unloadUnity?.();
-        resetUnityScene();
+        setShouldRenderUnity(false);
+        // unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena");
       }
     }
     if (buttonARMode) {
       setOpenModalARMode(true);
+    }
+    if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
+      console.log("✅ Escena ARReactNative 1 cargada correctamente desde Unity");
+      setUnitySceneLoaded(false);
+
+
     }
     // if (data?.touchEvent?.objectTouched === true) {
     //   setNotificationMode("hunt");
@@ -364,11 +396,15 @@ const StarChallenge = () => {
         if (data.photoVideoButton?.isPhoto) {
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
+          setShouldRenderUnity(true);
+          setUnitySceneLoaded(false)
           eraseFile();
         }
         if (data.photoVideoButton?.isPhoto == false) {
           setCapturedVideo(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
+          setShouldRenderUnity(true);
+          setUnitySceneLoaded(false)
         }
         break;
       case AR_MODES.HUNT_MODE:
@@ -483,14 +519,26 @@ const StarChallenge = () => {
   };
 
   // Detectar cambio de escena
-  useEffect(() => {
-    if (unityRef.current) {
-      console.log("cambio de scena");
-      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
-    }
-  }, [unityRef.current]);
+  // useEffect(() => {
+  //   if (unityRef.current) {
+  //     console.log("cambio de scena");
+  //     unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
+  //   }
+  // }, [unityRef.current]);
+    useEffect(() => {
+        if (!unityRef.current) return;
 
-  // Verificar si el modelo existe
+        const timeout = setTimeout(() => {
+            console.log("Solicitando carga de escena ARReactNative 1");
+            unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
+        }, 500); // menor delay, Unity ya está listo
+
+        return () => clearTimeout(timeout);
+    }, [unityLoading, isUnityLoaded]); // cambia cuando Unity termina de cargar
+
+
+
+    // Verificar si el modelo existe
   useEffect(() => {
     console.log("useEffect: [challengeObj]");
     if (challengeObj && modelFile) {
@@ -597,7 +645,7 @@ const StarChallenge = () => {
       // Clean up the timer when the component unmounts or loses focus
       return () => clearTimeout(timer);
     }
-  }, [unityRef, isScanMode, selectedChallengeOverride]);
+  }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
 
   useEffect(() => {
     if (
@@ -611,7 +659,7 @@ const StarChallenge = () => {
       sendModelDataToUnity();
     }
   }, [
-    unityRef,
+    isUnityLoaded,
     starModels,
     textureBase,
     userLocation,
@@ -630,7 +678,7 @@ const StarChallenge = () => {
         PointsCount();
       }, 1500);
     }
-  }, [isGeoTagMode, isHuntMode, locationObtainedForHunt, unityRef, selectedChallengeOverride]); // Added dependencies for sendSpawnData and PointsCount logic
+  }, [isGeoTagMode, isHuntMode, locationObtainedForHunt, isUnityLoaded, selectedChallengeOverride]); // Added dependencies for sendSpawnData and PointsCount logic
 
   useFocusEffect(
     useCallback(() => {
@@ -640,38 +688,56 @@ const StarChallenge = () => {
         unityRef.current?.resumeUnity();
         unityRef.current?.windowFocusChanged(true);
       }
-    }, [unityRef, isUnityLoaded])
+    }, [isUnityLoaded])
   );
 
   useEffect(() => {
-    if (unityRef.current) {
+    if (unityRef.current && !unityLoading && shouldRenderUnity) {
       const spawnData = {
         isDetectionEnabled: true,
         detectionDistance: 80,
       };
-      unityRef.current.postMessage(
-        "OBJImport",
-        "SetLoadingVisibility",
-        JSON.stringify({isVisible: false})
-      );
 
       const distanceDetect = {
         isDetectionEnabled: true,
-        detectionDistance: 80,
-      };
+        detectionDistance: 80
+      }
       unityRef.current.postMessage(
-        "Main Camera",
-        "SetDetectObjectState",
-        JSON.stringify(distanceDetect)
+          "Main Camera",
+          "SetDetectObjectState",
+          JSON.stringify(distanceDetect)
       );
       unityRef.current.postMessage(
-        "OBJImport",
-        "SetLoadingVisibility",
-        JSON.stringify({isVisible: false})
+          "OBJImport",
+          "SetLoadingVisibility",
+          JSON.stringify({isVisible: false})
       );
     }
-  }, []);
+  }, [isUnityLoaded, unityLoading, shouldRenderUnity]);
 
+  useFocusEffect(
+      useCallback(() => {
+        if (isFocusedRef.current) {
+          console.log("⚠️ Ya montado, ignorando");
+          return;
+        }
+
+        isFocusedRef.current = true;
+        console.log("✅ MONTANDO UNITY");
+        setShouldRenderUnity(true);
+        setUnityLoading(true);
+        setUnitySceneLoaded(true)
+        return () => {
+          console.log("❌ DESMONTANDO UNITY");
+          isFocusedRef.current = false;
+          setUnitySceneLoaded(false)
+          setShouldRenderUnity(false);
+          setUnityLoading(false);
+        };
+      }, [])
+  );
+
+  console.log('shouldRenderUnity, unitySceneLoaded', shouldRenderUnity, unitySceneLoaded, isUnityLoaded)
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -683,18 +749,34 @@ const StarChallenge = () => {
         backgroundColor: "#000",
       }}
     >
-      <UnityARCamera
-        width={"100%"}
-        height={"100%"}
-        unityRef={unityRef}
-        isProcessingMedia={processingMedia}
-        onUnityMessage={handleUnityMessage}
-        isUnityLoaded={isUnityLoaded}
-        capturedImage={capturedImage}
-        capturedVideo={capturedVideo}
-        imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
-      />
-
+    {shouldRenderUnity && (
+        <>
+          <UnityARCamera
+            width={"100%"}
+            height={"100%"}
+            unityRef={unityRef}
+            isProcessingMedia={processingMedia}
+            onUnityMessage={handleUnityMessage}
+            isUnityLoaded={isUnityLoaded}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
+            imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
+          />
+            {unitySceneLoaded === true && (
+                <View style={{
+                    position: 'absolute',
+                    top: 0, left: 0, right: 0, bottom: 0,
+                    backgroundColor: 'rgba(0,0,0,0.70)',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 999
+                }}>
+                    <ActivityIndicator size="large" color="#fff" />
+                    <Text style={{ color: '#fff', marginTop: 10 }}>Cargando experiencia AR...</Text>
+                </View>
+            )}
+        </>
+        )}
       {!isUnityLoaded && (
         <CameraControls
           hasCapturedContent={!!capturedImage || !!capturedVideo}
