@@ -30,7 +30,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const {initialUserLocation, getLocation} = userLocationHook();
   const {getSites, sites}: any = useArScreenHook();
-  const [sponsorData, setSponsorData] = useState([DEFAULT_SPONSOR]);
+  const [sponsorData, setSponsorData] = useState([]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
 
@@ -39,28 +39,43 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     onClose();
   };
 
-  const getSitesHandler = useCallback(
-    (sponsorId: string = "") => {
-      if (
-        typeof initialUserLocation?.latitude === "number" &&
-        isFinite(initialUserLocation?.latitude) &&
-        typeof initialUserLocation?.longitude === "number" &&
-        isFinite(initialUserLocation?.longitude)
-      ) {
-        const payload = {
-          lat: initialUserLocation?.latitude,
-          lon: initialUserLocation?.longitude,
-          site_type: selectedMode?.id,
-          sponsor: sponsorId || "",
-        };
-        getSites(payload);
-      }
-    },
-    [initialUserLocation, selectedMode, getSites]
-  );
+  const getSitesHandler = (sponsorId: string = "") => {
+    if (
+      typeof initialUserLocation?.latitude === "number" &&
+      isFinite(initialUserLocation?.latitude) &&
+      typeof initialUserLocation?.longitude === "number" &&
+      isFinite(initialUserLocation?.longitude)
+    ) {
+      const payload = {
+        lat: initialUserLocation?.latitude,
+        lon: initialUserLocation?.longitude,
+        site_type: selectedMode?.id,
+        sponsor: sponsorId || "",
+      };
+      getSites(payload);
 
+      if (sponsorId) {
+        setSelectedSponsor(
+          sponsorData.find((sponsor: any) => sponsor.value === Number(sponsorId)) || DEFAULT_SPONSOR
+        );
+      }
+    }
+  };
+
+  // Obtiene la ubicación del usuario
+  useEffect(() => {
+    getLocation();
+  }, []);
+
+  // Traer los sites iniciales
+  useEffect(() => {
+    getSitesHandler();
+  }, [initialUserLocation, selectedMode]);
+
+  // Crear la lista de sponsors desde los sites
   useEffect(() => {
     if (!sites?.length) return;
+    if (sponsorData?.length) return;
 
     const defaultSponsor = {
       label: DEFAULT_SPONSOR.label,
@@ -77,19 +92,14 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     setSelectedSponsor(updatedSponsorsData[0]);
   }, [sites]);
 
+  // Cuando se selecciona un sponsor, filtrar sites por sponsor
   useEffect(() => {
-    if (!selectedSponsor?.value) return;
-    getSitesHandler(selectedSponsor?.value?.toString());
+    if (selectedSponsor?.value) {
+      getSitesHandler(selectedSponsor?.value?.toString());
+    } else {
+      getSitesHandler();
+    }
   }, [selectedSponsor]);
-
-  useEffect(() => {
-    if (!sites?.length) return;
-    getSitesHandler();
-  }, [sites]);
-
-  useEffect(() => {
-    getLocation();
-  }, []);
 
   return (
     <View style={{width: "100%", maxHeight: "85%"}}>

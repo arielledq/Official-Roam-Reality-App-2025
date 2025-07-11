@@ -8,8 +8,8 @@ const useArScreenHook = () => {
     const response = await getSitesApi({
       lat: `${payload.lat}`,
       lon: `${payload.lon}`,
-      site_type: payload.site_type,
-      sponsor: payload.sponsor,
+      site_type: payload?.site_type,
+      sponsor: payload?.sponsor,
     });
     setSites(response?.data);
   };
