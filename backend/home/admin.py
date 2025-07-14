@@ -91,7 +91,7 @@ class SponsorFilter(admin.SimpleListFilter):
 class ScoreboardAdmin(admin.ModelAdmin):
     list_display = (
         "row_number",
-        "user",
+        "user_name",
         "calculated_points",    # memories_points + checkin_points
         "updated_at",
         "add_ar_memory"
@@ -100,6 +100,9 @@ class ScoreboardAdmin(admin.ModelAdmin):
     readonly_fields = (
         "calculated_points",
     )
+
+    def user_name(self, obj):
+        return obj.user.name
 
     def changelist_view(self, request, extra_context=None):
         self._cl_request = request
