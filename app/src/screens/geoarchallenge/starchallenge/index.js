@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState, useCallback, useLayoutEffect} from "react";
+import React, {useEffect, useRef, useState, useCallback} from "react";
 import {Platform, View, ActivityIndicator, Text} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
@@ -10,27 +10,35 @@ import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
 import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../../constants";
-// import useStyles from "./styles";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
-import {
-  copyFileForDisplay,
-  eraseFile,
-  handleUnzipProcess,
-  showMessage,
-} from "../../../util/helpers";
+import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../../util/helpers";
 
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
 
-// import {getNextStar as getNextStarApi} from "network";
-
 const StarChallenge = () => {
   const destinationData = useSelector(state => state.ar.destinationData);
   const selectedDestination = useSelector(state => state.ar);
+
+  const [openModalARMode, setOpenModalARMode] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const starChallengeObj = selectedDestination.starChallenge;
+  const challengeObjParameters = selectedDestination.geo_ar_star?.geo_site?.pin_challenge;
+  const [showNotification, setShowNotification] = useState(false);
+  const [notificationMode, setNotificationMode] = useState("scan");
+  const [selectedSite, setSelectedSite] = useState(null);
+
+  const navigation = useNavigation();
+
+  const lastSentLocationRef = useRef(null);
+  const viewShotRef = useRef();
+  const isFocusedRef = useRef(false);
+
+  // Unity states + Hooks
   const [isUnityLoaded, setIsUnityLoaded] = useState(true);
   const [shouldRenderUnity, setShouldRenderUnity] = useState(true); // Controla la visibilidad y carga de Unity
   const [capturedImage, setCapturedImage] = useState(null);
@@ -42,39 +50,23 @@ const StarChallenge = () => {
   const [modelResource, setModelResource] = useState();
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
-  // const _styles = useStyles();
-  const navigation = useNavigation();
-  const [openModalARMode, setOpenModalARMode] = useState(false);
   const [selectedChallengeOverride, setSelectedChallengeOverride] = useState(null);
-  const unityRef = useRef(null);
-  const [userLocation, setUserLocation] = useState(null);
-  const starChallengeObj = selectedDestination.starChallenge;
-  const challengeObjParameters = selectedDestination.geo_ar_star?.geo_site?.pin_challenge;
-  // const isStarChallenge = !!starChallengeObj?.id;
   const [sendModelData, setSendModelData] = useState(false);
-  const [showNotification, setShowNotification] = useState(false);
-  const [notificationMode, setNotificationMode] = useState("scan");
-  const [loading, setLoading] = useState(false);
-  // const [sendLocation, setSendLocation] = useState(false);
   const [unityLoading, setUnityLoading] = useState(true); // Nuevo estado para el loading de Unity al volver
   const [hasSentModelDataOnce, setHasSentModelDataOnce] = useState(false);
   const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false);
-
-  const lastSentLocationRef = useRef(null);
-  const viewShotRef = useRef();
-
-  const challengeObj = selectedChallengeOverride;
-  const modelFile = challengeObj?.model_file;
-  // const [initialDataSent, setInitialDataSent] = useState(false);
-  const isFocusedRef = useRef(false);
   const [unitySceneLoaded, setUnitySceneLoaded] = useState(false);
 
-  const [selectedSite, setSelectedSite] = useState(null);
+  const unityRef = useRef(null);
 
+  // Challenge derived states
+  const challengeObj = selectedChallengeOverride;
   const isHuntMode = selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE;
   const isGeoTagMode = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE;
   const isScanMode = selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE;
-
+  const modelFile =
+    challengeObj?.model_file ||
+    selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
   const checkPermission = () => {
@@ -113,8 +105,6 @@ const StarChallenge = () => {
   };
 
   const unzipModelFile = async (sourcePath, targetPath) => {
-    setLoading(true);
-
     const extractedData = await handleUnzipProcess(sourcePath, targetPath);
 
     if (extractedData.success) {
@@ -122,7 +112,6 @@ const StarChallenge = () => {
       setModelResource(extractedData.mtlFile);
       setTextureBase(extractedData.baseTexture);
       setTextureEmission(extractedData.emissionTexture);
-      // console.log("Model file unzipped and state updated successfully.");
     } else {
       console.error("Failed to unzip model file:", extractedData.error);
 
@@ -130,7 +119,6 @@ const StarChallenge = () => {
       setTextureBase(null);
       setTextureEmission(null);
     }
-    setLoading(false);
   };
 
   const checkIfModelExist = () => {
@@ -300,7 +288,6 @@ const StarChallenge = () => {
 
   const sendSpawnData = () => {
     if (!unityRef?.current || !isHuntMode) return;
-    console.log("[StarChallengeScreen] sendSpawnData selectedSite", selectedSite);
     const spawnData = {
       objects: [
         {
@@ -310,7 +297,7 @@ const StarChallenge = () => {
           // latitude: -25.29670612626421,
           // longitude: -57.58969884415989,
           scale: 1.0,
-          height: 1, 
+          height: 1,
           isVisible: true,
           updateRadius: 14.0,
         },
@@ -586,7 +573,6 @@ const StarChallenge = () => {
 
   // Verificar si el modelo existe
   useEffect(() => {
-    // console.log("useEffect: [challengeObj]");
     if (challengeObj && modelFile) {
       checkIfModelExist();
     }

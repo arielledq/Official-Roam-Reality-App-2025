@@ -77,6 +77,7 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="Go Navigate"
           // @ts-ignore
+          // component={FunFactsScreen}
           component={StarChallenge}
           options={{
             tabBarLabel: "",

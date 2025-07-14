@@ -251,16 +251,16 @@ const FunFactsScreen = ({
     }
   };
 
-  // useEffect(() => {
-  //   if (
-  //     !hasSharedToRoamProfile &&
-  //     (socialPointsCounter.facebook === 1 ||
-  //       socialPointsCounter.instagram === 1 ||
-  //       socialPointsCounter.others === 1)
-  //   ) {
-  //     shareToRoamProfile();
-  //   }
-  // }, [socialPointsCounter, hasSharedToRoamProfile]);
+  useEffect(() => {
+    if (
+      !hasSharedToRoamProfile &&
+      (socialPointsCounter.facebook === 1 ||
+        socialPointsCounter.instagram === 1 ||
+        socialPointsCounter.others === 1)
+    ) {
+      shareToRoamProfile();
+    }
+  }, [socialPointsCounter, hasSharedToRoamProfile]);
 
   const ARUserProfile = () => {
     getARProfile()
@@ -274,25 +274,6 @@ const FunFactsScreen = ({
       });
   };
 
-  // const getNextStar = async () => {
-  //   try {
-  //     const params = {
-  //       geo_site_id: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-  //       // geo_site_id: selectedGeoARSiteStars[0]?.id,
-  //       lat: userLocation?.latitude,
-  //       lon: userLocation?.longitude,
-  //     };
-  //     const response = await getNextStarApi(params);
-  //     if (response?.id) {
-  //       return response;
-  //     } else {
-  //       return null;
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // };
-
   const resetNavigation = () => {
     navigation.reset({
       index: 0,
@@ -302,21 +283,17 @@ const FunFactsScreen = ({
   };
 
   const endExperience = async () => {
-    if (challengeType === CHALLENGES_TYPE.STAR) {
-      const remainingStars = challengeObj?.remaining_stars;
+    const remainingStars = challengeObj?.remaining_stars;
 
-      console.log("[FunFactsScreen] challengeObj", challengeObj);
-      if (remainingStars > 1) {
-        // const updatedChallengeObj = await getNextStarApi(
-        //   challengeObj?.geo_ar_star?.geo_site?.id,
-        //   initialUserLocation.latitude,
-        //   initialUserLocation.longitude
-        // );
-        // @ts-ignore
-        // navigation.navigate("GeoArSiteRoutes", {starsChallenge: updatedChallengeObj});
-      } else {
-        resetNavigation();
-      }
+    console.log("[FunFactsScreen] challengeObj", challengeObj);
+    if (remainingStars > 1) {
+      const updatedChallengeObj = await getNextStarApi(
+        challengeObj?.geo_ar_star?.geo_site?.id,
+        initialUserLocation.latitude,
+        initialUserLocation.longitude
+      );
+      // @ts-ignore
+      navigation.navigate("StarChallenge", {starsChallenge: updatedChallengeObj});
     } else {
       resetNavigation();
     }
@@ -401,10 +378,16 @@ const FunFactsScreen = ({
     }
   };
 
-  const funFactImage = challengeObj?.huntChallenge?.image;
-  const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
-  const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
-  const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
+  // const funFactImage = challengeObj?.huntChallenge?.image;
+  // const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
+  // const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
+  // const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
+  const funFactImage = "https://placehold.co/400x400.png";
+  const siteImage = "https://placehold.co/80x80.png";
+  const siteName = "Fort James Tobago";
+  const funFactDetail =
+    "Built by the British in 1770, Fort James was named after King James Il of England. It was one of the main military outposts in Tobago, guarding the western coastline from invaders and pirates";
+
   const funFactSponsors = [];
 
   return (
@@ -420,7 +403,6 @@ const FunFactsScreen = ({
       hideBackButton
       scrollable
     >
-      {/* <View style={{flex: 1, gap: 16, paddingHorizontal: 8}}> */}
       <View
         style={{
           backgroundColor: "#272741",
@@ -505,10 +487,11 @@ const FunFactsScreen = ({
       <View
         style={{
           backgroundColor: "#272741",
-          gap: 16,
+          gap: 24,
           borderRadius: 12,
           overflow: "hidden",
           padding: 16,
+          paddingBottom: 24,
         }}
       >
         {/* Points */}
@@ -583,23 +566,22 @@ const FunFactsScreen = ({
         </View>
 
         {/* Buttons */}
-        <View style={{flexDirection: "row", gap: 12}}>
+        <View style={{flexDirection: "row", gap: 16}}>
           <AppButton
             onPress={shareToSocialMediaButtonHandler}
-            containerStyle={{flex: 1, height: 55, justifyContent: "center"}}
+            containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
             titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
             title={"Share To Socials"}
           />
 
           <AppButton
             onPress={endFunFactsButtonHandler}
-            containerStyle={{flex: 1, height: 55, justifyContent: "center"}}
+            containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
             titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
             title={"End"}
           />
         </View>
       </View>
-      {/* </View> */}
     </ChallengeScreen>
   );
 };
