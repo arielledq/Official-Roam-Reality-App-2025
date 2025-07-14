@@ -53,7 +53,7 @@ const StarChallenge = () => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMode, setNotificationMode] = useState("scan");
   const [loading, setLoading] = useState(false);
-    // const [sendLocation, setSendLocation] = useState(false);
+  // const [sendLocation, setSendLocation] = useState(false);
   const [unityLoading, setUnityLoading] = useState(true); // Nuevo estado para el loading de Unity al volver
   const [hasSentModelDataOnce, setHasSentModelDataOnce] = useState(false);
   const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false);
@@ -154,10 +154,10 @@ const StarChallenge = () => {
   const retakeButtonHandler = () => {
     setCapturedImage(null);
     setCapturedVideo(null);
-    setIsUnityLoaded(true)
+    setIsUnityLoaded(true);
     setShouldRenderUnity(true);
     setUnityLoading(true);
-    setUnitySceneLoaded(true)
+    setUnitySceneLoaded(true);
   };
 
   const playCameraSound = () => {
@@ -302,8 +302,8 @@ const StarChallenge = () => {
       objects: [
         {
           id: "1",
-          latitude: -25.29674605035726,
-          longitude: -57.58958597325399,
+          latitude: -25.29670612626421,
+          longitude: -57.58969884415989,
           scale: 1.0,
           height: 1,
           isVisible: true,
@@ -329,11 +329,26 @@ const StarChallenge = () => {
   };
 
   useEffect(() => {
-    if (unityRef.current && starModels && textureBase && userLocation && !hasSentModelDataOnce &&
-        (notificationMode === "scan" || notificationMode === "hunt")) {
+    if (
+      unityRef.current &&
+      starModels &&
+      textureBase &&
+      userLocation &&
+      !hasSentModelDataOnce &&
+      (notificationMode === "scan" || notificationMode === "hunt")
+    ) {
       sendModelDataToUnity();
     }
-  }, [isUnityLoaded, starModels, textureBase, userLocation, notificationMode, hasSentModelDataOnce, selectedChallengeOverride, modelResource]);
+  }, [
+    isUnityLoaded,
+    starModels,
+    textureBase,
+    userLocation,
+    notificationMode,
+    hasSentModelDataOnce,
+    selectedChallengeOverride,
+    modelResource,
+  ]);
 
   useEffect(() => {
     if (notificationMode === "hunt") {
@@ -379,8 +394,17 @@ const StarChallenge = () => {
       setUnitySceneLoaded(false);
     }
     if (data?.touchEvent?.objectTouched === true) {
-      notificationUnity('Se Presiono sobre la estrella', 'Auxiliooooooooooooooo')
-      console.log('Estrella encontrada')
+      notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
+      console.log("Estrella encontrada");
+      navigation.navigate({
+        name: "FunFactsScreen",
+        params: {
+          challengeObj: selectedSite,
+          // captureData: capturedImage,
+          // challengeType: CHALLENGES_TYPE.STAR,
+          // isMemory: false,
+        },
+      });
     }
     // if (data?.notificationMode) {
     //   setNotificationMode(data.notificationMode);
@@ -395,14 +419,14 @@ const StarChallenge = () => {
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
-          setUnitySceneLoaded(false)
+          setUnitySceneLoaded(false);
           eraseFile();
         }
         if (data.photoVideoButton?.isPhoto == false) {
           setCapturedVideo(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
-          setUnitySceneLoaded(false)
+          setUnitySceneLoaded(false);
         }
         break;
       case AR_MODES.HUNT_MODE:
@@ -439,7 +463,7 @@ const StarChallenge = () => {
     });
   };
 
-  const notificationUnity = (title, text ) => {
+  const notificationUnity = (title, text) => {
     if (unityRef.current) {
       const data = {
         isNotification: true,
@@ -523,18 +547,18 @@ const StarChallenge = () => {
   //     unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
   //   }
   // }, [unityRef.current]);
-    useEffect(() => {
-        if (!unityRef.current) return;
+  useEffect(() => {
+    if (!unityRef.current) return;
 
-        const timeout = setTimeout(() => {
-            console.log("Solicitando carga de escena ARReactNative 1");
-            unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
-        }, 500); // menor delay, Unity ya está listo
+    const timeout = setTimeout(() => {
+      console.log("Solicitando carga de escena ARReactNative 1");
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
+    }, 500); // menor delay, Unity ya está listo
 
-        return () => clearTimeout(timeout);
-    }, [unityLoading, isUnityLoaded]); // cambia cuando Unity termina de cargar
+    return () => clearTimeout(timeout);
+  }, [unityLoading, isUnityLoaded]); // cambia cuando Unity termina de cargar
 
-    // Verificar si el modelo existe
+  // Verificar si el modelo existe
   useEffect(() => {
     console.log("useEffect: [challengeObj]");
     if (challengeObj && modelFile) {
@@ -696,44 +720,49 @@ const StarChallenge = () => {
 
       const distanceDetect = {
         isDetectionEnabled: true,
-        detectionDistance: 80
-      }
+        detectionDistance: 80,
+      };
       unityRef.current.postMessage(
-          "Main Camera",
-          "SetDetectObjectState",
-          JSON.stringify(distanceDetect)
+        "Main Camera",
+        "SetDetectObjectState",
+        JSON.stringify(distanceDetect)
       );
       unityRef.current.postMessage(
-          "OBJImport",
-          "SetLoadingVisibility",
-          JSON.stringify({isVisible: false})
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({isVisible: false})
       );
     }
   }, [isUnityLoaded, unityLoading, shouldRenderUnity]);
 
   useFocusEffect(
-      useCallback(() => {
-        if (isFocusedRef.current) {
-          console.log("⚠️ Ya montado, ignorando");
-          return;
-        }
+    useCallback(() => {
+      if (isFocusedRef.current) {
+        console.log("⚠️ Ya montado, ignorando");
+        return;
+      }
 
-        isFocusedRef.current = true;
-        console.log("✅ MONTANDO UNITY");
-        setShouldRenderUnity(true);
-        setUnityLoading(true);
-        setUnitySceneLoaded(true)
-        return () => {
-          console.log("❌ DESMONTANDO UNITY");
-          isFocusedRef.current = false;
-          setUnitySceneLoaded(false)
-          setShouldRenderUnity(false);
-          setUnityLoading(false);
-        };
-      }, [])
+      isFocusedRef.current = true;
+      console.log("✅ MONTANDO UNITY");
+      setShouldRenderUnity(true);
+      setUnityLoading(true);
+      setUnitySceneLoaded(true);
+      return () => {
+        console.log("❌ DESMONTANDO UNITY");
+        isFocusedRef.current = false;
+        setUnitySceneLoaded(false);
+        setShouldRenderUnity(false);
+        setUnityLoading(false);
+      };
+    }, [])
   );
 
-  console.log('shouldRenderUnity, unitySceneLoaded', shouldRenderUnity, unitySceneLoaded, isUnityLoaded)
+  console.log(
+    "shouldRenderUnity, unitySceneLoaded",
+    shouldRenderUnity,
+    unitySceneLoaded,
+    isUnityLoaded
+  );
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -745,7 +774,7 @@ const StarChallenge = () => {
         backgroundColor: "#000",
       }}
     >
-    {shouldRenderUnity && (
+      {shouldRenderUnity && (
         <>
           <UnityARCamera
             width={"100%"}
@@ -758,21 +787,26 @@ const StarChallenge = () => {
             capturedVideo={capturedVideo}
             imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
           />
-            {unitySceneLoaded === true && (
-                <View style={{
-                    position: 'absolute',
-                    top: 0, left: 0, right: 0, bottom: 0,
-                    backgroundColor: 'rgba(0,0,0,0.70)',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    zIndex: 999
-                }}>
-                    <ActivityIndicator size="large" color="#fff" />
-                    <Text style={{ color: '#fff', marginTop: 10 }}>Cargando experiencia AR...</Text>
-                </View>
-            )}
+          {unitySceneLoaded === true && (
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.70)",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 999,
+              }}
+            >
+              <ActivityIndicator size="large" color="#fff" />
+              <Text style={{color: "#fff", marginTop: 10}}>Cargando experiencia AR...</Text>
+            </View>
+          )}
         </>
-        )}
+      )}
       {!isUnityLoaded && (
         <CameraControls
           hasCapturedContent={!!capturedImage || !!capturedVideo}
