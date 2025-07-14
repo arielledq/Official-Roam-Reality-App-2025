@@ -3,7 +3,7 @@ from django.dispatch import receiver
 
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
-from .models import Challenges, GeoARChallenges, ARUserProfile, ARMemories, ARSitePinCheckIn
+from .models import Challenges, GeoARChallenges, ARUserProfile, ARMemories, ARSitePinCheckIn, GeoARStarPoint
 from django.db.models import F
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.files.base import File
@@ -12,6 +12,9 @@ import tempfile
 from django.conf import settings
 import ffmpeg_downloader as ffdl
 import os
+from django.db.models.signals import m2m_changed
+from django.utils.translation import gettext_lazy as _
+from django.core.exceptions import ValidationError
 
 # @receiver(post_save, sender=ARMemories, dispatch_uid="update_points")
 # def update_points(sender, instance, **kwargs):
@@ -70,3 +73,13 @@ def update_thumbnails(sender, instance, **kwargs):
       suf = SimpleUploadedFile(video_file_thumbnail_tmp,thumbnail_tmp_out.read(),content_type=OUTPUT_IMAGE_CONTENT_TYPE)
       instance.thumbnail_memory_video_file = suf
       instance.save()
+
+
+@receiver(m2m_changed, sender=GeoARStarPoint.sponsors.through)
+def limit_sponsors(sender, instance, action, pk_set, **kwargs):
+    if action == 'pre_add':
+        total = instance.sponsors.count() + len(pk_set)
+        if total > 3:
+            raise ValidationError(
+                _("No more than 3 sponsor per star."),
+            )
