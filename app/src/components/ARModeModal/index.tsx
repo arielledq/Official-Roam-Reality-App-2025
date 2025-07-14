@@ -44,58 +44,58 @@ const ARModeModal = ({
     }
   }, [isVisible]);
 
-  useEffect(() => {
-    const fetchNextStarData = async () => {
-      if (selectedMode === MODES.HUNT && userLocation) {
-        const mapped = mapAllDestinationsToSponsors(selectedDestination);
-        const updated = await Promise.all(
-          mapped.map(async sponsor => {
-            const siteWithUpdates = await Promise.all(
-              sponsor.challenges.map(async (challenge: any) => {
-                try {
-                  const response = await getNextStarApi({
-                    geo_site_id: 772,
-                    lat: userLocation.latitude,
-                    lon: userLocation.longitude,
-                  });
-                  if (response?.id) return {...challenge, starData: response};
-                } catch (e) {
-                  console.error("Error en getNextStar", e);
-                }
-                return challenge;
-              })
-            );
-            return {...sponsor, challenges: siteWithUpdates};
-          })
-        );
-        console.log("⭐ Updated sponsors with stars:", updated);
-        setUpdatedSponsorsData(updated);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchNextStarData = async () => {
+  //     if (selectedMode === MODES.HUNT && userLocation) {
+  //       const mapped = mapAllDestinationsToSponsors(selectedDestination);
+  //       const updated = await Promise.all(
+  //         mapped.map(async sponsor => {
+  //           const siteWithUpdates = await Promise.all(
+  //             sponsor.challenges.map(async (challenge: any) => {
+  //               try {
+  //                 const response = await getNextStarApi({
+  //                   geo_site_id: 772,
+  //                   lat: userLocation.latitude,
+  //                   lon: userLocation.longitude,
+  //                 });
+  //                 if (response?.id) return {...challenge, starData: response};
+  //               } catch (e) {
+  //                 console.error("Error en getNextStar", e);
+  //               }
+  //               return challenge;
+  //             })
+  //           );
+  //           return {...sponsor, challenges: siteWithUpdates};
+  //         })
+  //       );
+  //       console.log("⭐ Updated sponsors with stars:", updated);
+  //       setUpdatedSponsorsData(updated);
+  //     }
+  //   };
 
-    fetchNextStarData();
-  }, [selectedMode]);
+  //   fetchNextStarData();
+  // }, [selectedMode]);
 
-  const mapAllDestinationsToSponsors = (destinations = []) => {
-    return destinations.map((destination: any) => ({
-      id: destination?.id?.toString(),
-      location: destination?.name,
-      backgroundImage: {uri: destination?.image},
-      hunts: 5,
-      miles: 100,
-      challenges: (destination?.star_ar_sites || [])
-        .filter((site: any) => site?.pin_challenge && site?.pin_challenge?.sponsored)
-        .map((site: any) => ({
-          ...site,
-          id: site?.id?.toString(),
-          title: site?.name,
-          points: site?.pin_challenge?.points || 0,
-          captures: {current: 0, total: 100},
-          cooldownHours: 0,
-          logo: {uri: site?.pin_challenge?.sponsored?.image || ""},
-        })),
-    }));
-  };
+  // const mapAllDestinationsToSponsors = (destinations = []) => {
+  //   return destinations.map((destination: any) => ({
+  //     id: destination?.id?.toString(),
+  //     location: destination?.name,
+  //     backgroundImage: {uri: destination?.image},
+  //     hunts: 5,
+  //     miles: 100,
+  //     challenges: (destination?.star_ar_sites || [])
+  //       .filter((site: any) => site?.pin_challenge && site?.pin_challenge?.sponsored)
+  //       .map((site: any) => ({
+  //         ...site,
+  //         id: site?.id?.toString(),
+  //         title: site?.name,
+  //         points: site?.pin_challenge?.points || 0,
+  //         captures: {current: 0, total: 100},
+  //         cooldownHours: 0,
+  //         logo: {uri: site?.pin_challenge?.sponsored?.image || ""},
+  //       })),
+  //   }));
+  // };
 
   const closeModalHandler = () => {
     setSelectedMode(null);

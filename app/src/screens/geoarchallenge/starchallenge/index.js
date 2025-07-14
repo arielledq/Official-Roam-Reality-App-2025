@@ -10,7 +10,7 @@ import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
 import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../../constants";
-import useStyles from "./styles";
+// import useStyles from "./styles";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
@@ -26,7 +26,7 @@ import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
 
-import {getNextStar as getNextStarApi} from "network";
+// import {getNextStar as getNextStarApi} from "network";
 
 const StarChallenge = () => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -42,7 +42,7 @@ const StarChallenge = () => {
   const [modelResource, setModelResource] = useState();
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
-  const _styles = useStyles();
+  // const _styles = useStyles();
   const navigation = useNavigation();
   const [openModalARMode, setOpenModalARMode] = useState(false);
   const [selectedChallengeOverride, setSelectedChallengeOverride] = useState(null);
@@ -50,7 +50,7 @@ const StarChallenge = () => {
   const [userLocation, setUserLocation] = useState(null);
   const starChallengeObj = selectedDestination.starChallenge;
   const challengeObjParameters = selectedDestination.geo_ar_star?.geo_site?.pin_challenge;
-  const isStarChallenge = !!starChallengeObj?.id;
+  // const isStarChallenge = !!starChallengeObj?.id;
   const [sendModelData, setSendModelData] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMode, setNotificationMode] = useState("scan");
@@ -65,7 +65,7 @@ const StarChallenge = () => {
 
   const challengeObj = selectedChallengeOverride;
   const modelFile = challengeObj?.model_file;
-  const [initialDataSent, setInitialDataSent] = useState(false);
+  // const [initialDataSent, setInitialDataSent] = useState(false);
   const isFocusedRef = useRef(false);
   const [unitySceneLoaded, setUnitySceneLoaded] = useState(false);
 
@@ -122,7 +122,7 @@ const StarChallenge = () => {
       setModelResource(extractedData.mtlFile);
       setTextureBase(extractedData.baseTexture);
       setTextureEmission(extractedData.emissionTexture);
-      console.log("Model file unzipped and state updated successfully.");
+      // console.log("Model file unzipped and state updated successfully.");
     } else {
       console.error("Failed to unzip model file:", extractedData.error);
 
@@ -142,7 +142,7 @@ const StarChallenge = () => {
 
       RNFS.exists(sourcePath)
         .then(exists => {
-          console.log("exists", exists);
+          // console.log("exists", exists);
           if (exists) {
             unzipModelFile(sourcePath, targetPath);
           } else {
@@ -236,7 +236,7 @@ const StarChallenge = () => {
   const updateUnityLocation = location => {
     if (unityRef?.current) {
       if (location.latitude && location.longitude) {
-        console.log("Enviando posicion del usuario");
+        // console.log("Enviando posicion del usuario");
         const jsonData = JSON.stringify({
           latitude: location?.latitude,
           longitude: location?.longitude,
@@ -300,16 +300,17 @@ const StarChallenge = () => {
 
   const sendSpawnData = () => {
     if (!unityRef?.current || !isHuntMode) return;
+    console.log("[StarChallengeScreen] sendSpawnData selectedSite", selectedSite);
     const spawnData = {
       objects: [
         {
           id: "1",
-          latitude: selectedSite.starData.coordinates[1],
-          longitude: selectedSite.starData.coordinates[0],
+          latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1],
+          longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0],
           // latitude: -25.29670612626421,
           // longitude: -57.58969884415989,
           scale: 1.0,
-          height: 1,
+          height: 1, 
           isVisible: true,
           updateRadius: 14.0,
         },
@@ -320,7 +321,7 @@ const StarChallenge = () => {
       "SpawnObjectsFromReact",
       JSON.stringify(spawnData)
     );
-    console.log("spawnData", spawnData);
+    console.log("[StarChallengeScreen] spawnData", spawnData);
   };
 
   const PointsCount = async () => {
@@ -357,7 +358,7 @@ const StarChallenge = () => {
 
   useEffect(() => {
     if (notificationMode === "hunt") {
-      console.log("se envio sendSpawnData");
+      // console.log("se envio sendSpawnData");
       setTimeout(() => {
         sendSpawnData();
         PointsCount();
@@ -395,12 +396,12 @@ const StarChallenge = () => {
       setOpenModalARMode(true);
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
-      console.log("✅ Escena ARReactNative 1 cargada correctamente desde Unity");
+      // console.log("✅ Escena ARReactNative 1 cargada correctamente desde Unity");
       setUnitySceneLoaded(false);
     }
     if (data?.touchEvent?.objectTouched === true) {
       notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
-      console.log("Estrella encontrada");
+      // console.log("Estrella encontrada");
       navigation.navigate({
         name: "FunFactsScreen",
         params: {
@@ -486,27 +487,27 @@ const StarChallenge = () => {
   const startChallengeHandler = async site => {
     // // Primero reiniciar la escena de unity
     // resetUnityScene();
-    if (site?.selectedMode?.mode === AR_MODES.HUNT_MODE && userLocation && site?.id) {
-      try {
-        const response = await getNextStarApi({
-          geo_site_id: site.id,
-          lat: userLocation.latitude,
-          lon: userLocation.longitude,
-        });
+    // if (site?.selectedMode?.mode === AR_MODES.HUNT_MODE && userLocation && site?.id) {
+    //   try {
+    //     const response = await getNextStarApi({
+    //       geo_site_id: site.id,
+    //       lat: userLocation.latitude,
+    //       lon: userLocation.longitude,
+    //     });
 
-        if (response?.id) {
-          console.log("⭐ Star data recibida desde startChallengeHandler:", response);
-          site = {
-            ...site,
-            starData: response.location,
-          };
-        }
-      } catch (error) {
-        console.error("❌ Error al obtener la estrella en startChallengeHandler", error);
-      }
-    }
+    //     if (response?.id) {
+    //       console.log("⭐ Star data recibida desde startChallengeHandler:", response);
+    //       site = {
+    //         ...site,
+    //         starData: response.location,
+    //       };
+    //     }
+    //   } catch (error) {
+    //     console.error("❌ Error al obtener la estrella en startChallengeHandler", error);
+    //   }
+    // }
 
-    console.log("site", site);
+    // console.log("site", site);
 
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
@@ -531,13 +532,14 @@ const StarChallenge = () => {
         };
         break;
       case AR_MODES.HUNT_MODE:
+        console.log("[StarChallengeScreen] huntChallenge site", site);
         challengeData = {
-          lat_long: site.lat_long,
-          challenge_requirement: site.pin_challenge?.challenge_requirement,
-          challenge_id: site.pin_challenge?.id,
-          model_file: site.pin_challenge?.model_file,
-          parameters: site.pin_challenge?.parameters,
-          points: site.pin_challenge?.points,
+          lat_long: site?.geo_ar_star?.geo_site?.lat_long,
+          challenge_requirement: site?.geo_ar_star?.geo_site?.pin_challenge?.challenge_requirement,
+          challenge_id: site?.geo_ar_star?.geo_site?.pin_challenge?.id,
+          model_file: site?.geo_ar_star?.geo_site?.pin_challenge?.model_file,
+          parameters: site?.geo_ar_star?.geo_site?.pin_challenge?.parameters,
+          points: site?.geo_ar_star?.geo_site?.pin_challenge?.points,
           setVisibleButtonPosition: false,
           arChallenge: false,
           isLocation: true,
@@ -575,7 +577,7 @@ const StarChallenge = () => {
     if (!unityRef.current) return;
 
     const timeout = setTimeout(() => {
-      console.log("Solicitando carga de escena ARReactNative 1");
+      // console.log("Solicitando carga de escena ARReactNative 1");
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
     }, 500); // menor delay, Unity ya está listo
 
@@ -584,7 +586,7 @@ const StarChallenge = () => {
 
   // Verificar si el modelo existe
   useEffect(() => {
-    console.log("useEffect: [challengeObj]");
+    // console.log("useEffect: [challengeObj]");
     if (challengeObj && modelFile) {
       checkIfModelExist();
     }
@@ -716,7 +718,7 @@ const StarChallenge = () => {
 
   useEffect(() => {
     if (isHuntMode || isGeoTagMode) {
-      console.log("se envio sendSpawnData");
+      // console.log("se envio sendSpawnData");
       setTimeout(() => {
         sendSpawnData();
         PointsCount();
@@ -726,7 +728,7 @@ const StarChallenge = () => {
 
   useFocusEffect(
     useCallback(() => {
-      console.log("useFocusEffect: [unityRef, isUnitLoaded]");
+      // console.log("useFocusEffect: [unityRef, isUnitLoaded]");
 
       if (Platform.OS === "android") {
         unityRef.current?.resumeUnity();
@@ -762,17 +764,17 @@ const StarChallenge = () => {
   useFocusEffect(
     useCallback(() => {
       if (isFocusedRef.current) {
-        console.log("⚠️ Ya montado, ignorando");
+        // console.log("⚠️ Ya montado, ignorando");
         return;
       }
 
       isFocusedRef.current = true;
-      console.log("✅ MONTANDO UNITY");
+      // console.log("✅ MONTANDO UNITY");
       setShouldRenderUnity(true);
       setUnityLoading(true);
       setUnitySceneLoaded(true);
       return () => {
-        console.log("❌ DESMONTANDO UNITY");
+        // console.log("❌ DESMONTANDO UNITY");
         isFocusedRef.current = false;
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);
@@ -847,12 +849,12 @@ const StarChallenge = () => {
   // }, [selectedSite, userLocation]);
   //
 
-  console.log(
-    "shouldRenderUnity, unitySceneLoaded",
-    shouldRenderUnity,
-    unitySceneLoaded,
-    isUnityLoaded
-  );
+  // console.log(
+  //   "shouldRenderUnity, unitySceneLoaded",
+  //   shouldRenderUnity,
+  //   unitySceneLoaded,
+  //   isUnityLoaded
+  // );
   return (
     <ChallengeScreen
       title="AR Star Hunt "

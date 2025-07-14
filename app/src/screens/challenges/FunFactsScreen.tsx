@@ -33,6 +33,8 @@ import theme from "assets/theme";
 import BGArShare from "assets/ar/bg-ar-share.png";
 import {GeolocationContext} from "GeolocationProvider";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
+import userLocationHook from "screens/drawerContent/location.hook";
+import useArScreenHook from "hooks/useArScreenHook";
 
 interface ShareChallengeRouteParams {
   challengeObj: any; // Replace 'any' with proper type if available
@@ -41,7 +43,9 @@ interface ShareChallengeRouteParams {
   isMemory: boolean;
 }
 
-const FunFactsScreen = () => {
+const FunFactsScreen = ({
+  route,
+}: RouteProp<{ShareChallenge: ShareChallengeRouteParams}, "ShareChallenge">) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
@@ -56,14 +60,11 @@ const FunFactsScreen = () => {
   const [viewWidth, setViewWidth] = useState(0);
   const viewRef = useRef(null);
 
-  const {userLocation} = useContext(GeolocationContext);
+  const {initialUserLocation, getLocation} = userLocationHook();
+  const {getNextStar: getNextStarApi} = useArScreenHook();
   const dispatch = useDispatch();
 
   const width = Dimensions.get("screen").width;
-
-  // Update the route type
-  const route =
-    useRoute<RouteProp<{ShareChallenge: ShareChallengeRouteParams}, "ShareChallenge">>();
   const navigation = useNavigation();
 
   const challengeObj = route?.params?.challengeObj;
@@ -82,7 +83,7 @@ const FunFactsScreen = () => {
   }
 
   let sponsor = challengeObj?.sponsored;
-  console.log("challengeObj", challengeObj);
+  // console.log("challengeObj", challengeObj);
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
   // let sponsorImage = sponsor?.image || "";
 
@@ -132,11 +133,11 @@ const FunFactsScreen = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.facebook;
           if (currCounter.facebook === 0) {
-            console.log("granting points for facebook");
+            // console.log("granting points for facebook");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
           } else {
-            console.log(" not counting more points but allowing to share... ");
+            // console.log(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -148,11 +149,11 @@ const FunFactsScreen = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.instagram;
           if (currCounter.instagram === 0) {
-            console.log("granting points for instagram");
+            // console.log("granting points for instagram");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
           } else {
-            console.log(" not counting more points but allowing to share... ");
+            // console.log(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -164,11 +165,11 @@ const FunFactsScreen = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.others;
           if (currCounter.others === 0) {
-            console.log("granting points for others");
+            // console.log("granting points for others");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
           } else {
-            console.log(" not counting more points but allowing to share... ");
+            // console.log(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -273,24 +274,24 @@ const FunFactsScreen = () => {
       });
   };
 
-  const getNextStar = async () => {
-    try {
-      const params = {
-        geo_site_id: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-        // geo_site_id: selectedGeoARSiteStars[0]?.id,
-        lat: userLocation?.latitude,
-        lon: userLocation?.longitude,
-      };
-      const response = await getNextStarApi(params);
-      if (response?.id) {
-        return response;
-      } else {
-        return null;
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const getNextStar = async () => {
+  //   try {
+  //     const params = {
+  //       geo_site_id: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+  //       // geo_site_id: selectedGeoARSiteStars[0]?.id,
+  //       lat: userLocation?.latitude,
+  //       lon: userLocation?.longitude,
+  //     };
+  //     const response = await getNextStarApi(params);
+  //     if (response?.id) {
+  //       return response;
+  //     } else {
+  //       return null;
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
 
   const resetNavigation = () => {
     navigation.reset({
@@ -304,10 +305,15 @@ const FunFactsScreen = () => {
     if (challengeType === CHALLENGES_TYPE.STAR) {
       const remainingStars = challengeObj?.remaining_stars;
 
+      console.log("[FunFactsScreen] challengeObj", challengeObj);
       if (remainingStars > 1) {
-        const updatedChallengeObj = await getNextStar();
+        // const updatedChallengeObj = await getNextStarApi(
+        //   challengeObj?.geo_ar_star?.geo_site?.id,
+        //   initialUserLocation.latitude,
+        //   initialUserLocation.longitude
+        // );
         // @ts-ignore
-        navigation.navigate("GeoArSiteRoutes", {starsChallenge: updatedChallengeObj});
+        // navigation.navigate("GeoArSiteRoutes", {starsChallenge: updatedChallengeObj});
       } else {
         resetNavigation();
       }
@@ -355,11 +361,6 @@ const FunFactsScreen = () => {
     );
   };
 
-  const handleLayout = (event: any) => {
-    const {width, height} = event.nativeEvent.layout;
-    setViewWidth(width);
-  };
-
   const baseOffset = 110;
   let offset = baseOffset;
   if (viewWidth >= 320) {
@@ -400,17 +401,10 @@ const FunFactsScreen = () => {
     }
   };
 
-  // useEffect(() => {
-  //   if (!isMemory) {
-  //     updateUserPointAPI({points: challengePoints});
-  //   }
-  // }, [isMemory]);
-
-  const funFactImage = "https://placehold.co/400x400.png";
-  const siteImage = "https://placehold.co/80x80.png";
-  const siteName = "Fort James Tobago";
-  const funFactDetail =
-    "Built by the British in 1770, Fort James was named after King James Il of England. It was one of the main military outposts in Tobago, guarding the western coastline from invaders and pirates";
+  const funFactImage = challengeObj?.huntChallenge?.image;
+  const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
+  const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
+  const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
   const funFactSponsors = [];
 
   return (

@@ -29,13 +29,28 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   };
 
   const {initialUserLocation, getLocation} = userLocationHook();
-  const {getSites, sites}: any = useArScreenHook();
+  const {getSites, sites, getNextStar: getNextStarApi}: any = useArScreenHook();
   const [sponsorData, setSponsorData] = useState([]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
 
-  const startChallengeHandler = (site: any) => {
-    onStartChallenge({...site, selectedMode});
+  const startChallengeHandler = async (site: any) => {
+    let updatedSiteData = {
+      ...site,
+      selectedMode,
+    };
+    if (selectedMode?.mode === AR_MODES.HUNT_MODE) {
+      const huntData = await getNextStarApi(
+        site.id,
+        initialUserLocation.latitude,
+        initialUserLocation.longitude
+      );
+      updatedSiteData = {
+        ...updatedSiteData,
+        huntChallenge: huntData,
+      };
+    }
+    onStartChallenge(updatedSiteData);
     onClose();
   };
 
