@@ -353,6 +353,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 
 JAZZMIN_SETTINGS = {
+    "custom_css": "css/admin_custom.css",
     "sidebar_background": "purple",
     "show_ui_builder": False,
 
@@ -372,6 +373,7 @@ JAZZMIN_SETTINGS = {
 
 JAZZMIN_UI_TWEAKS = {
     "navbar_small_text": False,
+    # "border-right_text_colour": "navbar-dark",
     "footer_small_text": False,
     "body_small_text": False,
     "brand_small_text": False,

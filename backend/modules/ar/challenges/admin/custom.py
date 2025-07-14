@@ -158,6 +158,13 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
 
 
 class GeoARStarPointForm(forms.ModelForm):
+
+    def clean_sponsors(self):
+        sponsors = self.cleaned_data.get('sponsors')
+        if sponsors and sponsors.count() > 3:
+            raise ValidationError("No more than 3 sponsor per star.")
+        return sponsors
+
     class Meta:
         model = GeoARStarPoint
         fields = '__all__'
