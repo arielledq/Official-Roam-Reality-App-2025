@@ -731,8 +731,8 @@ class GeoARStarPoint(models.Model):
     )
     image = models.FileField(upload_to="ar/geo_star_point/", blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
-    elevation = models.IntegerField(null=True)
-    sponsors = models.ManyToManyField(Sponsor, related_name="stars")
+    elevation = models.IntegerField(null=True, blank=True)
+    sponsors = models.ManyToManyField(Sponsor, related_name="stars", blank=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Star Points"
