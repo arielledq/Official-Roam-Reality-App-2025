@@ -1,0 +1,8 @@
+@media (prefers-color-scheme: dark) {
+  body.theme-default h1 {
+    color: #212529 !important;
+  }
+  body.theme-default .card-header .card-title {
+    color: #212529 !important;
+  }
+}
