@@ -9,18 +9,18 @@ import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
-import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../../constants";
+import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
-import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../../util/helpers";
+import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../util/helpers";
 
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
 
-const StarChallenge = () => {
+const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
   const selectedDestination = useSelector(state => state.ar);
 
@@ -68,6 +68,11 @@ const StarChallenge = () => {
     challengeObj?.model_file ||
     selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
+
+  const huntChallenge = route.params?.huntChallenge
+  const isContinuingHuntChallenge = !!huntChallenge
+
+  console.log("huntChallenge", huntChallenge)
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -911,4 +916,4 @@ const StarChallenge = () => {
   );
 };
 
-export default StarChallenge;
+export default ARScreen;

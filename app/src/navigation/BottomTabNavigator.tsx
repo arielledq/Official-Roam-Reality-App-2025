@@ -11,7 +11,7 @@ import ScoreBoard from "../screens/scoreboard";
 
 import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
-import StarChallenge from "screens/geoarchallenge/starchallenge";
+import ARScreen from "screens/arScreen";
 import FunFactsScreen from "screens/challenges/FunFactsScreen";
 // import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
 
@@ -78,7 +78,7 @@ const BottomTabNavigator = () => {
           name="Go Navigate"
           // @ts-ignore
           // component={FunFactsScreen}
-          component={StarChallenge}
+          component={ARScreen}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (

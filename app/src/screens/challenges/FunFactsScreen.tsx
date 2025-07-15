@@ -1,26 +1,23 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Image, Platform, Text, View, Dimensions} from "react-native";
-import {useNavigation, useRoute} from "@react-navigation/native";
-import moment from "moment";
+import {useNavigation} from "@react-navigation/native";
 // @ts-ignore
 import ViewShot, {captureRef} from "react-native-view-shot";
 import {useDispatch} from "react-redux";
-import {RouteProp} from "@react-navigation/native";
 
-import {SHARE_CONDITIONS_TEXT, SSNN} from "../../constants";
+import {SSNN} from "../../constants";
 import {
   getARProfile,
   postArMemory,
   postGeoPinCheckIn,
   starFoundAndSaveApi,
-  getNextStar as getNextStarApi,
   updateUserPointAPI,
 } from "network";
 import {fontGroup, FontSizes} from "util/FontUtils";
-import {getFileExtension, handleError, saveToGallery, showMessage} from "util/helpers";
+// import {handleError} from "util/helpers";
 // @ts-ignore
-import {CHALLENGES_TYPE} from "constants";
-import {updateARUserData} from "../../redux/AR";
+// import {CHALLENGES_TYPE} from "constants";
+// import {updateARUserData} from "../../redux/AR";
 
 import BackgroundWithImage from "components/background";
 import AppText from "components/text";
@@ -31,27 +28,23 @@ import ShareToSocialsModal from "components/ShareToSocialsModal";
 import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
-import userLocationHook from "screens/drawerContent/location.hook";
+// import userLocationHook from "screens/drawerContent/location.hook";
 import useArScreenHook from "hooks/useArScreenHook";
 import RenderHTML from "react-native-render-html";
 
 const FunFactsScreen = ({route}) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
-  const [hasPermission, setHasPermission] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
   const [socialPointsCounter, setSocialPointsCounter] = useState({
     facebook: 0,
     instagram: 0,
     others: 0,
   });
-  const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
+  // const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
   const [filePath, setFilePath] = useState("");
 
-  const [viewWidth, setViewWidth] = useState(0);
   const funFactCardRef = useRef(null);
 
-  const {initialUserLocation, getLocation} = userLocationHook();
+  // const {initialUserLocation, getLocation} = userLocationHook();
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const dispatch = useDispatch();
 
@@ -59,9 +52,8 @@ const FunFactsScreen = ({route}) => {
   const navigation = useNavigation();
 
   const challengeObj = route?.params?.challengeObj;
-  const captureData = route?.params?.captureData;
-  const challengeType = route?.params?.challengeType;
-  const isMemory = route?.params?.isMemory;
+  // const captureData = route?.params?.captureData;
+  // const challengeType = route?.params?.challengeType;
 
   let challengePoints = 0;
   const initialPoints = challengeObj?.pin_challenge?.points;
@@ -72,44 +64,8 @@ const FunFactsScreen = ({route}) => {
       socialPointsCounter.instagram +
       socialPointsCounter.others;
   }
-
-  let sponsor = challengeObj?.sponsored;
-
-  // switch (challengeType) {
-  // case CHALLENGES_TYPE.PHOTO_VIDEO:
-  //   screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
-  //   if (isMemory) startDate = "-";
-  //   break;
-  // case CHALLENGES_TYPE.PIN_CHECK_IN:
-  //   screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
-  //   if (isMemory) startDate = "-";
-  //   break;
-  //   case CHALLENGES_TYPE.STAR:
-  //     screenTitle = CHALLENGES_TYPE.STAR_TITLE;
-
-  //     sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
-  //     siteImage = sponsor?.image;
-  //     siteName = sponsor?.name;
-  //     if (isMemory) startDate = "-";
-  //     const remainingStars = challengeObj?.remaining_stars;
-  //     if (remainingStars > 1) {
-  //       challengePoints = 0;
-  //       challengeTitle = "";
-  //       endChallengeButtonText = "Continue to the next Star";
-  //     } else {
-  //       challengePoints = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points;
-  //     }
-  //     break;
-
-  //   default:
-  //     break;
-  // }
-
-  const capturedDataUri = captureData;
-  // const isVideo = capturedDataUri?.includes(".mp4");
-  // const filePath = isMemory ? captureData : capturedDataUri?.split("?")[0];
+  // const capturedDataUri = captureData;
   const fileExt = "png";
-  // const fileExt = isMemory ? getFileExtension(captureData) : filePath?.split(".").pop() || "";
 
   const handleCaptureScreenshot = async () => {
     try {
@@ -188,96 +144,89 @@ const FunFactsScreen = ({route}) => {
     }
   };
 
-  const shareToRoamProfile = async (endExperienceHandler?: () => void) => {
-    setIsLoading(true);
-    let filename = capturedDataUri.split("/").pop();
-    let shareFile = {
-      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
-      type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
-      name: filename,
-    };
+  // const shareToRoamProfile = async (endExperienceHandler?: () => void) => {
+  //   let filename = capturedDataUri.split("/").pop();
+  //   let shareFile = {
+  //     uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
+  //     type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
+  //     name: filename,
+  //   };
 
-    const formData = new FormData();
-    let res;
+  //   const formData = new FormData();
+  //   let res;
 
-    try {
-      // let successMessage = "Successfully, completed your challenge.";
-      switch (challengeType) {
-        case CHALLENGES_TYPE.PHOTO_VIDEO:
-          formData.append("challenges", challengeObj.id);
-          formData.append("memory_file", shareFile);
-          formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
-          res = await postArMemory(formData);
-          break;
+  //   try {
+  //     // let successMessage = "Successfully, completed your challenge.";
+  //     switch (challengeType) {
+  //       case CHALLENGES_TYPE.PHOTO_VIDEO:
+  //         formData.append("challenges", challengeObj.id);
+  //         formData.append("memory_file", shareFile);
+  //         formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+  //         res = await postArMemory(formData);
+  //         break;
 
-        case CHALLENGES_TYPE.PIN_CHECK_IN:
-          formData.append("geo_challenge", challengeObj.id);
-          formData.append("geo_site", challengeObj?.geo_site?.id);
-          formData.append("memory_file", shareFile);
+  //       case CHALLENGES_TYPE.PIN_CHECK_IN:
+  //         formData.append("geo_challenge", challengeObj.id);
+  //         formData.append("geo_site", challengeObj?.geo_site?.id);
+  //         formData.append("memory_file", shareFile);
 
-          res = await postGeoPinCheckIn(formData);
-          break;
-        // case CHALLENGES_TYPE.STAR:
-        //   res = await starFoundAndSaveApi({
-        //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-        //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
-        //     geo_ar_star_point: challengeObj?.id, // id de la estrella
-        //     latitude: userLocation?.latitude,
-        //     longitude: userLocation?.longitude,
-        //   });
+  //         res = await postGeoPinCheckIn(formData);
+  //         break;
+  //       // case CHALLENGES_TYPE.STAR:
+  //       //   res = await starFoundAndSaveApi({
+  //       //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+  //       //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
+  //       //     geo_ar_star_point: challengeObj?.id, // id de la estrella
+  //       //     latitude: userLocation?.latitude,
+  //       //     longitude: userLocation?.longitude,
+  //       //   });
 
-        //   const remainingStars = challengeObj?.remaining_stars;
-        //   // if (remainingStars > 1) {
-        //   //   successMessage = "Success, continue to the next Star.";
-        //   // }
+  //       //   const remainingStars = challengeObj?.remaining_stars;
+  //       //   // if (remainingStars > 1) {
+  //       //   //   successMessage = "Success, continue to the next Star.";
+  //       //   // }
 
-        //   break;
+  //       //   break;
 
-        default:
-          break;
-      }
+  //       default:
+  //         break;
+  //     }
 
-      setHasSharedToRoamProfile(true);
-      ARUserProfile();
+  //     setHasSharedToRoamProfile(true);
+  //     ARUserProfile();
 
-      if (res.status === 1) {
-        if (endExperienceHandler) {
-          endExperienceHandler();
-        }
-      } else {
-        console.error("Success - Error al compartir el desafío:", res);
-        handleError("There was an error sharing your challenge: " + res?.message);
-      }
-    } catch (error) {
-      console.error("Catch - Error al compartir el desafío:", error);
-      handleError("There was an error sharing your challenge: " + error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     if (res.status === 1) {
+  //       if (endExperienceHandler) {
+  //         endExperienceHandler();
+  //       }
+  //     } else {
+  //       console.error("Success - Error al compartir el desafío:", res);
+  //       handleError("There was an error sharing your challenge: " + res?.message);
+  //     }
+  //   } catch (error) {
+  //     console.error("Catch - Error al compartir el desafío:", error);
+  //     handleError("There was an error sharing your challenge: " + error);
+  //   }
+  // };
 
-  useEffect(() => {
-    if (
-      !hasSharedToRoamProfile &&
-      (socialPointsCounter.facebook === 1 ||
-        socialPointsCounter.instagram === 1 ||
-        socialPointsCounter.others === 1)
-    ) {
-      shareToRoamProfile();
-    }
-  }, [socialPointsCounter, hasSharedToRoamProfile]);
+  // useEffect(() => {
+  //   if (
+  //     !hasSharedToRoamProfile &&
+  //     (socialPointsCounter.facebook === 1 ||
+  //       socialPointsCounter.instagram === 1 ||
+  //       socialPointsCounter.others === 1)
+  //   ) {
+  //     shareToRoamProfile();
+  //   }
+  // }, [socialPointsCounter, hasSharedToRoamProfile]);
 
-  const ARUserProfile = () => {
-    getARProfile()
-      .then(res => {
-        if (res.status == 1) {
-          dispatch(updateARUserData(res));
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  };
+  // const ARUserProfile = () => {
+  //   getARProfile().then(res => {
+  //     if (res.status == 1) {
+  //       dispatch(updateARUserData(res));
+  //     }
+  //   });
+  // };
 
   const resetNavigation = () => {
     navigation.reset({
@@ -287,55 +236,48 @@ const FunFactsScreen = ({route}) => {
     });
   };
 
-  const endExperience = async () => {
-    const remainingStars = challengeObj?.remaining_stars;
+  const endFunFactsButtonHandler = async () => {
+    const geoSiteId = challengeObj?.huntChallenge?.geo_ar_star?.geo_site?.id;
+    const challengeId = challengeObj?.huntChallenge?.geo_ar_star?.id;
+    const starPointId = challengeObj?.huntChallenge?.id;
+    const lat = challengeObj?.lat_long?.coordinates[1];
+    const lon = challengeObj?.lat_long?.coordinates[0];
 
-    console.log("[FunFactsScreen] challengeObj", challengeObj);
+    // Record hunt challenge
+    try {
+      await starFoundAndSaveApi({
+        geo_site: geoSiteId, // Site ID
+        geo_ar_star: challengeId, // Challenge ID
+        geo_ar_star_point: starPointId, // Star/Hunt Point ID
+        latitude: lat,
+        longitude: lon,
+      });
+    } catch (error) {
+      console.error("Error al guardar el desafío:", error);
+    }
+
+    let newHuntPointChallenge;
+    try {
+      newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
+      console.log("newHuntPointChallenge", newHuntPointChallenge);
+    } catch (error) {
+      console.error("Error al obtener el siguiente desafío:", error);
+    }
+
+    // Extract remaining hunt pins
+    const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
+
     if (remainingStars > 1) {
-      const updatedChallengeObj = await getNextStarApi(
-        challengeObj?.geo_ar_star?.geo_site?.id,
-        initialUserLocation.latitude,
-        initialUserLocation.longitude
-      );
       // @ts-ignore
-      navigation.navigate("StarChallenge", {starsChallenge: updatedChallengeObj});
+      navigation.navigate("ARScreen", {huntChallenge: newHuntPointChallenge});
     } else {
       resetNavigation();
     }
   };
 
-  const endFunFactsButtonHandler = () => {
-    endExperience();
-  };
-
   const closeShareToSocialMediaButtonHandler = () => {
     setShareToSocialsIsOpen(false);
   };
-
-  const permissionsGrantedHandler = () => {
-    setHasPermission(true);
-  };
-
-  const toggleLoadingHandler = () => {
-    setIsLoading(currState => !currState);
-  };
-
-  const baseOffset = 110;
-  let offset = baseOffset;
-  if (viewWidth >= 320) {
-    offset = baseOffset - (viewWidth / 300) * 8;
-  }
-  if (viewWidth >= 300 && viewWidth < 320) {
-    offset = baseOffset - (viewWidth / 300) * 24;
-  }
-  if (viewWidth < 300) {
-    offset = 150;
-  }
-
-  let shareButtonTextSize = FontSizes.S16;
-  if (width < 420) {
-    shareButtonTextSize = FontSizes.S12;
-  }
 
   const screenModals = (
     <>
@@ -344,20 +286,11 @@ const FunFactsScreen = ({route}) => {
         fileExt={fileExt}
         isVisible={shareToSocialsIsOpen}
         isMemory={false}
-        sponsor={sponsor}
         onPointsGranted={countSocialPoints}
         onClose={closeShareToSocialMediaButtonHandler}
       />
     </>
   );
-
-  const toggleLoading = (value: boolean) => {
-    if (isMemory) {
-      setIsLoadingDisplay(value);
-    } else {
-      setIsLoadingDisplay(false);
-    }
-  };
 
   const funFactImage = challengeObj?.huntChallenge?.image;
   const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
@@ -399,8 +332,6 @@ const FunFactsScreen = ({route}) => {
           <Image
             resizeMode={"contain"}
             source={{uri: funFactImage}}
-            onLoadStart={() => toggleLoading(true)}
-            onLoad={() => toggleLoading(false)}
             style={{
               minWidth: 300,
               maxWidth: "100%",
@@ -571,14 +502,14 @@ const FunFactsScreen = ({route}) => {
           <AppButton
             onPress={handleCaptureScreenshot}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
-            titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
+            titleStyle={{fontSize: FontSizes.S12, fontWeight: "bold"}}
             title={"Share To Socials"}
           />
 
           <AppButton
             onPress={endFunFactsButtonHandler}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
-            titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
+            titleStyle={{fontSize: FontSizes.S12, fontWeight: "bold"}}
             title={"End"}
           />
         </View>
