@@ -172,7 +172,7 @@ class GeoARStarPointForm(forms.ModelForm):
     class Media:
         js = (
             'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js',
-            '../static/geoarstarpoint/geoarstarpoint_elevation.js',
+            'geoarstarpoint/geoarstarpoint_elevation.js',
         )
 
 
