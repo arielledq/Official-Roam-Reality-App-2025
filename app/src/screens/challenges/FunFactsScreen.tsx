@@ -3,7 +3,7 @@ import {Image, Platform, Text, View, Dimensions} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import moment from "moment";
 // @ts-ignore
-import Video from "react-native-video";
+import ViewShot, {captureRef} from "react-native-view-shot";
 import {useDispatch} from "react-redux";
 import {RouteProp} from "@react-navigation/native";
 
@@ -31,21 +31,11 @@ import ShareToSocialsModal from "components/ShareToSocialsModal";
 import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
-import {GeolocationContext} from "GeolocationProvider";
-import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 import userLocationHook from "screens/drawerContent/location.hook";
 import useArScreenHook from "hooks/useArScreenHook";
+import RenderHTML from "react-native-render-html";
 
-interface ShareChallengeRouteParams {
-  challengeObj: any; // Replace 'any' with proper type if available
-  captureData: string;
-  challengeType: string;
-  isMemory: boolean;
-}
-
-const FunFactsScreen = ({
-  route,
-}: RouteProp<{ShareChallenge: ShareChallengeRouteParams}, "ShareChallenge">) => {
+const FunFactsScreen = ({route}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
@@ -56,9 +46,10 @@ const FunFactsScreen = ({
     others: 0,
   });
   const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
+  const [filePath, setFilePath] = useState("");
 
   const [viewWidth, setViewWidth] = useState(0);
-  const viewRef = useRef(null);
+  const funFactCardRef = useRef(null);
 
   const {initialUserLocation, getLocation} = userLocationHook();
   const {getNextStar: getNextStarApi} = useArScreenHook();
@@ -72,57 +63,71 @@ const FunFactsScreen = ({
   const challengeType = route?.params?.challengeType;
   const isMemory = route?.params?.isMemory;
 
-  let screenTitle = "";
   let challengePoints = 0;
-  if (challengeObj?.points) {
+  const initialPoints = challengeObj?.pin_challenge?.points;
+  if (initialPoints) {
     challengePoints =
-      challengeObj.points +
+      initialPoints +
       socialPointsCounter.facebook +
       socialPointsCounter.instagram +
       socialPointsCounter.others;
   }
 
   let sponsor = challengeObj?.sponsored;
-  // console.log("challengeObj", challengeObj);
-  let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-  // let sponsorImage = sponsor?.image || "";
 
-  let startDate = moment().format("MM-DD-YYYY");
-  let endChallengeButtonText = "End & Share to Roam Profile";
-  switch (challengeType) {
-    case CHALLENGES_TYPE.PHOTO_VIDEO:
-      screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
-      if (isMemory) startDate = "-";
-      break;
-    case CHALLENGES_TYPE.PIN_CHECK_IN:
-      screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
-      if (isMemory) startDate = "-";
-      break;
-    case CHALLENGES_TYPE.STAR:
-      screenTitle = CHALLENGES_TYPE.STAR_TITLE;
+  // switch (challengeType) {
+  // case CHALLENGES_TYPE.PHOTO_VIDEO:
+  //   screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
+  //   if (isMemory) startDate = "-";
+  //   break;
+  // case CHALLENGES_TYPE.PIN_CHECK_IN:
+  //   screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
+  //   if (isMemory) startDate = "-";
+  //   break;
+  //   case CHALLENGES_TYPE.STAR:
+  //     screenTitle = CHALLENGES_TYPE.STAR_TITLE;
 
-      sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
-      siteImage = sponsor?.image;
-      siteName = sponsor?.name;
-      if (isMemory) startDate = "-";
-      const remainingStars = challengeObj?.remaining_stars;
-      if (remainingStars > 1) {
-        challengePoints = 0;
-        challengeTitle = "";
-        endChallengeButtonText = "Continue to the next Star";
-      } else {
-        challengePoints = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points;
-      }
-      break;
+  //     sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
+  //     siteImage = sponsor?.image;
+  //     siteName = sponsor?.name;
+  //     if (isMemory) startDate = "-";
+  //     const remainingStars = challengeObj?.remaining_stars;
+  //     if (remainingStars > 1) {
+  //       challengePoints = 0;
+  //       challengeTitle = "";
+  //       endChallengeButtonText = "Continue to the next Star";
+  //     } else {
+  //       challengePoints = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points;
+  //     }
+  //     break;
 
-    default:
-      break;
-  }
+  //   default:
+  //     break;
+  // }
 
   const capturedDataUri = captureData;
-  const isVideo = capturedDataUri?.includes(".mp4");
-  const filePath = isMemory ? captureData : capturedDataUri?.split("?")[0];
-  const fileExt = isMemory ? getFileExtension(captureData) : filePath?.split(".").pop() || "";
+  // const isVideo = capturedDataUri?.includes(".mp4");
+  // const filePath = isMemory ? captureData : capturedDataUri?.split("?")[0];
+  const fileExt = "png";
+  // const fileExt = isMemory ? getFileExtension(captureData) : filePath?.split(".").pop() || "";
+
+  const handleCaptureScreenshot = async () => {
+    try {
+      const uri = await captureRef(funFactCardRef, {
+        format: "png",
+        quality: 0.9,
+        result: "tmpfile", // or 'data-uri' if you prefer base64
+      });
+      setFilePath(uri);
+      console.log("Screenshot URI:", uri);
+
+      // Optional: Open share modal
+      setShareToSocialsIsOpen(true);
+      // or pass URI to ShareToSocialsModal
+    } catch (error) {
+      console.error("Screenshot capture error:", error);
+    }
+  };
 
   const countSocialPoints = (
     selectedSSNN: string,
@@ -299,20 +304,8 @@ const FunFactsScreen = ({
     }
   };
 
-  const endShareProfileButtonHandler = async () => {
-    if (hasSharedToRoamProfile) {
-      endExperience();
-    } else {
-      shareToRoamProfile(() => endExperience());
-    }
-  };
-
   const endFunFactsButtonHandler = () => {
     endExperience();
-  };
-
-  const shareToSocialMediaButtonHandler = () => {
-    setShareToSocialsIsOpen(true);
   };
 
   const closeShareToSocialMediaButtonHandler = () => {
@@ -325,17 +318,6 @@ const FunFactsScreen = ({
 
   const toggleLoadingHandler = () => {
     setIsLoading(currState => !currState);
-  };
-
-  const saveToGalleryButtonHandler = () => {
-    saveToGallery(
-      hasPermission,
-      permissionsGrantedHandler,
-      isMemory,
-      capturedDataUri,
-      fileExt,
-      toggleLoadingHandler
-    );
   };
 
   const baseOffset = 110;
@@ -361,12 +343,11 @@ const FunFactsScreen = ({
         fileUri={filePath}
         fileExt={fileExt}
         isVisible={shareToSocialsIsOpen}
-        isMemory={isMemory}
+        isMemory={false}
         sponsor={sponsor}
         onPointsGranted={countSocialPoints}
         onClose={closeShareToSocialMediaButtonHandler}
       />
-      <FullScreenLoadingSpinner isLoading={isLoading} />
     </>
   );
 
@@ -378,15 +359,15 @@ const FunFactsScreen = ({
     }
   };
 
-  // const funFactImage = challengeObj?.huntChallenge?.image;
-  // const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
-  // const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
-  // const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
-  const funFactImage = "https://placehold.co/400x400.png";
-  const siteImage = "https://placehold.co/80x80.png";
-  const siteName = "Fort James Tobago";
-  const funFactDetail =
-    "Built by the British in 1770, Fort James was named after King James Il of England. It was one of the main military outposts in Tobago, guarding the western coastline from invaders and pirates";
+  const funFactImage = challengeObj?.huntChallenge?.image;
+  const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
+  const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
+  const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
+  // const funFactImage = "https://placehold.co/400x400.png";
+  // const siteImage = "https://placehold.co/80x80.png";
+  // const siteName = "Fort James Tobago";
+  // const funFactDetail =
+  //   "Built by the British in 1770, Fort James was named after King James Il of England. It was one of the main military outposts in Tobago, guarding the western coastline from invaders and pirates";
 
   const funFactSponsors = [];
 
@@ -403,86 +384,106 @@ const FunFactsScreen = ({
       hideBackButton
       scrollable
     >
-      <View
-        style={{
-          backgroundColor: "#272741",
-          gap: 16,
-          borderRadius: 12,
-          overflow: "hidden",
-          paddingBottom: 16,
-        }}
-      >
-        {/* Card Image */}
-        <Image
-          resizeMode={"contain"}
-          source={{uri: funFactImage}}
-          onLoadStart={() => toggleLoading(true)}
-          onLoad={() => toggleLoading(false)}
+      {/* Fun facts card */}
+      <ViewShot ref={funFactCardRef} options={{format: "png", quality: 0.9}}>
+        <View
           style={{
-            minWidth: 300,
-            maxWidth: "100%",
-            minHeight: 300,
-            aspectRatio: 1,
-            resizeMode: "cover",
-            backgroundColor: "transparent",
+            backgroundColor: "#272741",
+            gap: 16,
+            borderRadius: 12,
+            overflow: "hidden",
+            paddingBottom: 16,
           }}
-        />
-
-        {/* Card Content */}
-        <View style={{paddingHorizontal: 16, gap: 16}}>
-          <View
+        >
+          {/* Card Image */}
+          <Image
+            resizeMode={"contain"}
+            source={{uri: funFactImage}}
+            onLoadStart={() => toggleLoading(true)}
+            onLoad={() => toggleLoading(false)}
             style={{
-              flexDirection: "row",
-              alignItems: "center",
-              gap: 16,
+              minWidth: 300,
+              maxWidth: "100%",
+              minHeight: 300,
+              aspectRatio: 1,
+              resizeMode: "cover",
+              backgroundColor: "transparent",
             }}
-          >
-            <Image style={{width: 25, height: 25, borderRadius: 25}} source={{uri: siteImage}} />
-            <Text
+          />
+
+          {/* Card Content */}
+          <View style={{paddingHorizontal: 16, gap: 16}}>
+            <View
               style={{
-                ...fontGroup.nunitoBold,
-                fontWeight: "700",
-                fontSize: FontSizes.S20,
-                color: theme.lightColors?.white,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 16,
               }}
             >
-              {siteName}
-            </Text>
-          </View>
+              <Image style={{width: 25, height: 25, borderRadius: 25}} source={{uri: siteImage}} />
+              <Text
+                style={{
+                  ...fontGroup.nunitoBold,
+                  fontWeight: "700",
+                  fontSize: FontSizes.S20,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                {siteName}
+              </Text>
+            </View>
 
-          <View>
-            <Text
-              style={{color: theme.lightColors?.white, fontSize: FontSizes.S14, lineHeight: 20}}
-            >
-              {funFactDetail}
-            </Text>
-          </View>
+            <View>
+              <RenderHTML
+                contentWidth={width}
+                tagsStyles={{
+                  p: {
+                    color: "#9CA3AF",
+                    fontSize: FontSizes.S14,
+                  },
+                  strong: {
+                    color: "#fff",
+                    fontSize: FontSizes.S14,
+                  },
+                  ol: {
+                    color: "#fff",
+                  },
+                  li: {
+                    color: "#fff",
+                  },
+                }}
+                source={{
+                  html: `${funFactDetail}`,
+                }}
+              />
+            </View>
 
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <Text
+            <View
               style={{
-                ...fontGroup.nunitoBold,
-                fontWeight: "700",
-                fontSize: FontSizes.S14,
-                color: theme.lightColors?.white,
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
               }}
             >
-              Brought to you by
-            </Text>
-            <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
-              <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
-              <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
-              <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+              <Text
+                style={{
+                  ...fontGroup.nunitoBold,
+                  fontWeight: "700",
+                  fontSize: FontSizes.S14,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                Brought to you by
+              </Text>
+              <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
+                <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+                <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+                <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
+              </View>
             </View>
           </View>
         </View>
-      </View>
+      </ViewShot>
 
       <View
         style={{
@@ -568,7 +569,7 @@ const FunFactsScreen = ({
         {/* Buttons */}
         <View style={{flexDirection: "row", gap: 16}}>
           <AppButton
-            onPress={shareToSocialMediaButtonHandler}
+            onPress={handleCaptureScreenshot}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
             titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
             title={"Share To Socials"}
