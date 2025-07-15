@@ -1,4 +1,4 @@
-FROM crowdbotics/cb-django:3.9-slim-bullseye AS build
+FROM crowdbotics/cb-django:3.9-slim-buster AS build
 
 # Copy dependency management files and install app packages to /.venv
 COPY backend/Pipfile backend/Pipfile.lock /
@@ -11,7 +11,7 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
 # RUN yarn install && yarn run web:build
 
 
-FROM crowdbotics/cb-django:3.9-slim-bullseye AS release
+FROM crowdbotics/cb-django:3.9-slim-buster AS release
 ARG SECRET_KEY
 
 # Set Working directory
