@@ -74,7 +74,8 @@ class SignupViewSet(ModelViewSet):
                     points=configs.POINTS_GIFT,
                     sponsor=sponsor,
                     geo_location=geo_location,
-                    memory_type='BONUS'
+                    memory_type='BONUS',
+                    user=user,
                 )
                 configs.NUMBER_USER_POINT_GIFT += 1
 
