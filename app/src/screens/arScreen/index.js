@@ -55,7 +55,7 @@ const ARScreen = ({route}) => {
   const [unityLoading, setUnityLoading] = useState(true); // Nuevo estado para el loading de Unity al volver
   const [hasSentModelDataOnce, setHasSentModelDataOnce] = useState(false);
   const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false);
-  const [unitySceneLoaded, setUnitySceneLoaded] = useState(false);
+  const [unitySceneLoaded, setUnitySceneLoaded] = useState(true);
 
   const unityRef = useRef(null);
 
@@ -69,10 +69,9 @@ const ARScreen = ({route}) => {
     selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
-  const huntChallenge = route.params?.huntChallenge
-  const isContinuingHuntChallenge = !!huntChallenge
-
-  console.log("huntChallenge", huntChallenge)
+  // const huntChallenge = TEST_HUNT_CHALLENGE;
+  const huntChallenge = route.params?.huntChallenge;
+  const isContinuingHuntChallenge = !!huntChallenge;
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -299,8 +298,6 @@ const ARScreen = ({route}) => {
           id: "1",
           latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1],
           longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0],
-          // latitude: -25.29670612626421,
-          // longitude: -57.58969884415989,
           scale: 1.0,
           height: 1,
           isVisible: true,
@@ -348,15 +345,15 @@ const ARScreen = ({route}) => {
     modelResource,
   ]);
 
-  useEffect(() => {
-    if (notificationMode === "hunt") {
-      // console.log("se envio sendSpawnData");
-      setTimeout(() => {
-        sendSpawnData();
-        PointsCount();
-      }, 1500);
-    }
-  }, [notificationMode, locationObtainedForHunt, isUnityLoaded, selectedChallengeOverride]);
+  // useEffect(() => {
+  //   if (notificationMode === "hunt") {
+  //     // console.log("se envio sendSpawnData");
+  //     setTimeout(() => {
+  //       sendSpawnData();
+  //       PointsCount();
+  //     }, 1500);
+  //   }
+  // }, [notificationMode, locationObtainedForHunt, isUnityLoaded, selectedChallengeOverride]);
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -477,30 +474,6 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
-    // // Primero reiniciar la escena de unity
-    // resetUnityScene();
-    // if (site?.selectedMode?.mode === AR_MODES.HUNT_MODE && userLocation && site?.id) {
-    //   try {
-    //     const response = await getNextStarApi({
-    //       geo_site_id: site.id,
-    //       lat: userLocation.latitude,
-    //       lon: userLocation.longitude,
-    //     });
-
-    //     if (response?.id) {
-    //       console.log("⭐ Star data recibida desde startChallengeHandler:", response);
-    //       site = {
-    //         ...site,
-    //         starData: response.location,
-    //       };
-    //     }
-    //   } catch (error) {
-    //     console.error("❌ Error al obtener la estrella en startChallengeHandler", error);
-    //   }
-    // }
-
-    // console.log("site", site);
-
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -541,12 +514,8 @@ const ARScreen = ({route}) => {
         break;
     }
 
-    // actualizar el challenge
-    // console.log("site", site);
     setSelectedSite(site);
     setSelectedChallengeOverride(challengeData);
-
-    // setSelectedChallengeData(challengeData);
 
     // Cerrar primero el modal actual
     closeModalARMode();
@@ -683,6 +652,13 @@ const ARScreen = ({route}) => {
       return () => clearTimeout(timer);
     }
   }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
+
+  // Continuar Hunt Challenge
+  useEffect(() => {
+    if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
+      startChallengeHandler(huntChallenge);
+    }
+  }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
 
   useEffect(() => {
     if (

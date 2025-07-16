@@ -1,23 +1,13 @@
-import React, {useEffect, useRef, useState} from "react";
-import {Image, Platform, Text, View, Dimensions} from "react-native";
+import React, {useRef, useState} from "react";
+import {Image, Text, View, Dimensions} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 // @ts-ignore
 import ViewShot, {captureRef} from "react-native-view-shot";
 import {useDispatch} from "react-redux";
 
-import {SSNN} from "../../constants";
-import {
-  getARProfile,
-  postArMemory,
-  postGeoPinCheckIn,
-  starFoundAndSaveApi,
-  updateUserPointAPI,
-} from "network";
+import {AR_MODES_MENU, SSNN} from "../../constants";
+import {starFoundAndSaveApi} from "network";
 import {fontGroup, FontSizes} from "util/FontUtils";
-// import {handleError} from "util/helpers";
-// @ts-ignore
-// import {CHALLENGES_TYPE} from "constants";
-// import {updateARUserData} from "../../redux/AR";
 
 import BackgroundWithImage from "components/background";
 import AppText from "components/text";
@@ -28,7 +18,6 @@ import ShareToSocialsModal from "components/ShareToSocialsModal";
 import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
-// import userLocationHook from "screens/drawerContent/location.hook";
 import useArScreenHook from "hooks/useArScreenHook";
 import RenderHTML from "react-native-render-html";
 
@@ -39,12 +28,10 @@ const FunFactsScreen = ({route}) => {
     instagram: 0,
     others: 0,
   });
-  // const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
   const [filePath, setFilePath] = useState("");
 
   const funFactCardRef = useRef(null);
 
-  // const {initialUserLocation, getLocation} = userLocationHook();
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const dispatch = useDispatch();
 
@@ -52,8 +39,6 @@ const FunFactsScreen = ({route}) => {
   const navigation = useNavigation();
 
   const challengeObj = route?.params?.challengeObj;
-  // const captureData = route?.params?.captureData;
-  // const challengeType = route?.params?.challengeType;
 
   let challengePoints = 0;
   const initialPoints = challengeObj?.pin_challenge?.points;
@@ -64,7 +49,6 @@ const FunFactsScreen = ({route}) => {
       socialPointsCounter.instagram +
       socialPointsCounter.others;
   }
-  // const capturedDataUri = captureData;
   const fileExt = "png";
 
   const handleCaptureScreenshot = async () => {
@@ -269,7 +253,9 @@ const FunFactsScreen = ({route}) => {
 
     if (remainingStars > 1) {
       // @ts-ignore
-      navigation.navigate("ARScreen", {huntChallenge: newHuntPointChallenge});
+      navigation.navigate("ARScreen", {
+        huntChallenge: {newHuntPointChallenge, selectedMode: AR_MODES_MENU[1]},
+      });
     } else {
       resetNavigation();
     }
