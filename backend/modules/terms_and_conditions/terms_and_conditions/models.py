@@ -9,6 +9,7 @@ class TermAndCondition(models.Model):
 	author = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.PROTECT,
+		related_name="terms_and_conditions"
 		)
 	is_active = models.BooleanField(
 		default=True

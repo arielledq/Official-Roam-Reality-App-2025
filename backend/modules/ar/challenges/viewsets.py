@@ -1,8 +1,9 @@
 import json
 from itertools import chain
 from operator import attrgetter
-
+import requests
 from configuration import configs
+from travel_ar_app_42706 import settings
 from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
@@ -12,7 +13,8 @@ from .serializers import ARMemoriesSerializerGet, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, \
-    GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer
+    GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer, \
+    ElevationRequestSerializer
 from rest_framework import viewsets, exceptions
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -42,7 +44,7 @@ class SponsorViewSet(viewsets.ModelViewSet):
     """
     A simple ViewSet for viewing and editing sponsors.
     """
-    queryset = Sponsor.objects.all()
+    queryset = Sponsor.objects.filter(is_active=True)
     serializer_class = SponsorSerializer
     http_method_names = ["get"]
 
@@ -710,3 +712,45 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         if int(self.request.query_params.get("site_type")) in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return super().filter_queryset(qs)
         return qs
+
+
+class ElevationAPIView(APIView):
+
+    def get(self, request, format=None):
+        serializer = ElevationRequestSerializer(data=request.query_params)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        lat = serializer.validated_data['lat']
+        lng = serializer.validated_data['lng']
+
+        # Tilequery URL API for Mapbox tileset
+        url = f"https://api.mapbox.com/v4/mapbox.mapbox-terrain-v2/tilequery/{lng},{lat}.json"
+        params = {
+            "layers": "contour",
+            "limit": 5,
+            "access_token": settings.MAPBOX_TOKEN
+        }
+
+        try:
+            resp = requests.get(url, params=params)
+            resp.raise_for_status()
+        except requests.RequestException as e:
+            return Response(
+                {"error": "Error while trying to connect to Mapbox", "details": str(e)},
+                status=status.HTTP_502_BAD_GATEWAY
+            )
+
+        data = resp.json()
+        features = data.get("features", [])
+        # Get all elevation and using the highest one
+        elevations = [
+            feat["properties"]["ele"]
+            for feat in features
+            if "properties" in feat and "ele" in feat["properties"]
+        ]
+        if not elevations:
+            return Response({"elevation": None}, status=status.HTTP_204_NO_CONTENT)
+
+        elevation = max(elevations)
+        return Response({"elevation": elevation}, status=status.HTTP_200_OK)

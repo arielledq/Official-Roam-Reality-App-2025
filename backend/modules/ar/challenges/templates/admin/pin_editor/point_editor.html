@@ -1,0 +1,28 @@
+{% extends "admin/pin_editor/base_editor.html" %}
+{% load static %}
+{% block title %} Sites Location Editor {% endblock %}
+
+
+
+{% block extrastyles %}
+    <link href="{% static 'pin_editor/' %}dashboard.css" rel="stylesheet">
+{% endblock %}
+
+
+    {% block appvars %}
+    <script>
+        window.app_vars = {
+            mapbox_token: '{{MAPBOX_TOKEN}}',
+            mapbox_style: 'mapbox://styles/jmpy/cl3ts7w60002416o3h6s9dpyq',
+            {#mapbox_style : 'mapbox://styles/mapbox/streets-v10',#}
+
+            static_root: '{% static 'pin_editor/images/' %}'.slice(0,-1),
+            {#static_root_svg: '{% static 'pin_editor/images/svg' %}'.slice(0,-1),#}
+        }
+    </script>
+    {% endblock %}
+
+
+{% block appjs %}
+    <script type="module" src="{% static 'pin_editor/preact_app_editor.js' %}"></script>
+{% endblock %}

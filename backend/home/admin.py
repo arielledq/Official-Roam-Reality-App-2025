@@ -1,14 +1,16 @@
 from itertools import count
-
 from django.contrib import admin
 from django.db.models import (
     Sum, Value, F, OuterRef, Subquery,
-    IntegerField, ExpressionWrapper, Q
+    IntegerField, ExpressionWrapper, Q, Case, When
 )
+from django.utils.translation import gettext_lazy as _
 from django.db.models.functions import Coalesce
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.html import format_html
+
+from configuration import configs
 from modules.ar.challenges.models import (
     ARUserProfileScoreboard as ScoreboardModel, ARMemories,
     ARSitePinCheckIn, GeoLocation, Sponsor
@@ -26,6 +28,29 @@ class DestinationFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         return queryset
 
+    def choices(self, changelist):
+        """
+        Rewriting choices() to make the filter mutually exclusive.
+        """
+        # “All”
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(
+                remove=[self.parameter_name, "sponsor"]
+            ),
+            "display": _("All"),
+        }
+        # For each destination
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == str(lookup),
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup},
+                    ["sponsor"],  # remove 'sponsor'
+                ),
+                "display": title,
+            }
+
 
 class SponsorFilter(admin.SimpleListFilter):
     title = "Sponsor"
@@ -38,29 +63,46 @@ class SponsorFilter(admin.SimpleListFilter):
     def queryset(self, request, queryset):
         return queryset
 
+    def choices(self, changelist):
+        """
+        Rewriting choices() to make the filter mutually exclusive.
+        """
+        # “All”
+        yield {
+            "selected": self.value() is None,
+            "query_string": changelist.get_query_string(
+                remove=[self.parameter_name, "destination"]
+            ),
+            "display": _("All"),
+        }
+        # For each sponsor
+        for lookup, title in self.lookup_choices:
+            yield {
+                "selected": self.value() == str(lookup),
+                "query_string": changelist.get_query_string(
+                    {self.parameter_name: lookup},
+                    ["destination"],  # remove 'destination'
+                ),
+                "display": title,
+            }
+
 
 @admin.register(ScoreboardModel)
 class ScoreboardAdmin(admin.ModelAdmin):
     list_display = (
         "row_number",
-        "user",
-        # "points",                # Ar profile points
-        # "memories_points",
-        # "checkin_points",
-        # "destination_points",    # memories_points + checkin_points
-        # "sponsor_points",    # memories_points + checkin_points
+        "user_name",
         "calculated_points",    # memories_points + checkin_points
         "updated_at",
         "add_ar_memory"
     )
     list_filter = (DestinationFilter, SponsorFilter)
-    # ordering = ("-points", "-updated_at")
     readonly_fields = (
-        # "memories_points",
-        # "checkin_points",
-        # "destination_points",
         "calculated_points",
     )
+
+    def user_name(self, obj):
+        return obj.user.name
 
     def changelist_view(self, request, extra_context=None):
         self._cl_request = request
@@ -68,102 +110,69 @@ class ScoreboardAdmin(admin.ModelAdmin):
 
     def get_queryset(self, request):
         self._row_counter = count(start=1)
-        qs = super().get_queryset(request).select_related("user")
-        # Using 0 when there is no filter
-        qs = qs.annotate(
-            memories_points=Value(0, output_field=IntegerField()),
-            checkin_points=Value(0, output_field=IntegerField()),
-        )
-        memories_sq = None
-        checkins_sq = None
+        qs = (super().get_queryset(request).select_related("user").filter(user__is_superuser=False, user__is_active=True)
+        .exclude(
+            user__in=configs.SCOREBOARD_EXCLUDED_USER_IDS,
+        ))
         destination = request.GET.get("destination")
         sponsor = request.GET.get("sponsor")
+        # Subquerys
+        memories_filter = Q(user=OuterRef("user"),
+                            challenge_approval__in=["UNAPPROVED", "APPROVED"])
+        checkins_filter = Q(user=OuterRef("user"),
+                            challenge_approval__in=["UNAPPROVED", "APPROVED"])
+
         if destination:
-            qs = qs.filter(
-                Q(user__user_ar_memories__geo_location=destination) |
-                Q(user__user_ar_site_checkin__geo_location=destination)
-            ).distinct()
-
-            # Sum calculation memories
-            memories_sq = (
-                ARMemories.objects
-                .filter(
-                    user=OuterRef("user"),
-                    geo_location=destination,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
-            )
-            # Sum calculation check-ins
-            checkins_sq = (
-                ARSitePinCheckIn.objects
-                .filter(
-                    user=OuterRef("user"),
-                    geo_location=destination,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
-            )
+            memories_filter &= Q(geo_location=destination)
+            checkins_filter &= Q(geo_location=destination)
         elif sponsor:
-            qs = qs.filter(
-                Q(user__user_ar_memories__challenges__sponsor=sponsor) |
-                Q(user__user_ar_site_checkin__geo_challenge__sponsor=sponsor)
-            ).distinct()
+            memories_filter &= Q(sponsor=sponsor)
+            checkins_filter &= Q(geo_challenge__sponsor=sponsor)
 
-            # Sum calculation memories
-            memories_sq = (
-                ARMemories.objects
-                .filter(
-                    user=OuterRef("user"),
-                    challenges__sponsor=sponsor,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
-            )
-            # Sum calculation check-ins
-            checkins_sq = (
-                ARSitePinCheckIn.objects
-                .filter(
-                    user=OuterRef("user"),
-                    geo_challenge__sponsor=sponsor,
-                    challenge_approval__in=["UNAPPROVED", "APPROVED"]
-                )
-                .values("user")
-                .annotate(total=Sum("points"))
-                .values("total")
-            )
-        if memories_sq is not None and checkins_sq is not None:
-            qs = qs.annotate(
-                memories_points=Coalesce(
-                    Subquery(memories_sq, output_field=IntegerField()),
-                    Value(0),
-                ),
-                checkin_points=Coalesce(
-                    Subquery(checkins_sq, output_field=IntegerField()),
-                    Value(0),
-                ),
-            )
-
-            # Sum both memories_points and checkin_points
-            qs = qs.annotate(
-                calculated_points=ExpressionWrapper(
-                    F("memories_points") + F("checkin_points"),
-                    output_field=IntegerField(),
+        # Sum ARMemories
+        memories_sq = (
+            ARMemories.objects
+            .filter(memories_filter)
+            .values("user")
+            .annotate(
+                total=Sum(
+                    Case(
+                        When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS'],
+                             then=F('points')),
+                        When(memory_type='DEDUCTED',
+                             then=F('points') * Value(-1)),
+                        default=Value(0),
+                        output_field=IntegerField(),
+                    )
                 )
             )
+            .values("total")
+        )
 
-        # Order by destination_points if there is a filter else use ar profile points
-        if destination or sponsor:
-            qs = qs.order_by("-calculated_points", "-updated_at")
-        else:
-            qs = qs.order_by("-points", "-updated_at")
+        # Sum ARSitePinCheckIn
+        checkins_sq = (
+            ARSitePinCheckIn.objects
+            .filter(checkins_filter)
+            .values("user")
+            .annotate(total=Sum("points"))
+            .values("total")
+        )
 
+        # Save totals and sum
+        qs = qs.annotate(
+            memories_points=Coalesce(
+                Subquery(memories_sq, output_field=IntegerField()),
+                Value(0),
+            ),
+            checkin_points=Coalesce(
+                Subquery(checkins_sq, output_field=IntegerField()),
+                Value(0),
+            ),
+        ).annotate(
+            calculated_points=F("memories_points") + F("checkin_points")
+        )
+
+        qs = qs.order_by("-calculated_points", "-updated_at", "user__id")  #, "user__id"
         return qs
 
     def row_number(self, obj):
@@ -171,37 +180,16 @@ class ScoreboardAdmin(admin.ModelAdmin):
     row_number.short_description = "#"
     row_number.admin_order_field = None
 
-    # def memories_points(self, obj):
-    #     return getattr(obj, "memories_points", 0)
-    # memories_points.short_description = "Memories Points"
-    # memories_points.admin_order_field = "memories_points"
-    #
-    # def checkin_points(self, obj):
-    #     return getattr(obj, "checkin_points", 0)
-    # checkin_points.short_description = "Check-in Points"
-    # checkin_points.admin_order_field = "checkin_points"
-
     def calculated_points(self, obj):
         return getattr(obj, "calculated_points", obj.points)
     calculated_points.short_description = "Calculated Points"
     calculated_points.admin_order_field = "calculated_points"
-
-    # def destination_points(self, obj):
-    #     return getattr(obj, "destination_points", 0)
-    # destination_points.short_description = "Destination Points"
-    # destination_points.admin_order_field = "destination_points"
-    #
-    # def sponsor_points(self, obj):
-    #     return getattr(obj, "sponsor_points", 0)
-    # sponsor_points.short_description = "Sponsor Points"
-    # sponsor_points.admin_order_field = "sponsor_points"
 
     def add_ar_memory(self, obj):
         info = (ARMemories._meta.app_label, ARMemories._meta.model_name)
         base_url = reverse(f"admin:{info[0]}_{info[1]}_add")
         params = {
             "user": obj.user.id,
-            # "memory_type": "ADJUSTMENT",
             "challenge_approval": "APPROVED",
         }
         # If there is a filter active
@@ -214,11 +202,3 @@ class ScoreboardAdmin(admin.ModelAdmin):
 
     add_ar_memory.short_description = "Add AR Memory"
     add_ar_memory.allow_tags = True
-
-
-        # url = (
-        #     reverse('admin:{}_{}_add'.format(*info))
-        #     + "?"
-        #     + urlencode({"ar_memory": f"{obj.id}"})
-        # )
-

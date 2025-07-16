@@ -87,6 +87,7 @@ SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -147,7 +148,10 @@ ROOT_URLCONF = 'travel_ar_app_42706.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'web_build')],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'web_build'),
+            os.path.join(BASE_DIR, 'modules', 'ar', 'challenges', 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -223,8 +227,13 @@ AUTHENTICATION_BACKENDS = (
 )
 
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static'), os.path.join(BASE_DIR, 'web_build')]
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+    os.path.join(BASE_DIR, 'web_build'),
+    os.path.join(BASE_DIR, 'modules', 'ar', 'challenges', 'static'),
+]
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
@@ -340,3 +349,59 @@ if GS_BUCKET_NAME:
 
 
 DOMAIN=env.str("DOMAIN", "")
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
+
+JAZZMIN_SETTINGS = {
+    "custom_css": "css/admin_custom.css",
+    "sidebar_background": "purple",
+    "show_ui_builder": False,
+
+    "order_with_respect_to": ["Points editor"],
+
+    "custom_links": {
+        "challenges": [
+            {
+                "name": "Points editor",
+                "url": "admin:challenges_geoarsite_dashboard",
+                "icon": "fa fa-map",
+                "permissions": ["user.view_user"]
+            },
+        ]
+    }
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    # "border-right_text_colour": "navbar-dark",
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-indigo",
+    "accent": "accent-indigo",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-indigo",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "default",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-primary",
+        "secondary": "btn-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-success"
+    }
+}
+
+MAPBOX_TOKEN = env.str("MAPBOX_TOKEN", "")

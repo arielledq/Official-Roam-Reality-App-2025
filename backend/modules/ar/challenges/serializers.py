@@ -1,7 +1,7 @@
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
-    ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
-    ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
-    StarCollection, GeoARGoldStar, DestinationFacts, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint, \
+from django.urls import reverse
+from rest_framework.fields import SerializerMethodField
+
+from .models import GeoARStarPoint, \
     ARExperience, GeoArSiteCategory
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
@@ -34,11 +34,7 @@ class ARUserProfileSerializer(serializers.ModelSerializer):
         return ARSitePinCheckIn.objects.filter(user=instance.user).count()
 
     def get_points(self, instance):
-        if hasattr(instance.user, 'destination_points'):
-            return instance.user.destination_points
-        elif hasattr(instance.user, 'sponsor_points'):
-            return instance.user.sponsor_points
-        return instance.user.user_ar_profile.points
+        return getattr(instance.user, 'calculated_points', 0)
 
 
 class SponsorSerializer(serializers.ModelSerializer):
@@ -228,6 +224,7 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
 
 class ARMemoriesSerializer(serializers.ModelSerializer):
     memory_file = serializers.FileField()
+    sponsor = SponsorSerializer
 
     class Meta:
         model = ARMemories
@@ -244,6 +241,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "challenge_approval",
             "created_at",
             "points",
+            "sponsor",
             "geo_location",
         )
 
@@ -506,6 +504,83 @@ class GeoLocationMiniSerializer(GeoModelSerializer):
         return instance.ar_experiences.exclude(is_active=False).count()
 
 
+class GeoARSiteMarkerSerializer(serializers.ModelSerializer):
+    location = SerializerMethodField()
+    edit_link = SerializerMethodField()
+    type = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GeoArSite
+        fields = (
+            "id",
+            "name",
+            "image",
+            "location",
+            "edit_link",
+            "type",
+        )
+
+    def get_location(self, instance: GeoArSite):
+        return instance.lat_long.coords[::-1]
+
+    def get_type(self, instance: GeoArSite):
+        return instance.type
+
+
+    def get_edit_link(self, instance: GeoArSite):
+        return reverse('admin:challenges_geoarsite_change', args=[instance.id])
+
+
+class GeoARStarPointMarkerSerializer(serializers.ModelSerializer):
+    location = SerializerMethodField()
+    edit_link = SerializerMethodField()
+    site = SerializerMethodField()
+    name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GeoARStarPoint
+        fields = (
+            "id",
+            "site",
+            "name",
+            "location",
+            "edit_link",
+        )
+
+
+    def get_location(self, instance: GeoARStarPoint):
+        return instance.location.coords[::-1]
+
+    def get_edit_link(self, instance: GeoARStarPoint):
+        return reverse('admin:challenges_geoarstarpoint_change', args=[instance.id])
+
+    def get_site(self, instance: GeoARStarPoint):
+        return instance.geo_ar_star.geo_site.name
+
+    def get_name(self, instance: GeoARStarPoint):
+        return f'{instance.geo_ar_star.name} - Star #{instance.order}'
+
+class GeoARSiteMarkerSaveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GeoArSite
+        fields = (
+            "id",
+            "lat_long"
+        )
+
+class GeoARStarMarkerSaveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = GeoARStarPoint
+        # geo_field = 'geo_location'
+        fields = (
+            "id",
+            "location",
+            "elevation",
+        )
+
+
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
@@ -532,6 +607,8 @@ class GeoStarPointSerializer(GeoModelSerializer):
     remaining_stars = serializers.SerializerMethodField()
     captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
+    image = serializers.ImageField()
+    sponsors = SponsorSerializer(many=True)
 
     class Meta:
         model = GeoARStarPoint
@@ -544,8 +621,10 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "remaining_stars",
             "captured_stars",
             "total_stars",
+            "image",
             "fun_facts",
             "elevation",
+            "sponsors",
         )
 
     def get_remaining_stars(self, instance):
@@ -661,3 +740,8 @@ class ARAllMemoriesSerializer(serializers.Serializer):
         elif isinstance(instance, ARSitePinCheckIn):
             return ARSitePinCheckInSerializer(instance, context=self.context).data
         return {}
+
+
+class ElevationRequestSerializer(serializers.Serializer):
+    lat = serializers.FloatField()
+    lng = serializers.FloatField()

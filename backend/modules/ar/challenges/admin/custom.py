@@ -9,7 +9,8 @@ from django.http import HttpResponse
 
 from notifications.models import Notification, NotificationTypes
 from onesignal_client.utils import send_notification
-from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
+from travel_ar_app_42706 import settings
+from ..models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, GeoArSite, GeoLocation, \
     GeoARStar, DestinationFacts, \
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
     GeoARSiteActivity, StarCollection, \
@@ -76,8 +77,8 @@ def reject_and_notify(self, request, queryset):
                 memory_checkin.challenge_approval = "DECLINED"
                 memory_checkin.save()
 
-                user.user_ar_profile.points -= memory_checkin.points
-                user.user_ar_profile.save()
+                user.ar_user_profile_user.points -= memory_checkin.points
+                user.ar_user_profile_user.save()
             notification = Notification.objects.create(
                 title="Your submission was declined",
                 description=memory_checkin.declined_reason if memory_checkin.declined_reason else 'Your submission '
@@ -93,7 +94,6 @@ def reject_and_notify(self, request, queryset):
 
 
 class ARMemoriesAdmin(admin.ModelAdmin):
-    
     search_fields = (
         "user__name",
         "challenges__name",
@@ -111,6 +111,7 @@ class ARMemoriesAdmin(admin.ModelAdmin):
 class ARChallengeAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Challenges)
 class ARChallengeUpdatedAdmin(admin.ModelAdmin):
     list_display = ('name', 'sponsor', 'expiry_date')
@@ -121,84 +122,119 @@ class ARChallengeUpdatedAdmin(admin.ModelAdmin):
     def sponsor_name(self, obj):
         return obj.sponsor.name
 
+
 @admin.register(GeoARChallenges)
 class GeoARChallengesUpdatedAdmin(admin.ModelAdmin):
     list_display = ('name', 'expiry_date')
     search_fields = ["name"]
 
+
 class GeoArChallengeAdmin(admin.ModelAdmin):
     zoomMapWidgets = {"widget": GoogleMapsOpenLayersWidgetZoom}
     mapWidgets = {"widget": GoogleMapsOpenLayersWidget}
     zoomMapFields = {
-          MultiPolygonField: zoomMapWidgets,
-          PointField: zoomMapWidgets,
-          MultiLineStringField: zoomMapWidgets,
-          MultiPolygonField: zoomMapWidgets,
-          MultiPointField: zoomMapWidgets,
+        MultiPolygonField: zoomMapWidgets,
+        PointField: zoomMapWidgets,
+        MultiLineStringField: zoomMapWidgets,
+        MultiPolygonField: zoomMapWidgets,
+        MultiPointField: zoomMapWidgets,
     }
     mapFields = {
-          MultiPolygonField: mapWidgets,
-          PointField: mapWidgets,
-          MultiLineStringField: mapWidgets,
-          MultiPolygonField: mapWidgets,
-          MultiPointField: mapWidgets,
+        MultiPolygonField: mapWidgets,
+        PointField: mapWidgets,
+        MultiLineStringField: mapWidgets,
+        MultiPolygonField: mapWidgets,
+        MultiPointField: mapWidgets,
     }
     formfield_overrides = mapFields
 
     def get_form(self, request, obj=None, change=False, **kwargs):
-      form_class = super().get_form(request, obj, change, **kwargs)
-      if obj:
-        self.formfield_overrides = self.zoomMapFields
-      else:
-        self.formfield_overrides = self.mapFields
-      return form_class
-   
+        form_class = super().get_form(request, obj, change, **kwargs)
+        if obj:
+            self.formfield_overrides = self.zoomMapFields
+        else:
+            self.formfield_overrides = self.mapFields
+        return form_class
+
+
+class GeoARStarPointForm(forms.ModelForm):
+
+    def clean_sponsors(self):
+        sponsors = self.cleaned_data.get('sponsors')
+        if sponsors and sponsors.count() > 3:
+            raise ValidationError("No more than 3 sponsor per star.")
+        return sponsors
+
+    class Meta:
+        model = GeoARStarPoint
+        fields = '__all__'
+
+    class Media:
+        js = (
+            'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js',
+            'geoarstarpoint/geoarstarpoint_elevation.js',
+        )
+
+
+@admin.register(GeoARStarPoint)
+class GeoARStarPointAdmin(GeoArChallengeAdmin):
+    form = GeoARStarPointForm
+    change_form_template = 'admin/geoarstarpoint/change_form.html'
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['MAPBOX_TOKEN'] = settings.MAPBOX_TOKEN
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['MAPBOX_TOKEN'] = settings.MAPBOX_TOKEN
+        return super().add_view(request, form_url, extra_context)
+
+
 @admin.register(GeoLocation)
 class GeoLocationAdmin(GeoArChallengeAdmin):
-    list_display = ('name','sequence_number','view_ar_sites','add_ar_sites','view_u_ar_sites','add_u_ar_sites',)
+    list_display = ('name', 'sequence_number', 'view_ar_sites', 'add_ar_sites', 'view_u_ar_sites', 'add_u_ar_sites',)
     ordering = ('sequence_number',)
-    search_fields = ["name",'sequence_number']
+    search_fields = ["name", 'sequence_number']
 
     def add_u_ar_sites(self, obj):
         count = obj.geo_location_ar_unique_site.count()
         info = (UniqueChallengeSite._meta.app_label, UniqueChallengeSite._meta.model_name)
         url = (
-            reverse('admin:{}_{}_add'.format(*info))
-            + "?"
-            + urlencode({"geo_location": f"{obj.id}"})
+                reverse('admin:{}_{}_add'.format(*info))
+                + "?"
+                + urlencode({"geo_location": f"{obj.id}"})
         )
         return format_html('<a href="{}"> ADD Unique Sites</a>', url)
-
 
     def view_u_ar_sites(self, obj):
         count = obj.geo_location_ar_unique_site.count()
         info = (UniqueChallengeSite._meta.app_label, UniqueChallengeSite._meta.model_name)
         url = (
-            reverse('admin:{}_{}_changelist'.format(*info))
-            + "?"
-            + urlencode({"geo_location": f"{obj.id}"})
+                reverse('admin:{}_{}_changelist'.format(*info))
+                + "?"
+                + urlencode({"geo_location": f"{obj.id}"})
         )
         return format_html('<a href="{}">{} Unique Sites</a>', url, count)
-
 
     def add_ar_sites(self, obj):
         count = obj.geo_location_ar_site.count()
         info = (GeoArSite._meta.app_label, GeoArSite._meta.model_name)
         url = (
-            reverse('admin:{}_{}_add'.format(*info))
-            + "?"
-            + urlencode({"geo_location": f"{obj.id}"})
+                reverse('admin:{}_{}_add'.format(*info))
+                + "?"
+                + urlencode({"geo_location": f"{obj.id}"})
         )
         return format_html('<a href="{}"> ADD AR Sites</a>', url)
-
 
     def view_ar_sites(self, obj):
         count = obj.geo_location_ar_site.count()
         info = (GeoArSite._meta.app_label, GeoArSite._meta.model_name)
         url = (
-            reverse('admin:{}_{}_changelist'.format(*info))
-            + "?"
-            + urlencode({"geo_location": f"{obj.id}"})
+                reverse('admin:{}_{}_changelist'.format(*info))
+                + "?"
+                + urlencode({"geo_location": f"{obj.id}"})
         )
         return format_html('<a href="{}">{} AR Sites</a>', url, count)
 
@@ -207,53 +243,26 @@ class GeoLocationAdmin(GeoArChallengeAdmin):
     add_ar_sites.short_description = "Add AR Sites"
     view_ar_sites.short_description = "AR Sites"
 
+
 @admin.register(GeoRegion)
 class GeoRegionAdmin(GeoArChallengeAdmin):
     list_display = ('name',)
     ordering = ('name',)
     search_fields = ["name"]
-    
+
+
 @admin.register(UniqueChallengeSite)
 class UniqueChallengeSiteAdmin(GeoArChallengeAdmin):
     list_display = ('name',)
     ordering = ("name",)
     search_fields = ["name"]
 
-   ###########
+
+###########
 # class ARExampleVideoInline(admin.TabularInline):
 #     model = ARExampleVideo
 #     extra = 1
 #     fields = ['video_file']
-
-
-@admin.register(GeoArSite)
-class GeoArSiteAdmin(GeoArChallengeAdmin):
-    list_display = ("id",'name',"check_ins","geo_location","view_ar_stars","add_ar_stars",)
-    ordering = ("name","check_ins",)
-    search_fields = ["name","geo_location__name"]
-    list_select_related = ['geo_location']  # To avoid extra queries
-
-    def add_ar_stars(self, obj):
-        info = (GeoARStar._meta.app_label, GeoARStar._meta.model_name)
-        url = (
-            reverse('admin:{}_{}_add'.format(*info))
-            + "?"
-            + urlencode({"geo_site": f"{obj.id}"})
-        )
-        return format_html('<a href="{}"> ADD Stars Site</a>', url)
-
-    def view_ar_stars(self, obj):
-        count = obj.geo_arstar_ar_site.count()
-        info = (GeoARStar._meta.app_label, GeoARStar._meta.model_name)
-        url = (
-            reverse('admin:{}_{}_changelist'.format(*info))
-            + "?"
-            + urlencode({"geo_site": f"{obj.id}"})
-        )
-        return format_html('<a href="{}">{} Stars Site</a>', url, count)
-
-    add_ar_stars.short_description = "Add AR Stars"
-    add_ar_stars.short_description = "AR Stars"
 
 
 # class GeoARStarPontInline(admin.TabularInline):
@@ -280,14 +289,15 @@ class GeoArSiteAdmin(GeoArChallengeAdmin):
 @admin.register(GeoARStar)
 class GeoArStarAdmin(GeoArChallengeAdmin):
     list_display = ("id", 'name', "view_ar_star_points", "add_ar_star_points",)
+
     # inlines = [GeoARStarPontInline]
 
     def add_ar_star_points(self, obj):
         info = (GeoARStarPoint._meta.app_label, GeoARStarPoint._meta.model_name)
         url = (
-            reverse('admin:{}_{}_add'.format(*info))
-            + "?"
-            + urlencode({"geo_ar_star": f"{obj.id}"})
+                reverse('admin:{}_{}_add'.format(*info))
+                + "?"
+                + urlencode({"geo_ar_star": f"{obj.id}"})
         )
         return format_html('<a href="{}"> ADD Stars Point</a>', url)
 
@@ -295,9 +305,9 @@ class GeoArStarAdmin(GeoArChallengeAdmin):
         count = obj.stars.count()
         info = (GeoARStarPoint._meta.app_label, GeoARStarPoint._meta.model_name)
         url = (
-            reverse('admin:{}_{}_changelist'.format(*info))
-            + "?"
-            + urlencode({"geo_ar_star": f"{obj.id}"})
+                reverse('admin:{}_{}_changelist'.format(*info))
+                + "?"
+                + urlencode({"geo_ar_star": f"{obj.id}"})
         )
         return format_html('<a href="{}">{} Stars Point</a>', url, count)
 
@@ -317,6 +327,7 @@ class ARSitePinCheckInAdmin(admin.ModelAdmin):
 
     def user_name(self, obj):
         return obj.user.name
+
     pass
 
 
@@ -345,6 +356,7 @@ class ARExampleVideoInline(admin.TabularInline):
 class ARExampleAdmin(admin.ModelAdmin):
     inlines = [ARExampleImageInline, ARExampleVideoInline]
 
+
 @admin.register(StarCollection)
 class StarCollectionAdmin(admin.ModelAdmin):
     pass
@@ -360,13 +372,27 @@ class ARUserProfileAdmin(GeoArChallengeAdmin):
     def user_email(self, obj):
         return obj.user.email
 
+class PanicMessageAdmin(GeoArChallengeAdmin):
+
+    search_fields = (
+        "user__name",
+    )
+    list_display = ('user_name' ,"message",)
+    list_select_related = ['user']  # To avoid extra queries
+
+    def user_name(self, obj):
+        return obj.user.name
+
+    pass
+
+
 
 admin.site.register(Sponsor, ARChallengeAdmin)
 admin.site.register(ARMemories, ARMemoriesAdmin)
 admin.site.register(ARSettings, ARChallengeAdmin)
 # admin.site.register(ARExample, ARChallengeAdmin)
 admin.site.register(ARExample, ARExampleAdmin)
-admin.site.register(GeoARStarPoint, GeoArChallengeAdmin)
+# admin.site.register(GeoARStarPoint, GeoArChallengeAdmin)
 # admin.site.register(GeoARStar, GeoArChallengeAdmin)
 admin.site.register(GeoARGoldStar, GeoArChallengeAdmin)
 admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
@@ -374,20 +400,4 @@ admin.site.register(ARChallengeParameterSettings, ARChallengeAdmin)
 admin.site.register(GeoARSiteActivity, ARChallengeAdmin)
 admin.site.register(DestinationFacts, GeoArChallengeAdmin)
 # admin.site.register(ARUserProfile, GeoArChallengeAdmin)
-
-class PanicMessageAdmin(GeoArChallengeAdmin):
-    
-    search_fields = (
-        "user__name",
-    )
-    list_display = ('user_name',"message",)
-    list_select_related = ['user']  # To avoid extra queries
-
-    def user_name(self, obj):
-        return obj.user.name
-
-    pass
 admin.site.register(PanicMessage, PanicMessageAdmin)
-
-
-
