@@ -263,6 +263,24 @@ export const getARSitesStars = payload =>
     },
     logoutFunc
   );
+export const getSponsors = () =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/sponsor/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+export const getARSites = payload =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/sites/?lat=${payload.lat}&lng=${payload.lon}&site_type=${
+        payload.site_type
+      }${payload?.sponsor ? `&sponsor=${payload.sponsor}` : ""}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
 export const getARProfile = () =>
   Request.callWithToken(
     {
@@ -506,8 +524,11 @@ export const getUserFriendList = () =>
     logoutFunc
   );
 
-export const getScoreboardList = destination => {
-  const queryParams = destination ? `?destination=${destination}` : "";
+export const getScoreboardList = (pageNumber = 1, destination = "", sponsor = "") => {
+  const queryParams =
+    `?page=${pageNumber}` +
+    (sponsor ? `&sponsor=${sponsor}` : "") +
+    (destination ? `&destination=${destination}` : "");
   return Request.callWithToken(
     {
       url: `${commonApiRoute}scoreboard/${queryParams}`,

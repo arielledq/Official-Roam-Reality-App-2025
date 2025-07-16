@@ -1,4 +1,4 @@
-FROM crowdbotics/cb-django:3.9-slim-bullseye AS build
+FROM crowdbotics/cb-django:3.9-slim-buster AS build
 
 # Copy dependency management files and install app packages to /.venv
 COPY backend/Pipfile backend/Pipfile.lock /
@@ -11,7 +11,12 @@ RUN PIPENV_VENV_IN_PROJECT=1 pipenv install --deploy
 # RUN yarn install && yarn run web:build
 
 
-FROM crowdbotics/cb-django:3.9-slim-bullseye AS release
+FROM crowdbotics/cb-django:3.9-slim-buster AS release
+
+RUN sed -i 's|http://deb.debian.org/debian|http://archive.debian.org/debian|g' /etc/apt/sources.list && \
+    sed -i 's|http://security.debian.org/debian-security|http://archive.debian.org/debian-security|g' /etc/apt/sources.list && \
+    apt-get update && \
+    apt-get install -y python3-pip python3-cffi python3-brotli libpango-1.0-0 libharfbuzz0b libpangoft2-1.0-0 libcairo2 libpq-dev libpangocairo-1.0-0
 ARG SECRET_KEY
 
 # Set Working directory

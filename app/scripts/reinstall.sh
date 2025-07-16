@@ -9,5 +9,8 @@ cd ios
 bundle exec pod install
 cd ..
 
-# 4. Start Metro with cache reset
+# 4. Fix dependencies
+./scripts/fix-dependencies.sh
+
+# 5. Start Metro with cache reset
 yarn start --reset-cache

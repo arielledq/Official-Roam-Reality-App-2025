@@ -11,10 +11,14 @@ import ScoreBoard from "../screens/scoreboard";
 
 import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
+import ARScreen from "screens/arScreen";
+import FunFactsScreen from "screens/challenges/FunFactsScreen";
+// import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
 
 const Tab = createMaterialBottomTabNavigator();
 
 const BottomTabNavigator = () => {
+  // const BottomTabNavigator = ({route}: {route: any}) => {
   const theme = useTheme();
   theme.colors.secondaryContainer = "transparent";
 
@@ -27,6 +31,9 @@ const BottomTabNavigator = () => {
     );
   };
 
+  // const routeName = getFocusedRouteNameFromRoute(route) ?? "DefaultScreen";
+  // const tabBarStyle = routeName === "Go Navigate" ? {display: "none"} : {display: "flex"};
+
   return (
     <SafeAreaProvider style={styles.container}>
       <Tab.Navigator
@@ -35,6 +42,9 @@ const BottomTabNavigator = () => {
         activeColor="#FFFFFF"
         inactiveColor="#FFFFFF"
         theme={theme}
+        // screenOptions={({route}) => ({
+        //   tabBarStyle: routeName === "Go Navigate" ? {display: "none"} : {display: "flex"},
+        // })}
       >
         <Tab.Screen
           name="GeoArChallenge"
@@ -67,7 +77,8 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="Go Navigate"
           // @ts-ignore
-          component={ARTipsScreen}
+          // component={FunFactsScreen}
+          component={ARScreen}
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (
@@ -78,6 +89,7 @@ const BottomTabNavigator = () => {
                 style={styles.cameraTabStyle}
               />
             ),
+            // tabBarStyle: {display: "none"},
           }}
         />
         <Tab.Screen

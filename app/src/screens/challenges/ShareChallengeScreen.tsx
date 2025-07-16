@@ -82,6 +82,7 @@ const ArChallengeShare = () => {
   }
 
   let sponsor = challengeObj?.sponsored;
+  console.log("challengeObj", challengeObj);
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
   let sponsorImage = sponsor?.image || "";
   let sponsorName = sponsor?.name || "";
@@ -491,7 +492,6 @@ const ArChallengeShare = () => {
             ref={viewRef}
             onLayout={handleLayout}
           >
-            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
             <View style={{flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1}}>
               {fileExt == "mp4" || isVideo ? (
                 <Video
@@ -523,6 +523,7 @@ const ArChallengeShare = () => {
                 />
               )}
             </View>
+            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
 
             <View style={{alignItems: "center"}}>
               {/* Sponsor row */}
@@ -583,7 +584,7 @@ const ArChallengeShare = () => {
             )}
           </View>
         </View>
-        <View style={{gap: 8}}>
+        <View style={{gap: 8, height: 110}}>
           <View
             style={{
               flexDirection: "row",
@@ -591,6 +592,7 @@ const ArChallengeShare = () => {
               justifyContent: "space-between",
               gap: 16,
               marginTop: isMemory ? 16 : 0,
+              flex: 1,
             }}
           >
             {/* Share to socials button */}
@@ -612,7 +614,7 @@ const ArChallengeShare = () => {
             <AppButton
               onPress={endShareProfileButtonHandler}
               buttonStyle={{height: 55}}
-              containerStyle={{}}
+              containerStyle={{flex: 1}}
               titleStyle={{fontSize: FontSizes.S18, fontWeight: "bold"}}
               title={endChallengeButtonText}
               loading={isLoading}

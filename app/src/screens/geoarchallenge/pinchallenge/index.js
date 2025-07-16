@@ -369,37 +369,6 @@ const PinChallenge = () => {
     setIsUnityLoaded(true);
   };
 
-  useEffect(() => {
-    checkPermission();
-    getLocation();
-    getLocationUpdates();
-    return () => stopLocationUpdates();
-  }, []);
-
-  useEffect(() => {
-    if (challengeObj && modelFile) {
-      checkIfModelExist();
-    }
-  }, [challengeObj]);
-
-  useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.9);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 3);
-      setPosition({
-        x: parseFloat(challengeObjParameters?.positionX) || 0,
-        y: parseFloat(challengeObjParameters?.positionY) || 0,
-        z: parseFloat(challengeObjParameters?.positionZ) || 0,
-      });
-      setScale({
-        x: parseFloat(challengeObjParameters?.scale_object) || 1,
-        y: parseFloat(challengeObjParameters?.scale_object) || 1,
-        z: parseFloat(challengeObjParameters?.scale_object) || 1,
-      });
-      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
-    }
-  }, [challengeObjParameters]);
-
   const sendBloomValuesToUnity = () => {
     const bloomData = {threshold, intensity};
 
@@ -541,6 +510,44 @@ const PinChallenge = () => {
   if (!isUnityLoaded) {
     screenPadding = {paddingBottom: 24};
   }
+
+  useEffect(() => {
+    if (unityRef.current) {
+      console.log("cambio de scena");
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");
+    }
+  }, [unityRef.current]);
+
+  useEffect(() => {
+    checkPermission();
+    getLocation();
+    getLocationUpdates();
+    return () => stopLocationUpdates();
+  }, []);
+
+  useEffect(() => {
+    if (challengeObj && modelFile) {
+      checkIfModelExist();
+    }
+  }, [challengeObj]);
+
+  useEffect(() => {
+    if (challengeObjParameters) {
+      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.9);
+      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || 3);
+      setPosition({
+        x: parseFloat(challengeObjParameters?.positionX) || 0,
+        y: parseFloat(challengeObjParameters?.positionY) || 0,
+        z: parseFloat(challengeObjParameters?.positionZ) || 0,
+      });
+      setScale({
+        x: parseFloat(challengeObjParameters?.scale_object) || 1,
+        y: parseFloat(challengeObjParameters?.scale_object) || 1,
+        z: parseFloat(challengeObjParameters?.scale_object) || 1,
+      });
+      setEmissionValue(parseFloat(challengeObjParameters?.emission_value) || 1);
+    }
+  }, [challengeObjParameters]);
 
   useFocusEffect(() => {
     const timer = setTimeout(() => {

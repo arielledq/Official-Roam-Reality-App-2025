@@ -1,10 +1,10 @@
-import { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import {useState} from "react";
+import {useSelector, useDispatch} from "react-redux";
 import Geolocation from "react-native-geolocation-service";
-import { hasLocationPermission } from "../../util/LocationLib";
-import { updateUserLocationData } from "../../redux/Login";
-import { updateARSiteLocation, updateUserLocation } from "../../network";
-import { USER_TYPES } from "../../constants";
+import {hasLocationPermission} from "../../util/LocationLib";
+import {updateUserLocationData} from "../../redux/Login";
+import {updateARSiteLocation, updateUserLocation} from "../../network";
+import {USER_TYPES} from "../../constants";
 
 const GET_LOCATION_CONFIG = {
   enableHighAccuracy: true,
@@ -99,18 +99,18 @@ const userLocationHook = () => {
   };
 
   const updatePlayerUserLocationAPI = (latitude, longitude) => {
-    updateUserLocation({ latitude, longitude });
-    dispatch(updateUserLocationData({ latitude, longitude }));
+    updateUserLocation({latitude, longitude});
+    dispatch(updateUserLocationData({latitude, longitude}));
   };
 
   const clearPlayerUserLocation = () => {
-    updateUserLocation({ latitude: null, longitude: null });
+    updateUserLocation({latitude: null, longitude: null});
     dispatch(updateUserLocationData());
   };
 
   const updateBandUserLocationAPI = (latitude, longitude) => {
     updateARSiteLocation(siteId, latitude, longitude);
-    dispatch(updateUserLocationData({ latitude, longitude }));
+    dispatch(updateUserLocationData({latitude, longitude}));
   };
 
   const clearBandUserLocation = () => {
@@ -118,7 +118,7 @@ const userLocationHook = () => {
     dispatch(updateUserLocationData());
   };
 
-  const updateUserLocationAPI = async ({ latitude, longitude }) => {
+  const updateUserLocationAPI = async ({latitude, longitude}) => {
     if (!isNaN(latitude) && !isNaN(longitude)) {
       try {
         switch (userType) {
@@ -136,7 +136,7 @@ const userLocationHook = () => {
       }
     } else {
       clearLocation();
-      console.error("[location.hook] location is not a number", { latitude, longitude });
+      console.error("[location.hook] location is not a number", {latitude, longitude});
     }
   };
 

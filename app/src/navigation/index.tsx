@@ -46,7 +46,7 @@ import GeoArChallenge from "../screens/home";
 import GeoArChallengeDetails from "../screens/geoarchallenge/destinationdetails";
 import GeoArSiteDetails from "../screens/geoarchallenge/sitedetails";
 import GeoArSiteRoutes from "../screens/geoarchallenge/siteroutes";
-// import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
+import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
 import GeoArOutdoor from "../screens/geoarchallenge/outdoorgeoar";
 import ARFilter from "../screens/archallenge/FilterView";
 import Feedback from "../screens/support-send-feedback/Feedback";
@@ -55,7 +55,7 @@ import GeoArSiteArrived from "../screens/geoarchallenge/arrivedsite";
 import ChallengeSelection from "../screens/geoarchallenge/challengeselection";
 import UniqueArChallenge from "../screens/geoarchallenge/uniquechallenge";
 import PinChallenge from "../screens/geoarchallenge/pinchallenge";
-import StarChallenge from "../screens/geoarchallenge/starchallenge";
+import ARScreen from "../screens/arScreen";
 import GeoUniqueArChallengeDetails from "../screens/geoarchallenge/geouniquechallengedetails";
 import UniqueArChallengeCapture from "../screens/geoarchallenge/uniquechallengecapture";
 import UniqueArChallengeShare from "../screens/geoarchallenge/uniquechallengeshare";
@@ -67,6 +67,7 @@ import Legal from "../screens/legal";
 import ScoreBoard from "../screens/scoreboard";
 import BandHome from "screens/bandHome";
 import Notifications from "screens/notifications";
+import FunFactsScreen from "screens/challenges/FunFactsScreen";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -198,7 +199,7 @@ const Navigation = () => {
             <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
             <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
             <Stack.Screen name="PinChallenge" component={PinChallenge} />
-            <Stack.Screen name="StarChallenge" component={StarChallenge} />
+            <Stack.Screen name="ARScreen" component={ARScreen} />
             <Stack.Screen
               name="GeoUniqueArChallengeDetails"
               component={GeoUniqueArChallengeDetails}
@@ -213,6 +214,7 @@ const Navigation = () => {
             <Stack.Screen name="FAQ" component={FAQ} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Legal" component={Legal} />
+            <Stack.Screen name="FunFactsScreen" component={FunFactsScreen} />
             {sharedRoutes}
           </>
         );

@@ -1,16 +1,16 @@
-import React, { createContext, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getDestinationFactsAll } from "./network";
-import { isPointInPolygon } from "./util/helpers";
+import React, {createContext, useEffect, useState} from "react";
+import {useDispatch, useSelector} from "react-redux";
+import {getDestinationFactsAll} from "./network";
+import {isPointInPolygon} from "./util/helpers";
 import DestinationFactModal from "./screens/DestinationFactModal/DestinationFactModal";
-import { updateDestinationVisited } from "./redux/AR/reducer";
+import {updateDestinationVisited} from "./redux/AR/reducer";
 import userLocationHook from "./screens/drawerContent/location.hook";
-import { USER_TYPES } from "constants";
+import {USER_TYPES} from "constants";
 
 export const GeolocationContext = createContext();
 
-export const GeolocationProvider = ({ children }) => {
-  const userToken = useSelector(state => state.login.data.token);
+export const GeolocationProvider = ({children}) => {
+  const userToken = useSelector(state => state.login?.data?.token);
   const userVisitedDestinations = useSelector(state => state.ar.destinationVisited);
   const dispatch = useDispatch();
   const [destinationFactsAll, setDestinationFactsAll] = useState([]);
@@ -19,7 +19,7 @@ export const GeolocationProvider = ({ children }) => {
   const user = useSelector(state => state.login.data);
   const userType = user?.type || 0;
 
-  const { initialUserLocation: userLocation, getLocation } = userLocationHook();
+  const {initialUserLocation: userLocation, getLocation} = userLocationHook();
 
   const getDestinationFacts = () => {
     getDestinationFactsAll().then(res => {
@@ -46,7 +46,7 @@ export const GeolocationProvider = ({ children }) => {
 
   useEffect(() => {
     if (userLocation && !openDestinationFactModal) {
-      for (let i = 0; i < destinationFactsAll.length; i++) {
+      for (let i = 0; i < destinationFactsAll?.length; i++) {
         const isInside = isPointInPolygon(
           [userLocation?.longitude, userLocation?.latitude],
           destinationFactsAll[i].border.coordinates
@@ -62,7 +62,7 @@ export const GeolocationProvider = ({ children }) => {
   }, [userLocation]);
 
   return (
-    <GeolocationContext.Provider value={{ userLocation }}>
+    <GeolocationContext.Provider value={{userLocation}}>
       <DestinationFactModal
         isVisible={openDestinationFactModal}
         onClose={() => setOpenDestinationFactModal(false)}

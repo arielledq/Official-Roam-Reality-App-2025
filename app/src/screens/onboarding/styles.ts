@@ -37,10 +37,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 25,
   },
   btnContainer: {
-    width: "90%",
+    width: "100%",
     paddingHorizontal: 10,
-    position: "absolute",
-    bottom: 20,
   },
 }));
 

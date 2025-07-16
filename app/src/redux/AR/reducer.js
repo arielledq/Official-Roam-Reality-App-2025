@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import {createSlice} from "@reduxjs/toolkit";
 
 const initialState = {
   arProfile: {},
@@ -9,6 +9,11 @@ const initialState = {
   selectedGeoARSiteStars: [],
   destinationFactsAll: [],
   destinationVisited: [],
+
+  destinationData: [],
+  starSitesCount: {},
+
+  sponsors: [],
 };
 
 export const sliceAR = createSlice({
@@ -61,6 +66,18 @@ export const sliceAR = createSlice({
     updateDestinationVisited: (state, action) => {
       state.destinationVisited.push(action.payload);
     },
+    updateDestinationData: (state, action) => {
+      state.destinationData = action.payload;
+    },
+    updateStarSitesCount: (state, action) => {
+      state.starSitesCount = {
+        ...state.starSitesCount,
+        ...action.payload,
+      };
+    },
+    updateSponsors: (state, action) => {
+      state.sponsors = action.payload;
+    },
   },
 });
 
@@ -75,4 +92,8 @@ export const {
   updateDestinationFactsAll,
   updateDestinationVisited,
   updateSelectedDestinationBandLocation,
+
+  updateDestinationData,
+  updateStarSitesCount,
+  updateSponsors,
 } = sliceAR.actions;
