@@ -314,7 +314,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 title={
                   <Text
                     style={{
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: 500,
                       color: theme.lightColors?.white,
                       textAlign: "center",
@@ -334,7 +334,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 title={
                   <Text
                     style={{
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: 500,
                       color: theme.lightColors?.white,
                       textAlign: "center",
