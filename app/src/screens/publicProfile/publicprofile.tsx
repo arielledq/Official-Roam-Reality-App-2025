@@ -209,6 +209,9 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
         />
         <View style={_styles.scoreboardContainer}>
           <AppText
+            onPress={() => {
+              navigation.navigate("TabNavigator", {screen: "Tab", params: {screen: "Scores"}});
+            }}
             adjustsFontSizeToFit={true}
             numberOfLines={1}
             style={_styles.scoreboard}

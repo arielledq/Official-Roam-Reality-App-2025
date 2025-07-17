@@ -592,7 +592,7 @@ const ArChallengeShare = () => {
               justifyContent: "space-between",
               gap: 16,
               marginTop: isMemory ? 16 : 0,
-              flex: 1,
+              height: 55,
             }}
           >
             {/* Share to socials button */}

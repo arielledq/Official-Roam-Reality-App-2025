@@ -231,7 +231,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     if (!email) return;
     sendCode({email: email.toLowerCase()});
     setIsTransitioning(true);
-    // @ts-expect-error
     navigation.navigate("EmailVerification", {
       email: email.toLowerCase(),
       profile: true,
@@ -282,7 +281,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           containerStyle={[
             _styles.editButtonContainer,
             {
-              top: Platform.OS === "ios" ? 130 : 110,
+              top: Platform.OS === "ios" ? 90 : 60,
             },
           ]}
           onPress={() => {
@@ -311,7 +310,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           isVerified={userProfile?.user_profile?.is_verified}
         />
         <View style={_styles.scoreboardContainer}>
-          <AppText adjustsFontSizeToFit={true} numberOfLines={1} style={_styles.scoreboard}>
+          <AppText
+            onPress={() => navigation.navigate("Scores")}
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={_styles.scoreboard}
+          >
             SCOREBOARD
           </AppText>
         </View>
