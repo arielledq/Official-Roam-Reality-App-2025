@@ -2,7 +2,7 @@ from django.urls import reverse
 from rest_framework.fields import SerializerMethodField
 
 from .models import GeoARStarPoint, \
-    ARExperience, GeoArSiteCategory
+    ARExperience, GeoArSiteCategory, ScanPicture
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
     ARSettings, ARExample, GeoLocation, GeoArSite, ARChallengeParameterSettings, \
     ARChallengeFilters, UniqueChallengeSite, GeoRegion, GeoARChallenges, GeoARStar, ARSitePinCheckIn, \
@@ -334,6 +334,15 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
         )
 
 
+class ScanPictureSerializer(serializers.ModelSerializer):
+    file_image = serializers.ImageField()
+    file_animation = serializers.FileField()
+
+    class Meta:
+        model = ScanPicture
+        fields = ['name', 'file_image', 'file_animation',]
+
+
 class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
     pin_challenge = GeoARChallengesSerializer(read_only=True)
@@ -341,6 +350,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     check_ins = serializers.SerializerMethodField()
     user_attempts = serializers.SerializerMethodField()
     sponsor = SponsorSerializer(read_only=True)
+    scan_pictures = ScanPictureSerializer(many=True)
 
     class Meta:
         model = GeoArSite
@@ -367,6 +377,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "sponsor",
             "is_active",
             "band_user",
+            "scan_pictures",
         )
 
     def get_check_ins(self, obj):
