@@ -110,7 +110,7 @@ class PanicMessageViewSet(ViewSet):
 class ARMemoriesViewSet(ViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ARMemories.objects.all()
+    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO'])
     serializer_class = ARMemoriesSerializer
     parser_class = (FileUploadParser,)
 
@@ -661,7 +661,7 @@ class MemoryCheckinViewSet(ViewSet):
     def list(self, request):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
-            all_user_memories = ARMemories.objects.filter(user=request.user.id)
+            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO'])
             result_list = sorted(
                 chain(all_user_check_in, all_user_memories),
                 key=attrgetter('created_at'),
