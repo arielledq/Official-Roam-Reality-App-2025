@@ -97,6 +97,15 @@ class LoginViewSet(ViewSet):
     serializer_class = AuthTokenSerializer
 
     def create(self, request):
+        username = request.data.get('username')
+
+        user = User.objects.filter(email=username).first()
+        if user is not None and not user.is_active:
+            return Response(
+                {"message": "Your account is inactive. Please contact support."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         serializer = self.serializer_class(
             data=request.data, context={"request": request}
         )
