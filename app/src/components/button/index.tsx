@@ -20,7 +20,11 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
   const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
   const colors = customColors || defaultColors;
   return (
-    <TouchableOpacity onPress={otherProps.onPress} style={[styles.containerStyle, containerStyle]}>
+    <TouchableOpacity
+      onPress={otherProps.onPress}
+      style={[styles.containerStyle, containerStyle]}
+      disabled={otherProps?.disabled}
+    >
       <LinearGradient
         colors={colors}
         start={{x: 0, y: 1}}

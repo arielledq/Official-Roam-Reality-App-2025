@@ -22,6 +22,7 @@ import AppButton from "../../../components/button";
 // @ts-ignore
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import theme from "assets/theme";
+import Toast from "react-native-toast-message";
 
 const {width} = Dimensions.get("window");
 
@@ -132,7 +133,11 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
           break;
       }
     } else {
-      showMessage("You have already completed the challenge.", "info", "AR Challenges");
+      Toast.show({
+        type: "info",
+        text1: "AR Challenge Info",
+        text2: "You will be allowed to check in after " + coolDownHoursText,
+      });
     }
   };
 
@@ -171,6 +176,16 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
       getExample();
     }
   }, [isFocused]);
+
+  useEffect(() => {
+    if (isChallengeDone && coolDownHoursText) {
+      Toast.show({
+        type: "info",
+        text1: "AR Challenge Info",
+        text2: "You will be allowed to check in after " + coolDownHoursText,
+      });
+    }
+  }, [isChallengeDone, coolDownHoursText]);
 
   const openExample = () => {
     const examplesList = examples?.length ? examples[0] : null;
@@ -311,19 +326,13 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 onPress={() => navigateToChallengeCapture(true)}
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
-                title={
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: theme.lightColors?.white,
-                      textAlign: "center",
-                    }}
-                  >
-                    Upload from Gallery
-                  </Text>
-                }
-                disabled={isLoading}
+                titleStyle={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  textAlign: "center",
+                }}
+                title="Upload from Gallery"
+                disabled={isLoading || isChallengeDone}
               />
             </View>
             <View style={{flex: 1}}>
@@ -331,19 +340,13 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 onPress={() => navigateToChallengeCapture(false)}
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
-                title={
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      fontWeight: 500,
-                      color: theme.lightColors?.white,
-                      textAlign: "center",
-                    }}
-                  >
-                    Capture from Camera
-                  </Text>
-                }
-                disabled={isLoading}
+                titleStyle={{
+                  fontSize: 12,
+                  fontWeight: 500,
+                  textAlign: "center",
+                }}
+                title="Capture from Camera"
+                disabled={isLoading || isChallengeDone}
               />
             </View>
           </View>
@@ -353,7 +356,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
             buttonStyle={styles.buttonStyle}
             containerStyle={styles.buttonContainerStyle}
             title={"Start Challenge"}
-            disabled={isLoading}
+            disabled={isLoading || isChallengeDone}
           />
         )}
       </View>
