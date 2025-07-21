@@ -526,6 +526,17 @@ const PinChallenge = () => {
   }
 
   useEffect(() => {
+  if (isUnityLoaded === false) {
+    setUnitySceneLoaded(false);
+  }
+  else {
+    setUnitySceneLoaded(true);
+  }
+}, [isUnityLoaded,]);
+
+
+
+  useEffect(() => {
     if (unityRef.current) {
       console.log("cambio de scena");
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");
@@ -564,6 +575,7 @@ const PinChallenge = () => {
   }, [challengeObjParameters]);
 
   useFocusEffect(() => {
+
     const timer = setTimeout(() => {
       if (unityRef.current) {
         PointsCount();
@@ -606,12 +618,6 @@ console.log("isUnityLoaded, unitySceneLoaded", isUnityLoaded, unitySceneLoaded)
           return;
         }
 
-        if (isUnityLoaded === false) {
-          setUnitySceneLoaded(false);
-        }
-        else {
-          setUnitySceneLoaded(true);
-        }
         isFocusedRef.current = true;
         setShouldRenderUnity(true);
         return () => {
