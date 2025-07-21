@@ -86,16 +86,17 @@ const ArChallengeShare = () => {
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
   let sponsorImage = sponsor?.image || "";
   let sponsorName = sponsor?.name || "";
-  let startDate = moment().format("MM-DD-YYYY");
+  const startDate = isMemory
+    ? moment(challengeObj?.created_at).format("MM-DD-YYYY")
+    : moment().format("MM-DD-YYYY");
   let endChallengeButtonText = "End & Share to Roam Profile";
+
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
-      if (isMemory) startDate = "-";
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
-      if (isMemory) startDate = "-";
       break;
     case CHALLENGES_TYPE.STAR:
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
@@ -103,7 +104,6 @@ const ArChallengeShare = () => {
       sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
       sponsorImage = sponsor?.image;
       sponsorName = sponsor?.name;
-      if (isMemory) startDate = "-";
       const remainingStars = challengeObj?.remaining_stars;
       if (remainingStars > 1) {
         challengePoints = 0;
@@ -240,11 +240,11 @@ const ArChallengeShare = () => {
         }
       } else {
         console.error("Success - Error al compartir el desafío:", res);
-        handleError("There was an error sharing your challenge: " + res?.message);
+        handleError("There was an error sharing your challenge");
       }
     } catch (error) {
       console.error("Catch - Error al compartir el desafío:", error);
-      handleError("There was an error sharing your challenge: " + error);
+      handleError("There was an error sharing your challenge");
     } finally {
       setIsLoading(false);
     }
@@ -293,6 +293,7 @@ const ArChallengeShare = () => {
   };
 
   const resetNavigation = () => {
+    console.log("resetNavigation");
     navigation.reset({
       index: 0,
       // @ts-ignore
@@ -548,18 +549,16 @@ const ArChallengeShare = () => {
               </View>
 
               {/* Completion date */}
-              {!isMemory && challengeTitle && (
-                <Text
-                  style={{
-                    ...fontGroup.nunitoLight,
-                    fontWeight: "300",
-                    fontSize: FontSizes.S10,
-                    color: theme.lightColors?.white,
-                  }}
-                >
-                  Completed on: {startDate}
-                </Text>
-              )}
+              <Text
+                style={{
+                  ...fontGroup.nunitoLight,
+                  fontWeight: "300",
+                  fontSize: FontSizes.S10,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                Completed on: {startDate}
+              </Text>
             </View>
           </View>
 

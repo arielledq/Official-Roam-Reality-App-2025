@@ -246,6 +246,8 @@ const ScoreBoard = ({}) => {
     );
   });
 
+  console.log("userProfile", userProfile);
+
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
       {/* Tabs */}

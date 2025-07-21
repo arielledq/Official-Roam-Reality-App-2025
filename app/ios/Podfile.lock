@@ -1702,7 +1702,7 @@ PODS:
     - Yoga
   - react-native-render-html (6.3.4):
     - React-Core
-  - react-native-safe-area-context (5.5.1):
+  - react-native-safe-area-context (5.5.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1717,8 +1717,8 @@ PODS:
     - React-hermes
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.5.1)
-    - react-native-safe-area-context/fabric (= 5.5.1)
+    - react-native-safe-area-context/common (= 5.5.2)
+    - react-native-safe-area-context/fabric (= 5.5.2)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1728,7 +1728,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/common (5.5.1):
+  - react-native-safe-area-context/common (5.5.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1752,7 +1752,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/fabric (5.5.1):
+  - react-native-safe-area-context/fabric (5.5.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2537,7 +2537,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (4.11.1):
+  - RNScreens (4.13.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2561,9 +2561,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.11.1)
+    - RNScreens/common (= 4.13.0)
     - Yoga
-  - RNScreens/common (4.11.1):
+  - RNScreens/common (4.13.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3109,7 +3109,7 @@ SPEC CHECKSUMS:
   react-native-onesignal: 0829ce2a504db26dd80eaf14d4e0211ea626fe62
   react-native-pager-view: 919534782a0489f7e2aeeb9a8b8959edfd3f067a
   react-native-render-html: 5afc4751f1a98621b3009432ef84c47019dcb2bd
-  react-native-safe-area-context: 091add53da15b67c76b176724725581b29a1cde3
+  react-native-safe-area-context: 7e926a200d4bc9c56562275743705c6b56176455
   react-native-unity: 9bf992c92225077eca177f71734e54d0a9a65444
   react-native-video: 8b867791128487bf82c9b6070ceddd2697bfabec
   react-native-view-shot: 57c7b8158751f19f32cb885109574712955ea016
@@ -3159,7 +3159,7 @@ SPEC CHECKSUMS:
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59
   RNPermissions: 80dd7d874d61698ddbef797d674415257399bcbc
   RNReanimated: 722d67dfde539bfe29b572878f4bc805f727726b
-  RNScreens: 482e9707f9826230810c92e765751af53826d509
+  RNScreens: 462f515a985afd52c518f749722b0c056ea8e25f
   RNShare: 27d19f1913a5f341e1e91496e8848e42bd6e0329
   RNSound: 314cc5226453ef4a3314a196c65e8a65e5106a7b
   RNSVG: 8a1054afe490b5d63b9792d7ae3c1fde8c05cdd0
