@@ -29,6 +29,7 @@ const Images = {
   CloseModal: require("./closeModal.png"),
   TikTokShare: require("./tiktok-share.png"),
   Earth: require("./Earth.png"),
+  ProfilePlaceholder: require("./profile_placeholder.png"),
 };
 
 export default Images;

@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Keyboard, Pressable, Text, View} from "react-native";
+import {Image, Keyboard, Pressable, Text, View} from "react-native";
 import {Formik} from "formik";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {Dropdown} from "react-native-element-dropdown";
@@ -7,6 +7,7 @@ import DatePicker from "react-native-date-picker";
 import axios from "axios";
 import {Asset, CameraOptions, launchImageLibrary} from "react-native-image-picker";
 import {useDispatch, useSelector} from "react-redux";
+import {Button, Dialog, Portal} from "react-native-paper";
 
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import {DateFormat, formatDate} from "../../util/DateUtils";
@@ -28,11 +29,13 @@ import useStyles from "./styles";
 import theme from "../../assets/theme";
 import {Icons} from "../../assets/Icons";
 import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
+import Images from "../../assets/images";
 
 interface ImageData {
   uri: string | undefined;
   type: string | undefined;
   name: string;
+  default: boolean;
 }
 
 const GENDERS = [
@@ -91,6 +94,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     value: userData?.home_country ?? "",
   });
   const [detailsShow, setDetailsShow] = useState(false);
+  const [showDialog, setShowDialog] = useState(false);
+  const [pendingValues, setPendingValues] = useState<any>(null);
+
   const dispatch = useDispatch();
   const _styles = useStyles();
   const nameRef = useRef();
@@ -115,6 +121,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       uri: image.uri,
       type: image.type,
       name: Date.now() + ".jpeg",
+      default: false,
     });
   }
 
@@ -242,14 +249,21 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   useEffect(() => {
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
+      const pImageUri = Image.resolveAssetSource(Images.ProfilePlaceholder).uri;
       formikRef.current.setValues({
-        pImage: userData?.image || undefined,
+        pImage: userData?.image || pImageUri,
         name: userData?.user?.name || "",
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
         address: userData?.home_address || "",
         country: userData?.home_country || "",
         date_of_birth: dob ? dateToString(dob) : "",
+      });
+      setPhotoDetails({
+        uri: userData?.image || pImageUri,
+        type: "image/png",
+        name: "profile.png",
+        default: true,
       });
     }
   }, [userData]);
@@ -266,7 +280,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         <Formik
           innerRef={formikRef}
           initialValues={initialFormValues}
-          onSubmit={values => handleEditProfile(values)}
+          onSubmit={values => {
+            if (!edit && photoDetails?.default) {
+              setPendingValues(values);
+              setShowDialog(true);
+            } else {
+              handleEditProfile(values);
+            }
+          }}
           enableReinitialize
           validationSchema={EditProfileSchema}
         >
@@ -362,7 +383,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       }}
                       renderLeftIcon={() => (
                         <Icon
-                          name={"meh"}
+                          name={"idcard"}
                           family="antdesign"
                           color={
                             (touched.gender && errors?.gender && !gender?.value) ||
@@ -531,7 +552,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       <View style={_styles.iconContainer}>
                         <Icon
                           onPress={() => {}}
-                          name={"camerao"}
+                          name={"calendar"}
                           family="antdesign"
                           color={
                             touched.date_of_birth && errors?.date_of_birth && !bDate
@@ -566,17 +587,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           </AppText>
                         </View>
                       )}
-                      <Icon
-                        onPress={() => {}}
-                        name={"calendar"}
-                        family="antdesign"
-                        color={
-                          touched.date_of_birth && errors?.date_of_birth && !bDate
-                            ? theme.lightColors?.white
-                            : theme.lightColors?.grey0
-                        }
-                        size={24}
-                      />
                     </Pressable>
                     {touched.date_of_birth && errors?.date_of_birth && !bDate ? (
                       <Text style={[_styles.errorText, {marginTop: 5}]}>
@@ -624,6 +634,69 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
           setDetailsShow(false);
         }}
       />
+
+      <Portal>
+        <Dialog
+          visible={showDialog}
+          onDismiss={() => setShowDialog(false)}
+          style={{
+            backgroundColor: "#1E1E2D",
+            borderRadius: 12,
+            padding: 16,
+          }}
+        >
+          <Dialog.Title style={{color: "white"}}>Make sure to add a profile picture</Dialog.Title>
+          <Dialog.Content>
+            <Text style={{color: "#B8B8B8", fontSize: 14, lineHeight: 20}}>
+              Are you sure you want to continue without a profile picture?
+            </Text>
+          </Dialog.Content>
+          <Dialog.Actions
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              paddingHorizontal: 0,
+              marginTop: 8,
+              gap: 8,
+            }}
+          >
+            <Button
+              mode="text"
+              onPress={() => {
+                if (pendingValues) {
+                  handleEditProfile(pendingValues);
+                  setShowDialog(false);
+                }
+              }}
+              textColor="#FF3B30"
+              style={{
+                borderRadius: 8,
+                width: 100,
+              }}
+              labelStyle={{
+                paddingVertical: 8,
+                fontSize: 14,
+                fontWeight: "600",
+              }}
+            >
+              Skip
+            </Button>
+
+            <View style={{flex: 1}}>
+              <AppButton
+                title="Add profile picture"
+                onPress={() => setShowDialog(false)}
+                buttonStyle={{
+                  height: 40,
+                }}
+                titleStyle={{
+                  fontSize: 14,
+                }}
+              />
+            </View>
+          </Dialog.Actions>
+        </Dialog>
+      </Portal>
     </BackgroundWithImage>
   );
 };
