@@ -89,10 +89,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     label: userData?.gender ?? "",
     value: userData?.gender ?? "",
   });
-  const [country, setCountry] = useState({
-    label: userData?.home_country ?? "",
-    value: userData?.home_country ?? "",
-  });
   const [detailsShow, setDetailsShow] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [pendingValues, setPendingValues] = useState<any>(null);
@@ -153,7 +149,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const handleEditProfile = (values: any) => {
     const formattedDate = dateToString(bDate);
     // Check if country has a value, if not, use the existing value
-    const updatedCountry = country.value ? country.value : userData?.home_country;
+    const updatedCountry = values.country ? values.country : userData?.home_country;
     const updatedGender = gender.value ? gender.value : userData?.gender;
     // Check if formattedDate has a value, if not, use the existing value
     const updatedDateOfBirth = formattedDate ? formattedDate : userData?.date_of_birth;
@@ -480,13 +476,13 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       style={[
                         _styles.dropdown,
                         isCountryDropDownFocused ? _styles.focusedInput : {},
-                        touched.country && errors?.country && !country?.value
+                        touched.country && errors?.country && !values.country
                           ? _styles.inputError
                           : {},
                       ]}
                       placeholderStyle={{
                         color:
-                          (touched.country && errors?.country && !country?.value) ||
+                          (touched.country && errors?.country && !values.country) ||
                           isCountryDropDownFocused
                             ? theme.lightColors?.white
                             : theme.lightColors?.grey0,
@@ -517,14 +513,13 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       value={values.country}
                       onChange={item => {
                         setFieldValue("country", item.value);
-                        setCountry(item);
                       }}
                       renderLeftIcon={() => (
                         <Icon
                           name={"enviromento"}
                           family="antdesign"
                           color={
-                            (touched.country && errors?.country && !country?.value) ||
+                            (touched.country && errors?.country && !values.country) ||
                             isCountryDropDownFocused
                               ? theme.lightColors?.white
                               : theme.lightColors?.grey0
@@ -533,7 +528,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         />
                       )}
                     />
-                    {touched.country && errors?.country && !country?.value ? (
+                    {touched.country && errors?.country && !values.country ? (
                       <Text style={_styles.errorText}>{errors.country}</Text>
                     ) : undefined}
                   </View>
