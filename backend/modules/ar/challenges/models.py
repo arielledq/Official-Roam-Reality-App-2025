@@ -608,6 +608,17 @@ class ARExampleVideo(models.Model):
         return f'AR Example Video Id: {self.id} - {self.ar_example.name}'
 
 
+class ScanPicture(models.Model):
+    name = models.CharField(
+        _("Name"), default=None, null=False, blank=False, max_length=255
+    )
+    file_image = models.ImageField(upload_to="scanpicture/img/")
+    file_animation = models.FileField(upload_to="scanpicture/animation/")
+
+    def __str__(self):
+        return self.name
+
+
 class GeoArSite(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
@@ -663,6 +674,8 @@ class GeoArSite(models.Model):
     band_user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="geo_ar_site_band_user", null=True, blank=True
     )
+
+    scan_pictures = models.ManyToManyField(ScanPicture, related_name="geo_sites", blank=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"
@@ -994,4 +1007,3 @@ class PanicMessage(models.Model):
     class Meta:
         verbose_name_plural = "Panic Messages"
         verbose_name = "Panic Message"
-

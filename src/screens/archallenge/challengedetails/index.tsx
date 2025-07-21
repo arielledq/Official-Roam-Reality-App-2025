@@ -158,6 +158,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
 
           if (coolDownParams) {
             setCoolDownHoursText(coolDownParams?.coolDownHoursText);
+            !coolDownParams?.coolDownFinished && setIsChallengeDone(true)
           } else {
             setCoolDownHoursText("0h");
           }
