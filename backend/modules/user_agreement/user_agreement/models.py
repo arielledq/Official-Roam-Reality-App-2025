@@ -5,13 +5,13 @@ from ckeditor.fields import RichTextField
 
 # Create your models here.
 
-class TermAndCondition(models.Model):
+class UserAgreement(models.Model):
 
 	body = RichTextField()
 	author = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.PROTECT,
-		related_name="terms_and_conditions"
+		related_name="user_agreement"
 		)
 	is_active = models.BooleanField(
 		default=True
