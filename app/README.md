@@ -29,16 +29,26 @@ yarn fix-deps
 yarn start
 ```
 
+### Aditional considerations
+
+- Library `react-native-maps`
+  - Use `1.24.3` for iOS
+  - Use `1.20.1` for Android
+
 ### iOS Additional Setup
+
+1️⃣ - Only the first time
+⚠️ - Always check
 
 #### iOS Add frameworks
 
-1.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`.
-2.  Add `New Copy Files Phase`.
-3.  Select `Add Other...` and then the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
-4.  Choose the `Frameworks` option.
-5.  Move the added files into the `Frameworks`.
-6.  Add a `Run script` with the following code:
+1.  1️⃣ - Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Phases > +`.
+2.  1️⃣ - Add `New Copy Files Phase`.
+3.  1️⃣ - Select `Add Other...` and then the `MvnCorder, NativeScreenRecorder` folders inside the compiled iOS build from Unity.
+4.  ⚠️ - Make sure that these folders are moved outside of the `ios` folder from the `unity/builds` folder, e.g. `unity/builds/Frameworks/MvnCorder` and `unity/builds/Frameworks/NativeScreenRecorder`. The empty `Frameworks` folder from the `ios` folder should be kept.
+5.  1️⃣ - Choose the `Frameworks` option.
+6.  1️⃣ - Move the added files into the `Frameworks`.
+7.  1️⃣ - Add a `Run script` with the following code:
 
 ```
    cd "${CONFIGURATION_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/Frameworks/UnityFramework.framework/"
@@ -47,8 +57,8 @@ yarn start
    fi
 ```
 
-7.  Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`.
-8.  Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields.
+8.  1️⃣ - Go to `travel_ar_app425706 > Targets > travel_ar_app425706 > Build Settings > Search Path`.
+9.  1️⃣ - Add the full path of the Framework folder from the built iOS Unity compilation on the `Debug` and `Release` fields.
 
 ## Unity Configuration
 
@@ -107,6 +117,14 @@ yarn build-aab
 
 Follow standard iOS release procedures through Xcode.
 
+#### Additional Considerations
+
+- Open the bundle from the `Organizer` in Xcode
+- `Show the content` of the bundle and navigate to `Products > Applications > travel_ar_app_42706`
+- `Show the content` again and navigate to `Frameworks > UnityFramework.framework > Frameworks`
+- Delete the `MvnCorder.framework` and `NativeScreenRecorder.framework` from the folder
+- Upload the bundle to the App Store
+
 ## Troubleshooting
 
 If you encounter any issues during setup or building, please check the following:
@@ -115,6 +133,7 @@ If you encounter any issues during setup or building, please check the following
 - Verify Unity version compatibility
 - Check that all required frameworks are properly linked
 - Confirm signing certificates are properly configured
+- Use the `yarn reinstall` command to clean and reinstall dependencies and leftover development files and caches.
 
 ## Contributing
 
