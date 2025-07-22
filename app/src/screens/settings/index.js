@@ -93,7 +93,7 @@ const Settings = () => {
       </View>
       <ConfirmationPopUp
         title={"Delete Account"}
-        description={"Are you sure you want to delete you account? This action is irreversible."}
+        description={"Are you sure you want to delete your account? This action is irreversible."}
         confirmText={"Accept and Continue"}
         confirmHandler={handleDeleteAccount}
         isVisible={isOpenDeleteModal}

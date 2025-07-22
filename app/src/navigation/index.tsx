@@ -68,8 +68,8 @@ import ScoreBoard from "../screens/scoreboard";
 import BandHome from "screens/bandHome";
 import Notifications from "screens/notifications";
 import FunFactsScreen from "screens/challenges/FunFactsScreen";
-import Waiver from "../../../src/screens/waiver";
-import UserAgreement from "../../../src/screens/userAgreement";
+import Waiver from "screens/waiver";
+import UserAgreement from "screens/userAgreement";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Drawer = createDrawerNavigator();
@@ -146,6 +146,8 @@ const Navigation = () => {
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+        <Stack.Screen name="Waiver" component={Waiver} />
+        <Stack.Screen name="UserAgreement" component={UserAgreement} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
         <Stack.Screen name="TabNavigator" component={DrawerNav} />

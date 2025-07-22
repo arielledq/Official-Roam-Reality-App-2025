@@ -6,6 +6,7 @@ import { AppHeader } from '../../components';
 import { getTermsAndConditions } from '../../network';
 import ScreenLoader from '../../components/screenLoader';
 import { FontSizes } from '../../util/FontUtils';
+import RenderHTML from "react-native-render-html";
 
 
 const { width } = Dimensions.get('window');
@@ -15,7 +16,7 @@ const TermsAndConditions = () => {
   const [html, setHtml] = useState('')
   useEffect(() => {
     getTermsAndConditions().then((res) => {
-      setHtml(res.data[0].body)
+      setHtml(res.data[0].body?.replace(/#000000/g, "#fff"))
     }).finally(() => setLoading(false))
   }, [])
   return (
@@ -27,13 +28,15 @@ const TermsAndConditions = () => {
         style={{ marginHorizontal: 20 }
         }
       >
-        <Text
-          style={{
-            lineHeight: 19.1,
-            color: '#fff',
-            fontSize: FontSizes.S14
+        <RenderHTML
+          tagsStyles={{
+            p: { color: "#fff", fontSize: FontSizes.S14 },
+            ol: { color: "#fff", fontSize: FontSizes.S14 },
+            strong: { color: "#fff", fontSize: FontSizes.S18 },
           }}
-        >{html}</Text>
+          source={{ html: html }}
+          contentWidth={width}
+        />
       </ScrollView>}
     </BackgroundWithImage>
   )

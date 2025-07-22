@@ -1,19 +1,19 @@
-import React, {useState} from "react";
-import {View, StyleSheet, Image, Alert, TouchableOpacity, Pressable} from "react-native";
-import {DrawerContentScrollView, DrawerItem} from "@react-navigation/drawer";
+import React, { useState } from "react";
+import { View, StyleSheet, Image, Alert, TouchableOpacity, Pressable } from "react-native";
+import { DrawerContentScrollView, DrawerItem } from "@react-navigation/drawer";
 import theme from "../../assets/theme";
-import {useNavigation} from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import Images from "../../assets/images";
 import Icon from "../../components/Icon";
 import AppText from "../../components/text";
-import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
 import LinearGradient from "react-native-linear-gradient";
 import BackgroundWithImage from "../../components/background";
 import useStyles from "./styles";
-import {AppHeader} from "../../components";
+import { AppHeader } from "../../components";
 
 const DrawerList = [
-  {icon: "Folder", label: "Privacy Policy", navigateTo: "PrivacyPolicy"},
+  { icon: "Folder", label: "Privacy Policy", navigateTo: "PrivacyPolicy" },
   {
     icon: "Folder",
     label: "Terms and Conditions",
@@ -22,16 +22,16 @@ const DrawerList = [
   {
     icon: "Folder",
     label: "End User Agreement",
-    navigateTo: "TermsAndConditions",
+    navigateTo: "UserAgreement",
   },
   {
     icon: "Folder",
     label: "Waiver",
-    navigateTo: "TermsAndConditions",
+    navigateTo: "Waiver",
   },
 ];
 
-const DrawerLayout = ({icon, label, navigateTo, index, onPress}) => {
+const DrawerLayout = ({ icon, label, navigateTo, index, onPress }) => {
   const renderDrawerItem = () => {
     return (
       <View
@@ -43,7 +43,7 @@ const DrawerLayout = ({icon, label, navigateTo, index, onPress}) => {
       >
         <Icon name={icon} family={"custom"} color={"white"} size={20} />
         <AppText style={styles.Text}>{label}</AppText>
-        <Icon name="right" family="antdesign" color={theme.darkColors?.white} size={20} />
+        <Icon name="chevron-right" family="entypo" color={theme.darkColors?.white} size={20} />
       </View>
     );
   };
@@ -53,26 +53,11 @@ const DrawerLayout = ({icon, label, navigateTo, index, onPress}) => {
         <TouchableOpacity onPress={() => onPress(navigateTo)}>
           <LinearGradient
             colors={["#9003E0", "#1158F4", "#9003E0"]}
-            style={[
-              styles.linearGradient,
-              {
-                padding: 0,
-                minHeight: 50,
-              },
-            ]}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}
+            style={styles.linearGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
           >
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 10,
-              }}
-            >
-              {renderDrawerItem()}
-            </View>
+            {renderDrawerItem()}
           </LinearGradient>
         </TouchableOpacity>
       ) : (
@@ -84,7 +69,7 @@ const DrawerLayout = ({icon, label, navigateTo, index, onPress}) => {
   );
 };
 
-const DrawerItems = ({onPress}) => {
+const DrawerItems = ({ onPress }) => {
   return DrawerList.map((el, i) => {
     return (
       <DrawerLayout
