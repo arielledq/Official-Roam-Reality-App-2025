@@ -1,27 +1,28 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { Dimensions, StyleSheet, Text, ScrollView } from 'react-native'
-import RenderHtml from 'react-native-render-html';
 import BackgroundWithImage from '../../components/background';
 import { AppHeader } from '../../components';
-import { getTermsAndConditions } from '../../network';
 import ScreenLoader from '../../components/screenLoader';
-import { FontSizes } from '../../util/FontUtils';
+import {useSelector} from "react-redux";
 import RenderHTML from "react-native-render-html";
+import {FontSizes} from "util/FontUtils.ts";
+import {getARStettings, getTermsAndConditions, getUserAgreement} from "network";
 
 
 const { width } = Dimensions.get('window');
 
-const TermsAndConditions = () => {
+const UserAgreement = () => {
   const [loading, setLoading] = useState(true)
   const [html, setHtml] = useState('')
   useEffect(() => {
-    getTermsAndConditions().then((res) => {
-      setHtml(res.data[0].body?.replace(/#000000/g, "#fff"))
+    getUserAgreement().then((res) => {
+      setHtml(res.data[0].body)
     }).finally(() => setLoading(false))
   }, [])
+
   return (
     <BackgroundWithImage>
-      <AppHeader title={"Terms and Conditions"} backgroundColor="transparent" />
+      <AppHeader title={"End User Agreement"} backgroundColor="transparent" />
       {loading ? <ScreenLoader /> : <ScrollView
         contentContainerStyle={{ paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
@@ -42,6 +43,6 @@ const TermsAndConditions = () => {
   )
 }
 
-export default TermsAndConditions
+export default UserAgreement
 
 const styles = StyleSheet.create({})
