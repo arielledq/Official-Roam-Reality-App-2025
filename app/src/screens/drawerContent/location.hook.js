@@ -8,14 +8,13 @@ import {USER_TYPES} from "../../constants";
 
 const GET_LOCATION_CONFIG = {
   enableHighAccuracy: true,
-  timeout: 15000,
-  maximumAge: 10000,
+  timeout: 10000,
+  maximumAge: 15000,
 };
 
 const WATCH_POSITION_CONFIG = {
   ...GET_LOCATION_CONFIG,
-  maximumAge: 5000,
-  distanceFilter: 5,
+  distanceFilter: 1,
   interval: 10000,
 };
 
@@ -32,7 +31,7 @@ const userLocationHook = () => {
 
   const dispatch = useDispatch();
 
-  const userLocation = userData?.user?.user_ar_profile?.current_location?.coordinates;
+  const userLocation = userData?.user?.ar_user_profile_user?.current_location?.coordinates;
   const locationIsEnabled = !!userLocation?.length;
 
   const getLocation = async () => {
@@ -68,7 +67,6 @@ const userLocationHook = () => {
       return;
     }
     setLoading(true);
-
     Geolocation.watchPosition(
       position => {
         const coords = {
@@ -91,6 +89,7 @@ const userLocationHook = () => {
   };
 
   const toggleUserLocation = () => {
+    console.log("locationIsEnabled", locationIsEnabled);
     if (locationIsEnabled) {
       clearLocation();
     } else {
@@ -131,16 +130,17 @@ const userLocationHook = () => {
             break;
         }
       } catch (error) {
-        clearLocation();
         console.error("[location.hook] updateUserLocationAPI error", error);
+        clearLocation();
       }
     } else {
-      clearLocation();
       console.error("[location.hook] location is not a number", {latitude, longitude});
+      clearLocation();
     }
   };
 
   const clearLocation = () => {
+    Geolocation.stopObserving();
     switch (userType) {
       case USER_TYPES.BAND:
         clearBandUserLocation();
@@ -150,7 +150,6 @@ const userLocationHook = () => {
         clearPlayerUserLocation();
         break;
     }
-    Geolocation.stopObserving();
   };
 
   return {

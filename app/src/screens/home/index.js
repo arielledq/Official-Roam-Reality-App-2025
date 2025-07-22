@@ -292,7 +292,7 @@ const GeoArChallenge = ({}) => {
   }, []);
 
   useEffect(() => {
-    if (user?.user_ar_profile?.points === GIFT_POINTS && !user?.has_receive_points) {
+    if (user?.ar_user_profile_user?.points === GIFT_POINTS && !user?.has_receive_points) {
       updatePointsNotification();
     }
 
