@@ -433,6 +433,15 @@ export const getARStettings = () =>
     },
     logoutFunc
   );
+
+export const getUserAgreement = () =>
+  Request.callWithToken(
+    {
+      url: `/modules/user-agreement/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
 export const sendFeedback = data =>
   Request.callWithToken(
     {

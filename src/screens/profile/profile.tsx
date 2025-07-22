@@ -227,7 +227,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     rows.push(data.slice(i, i + 3));
   }
   const navigateToVerifyMail = (email: string) => {
-    sendCode({ email: email.toLowerCase() });
+    // sendCode({ email: email.toLowerCase() });
     setIsTransitioning(true);
     // @ts-expect-error
     navigation.navigate("EmailVerification", {

@@ -1,11 +1,13 @@
 from django.db import models
 from django.conf import settings
+from ckeditor.fields import RichTextField
+
 
 # Create your models here.
 
 class PrivacyPolicy(models.Model):
 
-	body = models.TextField()
+	body = RichTextField()
 	author = models.ForeignKey(
 		settings.AUTH_USER_MODEL,
 		on_delete=models.PROTECT,

@@ -229,7 +229,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   }
   const navigateToVerifyMail = (email: string) => {
     if (!email) return;
-    sendCode({email: email.toLowerCase()});
+    // sendCode({email: email.toLowerCase()});
     setIsTransitioning(true);
     navigation.navigate("EmailVerification", {
       email: email.toLowerCase(),

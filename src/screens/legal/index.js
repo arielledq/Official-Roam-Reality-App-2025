@@ -22,12 +22,12 @@ const DrawerList = [
   {
     icon: "Folder",
     label: "End User Agreement",
-    navigateTo: "TermsAndConditions",
+    navigateTo: "UserAgreement",
   },
   {
     icon: "Folder",
     label: "Waiver",
-    navigateTo: "TermsAndConditions",
+    navigateTo: "Waiver",
   },
 ];
 
