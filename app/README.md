@@ -122,7 +122,7 @@ Follow standard iOS release procedures through Xcode.
 - Open the bundle from the `Organizer` in Xcode
 - `Show the content` of the bundle and navigate to `Products > Applications > travel_ar_app_42706`
 - `Show the content` again and navigate to `Frameworks > UnityFramework.framework > Frameworks`
-- Delete the `MvnCorder.framework` and `NativeScreenRecorder.framework` from the folder
+- Delete the `Frameworks` folder.
 - Upload the bundle to the App Store
 
 ## Troubleshooting
