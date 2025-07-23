@@ -87,6 +87,7 @@ const useStyles = makeStyles(theme => ({
     position: "absolute",
     right: 10,
     zIndex: 10,
+    top: 60,
   },
   editButton: {
     marginVertical: 5,

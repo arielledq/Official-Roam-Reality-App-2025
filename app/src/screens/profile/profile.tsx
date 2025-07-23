@@ -278,12 +278,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
-          containerStyle={[
-            _styles.editButtonContainer,
-            {
-              top: Platform.OS === "ios" ? 90 : 60,
-            },
-          ]}
+          containerStyle={_styles.editButtonContainer}
           onPress={() => {
             setIsTransitioning(true);
             //  @ts-ignore

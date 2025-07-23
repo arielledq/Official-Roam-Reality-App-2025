@@ -362,7 +362,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       onBlur={() => {
                         setGenderDropDownFocused(false);
                       }}
-                      activeColor={theme.lightColors?.inputBG}
+                      activeColor={theme.lightColors?.statBG}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -473,9 +473,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   {/* Country */}
                   <View style={_styles.dropdownParentView}>
                     <Dropdown
+                      autoScroll={false}
                       style={[
                         _styles.dropdown,
-                        isCountryDropDownFocused ? _styles.focusedInput : {},
                         touched.country && errors?.country && !values.country
                           ? _styles.inputError
                           : {},
@@ -483,9 +483,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       placeholderStyle={{
                         color:
                           (touched.country && errors?.country && !values.country) ||
-                          isCountryDropDownFocused
-                            ? theme.lightColors?.white
-                            : theme.lightColors?.grey0,
+                          theme.lightColors?.grey0,
                         marginStart: 13,
                         fontSize: FontSizes.S14,
                         opacity: 1,
@@ -494,13 +492,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         borderWidth: 0,
                         backgroundColor: "transparent",
                       }}
-                      onFocus={() => {
-                        setCountryDropDownFocused(true);
-                      }}
-                      onBlur={() => {
-                        setCountryDropDownFocused(false);
-                      }}
-                      activeColor={theme.lightColors?.inputBG}
+                      activeColor={theme.lightColors?.statBG}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -520,9 +512,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           family="antdesign"
                           color={
                             (touched.country && errors?.country && !values.country) ||
-                            isCountryDropDownFocused
-                              ? theme.lightColors?.white
-                              : theme.lightColors?.grey0
+                            theme.lightColors?.grey0
                           }
                           size={24}
                         />
