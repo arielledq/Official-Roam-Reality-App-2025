@@ -15,6 +15,7 @@ import {
   getARProfile,
   getARStettings,
   getARChallenges,
+  getGeoARDestinationsMini,
   getARSitesStars,
   updateProfile,
   getProfieDetails,
@@ -44,10 +45,13 @@ const GeoArChallenge = ({}) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
-  const [destinationData, setDestinationData] = useState([]);
+  const [destinationDataMini, setDestinationDataMini] = useState([]);
+  // const [destinationData, setDestinationData] = useState([]);
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
+
+  const destinationData = useSelector(state => state?.ar?.destinationData);
 
   const oneSignalClickHandler = additionalData => {
     navigateToGeoChallenge(additionalData);
@@ -56,16 +60,14 @@ const GeoArChallenge = ({}) => {
 
   const user = useSelector(state => state?.login?.data?.user);
 
-  const navigateToGeoChanllenge = additionalData => {
+  const navigateToGeoChallenge = additionalData => {
     const {destinationId} = additionalData;
     if (destinationId && destinationData?.length) {
       const selectedDestination = destinationData.find(
         destination => destination?.id === destinationId
       );
-
       if (selectedDestination) {
         dispatch(updateSelectedDestination(selectedDestination));
-
         setTimeout(() => {
           navigation.navigate("GeoArChallengeDetails");
         }, 500);
@@ -75,15 +77,29 @@ const GeoArChallenge = ({}) => {
 
   const ARSposored = () => {
     setIsLoading(true);
-    getGeoARDestinations()
+    getGeoARDestinationsMini()
       .then(res => {
-        if (res.status == 1) {
-          setDestinationData(res.data);
-          dispatch(updateDestinationData(res.data));
+        if (res?.status == 1) {
+          setDestinationDataMini(res?.data);
           for (let i = 0; i < res.data.length; i++) {
             const d = res.data[i];
             getARStarSites(d.id);
           }
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+
+    getGeoARDestinations()
+      .then(res => {
+        if (res.status == 1) {
+          // setDestinationData(res.data);
+          dispatch(updateDestinationData(res.data));
+          // for (let i = 0; i < res.data.length; i++) {
+          //   const d = res.data[i];
+          //   getARStarSites(d.id);
+          // }
         }
       })
       .finally(() => {
@@ -172,59 +188,74 @@ const GeoArChallenge = ({}) => {
     navigation.navigate("GeoArOutdoor");
   };
 
-  const Item = ({obj}) => (
-    <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={{width: "100%"}}>
-      <ImageBackground style={_styles.containerView} resizeMode="cover" source={{uri: obj.image}}>
-        <Image
-          source={GradientDownPNG}
+  const Item = ({obj}) => {
+    const destinationId = obj?.id;
+    let fullDestinationData = null;
+    if (destinationData?.length) {
+      fullDestinationData = destinationData?.find(destination => destination?.id === destinationId);
+    }
+    return (
+      <TouchableOpacity
+        onPress={() => navigateToChallengeDetails(fullDestinationData)}
+        style={{width: "100%"}}
+        disabled={!fullDestinationData}
+      >
+        <ImageBackground
+          style={_styles.containerView}
           resizeMode="cover"
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            top: 0,
-            width: "110%",
-          }}
-        />
-        <View style={{width: "100%", marginBottom: 10}}>
-          <Text style={_styles.list_title}>{obj.name}</Text>
-          <View
+          source={{uri: obj?.image}}
+        >
+          <Image
+            source={GradientDownPNG}
+            resizeMode="cover"
             style={{
-              flexDirection: "row",
-              justifyContent: "flex-start",
-              width: "100%",
-              alignItems: "flex-start",
-              marginTop: 20,
+              position: "absolute",
+              bottom: 0,
+              left: 0,
+              right: 0,
+              top: 0,
+              width: "110%",
             }}
-          >
-            <View style={{alignItems: "center", justifyContent: "center"}}>
-              <SiteIcon style={{width: 48, height: 48}} />
-              <Text style={_styles.s_list_count}>{obj.star_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>Sites</Text>
-            </View>
+          />
+          <View style={{width: "100%", marginBottom: 10}}>
+            <Text style={_styles.list_title}>{obj?.name}</Text>
             <View
               style={{
-                alignItems: "center",
-                justifyContent: "center",
-                marginStart: 22,
-                marginEnd: 10,
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                width: "100%",
+                alignItems: "flex-start",
+                marginTop: 20,
               }}
             >
-              <StarSiteIcon style={{width: 48, height: 48}} />
-              <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
-              <Text style={_styles.s_list_text}>Star Sites</Text>
-            </View>
-            <View style={{alignItems: "center", justifyContent: "center"}}>
-              <ArIcon style={{width: 48, height: 48}} />
-              <Text style={_styles.s_list_count}>{obj.unique_ar_sites.length}</Text>
-              <Text style={_styles.s_list_text}>AR Challenges</Text>
+              <View style={{alignItems: "center", justifyContent: "center"}}>
+                <SiteIcon style={{width: 48, height: 48}} />
+                <Text style={_styles.s_list_count}>{obj?.star_ar_sites_cnt || 0}</Text>
+                <Text style={_styles.s_list_text}>Sites</Text>
+              </View>
+              <View
+                style={{
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginStart: 22,
+                  marginEnd: 10,
+                }}
+              >
+                <StarSiteIcon style={{width: 48, height: 48}} />
+                <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
+                <Text style={_styles.s_list_text}>Star Sites</Text>
+              </View>
+              <View style={{alignItems: "center", justifyContent: "center"}}>
+                <ArIcon style={{width: 48, height: 48}} />
+                <Text style={_styles.s_list_count}>{obj?.unique_ar_sites_cnt || 0}</Text>
+                <Text style={_styles.s_list_text}>AR Challenges</Text>
+              </View>
             </View>
           </View>
-        </View>
-      </ImageBackground>
-    </TouchableOpacity>
-  );
+        </ImageBackground>
+      </TouchableOpacity>
+    );
+  };
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
@@ -280,7 +311,7 @@ const GeoArChallenge = ({}) => {
       const additionalData = notification?.additionalData;
 
       if (additionalData) {
-        navigateToGeoChanllenge(additionalData);
+        navigateToGeoChallenge(additionalData);
       }
     };
 
@@ -315,7 +346,7 @@ const GeoArChallenge = ({}) => {
       <FlatList
         showsVerticalScrollIndicator={false}
         style={{flex: 1, marginTop: 15}}
-        data={destinationData}
+        data={destinationDataMini}
         numColumns={1}
         refreshing={isLoading}
         onRefresh={() => {
