@@ -26,7 +26,6 @@ urlpatterns = [
     
     path("accounts/", include("allauth.urls")),
     path("modules/", include("modules.urls")),
-    path("modules/", include("modules.urls")),
     path("api/v1/", include("home.api.v1.urls")),
     path("api/v1/", include("feedback.api.v1.urls")),
     path("api/v1/", include("notifications.urls")),
