@@ -55,7 +55,7 @@ from django.core.exceptions import ValidationError
 
 @receiver(post_save, sender=ARMemories, dispatch_uid="update_thumbnails_updated")
 def update_thumbnails(sender, instance, **kwargs):
-    if ffdl.ffmpeg_path and os.path.exists(ffdl.ffmpeg_path, '') is False:
+    if ffdl.ffmpeg_path and not os.path.exists(ffdl.ffmpeg_path):
       subprocess.call(['ffdl','install','-y'])
 
     if kwargs['created'] and instance.memory_type == 'VIDEO':
