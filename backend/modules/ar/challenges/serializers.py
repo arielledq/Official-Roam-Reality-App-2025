@@ -361,10 +361,14 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
     file_animation = serializers.FileField()
+    file_3d = serializers.FileField()
+    icon = serializers.ImageField()
+    sponsor = SponsorSerializer()
 
     class Meta:
         model = ScanPicture
-        fields = ['name', 'file_image', 'file_animation',]
+        geo_field = ('coordinates',)
+        fields = ['name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'coordinates',]
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
