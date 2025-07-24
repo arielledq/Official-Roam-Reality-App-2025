@@ -742,7 +742,7 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         qs = self.filter_queryset(self.get_queryset())
         site_type = int(self.request.query_params.get("site_type"))
         if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
-            return qs
+            return super().list(request, *args, **kwargs)
 
         challenges = []
         scans = []
