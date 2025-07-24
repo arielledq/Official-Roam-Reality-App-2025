@@ -807,3 +807,12 @@ class ARAllMemoriesSerializer(serializers.Serializer):
 class ElevationRequestSerializer(serializers.Serializer):
     lat = serializers.FloatField()
     lng = serializers.FloatField()
+
+
+class ARScanSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        if isinstance(instance, Challenges):
+            return ChallengesSerializer(instance, context=self.context).data
+        elif isinstance(instance, ScanPicture):
+            return ScanPictureSerializer(instance, context=self.context).data
+        return {}

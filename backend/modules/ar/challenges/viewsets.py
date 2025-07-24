@@ -7,14 +7,14 @@ from travel_ar_app_42706 import settings
 from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
-    DestinationFacts, PanicMessage, GeoArSiteCategory
+    DestinationFacts, PanicMessage, GeoArSiteCategory, ScanPicture
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, \
     GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer, \
-    ElevationRequestSerializer
+    ElevationRequestSerializer, ARScanSerializer
 from rest_framework import viewsets, exceptions
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -711,7 +711,7 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         site_type = int(self.request.query_params.get("site_type"))
         if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return GeoArSiteSerializer
-        return ChallengesSerializer
+        return ARScanSerializer
 
     def get_queryset(self):
         try:
@@ -724,12 +724,12 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return GeoArSite.objects.all()
 
-        qs = Challenges.objects.filter(
+        qs = list(chain(
+            Challenges.objects.filter(
                 is_active=True
-            )
-
-        if sponsor := self.request.query_params.get("sponsor"):
-            qs = qs.filter(sponsor=sponsor)
+            ),
+            ScanPicture.objects.all()
+        ))
 
         return qs
 
@@ -737,6 +737,22 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         if int(self.request.query_params.get("site_type")) in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return super().filter_queryset(qs)
         return qs
+
+    def list(self, request, *args, **kwargs):
+        qs = self.filter_queryset(self.get_queryset())
+        site_type = int(self.request.query_params.get("site_type"))
+        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
+            return qs
+
+        challenges = []
+        scans = []
+        for element in qs:
+            data = ARScanSerializer(element).data
+            if isinstance(element, Challenges):
+                challenges.append(data)
+            else:
+                scans.append(data)
+        return Response(data={'challenges': challenges, 'scans': scans})
 
 
 class ElevationAPIView(APIView):
