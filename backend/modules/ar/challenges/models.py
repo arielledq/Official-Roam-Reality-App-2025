@@ -612,8 +612,18 @@ class ScanPicture(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
-    file_image = models.ImageField(upload_to="scanpicture/img/")
-    file_animation = models.FileField(upload_to="scanpicture/animation/")
+    file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/")
+    file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
+    icon = models.ImageField(_("Icon"), upload_to="scanpicture/icon/", null=True, blank=True)
+    file_animation = models.FileField(_("Animation"), upload_to="scanpicture/animation/")
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="scan_pictures",
+    )
+    coordinates = gis_models.PointField(_("Coordinates"), blank=True, null=True)
 
     def __str__(self):
         return self.name
