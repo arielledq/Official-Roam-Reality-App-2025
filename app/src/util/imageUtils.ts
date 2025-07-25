@@ -2,14 +2,15 @@
  * Utility functions for handling images, including base64 data URIs
  */
 
+import {ProfilePlaceholder} from "assets/base64";
 /**
  * Check if a string is a base64 data URI
  * @param str - The string to check
  * @returns true if the string is a base64 data URI, false otherwise
  */
 export const isBase64DataUri = (str: string): boolean => {
-  return str.startsWith('data:image/') && str.includes('base64,')
-}
+  return str.startsWith("data:image/") && str.includes("base64,");
+};
 
 /**
  * Get the appropriate source object for FastImage component
@@ -19,11 +20,11 @@ export const isBase64DataUri = (str: string): boolean => {
  */
 export const getImageSource = (imageUrl: string) => {
   if (isBase64DataUri(imageUrl)) {
-    return { uri: imageUrl }
+    return {uri: imageUrl};
   } else {
-    return { uri: imageUrl }
+    return {uri: imageUrl};
   }
-}
+};
 
 /**
  * Get FastImage source with additional properties
@@ -32,9 +33,23 @@ export const getImageSource = (imageUrl: string) => {
  * @returns FastImage source object with additional properties
  */
 export const getImageSourceWithProps = (imageUrl: string, additionalProps: object = {}) => {
-  const baseSource = getImageSource(imageUrl)
+  const baseSource = getImageSource(imageUrl);
   return {
     ...baseSource,
-    ...additionalProps
+    ...additionalProps,
+  };
+};
+
+export const getProfilePicture = (imageUrl?: string): string => {
+  console.log("Image URL:", imageUrl);
+  if (isBase64DataUri(imageUrl || "")) {
+    console.log("Base64 data URI");
+    return imageUrl || "";
   }
-} 
+  if (imageUrl) {
+    console.log("Image URL");
+    return imageUrl;
+  }
+  console.log("Not a Base64 data URI");
+  return ProfilePlaceholder;
+};

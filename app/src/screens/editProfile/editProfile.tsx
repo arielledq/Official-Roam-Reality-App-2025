@@ -30,6 +30,7 @@ import theme from "../../assets/theme";
 import {Icons} from "../../assets/Icons";
 import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
 import Images from "../../assets/images";
+import {ProfilePlaceholder} from "assets/base64";
 
 interface ImageData {
   uri: string | undefined;
@@ -80,7 +81,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isMobileInputFocused, setMobileInputFocused] = useState(false);
   const [isAddressInputFocused, setAddressInputFocused] = useState(false);
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false);
-  const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false);
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null);
   const [countryData, setCountryData] = useState<[]>([]);
   const [bDate, setBDate] = useState<Date>(dateOfBirth);
@@ -162,25 +162,26 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     gender.value ? updatedProfileData.append("gender", updatedGender) : {};
     updatedProfileData.append("home_country", updatedCountry);
     formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {};
-    if (photoDetails?.name) {
+    if (!photoDetails?.default) {
       updatedProfileData.append("image", photoDetails);
     }
-    setIsLoading(true);
-    updateProfile({
-      id: userProfile.user_profile.id,
-      data: updatedProfileData,
-    })
-      .then(res => {
-        if (res.status == 1) {
-          showMessage("Details saved successfully!");
-          handleNavigation();
-        } else {
-          handleError(res);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    console.log("updatedProfileData", updatedProfileData);
+    // setIsLoading(true);
+    // updateProfile({
+    //   id: userProfile.user_profile.id,
+    //   data: updatedProfileData,
+    // })
+    //   .then(res => {
+    //     if (res.status == 1) {
+    //       showMessage("Details saved successfully!");
+    //       handleNavigation();
+    //     } else {
+    //       handleError(res);
+    //     }
+    //   })
+    //   .finally(() => {
+    //     setIsLoading(false);
+    //   });
   };
 
   const formatPhoneNumber = (input: string) => {
@@ -245,9 +246,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   useEffect(() => {
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
-      const pImageUri = Image.resolveAssetSource(Images.ProfilePlaceholder).uri;
+      // @ts-ignore
       formikRef.current.setValues({
-        pImage: userData?.image || pImageUri,
+        pImage: userData?.image || ProfilePlaceholder,
         name: userData?.user?.name || "",
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
@@ -256,7 +257,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         date_of_birth: dob ? dateToString(dob) : "",
       });
       setPhotoDetails({
-        uri: userData?.image || pImageUri,
+        uri: userData?.image || ProfilePlaceholder,
         type: "image/png",
         name: "profile.png",
         default: true,

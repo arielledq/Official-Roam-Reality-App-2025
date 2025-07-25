@@ -8,10 +8,10 @@ import {
   Pressable,
   ImageBackground,
   Keyboard,
+  Image,
 } from "react-native";
 import Contacts from "react-native-contacts";
 import {useNavigation} from "@react-navigation/native";
-import FastImage from "react-native-fast-image";
 import theme from "../../assets/theme";
 import useStyles from "./styles";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
@@ -20,6 +20,7 @@ import useDebounce from "../../hooks/debounce";
 import {DEBOUNCE_TIME, showMessage, truncateText} from "../../util/helpers";
 import Images from "../../assets/images";
 import Icon from "components/Icon";
+import {getImageSourceWithProps, getProfilePicture} from "util/imageUtils";
 
 interface Contact {
   id?: string;
@@ -135,20 +136,15 @@ const ContactsTab = () => {
 
   const renderContact = ({item}: {item: Contact}) => {
     if (!item || typeof item !== "object") return null;
-
+    const profilePicture = getProfilePicture(item?.user_profile?.image || "");
     return (
       <View style={localStyle.contactContainer}>
         <View style={localStyle.contactLeftWrapper}>
           <ImageBackground source={Images.BGBlur} style={localStyle.imageBG} resizeMode="stretch">
-            <FastImage
+            <Image
               style={localStyle.image}
-              source={
-                item.user_profile && item.user_profile.image
-                  ? {uri: item.user_profile.image}
-                  : Images.BGBlur
-              }
-              resizeMode={FastImage.resizeMode.cover}
-              defaultSource={Images.BGBlur}
+              source={getImageSourceWithProps(profilePicture)}
+              resizeMode="cover"
             />
           </ImageBackground>
           <View>
