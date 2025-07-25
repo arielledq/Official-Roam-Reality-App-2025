@@ -165,23 +165,22 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (!photoDetails?.default) {
       updatedProfileData.append("image", photoDetails);
     }
-    console.log("updatedProfileData", updatedProfileData);
-    // setIsLoading(true);
-    // updateProfile({
-    //   id: userProfile.user_profile.id,
-    //   data: updatedProfileData,
-    // })
-    //   .then(res => {
-    //     if (res.status == 1) {
-    //       showMessage("Details saved successfully!");
-    //       handleNavigation();
-    //     } else {
-    //       handleError(res);
-    //     }
-    //   })
-    //   .finally(() => {
-    //     setIsLoading(false);
-    //   });
+    setIsLoading(true);
+    updateProfile({
+      id: userProfile.user_profile.id,
+      data: updatedProfileData,
+    })
+      .then(res => {
+        if (res.status == 1) {
+          showMessage("Details saved successfully!");
+          handleNavigation();
+        } else {
+          handleError(res);
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   const formatPhoneNumber = (input: string) => {
