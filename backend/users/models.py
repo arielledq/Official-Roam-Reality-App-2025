@@ -8,6 +8,8 @@ from django.utils import timezone
 from home.common import CommonModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.conf import settings
+from django.templatetags.static import static
 
 
 class User(AbstractUser):
@@ -69,6 +71,18 @@ class UserProfile(CommonModel):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     account_setup = models.BooleanField(default=False)
     friends = models.ManyToManyField(User, related_name='friends')
+
+    def get_image_url(self):
+        """Return the image URL or placeholder if no image is set"""
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        
+        # Try to get the placeholder from static files first
+        try:
+            return static('img/profile_placeholder.png')
+        except Exception:
+            # Fallback to a relative path if static function fails
+            return '/static/img/profile_placeholder.png'
 
     def __str__(self):
         return self.user.email
