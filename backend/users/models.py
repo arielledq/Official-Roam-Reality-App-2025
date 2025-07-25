@@ -9,7 +9,7 @@ from home.common import CommonModel
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.conf import settings
-from django.templatetags.static import static
+from storages.backends.s3boto3 import S3Boto3Storage
 
 
 class User(AbstractUser):
@@ -77,12 +77,14 @@ class UserProfile(CommonModel):
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
         
-        # Try to get the placeholder from static files first
-        try:
-            return static('img/profile_placeholder.png')
-        except Exception:
-            # Fallback to a relative path if static function fails
-            return '/static/img/profile_placeholder.png'
+        # Create a signed URL for the placeholder image using the same S3 storage backend
+        if hasattr(settings, 'USE_S3') and settings.USE_S3:
+            storage = S3Boto3Storage()
+            placeholder_path = f"{settings.AWS_MEDIA_LOCATION}/profile_placeholder.png"
+            return storage.url(placeholder_path)
+        
+        # Fallback to relative path if S3 is not configured
+        return '/static/img/profile_placeholder.png'
 
     def __str__(self):
         return self.user.email
