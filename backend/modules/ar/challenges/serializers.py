@@ -361,10 +361,14 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
     file_animation = serializers.FileField()
+    file_3d = serializers.FileField()
+    icon = serializers.ImageField()
+    sponsor = SponsorSerializer()
 
     class Meta:
         model = ScanPicture
-        fields = ['name', 'file_image', 'file_animation',]
+        geo_field = ('coordinates',)
+        fields = ['name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'coordinates',]
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
@@ -803,3 +807,12 @@ class ARAllMemoriesSerializer(serializers.Serializer):
 class ElevationRequestSerializer(serializers.Serializer):
     lat = serializers.FloatField()
     lng = serializers.FloatField()
+
+
+class ARScanSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        if isinstance(instance, Challenges):
+            return ChallengesSerializer(instance, context=self.context).data
+        elif isinstance(instance, ScanPicture):
+            return ScanPictureSerializer(instance, context=self.context).data
+        return {}

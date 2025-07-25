@@ -74,10 +74,14 @@ class SignupSerializer(serializers.ModelSerializer):
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
+    image = serializers.SerializerMethodField()
     
     class Meta:
         model = UserProfile
         fields = ('id', 'is_verified', 'image', 'account_setup', 'home_address', 'home_country','country_code', 'phone_number','gender')
+
+    def get_image(self, obj):
+        return obj.get_image_url()
 
 
 class UserSerializer(serializers.ModelSerializer):
