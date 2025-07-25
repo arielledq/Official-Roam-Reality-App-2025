@@ -6,10 +6,26 @@ from home.constants import Gender
 from core.utils import get_file_path
 from django.utils import timezone
 from home.common import CommonModel
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.conf import settings
-from storages.backends.s3boto3 import S3Boto3Storage
+import base64
+import os
+
+
+def get_placeholder_image_base64():
+    """Get the placeholder image as base64 data URL"""
+    try:
+        # Path to the placeholder image in static folder
+        static_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'static', 'img')
+        placeholder_path = os.path.join(static_dir, 'profile_placeholder.png')
+        
+        if os.path.exists(placeholder_path):
+            with open(placeholder_path, 'rb') as image_file:
+                encoded_string = base64.b64encode(image_file.read()).decode('utf-8')
+                return f'data:image/png;base64,{encoded_string}'
+    except Exception:
+        pass
+    
+    # Fallback to a simple SVG if PNG is not available
+    return 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSIjZGRkIi8+PHRleHQgeD0iNTAlIiB5PSI1MCUiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIxNCIgZmlsbD0iIzk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSIgZHk9Ii4zZW0iPlByb2ZpbGUgSW1hZ2U8L3RleHQ+PC9zdmc+'
 
 
 class User(AbstractUser):
@@ -77,14 +93,8 @@ class UserProfile(CommonModel):
         if self.image and hasattr(self.image, 'url'):
             return self.image.url
         
-        # Create a signed URL for the placeholder image using the same S3 storage backend
-        if hasattr(settings, 'USE_S3') and settings.USE_S3:
-            storage = S3Boto3Storage()
-            placeholder_path = f"{settings.AWS_MEDIA_LOCATION}/profile_placeholder.png"
-            return storage.url(placeholder_path)
-        
-        # Fallback to relative path if S3 is not configured
-        return '/static/img/profile_placeholder.png'
+        # Return the exact PNG placeholder image as a base64 data URL
+        return get_placeholder_image_base64()
 
     def __str__(self):
         return self.user.email
