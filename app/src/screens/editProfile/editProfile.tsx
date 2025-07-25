@@ -60,6 +60,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const edit = route?.params?.edit;
   const userData = route?.params?.profileDetails;
   const onProfileUpdate = route?.params?.onProfileUpdate;
+  console.log("userData", userData);
 
   let dateOfBirth = null;
   if (userData?.date_of_birth) {
@@ -162,7 +163,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     gender.value ? updatedProfileData.append("gender", updatedGender) : {};
     updatedProfileData.append("home_country", updatedCountry);
     formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {};
-    if (!photoDetails?.default) {
+    if (!photoDetails?.default && photoDetails?.uri) {
       updatedProfileData.append("image", photoDetails);
     }
     setIsLoading(true);
@@ -247,7 +248,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
       // @ts-ignore
       formikRef.current.setValues({
-        pImage: userData?.image || ProfilePlaceholder,
+        pImage: userData?.image,
         name: userData?.user?.name || "",
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
@@ -256,7 +257,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         date_of_birth: dob ? dateToString(dob) : "",
       });
       setPhotoDetails({
-        uri: userData?.image || ProfilePlaceholder,
+        uri: userData?.image,
         type: "image/png",
         name: "profile.png",
         default: true,
