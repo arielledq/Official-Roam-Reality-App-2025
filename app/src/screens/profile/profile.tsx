@@ -32,6 +32,7 @@ import {updateARUserData} from "../../redux/AR";
 import {BlurView} from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
 import {height} from "util/AppDimensions";
+import { getImageSource } from "../../util/imageUtils";
 
 const SCROLL_AMOUNT = 150;
 
@@ -240,7 +241,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-        {profileDetails?.image ? (
+        {profileDetails?.user?.user_profile?.image ? (
           <>
             <FastImage
               style={{
@@ -248,7 +249,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
                 height: height * 0.5,
               }}
               //  @ts-ignore
-              source={{uri: profileDetails?.image}}
+              source={profileDetails?.user?.user_profile?.image ? (() => {
+                const imageSource = getImageSource(profileDetails.user.user_profile.image);
+                return imageSource;
+              })() : undefined}
               resizeMode={FastImage.resizeMode.cover}
             />
             <LinearGradient
