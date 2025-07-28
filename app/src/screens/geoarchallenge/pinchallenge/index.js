@@ -676,7 +676,7 @@ console.log("isUnityLoaded, unitySceneLoaded", isUnityLoaded, unitySceneLoaded)
                     }}
                 >
                   <ActivityIndicator size="large" color="#fff" />
-                  <Text style={{color: "#fff", marginTop: 10}}>Cargando experiencia AR...</Text>
+                  <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience...</Text>
                 </View>
             )}
           </>
