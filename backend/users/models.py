@@ -96,8 +96,8 @@ class UserProfile(CommonModel):
             return self.image.url
         
         # Return the exact PNG placeholder image as a base64 data URL
-        # return get_placeholder_image_base64()
-        return configs.DEFAULT_IMAGE.get("image_url")
+        return get_placeholder_image_base64()
+        #return configs.DEFAULT_IMAGE.get("image_url")
 
     def __str__(self):
         return self.user.email
