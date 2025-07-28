@@ -49,7 +49,7 @@ env.read_env(env_file)
 #     GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 SENTRY_DSN = env.str("SENTRY_DSN", default="https://e8a6bfac5c5e45e98a6f9d96ef459795@sentry.innovatica.com.py//66")
 
 if SENTRY_DSN:
