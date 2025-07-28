@@ -2,6 +2,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
+
+from configuration import configs
 from home.constants import Gender
 from core.utils import get_file_path
 from django.utils import timezone
@@ -94,7 +96,8 @@ class UserProfile(CommonModel):
             return self.image.url
         
         # Return the exact PNG placeholder image as a base64 data URL
-        return get_placeholder_image_base64()
+        # return get_placeholder_image_base64()
+        return configs.DEFAULT_IMAGE.get("image_url")
 
     def __str__(self):
         return self.user.email
