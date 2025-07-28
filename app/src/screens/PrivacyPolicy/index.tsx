@@ -6,6 +6,7 @@ import { AppHeader } from '../../components';
 import ScreenLoader from '../../components/screenLoader';
 import { getPrivacyPolicy } from '../../network';
 import { FontSizes } from '../../util/FontUtils';
+import RenderHTML from "react-native-render-html";
 
 
 const { width } = Dimensions.get('window');
@@ -27,13 +28,15 @@ const PrivacyPolicy = () => {
         style={{ marginHorizontal: 20 }
         }
       >
-        <Text
-          style={{
-            lineHeight: 19.1,
-            color: '#fff',
-            fontSize: FontSizes.S14
+        <RenderHTML
+          tagsStyles={{
+            p: { color: "#fff", fontSize: FontSizes.S14 },
+            ol: { color: "#fff", fontSize: FontSizes.S14 },
+            strong: { color: "#fff", fontSize: FontSizes.S18 },
           }}
-        >{html}</Text>
+          source={{ html: html }}
+          contentWidth={width}
+        />
       </ScrollView>}
     </BackgroundWithImage>
   )

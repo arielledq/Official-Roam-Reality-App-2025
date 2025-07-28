@@ -22,12 +22,12 @@ const DrawerList = [
   {
     icon: "Folder",
     label: "End User Agreement",
-    navigateTo: "TermsAndConditions",
+    navigateTo: "UserAgreement",
   },
   {
     icon: "Folder",
     label: "Waiver",
-    navigateTo: "TermsAndConditions",
+    navigateTo: "Waiver",
   },
 ];
 
@@ -43,44 +43,14 @@ const DrawerLayout = ({icon, label, navigateTo, index, onPress}) => {
       >
         <Icon name={icon} family={"custom"} color={"white"} size={20} />
         <AppText style={styles.Text}>{label}</AppText>
-        <Icon name="right" family="antdesign" color={theme.darkColors?.white} size={20} />
+        <Icon name="right" color={theme.darkColors?.white} size={20} />
       </View>
     );
   };
   return (
-    <>
-      {index === 0 ? (
-        <TouchableOpacity onPress={() => onPress(navigateTo)}>
-          <LinearGradient
-            colors={["#9003E0", "#1158F4", "#9003E0"]}
-            style={[
-              styles.linearGradient,
-              {
-                padding: 0,
-                minHeight: 50,
-              },
-            ]}
-            start={{x: 0, y: 0}}
-            end={{x: 1, y: 0}}
-          >
-            <View
-              style={{
-                flex: 1,
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 10,
-              }}
-            >
-              {renderDrawerItem()}
-            </View>
-          </LinearGradient>
-        </TouchableOpacity>
-      ) : (
-        <TouchableOpacity onPress={() => onPress(navigateTo)} style={styles.linearGradient}>
-          {renderDrawerItem()}
-        </TouchableOpacity>
-      )}
-    </>
+    <TouchableOpacity onPress={() => onPress(navigateTo)} style={styles.linearGradient}>
+      {renderDrawerItem()}
+    </TouchableOpacity>
   );
 };
 

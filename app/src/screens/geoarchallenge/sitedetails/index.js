@@ -40,6 +40,7 @@ import {
 import Icon from "components/Icon";
 import theme from "assets/theme";
 import {EXPERIENCE_TYPE_CHOICES} from "../../../constants";
+import Toast from "react-native-toast-message";
 
 const GeoArSiteDetails = ({route}) => {
   const experience_type = route.params?.experience_type;
@@ -301,6 +302,16 @@ const GeoArSiteDetails = ({route}) => {
       };
     }, [])
   );
+
+  useEffect(() => {
+    if (!userIsAllowedToCheckIn && coolDownHoursText) {
+      Toast.show({
+        type: "info",
+        text1: "Check-in Info",
+        text2: "You will be allowed to check in after " + coolDownHoursText,
+      });
+    }
+  }, [userIsAllowedToCheckIn, coolDownHoursText]);
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>

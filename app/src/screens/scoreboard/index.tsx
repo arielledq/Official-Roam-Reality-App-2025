@@ -5,7 +5,7 @@ import FastImage from "react-native-fast-image";
 import {useSelector} from "react-redux";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 
-import {getGeoARDestinations, getMyRank, getScoreboardList} from "../../network";
+import {getGeoARDestinations, getMyRank, getProfieDetails, getScoreboardList} from "../../network";
 import {handleError, truncateText} from "util/helpers";
 
 import {AppHeader} from "../../components";
@@ -22,8 +22,7 @@ import {FontSizes} from "util/FontUtils";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import useScoreboardHook from "hooks/useScoreboardHook";
-
-const SCROLL_AMOUNT = 70;
+import {getProfilePicture} from "util/imageUtils";
 
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
@@ -33,12 +32,53 @@ const ScoreBoard = ({}) => {
   const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
   const [scrollPosition, setScrollPosition] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
+  const [profileDetails, setProfileDetails] = useState<any>();
   const {sponsors} = useScoreboardHook();
 
   const _styles = useStyles();
   const desRef = useRef<FlatList>(null);
   const navigation = useNavigation();
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
+
+  // let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors;
+  let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors;
+  filtersData = [...(filtersData || [])]; // Create a new array to avoid mutating the original
+
+  if (selectedDestination?.id) {
+    const selectedDestinationIndex = filtersData.findIndex(
+      (filter: any) => filter?.id === selectedDestination.id
+    );
+
+    if (selectedDestinationIndex !== -1) {
+      const selectedDestinationItem = filtersData[selectedDestinationIndex];
+      // Create a new array without the selected item
+      const filteredData = filtersData.filter(
+        (_: any, index: number) => index !== selectedDestinationIndex
+      );
+      // Insert the selected item at position 1
+      filtersData = [filteredData[0], selectedDestinationItem, ...filteredData.slice(1)];
+    }
+  }
+
+  const fetchProfileDetails = async () => {
+    try {
+      getProfieDetails({
+        id: userProfile.user_profile.id,
+      })
+        .then(res => {
+          if (res.status == 1) {
+            setProfileDetails(res);
+          } else {
+            console.error("Error", "Error fetching profile details: ");
+          }
+        })
+        .catch(err => {
+          console.error("Error", "Error fetching profile details: ");
+        });
+    } catch (error) {
+      console.error("Error", "Error fetching profile details: ");
+    }
+  };
 
   const getScoreboard = async (pageNumber = 1, destination = "", sponsor = "") => {
     setRefreshing(true);
@@ -79,7 +119,6 @@ const ScoreBoard = ({}) => {
 
   const ARDestinations = async () => {
     if (destinationData?.length) return;
-    setRefreshing(true);
     try {
       const res = await getGeoARDestinations();
       if (res.status == 1) {
@@ -119,9 +158,20 @@ const ScoreBoard = ({}) => {
   };
 
   const scrollRegionsPressHandler = () => {
-    const newPosition = scrollPosition + SCROLL_AMOUNT;
-    desRef.current?.scrollToOffset({offset: newPosition, animated: true});
-    setScrollPosition(newPosition);
+    if (!desRef.current) return;
+
+    const newIndex = Math.min(
+      Math.floor(scrollPosition / 100) + 3, // Adjust the divisor based on your item height
+      filtersData.length - 1 // Assuming 'data' is your FlatList data source
+    );
+
+    desRef.current.scrollToIndex({
+      index: newIndex,
+      animated: true,
+      viewPosition: 0.5, // Scrolls the item to the middle of the screen
+    });
+
+    setScrollPosition(newIndex * 100); // Adjust based on your item height
   };
 
   const getInitialData = () => {
@@ -135,19 +185,38 @@ const ScoreBoard = ({}) => {
     }
     getScoreboard(newPage, destination, sponsor);
     ARDestinations();
+    fetchProfileDetails();
   };
 
   React.useEffect(() => {
     getInitialData();
   }, []);
 
-  const DestinationItem = React.memo(({obj}: {obj: any}) => {
+  const skeletonItem = () => {
+    return (
+      <View
+        style={{
+          height: 50,
+          width: 50,
+          borderRadius: 4,
+          backgroundColor: "#131422",
+          marginHorizontal: 5,
+          marginVertical: 10,
+        }}
+      />
+    );
+  };
+
+  const FilterItem = React.memo(({obj}: {obj: any}) => {
     let filterImage = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
       filterImage = obj?.flag_image;
     } else {
       filterImage = obj?.image;
     }
+
+    if (!obj?.name) return skeletonItem();
+
     return (
       <TouchableOpacity
         onPress={() => filterDestinations(obj)}
@@ -192,6 +261,7 @@ const ScoreBoard = ({}) => {
   const Item = React.memo(({obj, index}: {obj: any; index: number}) => {
     const userPosition = index + 1;
     const userRank = userPosition;
+    const profilePicture = getProfilePicture(obj?.user_profile?.image);
     return (
       <View
         style={{
@@ -219,19 +289,15 @@ const ScoreBoard = ({}) => {
             }}
             resizeMode="stretch"
           >
-            <FastImage
+            <Image
               style={{
                 width: 40,
                 aspectRatio: 1,
                 borderRadius: 5,
                 height: 40,
               }}
-              source={{
-                uri: obj?.user_profile?.image,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.immutable,
-              }}
-              resizeMode={FastImage.resizeMode.cover}
+              source={{uri: profilePicture}}
+              resizeMode="cover"
             />
           </ImageBackground>
           <Text numberOfLines={2} style={_styles.nameText}>
@@ -245,6 +311,8 @@ const ScoreBoard = ({}) => {
       </View>
     );
   });
+
+  const profilePicture = getProfilePicture(profileDetails?.image);
 
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
@@ -278,11 +346,10 @@ const ScoreBoard = ({}) => {
       <View style={_styles.countryFiltersContainer}>
         <FlatList
           horizontal
-          ref={desRef}
-          data={challengeChoice == SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors}
+          data={filtersData?.length ? filtersData : [1, 2, 3, 4]}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
-          renderItem={({item}) => <DestinationItem obj={item} />}
+          renderItem={({item}) => <FilterItem obj={item} />}
           contentContainerStyle={{gap: 4}}
         />
         <TouchableOpacity
@@ -320,19 +387,15 @@ const ScoreBoard = ({}) => {
               }}
               resizeMode="stretch"
             >
-              <FastImage
+              <Image
                 style={{
                   width: 40,
                   aspectRatio: 1,
                   borderRadius: 5,
                   height: 40,
                 }}
-                source={{
-                  uri: userProfile?.user_profile?.image,
-                  priority: FastImage.priority.normal,
-                  cache: FastImage.cacheControl.immutable,
-                }}
-                resizeMode={FastImage.resizeMode.cover}
+                source={{uri: profilePicture}}
+                resizeMode="cover"
               />
             </ImageBackground>
             <Text style={_styles.nameText}>{userProfile?.name ? userProfile?.name : "You"}</Text>

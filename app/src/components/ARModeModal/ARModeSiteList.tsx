@@ -1,4 +1,4 @@
-import React, {useEffect, useCallback, useState} from "react";
+import React, {useEffect, useState} from "react";
 import {View, Text, Image, TouchableOpacity, ScrollView} from "react-native";
 
 import AppDropdown from "components/Dropdown";
@@ -263,10 +263,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       </View>
                       <View style={{flexDirection: "row", alignItems: "center"}}>
                         <Icon name="walkingIcon" color="#C881F0" family="custom" size={15} />
-                        <Text style={{color: "#C881F0", fontSize: 10}}>
-                          {/* TODO: API is missing the distance to the challenge it self */}
-                          {site?.check_in_site_radius || 0} Miles
-                        </Text>
+                        <Text style={{color: "#C881F0", fontSize: 10}}>0 Miles away</Text>
                       </View>
                     </View>
                   </View>

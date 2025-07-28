@@ -82,20 +82,20 @@ const ArChallengeShare = () => {
   }
 
   let sponsor = challengeObj?.sponsored;
-  console.log("challengeObj", challengeObj);
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
   let sponsorImage = sponsor?.image || "";
   let sponsorName = sponsor?.name || "";
-  let startDate = moment().format("MM-DD-YYYY");
+  const startDate = isMemory
+    ? moment(challengeObj?.created_at).format("MM-DD-YYYY")
+    : moment().format("MM-DD-YYYY");
   let endChallengeButtonText = "End & Share to Roam Profile";
+
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
-      if (isMemory) startDate = "-";
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
-      if (isMemory) startDate = "-";
       break;
     case CHALLENGES_TYPE.STAR:
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
@@ -103,7 +103,6 @@ const ArChallengeShare = () => {
       sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
       sponsorImage = sponsor?.image;
       sponsorName = sponsor?.name;
-      if (isMemory) startDate = "-";
       const remainingStars = challengeObj?.remaining_stars;
       if (remainingStars > 1) {
         challengePoints = 0;
@@ -195,56 +194,48 @@ const ArChallengeShare = () => {
     let res;
 
     try {
-      // let successMessage = "Successfully, completed your challenge.";
-      switch (challengeType) {
-        case CHALLENGES_TYPE.PHOTO_VIDEO:
-          formData.append("challenges", challengeObj.id);
-          formData.append("memory_file", shareFile);
-          formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
-          res = await postArMemory(formData);
-          break;
-
-        case CHALLENGES_TYPE.PIN_CHECK_IN:
-          formData.append("geo_challenge", challengeObj.id);
-          formData.append("geo_site", challengeObj?.geo_site?.id);
-          formData.append("memory_file", shareFile);
-
-          res = await postGeoPinCheckIn(formData);
-          break;
-        // case CHALLENGES_TYPE.STAR:
-        //   res = await starFoundAndSaveApi({
-        //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-        //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
-        //     geo_ar_star_point: challengeObj?.id, // id de la estrella
-        //     latitude: userLocation?.latitude,
-        //     longitude: userLocation?.longitude,
-        //   });
-
-        //   const remainingStars = challengeObj?.remaining_stars;
-        //   // if (remainingStars > 1) {
-        //   //   successMessage = "Success, continue to the next Star.";
-        //   // }
-
-        //   break;
-
-        default:
-          break;
+      console.log("ShareChallengeScreen shareToRoamProfile challengeObj:", challengeObj);
+      console.log("ShareChallengeScreen shareToRoamProfile challengeType:", challengeType);
+      if (challengeType === CHALLENGES_TYPE.PHOTO_VIDEO) {
+        formData.append("challenges", challengeObj?.id);
+        formData.append("memory_file", shareFile);
+        formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+        res = await postArMemory(formData);
       }
+      if (challengeType === CHALLENGES_TYPE.PIN_CHECK_IN) {
+        formData.append("geo_challenge", challengeObj?.id);
+        formData.append("geo_site", challengeObj?.geo_site?.id);
+        formData.append("memory_file", shareFile);
 
-      setHasSharedToRoamProfile(true);
-      ARUserProfile();
+        res = await postGeoPinCheckIn(formData);
+      }
+      // case CHALLENGES_TYPE.STAR:
+      //   res = await starFoundAndSaveApi({
+      //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+      //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
+      //     geo_ar_star_point: challengeObj?.id, // id de la estrella
+      //     latitude: userLocation?.latitude,
+      //     longitude: userLocation?.longitude,
+      //   });
 
-      if (res.status === 1) {
+      //   const remainingStars = challengeObj?.remaining_stars;
+      //   // if (remainingStars > 1) {
+      //   //   successMessage = "Success, continue to the next Star.";
+      //   // }
+
+      if (res?.status === 1) {
+        setHasSharedToRoamProfile(true);
+        ARUserProfile();
         if (endExperienceHandler) {
           endExperienceHandler();
         }
       } else {
         console.error("Success - Error al compartir el desafío:", res);
-        handleError("There was an error sharing your challenge: " + res?.message);
+        handleError("There was an error sharing your challenge");
       }
     } catch (error) {
       console.error("Catch - Error al compartir el desafío:", error);
-      handleError("There was an error sharing your challenge: " + error);
+      handleError("There was an error sharing your challenge");
     } finally {
       setIsLoading(false);
     }
@@ -293,6 +284,7 @@ const ArChallengeShare = () => {
   };
 
   const resetNavigation = () => {
+    console.log("resetNavigation");
     navigation.reset({
       index: 0,
       // @ts-ignore
@@ -548,18 +540,16 @@ const ArChallengeShare = () => {
               </View>
 
               {/* Completion date */}
-              {!isMemory && challengeTitle && (
-                <Text
-                  style={{
-                    ...fontGroup.nunitoLight,
-                    fontWeight: "300",
-                    fontSize: FontSizes.S10,
-                    color: theme.lightColors?.white,
-                  }}
-                >
-                  Completed on: {startDate}
-                </Text>
-              )}
+              <Text
+                style={{
+                  ...fontGroup.nunitoLight,
+                  fontWeight: "300",
+                  fontSize: FontSizes.S10,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                Completed on: {startDate}
+              </Text>
             </View>
           </View>
 
@@ -592,7 +582,7 @@ const ArChallengeShare = () => {
               justifyContent: "space-between",
               gap: 16,
               marginTop: isMemory ? 16 : 0,
-              flex: 1,
+              height: 55,
             }}
           >
             {/* Share to socials button */}

@@ -12,6 +12,8 @@ from taggit.serializers import (TagListSerializerField,
                                 TaggitSerializer)
 from django.contrib.gis.db.models import GeometryField
 from rest_framework_gis.serializers import GeoModelSerializer
+from django.utils import timezone
+from datetime import timedelta
 
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
@@ -157,10 +159,32 @@ class ChallengesSerializer(serializers.ModelSerializer):
         return obj.image.url
 
     def get_user_attempts(self, obj):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return ARMemories.objects.filter(user=user, challenges=obj).count()
-        return 0
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        memories = ARMemories.objects.filter(
+            user=user,
+            challenges=obj
+        ).order_by('created_at')
+
+        if not memories.exists():
+            return 0
+
+        now = timezone.now()
+        first_time = memories.first().created_at
+        cycle_length = timedelta(hours=obj.cooldown_hours)
+        cycles_passed = (now - first_time) // cycle_length
+        cycle_start = first_time + cycles_passed * cycle_length
+
+        # Attempts in current cycle (from cycle_start to now)
+        attempts = memories.filter(
+            created_at__gte=cycle_start,
+            created_at__lte=now
+        ).count()
+
+        return min(attempts, obj.challenge_attempt)
 
     class Meta:
         model = Challenges
@@ -337,10 +361,14 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
     file_animation = serializers.FileField()
+    file_3d = serializers.FileField()
+    icon = serializers.ImageField()
+    sponsor = SponsorSerializer()
 
     class Meta:
         model = ScanPicture
-        fields = ['name', 'file_image', 'file_animation',]
+        geo_field = ('coordinates',)
+        fields = ['name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'coordinates',]
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
@@ -384,10 +412,33 @@ class GeoArSiteSerializer(GeoModelSerializer):
         return ARSitePinCheckIn.objects.filter(geo_site=obj).count()
 
     def get_user_attempts(self, obj):
-        user = self.context['request'].user
-        if user.is_authenticated:
-            return ARSitePinCheckIn.objects.filter(user=user, geo_site=obj, geo_challenge=obj.pin_challenge).count()
-        return 0
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        check_ins = ARSitePinCheckIn.objects.filter(
+            user=user,
+            geo_site=obj,
+            geo_challenge=obj.pin_challenge,
+        ).order_by('created_at')
+
+        if not check_ins.exists():
+            return 0
+
+        now = timezone.now()
+        first_time = check_ins.first().created_at
+        cycle_length = timedelta(hours=obj.cooldown_hours)
+        cycles_passed = (now - first_time) // cycle_length
+        cycle_start = first_time + cycles_passed * cycle_length
+
+        # Attempts in current cycle (from cycle_start to now)
+        attempts = check_ins.filter(
+            created_at__gte=cycle_start,
+            created_at__lte=now
+        ).count()
+
+        return min(attempts, obj.challenge_attempt)
 
 
 class GeoRegionSerializer(GeoModelSerializer):
@@ -756,3 +807,12 @@ class ARAllMemoriesSerializer(serializers.Serializer):
 class ElevationRequestSerializer(serializers.Serializer):
     lat = serializers.FloatField()
     lng = serializers.FloatField()
+
+
+class ARScanSerializer(serializers.Serializer):
+    def to_representation(self, instance):
+        if isinstance(instance, Challenges):
+            return ChallengesSerializer(instance, context=self.context).data
+        elif isinstance(instance, ScanPicture):
+            return ScanPictureSerializer(instance, context=self.context).data
+        return {}

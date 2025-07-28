@@ -1,5 +1,14 @@
 import * as React from "react";
-import {Text, View, StyleSheet, Keyboard, Pressable, ImageBackground, Alert} from "react-native";
+import {
+  Text,
+  View,
+  StyleSheet,
+  Keyboard,
+  Pressable,
+  ImageBackground,
+  Alert,
+  Image,
+} from "react-native";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {AppInput} from "../../components";
 import {FlatList} from "react-native-gesture-handler";
@@ -15,6 +24,7 @@ import useDebounce from "../../hooks/debounce";
 import {DEBOUNCE_TIME, showMessage} from "../../util/helpers";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 import Icon from "components/Icon";
+import {getProfilePicture} from "util/imageUtils";
 
 const InAppUsers = () => {
   const _styles = useStyles();
@@ -103,7 +113,9 @@ const InAppUsers = () => {
   );
 };
 
-const renderFriendItem = (item, onAddFriendClick, styles?) => {
+const renderFriendItem = (item: any, onAddFriendClick: any, styles: any) => {
+  const profilePicture = getProfilePicture(item?.user_profile?.image || "");
+
   return (
     <View
       style={{
@@ -135,14 +147,14 @@ const renderFriendItem = (item, onAddFriendClick, styles?) => {
           }}
           resizeMode="stretch"
         >
-          <FastImage
+          <Image
             style={{
               width: 30,
               aspectRatio: 1,
               borderRadius: 5,
             }}
-            source={{uri: item?.user_profile?.image}}
-            resizeMode={FastImage.resizeMode.cover}
+            source={{uri: profilePicture}}
+            resizeMode="cover"
           />
         </ImageBackground>
         <View>

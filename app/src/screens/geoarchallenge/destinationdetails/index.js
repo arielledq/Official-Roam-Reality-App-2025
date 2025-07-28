@@ -193,16 +193,18 @@ const GeoArChallengeDetails = ({}) => {
   };
 
   const f_markerView = o => {
-    if (
-      o?.user_ar_profile?.current_location &&
-      o?.user_ar_profile?.current_location?.coordinates?.length
-    ) {
+    const friendHasLocation =
+      !!o?.ar_user_profile_user?.current_location &&
+      !!o?.ar_user_profile_user?.current_location?.coordinates?.length;
+    if (friendHasLocation) {
+      const friendLat = o?.ar_user_profile_user?.current_location.coordinates[1];
+      const friendLong = o?.ar_user_profile_user?.current_location.coordinates[0];
       return (
         <Marker
           key={o.id}
           coordinate={{
-            latitude: o?.user_ar_profile?.current_location.coordinates[1],
-            longitude: o?.user_ar_profile?.current_location.coordinates[0],
+            latitude: friendLat,
+            longitude: friendLong,
           }}
           title={o.name}
           onCalloutPress={() => {
@@ -613,15 +615,15 @@ const GeoArChallengeDetails = ({}) => {
             data={categories}
             renderItem={({item}) => (
               <TouchableOpacity
-                onPress={() => showFilteredList(item.id)}
+                onPress={() => showFilteredList(item?.id)}
                 activeOpacity={0.5}
                 style={
-                  item.name === "Full"
+                  item?.name === "Full"
                     ? _styles.selectButtonStyle
-                    : {..._styles.unSelectButtonStyle, backgroundColor: item.color}
+                    : {..._styles.unSelectButtonStyle, backgroundColor: item?.color}
                 }
               >
-                <Text style={_styles.buttonSelectText}>{item.name}</Text>
+                <Text style={_styles.buttonSelectText}>{item?.name}</Text>
               </TouchableOpacity>
             )}
             keyExtractor={item => item?.id?.toString()}
@@ -640,31 +642,32 @@ const GeoArChallengeDetails = ({}) => {
               onPress={moveToFullRegion}
               activeOpacity={0.5}
               style={
-                selectedRegionName == "Full"
+                selectedRegionName === "Full"
                   ? _styles.selectButtonStyle
                   : _styles.unSelectButtonStyle
               }
             >
               <Text style={_styles.buttonSelectText}>Full</Text>
             </TouchableOpacity>
-            {regions?.length &&
-              regions.map(e => {
-                if (e.geo_region)
-                  return (
-                    <TouchableOpacity
-                      key={e.id}
-                      activeOpacity={0.5}
-                      onPress={() => moveToRegion(e)}
-                      style={
-                        selectedRegionName == e.name
-                          ? _styles.selectButtonStyle
-                          : _styles.unSelectButtonStyle
-                      }
-                    >
-                      <Text style={_styles.buttonSelectText}>{e.name}</Text>
-                    </TouchableOpacity>
-                  );
-              })}
+            {regions?.length
+              ? regions.map(e => {
+                  if (e?.geo_region)
+                    return (
+                      <TouchableOpacity
+                        key={e?.id}
+                        activeOpacity={0.5}
+                        onPress={() => moveToRegion(e)}
+                        style={
+                          selectedRegionName === e?.name
+                            ? _styles.selectButtonStyle
+                            : _styles.unSelectButtonStyle
+                        }
+                      >
+                        <Text style={_styles.buttonSelectText}>{e?.name || ""}</Text>
+                      </TouchableOpacity>
+                    );
+                })
+              : null}
           </ScrollView>
         )}
       </View>

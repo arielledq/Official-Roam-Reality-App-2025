@@ -1,6 +1,6 @@
 import Config from "../config";
-import { searchUsers } from "../network";
-import { LocationPoint } from "./LocationLib";
+import {searchUsers} from "../network";
+import {LocationPoint} from "./LocationLib";
 
 const PlacesAPIURL = (point: LocationPoint, radius: Number) => {
   return `https://maps.googleapis.com/maps/api/place/nearbysearch/json?location=${point.latitude},${point.longitude}&radius=50&key=${Config.GEOCODER_API_KEY}`;
@@ -42,14 +42,14 @@ export const getMyRank = (userProfile: any, arProfile: any, callback: (rank: any
   searchUsers(payload).then(response => {
     if (response) {
       if (response?.data?.length > 0) {
-        let arProfiles = response?.data.filter((a: any) => a.user_ar_profile);
+        let arProfiles = response?.data.filter((a: any) => a.ar_user_profile_user);
         arProfiles = arProfiles.filter((a: any) => a.name);
         if (arProfile && userProfile) {
-          userProfile.user_ar_profile = arProfile;
+          userProfile.ar_user_profile_user = arProfile;
           arProfiles.push(userProfile);
         }
         const aa = arProfiles.sort(
-          (a: any, b: any) => b?.user_ar_profile?.points - a?.user_ar_profile?.points
+          (a: any, b: any) => b?.ar_user_profile_user?.points - a?.ar_user_profile_user?.points
         );
         for (var i = 0; i < aa.length; i++) {
           aa[i].rank = i + 1;

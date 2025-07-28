@@ -447,6 +447,14 @@ export const getARStettings = () =>
     },
     logoutFunc
   );
+export const getUserAgreement = () =>
+  Request.callWithToken(
+    {
+      url: `/modules/user-agreement/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
 export const sendFeedback = data =>
   Request.callWithToken(
     {
@@ -700,6 +708,14 @@ export const sendRoamingNotification = payload =>
       url: `${commonApiRoute}notifications/send_roaming_notifications/`,
       method: "POST",
       data: payload,
+    },
+    logoutFunc
+  );
+export const getGeoARDestinationsMini = () =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/geo-ar-location-mini/`,
+      method: "GET",
     },
     logoutFunc
   );

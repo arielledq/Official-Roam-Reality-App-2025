@@ -7,14 +7,14 @@ from travel_ar_app_42706 import settings
 from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
-    DestinationFacts, PanicMessage, GeoArSiteCategory
+    DestinationFacts, PanicMessage, GeoArSiteCategory, ScanPicture
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
     GeoLocationSerializer, GeoArSiteSerializer, ARSitePinCheckInSerializer, StarCollectionSerializer, \
     GoldStarCollectionSerializer, DestinationFactsSerializer, PanicMessageSerializer, \
     GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer, \
-    ElevationRequestSerializer
+    ElevationRequestSerializer, ARScanSerializer
 from rest_framework import viewsets, exceptions
 from rest_framework.viewsets import ViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
@@ -127,38 +127,52 @@ class ARMemoriesViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='check-challenge-done', name='Check Challenge')
     def check_challenge_done(self, request):
-        user_id = self.request.user.id
+        user = request.user
         challenge_id = request.data.get("challenges")
 
         try:
-            challenge_obj = Challenges.objects.get(pk=challenge_id)
-        except GeoARChallenges.DoesNotExist:
+            challenge = Challenges.objects.get(pk=challenge_id)
+        except Challenges.DoesNotExist:
             return Response(
                 {'message': f'Challenge {challenge_id} does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        results = ARMemories.objects.filter(user=user_id, challenges=challenge_id)
+        memories = ARMemories.objects.filter(
+            user=user,
+            challenges=challenge
+        ).order_by('created_at')
 
-        total_attempts = len(results)
-        if total_attempts >= challenge_obj.challenge_attempt:
-            # Is important to verify if total_attempts is multiple of challenge_attempt,
-            # so if it is true, checks the cooldown
-            if total_attempts % challenge_obj.challenge_attempt == 0:
-                last_check_in = results.order_by('-created_at').first()
-                if last_check_in:
-                    cooldown_hours = getattr(challenge_obj, 'cooldown_hours', 24)
-                    cooldown_limit = last_check_in.created_at + timezone.timedelta(hours=cooldown_hours)
+        if not memories.exists():
+            return Response(
+                {'message': "Challenge can be submitted now."},
+                status=status.HTTP_200_OK
+            )
 
-                    if timezone.now() < cooldown_limit:
-                        time_remaining = cooldown_limit - timezone.now()
-                        return Response(
-                            {
-                                'message': "You are still in cooldown period.",
-                                'remaining': str(time_remaining)
-                            },
-                            status=status.HTTP_403_FORBIDDEN
-                        )
+        now = timezone.now()
+        first_time = memories.first().created_at
+        cycle_length = timezone.timedelta(hours=challenge.cooldown_hours)
+
+        # Cycles
+        cycles_passed = (now - first_time) // cycle_length
+        cycle_start = first_time + cycles_passed * cycle_length
+        window_end = cycle_start + cycle_length
+
+        # Attempts in current cycles
+        attempts = memories.filter(
+            created_at__gte=cycle_start,
+            created_at__lte=now
+        ).count()
+
+        # Attempts finished
+        if attempts >= challenge.challenge_attempt and now < window_end:
+            return Response(
+                {
+                    'message': "You are still in cooldown period.",
+                    'remaining': str(window_end - now)
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         return Response(
             {'message': "Challenge can be submitted now."},
@@ -167,7 +181,7 @@ class ARMemoriesViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='check-geo-challenge-done', name='Check Geo Challenge')
     def check_geo_challenge_done(self, request):
-        user_id = self.request.user.id
+        user = request.user
         geo_challenge_id = request.data.get("geo_challenge")
         geo_site_id = request.data.get("geo_site")
 
@@ -179,32 +193,43 @@ class ARMemoriesViewSet(ViewSet):
                 {'message': f'Challenge or site does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        results = ARSitePinCheckIn.objects.filter(
-            user=user_id,
+
+        check_ins = ARSitePinCheckIn.objects.filter(
+            user=user,
             geo_challenge=geo_challenge_id,
             geo_site=geo_site_id,
-        )
+        ).order_by('created_at')
 
-        total_attempts = len(results)
+        if not check_ins.exists():
+            return Response(
+                {'message': "Challenge can be submitted now."},
+                status=status.HTTP_200_OK
+            )
 
-        if total_attempts >= site_obj.challenge_attempt:
-            # Is important to verify if total_attempts is multiple of challenge_attempt,
-            # so if it is true, check the cooldown
-            if total_attempts % site_obj.challenge_attempt == 0:
-                last_check_in = results.order_by('-created_at').first()
-                if last_check_in:
-                    cooldown_hours = getattr(site_obj, 'cooldown_hours', 24)
-                    cooldown_limit = last_check_in.created_at + timezone.timedelta(hours=cooldown_hours)
+        now = timezone.now()
+        first_time = check_ins.first().created_at
+        cycle_length = timezone.timedelta(hours=site_obj.cooldown_hours)
 
-                    if timezone.now() < cooldown_limit:
-                        time_remaining = cooldown_limit - timezone.now()
-                        return Response(
-                            {
-                                'message': "You are still in cooldown period.",
-                                'remaining': str(time_remaining)
-                            },
-                            status=status.HTTP_403_FORBIDDEN
-                        )
+        # Cycles
+        cycles_passed = (now - first_time) // cycle_length
+        cycle_start = first_time + cycles_passed * cycle_length
+        window_end = cycle_start + cycle_length
+
+        # Attempts in current cycles
+        attempts = check_ins.filter(
+            created_at__gte=cycle_start,
+            created_at__lte=now
+        ).count()
+
+        # Attempts finished
+        if attempts >= site_obj.challenge_attempt and now < window_end:
+            return Response(
+                {
+                    'message': "You are still in cooldown period.",
+                    'remaining': str(window_end - now)
+                },
+                status=status.HTTP_403_FORBIDDEN
+            )
 
         return Response(
             {'message': "Challenge can be submitted now."},
@@ -686,7 +711,7 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         site_type = int(self.request.query_params.get("site_type"))
         if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return GeoArSiteSerializer
-        return ChallengesSerializer
+        return ARScanSerializer
 
     def get_queryset(self):
         try:
@@ -699,12 +724,12 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return GeoArSite.objects.all()
 
-        qs = Challenges.objects.filter(
+        qs = list(chain(
+            Challenges.objects.filter(
                 is_active=True
-            )
-
-        if sponsor := self.request.query_params.get("sponsor"):
-            qs = qs.filter(sponsor=sponsor)
+            ),
+            ScanPicture.objects.all()
+        ))
 
         return qs
 
@@ -712,6 +737,22 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         if int(self.request.query_params.get("site_type")) in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
             return super().filter_queryset(qs)
         return qs
+
+    def list(self, request, *args, **kwargs):
+        qs = self.filter_queryset(self.get_queryset())
+        site_type = int(self.request.query_params.get("site_type"))
+        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
+            return super().list(request, *args, **kwargs)
+
+        challenges = []
+        scans = []
+        for element in qs:
+            data = ARScanSerializer(element).data
+            if isinstance(element, Challenges):
+                challenges.append(data)
+            else:
+                scans.append(data)
+        return Response(data={'challenges': challenges, 'scans': scans})
 
 
 class ElevationAPIView(APIView):

@@ -1,9 +1,8 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {FlatList, Image, Platform, TouchableOpacity, View} from "react-native";
+import {FlatList, Image, TouchableOpacity, View} from "react-native";
 import useStyles from "./styles";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
-import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import {MenuIcon} from "../../assets/svg";
 import UserInfoCard from "../../components/userInfoCard";
@@ -21,17 +20,16 @@ import {
   getAllMemories,
   getProfieDetails,
   getUserCollectedStarCount,
-  sendCode,
   getMyRank,
 } from "../../network";
 import {useDispatch, useSelector} from "react-redux";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
-import FastImage from "react-native-fast-image";
 import ScreenLoader from "../../components/screenLoader";
 import {updateARUserData} from "../../redux/AR";
 import {BlurView} from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
 import {height} from "util/AppDimensions";
+import {getProfilePicture} from "util/imageUtils";
 
 const SCROLL_AMOUNT = 150;
 
@@ -231,60 +229,44 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     if (!email) return;
     // sendCode({email: email.toLowerCase()});
     setIsTransitioning(true);
-    // @ts-expect-error
+    // @ts-ignore
     navigation.navigate("EmailVerification", {
       email: email.toLowerCase(),
       profile: true,
     });
   };
 
+  const profilePicture = getProfilePicture(profileDetails?.user?.user_profile?.image);
+
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-        {profileDetails?.image ? (
-          <>
-            <FastImage
-              style={{
-                width: "100%",
-                height: height * 0.5,
-              }}
-              //  @ts-ignore
-              source={{uri: profileDetails?.image}}
-              resizeMode={FastImage.resizeMode.cover}
-            />
-            <LinearGradient
-              colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-              start={{x: 0.5, y: 1}}
-              end={{x: 0.5, y: 0.7}}
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                zIndex: 1,
-              }}
-            />
-          </>
-        ) : (
-          <>
-            <View
-              style={{
-                width: "100%",
-                height: 200,
-              }}
-            />
-          </>
-        )}
+        <Image
+          style={{
+            width: "100%",
+            height: height * 0.5,
+          }}
+          source={{uri: profilePicture}}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+          start={{x: 0.5, y: 1}}
+          end={{x: 0.5, y: 0.7}}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+          }}
+        />
+
         <AppButton
           customColors={["#7B16FF", "#1158F4"]}
           buttonStyle={_styles.editButton}
-          containerStyle={[
-            _styles.editButtonContainer,
-            {
-              top: Platform.OS === "ios" ? 130 : 110,
-            },
-          ]}
+          containerStyle={_styles.editButtonContainer}
           onPress={() => {
             setIsTransitioning(true);
             //  @ts-ignore
@@ -311,7 +293,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           isVerified={userProfile?.user_profile?.is_verified}
         />
         <View style={_styles.scoreboardContainer}>
-          <AppText adjustsFontSizeToFit={true} numberOfLines={1} style={_styles.scoreboard}>
+          <AppText
+            // @ts-ignore
+            onPress={() => navigation.navigate("Scores")}
+            adjustsFontSizeToFit={true}
+            numberOfLines={1}
+            style={_styles.scoreboard}
+          >
             SCOREBOARD
           </AppText>
         </View>

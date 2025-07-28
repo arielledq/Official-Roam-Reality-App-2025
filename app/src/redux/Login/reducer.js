@@ -21,15 +21,15 @@ export const sliceLogin = createSlice({
     updateUserLocationData: (state, action) => {
       const {longitude, latitude} = action.payload || {};
       if (
-        !state?.data?.user?.user_ar_profile ||
+        !state?.data?.user?.ar_user_profile_user ||
         typeof longitude !== "number" ||
         typeof latitude !== "number"
       ) {
+        state.data.user.ar_user_profile_user.current_location = null;
         return;
       }
-
-      state.data.user.user_ar_profile.current_location = {
-        ...state.data.user.user_ar_profile.current_location,
+      state.data.user.ar_user_profile_user.current_location = {
+        ...state.data.user.ar_user_profile_user.current_location,
         coordinates: [longitude, latitude],
       };
     },
