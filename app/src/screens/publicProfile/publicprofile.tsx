@@ -30,6 +30,7 @@ import UserReportCard from "../../components/userInfoCard";
 import ReportUserModal from "../reportUser/ReportUser";
 import {showMessage} from "../../util/helpers";
 import ConfirmationPopUp from "../../components/confirmationPopUp";
+import {getProfilePicture} from "util/imageUtils";
 
 const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> = () => {
   const navigation = useNavigation();
@@ -172,33 +173,33 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       });
   };
 
+  const profilePicture = getProfilePicture(userProfile?.user_profile?.image || "");
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
-      {userProfile?.user_profile?.image && (
-        <View style={_styles.avatarContainer}>
-          <FastImage
-            style={{
-              width: "100%",
-              height: height * 0.5,
-            }}
-            source={{uri: userProfile?.user_profile?.image}}
-            resizeMode={FastImage.resizeMode.cover}
-          />
-          <LinearGradient
-            colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-            start={{x: 0.5, y: 1}}
-            end={{x: 0.5, y: 0.7}}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              zIndex: 1,
-            }}
-          />
-        </View>
-      )}
+      <View style={_styles.avatarContainer}>
+        <Image
+          style={{
+            width: "100%",
+            height: height * 0.5,
+          }}
+          source={{uri: profilePicture}}
+          resizeMode="cover"
+        />
+        <LinearGradient
+          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+          start={{x: 0.5, y: 1}}
+          end={{x: 0.5, y: 0.7}}
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            zIndex: 1,
+          }}
+        />
+      </View>
+
       <View style={_styles.scroll}>
         <UserReportCard
           image={userProfile?.user_profile?.image ? true : false}

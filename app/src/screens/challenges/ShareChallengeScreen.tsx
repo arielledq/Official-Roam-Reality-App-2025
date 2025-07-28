@@ -82,7 +82,6 @@ const ArChallengeShare = () => {
   }
 
   let sponsor = challengeObj?.sponsored;
-  console.log("challengeObj", challengeObj);
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
   let sponsorImage = sponsor?.image || "";
   let sponsorName = sponsor?.name || "";
@@ -195,46 +194,38 @@ const ArChallengeShare = () => {
     let res;
 
     try {
-      // let successMessage = "Successfully, completed your challenge.";
-      switch (challengeType) {
-        case CHALLENGES_TYPE.PHOTO_VIDEO:
-          formData.append("challenges", challengeObj.id);
-          formData.append("memory_file", shareFile);
-          formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
-          res = await postArMemory(formData);
-          break;
-
-        case CHALLENGES_TYPE.PIN_CHECK_IN:
-          formData.append("geo_challenge", challengeObj.id);
-          formData.append("geo_site", challengeObj?.geo_site?.id);
-          formData.append("memory_file", shareFile);
-
-          res = await postGeoPinCheckIn(formData);
-          break;
-        // case CHALLENGES_TYPE.STAR:
-        //   res = await starFoundAndSaveApi({
-        //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-        //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
-        //     geo_ar_star_point: challengeObj?.id, // id de la estrella
-        //     latitude: userLocation?.latitude,
-        //     longitude: userLocation?.longitude,
-        //   });
-
-        //   const remainingStars = challengeObj?.remaining_stars;
-        //   // if (remainingStars > 1) {
-        //   //   successMessage = "Success, continue to the next Star.";
-        //   // }
-
-        //   break;
-
-        default:
-          break;
+      console.log("ShareChallengeScreen shareToRoamProfile challengeObj:", challengeObj);
+      console.log("ShareChallengeScreen shareToRoamProfile challengeType:", challengeType);
+      if (challengeType === CHALLENGES_TYPE.PHOTO_VIDEO) {
+        formData.append("challenges", challengeObj?.id);
+        formData.append("memory_file", shareFile);
+        formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+        res = await postArMemory(formData);
       }
+      if (challengeType === CHALLENGES_TYPE.PIN_CHECK_IN) {
+        formData.append("geo_challenge", challengeObj?.id);
+        formData.append("geo_site", challengeObj?.geo_site?.id);
+        formData.append("memory_file", shareFile);
 
-      setHasSharedToRoamProfile(true);
-      ARUserProfile();
+        res = await postGeoPinCheckIn(formData);
+      }
+      // case CHALLENGES_TYPE.STAR:
+      //   res = await starFoundAndSaveApi({
+      //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
+      //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
+      //     geo_ar_star_point: challengeObj?.id, // id de la estrella
+      //     latitude: userLocation?.latitude,
+      //     longitude: userLocation?.longitude,
+      //   });
 
-      if (res.status === 1) {
+      //   const remainingStars = challengeObj?.remaining_stars;
+      //   // if (remainingStars > 1) {
+      //   //   successMessage = "Success, continue to the next Star.";
+      //   // }
+
+      if (res?.status === 1) {
+        setHasSharedToRoamProfile(true);
+        ARUserProfile();
         if (endExperienceHandler) {
           endExperienceHandler();
         }

@@ -1,6 +1,6 @@
-import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {screenHorizontalPadding} from "../../util/AppDimensions";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -18,8 +18,8 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     marginTop: -15,
   },
-  buttonContainer: { marginBottom: "10%" },
-  buttonStyle: { height: 50 },
+  buttonContainer: {marginBottom: "10%"},
+  buttonStyle: {height: 50},
   input: {
     ...fontGroup.nunitoRegular,
     height: 50,
@@ -38,7 +38,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "space-between",
     alignItems: "center",
   },
-  chidlView: { flex: 1 },
+  chidlView: {flex: 1},
   dropdown: {
     height: 50,
     backgroundColor: theme.colors.inputBG,
@@ -50,7 +50,7 @@ const useStyles = makeStyles(theme => ({
   },
   selectedTextStyle: {
     ...fontGroup.nunitoRegular,
-    color: theme.colors.white,
+    color: theme.colors.grey0,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
     paddingLeft: 12,
@@ -90,10 +90,12 @@ const useStyles = makeStyles(theme => ({
   },
   itemContainerStyle: {
     color: theme.colors.grey0,
-    backgroundColor: theme.colors.inputBG,
-    borderRadius: 6,
+    backgroundColor: theme.colors.boxStatBG,
   },
-  dropdownParentView: { zIndex: 1, marginBottom: 20, marginTop: -7 },
+  dropdownParentView: {
+    marginBottom: 20,
+    marginTop: -7,
+  },
   iconContainer: {
     marginRight: 10,
   },

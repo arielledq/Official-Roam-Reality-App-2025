@@ -22,8 +22,7 @@ import {FontSizes} from "util/FontUtils";
 // @ts-ignore
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import useScoreboardHook from "hooks/useScoreboardHook";
-
-const SCROLL_AMOUNT = 70;
+import {getProfilePicture} from "util/imageUtils";
 
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
@@ -53,7 +52,9 @@ const ScoreBoard = ({}) => {
     if (selectedDestinationIndex !== -1) {
       const selectedDestinationItem = filtersData[selectedDestinationIndex];
       // Create a new array without the selected item
-      const filteredData = filtersData.filter((_, index) => index !== selectedDestinationIndex);
+      const filteredData = filtersData.filter(
+        (_: any, index: number) => index !== selectedDestinationIndex
+      );
       // Insert the selected item at position 1
       filtersData = [filteredData[0], selectedDestinationItem, ...filteredData.slice(1)];
     }
@@ -260,6 +261,7 @@ const ScoreBoard = ({}) => {
   const Item = React.memo(({obj, index}: {obj: any; index: number}) => {
     const userPosition = index + 1;
     const userRank = userPosition;
+    const profilePicture = getProfilePicture(obj?.user_profile?.image);
     return (
       <View
         style={{
@@ -287,19 +289,15 @@ const ScoreBoard = ({}) => {
             }}
             resizeMode="stretch"
           >
-            <FastImage
+            <Image
               style={{
                 width: 40,
                 aspectRatio: 1,
                 borderRadius: 5,
                 height: 40,
               }}
-              source={{
-                uri: obj?.user_profile?.image,
-                priority: FastImage.priority.normal,
-                cache: FastImage.cacheControl.immutable,
-              }}
-              resizeMode={FastImage.resizeMode.cover}
+              source={{uri: profilePicture}}
+              resizeMode="cover"
             />
           </ImageBackground>
           <Text numberOfLines={2} style={_styles.nameText}>
@@ -313,6 +311,8 @@ const ScoreBoard = ({}) => {
       </View>
     );
   });
+
+  const profilePicture = getProfilePicture(profileDetails?.image);
 
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
@@ -387,19 +387,15 @@ const ScoreBoard = ({}) => {
               }}
               resizeMode="stretch"
             >
-              <FastImage
+              <Image
                 style={{
                   width: 40,
                   aspectRatio: 1,
                   borderRadius: 5,
                   height: 40,
                 }}
-                source={{
-                  uri: profileDetails?.image,
-                  priority: FastImage.priority.normal,
-                  cache: FastImage.cacheControl.immutable,
-                }}
-                resizeMode={FastImage.resizeMode.cover}
+                source={{uri: profilePicture}}
+                resizeMode="cover"
               />
             </ImageBackground>
             <Text style={_styles.nameText}>{userProfile?.name ? userProfile?.name : "You"}</Text>

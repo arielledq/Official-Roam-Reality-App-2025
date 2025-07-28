@@ -7,11 +7,11 @@
 import React, {useState, useEffect, useContext} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import ReactNativeModal from "react-native-modal";
-import {GeolocationContext} from "GeolocationProvider";
+// import {GeolocationContext} from "GeolocationProvider";
 
-import {getNextStar as getNextStarApi} from "network";
+// import {getNextStar as getNextStarApi} from "network";
 import {FontSizes} from "util/FontUtils";
-import theme from "assets/theme";
+// import theme from "assets/theme";
 // @ts-ignore
 import {AR_MODES_MENU, MODES, ARModeMenuType} from "constants";
 
@@ -35,8 +35,8 @@ const ARModeModal = ({
   onStartChallenge,
 }: ARModeModalProps) => {
   const [selectedMode, setSelectedMode] = useState<ARModeMenuType | null>(null);
-  const [updatedSponsorsData, setUpdatedSponsorsData] = useState<any>([]);
-  const {userLocation} = useContext(GeolocationContext);
+  // const [updatedSponsorsData, setUpdatedSponsorsData] = useState<any>([]);
+  // const {userLocation} = useContext(GeolocationContext);
 
   useEffect(() => {
     if (isVisible) {

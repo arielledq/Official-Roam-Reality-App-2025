@@ -711,3 +711,11 @@ export const sendRoamingNotification = payload =>
     },
     logoutFunc
   );
+export const getGeoARDestinationsMini = () =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/geo-ar-location-mini/`,
+      method: "GET",
+    },
+    logoutFunc
+  );

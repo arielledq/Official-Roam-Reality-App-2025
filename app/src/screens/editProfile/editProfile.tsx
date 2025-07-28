@@ -30,6 +30,7 @@ import theme from "../../assets/theme";
 import {Icons} from "../../assets/Icons";
 import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
 import Images from "../../assets/images";
+import {ProfilePlaceholder} from "assets/base64";
 
 interface ImageData {
   uri: string | undefined;
@@ -80,7 +81,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isMobileInputFocused, setMobileInputFocused] = useState(false);
   const [isAddressInputFocused, setAddressInputFocused] = useState(false);
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false);
-  const [isCountryDropDownFocused, setCountryDropDownFocused] = useState(false);
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null);
   const [countryData, setCountryData] = useState<[]>([]);
   const [bDate, setBDate] = useState<Date>(dateOfBirth);
@@ -162,7 +162,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     gender.value ? updatedProfileData.append("gender", updatedGender) : {};
     updatedProfileData.append("home_country", updatedCountry);
     formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {};
-    if (photoDetails?.name) {
+    if (!photoDetails?.default) {
       updatedProfileData.append("image", photoDetails);
     }
     setIsLoading(true);
@@ -245,9 +245,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   useEffect(() => {
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
-      const pImageUri = Image.resolveAssetSource(Images.ProfilePlaceholder).uri;
+      // @ts-ignore
       formikRef.current.setValues({
-        pImage: userData?.image || pImageUri,
+        pImage: userData?.image || ProfilePlaceholder,
         name: userData?.user?.name || "",
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
@@ -256,7 +256,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         date_of_birth: dob ? dateToString(dob) : "",
       });
       setPhotoDetails({
-        uri: userData?.image || pImageUri,
+        uri: userData?.image || ProfilePlaceholder,
         type: "image/png",
         name: "profile.png",
         default: true,
@@ -362,7 +362,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       onBlur={() => {
                         setGenderDropDownFocused(false);
                       }}
-                      activeColor={theme.lightColors?.inputBG}
+                      activeColor={theme.lightColors?.statBG}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -473,9 +473,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   {/* Country */}
                   <View style={_styles.dropdownParentView}>
                     <Dropdown
+                      autoScroll={false}
                       style={[
                         _styles.dropdown,
-                        isCountryDropDownFocused ? _styles.focusedInput : {},
                         touched.country && errors?.country && !values.country
                           ? _styles.inputError
                           : {},
@@ -483,9 +483,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       placeholderStyle={{
                         color:
                           (touched.country && errors?.country && !values.country) ||
-                          isCountryDropDownFocused
-                            ? theme.lightColors?.white
-                            : theme.lightColors?.grey0,
+                          theme.lightColors?.grey0,
                         marginStart: 13,
                         fontSize: FontSizes.S14,
                         opacity: 1,
@@ -494,13 +492,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         borderWidth: 0,
                         backgroundColor: "transparent",
                       }}
-                      onFocus={() => {
-                        setCountryDropDownFocused(true);
-                      }}
-                      onBlur={() => {
-                        setCountryDropDownFocused(false);
-                      }}
-                      activeColor={theme.lightColors?.inputBG}
+                      activeColor={theme.lightColors?.statBG}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -520,9 +512,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                           family="antdesign"
                           color={
                             (touched.country && errors?.country && !values.country) ||
-                            isCountryDropDownFocused
-                              ? theme.lightColors?.white
-                              : theme.lightColors?.grey0
+                            theme.lightColors?.grey0
                           }
                           size={24}
                         />

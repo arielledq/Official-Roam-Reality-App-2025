@@ -1,15 +1,15 @@
 // PendingRequests.tsx
 import {useFocusEffect} from "@react-navigation/native";
 import React, {useCallback, useState} from "react";
-import {View, Text, FlatList, Pressable, ImageBackground} from "react-native";
+import {View, Text, FlatList, Pressable, ImageBackground, Image} from "react-native";
 import {acceptFriendRequests, getPendingFriendRequests, rejectFriendRequests} from "../../network";
 import useStyles from "./styles";
 import theme from "../../assets/theme";
 import {Icon} from "@rneui/base";
-import FastImage from "react-native-fast-image";
 import Images from "../../assets/images";
 import {showMessage, truncateText} from "../../util/helpers";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
+import {getProfilePicture} from "util/imageUtils";
 
 const PendingRequests = () => {
   const [pendingRequests, setPendingRequests] = React.useState([]);
@@ -81,8 +81,8 @@ const PendingRequests = () => {
     <View style={_styles.container}>
       <FlatList
         data={pendingRequests}
-        keyExtractor={item => item.id.toString()}
-        renderItem={({item}) => renderFriendItem(item, onAccept, onReject)}
+        keyExtractor={(item: any) => item?.id?.toString()}
+        renderItem={({item}: {item: any}) => renderFriendItem(item, onAccept, onReject)}
         contentContainerStyle={_styles.scroll}
         onRefresh={() => onRefresh()}
         refreshing={isFetching}
@@ -92,8 +92,9 @@ const PendingRequests = () => {
   );
 };
 
-const renderFriendItem = (item, onAccept, onReject) => {
+const renderFriendItem = (item: any, onAccept: any, onReject: any) => {
   const {from_user} = item;
+  const profilePicture = getProfilePicture(from_user?.user_profile?.image);
   return (
     <View
       style={{
@@ -115,11 +116,7 @@ const renderFriendItem = (item, onAccept, onReject) => {
         }}
       >
         <ImageBackground source={Images.BGBlur} style={localStyles.imageBg} resizeMode="stretch">
-          <FastImage
-            style={localStyles.image}
-            source={{uri: from_user?.user_profile?.image}}
-            resizeMode={FastImage.resizeMode.cover}
-          />
+          <Image style={localStyles.image} source={{uri: profilePicture}} resizeMode="cover" />
         </ImageBackground>
         <View>
           <Text style={{color: theme.lightColors?.white}}>{from_user.name}</Text>

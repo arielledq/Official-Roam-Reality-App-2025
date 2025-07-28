@@ -1,17 +1,17 @@
 // MyFriends.tsx
 import React, {useCallback, useState} from "react";
-import {View, Text, FlatList, Keyboard, ImageBackground, Pressable} from "react-native";
+import {View, Text, FlatList, Keyboard, ImageBackground, Pressable, Image} from "react-native";
 import {AppInput} from "../../components";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
 import theme from "../../assets/theme";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {getUserFriendList} from "../../network";
-import FastImage from "react-native-fast-image";
 import useDebounce from "../../hooks/debounce";
 import {DEBOUNCE_TIME} from "../../util/helpers";
 import Images from "../../assets/images";
 import Icon from "components/Icon";
+import {getProfilePicture} from "util/imageUtils";
 
 const MyFriends = () => {
   const [searchText, setSearchText] = React.useState("");
@@ -42,6 +42,7 @@ const MyFriends = () => {
 
   const onChangeText = () => {
     const filtered = friendList?.filter(item =>
+      // @ts-ignore
       item?.name?.toLowerCase().includes(debounceQuery.toLowerCase())
     );
     setFilteredUsers(filtered);
@@ -74,8 +75,8 @@ const MyFriends = () => {
         />
         <FlatList
           data={filteredUsers}
-          keyExtractor={item => item.id.toString()}
-          renderItem={({item}) => renderFriendItem(item, _styles, navigation)}
+          keyExtractor={(item: any) => item?.id?.toString()}
+          renderItem={({item}: {item: any}) => renderFriendItem(item, _styles, navigation)}
           onRefresh={() => onRefresh()}
           refreshing={isFetching}
         />
@@ -84,20 +85,13 @@ const MyFriends = () => {
   );
 };
 
-const renderFriendItem = (item, styles, navigation) => {
+const renderFriendItem = (item: any, styles: any, navigation: any) => {
+  const profilePicture = getProfilePicture(item?.user_profile?.image);
   return (
     <View style={localStyle.contactContainer}>
       <View style={localStyle.contactLeftWrapper}>
         <ImageBackground source={Images.BGBlur} style={localStyle.imageBG} resizeMode="stretch">
-          <FastImage
-            style={localStyle.image}
-            source={
-              item?.user_profile?.image
-                ? {uri: item?.user_profile?.image}
-                : Images.ProfileImgGradient
-            }
-            resizeMode={FastImage.resizeMode.stretch}
-          />
+          <Image style={localStyle.image} source={{uri: profilePicture}} resizeMode="cover" />
         </ImageBackground>
         <View>
           <Text style={styles.title}>{item?.name}</Text>

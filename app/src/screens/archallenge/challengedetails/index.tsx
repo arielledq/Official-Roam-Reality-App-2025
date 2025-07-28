@@ -162,7 +162,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
 
           if (coolDownParams) {
             setCoolDownHoursText(coolDownParams?.coolDownHoursText);
-            !coolDownParams?.coolDownFinished && setIsChallengeDone(true)
+            !coolDownParams?.coolDownFinished && setIsChallengeDone(true);
           } else {
             setCoolDownHoursText("0h");
           }
@@ -328,7 +328,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 titleStyle={{
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 500,
                   textAlign: "center",
                 }}
@@ -342,7 +342,7 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
                 buttonStyle={styles.buttonStyle}
                 containerStyle={styles.buttonContainerStyle}
                 titleStyle={{
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: 500,
                   textAlign: "center",
                 }}
