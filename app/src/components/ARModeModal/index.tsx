@@ -4,16 +4,12 @@
 
 // Comenzamos creando el archivo principal con uso de ModeRenderer
 
-import React, {useState, useEffect, useContext} from "react";
+import React, {useState, useEffect} from "react";
 import {View, Text, StyleSheet} from "react-native";
 import ReactNativeModal from "react-native-modal";
-// import {GeolocationContext} from "GeolocationProvider";
-
-// import {getNextStar as getNextStarApi} from "network";
 import {FontSizes} from "util/FontUtils";
-// import theme from "assets/theme";
 // @ts-ignore
-import {AR_MODES_MENU, MODES, ARModeMenuType} from "constants";
+import {AR_MODES_MENU, ARModeMenuType} from "constants";
 
 import {AppButton} from "components";
 import Icon from "components/Icon";
@@ -24,19 +20,11 @@ import ARModeSiteList from "./ARModeSiteList.tsx";
 interface ARModeModalProps {
   isVisible: boolean;
   onClose: () => void;
-  selectedDestination: any;
   onStartChallenge: () => void;
 }
 
-const ARModeModal = ({
-  isVisible = false,
-  onClose,
-  selectedDestination = [],
-  onStartChallenge,
-}: ARModeModalProps) => {
+const ARModeModal = ({isVisible = false, onClose, onStartChallenge}: ARModeModalProps) => {
   const [selectedMode, setSelectedMode] = useState<ARModeMenuType | null>(null);
-  // const [updatedSponsorsData, setUpdatedSponsorsData] = useState<any>([]);
-  // const {userLocation} = useContext(GeolocationContext);
 
   useEffect(() => {
     if (isVisible) {

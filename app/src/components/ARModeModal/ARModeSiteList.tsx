@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {View, Text, Image, TouchableOpacity, ScrollView} from "react-native";
+import {View, Text, Image, TouchableOpacity, ScrollView, FlatList} from "react-native";
 
 import AppDropdown from "components/Dropdown";
 import {AppButton} from "components";
@@ -11,6 +11,7 @@ import fontGroup from "assets/fonts";
 import userLocationHook from "screens/drawerContent/location.hook";
 // @ts-ignore
 import {AR_MODES} from "constants";
+import ARChallengeItem from "./ARChallengeItem";
 
 interface ARModeSiteListProps {
   selectedMode: any;
@@ -30,9 +31,10 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const {initialUserLocation, getLocation} = userLocationHook();
   const {getSites, sites, getNextStar: getNextStarApi}: any = useArScreenHook();
-  const [sponsorData, setSponsorData] = useState([]);
+  const [sponsorData, setSponsorData] = useState<any>([]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
+  const [filteredSites, setFilteredSites] = useState<any>([]);
 
   const startChallengeHandler = async (site: any) => {
     let updatedSiteData = {
@@ -55,7 +57,23 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   };
 
   const getSitesHandler = (sponsorId: string = "") => {
-    if (
+    if (sponsorId) {
+      let updatedSites = sites.filter(
+        (site: any) => site?.pin_challenge?.sponsored?.id === Number(sponsorId)
+      );
+      if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
+        const ArFiltersChallenges = sites[sites.length - 1];
+        const updatedChallenges = ArFiltersChallenges?.challenges?.filter(
+          (challenge: any) => challenge?.sponsored?.id === Number(sponsorId)
+        );
+        setFilteredSites([
+          ...updatedSites,
+          {...ArFiltersChallenges, challenges: updatedChallenges},
+        ]);
+      } else {
+        setFilteredSites(updatedSites);
+      }
+    } else if (
       typeof initialUserLocation?.latitude === "number" &&
       isFinite(initialUserLocation?.latitude) &&
       typeof initialUserLocation?.longitude === "number" &&
@@ -65,7 +83,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         lat: initialUserLocation?.latitude,
         lon: initialUserLocation?.longitude,
         site_type: selectedMode?.id,
-        sponsor: sponsorId || "",
+        sponsor: "",
       };
       getSites(payload);
 
@@ -90,18 +108,39 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   // Crear la lista de sponsors desde los sites
   useEffect(() => {
     if (!sites?.length) return;
+    setFilteredSites(sites);
+
     if (sponsorData?.length) return;
 
     const defaultSponsor = {
       label: DEFAULT_SPONSOR.label,
       value: DEFAULT_SPONSOR.value,
     };
-    const sponsorsData = sites.map((site: any) => ({
-      label: site?.sponsor?.name || site?.sponsored?.name,
-      value: site?.sponsor?.id || site?.sponsored?.id,
-      ...site?.sponsor,
-      ...site?.sponsored,
-    }));
+    let sponsorsData: any[] = [];
+
+    if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
+      sites.forEach((site: any) => {
+        site?.challenges?.length &&
+          site?.challenges.forEach((challenge: any) => {
+            sponsorsData.push({
+              label: challenge?.sponsor?.name || challenge?.sponsored?.name,
+              value: challenge?.sponsor?.id || challenge?.sponsored?.id,
+              ...challenge?.sponsor,
+              ...challenge?.sponsored,
+            });
+          });
+      });
+      sponsorsData = Array.from(new Set(sponsorsData.map(s => s.value))).map(id =>
+        sponsorsData.find(s => s.value === id)
+      );
+    } else {
+      sponsorsData = sites.map((site: any) => ({
+        label: site?.sponsor?.name || site?.sponsored?.name,
+        value: site?.sponsor?.id || site?.sponsored?.id,
+        ...site?.sponsor,
+        ...site?.sponsored,
+      }));
+    }
     const updatedSponsorsData = [defaultSponsor, ...sponsorsData];
     setSponsorData(updatedSponsorsData);
     setSelectedSponsor(updatedSponsorsData[0]);
@@ -198,40 +237,30 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
       </View>
 
       <ScrollView style={{marginTop: 15}}>
-        {sites?.length > 0 &&
-          sites?.map((site: any) => {
+        {filteredSites?.length > 0 &&
+          filteredSites?.map((site: any) => {
             if (!site?.name) return;
             const isExpanded = expandedSites.includes(site.id);
+            const siteName = site?.name;
+            let siteImage = {uri: site?.image};
+            const siteId = site?.id;
 
-            let challengeTitle = "";
-            let attemptsDetails = "";
-            let sponsorImage = "";
+            let challenges = [];
             switch (selectedMode?.mode) {
               case AR_MODES.GEO_TAG_MODE:
-                challengeTitle = site?.pin_challenge?.name;
-                attemptsDetails = `${site?.user_attempts || 0}/${
-                  site?.challenge_attempt || 0
-                } Check-Ins`;
-                sponsorImage = site?.sponsor?.image;
+                challenges = [site?.pin_challenge];
                 break;
               case AR_MODES.SCAN_MODE:
-                challengeTitle = site?.sponsored?.name;
-                attemptsDetails = `${site?.user_attempts || 0}/${
-                  site?.challenge_attempt || 0
-                } Gems`;
-                sponsorImage = site?.sponsored?.image;
+                siteImage = require("../../assets/images/AppSettingsIcon.png");
+                challenges = site?.challenges || [];
                 break;
               case AR_MODES.HUNT_MODE:
-                challengeTitle = site?.pin_challenge?.name;
-                attemptsDetails = `${site?.user_attempts || 0}/${
-                  site?.challenge_attempt || 0
-                } Captures`;
-                sponsorImage = site?.sponsor?.image;
+                challenges = [site?.pin_challenge];
                 break;
             }
 
             return (
-              <View key={site.id} style={{marginBottom: 15}}>
+              <View key={siteId} style={{marginBottom: 15}}>
                 <TouchableOpacity
                   onPress={() =>
                     setExpandedSites(prev =>
@@ -249,12 +278,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                   }}
                 >
                   <Image
-                    source={{uri: site?.image}}
+                    source={siteImage}
                     style={{width: 70, height: 50, borderRadius: 6, marginRight: 10}}
                   />
                   <View style={{flex: 1}}>
                     <Text style={{color: "white", fontSize: 16, fontWeight: "bold"}}>
-                      {site?.name}
+                      {siteName}
                     </Text>
                     <View style={{flexDirection: "row", gap: 10}}>
                       <View style={{flexDirection: "row", alignItems: "center"}}>
@@ -277,53 +306,51 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                 </TouchableOpacity>
 
                 {isExpanded && (
-                  <View style={{marginTop: 10, marginLeft: 10}}>
-                    <TouchableOpacity
-                      key={site.pin_challenge?.id}
-                      activeOpacity={0.8}
-                      onPress={() => startChallengeHandler(site)}
-                      style={{
-                        backgroundColor: "#27273F",
-                        borderRadius: 10,
-                        flexDirection: "row",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                        padding: 12,
-                        marginBottom: 10,
-                      }}
-                    >
-                      <View
-                        style={{
-                          backgroundColor: "#7A32F4",
-                          borderRadius: 5,
-                          padding: 6,
-                          alignItems: "center",
-                          justifyContent: "center",
-                          width: 50,
-                        }}
-                      >
-                        <Text style={{color: "white", fontSize: 14, fontWeight: "bold"}}>
-                          {site?.pin_challenge?.points || 0}
-                        </Text>
-                        <Text style={{color: "white", fontSize: 10}}>Points</Text>
-                      </View>
-                      <View style={{flex: 1, marginLeft: 10}}>
-                        <Text style={{color: "white", fontSize: 12, fontWeight: "bold"}}>
-                          {challengeTitle}
-                        </Text>
-                        <View style={{flexDirection: "row", alignItems: "center", marginTop: 2}}>
-                          <Text style={{color: "#C881F0", fontSize: 10}}>{attemptsDetails}</Text>
-                          <Text style={{color: "#C881F0", fontSize: 10, marginLeft: 10}}>
-                            ⏱ {site?.pin_challenge?.cooldownHours || 0} Hrs Cooldown
-                          </Text>
-                        </View>
-                      </View>
-                      <Image
-                        source={{uri: sponsorImage}}
-                        style={{width: 40, height: 40, borderRadius: 20}}
-                      />
-                    </TouchableOpacity>
-                  </View>
+                  <FlatList
+                    data={challenges}
+                    renderItem={({item}: {item: any}) => {
+                      let challengeTitle = "";
+                      let attemptsDetails = "";
+                      let sponsorImage = "";
+                      let onPressHandler = () => startChallengeHandler(site);
+
+                      switch (selectedMode?.mode) {
+                        case AR_MODES.GEO_TAG_MODE:
+                          challengeTitle = item?.name;
+                          attemptsDetails = `${site?.user_attempts || 0}/${
+                            site?.challenge_attempt || 0
+                          } Check-Ins`;
+                          sponsorImage = site?.sponsor?.image;
+                          break;
+                        case AR_MODES.SCAN_MODE:
+                          challengeTitle = item?.name;
+                          attemptsDetails = `${item?.user_attempts || 0}/${
+                            item?.challenge_attempt || 0
+                          } Gems`;
+                          sponsorImage = item?.sponsored?.image;
+                          onPressHandler = () => startChallengeHandler(item);
+                          break;
+                        case AR_MODES.HUNT_MODE:
+                          challengeTitle = site?.pin_challenge?.name;
+                          attemptsDetails = `${site?.user_attempts || 0}/${
+                            site?.challenge_attempt || 0
+                          } Captures`;
+                          sponsorImage = site?.sponsor?.image;
+                          break;
+                      }
+
+                      return (
+                        <ARChallengeItem
+                          title={challengeTitle}
+                          points={item?.points || 0}
+                          attemptsDetails={attemptsDetails}
+                          coolDownHours={item?.cooldownHours || 0}
+                          sponsorImage={sponsorImage}
+                          onPress={onPressHandler}
+                        />
+                      );
+                    }}
+                  />
                 )}
               </View>
             );
