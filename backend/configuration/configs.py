@@ -54,6 +54,10 @@ METER_RADIUS = ConfigKey(
     verbose_name='Radius of user in meters',
 )
 
+DEFAULT_IMAGE = ConfigKey(
+    value="",
+    verbose_name='Default image for users',
+)
 
 
 
