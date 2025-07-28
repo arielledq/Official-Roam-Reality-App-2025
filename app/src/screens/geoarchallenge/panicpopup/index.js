@@ -1,18 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { View, Keyboard, Text, TouchableOpacity, Alert } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { AppButton, AppHeader, AppInput } from "../../../components";
-import { PanicPopUpSchema } from "../../../util/ValidationSchemas";
+import React, {useEffect, useState} from "react";
+import {View, Keyboard, Text, TouchableOpacity, Alert} from "react-native";
+import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
+import {AppButton, AppHeader, AppInput} from "../../../components";
+import {PanicPopUpSchema} from "../../../util/ValidationSchemas";
 import BackgroundWithImage from "../../../components/background";
-import { useSelector } from "react-redux";
+import {useSelector} from "react-redux";
 import theme from "../../../assets/theme";
 import useStyles from "./styles";
-import { Formik } from "formik";
-import { panicMessageAPI } from "../../../network";
-import { getDeviceCurrentLocation } from "../../../util/LocationLib";
-import { showMessage } from "../../../util/helpers";
+import {Formik} from "formik";
+import {panicMessageAPI} from "../../../network";
+import {getDeviceCurrentLocation} from "../../../util/LocationLib";
+import {showMessage} from "../../../util/helpers";
+import {BackArrowIcon} from "assets/svg";
 
-const PanicPopUp = ({ onClose }) => {
+const PanicPopUp = ({onClose}) => {
   const _styles = useStyles();
   const [isMessageInputFocused, setMessageInputFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,7 +42,15 @@ const PanicPopUp = ({ onClose }) => {
 
   return (
     <BackgroundWithImage>
-      <AppHeader title={"Emergency Message"} leftComponent={null} backgroundColor="transparent" />
+      <AppHeader
+        title={"Emergency Message"}
+        leftComponent={
+          <TouchableOpacity onPress={() => onClose()}>
+            <BackArrowIcon />
+          </TouchableOpacity>
+        }
+        backgroundColor="transparent"
+      />
       <KeyboardAwareScrollView
         keyboardShouldPersistTaps="always"
         nestedScrollEnabled
@@ -57,7 +66,7 @@ const PanicPopUp = ({ onClose }) => {
           enableReinitialize
           validationSchema={PanicPopUpSchema}
         >
-          {({ handleChange, handleSubmit, values, errors, touched }) => (
+          {({handleChange, handleSubmit, values, errors, touched}) => (
             <View style={_styles.container}>
               <Text style={_styles.emergencyText}>Emergency Procedure</Text>
               <Text style={_styles.emergencyTextDes}>
