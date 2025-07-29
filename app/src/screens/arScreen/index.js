@@ -489,7 +489,6 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
-    console.log("[StarChallengeScreen] startChallengeHandler site", site);
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -529,7 +528,6 @@ const ARScreen = ({route}) => {
       default:
         break;
     }
-    console.log("[StarChallengeScreen] challengeData", challengeData);
     setSelectedSite(site);
     setSelectedChallengeOverride(challengeData);
     setHasSentModelDataOnce(false);
