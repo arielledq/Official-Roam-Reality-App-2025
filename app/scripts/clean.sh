@@ -19,7 +19,6 @@ rm -rf ~/Library/Developer/Xcode/DerivedData
 
 # Remove Android folders
 cd android
-./gradlew clean 
 rm -rf ./android/app/build
 rm -rf ./android/build
 rm -rf .gradle

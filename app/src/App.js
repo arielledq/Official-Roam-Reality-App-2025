@@ -10,6 +10,7 @@ import {OneSignal} from "react-native-onesignal";
 import "react-native-get-random-values";
 import {PersistGate} from "redux-persist/integration/react";
 import {Provider as PaperProvider} from "react-native-paper";
+import {enableScreens} from "react-native-screens";
 
 import Config from "./config";
 import {persistor, store} from "./store";
@@ -21,6 +22,7 @@ if (__DEV__) {
   require("../ReactotronConfig"); // Import before any other code
 }
 
+enableScreens();
 Geocoder.init(Config.GEOCODER_API_KEY);
 
 // INFO: react-native-onesignal setup
