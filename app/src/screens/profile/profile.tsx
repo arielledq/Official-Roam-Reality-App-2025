@@ -30,6 +30,7 @@ import {BlurView} from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
 import {height} from "util/AppDimensions";
 import {getProfilePicture} from "util/imageUtils";
+import FastImage from "react-native-fast-image";
 
 const SCROLL_AMOUNT = 150;
 
@@ -235,12 +236,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     });
   };
 
-  const profilePicture = getProfilePicture(profileDetails?.user?.user_profile?.image);
+  const profilePicture = getProfilePicture(userProfile?.user_profile?.image);
+  
 
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-        <Image
+      <FastImage
           style={{
             width: "100%",
             height: height * 0.5,

@@ -46,6 +46,7 @@ const ArChallengeShare = () => {
   const [isLoadingDisplay, setIsLoadingDisplay] = useState(true);
   const [hasPermission, setHasPermission] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
+  const [disableBackButton, setDisableBackButton] = useState(false);
   const [socialPointsCounter, setSocialPointsCounter] = useState({
     facebook: 0,
     instagram: 0,
@@ -134,6 +135,7 @@ const ArChallengeShare = () => {
             console.log("granting points for facebook");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
+            setDisableBackButton(true);
           } else {
             console.log(" not counting more points but allowing to share... ");
           }
@@ -150,6 +152,7 @@ const ArChallengeShare = () => {
             console.log("granting points for instagram");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
+            setDisableBackButton(true);
           } else {
             console.log(" not counting more points but allowing to share... ");
           }
@@ -166,6 +169,7 @@ const ArChallengeShare = () => {
             console.log("granting points for others");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
+            setDisableBackButton(true);
           } else {
             console.log(" not counting more points but allowing to share... ");
           }
@@ -405,6 +409,7 @@ const ArChallengeShare = () => {
       title={screenTitle}
       style={{justifyContent: "space-between", flex: 1}}
       modals={screenModals}
+      disableBackButton={disableBackButton}
     >
       <View style={{flex: 1, paddingHorizontal: 32}}>
         <View style={{flex: 1}}>
