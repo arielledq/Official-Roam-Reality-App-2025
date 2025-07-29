@@ -162,7 +162,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     gender.value ? updatedProfileData.append("gender", updatedGender) : {};
     updatedProfileData.append("home_country", updatedCountry);
     formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {};
-    if (!photoDetails?.default) {
+    if (photoDetails && !photoDetails?.default) {
       updatedProfileData.append("image", photoDetails);
     }
     setIsLoading(true);
@@ -255,6 +255,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         country: userData?.home_country || "",
         date_of_birth: dob ? dateToString(dob) : "",
       });
+      console.log("here")
       setPhotoDetails({
         uri: userData?.image || ProfilePlaceholder,
         type: "image/png",
