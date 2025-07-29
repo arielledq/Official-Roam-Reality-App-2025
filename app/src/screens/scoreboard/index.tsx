@@ -5,8 +5,8 @@ import FastImage from "react-native-fast-image";
 import {useSelector} from "react-redux";
 import {DrawerActions, useNavigation} from "@react-navigation/native";
 
-import {getGeoARDestinations, getMyRank, getProfieDetails, getScoreboardList} from "../../network";
-import {handleError, truncateText} from "util/helpers";
+import {getMyRank, getProfieDetails, getScoreboardList} from "../../network";
+import {truncateText} from "util/helpers";
 
 import {AppHeader} from "../../components";
 import ScreenContainer from "components/ScreenContainer";
@@ -24,13 +24,14 @@ import RankBG from "../../assets/geoar/rank_bg.svg";
 import useScoreboardHook from "hooks/useScoreboardHook";
 import {getProfilePicture} from "util/imageUtils";
 
+const ITEM_WIDTH = 60;
+
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
   const [rankMine, setRankMine] = useState<any>();
   const [destinations, setDestinations] = useState<any>();
   const [selectedDestination, setSelectedDestination] = useState<any>();
   const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
-  const [scrollPosition, setScrollPosition] = useState(0);
   const [refreshing, setRefreshing] = useState(false);
   const [profileDetails, setProfileDetails] = useState<any>();
   const {sponsors} = useScoreboardHook();
@@ -39,10 +40,11 @@ const ScoreBoard = ({}) => {
 
   const _styles = useStyles();
   const desRef = useRef<FlatList>(null);
+  const scrollPositionRef = useRef(0);
+
   const navigation = useNavigation();
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
 
-  // let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors;
   let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinations : sponsors;
   filtersData = [...(filtersData || [])]; // Create a new array to avoid mutating the original
 
@@ -119,23 +121,6 @@ const ScoreBoard = ({}) => {
     getScoreboard(newPage, destination, sponsor);
   };
 
-  // const ARDestinations = async () => {
-  //   // if (destinations?.length) return;
-  //   // try {
-  //   //   const res = await getGeoARDestinations();
-  //   //   if (res.status == 1) {
-  //   //     const defaultDestination = {name: "Global", id: "", flag_image: ""};
-  //   //     const updatedDestinations = [defaultDestination, ...res.data];
-  //   //     setDestinations(updatedDestinations);
-  //   //   } else {
-  //   //     res.message.message = "Error in loading Destinations.";
-  //   //     handleError(res);
-  //   //   }
-  //   // } catch (error) {
-  //   //   console.error(error);
-  //   // }
-  // };
-
   const handleMenuButton = () => {
     return (
       <TouchableOpacity
@@ -161,19 +146,14 @@ const ScoreBoard = ({}) => {
 
   const scrollRegionsPressHandler = () => {
     if (!desRef.current) return;
-
-    const newIndex = Math.min(
-      Math.floor(scrollPosition / 100) + 3, // Adjust the divisor based on your item height
-      filtersData.length - 1 // Assuming 'data' is your FlatList data source
-    );
+    const currentIndex = Math.round(scrollPositionRef.current / ITEM_WIDTH);
+    const newIndex = Math.min(currentIndex + 3, filtersData.length - 1);
 
     desRef.current.scrollToIndex({
       index: newIndex,
       animated: true,
-      viewPosition: 0.5, // Scrolls the item to the middle of the screen
+      viewPosition: 0.5,
     });
-
-    setScrollPosition(newIndex * 100); // Adjust based on your item height
   };
 
   const getInitialData = () => {
@@ -186,7 +166,6 @@ const ScoreBoard = ({}) => {
       sponsor = selectedDestination?.id || "";
     }
     getScoreboard(newPage, destination, sponsor);
-    // ARDestinations();
     fetchProfileDetails();
   };
 
@@ -345,14 +324,27 @@ const ScoreBoard = ({}) => {
       </View>
 
       {/* Country filters */}
-      <View style={_styles.countryFiltersContainer}>
+      <View style={{..._styles.countryFiltersContainer, height: ITEM_WIDTH}}>
         <FlatList
+          ref={desRef}
           horizontal
+          nestedScrollEnabled={true}
+          scrollEnabled={true}
           data={filtersData?.length ? filtersData : [1, 2, 3, 4]}
           showsHorizontalScrollIndicator={false}
           showsVerticalScrollIndicator={false}
           renderItem={({item}) => <FilterItem obj={item} />}
           contentContainerStyle={{gap: 4}}
+          onScroll={({nativeEvent}) => {
+            scrollPositionRef.current = nativeEvent.contentOffset.x;
+          }}
+          scrollEventThrottle={16}
+          getItemLayout={(_, index) => ({
+            length: ITEM_WIDTH,
+            offset: ITEM_WIDTH * index,
+            index,
+          })}
+          style={{height: ITEM_WIDTH}}
         />
         <TouchableOpacity
           onPress={scrollRegionsPressHandler}
