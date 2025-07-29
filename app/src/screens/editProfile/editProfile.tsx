@@ -256,6 +256,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         country: userData?.home_country || "",
         date_of_birth: dob ? dateToString(dob) : "",
       });
+      console.log("here")
       setPhotoDetails({
         uri: userData?.image,
         type: "image/png",

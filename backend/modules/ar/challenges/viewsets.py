@@ -538,10 +538,8 @@ class ARSitePinCheckInViewSet(ViewSet):
     @action(detail=False, methods=['post'], url_path='country-checkins-count', name='Check Country Check-ins')
     def country_checkins(self, request):
         user_id = request.data.get("user_id")
-        print(user_id)
         criterion1 = Q(user=user_id)
         qs = ARSitePinCheckIn.objects.filter(criterion1)
-        print(qs)
         countryArray = {}
         count = 0
         for item in qs:
@@ -549,7 +547,6 @@ class ARSitePinCheckInViewSet(ViewSet):
                 countryArray[item.geo_site.geo_location] = True
                 count += 1
 
-        print(countryArray)
         return Response({'count': count}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
