@@ -1,4 +1,4 @@
-import React, {useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {Text, View, ImageBackground, TouchableOpacity, FlatList, Image} from "react-native";
 
 import FastImage from "react-native-fast-image";
@@ -27,7 +27,7 @@ import {getProfilePicture} from "util/imageUtils";
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
   const [rankMine, setRankMine] = useState<any>();
-  const [destinationData, setDestinationData] = useState<any>();
+  const [destinations, setDestinations] = useState<any>();
   const [selectedDestination, setSelectedDestination] = useState<any>();
   const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -35,13 +35,15 @@ const ScoreBoard = ({}) => {
   const [profileDetails, setProfileDetails] = useState<any>();
   const {sponsors} = useScoreboardHook();
 
+  const destinationData = useSelector((state: any) => state?.ar?.destinationData);
+
   const _styles = useStyles();
   const desRef = useRef<FlatList>(null);
   const navigation = useNavigation();
   const userProfile = useSelector((state: any) => state?.login?.data?.user);
 
   // let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors;
-  let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinationData : sponsors;
+  let filtersData = challengeChoice === SCOREBOARD_TYPE.DESTINATION ? destinations : sponsors;
   filtersData = [...(filtersData || [])]; // Create a new array to avoid mutating the original
 
   if (selectedDestination?.id) {
@@ -117,22 +119,22 @@ const ScoreBoard = ({}) => {
     getScoreboard(newPage, destination, sponsor);
   };
 
-  const ARDestinations = async () => {
-    if (destinationData?.length) return;
-    try {
-      const res = await getGeoARDestinations();
-      if (res.status == 1) {
-        const defaultDestination = {name: "Global", id: "", flag_image: ""};
-        const updatedDestinations = [defaultDestination, ...res.data];
-        setDestinationData(updatedDestinations);
-      } else {
-        res.message.message = "Error in loading Destinations.";
-        handleError(res);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  // const ARDestinations = async () => {
+  //   // if (destinations?.length) return;
+  //   // try {
+  //   //   const res = await getGeoARDestinations();
+  //   //   if (res.status == 1) {
+  //   //     const defaultDestination = {name: "Global", id: "", flag_image: ""};
+  //   //     const updatedDestinations = [defaultDestination, ...res.data];
+  //   //     setDestinations(updatedDestinations);
+  //   //   } else {
+  //   //     res.message.message = "Error in loading Destinations.";
+  //   //     handleError(res);
+  //   //   }
+  //   // } catch (error) {
+  //   //   console.error(error);
+  //   // }
+  // };
 
   const handleMenuButton = () => {
     return (
@@ -184,7 +186,7 @@ const ScoreBoard = ({}) => {
       sponsor = selectedDestination?.id || "";
     }
     getScoreboard(newPage, destination, sponsor);
-    ARDestinations();
+    // ARDestinations();
     fetchProfileDetails();
   };
 
@@ -410,6 +412,15 @@ const ScoreBoard = ({}) => {
       <Text style={_styles.leaderboardTitle}>Leaderboard</Text>
     </View>
   );
+
+  useEffect(() => {
+    const defaultDestination = {name: "Global", id: "", flag_image: ""};
+    let updatedDestinations = [defaultDestination];
+    if (destinationData?.length) {
+      updatedDestinations = [defaultDestination, ...destinationData];
+    }
+    setDestinations(updatedDestinations);
+  }, [destinationData]);
 
   return (
     <ScreenContainer>

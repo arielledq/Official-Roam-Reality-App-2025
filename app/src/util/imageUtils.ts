@@ -41,15 +41,11 @@ export const getImageSourceWithProps = (imageUrl: string, additionalProps: objec
 };
 
 export const getProfilePicture = (imageUrl?: string): string => {
-  console.log("Image URL:", imageUrl);
   if (isBase64DataUri(imageUrl || "")) {
-    console.log("Base64 data URI");
     return imageUrl || "";
   }
   if (imageUrl) {
-    console.log("Image URL");
     return imageUrl;
   }
-  console.log("Not a Base64 data URI");
   return ProfilePlaceholder;
 };
