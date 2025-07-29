@@ -164,7 +164,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         .then(res => {
           if (res.status == 1) {
             setARMemories(res.data);
-            console.log("res.data", JSON.stringify(res.data, null, 2));
           } else {
             console.error("Error", "Error fetching ar memories: ");
           }
