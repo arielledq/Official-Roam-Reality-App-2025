@@ -34,6 +34,19 @@ export const SSNN: {
   OTHERS: "OTHERS",
 };
 
+export const ELEMENTSUNITY = [
+  "position",
+  "ArMode",
+  "screen",
+  "loading",
+  "timer",
+  "Back",
+  "points",
+  "Stars",
+  "Details",
+  "CompassArrow",
+  "Arrow",]
+
 export const EXPERIENCE_TYPE_CHOICES = {
   AR_CHALLENGE: "AR_CHALLENGE",
   GEO_AR_CHALLENGE: "GEO_AR_CHALLENGE",

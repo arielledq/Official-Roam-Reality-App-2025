@@ -19,6 +19,7 @@ import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../util/help
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
+import {ELEMENTSUNITY} from "../../constants";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -51,12 +52,12 @@ const ARScreen = ({route}) => {
   const [threshold, setThreshold] = useState(0);
   const [intensity, setIntensity] = useState(1);
   const [selectedChallengeOverride, setSelectedChallengeOverride] = useState(null);
-  const [sendModelData, setSendModelData] = useState(false);
+  const [sendSpawnModelData, setSendSpawnModelData] = useState(false);
   const [unityLoading, setUnityLoading] = useState(true); // Nuevo estado para el loading de Unity al volver
   const [hasSentModelDataOnce, setHasSentModelDataOnce] = useState(false);
   const [locationObtainedForHunt, setLocationObtainedForHunt] = useState(false);
   const [unitySceneLoaded, setUnitySceneLoaded] = useState(true);
-
+  const [validUserLocation, setValidUserLocation] = useState(null);
   const unityRef = useRef(null);
 
   // Challenge derived states
@@ -91,10 +92,6 @@ const ARScreen = ({route}) => {
       ]);
     }
   };
-
-  // const dataGpsChallegen = (selectedSSNN, challengeData) => {
-  //   setSelectedChallengeOverride(challengeData);
-  // };
 
   const downloadModelFile = (sourcePath, targetPath) => {
     RNFetchBlob.config({
@@ -228,7 +225,6 @@ const ARScreen = ({route}) => {
   const updateUnityLocation = location => {
     if (unityRef?.current) {
       if (location.latitude && location.longitude) {
-        // console.log("Enviando posicion del usuario");
         const jsonData = JSON.stringify({
           latitude: location?.latitude,
           longitude: location?.longitude,
@@ -253,8 +249,8 @@ const ARScreen = ({route}) => {
       unityRef.current &&
       textureBase &&
       starModels &&
-      userLocation &&
-      !hasSentModelDataOnce &&
+      validUserLocation &&
+      // !hasSentModelDataOnce &&
       (isGeoTagMode || isHuntMode)
     ) {
       const modelData = {
@@ -268,24 +264,24 @@ const ARScreen = ({route}) => {
           z: 1,
         },
         emissionIntensity: parseFloat(selectedChallengeOverride.parameters?.emission_value) || 1,
-        rotationSpeed: Number(selectedChallengeOverride.parameters?.loop_delay) || 1,
+        rotationSpeed: Number(selectedChallengeOverride.parameters?.loop_delay) || 50,
         scaleSpeed: Number(selectedChallengeOverride.parameters?.scale_sensitivity) || 0.01,
         minScale: Number(selectedChallengeOverride.parameters?.min_pinch_scale) || 1,
         maxScale: Number(selectedChallengeOverride.parameters?.max_pinch_scale) || 1,
-        isVisible: !isHuntMode,
+        isVisible: !isHuntMode, //true
         position: {
           x: parseFloat(selectedChallengeOverride.parameters?.positionX) || 0,
           y: parseFloat(selectedChallengeOverride.parameters?.positionY) || 0,
           z: 2 || 0.4,
         },
         distanceCamera: 2,
-        isHuntMode: isHuntMode,
-        allowScale: isHuntMode,
+        isHuntMode: isHuntMode, //true
+        allowScale: isHuntMode, //true
       };
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
-      setSendModelData(true);
+      // setSendModelData(true);
       setHasSentModelDataOnce(true);
     }
   };
@@ -296,12 +292,13 @@ const ARScreen = ({route}) => {
       objects: [
         {
           id: "1",
-          latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1],
-          longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0],
+          latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
+          longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
           scale: 1.0,
           height: 1,
           isVisible: true,
           updateRadius: 14.0,
+          isHuntMode: isHuntMode
         },
       ],
     };
@@ -310,6 +307,7 @@ const ARScreen = ({route}) => {
       "SpawnObjectsFromReact",
       JSON.stringify(spawnData)
     );
+    setSendSpawnModelData(true)
     console.log("[StarChallengeScreen] spawnData", spawnData);
   };
 
@@ -324,11 +322,27 @@ const ARScreen = ({route}) => {
   };
 
   useEffect(() => {
+    // console.log("Verificando condiciones:");
+    // // console.log("unityRef.current:", unityRef.current);
+    // console.log("starModels:", starModels);
+    // console.log("textureBase:", textureBase);
+    // console.log("userLocation:", userLocation);
+    // console.log("hasSentModelDataOnce:", hasSentModelDataOnce);
+    // console.log("notificationMode:", notificationMode);
+    // console.log(
+    //     "Condición final:",
+    //     unityRef.current &&
+    //     starModels &&
+    //     textureBase &&
+    //     validUserLocation &&
+    //     !hasSentModelDataOnce &&
+    //     (notificationMode === "scan" || notificationMode === "hunt")
+    // );
     if (
       unityRef.current &&
       starModels &&
       textureBase &&
-      userLocation &&
+      validUserLocation &&
       !hasSentModelDataOnce &&
       (notificationMode === "scan" || notificationMode === "hunt")
     ) {
@@ -338,22 +352,12 @@ const ARScreen = ({route}) => {
     isUnityLoaded,
     starModels,
     textureBase,
-    userLocation,
+    validUserLocation,
     notificationMode,
     hasSentModelDataOnce,
     selectedChallengeOverride,
     modelResource,
   ]);
-
-  // useEffect(() => {
-  //   if (notificationMode === "hunt") {
-  //     // console.log("se envio sendSpawnData");
-  //     setTimeout(() => {
-  //       sendSpawnData();
-  //       PointsCount();
-  //     }, 1500);
-  //   }
-  // }, [notificationMode, locationObtainedForHunt, isUnityLoaded, selectedChallengeOverride]);
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -385,29 +389,29 @@ const ARScreen = ({route}) => {
       setOpenModalARMode(true);
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
-      // console.log("✅ Escena ARReactNative 1 cargada correctamente desde Unity");
       setUnitySceneLoaded(false);
+      // Para ocultar elementos de la interfaz de UNITY
+      const hide = ["Arrow", "loading", "Stars", "CompassArrow" ];
+      const show = ELEMENTSUNITY.filter(name => !hide.includes(name));
+
+      unityRef.current.postMessage(
+          "CanvasController",
+          "ShowHideElements",
+          JSON.stringify({ show, hide })
+      );
     }
     if (data?.touchEvent?.objectTouched === true) {
       notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
-      // console.log("Estrella encontrada");
       navigation.navigate({
         name: "FunFactsScreen",
         params: {
           challengeObj: selectedSite,
-          // captureData: capturedImage,
-          // challengeType: CHALLENGES_TYPE.STAR,
-          // isMemory: false,
         },
       });
     }
-    // if (data?.notificationMode) {
-    //   setNotificationMode(data.notificationMode);
-    // }
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
-        // Todavia no implementado
         break;
       case AR_MODES.SCAN_MODE:
         if (data.photoVideoButton?.isPhoto) {
@@ -425,7 +429,19 @@ const ARScreen = ({route}) => {
         }
         break;
       case AR_MODES.HUNT_MODE:
-        // Todavia no implementado
+        unityRef.current.postMessage(
+            "ArMode",
+            "SetTextArModal",
+            JSON.stringify({ titleARMode: "Hunt Mode", textlabel: "ArMode", visibleLabel: false })
+        );
+        const show = ["Back", "Details", "ArMode", "Arrow" ];
+        const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+
+        unityRef.current.postMessage(
+            "CanvasController",
+            "ShowHideElements",
+            JSON.stringify({ show, hide })
+        );
         break;
       default:
         break;
@@ -447,7 +463,6 @@ const ARScreen = ({route}) => {
 
     updatedData = await copyFileForDisplay(updatedData);
 
-    // Navegar y pasar la captura actualizada
     navigation.navigate({
       name: "ArChallengeShare",
       params: {
@@ -516,43 +531,31 @@ const ARScreen = ({route}) => {
 
     setSelectedSite(site);
     setSelectedChallengeOverride(challengeData);
-
-    // Cerrar primero el modal actual
+    setHasSentModelDataOnce(false);
+    setSendSpawnModelData(false);
     closeModalARMode();
 
-    // Mostrar la notificación luego de un pequeño delay
     setTimeout(() => {
-      // setNotificationMode("scan");
       setShowNotification(true);
-    }, 1000); // 300ms funciona bien visualmente
+    }, 1000);
   };
 
-  // Detectar cambio de escena
-  // useEffect(() => {
-  //   if (unityRef.current) {
-  //     console.log("cambio de scena");
-  //     unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
-  //   }
-  // }, [unityRef.current]);
   useEffect(() => {
     if (!unityRef.current) return;
 
     const timeout = setTimeout(() => {
-      // console.log("Solicitando carga de escena ARReactNative 1");
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
-    }, 500); // menor delay, Unity ya está listo
+    }, 500);
 
     return () => clearTimeout(timeout);
-  }, [unityLoading, isUnityLoaded]); // cambia cuando Unity termina de cargar
+  }, [unityLoading, isUnityLoaded]);
 
-  // Verificar si el modelo existe
   useEffect(() => {
     if (challengeObj && modelFile) {
       checkIfModelExist();
     }
   }, [challengeObj, modelFile]);
 
-  // Activar posicion GPS
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
       position => {
@@ -570,23 +573,18 @@ const ARScreen = ({route}) => {
           accuracy: position.coords.accuracy,
         };
         setUserLocation(newLocation);
+        if (
+            !validUserLocation &&
+            newLocation.latitude &&
+            newLocation.longitude &&
+            newLocation.latitude !== 0 &&
+            newLocation.longitude !== 0
+        ) {
+          setValidUserLocation(newLocation);
+        }
 
-        const LOCATION_THRESHOLD = 0.00001;
-
-        // if (
-        //     notificationMode === "hunt" && // Only execute updateUnityLocation if notificationMode is "hunt"
-        //     (!lastSentLocationRef.current ||
-        //         Math.abs(newLocation.latitude - lastSentLocationRef.current.latitude) > LOCATION_THRESHOLD ||
-        //         Math.abs(newLocation.longitude - lastSentLocationRef.current.longitude) > LOCATION_THRESHOLD)
-        // ) {
-        //   console.log('ejecutando envio de posicion');
-        updateUnityLocation(newLocation);
-        lastSentLocationRef.current = newLocation;
-        // }
-        // if (notificationMode === "scan") { // For scan mode, still update location but don't set `locationObtainedForHunt`
-        //   updateUnityLocation(newLocation);
-        //   lastSentLocationRef.current = newLocation;
-        // }
+          updateUnityLocation(newLocation);
+          lastSentLocationRef.current = newLocation;
       },
       error => {},
       {
@@ -605,7 +603,6 @@ const ARScreen = ({route}) => {
     };
   }, [unityRef]);
 
-  // Activar efecto Bloom
   useEffect(() => {
     if (challengeObjParameters) {
       setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || 0.1);
@@ -613,19 +610,14 @@ const ARScreen = ({route}) => {
     }
   }, [challengeObjParameters]);
 
-  // Verificar que el usuario tenga todos los permisos
   useEffect(() => {
     checkPermission();
   }, [selectedChallengeOverride]);
 
-  // Levantar el challenge de Scan Mode enviando los datos a Unity
   useEffect(() => {
-    // Only run these operations if unityRef.current is available
     if (unityRef.current && isScanMode) {
-      // Use a setTimeout to give Unity a moment to fully initialize
       const timer = setTimeout(() => {
         PointsCount();
-        // isLoadingUnity();
 
         unityRef.current.postMessage(
           "Scriptposition",
@@ -646,14 +638,12 @@ const ARScreen = ({route}) => {
             })
           );
         }
-      }, 500); // 500ms delay
+      }, 500);
 
-      // Clean up the timer when the component unmounts or loses focus
       return () => clearTimeout(timer);
     }
   }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
 
-  // Continuar Hunt Challenge
   useEffect(() => {
     if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
       startChallengeHandler(huntChallenge);
@@ -665,7 +655,7 @@ const ARScreen = ({route}) => {
       unityRef.current &&
       starModels &&
       textureBase &&
-      userLocation &&
+        validUserLocation &&
       !hasSentModelDataOnce &&
       (isGeoTagMode || isHuntMode)
     ) {
@@ -675,28 +665,49 @@ const ARScreen = ({route}) => {
     isUnityLoaded,
     starModels,
     textureBase,
-    userLocation,
+    validUserLocation,
     isGeoTagMode,
     isHuntMode,
     hasSentModelDataOnce,
     selectedChallengeOverride,
     modelResource,
-  ]); // Added dependencies for sendModelDataToUnity logic
+  ]);
 
   useEffect(() => {
-    if (isHuntMode || isGeoTagMode) {
-      // console.log("se envio sendSpawnData");
-      setTimeout(() => {
-        sendSpawnData();
-        PointsCount();
-      }, 1500);
+    if (!unityRef.current || unitySceneLoaded) return;
+    const shouldSendModel =
+        (isGeoTagMode || isHuntMode) &&
+        !hasSentModelDataOnce &&
+        validUserLocation &&
+        textureBase &&
+        starModels;
+
+    const shouldSendSpawn =
+        isHuntMode &&
+        !sendSpawnModelData &&
+        validUserLocation;
+
+    if (shouldSendModel) {
+      sendModelDataToUnity();
     }
-  }, [isGeoTagMode, isHuntMode, locationObtainedForHunt, isUnityLoaded, selectedChallengeOverride]); // Added dependencies for sendSpawnData and PointsCount logic
+
+    if (shouldSendSpawn) {
+      sendSpawnData();
+      PointsCount();
+    }
+  }, [
+    unitySceneLoaded,
+    isGeoTagMode,
+    isHuntMode,
+    userLocation,
+    textureBase,
+    starModels,
+    hasSentModelDataOnce,
+    sendSpawnModelData,
+  ]);
 
   useFocusEffect(
     useCallback(() => {
-      // console.log("useFocusEffect: [unityRef, isUnitLoaded]");
-
       if (Platform.OS === "android") {
         unityRef.current?.resumeUnity();
         unityRef.current?.windowFocusChanged(true);
@@ -706,10 +717,6 @@ const ARScreen = ({route}) => {
 
   useEffect(() => {
     if (unityRef.current && !unityLoading && shouldRenderUnity) {
-      const spawnData = {
-        isDetectionEnabled: true,
-        detectionDistance: 80,
-      };
 
       const distanceDetect = {
         isDetectionEnabled: true,
@@ -730,98 +737,44 @@ const ARScreen = ({route}) => {
 
   useFocusEffect(
     useCallback(() => {
+      const timeout = setTimeout(() => {
+        if (!unitySceneLoaded) {
+          if (isGeoTagMode && !hasSentModelDataOnce) {
+            sendModelDataToUnity();
+          }
+          if (isHuntMode && !sendSpawnModelData) {
+            sendSpawnData();
+            PointsCount();
+
+          }
+        }
+      }, 1500);
+      // if (isHuntMode && !unitySceneLoaded ) {
+      //   console.log("🔁 Reenviando sendSpawnData después de volver al foco");
+      //   sendSpawnData();
+      //   PointsCount();
+      // }
       if (isFocusedRef.current) {
-        // console.log("⚠️ Ya montado, ignorando");
         return;
       }
 
       isFocusedRef.current = true;
-      // console.log("✅ MONTANDO UNITY");
       setShouldRenderUnity(true);
       setUnityLoading(true);
       setUnitySceneLoaded(true);
       return () => {
-        // console.log("❌ DESMONTANDO UNITY");
+        clearTimeout(timeout);
+        setValidUserLocation(false);
         isFocusedRef.current = false;
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);
         setUnityLoading(false);
+        setHasSentModelDataOnce(false)
+        setSendSpawnModelData(false)
       };
     }, [])
   );
 
-  // useEffect(() => {
-  //   const fetchNextStarData = async () => {
-  //     if (
-  //         selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE &&
-  //         userLocation &&
-  //         selectedSite?.id
-  //     ) {
-  //       console.log("entro para estrella")
-  //       try {
-  //         const response = await getNextStarApi({
-  //           geo_site_id: selectedSite.id,
-  //           lat: userLocation.latitude,
-  //           lon: userLocation.longitude,
-  //         });
-  //
-  //         if (response?.id) {
-  //           console.log("⭐ Star data recibida:", response);
-  //           // Puedes guardar esto en otro estado si lo necesitas:
-  //           setSelectedSite(prev => ({
-  //             ...prev,
-  //             starData: response,
-  //           }));
-  //         }
-  //       } catch (error) {
-  //         console.error("❌ Error en getNextStarApi", error);
-  //       }
-  //     }
-  //   };
-  //
-  //   fetchNextStarData();
-  // }, [selectedSite, userLocation]);
-  //
-
-  // useEffect(() => {
-  //   const fetchNextStarData = async () => {
-  //     if (
-  //         selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE &&
-  //         userLocation &&
-  //         selectedSite?.id
-  //     ) {
-  //       console.log("entro para estrella")
-  //       try {
-  //         const response = await getNextStarApi({
-  //           geo_site_id: selectedSite.id,
-  //           lat: userLocation.latitude,
-  //           lon: userLocation.longitude,
-  //         });
-  //
-  //         if (response?.id) {
-  //           console.log("⭐ Star data recibida:", response);
-  //           // Puedes guardar esto en otro estado si lo necesitas:
-  //           setSelectedSite(prev => ({
-  //             ...prev,
-  //             starData: response,
-  //           }));
-  //         }
-  //       } catch (error) {
-  //         console.error("❌ Error en getNextStarApi", error);
-  //       }
-  //     }
-  //   };
-  //
-  //   fetchNextStarData();
-  // }, [selectedSite, userLocation]);
-  //
-
-  // console.log(
-  //   "shouldRenderUnity, unitySceneLoaded",
-  //   shouldRenderUnity,
-  //   unitySceneLoaded,
-  //   isUnityLoaded
-  // );
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -854,14 +807,14 @@ const ARScreen = ({route}) => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.70)",
+                backgroundColor: "rgba(0,0,0,0.99)",
                 justifyContent: "center",
                 alignItems: "center",
                 zIndex: 999,
               }}
             >
               <ActivityIndicator size="large" color="#fff" />
-              <Text style={{color: "#fff", marginTop: 10}}>Cargando experiencia AR...</Text>
+              <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience</Text>
             </View>
           )}
         </>

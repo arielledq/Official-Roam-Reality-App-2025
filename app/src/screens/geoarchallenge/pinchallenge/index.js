@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState, useCallback} from "react";
-import {Platform} from "react-native";
+import {ActivityIndicator, Platform, Text, View} from "react-native";
 
 import {useSelector} from "react-redux";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
@@ -22,7 +22,7 @@ import {
   hasLocationPermission,
   isLocationPointInPolygon,
 } from "../../../util/LocationLib";
-import {CHALLENGES_TYPE} from "../../../constants";
+import {CHALLENGES_TYPE, ELEMENTSUNITY} from "../../../constants";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
 import {PIN_CHALLENGE_CONFIG} from "../../../constants";
@@ -48,12 +48,15 @@ const PinChallenge = () => {
   const [challengeInformationView, setChallengeInformationView] = useState(false);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [processingMedia, setProcessingMedia] = useState(false);
+  const [unitySceneLoaded, setUnitySceneLoaded] = useState(false);
+  const [shouldRenderUnity, setShouldRenderUnity] = useState(false);
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
 
   const unityRef = useRef(null); // Unity reference
   const watchIdRef = useRef(null);
   const viewShotRef = useRef();
+  const isFocusedRef = useRef(false);
 
   const navigation = useNavigation();
 
@@ -166,9 +169,9 @@ const PinChallenge = () => {
           z: 2 || 0.4,
         },
       };
-      setTimeout(() => {
+      // setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
-      }, 500);
+      // }, 500);
     }
   };
 
@@ -349,7 +352,6 @@ const PinChallenge = () => {
     } catch (error) {
       console.error("Error capturando la imagen con filtros:", error);
     }
-
     navigation.navigate({
       name: "ArChallengeShare",
       params: {
@@ -367,6 +369,7 @@ const PinChallenge = () => {
     setCapturedImage(null);
     setCapturedVideo(null);
     setIsUnityLoaded(true);
+    setUnitySceneLoaded(true);
   };
 
   const sendBloomValuesToUnity = () => {
@@ -484,8 +487,19 @@ const PinChallenge = () => {
     if (buttonPhotoIsPressed && !isMeInsideInSite) {
       viewNotification();
     }
+    if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
+      setUnitySceneLoaded(false);
+      const hide = ["Arrow", "loading", "Stars", "CompassArrow" ];
+      const show = ELEMENTSUNITY.filter(name => !hide.includes(name));
 
+      unityRef.current.postMessage(
+          "CanvasController",
+          "ShowHideElements",
+          JSON.stringify({ show, hide })
+      );
+    }
     if (data.photoVideoButton?.isPhoto && isMeInsideInSite) {
+      setUnitySceneLoaded(false);
       setCapturedImage(data.photoVideoButton?.filepath);
       setIsUnityLoaded(false);
       eraseFile();
@@ -510,6 +524,17 @@ const PinChallenge = () => {
   if (!isUnityLoaded) {
     screenPadding = {paddingBottom: 24};
   }
+
+  useEffect(() => {
+  if (isUnityLoaded === false) {
+    setUnitySceneLoaded(false);
+  }
+  else {
+    setUnitySceneLoaded(true);
+  }
+}, [isUnityLoaded,]);
+
+
 
   useEffect(() => {
     if (unityRef.current) {
@@ -550,6 +575,7 @@ const PinChallenge = () => {
   }, [challengeObjParameters]);
 
   useFocusEffect(() => {
+
     const timer = setTimeout(() => {
       if (unityRef.current) {
         PointsCount();
@@ -560,7 +586,7 @@ const PinChallenge = () => {
             setVisibleButtonPosition: true,
           })
         );
-        if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded) {
+        if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded && !unitySceneLoaded) {
           sendModelDataToUnitySpawn();
           sendBloomValuesToUnity();
         }
@@ -571,6 +597,39 @@ const PinChallenge = () => {
     }, 700);
     return () => clearTimeout(timer);
   });
+console.log("isUnityLoaded, unitySceneLoaded", isUnityLoaded, unitySceneLoaded)
+  useFocusEffect(
+      useCallback(() => {
+        const timeout = setTimeout(() => {
+          if (!unitySceneLoaded) {
+            if (unityRef.current) {
+              PointsCount();
+              unityRef.current.postMessage(
+                "Scriptposition",
+                "SetVisibleButton",
+                JSON.stringify({
+                  setVisibleButtonPosition: true,
+                })
+              );
+            }
+          }
+        }, 800);
+        if (isFocusedRef.current) {
+          return;
+        }
+
+        isFocusedRef.current = true;
+        setShouldRenderUnity(true);
+        return () => {
+          clearTimeout(timeout);
+          isFocusedRef.current = false;
+          setUnitySceneLoaded(false);
+          setShouldRenderUnity(false);
+          //
+        };
+      }, [])
+  );
+
   return (
     <ChallengeScreen
       title={`Location Check In\n${selectedGeoSite.name}`}
@@ -586,20 +645,42 @@ const PinChallenge = () => {
       headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
       scrollable={false}
     >
-      <UnityARCamera
-        width="100%"
-        height="100%"
-        unityRef={unityRef}
-        isProcessingMedia={processingMedia}
-        isUnityLoaded={isUnityLoaded}
-        capturedImage={capturedImage}
-        capturedVideo={capturedVideo}
-        onUnityMessage={handleUnityMessage}
-        imageFilter={{
-          challengeObj: {...challengeObj, challenge_type: CHALLENGES_TYPE.PIN_CHECK_IN},
-          viewShotRef: viewShotRef,
-        }}
-      />
+      {shouldRenderUnity && (
+          <>
+            <UnityARCamera
+                width="100%"
+                height="100%"
+                unityRef={unityRef}
+                isProcessingMedia={processingMedia}
+                isUnityLoaded={isUnityLoaded}
+                capturedImage={capturedImage}
+                capturedVideo={capturedVideo}
+                onUnityMessage={handleUnityMessage}
+                imageFilter={{
+                  challengeObj: {...challengeObj, challenge_type: CHALLENGES_TYPE.PIN_CHECK_IN},
+                  viewShotRef: viewShotRef,
+                }}
+            />
+            {unitySceneLoaded === true && (
+                <View
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: "rgba(0,0,0,0.99)",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      zIndex: 999,
+                    }}
+                >
+                  <ActivityIndicator size="large" color="#fff" />
+                  <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience...</Text>
+                </View>
+            )}
+          </>
+      )}
       {!isUnityLoaded && (
         <CameraControls
           onRetake={retakeButtonHandler}

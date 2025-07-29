@@ -378,7 +378,7 @@ const ArChallengeCapture = ({route, navigation}) => {
             zIndex: 999
           }}>
             <ActivityIndicator size="large" color="#fff" />
-            <Text style={{ color: '#fff', marginTop: 10 }}>Cargando AR...</Text>
+            <Text style={{ color: '#fff', marginTop: 10 }}>Loading AR experience</Text>
           </View>
       )}
       {!isUnityLoaded && (
