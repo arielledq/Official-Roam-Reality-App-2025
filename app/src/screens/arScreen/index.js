@@ -298,7 +298,7 @@ const ARScreen = ({route}) => {
           height: 1,
           isVisible: true,
           updateRadius: 14.0,
-          isHuntMode: isHuntMode
+          isHuntMode: isHuntMode,
         },
       ],
     };
@@ -307,7 +307,7 @@ const ARScreen = ({route}) => {
       "SpawnObjectsFromReact",
       JSON.stringify(spawnData)
     );
-    setSendSpawnModelData(true)
+    setSendSpawnModelData(true);
     console.log("[StarChallengeScreen] spawnData", spawnData);
   };
 
@@ -391,13 +391,13 @@ const ARScreen = ({route}) => {
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
       setUnitySceneLoaded(false);
       // Para ocultar elementos de la interfaz de UNITY
-      const hide = ["Arrow", "loading", "Stars", "CompassArrow" ];
+      const hide = ["Arrow", "loading", "Stars", "CompassArrow"];
       const show = ELEMENTSUNITY.filter(name => !hide.includes(name));
 
       unityRef.current.postMessage(
-          "CanvasController",
-          "ShowHideElements",
-          JSON.stringify({ show, hide })
+        "CanvasController",
+        "ShowHideElements",
+        JSON.stringify({show, hide})
       );
     }
     if (data?.touchEvent?.objectTouched === true) {
@@ -430,17 +430,17 @@ const ARScreen = ({route}) => {
         break;
       case AR_MODES.HUNT_MODE:
         unityRef.current.postMessage(
-            "ArMode",
-            "SetTextArModal",
-            JSON.stringify({ titleARMode: "Hunt Mode", textlabel: "ArMode", visibleLabel: false })
+          "ArMode",
+          "SetTextArModal",
+          JSON.stringify({titleARMode: "Hunt Mode", textlabel: "ArMode", visibleLabel: false})
         );
-        const show = ["Back", "Details", "ArMode", "Arrow" ];
+        const show = ["Back", "Details", "ArMode", "Arrow"];
         const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
         unityRef.current.postMessage(
-            "CanvasController",
-            "ShowHideElements",
-            JSON.stringify({ show, hide })
+          "CanvasController",
+          "ShowHideElements",
+          JSON.stringify({show, hide})
         );
         break;
       default:
@@ -489,6 +489,7 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
+    console.log("[StarChallengeScreen] startChallengeHandler site", site);
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -528,7 +529,7 @@ const ARScreen = ({route}) => {
       default:
         break;
     }
-
+    console.log("[StarChallengeScreen] challengeData", challengeData);
     setSelectedSite(site);
     setSelectedChallengeOverride(challengeData);
     setHasSentModelDataOnce(false);
@@ -574,17 +575,17 @@ const ARScreen = ({route}) => {
         };
         setUserLocation(newLocation);
         if (
-            !validUserLocation &&
-            newLocation.latitude &&
-            newLocation.longitude &&
-            newLocation.latitude !== 0 &&
-            newLocation.longitude !== 0
+          !validUserLocation &&
+          newLocation.latitude &&
+          newLocation.longitude &&
+          newLocation.latitude !== 0 &&
+          newLocation.longitude !== 0
         ) {
           setValidUserLocation(newLocation);
         }
 
-          updateUnityLocation(newLocation);
-          lastSentLocationRef.current = newLocation;
+        updateUnityLocation(newLocation);
+        lastSentLocationRef.current = newLocation;
       },
       error => {},
       {
@@ -655,7 +656,7 @@ const ARScreen = ({route}) => {
       unityRef.current &&
       starModels &&
       textureBase &&
-        validUserLocation &&
+      validUserLocation &&
       !hasSentModelDataOnce &&
       (isGeoTagMode || isHuntMode)
     ) {
@@ -676,16 +677,13 @@ const ARScreen = ({route}) => {
   useEffect(() => {
     if (!unityRef.current || unitySceneLoaded) return;
     const shouldSendModel =
-        (isGeoTagMode || isHuntMode) &&
-        !hasSentModelDataOnce &&
-        validUserLocation &&
-        textureBase &&
-        starModels;
+      (isGeoTagMode || isHuntMode) &&
+      !hasSentModelDataOnce &&
+      validUserLocation &&
+      textureBase &&
+      starModels;
 
-    const shouldSendSpawn =
-        isHuntMode &&
-        !sendSpawnModelData &&
-        validUserLocation;
+    const shouldSendSpawn = isHuntMode && !sendSpawnModelData && validUserLocation;
 
     if (shouldSendModel) {
       sendModelDataToUnity();
@@ -717,7 +715,6 @@ const ARScreen = ({route}) => {
 
   useEffect(() => {
     if (unityRef.current && !unityLoading && shouldRenderUnity) {
-
       const distanceDetect = {
         isDetectionEnabled: true,
         detectionDistance: 80,
@@ -745,7 +742,6 @@ const ARScreen = ({route}) => {
           if (isHuntMode && !sendSpawnModelData) {
             sendSpawnData();
             PointsCount();
-
           }
         }
       }, 1500);
@@ -769,8 +765,8 @@ const ARScreen = ({route}) => {
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);
         setUnityLoading(false);
-        setHasSentModelDataOnce(false)
-        setSendSpawnModelData(false)
+        setHasSentModelDataOnce(false);
+        setSendSpawnModelData(false);
       };
     }, [])
   );

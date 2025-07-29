@@ -47,13 +47,17 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         initialUserLocation.latitude,
         initialUserLocation.longitude
       );
-      updatedSiteData = {
-        ...updatedSiteData,
-        huntChallenge: huntData,
-      };
+      if (huntData?.id) {
+        updatedSiteData = {
+          ...updatedSiteData,
+          huntChallenge: huntData,
+        };
+        onStartChallenge(updatedSiteData);
+        onClose();
+      } else {
+        console.log("ya no hay mas estrellas que colectar");
+      }
     }
-    onStartChallenge(updatedSiteData);
-    onClose();
   };
 
   const getSitesHandler = (sponsorId: string = "") => {
