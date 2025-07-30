@@ -16,6 +16,7 @@ interface CaptureChallengeScreenProps {
   children: React.ReactNode;
   scrollable?: boolean;
   style?: ViewStyle;
+  disableBackButton?: boolean;
 }
 
 const ChallengeScreen = ({
@@ -27,6 +28,7 @@ const ChallengeScreen = ({
   style,
   appHeader = true,
   scrollable = true,
+  disableBackButton = false,
 }: CaptureChallengeScreenProps) => {
   const {height, width} = useWindowDimensions();
 
@@ -60,6 +62,7 @@ const ChallengeScreen = ({
       {appHeader && (
         <AppHeader
           hideBackButton={hideBackButton}
+          disableBackButton={disableBackButton}
           centerComponent={{
             text: title,
             numberOfLines: 2,
