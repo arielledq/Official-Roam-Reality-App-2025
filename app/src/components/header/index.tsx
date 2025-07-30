@@ -16,7 +16,11 @@ const AppHeader: FC<AppHeaderProps> = props => {
       <TouchableOpacity
         style={styles.backIcon}
         hitSlop={getHitSlop(5)}
-        onPress={() => navigation?.goBack()}
+        onPress={() => {
+          if (!props?.disableBackButton) {
+            navigation?.goBack();
+          }
+        }}
       >
         <BackArrowIcon />
       </TouchableOpacity>
