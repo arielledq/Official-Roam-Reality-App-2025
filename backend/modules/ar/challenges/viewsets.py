@@ -31,7 +31,7 @@ from django.db.models import Q
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.geos import Point
 from django.utils import timezone
-import datetime
+from datetime import timedelta
 from django_filters.rest_framework import DjangoFilterBackend
 
 
@@ -137,45 +137,38 @@ class ARMemoriesViewSet(ViewSet):
                 {'message': f'Challenge {challenge_id} does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
-        memories = ARMemories.objects.filter(
+        window_start = timezone.now() - timedelta(hours=challenge.cooldown_hours)
+        qs = ARMemories.objects.filter(
             user=user,
-            challenges=challenge
+            challenges=challenge,
+            created_at__gte=window_start
         ).order_by('created_at')
 
-        if not memories.exists():
+        used = qs.count()
+
+        if used < challenge.challenge_attempt:
             return Response(
-                {'message': "Challenge can be submitted now."},
+                {"message": "Challenge can be submitted now."},
                 status=status.HTTP_200_OK
             )
 
+        idx = used - challenge.challenge_attempt
+        anchor = qs[idx].created_at
+        cooldown_end = anchor + timedelta(hours=challenge.cooldown_hours)
         now = timezone.now()
-        first_time = memories.first().created_at
-        cycle_length = timezone.timedelta(hours=challenge.cooldown_hours)
 
-        # Cycles
-        cycles_passed = (now - first_time) // cycle_length
-        cycle_start = first_time + cycles_passed * cycle_length
-        window_end = cycle_start + cycle_length
-
-        # Attempts in current cycles
-        attempts = memories.filter(
-            created_at__gte=cycle_start,
-            created_at__lte=now
-        ).count()
-
-        # Attempts finished
-        if attempts >= challenge.challenge_attempt and now < window_end:
+        if now < cooldown_end:
+            remaining = cooldown_end - now
             return Response(
                 {
-                    'message': "You are still in cooldown period.",
-                    'remaining': str(window_end - now)
+                    "message": "You are still in cooldown period.",
+                    "remaining": str(remaining)
                 },
                 status=status.HTTP_403_FORBIDDEN
             )
 
         return Response(
-            {'message': "Challenge can be submitted now."},
+            {"message": "Challenge can be submitted now."},
             status=status.HTTP_200_OK
         )
 
@@ -194,45 +187,39 @@ class ARMemoriesViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        check_ins = ARSitePinCheckIn.objects.filter(
+        window_start = timezone.now() - timedelta(hours=site_obj.cooldown_hours)
+        qs = ARSitePinCheckIn.objects.filter(
             user=user,
             geo_challenge=geo_challenge_id,
             geo_site=geo_site_id,
+            created_at__gte=window_start
         ).order_by('created_at')
 
-        if not check_ins.exists():
+        used = qs.count()
+
+        if used < site_obj.challenge_attempt:
             return Response(
-                {'message': "Challenge can be submitted now."},
+                {"message": "Challenge can be submitted now."},
                 status=status.HTTP_200_OK
             )
 
+        idx = used - site_obj.challenge_attempt
+        anchor = qs[idx].created_at
+        cooldown_end = anchor + timedelta(hours=site_obj.cooldown_hours)
         now = timezone.now()
-        first_time = check_ins.first().created_at
-        cycle_length = timezone.timedelta(hours=site_obj.cooldown_hours)
 
-        # Cycles
-        cycles_passed = (now - first_time) // cycle_length
-        cycle_start = first_time + cycles_passed * cycle_length
-        window_end = cycle_start + cycle_length
-
-        # Attempts in current cycles
-        attempts = check_ins.filter(
-            created_at__gte=cycle_start,
-            created_at__lte=now
-        ).count()
-
-        # Attempts finished
-        if attempts >= site_obj.challenge_attempt and now < window_end:
+        if now < cooldown_end:
+            remaining = cooldown_end - now
             return Response(
                 {
-                    'message': "You are still in cooldown period.",
-                    'remaining': str(window_end - now)
+                    "message": "You are still in cooldown period.",
+                    "remaining": str(remaining)
                 },
                 status=status.HTTP_403_FORBIDDEN
             )
 
         return Response(
-            {'message': "Challenge can be submitted now."},
+            {"message": "Challenge can be submitted now."},
             status=status.HTTP_200_OK
         )
 
