@@ -2749,9 +2749,9 @@ babel-plugin-transform-flow-enums@^0.0.2:
     "@babel/plugin-syntax-flow" "^7.12.1"
 
 babel-preset-current-node-syntax@^1.0.0:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/babel-preset-current-node-syntax/-/babel-preset-current-node-syntax-1.1.1.tgz#204c610030f7e74d4cb1ad7d0ff3c044abf48688"
-  integrity sha512-23fWKohMTvS5s0wwJKycOe0dBdCwQ6+iiLaNR9zy8P13mtFRFM9qLLX6HJX5DL2pi/FNDf3fCQHM4FIMoHH/7w==
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/babel-preset-current-node-syntax/-/babel-preset-current-node-syntax-1.2.0.tgz#20730d6cdc7dda5d89401cab10ac6a32067acde6"
+  integrity sha512-E/VlAEzRrsLEb2+dv8yp3bo4scof3l9nR4lrld+Iy5NyVqgVYUJnDAmunkhPMisRI32Qc4iRiz425d8vM++2fg==
   dependencies:
     "@babel/plugin-syntax-async-generators" "^7.8.4"
     "@babel/plugin-syntax-bigint" "^7.8.3"
@@ -6782,10 +6782,10 @@ react-native-map-link@^3.9.0:
   resolved "https://registry.yarnpkg.com/react-native-map-link/-/react-native-map-link-3.9.0.tgz#488eeb6ffa6a8164f1952ce230ab9a224d7855c4"
   integrity sha512-3Aod4Y/5wtueR0ss6ffPzW5idz9oGYymm8WdnTJihJ89AXC6O1w/ausxdcBO0vmVGPhVlNicJPPZogp2l1oW8A==
 
-react-native-maps@1.20.1:
-  version "1.20.1"
-  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-1.20.1.tgz#f613364886b2f72db56cafcd2bd7d3a35f470dfb"
-  integrity sha512-NZI3B5Z6kxAb8gzb2Wxzu/+P2SlFIg1waHGIpQmazDSCRkNoHNY4g96g+xS0QPSaG/9xRBbDNnd2f2/OW6t6LQ==
+react-native-maps@1.24.3:
+  version "1.24.3"
+  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-1.24.3.tgz#05ab0ddedd03c8f63dd52141fe7f0583b1a5cb2e"
+  integrity sha512-cF5oTA8z24QqGIRFfDcsXLEs/gCd0RhaJ9KPv/2HiogKD5gpjh1naimZUJQ6IsEcUngSSk8iov6p2jd7dB+/bQ==
   dependencies:
     "@types/geojson" "^7946.0.13"
 
