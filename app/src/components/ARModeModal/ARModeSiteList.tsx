@@ -52,6 +52,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           ...updatedSiteData,
           huntChallenge: huntData,
         };
+        onStartChallenge(updatedSiteData);
         onClose();
       } else {
         console.log("ya no hay mas estrellas que colectar");
