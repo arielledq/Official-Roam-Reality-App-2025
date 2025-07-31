@@ -43,11 +43,6 @@ class ARExperienceAdmin(admin.ModelAdmin):
     list_display = ('title_1', 'title_2', 'geo_location',)
 
 
-@admin.register(ScanPicture)
-class ScanPictureAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-
-
 @admin.register(GeoArSiteCategory)
 class GeoArSiteCategoryAdmin(admin.ModelAdmin):
     list_display = ('name',)
@@ -160,6 +155,11 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
         else:
             self.formfield_overrides = self.mapFields
         return form_class
+
+
+@admin.register(ScanPicture)
+class ScanPictureAdmin(GeoArChallengeAdmin):
+    list_display = ('name',)
 
 
 class GeoARStarPointForm(forms.ModelForm):
