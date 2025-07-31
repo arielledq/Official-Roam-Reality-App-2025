@@ -159,8 +159,9 @@ class ChallengesSerializer(serializers.ModelSerializer):
         return obj.image.url
 
     def get_user_attempts(self, obj):
-        user = self.context['request'].user
-        if not user.is_authenticated:
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
             return 0
 
         window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
@@ -398,8 +399,9 @@ class GeoArSiteSerializer(GeoModelSerializer):
         return ARSitePinCheckIn.objects.filter(geo_site=obj).count()
 
     def get_user_attempts(self, obj):
-        user = self.context['request'].user
-        if not user.is_authenticated:
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
             return 0
 
         window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
