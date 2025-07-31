@@ -12,6 +12,8 @@ import userLocationHook from "screens/drawerContent/location.hook";
 // @ts-ignore
 import {AR_MODES} from "constants";
 import ARChallengeItem from "./ARChallengeItem";
+import {showMessage} from "util/helpers";
+import Toast from "react-native-toast-message";
 
 interface ARModeSiteListProps {
   selectedMode: any;
@@ -55,7 +57,11 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         onStartChallenge(updatedSiteData);
         onClose();
       } else {
-        console.log("ya no hay mas estrellas que colectar");
+        Toast.show({
+          type: "info",
+          text1: "Hunt Challenge Info",
+          text2: "You have collected all the stars in this hunt challenge",
+        });
       }
     }
   };

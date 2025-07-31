@@ -20,6 +20,7 @@ import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
 import {ELEMENTSUNITY} from "../../constants";
+import Toast from "react-native-toast-message";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -72,6 +73,7 @@ const ARScreen = ({route}) => {
 
   // const huntChallenge = TEST_HUNT_CHALLENGE;
   const huntChallenge = route.params?.huntChallenge;
+  const huntChallengeFinished = route.params?.huntChallengeFinished;
   const isContinuingHuntChallenge = !!huntChallenge;
 
   const checkPermission = () => {
@@ -292,6 +294,8 @@ const ARScreen = ({route}) => {
       objects: [
         {
           id: "1",
+          // latitude: -25.296824,
+          // longitude: -57.589536,
           latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
           longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
           scale: 1.0,
@@ -308,7 +312,7 @@ const ARScreen = ({route}) => {
       JSON.stringify(spawnData)
     );
     setSendSpawnModelData(true);
-    console.log("[StarChallengeScreen] spawnData", spawnData);
+    // console.log("[StarChallengeScreen] spawnData", spawnData);
   };
 
   const PointsCount = async () => {
@@ -402,6 +406,7 @@ const ARScreen = ({route}) => {
     }
     if (data?.touchEvent?.objectTouched === true) {
       notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
+      console.log("[ARScreen] Navigating to FunFactsScreen", selectedSite);
       navigation.navigate({
         name: "FunFactsScreen",
         params: {
@@ -489,6 +494,7 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
+    console.log("[ARScreen] startChallengeHandler site", site);
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -512,7 +518,6 @@ const ARScreen = ({route}) => {
         };
         break;
       case AR_MODES.HUNT_MODE:
-        console.log("[StarChallengeScreen] huntChallenge site", site);
         challengeData = {
           lat_long: site?.geo_ar_star?.geo_site?.lat_long,
           challenge_requirement: site?.geo_ar_star?.geo_site?.pin_challenge?.challenge_requirement,
@@ -648,6 +653,16 @@ const ARScreen = ({route}) => {
       startChallengeHandler(huntChallenge);
     }
   }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
+
+  useEffect(() => {
+    if (huntChallengeFinished) {
+      Toast.show({
+        type: "info",
+        text1: "Hunt Challenge Info",
+        text2: "You have finished the hunt challenge",
+      });
+    }
+  }, [huntChallengeFinished]);
 
   useEffect(() => {
     if (
