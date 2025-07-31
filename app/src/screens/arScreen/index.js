@@ -294,8 +294,6 @@ const ARScreen = ({route}) => {
       objects: [
         {
           id: "1",
-          // latitude: -25.296824,
-          // longitude: -57.589536,
           latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
           longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
           scale: 1.0,
@@ -312,7 +310,6 @@ const ARScreen = ({route}) => {
       JSON.stringify(spawnData)
     );
     setSendSpawnModelData(true);
-    // console.log("[StarChallengeScreen] spawnData", spawnData);
   };
 
   const PointsCount = async () => {

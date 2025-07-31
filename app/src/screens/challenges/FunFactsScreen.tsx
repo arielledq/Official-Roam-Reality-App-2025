@@ -250,8 +250,6 @@ const FunFactsScreen = ({route}) => {
     // Extract remaining hunt pins
     const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
 
-    console.log("remainingStars", remainingStars);
-
     let navigationParams = {};
     if (remainingStars >= 1) {
       const huntChallenge = {
@@ -259,7 +257,6 @@ const FunFactsScreen = ({route}) => {
         selectedMode: AR_MODES_MENU[1],
         huntChallenge: newHuntPointChallenge,
       };
-      console.log("Navigating to ARScreen", huntChallenge);
       navigationParams = {
         huntChallenge,
       };
@@ -295,7 +292,6 @@ const FunFactsScreen = ({route}) => {
     </>
   );
 
-  console.log("challengeObj", challengeObj);
   const funFactImage = challengeObj?.huntChallenge?.image;
   const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
   const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
