@@ -612,7 +612,7 @@ class ScanPicture(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
-    file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/")
+    file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/", null=True, blank=True)
     file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
     icon = models.ImageField(_("Icon"), upload_to="scanpicture/icon/", null=True, blank=True)
     file_animation = models.FileField(_("Animation"), upload_to="scanpicture/animation/")
@@ -624,6 +624,13 @@ class ScanPicture(models.Model):
         related_name="scan_pictures",
     )
     coordinates = gis_models.PointField(_("Coordinates"), blank=True, null=True)
+
+    def clean(self):
+        super().clean()
+        if not self.file_image and not self.file_3d:
+            raise ValidationError(_("Image or 3D File is required."))
+        if self.file_image and self.file_3d:
+            raise ValidationError(_("You can not upload image and 3D file, only one of them."))
 
     def __str__(self):
         return self.name
