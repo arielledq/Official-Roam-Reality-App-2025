@@ -252,6 +252,7 @@ const FunFactsScreen = ({route}) => {
 
     console.log("remainingStars", remainingStars);
 
+    let navigationParams = {};
     if (remainingStars >= 1) {
       const huntChallenge = {
         ...challengeObj,
@@ -259,16 +260,22 @@ const FunFactsScreen = ({route}) => {
         huntChallenge: newHuntPointChallenge,
       };
       console.log("Navigating to ARScreen", huntChallenge);
-      // @ts-ignore
-      navigation.navigate("ARScreen", {
+      navigationParams = {
         huntChallenge,
-      });
+      };
     } else {
-      // @ts-ignore
-      navigation.navigate("ARScreen", {
+      navigationParams = {
         huntChallengeFinished: true,
-      });
+      };
     }
+
+    setTimeout(() => {
+      // @ts-ignore
+      navigation.navigate("TabNavigator", {
+        screen: "Tab",
+        params: {screen: "Go Navigate", params: navigationParams},
+      });
+    }, 250);
   };
 
   const closeShareToSocialMediaButtonHandler = () => {
