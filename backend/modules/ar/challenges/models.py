@@ -623,6 +623,7 @@ class ScanPicture(models.Model):
         blank=True,
         related_name="scan_pictures",
     )
+    info = RichTextField(_("Info"), blank=True, null=True)
     coordinates = gis_models.PointField(_("Coordinates"), blank=True, null=True)
 
     def clean(self):

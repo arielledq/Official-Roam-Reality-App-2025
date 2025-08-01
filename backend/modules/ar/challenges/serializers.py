@@ -355,7 +355,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'coordinates',]
+        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',]
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
