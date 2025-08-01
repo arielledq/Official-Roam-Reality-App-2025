@@ -34,6 +34,9 @@ const PrivacyPolicy = () => {
             ol: { color: "#fff", fontSize: FontSizes.S14 },
             ul: { color: "#fff", fontSize: FontSizes.S14 },
             strong: { color: "#fff", fontSize: FontSizes.S18 },
+            em: { color: "#fff", fontStyle: "italic" },
+            u: { color: "#fff" ,textDecorationLine: "underline", },
+            s: { color: "#fff", textDecorationLine: "line-through", },
           }}
           source={{ html: html }}
           contentWidth={width}

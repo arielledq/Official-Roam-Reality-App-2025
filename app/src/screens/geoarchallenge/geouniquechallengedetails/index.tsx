@@ -166,6 +166,9 @@ const GeoUniqueArChallengeDetails: ScreenStackComponent<
               color: "#fff",
               fontSize: FontSizes.S18,
             },
+            em: { fontStyle: "italic" },
+            u: { textDecorationLine: "underline", },
+            s: { textDecorationLine: "line-through", },
           }}
           source={{
             html: `${challengeObj.description}`,

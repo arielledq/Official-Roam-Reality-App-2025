@@ -406,7 +406,7 @@ class FindFriendsAPIView(APIView):
                 Q(email__icontains=search) |
                 Q(name__icontains=search) 
             ).exclude(id__in=friends).exclude(id__in=users_with_friend_request).exclude(id=request.user.id)
-            serializer = UserSerializer(users, many=True)
+            serializer = UserSerializer(users[:100], many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

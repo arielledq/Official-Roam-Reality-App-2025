@@ -459,6 +459,12 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
                 {"error": "Lat, lon and geo_site_id parameters are required."},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+        try:
+            geo_site_id = int(geo_site_id)
+        except (ValueError, TypeError):
+            return Response({"error": "geo_site_id must be an integer."}, status=status.HTTP_400_BAD_REQUEST)
+
         ar_star = self.queryset.filter(geo_site=geo_site_id).first()
 
         if not ar_star:

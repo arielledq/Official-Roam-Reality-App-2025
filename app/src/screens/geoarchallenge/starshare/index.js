@@ -92,6 +92,15 @@ const ArStarChallengeShare = props => {
                   color: "#fff",
                   fontSize: FontSizes.S10,
                 },
+                em: {
+                  fontStyle: "italic",
+                },
+                u: {
+                  textDecorationLine: "underline",
+                },
+                s: {
+                  textDecorationLine: "line-through",
+                },
                 strong: {
                   lineHeight: 13.64,
                   color: "#fff",
