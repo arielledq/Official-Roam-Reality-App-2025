@@ -532,6 +532,7 @@ class ARMemories(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
+    user_first_attempt = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "AR Memories"
@@ -889,6 +890,7 @@ class ARSitePinCheckIn(models.Model):
         related_name="ar_checkins",
     )
     points = models.IntegerField(verbose_name="Points", default=0)
+    user_first_attempt = models.BooleanField(default=False)
 
     class Meta:
         verbose_name_plural = "AR Site Pin Check-ins"

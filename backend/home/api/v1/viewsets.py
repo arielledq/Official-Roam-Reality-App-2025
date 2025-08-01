@@ -49,6 +49,15 @@ logger = logging.getLogger('django')
 
 User = get_user_model()
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import ensure_csrf_cookie
+
+@ensure_csrf_cookie
+def csrf_token_view(request):
+    token = request.META.get("CSRF_COOKIE", "")
+    print(f"token {token}")
+    return JsonResponse({"csrfToken": token})
+
 
 class SignupViewSet(ModelViewSet):
     serializer_class = SignupSerializer
