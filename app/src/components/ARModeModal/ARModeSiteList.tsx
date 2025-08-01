@@ -14,6 +14,7 @@ import {AR_MODES} from "constants";
 import ARChallengeItem from "./ARChallengeItem";
 import {showMessage} from "util/helpers";
 import Toast from "react-native-toast-message";
+import theme from "assets/theme";
 
 interface ARModeSiteListProps {
   selectedMode: any;
@@ -186,7 +187,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             height: 75,
             width: 75,
             borderRadius: 110,
-            backgroundColor: "#27273F",
+            backgroundColor: theme.lightColors?.grey4,
             alignItems: "center",
             justifyContent: "center",
           }}
@@ -199,7 +200,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         <AppDropdown
           data={sponsorData}
           maxHeight={300}
-          containerStyle={{flex: 1}}
+          containerStyle={{flex: 1, borderRadius: 0}}
           labelField="label"
           valueField="value"
           selectedTextStyle={{fontSize: 14, ...fontGroup.nunitoBold, fontWeight: "bold"}}
@@ -207,7 +208,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             ...fontGroup.nunitoBold,
             textTransform: "uppercase",
             fontWeight: "bold",
-            color: "#fff",
+            color: theme.lightColors?.white,
             fontSize: 14,
           }}
           placeholder={selectedSponsor?.label || ""}
@@ -216,7 +217,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             textTransform: "uppercase",
             fontWeight: "bold",
           }}
-          activeColor="#C881F0"
+          activeColor={theme.lightColors?.magenta}
           value={selectedSponsor?.value?.toString().toUpperCase() || ""}
           onChange={item => {
             setSelectedSponsor(item);
@@ -232,31 +233,33 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           marginTop: 25,
         }}
       >
-        <Text style={{fontSize: 18, fontWeight: "bold", color: "white"}}>
+        <Text style={{fontSize: 18, fontWeight: "bold", color: "white", flex: 1}}>
           {selectedMode?.listLabel} Available
         </Text>
-        <AppButton
-          customColors={["#27273F", "#27273F"]}
-          containerStyle={{
-            paddingHorizontal: 0,
-            borderRadius: 4,
-            paddingVertical: 0,
-            paddingRight: 5,
-            width: 90,
-            minHeight: 35,
-          }}
-          iconContainerStyle={{
-            padding: 0,
-          }}
-          titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold"}}
-          onPress={() => getSitesHandler()}
-          title="Refresh"
-          icon={
-            <View style={{paddingHorizontal: 5}}>
-              <RefreshIcon />
-            </View>
-          }
-        />
+        <View style={{width: 90}}>
+          <AppButton
+            // @ts-ignore
+            customColors={[theme.lightColors?.grey4, theme.lightColors?.grey4]}
+            containerStyle={{
+              paddingLeft: 0,
+              paddingRight: 4,
+              paddingVertical: 0,
+              borderRadius: 4,
+              minHeight: 35,
+            }}
+            iconContainerStyle={{
+              padding: 0,
+            }}
+            titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold"}}
+            onPress={() => getSitesHandler()}
+            title="Refresh"
+            icon={
+              <View style={{paddingHorizontal: 5}}>
+                <RefreshIcon />
+              </View>
+            }
+          />
+        </View>
       </View>
 
       <ScrollView style={{marginTop: 15}}>
@@ -266,18 +269,26 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             const siteId = site?.id || site?.name + index;
             const siteName = site?.name;
             let siteImage = {uri: site?.image};
+            let challengesAvailable;
+            const challengeDistance = "0 Miles away";
             let challenges = [];
             switch (selectedMode?.mode) {
               case AR_MODES.GEO_TAG_MODE:
+                challengesAvailable = "1 Tag";
                 challenges = [site?.pin_challenge];
                 break;
               case AR_MODES.SCAN_MODE:
+                const numberChallengesAvailable = site?.challenges?.length || 1;
+                challengesAvailable = `${numberChallengesAvailable} Gem${
+                  numberChallengesAvailable === 1 ? "" : "s"
+                }`;
                 siteImage = site?.icon
                   ? {uri: site.icon}
                   : require("../../assets/images/AppSettingsIcon.png");
                 challenges = site?.challenges || [site];
                 break;
               case AR_MODES.HUNT_MODE:
+                challengesAvailable = "1 Hunt";
                 challenges = [site?.pin_challenge];
                 break;
             }
@@ -293,7 +304,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                     )
                   }
                   style={{
-                    backgroundColor: "#27273F",
+                    backgroundColor: theme.lightColors?.grey4,
                     borderRadius: 4,
                     padding: 12,
                     flexDirection: "row",
@@ -308,22 +319,31 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                     <Text style={{color: "white", fontSize: 16, fontWeight: "bold"}}>
                       {siteName}
                     </Text>
-                    <View style={{flexDirection: "row", gap: 10}}>
-                      <View style={{flexDirection: "row", alignItems: "center"}}>
+                    <View style={{flexDirection: "row", gap: 8}}>
+                      <View style={{flexDirection: "row", alignItems: "center", gap: 2}}>
                         <Icon name="pinrosa" family="custom" size={15} />
-                        <Text style={{color: "#C881F0", fontSize: 10}}>1</Text>
+                        <Text style={{color: theme.lightColors?.grey0, fontSize: 10}}>
+                          {challengesAvailable}
+                        </Text>
                       </View>
-                      <View style={{flexDirection: "row", alignItems: "center"}}>
-                        <Icon name="walkingIcon" color="#C881F0" family="custom" size={15} />
-                        <Text style={{color: "#C881F0", fontSize: 10}}>0 Miles away</Text>
+                      <View style={{flexDirection: "row", alignItems: "center", gap: 2}}>
+                        <Icon
+                          name="walkingIcon"
+                          color={theme.lightColors?.magenta}
+                          family="custom"
+                          size={15}
+                        />
+                        <Text style={{color: theme.lightColors?.grey0, fontSize: 10}}>
+                          {challengeDistance}
+                        </Text>
                       </View>
                     </View>
                   </View>
                   <View>
                     {isExpanded ? (
-                      <Icon name="up" size={20} color="white" />
+                      <Icon name="up" size={20} color={theme.lightColors?.grey0} />
                     ) : (
-                      <Icon name="down" size={20} color="white" />
+                      <Icon name="down" size={20} color={theme.lightColors?.grey0} />
                     )}
                   </View>
                 </TouchableOpacity>

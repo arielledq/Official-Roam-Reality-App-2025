@@ -3,6 +3,7 @@ import {View} from "react-native";
 import {AppButton} from "components";
 // @ts-ignore
 import {ARModeMenuType} from "constants";
+import theme from "assets/theme";
 
 interface ARModeMenuProps {
   options: ARModeMenuType[];
@@ -17,7 +18,11 @@ const ARModeMenu = ({options, onPress}: ARModeMenuProps) => {
           <AppButton
             key={option.id}
             buttonStyle={{height: 52, width: "100%"}}
-            customColors={["#B816E0", "#8516e0", "#1158F4"]}
+            customColors={[
+              theme.lightColors?.pink || "",
+              theme.lightColors?.purple || "",
+              theme.lightColors?.inputBlue || "",
+            ]}
             onPress={() => onPress(option)}
             titleStyle={{width: "100%", fontWeight: "700"}}
             title={option.label}

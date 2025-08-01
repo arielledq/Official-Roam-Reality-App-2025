@@ -318,7 +318,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
         <View
           style={{
-            backgroundColor: theme.lightColors?.boxStatBG,
+            backgroundColor: theme.lightColors?.grey4,
             borderRadius: 8,
             paddingHorizontal: 16,
             paddingVertical: 24,
@@ -336,7 +336,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
 const styles = {
   modal: {
-    backgroundColor: theme.lightColors?.boxStatBG,
+    backgroundColor: theme.lightColors?.grey4,
     borderRadius: 8,
     padding: 16,
   },
@@ -360,7 +360,7 @@ const styles = {
     fontFamily: FontFamily.PoppinsBold,
     minHeight: 300,
     flex: 1,
-    backgroundColor: theme.lightColors?.boxStatBG,
+    backgroundColor: theme.lightColors?.grey4,
   },
 };
 
