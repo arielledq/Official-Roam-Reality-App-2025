@@ -785,8 +785,8 @@ class ElevationRequestSerializer(serializers.Serializer):
 
 class ARScanSerializer(serializers.Serializer):
     def to_representation(self, instance):
-        if isinstance(instance, Challenges):
-            return ChallengesSerializer(instance, context=self.context).data
-        elif isinstance(instance, ScanPicture):
+        # if isinstance(instance, Challenges):
+        #     return ChallengesSerializer(instance, context=self.context).data
+        if isinstance(instance, ScanPicture):
             return ScanPictureSerializer(instance, context=self.context).data
         return {}

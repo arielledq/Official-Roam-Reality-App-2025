@@ -738,11 +738,11 @@ class ArSiteViewSet(viewsets.GenericViewSet,
         scans = []
         for element in qs:
             data = ARScanSerializer(element).data
-            if isinstance(element, Challenges):
-                challenges.append(data)
-            else:
+            # if isinstance(element, Challenges):
+            #     challenges.append(data)
+            if isinstance(element, ScanPicture):
                 scans.append(data)
-        return Response(data={'challenges': challenges, 'scans': scans})
+        return Response(data={'scans': scans})
 
 
 class ElevationAPIView(APIView):
