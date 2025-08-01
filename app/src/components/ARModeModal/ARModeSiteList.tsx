@@ -358,7 +358,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       let sponsorImage = "";
                       const points = item?.points || 0;
                       const coolDownHours = item?.cooldownHours || 0;
-                      let onPressHandler = () => startChallengeHandler(site);
+                      const onPressHandler = () => startChallengeHandler(site);
 
                       switch (selectedMode?.mode) {
                         case AR_MODES.GEO_TAG_MODE:
@@ -374,7 +374,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             item?.challenge_attempt || 0
                           } Gems`;
                           sponsorImage = item?.sponsored?.image || item?.sponsor?.image;
-                          onPressHandler = () => startChallengeHandler(item);
                           break;
                         case AR_MODES.HUNT_MODE:
                           challengeTitle = site?.pin_challenge?.name;
