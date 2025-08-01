@@ -355,7 +355,8 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',]
+        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',
+                  'attempts', 'cooldown_hours', 'points',]
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
@@ -635,6 +636,8 @@ class GeoStarSerializer(GeoModelSerializer):
             "challenges",
             "sponsored",
             "following_mode",
+            'attempts',
+            'cooldown_hours',
         )
 
 
@@ -661,6 +664,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "fun_facts",
             "elevation",
             "sponsors",
+            'points',
         )
 
     def get_remaining_stars(self, instance):
