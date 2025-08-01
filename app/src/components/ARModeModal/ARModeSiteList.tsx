@@ -43,26 +43,39 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
       ...site,
       selectedMode,
     };
-    if (selectedMode?.mode === AR_MODES.HUNT_MODE) {
-      const huntData = await getNextStarApi(
-        site.id,
-        initialUserLocation.latitude,
-        initialUserLocation.longitude
-      );
-      if (huntData?.id) {
-        updatedSiteData = {
-          ...updatedSiteData,
-          huntChallenge: huntData,
-        };
-        onStartChallenge(updatedSiteData);
+    switch (selectedMode?.mode) {
+      case AR_MODES.HUNT_MODE:
+        const huntData = await getNextStarApi(
+          site.id,
+          initialUserLocation.latitude,
+          initialUserLocation.longitude
+        );
+        if (huntData?.id) {
+          updatedSiteData = {
+            ...updatedSiteData,
+            huntChallenge: huntData,
+          };
+          onStartChallenge(updatedSiteData);
+          onClose();
+        } else {
+          Toast.show({
+            type: "info",
+            text1: "Hunt Challenge Info",
+            text2: "You have collected all the stars in this hunt challenge",
+          });
+        }
+        break;
+
+      case AR_MODES.SCAN_MODE:
+        onStartChallenge(site);
         onClose();
-      } else {
-        Toast.show({
-          type: "info",
-          text1: "Hunt Challenge Info",
-          text2: "You have collected all the stars in this hunt challenge",
-        });
-      }
+
+        break;
+      case AR_MODES.GEO_TAG_MODE:
+        onStartChallenge(site);
+        onClose();
+
+        break;
     }
   };
 
@@ -248,35 +261,35 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
       <ScrollView style={{marginTop: 15}}>
         {filteredSites?.length > 0 &&
-          filteredSites?.map((site: any) => {
+          filteredSites?.map((site: any, index: number) => {
             if (!site?.name) return;
-            const isExpanded = expandedSites.includes(site.id);
+            const siteId = site?.id || site?.name + index;
             const siteName = site?.name;
             let siteImage = {uri: site?.image};
-            const siteId = site?.id;
-
             let challenges = [];
             switch (selectedMode?.mode) {
               case AR_MODES.GEO_TAG_MODE:
                 challenges = [site?.pin_challenge];
                 break;
               case AR_MODES.SCAN_MODE:
-                siteImage = require("../../assets/images/AppSettingsIcon.png");
-                challenges = site?.challenges || [];
+                siteImage = site?.icon
+                  ? {uri: site.icon}
+                  : require("../../assets/images/AppSettingsIcon.png");
+                challenges = site?.challenges || [site];
                 break;
               case AR_MODES.HUNT_MODE:
                 challenges = [site?.pin_challenge];
                 break;
             }
 
+            const isExpanded = expandedSites.includes(siteId);
+
             return (
               <View key={siteId} style={{marginBottom: 15}}>
                 <TouchableOpacity
                   onPress={() =>
                     setExpandedSites(prev =>
-                      prev.includes(site.id)
-                        ? prev.filter(id => id !== site.id)
-                        : [...prev, site.id]
+                      prev.includes(siteId) ? prev.filter(id => id !== siteId) : [...prev, siteId]
                     )
                   }
                   style={{
@@ -298,7 +311,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                     <View style={{flexDirection: "row", gap: 10}}>
                       <View style={{flexDirection: "row", alignItems: "center"}}>
                         <Icon name="pinrosa" family="custom" size={15} />
-                        <Text style={{color: "#C881F0", fontSize: 10}}> 1</Text>
+                        <Text style={{color: "#C881F0", fontSize: 10}}>1</Text>
                       </View>
                       <View style={{flexDirection: "row", alignItems: "center"}}>
                         <Icon name="walkingIcon" color="#C881F0" family="custom" size={15} />
@@ -318,10 +331,13 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                 {isExpanded && (
                   <FlatList
                     data={challenges}
+                    keyExtractor={(item: any, index: number) => item?.id || item?.name + index}
                     renderItem={({item}: {item: any}) => {
                       let challengeTitle = "";
                       let attemptsDetails = "";
                       let sponsorImage = "";
+                      const points = item?.points || 0;
+                      const coolDownHours = item?.cooldownHours || 0;
                       let onPressHandler = () => startChallengeHandler(site);
 
                       switch (selectedMode?.mode) {
@@ -337,7 +353,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                           attemptsDetails = `${item?.user_attempts || 0}/${
                             item?.challenge_attempt || 0
                           } Gems`;
-                          sponsorImage = item?.sponsored?.image;
+                          sponsorImage = item?.sponsored?.image || item?.sponsor?.image;
                           onPressHandler = () => startChallengeHandler(item);
                           break;
                         case AR_MODES.HUNT_MODE:
@@ -352,9 +368,9 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       return (
                         <ARChallengeItem
                           title={challengeTitle}
-                          points={item?.points || 0}
+                          points={points}
                           attemptsDetails={attemptsDetails}
-                          coolDownHours={item?.cooldownHours || 0}
+                          coolDownHours={coolDownHours}
                           sponsorImage={sponsorImage}
                           onPress={onPressHandler}
                         />
