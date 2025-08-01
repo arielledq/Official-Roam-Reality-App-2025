@@ -305,6 +305,9 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               color: "#9CA3AF",
               fontSize: FontSizes.S14,
             },
+            em: { fontStyle: "italic" },
+            u: { textDecorationLine: "underline", },
+            s: { textDecorationLine: "line-through", },
             strong: {
               lineHeight: 19.1,
               color: "#fff",

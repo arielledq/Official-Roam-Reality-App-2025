@@ -31,6 +31,9 @@ const ViewInfoModal = ({ isVisible = false, onClose = () => {}, content = "" }) 
           tagsStyles={{
             p: { color: "#FFF", fontSize: FontSizes.S14 },
             strong: { color: "#FFF", fontSize: FontSizes.S18 },
+            em: { color: "#fff", fontStyle: "italic" },
+            u: { color: "#fff" ,textDecorationLine: "underline", },
+            s: { color: "#fff", textDecorationLine: "line-through", },
           }}
           source={{ html: content }}
         />

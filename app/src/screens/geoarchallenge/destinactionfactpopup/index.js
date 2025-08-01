@@ -80,6 +80,9 @@ const DestinationFactPopUp = ({ facts, onClose }) => {
                   color: "#fff",
                   fontSize: FontSizes.S10,
                 },
+                em: { color: "#fff", fontStyle: "italic" },
+                u: { color: "#fff" ,textDecorationLine: "underline", },
+                s: { color: "#fff", textDecorationLine: "line-through", },
               }}
               source={{
                 html: `${facts?.facts}`,
