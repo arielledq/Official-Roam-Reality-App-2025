@@ -226,7 +226,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           customColors={["#27273F", "#27273F"]}
           containerStyle={{
             paddingHorizontal: 0,
-            borderRadius: 8,
+            borderRadius: 4,
             paddingVertical: 0,
             paddingRight: 5,
             width: 90,
@@ -281,7 +281,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                   }
                   style={{
                     backgroundColor: "#27273F",
-                    borderRadius: 10,
+                    borderRadius: 4,
                     padding: 12,
                     flexDirection: "row",
                     alignItems: "center",

@@ -25,7 +25,7 @@ const ARChallengeItem = ({
         onPress={() => onPress()}
         style={{
           backgroundColor: "#27273F",
-          borderRadius: 10,
+          borderRadius: 4,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
@@ -36,7 +36,7 @@ const ARChallengeItem = ({
         <View
           style={{
             backgroundColor: "#7A32F4",
-            borderRadius: 5,
+            borderRadius: 4,
             padding: 6,
             alignItems: "center",
             justifyContent: "center",
