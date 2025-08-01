@@ -130,7 +130,7 @@ const ARModeModal = ({isVisible = false, onClose, onStartChallenge}: ARModeModal
           <Text
             style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}
           >
-            {selectedMode?.name?.toUpperCase() || "AR MODE"}
+            {selectedMode?.label?.toUpperCase() || "AR MODE"}
           </Text>
           {selectedMode?.id ? (
             <ARModeSiteList
