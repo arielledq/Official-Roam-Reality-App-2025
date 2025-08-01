@@ -34,6 +34,9 @@ const UserAgreement = () => {
             p: { color: "#fff", fontSize: FontSizes.S14 },
             ol: { color: "#fff", fontSize: FontSizes.S14 },
             ul: { color: "#fff", fontSize: FontSizes.S14 },
+            em: { color: "#fff", fontStyle: "italic" },
+            u: { color: "#fff" ,textDecorationLine: "underline", },
+            s: { color: "#fff", textDecorationLine: "line-through", },
             strong: { color: "#fff", fontSize: FontSizes.S18 },
           }}
           source={{ html: html }}

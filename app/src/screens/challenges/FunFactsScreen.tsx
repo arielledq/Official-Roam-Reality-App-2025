@@ -368,6 +368,9 @@ const FunFactsScreen = ({route}) => {
                   li: {
                     color: "#fff",
                   },
+                  em: { fontStyle: "italic" },
+                  u: { textDecorationLine: "underline", },
+                  s: { textDecorationLine: "line-through", },
                 }}
                 source={{
                   html: `${funFactDetail}`,

@@ -157,6 +157,15 @@ const GeoArSiteDetails = ({route}) => {
                 color: "#9CA3AF",
                 fontSize: FontSizes.S14,
               },
+              em: {
+                fontStyle: "italic",
+              },
+              u: {
+                textDecorationLine: "underline",
+              },
+              s: {
+                textDecorationLine: "line-through",
+              },
               strong: {
                 color: "#fff",
                 fontSize: FontSizes.S18,
@@ -500,6 +509,15 @@ const GeoArSiteDetails = ({route}) => {
                 lineHeight: 19.1,
                 color: "#fff",
                 fontSize: FontSizes.S12,
+              },
+              em: {
+                fontStyle: "italic",
+              },
+              u: {
+                textDecorationLine: "underline",
+              },
+              s: {
+                textDecorationLine: "line-through",
               },
               strong: {
                 ...fontGroup.nunitoRegular,

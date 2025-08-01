@@ -43,6 +43,9 @@ const ConfirmationPopUp = ({
               p: { color: "#9CA3AF", fontSize: FontSizes.S14 },
               ol: { color: "#9CA3AF", fontSize: FontSizes.S14 },
               ul: { color: "#9CA3AF", fontSize: FontSizes.S14 },
+              em: { fontStyle: "italic" },
+              u: { textDecorationLine: "underline", },
+              s: { textDecorationLine: "line-through", },
               strong: { color: "#fff", fontSize: FontSizes.S18 },
             }}
             source={{ html: htmlContent }}
