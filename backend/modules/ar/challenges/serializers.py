@@ -361,12 +361,35 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     file_3d = serializers.FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
+    user_attempts = serializers.SerializerMethodField()
 
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
         fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',
-                  'attempts', 'cooldown_hours', 'points',]
+                  'attempts', 'cooldown_hours', 'points', "user_attempts",]
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = ARMemories.objects.filter(
+            user=user,
+            created_at__gte=window_start,
+            memory_type__in=['SCAN_PHOTO',],
+        ).order_by('created_at')
+
+        last_first_attempt = qs.filter(user_first_attempt=True).last()
+
+        if last_first_attempt:
+            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
+            return attempts_since.count()
+        elif qs.exists():
+            return min(qs.count(), obj.challenge_attempt)
+        return 0
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
