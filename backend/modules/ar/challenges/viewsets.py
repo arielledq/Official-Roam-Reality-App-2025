@@ -7,7 +7,7 @@ from travel_ar_app_42706 import settings
 from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
-    DestinationFacts, PanicMessage, GeoArSiteCategory, ScanPicture
+    DestinationFacts, PanicMessage, GeoArSiteCategory, ScanPicture, GeoARStarPoint
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
@@ -33,8 +33,7 @@ from django.contrib.gis.geos import Point
 from django.utils import timezone
 from datetime import timedelta
 from django_filters.rest_framework import DjangoFilterBackend
-
-
+from django.contrib.gis.geos import Point
 
 
 SOCIAL_POINTS = 1
@@ -110,7 +109,7 @@ class PanicMessageViewSet(ViewSet):
 class ARMemoriesViewSet(ViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO'])
+    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO', 'STAR'])
     serializer_class = ARMemoriesSerializer
     parser_class = (FileUploadParser,)
 
@@ -622,12 +621,20 @@ class StarCollectionViewSet(ViewSet):
         geo_ar_star_point = request.data.get("geo_ar_star_point")
         latitude = request.data.get("latitude")
         longitude = request.data.get("longitude")
-        from django.contrib.gis.geos import Point
         pnt = Point(longitude, latitude)
         request.data['point'] = pnt
         serializer = StarCollectionSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
+            star_point = GeoARStarPoint.objects.filter(id=geo_ar_star_point).first()
+            site = GeoArSite.objects.filter(id=geo_site).first()
+            ARMemories.objects.create(
+                user=request.user,
+                memory_type='STAR',
+                geo_challenge=site.pin_challenge,
+                geo_location=site.geo_location,
+                points=star_point.points,
+            )
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -676,7 +683,7 @@ class MemoryCheckinViewSet(ViewSet):
     def list(self, request):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
-            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO'])
+            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO', 'STAR'])
             result_list = sorted(
                 chain(all_user_check_in, all_user_memories),
                 key=attrgetter('created_at'),

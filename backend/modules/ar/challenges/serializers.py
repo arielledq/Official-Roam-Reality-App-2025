@@ -14,6 +14,8 @@ from django.contrib.gis.db.models import GeometryField
 from rest_framework_gis.serializers import GeoModelSerializer
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.exceptions import ValidationError
+
 
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
@@ -714,6 +716,14 @@ class StarCollectionSerializer(serializers.ModelSerializer):
             "user",
             "point",
         )
+
+    def validate(self, attrs):
+        geo_site = attrs.get("geo_site")
+        geo_ar_star = attrs.get("geo_ar_star")
+        geo_ar_star_point = attrs.get("geo_ar_star_point")
+        if not geo_site or not geo_ar_star or not geo_ar_star_point:
+            raise ValidationError("geo_site, geo_ar_star and geo_ar_star_point are mandatory.")
+        return attrs
 
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
