@@ -33,6 +33,7 @@ CHALLENGE_REQUIREMENT = (
 AR_MEMORY_CHOICES = (
     ("PHOTO", "PHOTO"),
     ("VIDEO", "VIDEO"),
+    ("SCAN_PHOTO", "SCAN_PHOTO"),
     ("STAR", "STAR"),
     ("BONUS", "BONUS"),
     ("DEDUCTED", "DEDUCTED"),

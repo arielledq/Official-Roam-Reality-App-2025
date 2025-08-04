@@ -136,35 +136,38 @@ class ARMemoriesViewSet(ViewSet):
                 {'message': f'Challenge {challenge_id} does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        window_start = timezone.now() - timedelta(hours=challenge.cooldown_hours)
+        now = timezone.now()
+        window_start = now - timedelta(hours=challenge.cooldown_hours)
         qs = ARMemories.objects.filter(
             user=user,
             challenges=challenge,
-            created_at__gte=window_start
+            created_at__gte=window_start,
+            memory_type__in=['PHOTO', 'VIDEO'],
         ).order_by('created_at')
 
         used = qs.count()
-
-        if used < challenge.challenge_attempt:
-            return Response(
-                {"message": "Challenge can be submitted now."},
-                status=status.HTTP_200_OK
-            )
-
-        idx = used - challenge.challenge_attempt
-        anchor = qs[idx].created_at
-        cooldown_end = anchor + timedelta(hours=challenge.cooldown_hours)
-        now = timezone.now()
-
-        if now < cooldown_end:
-            remaining = cooldown_end - now
-            return Response(
-                {
-                    "message": "You are still in cooldown period.",
-                    "remaining": str(remaining)
-                },
-                status=status.HTTP_403_FORBIDDEN
-            )
+        first = qs.filter(user_first_attempt=True).last()
+        if first:
+            if used < challenge.challenge_attempt:
+                return Response(
+                    {"message": "Challenge can be submitted now."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                cooldown_end = first.created_at + timedelta(hours=challenge.cooldown_hours)
+                if now < cooldown_end:
+                    remaining = cooldown_end - now
+                    return Response(
+                        {
+                            "message": "You are still in cooldown period.",
+                            "remaining": str(remaining)
+                        },
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+        if qs.exists() and not first:
+            last = qs.last()
+            last.user_first_attempt = True
+            last.save()
 
         return Response(
             {"message": "Challenge can be submitted now."},
@@ -186,7 +189,8 @@ class ARMemoriesViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        window_start = timezone.now() - timedelta(hours=site_obj.cooldown_hours)
+        now = timezone.now()
+        window_start = now - timedelta(hours=site_obj.cooldown_hours)
         qs = ARSitePinCheckIn.objects.filter(
             user=user,
             geo_challenge=geo_challenge_id,
@@ -195,27 +199,77 @@ class ARMemoriesViewSet(ViewSet):
         ).order_by('created_at')
 
         used = qs.count()
+        first = qs.filter(user_first_attempt=True).last()
+        if first:
+            if used < site_obj.challenge_attempt:
+                return Response(
+                    {"message": "Challenge can be submitted now."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                cooldown_end = first.created_at + timedelta(hours=site_obj.cooldown_hours)
+                if now < cooldown_end:
+                    remaining = cooldown_end - now
+                    return Response(
+                        {
+                            "message": "You are still in cooldown period.",
+                            "remaining": str(remaining)
+                        },
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+        if qs.exists() and not first:
+            last = qs.last()
+            last.user_first_attempt = True
+            last.save()
 
-        if used < site_obj.challenge_attempt:
+        return Response(
+            {"message": "Challenge can be submitted now."},
+            status=status.HTTP_200_OK
+        )
+
+    @action(detail=False, methods=['post'], url_path='check-scan-done', name='Check Scan')
+    def check_scan_done(self, request):
+        user = request.user
+        scan_id = request.data.get("scans")
+
+        try:
+            scan = ScanPicture.objects.get(pk=scan_id)
+        except ScanPicture.DoesNotExist:
             return Response(
-                {"message": "Challenge can be submitted now."},
-                status=status.HTTP_200_OK
+                {'message': f'ScanPicture {scan_id} does not exist.'},
+                status=status.HTTP_404_NOT_FOUND
             )
-
-        idx = used - site_obj.challenge_attempt
-        anchor = qs[idx].created_at
-        cooldown_end = anchor + timedelta(hours=site_obj.cooldown_hours)
         now = timezone.now()
+        window_start = now - timedelta(hours=scan.cooldown_hours)
+        qs = ARMemories.objects.filter(
+            user=user,
+            created_at__gte=window_start,
+            memory_type__in=['SCAN_PHOTO'],
+        ).order_by('created_at')
 
-        if now < cooldown_end:
-            remaining = cooldown_end - now
-            return Response(
-                {
-                    "message": "You are still in cooldown period.",
-                    "remaining": str(remaining)
-                },
-                status=status.HTTP_403_FORBIDDEN
-            )
+        used = qs.count()
+        first = qs.filter(user_first_attempt=True).last()
+        if first:
+            if used < scan.challenge_attempt:
+                return Response(
+                    {"message": "Challenge can be submitted now."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                cooldown_end = first.created_at + timedelta(hours=scan.cooldown_hours)
+                if now < cooldown_end:
+                    remaining = cooldown_end - now
+                    return Response(
+                        {
+                            "message": "You are still in cooldown period.",
+                            "remaining": str(remaining)
+                        },
+                        status=status.HTTP_403_FORBIDDEN
+                    )
+        if qs.exists() and not first:
+            last = qs.last()
+            last.user_first_attempt = True
+            last.save()
 
         return Response(
             {"message": "Challenge can be submitted now."},
@@ -447,6 +501,16 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
                 count += len(o.stars.all())
         return Response({count}, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'], url_path='get-hidden-stars', name='AR Site Hidden Stars')
+    def get_hidden_ar_star(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_site__geo_location=id)
+        count = 0
+        for o in objs:
+            if o.stars:
+                count += len(o.stars.all())
+        return Response({count}, status=status.HTTP_200_OK)
+
     @action(detail=False, methods=['get'], url_path='get-next-star', name='AR Site Stars')
     def get_next_star(self, request):
         lat = request.GET.get("lat")
@@ -469,8 +533,12 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
         if not ar_star:
             return Response({"detail": "Ar Star not found"}, status=status.HTTP_400_BAD_REQUEST)
 
+        now = timezone.now()
+        window_start = now - timedelta(hours=ar_star.cooldown_hours)
+
         user_location = Point(float(lon), float(lat), srid=4326)
-        visited_points = StarCollection.objects.filter(user=request.user).values_list('geo_ar_star_point_id', flat=True)
+        visited_points = (StarCollection.objects.filter(user=request.user, created_at__gte=window_start,)
+                          .values_list('geo_ar_star_point_id', flat=True))
         remaining_stars = ar_star.stars.exclude(id__in=visited_points)
 
         if ar_star.following_mode == 'PROXIMITY':
