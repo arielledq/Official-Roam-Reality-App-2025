@@ -90,7 +90,7 @@ const useStyles = makeStyles(theme => ({
   },
   itemContainerStyle: {
     color: theme.colors.grey0,
-    backgroundColor: theme.colors.boxStatBG,
+    backgroundColor: theme.colors.grey4,
   },
   dropdownParentView: {
     marginBottom: 20,

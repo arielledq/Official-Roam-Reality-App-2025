@@ -87,7 +87,7 @@ const DestinationFactModal: React.FC<DestinationFactModalProps> = ({
 
 const styles = {
   modal: {
-    backgroundColor: theme.lightColors?.boxStatBG,
+    backgroundColor: theme.lightColors?.grey4,
     borderRadius: 8,
     padding: 16,
     width: '100%',
@@ -114,7 +114,7 @@ const styles = {
     fontFamily: FontFamily.PoppinsBold,
     minHeight: 300,
     flex: 1,
-    backgroundColor: theme.lightColors?.boxStatBG
+    backgroundColor: theme.lightColors?.grey4
 
   },
 }

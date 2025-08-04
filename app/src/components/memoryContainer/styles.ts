@@ -9,7 +9,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: theme.colors.boxStatBG,
+    backgroundColor: theme.colors.grey4,
     borderRadius: 12,
 
     paddingTop: 8,

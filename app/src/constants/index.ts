@@ -108,7 +108,7 @@ export const AR_MODES = {
 export const AR_MODES_MENU = [
   {
     id: 1,
-    label: "Geo-Tag Mode",
+    label: "Check-In Mode",
     name: "Geo-Tag",
     listLabel: "Geo-Tags",
     mode: AR_MODES.GEO_TAG_MODE,

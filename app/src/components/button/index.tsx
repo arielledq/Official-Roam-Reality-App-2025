@@ -1,17 +1,21 @@
 import {Button} from "@rneui/themed";
 import React, {FC} from "react";
-import {StyleSheet, TouchableOpacity, View} from "react-native";
+import {StyleSheet, TouchableOpacity, View, StyleProp, ViewStyle} from "react-native";
 import theme from "../../assets/theme";
 import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
-import {ButtonProps} from "./type";
+import {ButtonProps as ButtonPropsRN} from "./type";
 import LinearGradient from "react-native-linear-gradient";
 
-const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
+interface AppButtonProps extends ButtonPropsRN {
+  innerContainerStyle?: StyleProp<ViewStyle>;
+}
+
+const AppButton: FC<AppButtonProps> = (props: AppButtonProps) => {
   const {
     buttonStyle = {},
     titleStyle = {},
     containerStyle = {},
-    innerContainerStyle = {},
+    innerContainerStyle,
     customColors,
     radius,
     ...otherProps
@@ -39,13 +43,15 @@ const AppButton: FC<ButtonProps> = (props: ButtonProps) => {
         ]}
       >
         <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            paddingHorizontal: 10,
-            ...innerContainerStyle,
-          }}
+          style={[
+            {
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              paddingHorizontal: 10,
+            },
+            innerContainerStyle,
+          ]}
         >
           <Button
             loadingStyle={{backgroundColor: "transparent"}}
