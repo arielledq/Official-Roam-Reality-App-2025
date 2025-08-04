@@ -774,7 +774,7 @@
 //           <View
 //               style={[
 //                 sharedStyles.modalContent,
-//                 { backgroundColor: theme.lightColors?.boxStatBG },
+//                 { backgroundColor: theme.lightColors?.grey4 },
 //               ]}
 //           >
 //             {ChooseARMode}

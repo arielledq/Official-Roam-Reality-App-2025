@@ -198,8 +198,6 @@ const ArChallengeShare = () => {
     let res;
 
     try {
-      console.log("ShareChallengeScreen shareToRoamProfile challengeObj:", challengeObj);
-      console.log("ShareChallengeScreen shareToRoamProfile challengeType:", challengeType);
       if (challengeType === CHALLENGES_TYPE.PHOTO_VIDEO) {
         formData.append("challenges", challengeObj?.id);
         formData.append("memory_file", shareFile);
@@ -613,6 +611,7 @@ const ArChallengeShare = () => {
               titleStyle={{fontSize: FontSizes.S18, fontWeight: "bold"}}
               title={endChallengeButtonText}
               loading={isLoading}
+              disabled={isLoading}
             />
           )}
         </View>

@@ -243,7 +243,6 @@ const FunFactsScreen = ({route}) => {
     let newHuntPointChallenge;
     try {
       newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
-      console.log("newHuntPointChallenge", newHuntPointChallenge);
     } catch (error) {
       console.error("Error al obtener el siguiente desafío:", error);
     }
@@ -251,14 +250,29 @@ const FunFactsScreen = ({route}) => {
     // Extract remaining hunt pins
     const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
 
-    if (remainingStars > 1) {
-      // @ts-ignore
-      navigation.navigate("ARScreen", {
-        huntChallenge: {newHuntPointChallenge, selectedMode: AR_MODES_MENU[1]},
-      });
+    let navigationParams = {};
+    if (remainingStars >= 1) {
+      const huntChallenge = {
+        ...challengeObj,
+        selectedMode: AR_MODES_MENU[1],
+        huntChallenge: newHuntPointChallenge,
+      };
+      navigationParams = {
+        huntChallenge,
+      };
     } else {
-      resetNavigation();
+      navigationParams = {
+        huntChallengeFinished: true,
+      };
     }
+
+    setTimeout(() => {
+      // @ts-ignore
+      navigation.navigate("TabNavigator", {
+        screen: "Tab",
+        params: {screen: "Go Navigate", params: navigationParams},
+      });
+    }, 250);
   };
 
   const closeShareToSocialMediaButtonHandler = () => {

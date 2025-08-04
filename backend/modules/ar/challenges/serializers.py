@@ -168,10 +168,18 @@ class ChallengesSerializer(serializers.ModelSerializer):
         qs = ARMemories.objects.filter(
             user=user,
             challenges=obj,
-            created_at__gte=window_start
+            created_at__gte=window_start,
+            memory_type__in=['PHOTO', 'VIDEO'],
         ).order_by('created_at')
-        used = qs.count()
-        return min(used, obj.challenge_attempt)
+
+        last_first_attempt = qs.filter(user_first_attempt=True).last()
+
+        if last_first_attempt:
+            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
+            return attempts_since.count()
+        elif qs.exists():
+            return min(qs.count(), obj.challenge_attempt)
+        return 0
 
     class Meta:
         model = Challenges
@@ -412,8 +420,15 @@ class GeoArSiteSerializer(GeoModelSerializer):
             geo_challenge=obj.pin_challenge,
             created_at__gte=window_start,
         ).order_by('created_at')
-        used = qs.count()
-        return min(used, obj.challenge_attempt)
+
+        last_first_attempt = qs.filter(user_first_attempt=True).last()
+
+        if last_first_attempt:
+            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
+            return attempts_since.count()
+        elif qs.exists():
+            return min(qs.count(), obj.challenge_attempt)
+        return 0
 
 
 class GeoRegionSerializer(GeoModelSerializer):

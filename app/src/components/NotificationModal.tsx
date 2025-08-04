@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   container: {
-    backgroundColor: theme.lightColors?.boxStatBG,
+    backgroundColor: theme.lightColors?.grey4,
     borderRadius: 20,
     padding: 24,
     alignItems: "center",

@@ -16,6 +16,7 @@ import Icon from "components/Icon";
 
 import ARModeMenu from "./ARModeMenu.tsx";
 import ARModeSiteList from "./ARModeSiteList.tsx";
+import theme from "assets/theme/index.ts";
 
 interface ARModeModalProps {
   isVisible: boolean;
@@ -103,7 +104,7 @@ const ARModeModal = ({isVisible = false, onClose, onStartChallenge}: ARModeModal
           style={[
             styles.modalContent,
             {
-              backgroundColor: "#131422",
+              backgroundColor: theme.lightColors?.inputBG,
               height: selectedMode === null ? 270 : "auto",
             },
           ]}
@@ -121,11 +122,15 @@ const ARModeModal = ({isVisible = false, onClose, onStartChallenge}: ARModeModal
             <AppButton
               onPress={closeModalHandler}
               customColors={["transparent", "transparent"]}
-              icon={<Icon name="closes" color="#C881F0" family="custom" size={30} />}
+              icon={
+                <Icon name="closes" color={theme.lightColors?.magenta} family="custom" size={30} />
+              }
             ></AppButton>
           </View>
-          <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: "#fff"}}>
-            {selectedMode?.name?.toUpperCase() || "AR MODE"}
+          <Text
+            style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}
+          >
+            {selectedMode?.label?.toUpperCase() || "AR MODE"}
           </Text>
           {selectedMode?.id ? (
             <ARModeSiteList

@@ -107,7 +107,7 @@ const ReportUserModal: React.FC<ReportUserModalProps> = ({ isVisible, onClose, o
 const styles = {
   container: {},
   modal: {
-    backgroundColor: theme.lightColors?.boxStatBG,
+    backgroundColor: theme.lightColors?.grey4,
     borderRadius: 8,
     padding: 16,
     width: "100%",
