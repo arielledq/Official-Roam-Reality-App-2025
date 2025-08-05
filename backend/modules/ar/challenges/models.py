@@ -535,6 +535,22 @@ class ARMemories(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
     user_first_attempt = models.BooleanField(default=False)
+    scan_picture = models.ForeignKey(
+        "ScanPicture",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Scan picture",
+        related_name="ar_memories",
+    )
+    star_point = models.ForeignKey(
+        "GeoARStarPoint",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Star point",
+        related_name="ar_memories",
+    )
 
     class Meta:
         verbose_name_plural = "AR Memories"
@@ -949,6 +965,7 @@ class StarCollection(models.Model):
         User, on_delete=models.CASCADE, related_name="star_collection_user"
     )
     point = gis_models.PointField(_("Point"), blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Star Collections"

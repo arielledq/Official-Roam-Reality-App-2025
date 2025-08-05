@@ -662,6 +662,7 @@ class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    user_attempts = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoARStar
@@ -678,7 +679,29 @@ class GeoStarSerializer(GeoModelSerializer):
             "following_mode",
             'attempts',
             'cooldown_hours',
+            'user_attempts',
         )
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = StarCollection.objects.filter(
+            user=request.user,
+            created_at__gte=window_start,
+        ).order_by('created_at')
+        total_stars = obj.stars.count()
+        collected_ids = list(qs.values_list('geo_ar_star_point_id', flat=True))
+
+        grouped = [
+            collected_ids[i:i + total_stars]
+            for i in range(0, len(collected_ids), total_stars)
+        ]
+        attempts_done = len([g for g in grouped if len(g) == total_stars])
+        return attempts_done
 
 
 class GeoStarPointSerializer(GeoModelSerializer):
