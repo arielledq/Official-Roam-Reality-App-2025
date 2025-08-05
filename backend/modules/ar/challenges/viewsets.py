@@ -637,14 +637,11 @@ class GeoArStarViewSet(viewsets.ModelViewSet):
         elif ar_star.following_mode == 'SPECIFIC':
             remaining_stars = remaining_stars.order_by('order')
 
-        if remaining_stars.exists():
-            next_star = remaining_stars.first()
-            return Response(
-                GeoStarPointSerializer(next_star, context={'request': request}).data,
-                status=status.HTTP_200_OK
-            )
-
-        return Response({"detail": "No more stars available in this attempt"}, status=status.HTTP_200_OK)
+        next_star = remaining_stars.first()
+        return Response({
+            "attempt_number": attempts_done + 1,
+            "star": GeoStarPointSerializer(next_star, context={'request': request}).data
+        }, status=status.HTTP_200_OK)
 
 
 class ARSitePinCheckInViewSet(ViewSet):
