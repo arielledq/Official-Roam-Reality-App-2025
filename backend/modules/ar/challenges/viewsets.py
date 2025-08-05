@@ -859,57 +859,11 @@ class MemoryCheckinViewSet(ViewSet):
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ArSiteViewSet(viewsets.GenericViewSet,
-                    viewsets.mixins.ListModelMixin,):
+class ArSiteViewSet(viewsets.GenericViewSet, viewsets.mixins.ListModelMixin,):
+    queryset = GeoArSite.objects.all()
+    serializer_class = GeoArSiteSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArSiteFilterSet
-
-    def get_serializer_class(self):
-        site_type = int(self.request.query_params.get("site_type"))
-        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
-            return GeoArSiteSerializer
-        return ARScanSerializer
-
-    def get_queryset(self):
-        try:
-            site_type = int(self.request.query_params.get("site_type"))
-        except:
-            raise exceptions.ValidationError({
-                "detail": "site_type is required ?site_type=<int>"
-            })
-
-        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
-            return GeoArSite.objects.all()
-
-        qs = list(chain(
-            Challenges.objects.filter(
-                is_active=True
-            ),
-            ScanPicture.objects.all()
-        ))
-
-        return qs
-
-    def filter_queryset(self, qs):
-        if int(self.request.query_params.get("site_type")) in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
-            return super().filter_queryset(qs)
-        return qs
-
-    def list(self, request, *args, **kwargs):
-        qs = self.filter_queryset(self.get_queryset())
-        site_type = int(self.request.query_params.get("site_type"))
-        if site_type in [ArSiteFilterSet.SiteType.SITE, ArSiteFilterSet.SiteType.SITE_STAR]:
-            return super().list(request, *args, **kwargs)
-
-        challenges = []
-        scans = []
-        for element in qs:
-            data = ARScanSerializer(element).data
-            # if isinstance(element, Challenges):
-            #     challenges.append(data)
-            if isinstance(element, ScanPicture):
-                scans.append(data)
-        return Response(data={'scans': scans})
 
 
 class ElevationAPIView(APIView):
