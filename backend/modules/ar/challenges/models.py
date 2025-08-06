@@ -33,6 +33,8 @@ CHALLENGE_REQUIREMENT = (
 AR_MEMORY_CHOICES = (
     ("PHOTO", "PHOTO"),
     ("VIDEO", "VIDEO"),
+    ("SCAN_PHOTO", "SCAN_PHOTO"),
+    ("STAR", "STAR"),
     ("BONUS", "BONUS"),
     ("DEDUCTED", "DEDUCTED"),
 )
@@ -533,6 +535,22 @@ class ARMemories(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
     user_first_attempt = models.BooleanField(default=False)
+    scan_picture = models.ForeignKey(
+        "ScanPicture",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Scan picture",
+        related_name="ar_memories",
+    )
+    star_point = models.ForeignKey(
+        "GeoARStarPoint",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Star point",
+        related_name="ar_memories",
+    )
 
     class Meta:
         verbose_name_plural = "AR Memories"
@@ -626,6 +644,12 @@ class ScanPicture(models.Model):
     )
     info = RichTextField(_("Info"), blank=True, null=True)
     coordinates = gis_models.PointField(_("Coordinates"), blank=True, null=True)
+    attempts = models.IntegerField(verbose_name="Attempts", default=1)
+    cooldown_hours = models.PositiveIntegerField(
+        default=24,
+        verbose_name='Cooldown (in hours)'
+    )
+    points = models.IntegerField(verbose_name="Points", default=0)
 
     def clean(self):
         super().clean()
@@ -739,6 +763,11 @@ class GeoARStar(models.Model):
         default='PROXIMITY',
         verbose_name="Star Following Mode"
     )
+    attempts = models.IntegerField(verbose_name="Attempts", default=1)
+    cooldown_hours = models.PositiveIntegerField(
+        default=24,
+        verbose_name='Cooldown (in hours)'
+    )
 
     class Meta:
         verbose_name_plural = "Geo AR Stars"
@@ -765,6 +794,7 @@ class GeoARStarPoint(models.Model):
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     elevation = models.IntegerField(null=True, blank=True)
     sponsors = models.ManyToManyField(Sponsor, related_name="stars", blank=True)
+    points = models.IntegerField(verbose_name="Points", default=0)
 
     class Meta:
         verbose_name_plural = "Geo AR Star Points"
@@ -935,6 +965,7 @@ class StarCollection(models.Model):
         User, on_delete=models.CASCADE, related_name="star_collection_user"
     )
     point = gis_models.PointField(_("Point"), blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Star Collections"

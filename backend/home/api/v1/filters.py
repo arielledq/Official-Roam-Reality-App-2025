@@ -30,7 +30,7 @@ class ScoreFilterSet(filters.FilterSet):
             .values('user')
             .annotate(total=Sum(
                 Case(
-                    When(memory_type__in=['PHOTO','VIDEO','BONUS'], then=F('points')),
+                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS', 'SCAN_PHOTO', 'STAR',], then=F('points')),
                     When(memory_type='DEDUCTED', then=F('points') * Value(-1)),
                     default=Value(0),
                     output_field=IntegerField()
@@ -76,7 +76,7 @@ class ScoreFilterSet(filters.FilterSet):
             .values('user')
             .annotate(total=Sum(
                 Case(
-                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS'], then=F('points')),
+                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS', 'SCAN_PHOTO', 'STAR',], then=F('points')),
                     When(memory_type='DEDUCTED', then=F('points') * Value(-1)),
                     default=Value(0),
                     output_field=IntegerField()

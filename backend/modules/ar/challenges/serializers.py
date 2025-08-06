@@ -14,6 +14,8 @@ from django.contrib.gis.db.models import GeometryField
 from rest_framework_gis.serializers import GeoModelSerializer
 from django.utils import timezone
 from datetime import timedelta
+from rest_framework.exceptions import ValidationError
+
 
 
 class ARUserProfileSerializer(serializers.ModelSerializer):
@@ -359,11 +361,35 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     file_3d = serializers.FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
+    user_attempts = serializers.SerializerMethodField()
 
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',]
+        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',
+                  'attempts', 'cooldown_hours', 'points', "user_attempts",]
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = ARMemories.objects.filter(
+            user=user,
+            created_at__gte=window_start,
+            memory_type__in=['SCAN_PHOTO',],
+        ).order_by('created_at')
+
+        last_first_attempt = qs.filter(user_first_attempt=True).last()
+
+        if last_first_attempt:
+            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
+            return attempts_since.count()
+        elif qs.exists():
+            return min(qs.count(), obj.challenge_attempt)
+        return 0
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
@@ -636,6 +662,7 @@ class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
     sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    user_attempts = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoARStar
@@ -650,7 +677,31 @@ class GeoStarSerializer(GeoModelSerializer):
             "challenges",
             "sponsored",
             "following_mode",
+            'attempts',
+            'cooldown_hours',
+            'user_attempts',
         )
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = StarCollection.objects.filter(
+            user=request.user,
+            created_at__gte=window_start,
+        ).order_by('created_at')
+        total_stars = obj.stars.count()
+        collected_ids = list(qs.values_list('geo_ar_star_point_id', flat=True))
+
+        grouped = [
+            collected_ids[i:i + total_stars]
+            for i in range(0, len(collected_ids), total_stars)
+        ]
+        attempts_done = len([g for g in grouped if len(g) == total_stars])
+        return attempts_done
 
 
 class GeoStarPointSerializer(GeoModelSerializer):
@@ -676,6 +727,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "fun_facts",
             "elevation",
             "sponsors",
+            'points',
         )
 
     def get_remaining_stars(self, instance):
@@ -710,6 +762,14 @@ class StarCollectionSerializer(serializers.ModelSerializer):
             "user",
             "point",
         )
+
+    def validate(self, attrs):
+        geo_site = attrs.get("geo_site")
+        geo_ar_star = attrs.get("geo_ar_star")
+        geo_ar_star_point = attrs.get("geo_ar_star_point")
+        if not geo_site or not geo_ar_star or not geo_ar_star_point:
+            raise ValidationError("geo_site, geo_ar_star and geo_ar_star_point are mandatory.")
+        return attrs
 
 
 class ARSitePinCheckInSerializer(serializers.ModelSerializer):
@@ -800,8 +860,8 @@ class ElevationRequestSerializer(serializers.Serializer):
 
 class ARScanSerializer(serializers.Serializer):
     def to_representation(self, instance):
-        if isinstance(instance, Challenges):
-            return ChallengesSerializer(instance, context=self.context).data
-        elif isinstance(instance, ScanPicture):
+        # if isinstance(instance, Challenges):
+        #     return ChallengesSerializer(instance, context=self.context).data
+        if isinstance(instance, ScanPicture):
             return ScanPictureSerializer(instance, context=self.context).data
         return {}

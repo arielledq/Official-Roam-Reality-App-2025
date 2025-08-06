@@ -34,10 +34,12 @@ class ArSiteFilterSet(filters.FilterSet):
     class SiteType:
         SITE = 1
         SITE_STAR = 2
+        SITE_SCAN = 3
 
         TYPE_CHOICES = (
             (1, 'SITE'),
             (2, 'SITE_STAR'),
+            (3, 'SITE_SCAN'),
         )
 
     site_type = filters.ChoiceFilter(choices=SiteType.TYPE_CHOICES, method='filter_by_type')
@@ -59,8 +61,10 @@ class ArSiteFilterSet(filters.FilterSet):
             lat_long__distance_lte=(user_pt, D(m=configs.METER_RADIUS))
         )
 
-        site = int(value)
-        if site == self.SiteType.SITE:
+        site_type = int(value)
+        if site_type == self.SiteType.SITE:
             return qs.filter(geo_arstar_ar_site__isnull=True)
-        else:
+        elif site_type == self.SiteType.SITE_STAR:
             return qs.filter(geo_arstar_ar_site__isnull=False).distinct()
+        else:
+            return qs.filter(scan_pictures__isnull=False).distinct()
