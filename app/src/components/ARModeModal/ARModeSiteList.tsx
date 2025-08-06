@@ -68,12 +68,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         break;
 
       case AR_MODES.SCAN_MODE:
-        onStartChallenge(site);
+        onStartChallenge(updatedSiteData);
         onClose();
 
         break;
       case AR_MODES.GEO_TAG_MODE:
-        onStartChallenge(site);
+        onStartChallenge(updatedSiteData);
         onClose();
 
         break;

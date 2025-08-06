@@ -21,6 +21,7 @@ import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
 import {ELEMENTSUNITY} from "../../constants";
 import Toast from "react-native-toast-message";
+import text from "components/text";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -33,7 +34,6 @@ const ARScreen = ({route}) => {
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMode, setNotificationMode] = useState("scan");
   const [selectedSite, setSelectedSite] = useState(null);
-
   const navigation = useNavigation();
 
   const lastSentLocationRef = useRef(null);
@@ -247,13 +247,19 @@ const ARScreen = ({route}) => {
   };
 
   const sendModelDataToUnity = () => {
+    // console.log("sendModelDataToUnity ingresando por medio de Scan")
+    // console.log(textureBase)
+    // console.log(starModels)
+    // console.log(validUserLocation)
+    // console.log(textureBase)
     if (
       unityRef.current &&
       textureBase &&
       starModels &&
-      validUserLocation &&
+      validUserLocation
+        // &&
       // !hasSentModelDataOnce &&
-      (isGeoTagMode || isHuntMode)
+      // (isGeoTagMode || isHuntMode ) //TODO Verificar
     ) {
       const modelData = {
         objFile: starModels.replace("file://", ""),
@@ -289,18 +295,47 @@ const ARScreen = ({route}) => {
   };
 
   const sendSpawnData = () => {
-    if (!unityRef?.current || !isHuntMode) return;
-    const spawnData = {
-      objects: [
+    if (!unityRef?.current) return;
+    let config =
         {
           id: "1",
-          latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
-          longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
+          latitude: null, // ||  -25.296442,
+          longitude: null, //||  -57.589580,
           scale: 1.0,
           height: 1,
           isVisible: true,
           updateRadius: 14.0,
-          isHuntMode: isHuntMode,
+          isHuntMode: false,
+        }
+
+    if (selectedSite.selectedMode.mode === AR_MODES.HUNT_MODE){
+      config =
+          {
+            ...config,
+            latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
+            longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
+            height: 1,
+            isVisible: true,
+            updateRadius: 14.0, // verificar
+            isHuntMode: true,
+          }
+    }
+    if (selectedSite.selectedMode.mode === AR_MODES.SCAN_MODE){
+      config =
+          {
+            ...config,
+            latitude: selectedSite?.coordinates?.coordinates[1], // ||  -25.296442,
+            longitude: selectedSite?.coordinates?.coordinates[0], //||  -57.589580,
+            height: 1,
+            isVisible: true,
+            updateRadius: 14.0, // verificar
+            isHuntMode: true,
+          }
+    }
+    const spawnData = {
+      objects: [
+        {
+          ...config
         },
       ],
     };
@@ -489,6 +524,10 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
+    console.log("[ARScreen] startChallengeHandler site", site);
+    if (unityRef.current) {
+      unityRef.current.postMessage("Main Camera", "ResetARContent", '');
+    }
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -503,26 +542,38 @@ const ARScreen = ({route}) => {
         break;
       case AR_MODES.SCAN_MODE:
         challengeData = {
-          challenge_requirement: site?.challenge_requirement,
+          model_file: site?.file_3d,
+          lat_long: site?.coordinates,
+          challenge_requirement: "PHOTO",
+          arChallenge: true, //vERIFICAR CODIGO DE UNITY
+          isLocation: false, //vERIFICAR CODIGO DE UNITY
           challenge_id: site?.id,
-          points: site?.points,
-          setVisibleButtonPosition: false,
-          arChallenge: true,
-          isLocation: false,
+          parameters: null, // Verificar uso para objeto 3d -modificaciones- ---- Falta que venga del Backend
+          points: site?.points || 0, // Falta que venga del Backend
+          selectedMode: 'Scan',
+          setVisibleButtonPosition: false
+
         };
+        // console.log('challengeData Scan Mode', challengeData);
+        // const payload = {
+        //   bundleURL: "https://tuservidor.com/ar_particles",
+        //   localImagePath: "/storage/emulated/0/Download/my-image.png"
+        // };
+        // unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
         break;
       case AR_MODES.HUNT_MODE:
         challengeData = {
-          lat_long: site?.geo_ar_star?.geo_site?.lat_long,
-          challenge_requirement: site?.geo_ar_star?.geo_site?.pin_challenge?.challenge_requirement,
-          challenge_id: site?.geo_ar_star?.geo_site?.pin_challenge?.id,
-          model_file: site?.geo_ar_star?.geo_site?.pin_challenge?.model_file,
-          parameters: site?.geo_ar_star?.geo_site?.pin_challenge?.parameters,
-          points: site?.geo_ar_star?.geo_site?.pin_challenge?.points,
+          lat_long: site?.huntChallenge?.geo_ar_star?.geo_site?.lat_long,
+          challenge_requirement: site?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.challenge_requirement,
+          challenge_id: site?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.id,
+          model_file: site?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file,
+          parameters: site?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.parameters,
+          points: site?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.points,
           setVisibleButtonPosition: false,
           arChallenge: false,
           isLocation: true,
         };
+
         break;
       default:
         break;
@@ -537,6 +588,28 @@ const ARScreen = ({route}) => {
       setShowNotification(true);
     }, 1000);
   };
+  useEffect(() => {
+    if (!unityRef.current) return;
+    if (selectedSite?.selectedMode.mode === AR_MODES.SCAN_MODE) {
+      const has3DFile= selectedSite?.file_3d
+      if (has3DFile && textureBase && starModels) {
+        console.log("tiro modelo desde scan mode")
+        sendModelDataToUnity()
+        if (hasSentModelDataOnce){
+          sendSpawnData()
+        }
+
+        console.log("pendiente file 3d");
+      }
+      else {
+        const payload = {
+          bundleURL: selectedSite?.file_animation,
+          localImagePath: selectedSite?.file_image,
+        };
+        unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
+      }
+    }
+  }, [selectedSite, unityRef, hasSentModelDataOnce, textureBase]);
 
   useEffect(() => {
     if (!unityRef.current) return;
@@ -642,11 +715,11 @@ const ARScreen = ({route}) => {
     }
   }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
 
-  useEffect(() => {
-    if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
-      startChallengeHandler(huntChallenge);
-    }
-  }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
+  // useEffect(() => {
+  //   if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
+  //     startChallengeHandler(huntChallenge);
+  //   }
+  // }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
 
   useEffect(() => {
     if (huntChallengeFinished) {
@@ -658,31 +731,39 @@ const ARScreen = ({route}) => {
     }
   }, [huntChallengeFinished]);
 
-  useEffect(() => {
-    if (
-      unityRef.current &&
-      starModels &&
-      textureBase &&
-      validUserLocation &&
-      !hasSentModelDataOnce &&
-      (isGeoTagMode || isHuntMode)
-    ) {
-      sendModelDataToUnity();
-    }
-  }, [
-    isUnityLoaded,
-    starModels,
-    textureBase,
-    validUserLocation,
-    isGeoTagMode,
-    isHuntMode,
-    hasSentModelDataOnce,
-    selectedChallengeOverride,
-    modelResource,
-  ]);
+  // useEffect(() => {
+  //   if (
+  //     unityRef.current &&
+  //     starModels &&
+  //     textureBase &&
+  //     validUserLocation &&
+  //     !hasSentModelDataOnce &&
+  //     (isGeoTagMode || isHuntMode)
+  //   ) {
+  //     sendModelDataToUnity();
+  //   }
+  // }, [
+  //   isUnityLoaded,
+  //   starModels,
+  //   textureBase,
+  //   validUserLocation,
+  //   isGeoTagMode,
+  //   isHuntMode,
+  //   hasSentModelDataOnce,
+  //   selectedChallengeOverride,
+  //   modelResource,
+  // ]);
 
   useEffect(() => {
     if (!unityRef.current || unitySceneLoaded) return;
+    const show = ["Back", "Details", "ArMode", "Arrow", "position" ];
+    const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+
+    unityRef.current.postMessage(
+        "CanvasController",
+        "ShowHideElements",
+        JSON.stringify({ show, hide })
+    );
     const shouldSendModel =
       (isGeoTagMode || isHuntMode) &&
       !hasSentModelDataOnce &&
@@ -690,13 +771,7 @@ const ARScreen = ({route}) => {
       textureBase &&
       starModels;
 
-    const shouldSendSpawn = isHuntMode && !sendSpawnModelData && validUserLocation;
-
     if (shouldSendModel) {
-      sendModelDataToUnity();
-    }
-
-    if (shouldSendSpawn) {
       sendSpawnData();
       PointsCount();
     }
@@ -767,13 +842,19 @@ const ARScreen = ({route}) => {
       setUnitySceneLoaded(true);
       return () => {
         clearTimeout(timeout);
+        if (unityRef.current) {
+          unityRef.current.postMessage("Main Camera", "ResetARContent", '');
+        }
+        // if (unityRef.current && unitySceneLoaded) {
+        //   resetUnityScene();
+        // }
         setValidUserLocation(false);
         isFocusedRef.current = false;
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);
         setUnityLoading(false);
-        setHasSentModelDataOnce(false);
-        setSendSpawnModelData(false);
+        setSendSpawnModelData(false)
+        setHasSentModelDataOnce(false)
       };
     }, [])
   );
