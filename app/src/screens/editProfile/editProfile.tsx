@@ -31,6 +31,7 @@ import {Icons} from "../../assets/Icons";
 import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
 import Images from "../../assets/images";
 import {ProfilePlaceholder} from "assets/base64";
+import {updateUserProperties} from "redux/Login/reducer";
 
 interface ImageData {
   uri: string | undefined;
@@ -173,6 +174,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     })
       .then(res => {
         if (res.status == 1) {
+          dispatch(updateUserProperties(res?.user));
           showMessage("Details saved successfully!");
           handleNavigation();
         } else {
@@ -256,7 +258,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         country: userData?.home_country || "",
         date_of_birth: dob ? dateToString(dob) : "",
       });
-      console.log("here")
       setPhotoDetails({
         uri: userData?.image,
         type: "image/png",
@@ -364,7 +365,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       onBlur={() => {
                         setGenderDropDownFocused(false);
                       }}
-                      activeColor={theme.lightColors?.statBG}
+                      activeColor={theme.lightColors?.inputBlue}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -494,7 +495,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         borderWidth: 0,
                         backgroundColor: "transparent",
                       }}
-                      activeColor={theme.lightColors?.statBG}
+                      activeColor={theme.lightColors?.inputBlue}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
