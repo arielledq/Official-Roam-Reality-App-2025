@@ -252,13 +252,15 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       </TouchableOpacity>
       <View style={{marginHorizontal: -22}}>
         <FlatList
-          contentContainerStyle={{marginBottom: 50}}
+          scrollEventThrottle={32} // Adjust this value for performance
+          style={{width: "100%"}}
+          contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => <MemoryContainer onPressAction={navigateToShare} item={item} />}
-          keyExtractor={item => item.id.toString()}
+          renderItem={({item}) => <MemoryContainer item={item} onPressAction={navigateToShare} />}
+          keyExtractor={(item: any) => item?.id?.toString()}
         />
       </View>
     </View>
