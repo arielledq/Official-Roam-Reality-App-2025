@@ -236,13 +236,11 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         <Text style={{fontSize: 18, fontWeight: "bold", color: "white", flex: 1}}>
           {selectedMode?.listLabel} Available
         </Text>
-        <View style={{width: 90}}>
+        <View style={{width: 90, marginRight: 4}}>
           <AppButton
             // @ts-ignore
             customColors={[theme.lightColors?.grey4, theme.lightColors?.grey4]}
             containerStyle={{
-              paddingLeft: 0,
-              paddingRight: 4,
               paddingVertical: 0,
               borderRadius: 4,
               minHeight: 35,
@@ -250,7 +248,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             iconContainerStyle={{
               padding: 0,
             }}
-            titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold"}}
+            titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold", paddingRight: 4}}
             onPress={() => getSitesHandler()}
             title="Refresh"
             icon={
