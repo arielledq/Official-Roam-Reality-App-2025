@@ -375,7 +375,6 @@ const ARScreen = ({route}) => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    // console.log("DATA UNIT", data);
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
 
@@ -403,7 +402,6 @@ const ARScreen = ({route}) => {
     }
     if (data?.touchEvent?.objectTouched === true) {
       notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
-      console.log("[ARScreen] Navigating to FunFactsScreen", selectedSite);
       navigation.navigate({
         name: "FunFactsScreen",
         params: {
@@ -491,7 +489,6 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
-    console.log("[ARScreen] startChallengeHandler site", site);
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:

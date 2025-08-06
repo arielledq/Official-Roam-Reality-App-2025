@@ -82,21 +82,15 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const getSitesHandler = (sponsorId: string = "") => {
     if (sponsorId) {
-      let updatedSites = sites.filter(
-        (site: any) => site?.pin_challenge?.sponsored?.id === Number(sponsorId)
-      );
+      let updatedSites;
       if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
-        const ArFiltersChallenges = sites[sites.length - 1];
-        const updatedChallenges = ArFiltersChallenges?.challenges?.filter(
-          (challenge: any) => challenge?.sponsored?.id === Number(sponsorId)
-        );
-        setFilteredSites([
-          ...updatedSites,
-          {...ArFiltersChallenges, challenges: updatedChallenges},
-        ]);
+        updatedSites = sites.filter((site: any) => site?.sponsor?.id === Number(sponsorId));
       } else {
-        setFilteredSites(updatedSites);
+        updatedSites = sites.filter(
+          (site: any) => site?.pin_challenge?.sponsored?.id === Number(sponsorId)
+        );
       }
+      setFilteredSites(updatedSites);
     } else if (
       typeof initialUserLocation?.latitude === "number" &&
       isFinite(initialUserLocation?.latitude) &&
@@ -276,14 +270,14 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                 challenges = [site?.pin_challenge];
                 break;
               case AR_MODES.SCAN_MODE:
-                const numberChallengesAvailable = site?.challenges?.length || 1;
+                const numberChallengesAvailable = site?.scan_pictures?.length || 1;
                 challengesAvailable = `${numberChallengesAvailable} Gem${
                   numberChallengesAvailable === 1 ? "" : "s"
                 }`;
-                siteImage = site?.icon
-                  ? {uri: site.icon}
+                siteImage = site?.image
+                  ? {uri: site.image}
                   : require("../../assets/images/AppSettingsIcon.png");
-                challenges = site?.challenges || [site];
+                challenges = site?.scan_pictures;
                 break;
               case AR_MODES.HUNT_MODE:
                 challengesAvailable = "1 Hunt";
@@ -355,8 +349,8 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       let attemptsDetails = "";
                       let sponsorImage = "";
                       const points = item?.points || 0;
-                      const coolDownHours = item?.cooldownHours || 0;
-                      const onPressHandler = () => startChallengeHandler(site);
+                      let coolDownHours = item?.cooldownHours || 0;
+                      let onPressHandler = () => startChallengeHandler(site);
 
                       switch (selectedMode?.mode) {
                         case AR_MODES.GEO_TAG_MODE:
@@ -369,9 +363,20 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                         case AR_MODES.SCAN_MODE:
                           challengeTitle = item?.name;
                           attemptsDetails = `${item?.user_attempts || 0}/${
-                            item?.challenge_attempt || 0
+                            item?.attempts || 0
                           } Gems`;
-                          sponsorImage = item?.sponsored?.image || item?.sponsor?.image;
+                          sponsorImage = item?.sponsor?.image;
+                          coolDownHours = item?.cooldown_hours || 0;
+                          const updatedSite = {
+                            ...site,
+                            // Remove list of challenges
+                            scan_pictures: null,
+                            // Set the 'selected challenge'
+                            scanChallenge: {
+                              ...item,
+                            },
+                          };
+                          onPressHandler = () => startChallengeHandler(updatedSite);
                           break;
                         case AR_MODES.HUNT_MODE:
                           challengeTitle = site?.pin_challenge?.name;
