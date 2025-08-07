@@ -12,9 +12,9 @@ import userLocationHook from "screens/drawerContent/location.hook";
 // @ts-ignore
 import {AR_MODES} from "constants";
 import ARChallengeItem from "./ARChallengeItem";
-import {showMessage} from "util/helpers";
 import Toast from "react-native-toast-message";
 import theme from "assets/theme";
+import {checkHuntCoolDownAPI, checkScansCoolDownAPI} from "network";
 
 interface ARModeSiteListProps {
   selectedMode: any;
@@ -33,7 +33,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   };
 
   const {initialUserLocation, getLocation} = userLocationHook();
-  const {getSites, sites, getNextStar: getNextStarApi}: any = useArScreenHook();
+  const {getSites, sites, getNextStar}: any = useArScreenHook();
   const [sponsorData, setSponsorData] = useState<any>([]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
@@ -45,33 +45,95 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
       selectedMode,
     };
     switch (selectedMode?.mode) {
-      case AR_MODES.HUNT_MODE:
-        const huntData = await getNextStarApi(
-          site.id,
-          initialUserLocation.latitude,
-          initialUserLocation.longitude
-        );
-        if (huntData?.id) {
+      case AR_MODES.HUNT_MODE: {
+        let hasNextStar = false;
+        const params = {
+          geo_site_id: site.id,
+          lat: initialUserLocation.latitude,
+          lon: initialUserLocation.longitude,
+        };
+        const huntChallenge = await getNextStar(params);
+        if (huntChallenge?.id) {
+          hasNextStar = true;
           updatedSiteData = {
             ...updatedSiteData,
-            huntChallenge: huntData,
+            huntChallenge: {...huntChallenge},
+          };
+        } else {
+          hasNextStar = false;
+        }
+
+        // Validate cool down period && Start challenge
+        if (hasNextStar) {
+          // Validate cool down period
+          const scanId = updatedSiteData?.huntChallenge?.geo_ar_star?.id;
+          let isInCoolDownPeriod = false;
+          try {
+            await checkHuntCoolDownAPI(scanId);
+            isInCoolDownPeriod = false;
+          } catch (e: any) {
+            isInCoolDownPeriod = true;
+            Toast.show({
+              type: "info",
+              text1: "Scan Challenge Info",
+              text2: e?.message?.message || "You are in cool down period. Please try again later.",
+            });
+          }
+
+          // Start challenge
+          if (!isInCoolDownPeriod) {
+            onStartChallenge(updatedSiteData);
+            onClose();
+          } else {
+            onClose();
+          }
+        } else {
+          onClose();
+        }
+
+        break;
+      }
+      case AR_MODES.SCAN_MODE: {
+        // Validate cool down period
+        const scanId = updatedSiteData?.scanChallenge?.id;
+        let isInCoolDownPeriod = false;
+        try {
+          const scanCoolDownRsp = await checkScansCoolDownAPI(scanId);
+          const isFirstScan = "ScanPicture None does not exist.";
+          if (scanCoolDownRsp?.status >= 200 && scanCoolDownRsp?.status < 300) {
+            isInCoolDownPeriod = false;
+          } else if (
+            scanCoolDownRsp?.errorStatus === 404 &&
+            scanCoolDownRsp?.message?.message === isFirstScan
+          ) {
+            isInCoolDownPeriod = false;
+          } else {
+            isInCoolDownPeriod = true;
+            throw new Error(scanCoolDownRsp?.message);
+          }
+        } catch (e: any) {
+          isInCoolDownPeriod = true;
+          Toast.show({
+            type: "error",
+            text1: "Error verifying your cool down period",
+            text2: e?.message?.message || "There was an unexpected error. Please try again later.",
+          });
+        }
+
+        // Start challenge
+        if (!isInCoolDownPeriod) {
+          updatedSiteData = {
+            ...updatedSiteData,
+            memory_type: "SCAN_PHOTO",
           };
           onStartChallenge(updatedSiteData);
           onClose();
         } else {
-          Toast.show({
-            type: "info",
-            text1: "Hunt Challenge Info",
-            text2: "You have collected all the stars in this hunt challenge",
-          });
+          onClose();
         }
-        break;
-
-      case AR_MODES.SCAN_MODE:
-        onStartChallenge(updatedSiteData);
-        onClose();
 
         break;
+      }
       case AR_MODES.GEO_TAG_MODE:
         onStartChallenge(updatedSiteData);
         onClose();
@@ -359,6 +421,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             site?.challenge_attempt || 0
                           } Check-Ins`;
                           sponsorImage = site?.sponsor?.image;
+                          coolDownHours = 0; // TODO: Missing cool down hours on the API response
                           break;
                         case AR_MODES.SCAN_MODE:
                           challengeTitle = item?.name;
@@ -384,6 +447,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             site?.challenge_attempt || 0
                           } Captures`;
                           sponsorImage = site?.sponsor?.image;
+                          coolDownHours = 0; // TODO: Missing cool down hours on the API response
                           break;
                       }
 

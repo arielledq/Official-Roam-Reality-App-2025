@@ -21,7 +21,7 @@ import BGArShare from "assets/ar/bg-ar-share.png";
 import useArScreenHook from "hooks/useArScreenHook";
 import RenderHTML from "react-native-render-html";
 
-const FunFactsScreen = ({route}) => {
+const FunFactsScreen = ({route}: any) => {
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
   const [socialPointsCounter, setSocialPointsCounter] = useState({
     facebook: 0,
@@ -240,7 +240,7 @@ const FunFactsScreen = ({route}) => {
       console.error("Error al guardar el desafío:", error);
     }
 
-    let newHuntPointChallenge;
+    let newHuntPointChallenge: any;
     try {
       newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
     } catch (error) {
@@ -382,9 +382,9 @@ const FunFactsScreen = ({route}) => {
                   li: {
                     color: "#fff",
                   },
-                  em: { fontStyle: "italic" },
-                  u: { textDecorationLine: "underline", },
-                  s: { textDecorationLine: "line-through", },
+                  em: {fontStyle: "italic"},
+                  u: {textDecorationLine: "underline"},
+                  s: {textDecorationLine: "line-through"},
                 }}
                 source={{
                   html: `${funFactDetail}`,

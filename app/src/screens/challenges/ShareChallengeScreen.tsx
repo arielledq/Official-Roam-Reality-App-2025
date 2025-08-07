@@ -201,7 +201,13 @@ const ArChallengeShare = () => {
       if (challengeType === CHALLENGES_TYPE.PHOTO_VIDEO) {
         formData.append("challenges", challengeObj?.id);
         formData.append("memory_file", shareFile);
-        formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+        let memoryType = "";
+        if (challengeObj?.memory_type) {
+          memoryType = challengeObj?.memory_type;
+        } else {
+          memoryType = fileExt == "mp4" ? "VIDEO" : "PHOTO";
+        }
+        formData.append("memory_type", memoryType);
         res = await postArMemory(formData);
       }
       if (challengeType === CHALLENGES_TYPE.PIN_CHECK_IN) {
