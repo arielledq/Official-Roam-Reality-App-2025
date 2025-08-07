@@ -603,7 +603,6 @@ class GeoARSiteMarkerSerializer(serializers.ModelSerializer):
     def get_type(self, instance: GeoArSite):
         return instance.type
 
-
     def get_edit_link(self, instance: GeoArSite):
         return reverse('admin:challenges_geoarsite_change', args=[instance.id])
 
@@ -637,6 +636,32 @@ class GeoARStarPointMarkerSerializer(serializers.ModelSerializer):
     def get_name(self, instance: GeoARStarPoint):
         return f'{instance.geo_ar_star.name} - Star #{instance.order}'
 
+
+class ScanPictureMarkerSerializer(serializers.ModelSerializer):
+    location = SerializerMethodField()
+    edit_link = SerializerMethodField()
+    # site = SerializerMethodField()
+
+    class Meta:
+        model = ScanPicture
+        fields = (
+            "id",
+            # "site",
+            "name",
+            "location",
+            "edit_link",
+        )
+
+    def get_location(self, instance: ScanPicture):
+        return instance.coordinates.coords[::-1]
+
+    def get_edit_link(self, instance: ScanPicture):
+        return reverse('admin:challenges_scanpicture_change', args=[instance.id])
+
+    # def get_site(self, instance: ScanPicture):
+    #     return instance.geo_ar_star.geo_site.name
+
+
 class GeoARSiteMarkerSaveSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -645,6 +670,7 @@ class GeoARSiteMarkerSaveSerializer(serializers.ModelSerializer):
             "id",
             "lat_long"
         )
+
 
 class GeoARStarMarkerSaveSerializer(serializers.ModelSerializer):
 
@@ -655,6 +681,16 @@ class GeoARStarMarkerSaveSerializer(serializers.ModelSerializer):
             "id",
             "location",
             "elevation",
+        )
+
+
+class ScanPictureMarkerSaveSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = ScanPicture
+        fields = (
+            "id",
+            "coordinates"
         )
 
 

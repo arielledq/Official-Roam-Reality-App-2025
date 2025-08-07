@@ -12,7 +12,15 @@ const invertTuple = (tupl) => [tupl[1], tupl[0]]
 import {MAP_CENTER, MAPBOX_STYLES} from "./app/consts.js";
 import {STYLES} from "./app/styles.js";
 import {dashboardData, postSiteChanges} from "./app/backend_link.js";
-import {capitalize, getImagedMarker, getSitePopup, getStarPopup, getStockMarker, Toast} from "./app/helpers.js";
+import {
+    capitalize,
+    getImagedMarker,
+    getScanPopup,
+    getSitePopup,
+    getStarPopup,
+    getStockMarker,
+    Toast
+} from "./app/helpers.js";
 
 function App(props) {
     const [mapx, setMapx] = useState(null)
@@ -20,13 +28,16 @@ function App(props) {
     const [dataLoading, setDataLoading] = useState(false)
     const [cachedSites, setCachedSites] = useState({})
     const [cachedStars, setCachedStars] = useState({})
+    const [cachedScans, setCachedScans] = useState({})
     const cachedMarkers = useRef({})
     const cachedMarkers2 = useRef({})
+    const cachedMarkers3 = useRef({})
     const [totalizerString, setTotalizerString] = useState('')
     const [searchfield, setSearchfield] = useState('')
-    const [selectedTypes, setSelectedTypes] = useState(['simple', 'band', 'stars'])
+    const [selectedTypes, setSelectedTypes] = useState(['geo-tag', 'band', 'hunt', 'scans'])
     const [siteChanges, setSiteChanges] = useState({})
     const [starChanges, setStarChanges] = useState({})
+    const [scanChanges, setScanChanges] = useState({})
     const [mapBounds, setMapBounds] = useState(null)
 
     const reloadMapData = () => {
@@ -51,8 +62,13 @@ function App(props) {
                 elevation: elevation
             }
         })
-        //console.log(starChanges, star_data)
 
+        const scan_data = Object.entries(scanChanges).map(([scan_id, {location}]) => {
+            return {
+                id: scan_id,
+                coordinates: { "type": "Point", "coordinates": invertTuple(location) },
+            }
+        })
         // console.log('saving ', data)
 
         Swal.fire({
@@ -62,7 +78,7 @@ function App(props) {
                 Swal.showLoading()
             }
         })
-        postSiteChanges({sites: site_data, stars: star_data})
+        postSiteChanges({sites: site_data, stars: star_data, scans: scan_data})
             .then((response) => {
                 Swal.close()
                 // const r = JSON.parse(response)
@@ -74,6 +90,7 @@ function App(props) {
                         })
                         setSiteChanges({})
                         setStarChanges({})
+                        setScanChanges({})
                         reloadMapData()
                     } else {
                         Toast.fire({
@@ -103,6 +120,7 @@ function App(props) {
     const restoreBtn = () => {
         setSiteChanges({})
         setStarChanges({})
+        setScanChanges({})
         Object.entries(cachedSites).forEach(([key, site]) => {
           const marker = cachedMarkers.current[site.id]
           marker.setLngLat(invertTuple(site.location))
@@ -110,6 +128,10 @@ function App(props) {
         Object.entries(cachedStars).forEach(([key, star]) => {
           const marker = cachedMarkers2.current[star.id]
           marker.setLngLat(invertTuple(star.location))
+        })
+        Object.entries(cachedScans).forEach(([key, scan]) => {
+          const marker = cachedMarkers3.current[scan.id]
+          marker.setLngLat(invertTuple(scan.location))
         })
     }
 
@@ -149,6 +171,18 @@ function App(props) {
         }
     }
 
+    const handleScanMarkerDragEnd = (scan, map) => {
+        return (ev) => {
+            const lngLat = ev.target.getLngLat();
+            setScanChanges((prev) => ({
+                ...prev,
+                [scan.id]: {
+                    location: [lngLat.lat, lngLat.lng],
+                }
+            }))
+        }
+    }
+
     const processMoreSites = (sites, sitesCache, map) => {
         sites.forEach((m) => {
             if (sitesCache[m.id]) {
@@ -159,7 +193,24 @@ function App(props) {
         Object.entries(sitesCache).forEach(([key, site]) => {
             if (!cachedMarkers.current[key]) {
                 // console.log('creating marker for ', site.id, key)
-                const marker = getStockMarker(invertTuple(site.location), props.static_root + '/M3.png')
+                let color = ''
+                switch (site?.type) {
+                    case 'geo-tag':
+                        color = 'rgb(102, 16, 242)'
+                        break;
+
+                    case 'band':
+                        color = 'rgb(22,136,4)'
+                        break;
+
+                    case 'hunt':
+                        color = 'rgb(236,206,16)'
+                        break;
+
+                    default:
+                        break;
+    }
+                const marker = getStockMarker(invertTuple(site.location), color, props.static_root + '/M3.png')
                 marker.on('dragend', handleMarkerDragEnd(site))
 
                 marker.setPopup(getSitePopup(site))
@@ -189,9 +240,29 @@ function App(props) {
         })
     }
 
+    const processMoreScans = (scans, scansCache, map) => {
+        scans.forEach((m) => {
+            if (scansCache[m.id]) {
+                // console.log('id repetido ', m.id)
+            }
+            scansCache[m.id] = m
+        })
+        Object.entries(scansCache).forEach(([key, scan]) => {
+            if (!cachedMarkers3.current[key]) {
+                const marker = getStockMarker(invertTuple(scan.location), 'rgb(255,127,28)', props.static_root + '/M3.png')
+                marker.on('dragend', handleScanMarkerDragEnd(scan))
+
+                marker.setPopup(getScanPopup(scan))
+                marker.addTo(map)
+                cachedMarkers3.current[key] = marker
+            }
+        })
+    }
+
     const loadSiteData = (page, bounds, othermap) => {
         let sitesCache = {}
         let starsCache = {}
+        let scansCache = {}
         if (!page) {
             page = 1
             Object.values(cachedMarkers.current).forEach(marker => marker.remove())
@@ -202,6 +273,7 @@ function App(props) {
         }else{
             sitesCache = cachedSites
             starsCache = cachedStars
+            scansCache = cachedScans
         }
         setDataLoading(true)
         const params = {page, bounds}
@@ -212,13 +284,13 @@ function App(props) {
         dashboardData(params).then((response) => {
             if (response.status === 200) {
                 if (response.data) {
-                    console.log('resp', response.data)
-
                     let data = response.data.result
                     processMoreSites(data.sites, sitesCache, othermap)
                     setCachedSites({...sitesCache})
                     processMoreStars(data.stars, starsCache, othermap)
                     setCachedStars({...starsCache})
+                    processMoreScans(data.scans, scansCache, othermap)
+                    setCachedScans({...scansCache})
 
                     if (data?.pages !== data?.page) {
                         setTotalizerString(`${data?.page} / ${data?.pages}`)
@@ -335,7 +407,7 @@ function App(props) {
             <div class="card d-flex flex-column align-items-start justify-content-start p-3">
                 <h5>Type of sites to include:</h5>
                 
-                ${['simple', 'band', 'stars'].map((type, idx) => html`
+                ${['geo-tag', 'band', 'hunt', 'scans'].map((type, idx) => html`
                     <div class="d-flex flex-row align-items-center justify-content-start">
                         <input 
                                 type="checkbox" 
@@ -352,7 +424,7 @@ function App(props) {
         </div>`
 
 
-    const pendingChanges = (Object.keys(siteChanges).length + Object.keys(starChanges).length) > 0
+    const pendingChanges = (Object.keys(siteChanges).length + Object.keys(starChanges).length + Object.keys(scanChanges).length) > 0
 
     return html`
         <div class="d-flex flex-row m-2">

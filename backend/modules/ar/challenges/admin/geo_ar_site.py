@@ -1,24 +1,51 @@
 from functools import update_wrapper
-
 from django.conf import settings
 from django.contrib import admin
 from django.template.response import TemplateResponse
-
-from .custom import GeoArChallengeAdmin
+from .custom import GeoArChallengeAdmin, PointFieldForm
 from ..models import GeoArSite, GeoARStar
+from django import forms
+from django.contrib import admin
 from django.urls import reverse
 from django.utils.http import urlencode
 from django.utils.html import format_html
-
 from ..views import get_map_points_data, save_point_editor_changes
+
+
+class GeoArSiteForm(PointFieldForm, forms.ModelForm):
+    point_field_name = 'lat_long'
+
+    class Meta:
+        model = GeoArSite
+        fields = '__all__'
 
 
 @admin.register(GeoArSite)
 class GeoArSiteAdmin(GeoArChallengeAdmin):
+    form = GeoArSiteForm
     list_display = ("id",'name',"check_ins","geo_location","view_ar_stars","add_ar_stars",)
     ordering = ("name","check_ins",)
     search_fields = ["name","geo_location__name"]
     list_select_related = ['geo_location']  # To avoid extra queries
+
+    # def get_fieldsets(self, request, obj=None):
+    #     fieldsets = super().get_fieldsets(request, obj)
+    #     point_field = self.form.point_field_name
+    #     new_fieldsets = []
+    #
+    #     for name, opts in fieldsets:
+    #         fields = list(opts.get('fields', []))
+    #
+    #         if point_field in fields:
+    #             idx = fields.index(point_field)
+    #             fields[idx:idx + 1] = [
+    #                 f"latitude",
+    #                 f"longitude"
+    #             ]
+    #
+    #         new_fieldsets.append((name, {'fields': fields}))
+    #
+    #     return new_fieldsets
 
     def add_ar_stars(self, obj):
         info = (GeoARStar._meta.app_label, GeoARStar._meta.model_name)
