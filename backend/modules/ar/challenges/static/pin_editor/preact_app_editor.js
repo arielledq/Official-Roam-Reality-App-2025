@@ -270,6 +270,9 @@ function App(props) {
 
             Object.values(cachedMarkers2.current).forEach(marker => marker.remove())
             cachedMarkers2.current = {}
+
+            Object.values(cachedMarkers3.current).forEach(marker => marker.remove())
+            cachedMarkers3.current = {}
         }else{
             sitesCache = cachedSites
             starsCache = cachedStars

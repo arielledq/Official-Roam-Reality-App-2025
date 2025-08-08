@@ -112,18 +112,21 @@ def get_map_points_data(request):
                         output_field=models.CharField(),
                     )
                 )
+                types = []
                 if 'types' in req:
                     types = req['types']
                     marinas_flt = marinas_flt.filter(type__in=types)
 
                 sites = marinas_flt.order_by("distance")
                 sites = sites[start:start + EDITOR_PAGESIZE]
-                star_q = GeoARStarPoint.objects.filter(geo_ar_star__geo_site__in=sites).select_related('geo_ar_star__geo_site').all()
-                scan_q = ScanPicture.objects.filter(geo_sites__in=sites).prefetch_related('geo_sites').all()
-
+                scans = []
+                if 'scans' in types:
+                    scan_q = ScanPicture.objects.filter(geo_sites__in=sites).prefetch_related('geo_sites').all()
+                    scans = ScanPictureMarkerSerializer(instance=scan_q, many=True, context={'request': request}).data
+                star_q = GeoARStarPoint.objects.filter(geo_ar_star__geo_site__in=sites).select_related(
+                    'geo_ar_star__geo_site').all()
                 sites = GeoARSiteMarkerSerializer(instance=sites, many=True, context={'request': request}).data
                 stars = GeoARStarPointMarkerSerializer(instance=star_q, many=True, context={'request': request}).data
-                scans = ScanPictureMarkerSerializer(instance=scan_q, many=True, context={'request': request}).data
                 count = marinas_flt.count()
                 data = dict(result=dict(sites=sites, stars=stars, scans=scans, total=count, page=page, pages=count // EDITOR_PAGESIZE + 1))
             except (ValueError, KeyError, GeoArSite.DoesNotExist):
