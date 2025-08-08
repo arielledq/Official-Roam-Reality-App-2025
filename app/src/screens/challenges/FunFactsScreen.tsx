@@ -18,7 +18,7 @@ import ShareToSocialsModal from "components/ShareToSocialsModal";
 import theme from "assets/theme";
 // @ts-ignore
 import BGArShare from "assets/ar/bg-ar-share.png";
-import useArScreenHook from "hooks/useArScreenHook";
+import useArScreenHook from "../../hooks/useArScreenHook";
 import RenderHTML from "react-native-render-html";
 
 const FunFactsScreen = ({route}: any) => {

@@ -471,7 +471,7 @@ const ARScreen = ({route}) => {
             "screen",
             "SetTypeChallenge",
             JSON.stringify({
-              typeChallenge: challengeType,
+              typeChallenge: 'PHOTO',
               arChallenge: true,
               isLocation: false,
             })

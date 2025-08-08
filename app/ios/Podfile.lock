@@ -1450,7 +1450,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-cameraroll (7.10.1):
+  - react-native-cameraroll (7.10.2):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1676,7 +1676,7 @@ PODS:
   - react-native-onesignal (5.2.13):
     - OneSignalXCFramework (= 5.2.14)
     - React (< 1.0.0, >= 0.13.0)
-  - react-native-pager-view (6.8.1):
+  - react-native-pager-view (6.9.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1702,7 +1702,7 @@ PODS:
     - Yoga
   - react-native-render-html (6.3.4):
     - React-Core
-  - react-native-safe-area-context (5.5.2):
+  - react-native-safe-area-context (5.6.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1717,8 +1717,8 @@ PODS:
     - React-hermes
     - React-ImageManager
     - React-jsi
-    - react-native-safe-area-context/common (= 5.5.2)
-    - react-native-safe-area-context/fabric (= 5.5.2)
+    - react-native-safe-area-context/common (= 5.6.0)
+    - react-native-safe-area-context/fabric (= 5.6.0)
     - React-NativeModulesApple
     - React-RCTFabric
     - React-renderercss
@@ -1728,7 +1728,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/common (5.5.2):
+  - react-native-safe-area-context/common (5.6.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1752,7 +1752,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-safe-area-context/fabric (5.5.2):
+  - react-native-safe-area-context/fabric (5.6.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2299,7 +2299,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNDateTimePicker (8.4.3):
+  - RNDateTimePicker (8.4.4):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2331,7 +2331,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.8.4)
   - RNFS (2.20.0):
     - React-Core
-  - RNGestureHandler (2.27.2):
+  - RNGestureHandler (2.28.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2413,7 +2413,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated (3.19.0):
+  - RNReanimated (3.19.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2436,10 +2436,10 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated (= 3.19.0)
-    - RNReanimated/worklets (= 3.19.0)
+    - RNReanimated/reanimated (= 3.19.1)
+    - RNReanimated/worklets (= 3.19.1)
     - Yoga
-  - RNReanimated/reanimated (3.19.0):
+  - RNReanimated/reanimated (3.19.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2462,9 +2462,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/reanimated/apple (= 3.19.0)
+    - RNReanimated/reanimated/apple (= 3.19.1)
     - Yoga
-  - RNReanimated/reanimated/apple (3.19.0):
+  - RNReanimated/reanimated/apple (3.19.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2488,7 +2488,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNReanimated/worklets (3.19.0):
+  - RNReanimated/worklets (3.19.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2511,9 +2511,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNReanimated/worklets/apple (= 3.19.0)
+    - RNReanimated/worklets/apple (= 3.19.1)
     - Yoga
-  - RNReanimated/worklets/apple (3.19.0):
+  - RNReanimated/worklets/apple (3.19.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2588,7 +2588,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNShare (12.1.2):
+  - RNShare (12.2.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3095,7 +3095,7 @@ SPEC CHECKSUMS:
   React-Mapbuffer: 8df5296f9d9a61f980d293b55026cfebcd8dfb0a
   React-microtasksnativemodule: c8ed30f8ec30affbc73411c54207bd67b1125bbb
   react-native-blur: 06d0f9906ecd6cde3a42de16c6cd829a2bf0710c
-  react-native-cameraroll: 41084e42ab4ec08940452737aca3fd5e0edc63fe
+  react-native-cameraroll: 126bff3dd6d0844dcbc69ebc34785138791c0ab3
   react-native-contacts: 30229f4b7d13283c56cfaf30f389f3a844709550
   react-native-date-picker: e687e018f66da4734b3db3ddf3d323e930425d56
   react-native-fbsdk-next: 52f81e60eb3e8e0e06cf9728b4572d3509ca9d01
@@ -3107,9 +3107,9 @@ SPEC CHECKSUMS:
   react-native-maps: a48f905ccf2048f130c0a55996880d479299bc1c
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-onesignal: 0829ce2a504db26dd80eaf14d4e0211ea626fe62
-  react-native-pager-view: 919534782a0489f7e2aeeb9a8b8959edfd3f067a
+  react-native-pager-view: f79b095ad2f207028f17626dd7aaf8411c42accc
   react-native-render-html: 5afc4751f1a98621b3009432ef84c47019dcb2bd
-  react-native-safe-area-context: 7e926a200d4bc9c56562275743705c6b56176455
+  react-native-safe-area-context: f0f631086ac8e569b5cd7911e4403cd96cd31915
   react-native-unity: 9bf992c92225077eca177f71734e54d0a9a65444
   react-native-video: 8b867791128487bf82c9b6070ceddd2697bfabec
   react-native-view-shot: 57c7b8158751f19f32cb885109574712955ea016
@@ -3150,17 +3150,17 @@ SPEC CHECKSUMS:
   RNAppleAuthentication: c3dddf5918126c9aae85dc2e2ce9fb87835e9e04
   RNCAsyncStorage: a1c8cc8a99c32de1244a9cf707bf9d83d0de0f71
   RNCMaskedView: ae521efb1c6c2b183ae0f8479487db03c826184c
-  RNDateTimePicker: 9eacd6be3672493ffd7852036e1e073fc291f939
+  RNDateTimePicker: e06a33326cb7596cfd586b592c42f681f8e2988d
   RNDeviceInfo: d863506092aef7e7af3a1c350c913d867d795047
   RNFastImage: 462a183c4b0b6b26fdfd639e1ed6ba37536c3b87
   RNFS: 89de7d7f4c0f6bafa05343c578f61118c8282ed8
-  RNGestureHandler: 9205e0a9649ef6fcfd71e86992ecfb21eefab3d3
+  RNGestureHandler: 0397fea67f39d5a2d17fcf4a028e206f7ba098ba
   RNGoogleSignin: 2537addd0714a6f20f794db17da71675f15294c7
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59
   RNPermissions: 149e4ced4546cfeace340e87c5d33cf382bef29e
-  RNReanimated: ac0cfc5da50d769ec1e3c6ccb362c1bf7d08ac87
+  RNReanimated: 730ffe6cf7b931f78b795e6b6e0920dcab9c8beb
   RNScreens: 7e56b051227a1a11c3068849d1a9a5dd457537df
-  RNShare: 7037c1ffade13224999abff81fb18290c4eddf6e
+  RNShare: a60af5971cb114a8d31df642b108e3fe00e5b987
   RNSound: 314cc5226453ef4a3314a196c65e8a65e5106a7b
   RNSVG: ba53827311fd9f8a14e06626365a749ce7713975
   SDWebImage: a7f831e1a65eb5e285e3fb046a23fcfbf08e696d

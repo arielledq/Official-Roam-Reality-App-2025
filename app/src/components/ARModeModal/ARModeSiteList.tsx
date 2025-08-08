@@ -6,7 +6,7 @@ import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
 import Images from "assets/images";
 import Icon from "components/Icon";
-import useArScreenHook from "hooks/useArScreenHook";
+import useArScreenHook from "../../hooks/useArScreenHook";
 import fontGroup from "assets/fonts";
 import userLocationHook from "screens/drawerContent/location.hook";
 // @ts-ignore
