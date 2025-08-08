@@ -409,6 +409,7 @@ const ARScreen = ({route}) => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
+    console.log("dataUnity", data)
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
     let show = []
@@ -465,6 +466,15 @@ const ARScreen = ({route}) => {
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
+        unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: challengeType,
+              arChallenge: true,
+              isLocation: false,
+            })
+        );
         // TODO Button ARMODE Name
         unityRef.current.postMessage(
             "ArMode",
@@ -478,6 +488,15 @@ const ARScreen = ({route}) => {
         );
         break;
       case AR_MODES.SCAN_MODE:
+        unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "PHOTO",
+              arChallenge: true,
+              isLocation: false,
+            })
+        );
         if (data.photoVideoButton?.isPhoto) {
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
