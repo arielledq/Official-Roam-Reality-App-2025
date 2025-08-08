@@ -451,9 +451,9 @@ const ARScreen = ({route}) => {
       if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
         unityRef.current.postMessage("Main Camera", "ShowARObject");
       }
-      else
+      if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE)
       {
-        notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
+        // notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
         navigation.navigate({
           name: "FunFactsScreen",
           params: {
@@ -461,6 +461,7 @@ const ARScreen = ({route}) => {
           },
         });
       }
+
 
     }
 
