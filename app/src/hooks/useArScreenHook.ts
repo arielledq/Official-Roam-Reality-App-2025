@@ -5,7 +5,7 @@ import Toast from "react-native-toast-message";
 const useArScreenHook = () => {
   const [sites, setSites] = useState();
 
-  const getSites = async payload => {
+  const getSites = async (payload: any) => {
     const response = await getSitesApi({
       lat: `${payload.lat}`,
       lon: `${payload.lon}`,
@@ -16,10 +16,10 @@ const useArScreenHook = () => {
     setSites(updatedResponse);
   };
 
-  const getNextStar = async (geoSiteId, lat, lon) => {
+  const getNextStar = async (geoSiteId: number, lat: number, lon: number) => {
     let huntChallenge = {};
     try {
-      const params = {
+      const params: any = {
         geo_site_id: geoSiteId,
         lat: lat,
         lon: lon,
@@ -37,7 +37,7 @@ const useArScreenHook = () => {
           text2: "You have collected all the stars in this hunt challenge",
         });
       }
-    } catch (error) {
+    } catch (error: any) {
       Toast.show({
         type: "error",
         text1: "Error retrieving the challenge",
