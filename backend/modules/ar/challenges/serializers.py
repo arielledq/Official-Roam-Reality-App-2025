@@ -1,6 +1,7 @@
 from django.urls import reverse
 from rest_framework.fields import SerializerMethodField
 
+from .cooldown_functions import geo_cooldown_by_user, scan_cooldown_by_user, hunt_cooldown_by_user
 from .models import GeoARStarPoint, \
     ARExperience, GeoArSiteCategory, ScanPicture
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, \
@@ -362,12 +363,13 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
     user_attempts = serializers.SerializerMethodField()
+    cooldown = serializers.SerializerMethodField()
 
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
         fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',
-                  'attempts', 'cooldown_hours', 'points', "user_attempts",]
+                  'attempts', 'points', "user_attempts", "cooldown",]
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
@@ -391,6 +393,14 @@ class ScanPictureSerializer(serializers.ModelSerializer):
             return min(qs.count(), obj.challenge_attempt)
         return 0
 
+    def get_cooldown(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        return scan_cooldown_by_user(user, obj)
+
 
 class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
@@ -400,6 +410,8 @@ class GeoArSiteSerializer(GeoModelSerializer):
     user_attempts = serializers.SerializerMethodField()
     sponsor = SponsorSerializer(read_only=True)
     scan_pictures = ScanPictureSerializer(many=True)
+    checkin_cooldown = serializers.SerializerMethodField()
+    hunt_cooldown = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoArSite
@@ -427,6 +439,8 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "is_active",
             "band_user",
             "scan_pictures",
+            "checkin_cooldown",
+            "hunt_cooldown",
         )
 
     def get_check_ins(self, obj):
@@ -453,6 +467,24 @@ class GeoArSiteSerializer(GeoModelSerializer):
             return attempts_since.count()
         elif qs.exists():
             return min(qs.count(), obj.challenge_attempt)
+        return 0
+
+    def get_checkin_cooldown(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+        return geo_cooldown_by_user(user, obj, obj.pin_challenge.id)
+
+    def get_hunt_cooldown(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        if obj.geo_arstar_ar_site.exists():
+            ar_star = obj.geo_arstar_ar_site.first()
+            return hunt_cooldown_by_user(user, ar_star)
         return 0
 
 
@@ -714,7 +746,6 @@ class GeoStarSerializer(GeoModelSerializer):
             "sponsored",
             "following_mode",
             'attempts',
-            'cooldown_hours',
             'user_attempts',
         )
 
