@@ -52,15 +52,21 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           lat: initialUserLocation.latitude,
           lon: initialUserLocation.longitude,
         };
-        const huntChallenge = await getNextStar(params);
-        if (huntChallenge?.id) {
-          hasNextStar = true;
-          updatedSiteData = {
-            ...updatedSiteData,
-            huntChallenge: {...huntChallenge},
-          };
-        } else {
-          hasNextStar = false;
+        try {
+          const huntChallenge = await getNextStar(params.geo_site_id, params.lat, params.lon);
+          if (huntChallenge?.id) {
+            hasNextStar = true;
+            updatedSiteData = {
+              ...updatedSiteData,
+              huntChallenge: {...huntChallenge},
+            };
+          }
+        } catch (error: any) {
+          Toast.show({
+            type: "error",
+            text1: "Error retrieving the challenge",
+            text2: error?.message || "There was an unexpected error. Please try again later.",
+          });
         }
 
         // Validate cool down period && Start challenge

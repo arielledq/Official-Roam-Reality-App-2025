@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {getARSites as getSitesApi, getNextStar as getNextStarApi} from "../network";
+import Toast from "react-native-toast-message";
 
 const useArScreenHook = () => {
   const [sites, setSites] = useState();
@@ -23,7 +24,7 @@ const useArScreenHook = () => {
         lat: lat,
         lon: lon,
       };
-      const nextStarRsp = await getNextStar(params);
+      const nextStarRsp = await getNextStarApi(params);
       if (nextStarRsp?.star?.id) {
         huntChallenge = {
           ...nextStarRsp.star,
