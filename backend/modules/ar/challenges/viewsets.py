@@ -111,7 +111,7 @@ class PanicMessageViewSet(ViewSet):
 class ARMemoriesViewSet(ViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO', 'STAR'])
+    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
     serializer_class = ARMemoriesSerializer
     parser_class = (FileUploadParser,)
 
@@ -757,7 +757,27 @@ class MemoryCheckinViewSet(ViewSet):
     def list(self, request):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
-            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO', 'STAR'])
+            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
+            result_list = sorted(
+                chain(all_user_check_in, all_user_memories),
+                key=attrgetter('created_at'),
+                reverse=True
+            )
+            serializer = ARAllMemoriesSerializer(
+                result_list,
+                many=True,
+                context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], url_path='public', name='AR Public')
+    def public(self, request):
+        try:
+            user = request.GET.get("user_id")
+            all_user_check_in = ARSitePinCheckIn.objects.filter(user=user)
+            all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
             result_list = sorted(
                 chain(all_user_check_in, all_user_memories),
                 key=attrgetter('created_at'),
