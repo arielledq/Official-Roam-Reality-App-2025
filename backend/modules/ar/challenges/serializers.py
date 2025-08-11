@@ -16,6 +16,7 @@ from rest_framework_gis.serializers import GeoModelSerializer
 from django.utils import timezone
 from datetime import timedelta
 from rest_framework.exceptions import ValidationError
+from utils.s3utils import RandomDownloadNameS3FileField
 
 
 
@@ -358,8 +359,8 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 
 class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
-    file_animation = serializers.FileField()
-    file_3d = serializers.FileField()
+    file_animation = RandomDownloadNameS3FileField()
+    file_3d = RandomDownloadNameS3FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
     user_attempts = serializers.SerializerMethodField()
