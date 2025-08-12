@@ -266,6 +266,7 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "points",
             "sponsor",
             "geo_location",
+            "scan_picture"
         )
 
 
