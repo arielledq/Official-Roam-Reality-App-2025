@@ -4,6 +4,7 @@ from operator import attrgetter
 import requests
 from configuration import configs
 from travel_ar_app_42706 import settings
+from .cooldown_functions import geo_cooldown_by_user, scan_cooldown_by_user, hunt_cooldown_by_user
 from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
@@ -110,7 +111,7 @@ class PanicMessageViewSet(ViewSet):
 class ARMemoriesViewSet(ViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO', 'STAR'])
+    queryset = ARMemories.objects.filter(memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
     serializer_class = ARMemoriesSerializer
     parser_class = (FileUploadParser,)
 
@@ -191,41 +192,18 @@ class ARMemoriesViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        now = timezone.now()
-        window_start = now - timedelta(hours=site_obj.cooldown_hours)
-        qs = ARSitePinCheckIn.objects.filter(
-            user=user,
-            geo_challenge=geo_challenge_id,
-            geo_site=geo_site_id,
-            created_at__gte=window_start
-        ).order_by('created_at')
+        cooldown = geo_cooldown_by_user(user, site_obj, geo_challenge_id)
 
-        if not qs.exists():
+        if cooldown == 0:
             return Response(
                 {"message": "GeoChallenge can be submitted now."},
                 status=status.HTTP_200_OK
             )
 
-        first_attempt = qs.filter(user_first_attempt=True).last()
-
-        if not first_attempt:
-            first_attempt = qs.last()
-            first_attempt.user_first_attempt = True
-            first_attempt.save()
-
-        used = qs.filter(created_at__gte=first_attempt.created_at).count()
-        if used < site_obj.challenge_attempt:
-            return Response(
-                {"message": "GeoChallenge can be submitted now."},
-                status=status.HTTP_200_OK
-            )
-
-        cooldown_end = first_attempt.created_at + timedelta(hours=site_obj.cooldown_hours)
-        remaining = cooldown_end - now
         return Response(
             {
                 "message": "You are still in cooldown period.",
-                "remaining": str(remaining)
+                "remaining": cooldown
             },
             status=status.HTTP_403_FORBIDDEN
         )
@@ -242,41 +220,18 @@ class ARMemoriesViewSet(ViewSet):
                 {'message': f'ScanPicture {scan_id} does not exist.'},
                 status=status.HTTP_404_NOT_FOUND
             )
-        now = timezone.now()
-        window_start = now - timedelta(hours=scan.cooldown_hours)
-        qs = ARMemories.objects.filter(
-            user=user,
-            scan_picture=scan,
-            created_at__gte=window_start,
-            memory_type__in=['SCAN_PHOTO'],
-        ).order_by('created_at')
 
-        if not qs.exists():
+        cooldown = scan_cooldown_by_user(user, scan)
+        if cooldown == 0:
             return Response(
                 {"message": "Scans can be submitted now."},
                 status=status.HTTP_200_OK
             )
 
-        first_attempt = qs.filter(user_first_attempt=True).last()
-
-        if not first_attempt:
-            first_attempt = qs.last()
-            first_attempt.user_first_attempt = True
-            first_attempt.save()
-
-        used = qs.filter(created_at__gte=first_attempt.created_at).count()
-
-        if used < scan.challenge_attempt:
-            return Response(
-                {"message": "Scans can be submitted now."},
-                status=status.HTTP_200_OK
-            )
-        cooldown_end = first_attempt.created_at + timedelta(hours=scan.cooldown_hours)
-        remaining = cooldown_end - now
         return Response(
             {
                 "message": "You are still in cooldown period.",
-                "remaining": str(remaining)
+                "remaining": cooldown
             },
             status=status.HTTP_403_FORBIDDEN
         )
@@ -294,61 +249,20 @@ class ARMemoriesViewSet(ViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-        now = timezone.now()
-        window_start = now - timedelta(hours=ar_star.cooldown_hours)
-        star_points = list(ar_star.stars.values_list('id', flat=True))  # all related star_point ids
-
-        # Memories in window
-        memories = ARMemories.objects.filter(
-            user=user,
-            star_point__in=star_points,
-            created_at__gte=window_start,
-            memory_type__in=['STAR',],
-        ).order_by('created_at')
-
-        if not memories.exists():
+        cooldown = hunt_cooldown_by_user(user, ar_star)
+        if cooldown == 0:
             return Response(
                 {"message": "Hunt can be submitted now."},
                 status=status.HTTP_200_OK
             )
 
-        first_attempt = memories.filter(user_first_attempt=True).last()
-
-        if not first_attempt:
-            # Set the first memory as the last attempt
-            first_attempt = memories.last()
-            first_attempt.user_first_attempt = True
-            first_attempt.save()
-
-        # Only count attempts from the first attempt forward
-        relevant_memories = (memories.filter(created_at__gte=first_attempt.created_at)
-                             .values_list('star_point_id', flat=True))
-        star_point_count = Counter(relevant_memories)
-
-        # Contar cuántos sets completos hay (mínimo número de veces que cada star_point aparece)
-        complete_sets = min([star_point_count.get(sp_id, 0) for sp_id in star_points])
-
-        if complete_sets < ar_star.attempts:
-            return Response(
-                {"message": "Hunt can be submitted now."},
-                status=status.HTTP_200_OK
-            )
-        else:
-            cooldown_end = first_attempt.created_at + timedelta(hours=ar_star.cooldown_hours)
-            if now < cooldown_end:
-                remaining = cooldown_end - now
-                return Response(
-                    {
-                        "message": "You are still in cooldown period.",
-                        "remaining": str(remaining)
-                    },
-                    status=status.HTTP_403_FORBIDDEN
-                )
-            else:
-                return Response(
-                    {"message": "Hunt can be submitted now."},
-                    status=status.HTTP_200_OK
-                )
+        return Response(
+            {
+                "message": "You are still in cooldown period.",
+                "remaining": cooldown
+            },
+            status=status.HTTP_403_FORBIDDEN
+        )
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.queryset.get(pk=kwargs.get('pk'))
@@ -843,7 +757,27 @@ class MemoryCheckinViewSet(ViewSet):
     def list(self, request):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
-            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO', 'STAR'])
+            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
+            result_list = sorted(
+                chain(all_user_check_in, all_user_memories),
+                key=attrgetter('created_at'),
+                reverse=True
+            )
+            serializer = ARAllMemoriesSerializer(
+                result_list,
+                many=True,
+                context={'request': request}
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=False, methods=['get'], url_path='public', name='AR Public')
+    def public(self, request):
+        try:
+            user = request.GET.get("user_id")
+            all_user_check_in = ARSitePinCheckIn.objects.filter(user=user)
+            all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
             result_list = sorted(
                 chain(all_user_check_in, all_user_memories),
                 key=attrgetter('created_at'),
@@ -860,6 +794,8 @@ class MemoryCheckinViewSet(ViewSet):
 
 
 class ArSiteViewSet(viewsets.GenericViewSet, viewsets.mixins.ListModelMixin,):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
     queryset = GeoArSite.objects.all()
     serializer_class = GeoArSiteSerializer
     filter_backends = [DjangoFilterBackend]

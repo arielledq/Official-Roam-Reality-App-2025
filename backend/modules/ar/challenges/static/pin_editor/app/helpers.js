@@ -17,9 +17,9 @@ export const capitalize = (s) => {
     return s.charAt(0).toUpperCase() + s.slice(1)
 }
 
-export const getStockMarker = (coords, img, w, h, prc) => {
+export const getStockMarker = (coords, color, img, w, h, prc) => {
     // return new mapboxgl.Marker(getMarkerEl(img, w, h, prc), )
-    return new mapboxgl.Marker({color: 'rgb(102, 16, 242)'})
+    return new mapboxgl.Marker({color: color})
         .setLngLat(coords).setDraggable(true)
 
 }
@@ -63,3 +63,13 @@ export const getStarPopup = (star) => {
         `
     )
 }
+
+export const getScanPopup = (scan) => {
+    return new mapboxgl.Popup({offset: 25}).setHTML(
+        `
+            <h5><b>Scan name:</b></h5>
+            <h5>${scan.name}</h5>
+            <h6><a href="${scan.edit_link}" target="_blank">Edit scan</a></h6>
+        `
+    )
+} //<h6><b>Site: </b> ${star.site}</h6>
