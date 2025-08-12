@@ -1,7 +1,7 @@
 import io
 import os
 import zipfile
-
+from django.contrib.gis.geos import Point
 from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import transaction
@@ -157,12 +157,70 @@ class GeoArChallengeAdmin(admin.ModelAdmin):
         return form_class
 
 
+class PointFieldForm(forms.ModelForm):
+    latitude = forms.FloatField(required=False, label="Latitude")
+    longitude = forms.FloatField(required=False, label="Longitude")
+    point_field_name = None
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        field_name = self.point_field_name
+        if not field_name:
+            raise ValueError("'point_field_name' must be specified in the form.")
+
+        if field_name not in self.fields or not isinstance(self._meta.model._meta.get_field(field_name), PointField):
+            raise ValueError(f"'{field_name}' is not a valid PointField.")
+
+        # Hide map widget
+        self.fields[field_name].widget = forms.HiddenInput()
+
+        # Additional fields lat y lon
+        self.fields[f'latitude'] = forms.FloatField(
+            label=f'Latitude',
+            required=False
+        )
+        self.fields[f'longitude'] = forms.FloatField(
+            label=f'Longitude',
+            required=False
+        )
+
+        # Initial values
+        point = getattr(self.instance, field_name)
+        if point:
+            self.fields[f'latitude'].initial = point.y
+            self.fields[f'longitude'].initial = point.x
+
+    def clean(self):
+        cleaned_data = super().clean()
+
+        field_name = self.point_field_name
+        lat = cleaned_data.pop(f"latitude", None)
+        lon = cleaned_data.pop(f"longitude", None)
+
+        if lat is not None and lon is not None:
+            cleaned_data[field_name] = Point(lon, lat)
+        else:
+            cleaned_data[field_name] = None
+
+        return cleaned_data
+
+
+class ScanPictureForm(PointFieldForm, forms.ModelForm):
+    point_field_name = 'coordinates'
+
+    class Meta:
+        model = ScanPicture
+        fields = '__all__'
+
+
 @admin.register(ScanPicture)
-class ScanPictureAdmin(GeoArChallengeAdmin):
+class ScanPictureAdmin(admin.ModelAdmin):
+    form = ScanPictureForm
     list_display = ('name',)
 
 
-class GeoARStarPointForm(forms.ModelForm):
+class GeoARStarPointForm(PointFieldForm, forms.ModelForm):
+    point_field_name = 'location'
 
     def clean_sponsors(self):
         sponsors = self.cleaned_data.get('sponsors')

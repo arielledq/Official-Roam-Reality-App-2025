@@ -540,7 +540,7 @@ class ARMemories(models.Model):
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        verbose_name="Scan picture",
+        verbose_name="Scans",
         related_name="ar_memories",
     )
     star_point = models.ForeignKey(
@@ -651,6 +651,10 @@ class ScanPicture(models.Model):
     )
     points = models.IntegerField(verbose_name="Points", default=0)
 
+    class Meta:
+        verbose_name_plural = "Scans"
+        verbose_name = "Scan"
+
     def clean(self):
         super().clean()
         if not self.file_image and not self.file_3d:
@@ -718,7 +722,7 @@ class GeoArSite(models.Model):
         User, on_delete=models.CASCADE, related_name="geo_ar_site_band_user", null=True, blank=True
     )
 
-    scan_pictures = models.ManyToManyField(ScanPicture, related_name="geo_sites", blank=True)
+    scan_pictures = models.ManyToManyField(ScanPicture, related_name="geo_sites", blank=True, verbose_name="Scans")
 
     class Meta:
         verbose_name_plural = "Geo AR Site"

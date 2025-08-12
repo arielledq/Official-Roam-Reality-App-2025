@@ -7,9 +7,10 @@ from django.db import transaction, models
 from django.db.models import Q, Count, Case, When, Value
 from django.http import JsonResponse, HttpResponse
 
-from modules.ar.challenges.models import GeoArSite, GeoARStarPoint
+from modules.ar.challenges.models import GeoArSite, GeoARStarPoint, ScanPicture
 from modules.ar.challenges.serializers import GeoARSiteMarkerSerializer, \
-    GeoARSiteMarkerSaveSerializer, GeoARStarPointMarkerSerializer, GeoARStarMarkerSaveSerializer
+    GeoARSiteMarkerSaveSerializer, GeoARStarPointMarkerSerializer, GeoARStarMarkerSaveSerializer, \
+    ScanPictureMarkerSerializer, ScanPictureMarkerSaveSerializer
 
 EDITOR_PAGESIZE = 100
 
@@ -26,17 +27,21 @@ def save_point_editor_changes(request):
             req = json.loads(request.body.decode('UTF-8'))
 
             try:
-                sites_data, stars_data = req.get('sites', []), req.get('stars', [])
+                sites_data, stars_data, scans_data = req.get('sites', []), req.get('stars', []), req.get('scans', [])
                 with transaction.atomic():
                     sites = {s.id: s for s in GeoArSite.objects.filter(id__in=[r['id'] for r in sites_data]).all()}
                     for r in sites_data:
                         serializer = GeoARSiteMarkerSaveSerializer(data=r, instance=sites[int(r['id'])])
                         serializer.is_valid(raise_exception=True)
                         serializer.save()
-
                     stars = {s.id: s for s in GeoARStarPoint.objects.filter(id__in=[r['id'] for r in stars_data]).all()}
                     for r in stars_data:
                         serializer = GeoARStarMarkerSaveSerializer(data=r, instance=stars[int(r['id'])])
+                        serializer.is_valid(raise_exception=True)
+                        serializer.save()
+                    scans = {s.id: s for s in ScanPicture.objects.filter(id__in=[r['id'] for r in scans_data]).all()}
+                    for r in scans_data:
+                        serializer = ScanPictureMarkerSaveSerializer(data=r, instance=scans[int(r['id'])])
                         serializer.is_valid(raise_exception=True)
                         serializer.save()
 
@@ -89,32 +94,41 @@ def get_map_points_data(request):
                     type=Case(
                         When(
                             Q(band_user__isnull=True, star_count=0),
-                            then=Value('simple')
+                            then=Value('geo-tag')
                         ),
                         When(
                             Q(band_user__isnull=True, star_count__gt=0),
-                            then=Value('stars')
+                            then=Value('hunt')
                         ),
                         When(
                             Q(band_user__isnull=False, category__isnull=False, star_count=0),
                             then=Value('band')
                         ),
+                        # When(
+                        #     Q(scan_pictures__isnull=False, star_count=0),
+                        #     then=Value('scans')
+                        # ),
                         default=Value(None),  # Optional: sets a default value if no condition is met
                         output_field=models.CharField(),
                     )
                 )
+                types = []
                 if 'types' in req:
                     types = req['types']
                     marinas_flt = marinas_flt.filter(type__in=types)
 
                 sites = marinas_flt.order_by("distance")
                 sites = sites[start:start + EDITOR_PAGESIZE]
-                star_q = GeoARStarPoint.objects.filter(geo_ar_star__geo_site__in=sites).select_related('geo_ar_star__geo_site').all()
-
+                scans = []
+                if 'scans' in types:
+                    scan_q = ScanPicture.objects.filter(geo_sites__in=sites).prefetch_related('geo_sites').all()
+                    scans = ScanPictureMarkerSerializer(instance=scan_q, many=True, context={'request': request}).data
+                star_q = GeoARStarPoint.objects.filter(geo_ar_star__geo_site__in=sites).select_related(
+                    'geo_ar_star__geo_site').all()
                 sites = GeoARSiteMarkerSerializer(instance=sites, many=True, context={'request': request}).data
                 stars = GeoARStarPointMarkerSerializer(instance=star_q, many=True, context={'request': request}).data
                 count = marinas_flt.count()
-                data = dict(result=dict(sites=sites, stars=stars, total=count, page=page, pages=count // EDITOR_PAGESIZE + 1))
+                data = dict(result=dict(sites=sites, stars=stars, scans=scans, total=count, page=page, pages=count // EDITOR_PAGESIZE + 1))
             except (ValueError, KeyError, GeoArSite.DoesNotExist):
                 data = dict(result=result, message='Wrong data sent, not listing!')
 
