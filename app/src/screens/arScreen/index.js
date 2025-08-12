@@ -1006,6 +1006,12 @@ const ARScreen = ({route}) => {
   }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
 
   useEffect(() => {
+    if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
+      startChallengeHandler(huntChallenge);
+    }
+  }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
+
+  useEffect(() => {
     if (huntChallengeFinished) {
       Toast.show({
         type: "info",
