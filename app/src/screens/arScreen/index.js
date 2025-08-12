@@ -68,8 +68,8 @@ const ARScreen = ({route}) => {
   const isGeoTagMode = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE;
   const isScanMode = selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE;
   const modelFile =
-    challengeObj?.model_file ||
-    selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
+      challengeObj?.model_file ||
+      selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
   // const huntChallenge = TEST_HUNT_CHALLENGE;
@@ -77,6 +77,26 @@ const ARScreen = ({route}) => {
   const huntChallengeFinished = route.params?.huntChallengeFinished;
   const isContinuingHuntChallenge = !!huntChallenge;
   const [bundleFile, setBundleFile] = useState(null);
+  const SCENE_NAME = "ARReactNative 1"; // tu escena
+  const [sceneIsReady, setSceneIsReady] = useState(false);
+  const [pendingMode, setPendingMode] = useState(null);
+  const reloadLastModeRef = useRef(null);
+  const bundleRequestedRef = useRef(false);
+
+  const shouldRun3DFlow = (mode) => {
+    if (!mode) return false;
+    if (mode === AR_MODES.HUNT_MODE) return true;
+    if (mode === AR_MODES.SCAN_MODE) return !!selectedSite?.scanChallenge?.file_3d; // solo si hay 3D
+    return false; // GEO no entra acá (manejo aparte)
+  };
+
+  // espera breve tras sceneLoaded antes de enviar datos (ajustable)
+  const AFTER_SCENE_COOLDOWN_MS = 400;
+
+  const sendFlowTimerRef = useRef(null);   // timer del orquestador
+  const sceneCycleRef     = useRef(0);
+  const sendBundleTimerRef = useRef(null);
+  const loadArContentSentRef = useRef(false);
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -102,11 +122,11 @@ const ARScreen = ({route}) => {
       fileCache: true,
       path: sourcePath,
     })
-      .fetch("GET", modelFile)
-      .then(res => {
-        unzipModelFile(res.path(), targetPath);
-      })
-      .catch(console.error);
+        .fetch("GET", modelFile)
+        .then(res => {
+          unzipModelFile(res.path(), targetPath);
+        })
+        .catch(console.error);
   };
 
   const unzipModelFile = async (sourcePath, targetPath) => {
@@ -134,15 +154,15 @@ const ARScreen = ({route}) => {
       const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
 
       RNFS.exists(sourcePath)
-        .then(exists => {
-          // console.log("exists", exists);
-          if (exists) {
-            unzipModelFile(sourcePath, targetPath);
-          } else {
-            downloadModelFile(sourcePath, targetPath);
-          }
-        })
-        .catch(console.error);
+          .then(exists => {
+            // console.log("exists", exists);
+            if (exists) {
+              unzipModelFile(sourcePath, targetPath);
+            } else {
+              downloadModelFile(sourcePath, targetPath);
+            }
+          })
+          .catch(console.error);
     }
   };
 
@@ -158,15 +178,15 @@ const ARScreen = ({route}) => {
   const playCameraSound = () => {
     Sound.setCategory("Playback");
     let cameraSound = new Sound(
-      Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
-      Sound.MAIN_BUNDLE,
-      error => {
-        if (error) {
-          console.error("failed to load the sound", error);
-        } else {
-          cameraSound.play();
+        Platform.OS === "android" ? "camerasound.mp3" : "camera-sound.mp3",
+        Sound.MAIN_BUNDLE,
+        error => {
+          if (error) {
+            console.error("failed to load the sound", error);
+          } else {
+            cameraSound.play();
+          }
         }
-      }
     );
   };
 
@@ -177,40 +197,40 @@ const ARScreen = ({route}) => {
       unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
 
       const basePath =
-        Platform.OS === "android"
-          ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
-          : RNFS.DocumentDirectoryPath;
+          Platform.OS === "android"
+              ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
+              : RNFS.DocumentDirectoryPath;
 
       setProcessingMedia(true);
 
       setTimeout(() => {
         RNFS.readDir(basePath)
-          .then(files => {
-            console.info("Archivos encontrados en el directorio:", files);
+            .then(files => {
+              console.info("Archivos encontrados en el directorio:", files);
 
-            if (Array.isArray(files) && files.length > 0) {
-              const foundFile = files.find(
-                file =>
-                  file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
-              );
+              if (Array.isArray(files) && files.length > 0) {
+                const foundFile = files.find(
+                    file =>
+                        file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
+                );
 
-              if (foundFile) {
-                console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
-                setCapturedImage(foundFile.path);
-                setShouldRenderUnity(false);
+                if (foundFile) {
+                  console.info("CAPTURA DE PANTALLA ENCONTRADA:", foundFile);
+                  setCapturedImage(foundFile.path);
+                  setShouldRenderUnity(false);
+                } else {
+                  console.error("No se encontró ningún archivo .png en el directorio.");
+                }
               } else {
-                console.error("No se encontró ningún archivo .png en el directorio.");
+                console.error("El directorio está vacío o 'files' no es un array válido.");
               }
-            } else {
-              console.error("El directorio está vacío o 'files' no es un array válido.");
-            }
-          })
-          .catch(err => {
-            console.error("Error leyendo el directorio:", err);
-          })
-          .finally(() => {
-            setProcessingMedia(false);
-          });
+            })
+            .catch(err => {
+              console.error("Error leyendo el directorio:", err);
+            })
+            .finally(() => {
+              setProcessingMedia(false);
+            });
       }, 2000);
     }
   };
@@ -248,6 +268,7 @@ const ARScreen = ({route}) => {
     }
   };
 
+
   const sendModelDataToUnity = () => {
     // console.log("sendModelDataToUnity ingresando por medio de Scan")
     // console.log(textureBase)
@@ -255,14 +276,15 @@ const ARScreen = ({route}) => {
     // console.log(validUserLocation)
     // console.log(textureBase)
     if (
-      unityRef.current &&
-      textureBase &&
-      starModels &&
-      validUserLocation
-      // &&
-      // !hasSentModelDataOnce &&
-      // (isGeoTagMode || isHuntMode ) //TODO Verificar
+        unityRef.current &&
+        textureBase &&
+        starModels &&
+        validUserLocation
+        // &&
+        // !hasSentModelDataOnce &&
+        // (isGeoTagMode || isHuntMode ) //TODO Verificar
     ) {
+      const huntLike = isHuntMode || (isScanMode && !!selectedSite?.scanChallenge?.file_3d);
       const modelData = {
         objFile: starModels.replace("file://", ""),
         mtlFile: modelResource ? modelResource.replace("file://", "") : "",
@@ -274,25 +296,26 @@ const ARScreen = ({route}) => {
           z: 1,
         },
         emissionIntensity: parseFloat(selectedChallengeOverride?.parameters?.emission_value) || 1,
-        rotationSpeed: Number(selectedChallengeOverride.parameters?.loop_delay) || 50,
-        scaleSpeed: Number(selectedChallengeOverride.parameters?.scale_sensitivity) || 0.01,
-        minScale: Number(selectedChallengeOverride.parameters?.min_pinch_scale) || 1,
-        maxScale: Number(selectedChallengeOverride.parameters?.max_pinch_scale) || 1,
+        rotationSpeed: Number(selectedChallengeOverride?.parameters?.loop_delay) || 50,
+        scaleSpeed: Number(selectedChallengeOverride?.parameters?.scale_sensitivity) || 0.01,
+        minScale: Number(selectedChallengeOverride?.parameters?.min_pinch_scale) || 1,
+        maxScale: Number(selectedChallengeOverride?.parameters?.max_pinch_scale) || 1,
         isVisible: isGeoTagMode, //true
         position: {
-          x: parseFloat(selectedChallengeOverride.parameters?.positionX) || 0,
-          y: parseFloat(selectedChallengeOverride.parameters?.positionY) || 0,
+          x: parseFloat(selectedChallengeOverride?.parameters?.positionX) || 0,
+          y: parseFloat(selectedChallengeOverride?.parameters?.positionY) || 0,
           z: 2 || 0.4,
         },
         distanceCamera: 2,
-        isHuntMode: isHuntMode, //true
-        allowScale: isHuntMode, //true
+        isHuntMode: huntLike, //true
+        allowScale: huntLike, //true
       };
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
       // setSendModelData(true);
       setHasSentModelDataOnce(true);
+      console.log("HUNTLIKE", huntLike, '/n', modelData)
     }
   };
 
@@ -301,7 +324,7 @@ const ARScreen = ({route}) => {
     let config = {
       id: "1",
       latitude: -25.296442, // selectedSite?.scanChallenge?.coordinates[1] , // ||
-      longitude:  -57.589580, //selectedSite?.scanChallenge?.coordinates[0], //||
+      longitude: -57.589580, //selectedSite?.scanChallenge?.coordinates[0], //||
       scale: 1.0,
       height: 1,
       isVisible: true,
@@ -323,8 +346,8 @@ const ARScreen = ({route}) => {
     if (selectedSite.selectedMode.mode === AR_MODES.SCAN_MODE) {
       config = {
         ...config,
-        latitude: selectedSite?.coordinates?.coordinates[1], // ||  -25.296442,
-        longitude: selectedSite?.coordinates?.coordinates[0], //||  -57.589580,
+        latitude: selectedSite?.scanChallenge?.coordinates?.coordinates[1], // ||  -25.296442,
+        longitude: selectedSite?.scanChallenge?.coordinates?.coordinates[0], //||  -57.589580,
         height: 1,
         isVisible: true,
         updateRadius: 14.0, // verificar
@@ -338,10 +361,11 @@ const ARScreen = ({route}) => {
         },
       ],
     };
+    console.log("Se Envio SpawnDAta", spawnData);
     unityRef.current.postMessage(
-      "ObjectSpawner",
-      "SpawnObjectsFromReact",
-      JSON.stringify(spawnData)
+        "ObjectSpawner",
+        "SpawnObjectsFromReact",
+        JSON.stringify(spawnData)
     );
     setSendSpawnModelData(true);
   };
@@ -356,43 +380,6 @@ const ARScreen = ({route}) => {
     }
   };
 
-  useEffect(() => {
-    // console.log("Verificando condiciones:");
-    // // console.log("unityRef.current:", unityRef.current);
-    // console.log("starModels:", starModels);
-    // console.log("textureBase:", textureBase);
-    // console.log("userLocation:", userLocation);
-    // console.log("hasSentModelDataOnce:", hasSentModelDataOnce);
-    // console.log("notificationMode:", notificationMode);
-    // console.log(
-    //     "Condición final:",
-    //     unityRef.current &&
-    //     starModels &&
-    //     textureBase &&
-    //     validUserLocation &&
-    //     !hasSentModelDataOnce &&
-    //     (notificationMode === "scan" || notificationMode === "hunt")
-    // );
-    if (
-      unityRef.current &&
-      starModels &&
-      textureBase &&
-      validUserLocation &&
-      !hasSentModelDataOnce &&
-      (notificationMode === "scan" || notificationMode === "hunt")
-    ) {
-      sendModelDataToUnity();
-    }
-  }, [
-    isUnityLoaded,
-    starModels,
-    textureBase,
-    validUserLocation,
-    notificationMode,
-    hasSentModelDataOnce,
-    selectedChallengeOverride,
-    modelResource,
-  ]);
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -407,14 +394,28 @@ const ARScreen = ({route}) => {
     }
   };
 
+
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
     console.log("dataUnity", data)
+
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
     let show = []
     let hide = []
-
+    if (data?.sceneLoading === true) {
+      sceneCycleRef.current += 1;
+      setSceneIsReady(false);
+      setUnityLoading(true);
+      setUnitySceneLoaded(true);
+      bundleRequestedRef.current = false;
+      loadArContentSentRef.current = false;
+    }
+    if (data?.objectDetect) {
+      if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge?.file_3d) {
+        unityRef.current.postMessage("Main Camera", "ShowARObject");
+      }
+    }
     if (buttonBack) {
       navigation?.goBack();
       if (Platform.OS === "android") {
@@ -427,32 +428,25 @@ const ARScreen = ({route}) => {
 
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
+      setSceneIsReady(true);
+      setUnityLoading(false);
       setUnitySceneLoaded(false);
-      if (unityRef.current) {
-        unityRef.current.postMessage("Main Camera", "ResetARContent", "");
+      if (!selectedSite?.selectedMode?.mode) {
+        const show = ["Back", "Details", "ArMode"];
+        const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+        unityRef.current.postMessage(
+            "CanvasController",
+            "ShowHideElements",
+            JSON.stringify({show, hide})
+        );
       }
-
-      // Para ocultar elementos de la interfaz de UNITY
-      const show = ["Back", "Details", "ArMode",];
-      const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-
-      unityRef.current.postMessage(
-        "CanvasController",
-        "ShowHideElements",
-        JSON.stringify({show, hide})
-      );
-      unityRef.current.postMessage(
-          "ArMode",
-          "SetTextArModal",
-          JSON.stringify({titleARMode: "AR MODE", textlabel: " ", visibleLabel: false})
-      );
     }
+
     if (data?.touchEvent?.objectTouched === true) {
-      if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
+      if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge?.file_3d) {
         unityRef.current.postMessage("Main Camera", "ShowARObject");
       }
-      if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE)
-      {
+      if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
         // notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
         navigation.navigate({
           name: "FunFactsScreen",
@@ -467,28 +461,36 @@ const ARScreen = ({route}) => {
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
-        unityRef.current.postMessage(
-            "screen",
-            "SetTypeChallenge",
-            JSON.stringify({
-              typeChallenge: 'PHOTO',
-              arChallenge: true,
-              isLocation: false,
-            })
-        );
-        // TODO Button ARMODE Name
-        unityRef.current.postMessage(
-            "ArMode",
-            "SetTextArModal",
-            JSON.stringify({titleARMode: "Check-In Mode", textlabel: "ArMode", visibleLabel: true})
-        );
-        // TODO Canvas viewers
-        show = ["Back", "Details", "ArMode", 'screen', "position", "points"];
-        hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-        unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({show, hide})
-        );
+        // setSelectedSite(null)
+        setSelectedChallengeOverride(null)
+
+        //     unityRef.current.postMessage(
+        //         "screen",
+        //         "SetTypeChallenge",
+        //         JSON.stringify({
+        //           typeChallenge: "",
+        //           arChallenge: true,
+        //           isLocation: false,
+        //         })
+        //     );
+        //     setTimeout(() => {
+        //       // TODO Canvas viewers
+        //       show = ["Back", "Details", "ArMode", 'screen', "position", "points"];
+        //       hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+        //       unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({show, hide})
+        //       );
+        //     // TODO Button ARMODE Name
+        //     unityRef.current.postMessage(
+        //         "ArMode",
+        //         "SetTextArModal",
+        //         JSON.stringify({titleARMode: "Check-In Mode", textlabel: "ArMode", visibleLabel: true})
+        //     );
+        //
+        // }, 1000);
         break;
       case AR_MODES.SCAN_MODE:
+        // setSelectedSite(null)
+        setSelectedChallengeOverride(null)
         unityRef.current.postMessage(
             "screen",
             "SetTypeChallenge",
@@ -511,40 +513,49 @@ const ARScreen = ({route}) => {
           setShouldRenderUnity(true);
           setUnitySceneLoaded(false);
         }
-        // TODO Button ARMODE Name
-        unityRef.current.postMessage("ArMode", "SetTextArModal", JSON.stringify({titleARMode: "Scan Mode", textlabel: "ArMode", visibleLabel: true})
-        );
         // TODO Canvas viewers
-          if (selectedSite?.scanChallenge?.file_3d){
-            show = ["Back", "Details", "ArMode", "Arrow", "screen", "position","points"];
-            hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-            unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({show, hide})
-            );
-          }
-          else
-            show = ["Back", "Details", "ArMode", "Arrow", "screen",];
-            hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-            unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({show, hide})
-            );
+
+        // if (selectedSite?.scanChallenge?.file_3d) {
+        //   show = ["Back", "Details", "ArMode", "Arrow", "screen", "position", "points"];
+        //   hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+        //   unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({ show, hide }));
+        //   unityRef.current.postMessage("ArMode", "SetTextArModal", JSON.stringify({ titleARMode: "Scan Mode", textlabel: "ArMode", visibleLabel: true }));
+        // } else {
+        //   show = ["Back", "Details", "ArMode", "screen"];
+        //   hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+        //   unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({ show, hide }));
+        //   unityRef.current.postMessage("ArMode", "SetTextArModal", JSON.stringify({ titleARMode: "Scan Mode", textlabel: "ArMode", visibleLabel: true }));
+        // }
 
         break;
       case AR_MODES.HUNT_MODE:
-       // TODO Button ARMODE Name
-        unityRef.current.postMessage(
-          "ArMode",
-          "SetTextArModal",
-          JSON.stringify({titleARMode: "Hunt Mode", textlabel: "ArMode", visibleLabel: false})
-        );
+        // setSelectedSite(null)
+        setSelectedChallengeOverride(null)
+        // TODO Button ARMODE Name
+        // setTimeout(() => {
+        //   const show = ["Back", "Details", "ArMode", "Arrow", "Stars", "points", "position"];
+        //   const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+        //
+        //   unityRef.current.postMessage(
+        //       "CanvasController",
+        //       "ShowHideElements",
+        //       JSON.stringify({ show, hide })
+        //   );
+        //
+        //   unityRef.current.postMessage(
+        //       "ArMode",
+        //       "SetTextArModal",
+        //       JSON.stringify({ titleARMode: "Hunt Mode", textlabel: "ArMode", visibleLabel: false })
+        //   );
+        // }, 1000);
         // TODO Canvas viewers
-        show = ["Back", "Details", "ArMode", "Arrow", "Stars", "points", "position"];
-        hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-        unityRef.current.postMessage("CanvasController", "ShowHideElements", JSON.stringify({show, hide})
-        );
         break;
       default:
         break;
     }
   };
+
+
 
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && selectedSite?.ar_filters.length > 0;
@@ -587,10 +598,8 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
+    let mode = site?.selectedMode?.mode;
     console.log("[ARScreen] startChallengeHandler site", site);
-    if (unityRef.current) {
-      unityRef.current.postMessage("Main Camera", "ResetARContent", "");
-    }
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -643,12 +652,20 @@ const ARScreen = ({route}) => {
       default:
         break;
     }
+    setPendingMode(mode);
     setSelectedSite(site);
     setSelectedChallengeOverride(challengeData);
     setHasSentModelDataOnce(false);
     setSendSpawnModelData(false);
+    setSceneIsReady(false);
+    setUnityLoading(true);
+    setUnitySceneLoaded(true);
     closeModalARMode();
+    if (unityRef.current) {
 
+        unityRef.current?.postMessage("SceneLoader", "LoadSpecificSceneForce", SCENE_NAME);
+
+    }
     setTimeout(() => {
       setShowNotification(true);
     }, 1000);
@@ -671,8 +688,8 @@ const ARScreen = ({route}) => {
               "Main Camera",
               "LoadARContent",
               JSON.stringify({
-                // bundleURL: "",
-                localBundlePath: res.path(),
+                bundleURL: selectedSite?.scanChallenge?.file_animation || "",
+                // localBundlePath: res.path(),
                 localImagePath: selectedSite?.scanChallenge?.file_image || "",
               })
           );
@@ -685,55 +702,328 @@ const ARScreen = ({route}) => {
   };
 
   useEffect(() => {
+    if (!sceneIsReady || !unityRef.current) return;
+
+    const mode = (pendingMode ?? selectedSite?.selectedMode?.mode);
+    if (mode !== AR_MODES.SCAN_MODE) return;
+
+    // si no hay animación, nada que hacer
+    const bundleURL = selectedSite?.scanChallenge?.file_animation || "";
+    if (!bundleURL) return;
+
+    // evita dobles
+    if (loadArContentSentRef.current) return;
+
+    // pequeño cooldown + token de ciclo por si recargó la escena
+    const cycleAtSchedule = sceneCycleRef.current;
+    const t = setTimeout(() => {
+      if (sceneCycleRef.current !== cycleAtSchedule) return;
+      if (!sceneIsReady || !unityRef.current) return;
+
+      const payload = { bundleURL };
+      const has3D = !!selectedSite?.scanChallenge?.file_3d;
+
+
+      if (has3D) {
+        const file3d = selectedSite?.scanChallenge?.file_animation || "";
+        if (file3d) payload.file3d = file3d; // Asumiendo que 'file3d' es el nombre de la propiedad esperada en Unity.
+      }
+      else {
+        const img = selectedSite?.scanChallenge?.file_image || "";
+        if (img) payload.localImagePath = img;
+      }
+
+      unityRef.current.postMessage(
+          "Main Camera",
+          "LoadARContent",
+          JSON.stringify(payload)
+      );
+      loadArContentSentRef.current = true;
+    }, AFTER_SCENE_COOLDOWN_MS);
+
+    return () => clearTimeout(t);
+  }, [
+    sceneIsReady,
+    pendingMode,
+    selectedSite?.selectedMode?.mode,
+    selectedSite?.scanChallenge?.file_animation,
+    selectedSite?.scanChallenge?.file_3d,
+    selectedSite?.scanChallenge?.file_image,
+  ]);
+
+  // arriba:
+// const AFTER_SCENE_COOLDOWN_MS = 400;
+// const sendFlowTimerRef = useRef(null);
+// const sceneCycleRef = useRef(0); // se incrementa en sceneLoading:true
+
+  useEffect(() => {
     if (!unityRef.current) return;
+    if (!sceneIsReady) return;
 
-    if (selectedSite?.selectedMode.mode === AR_MODES.SCAN_MODE) {
-      const has3DFile = selectedSite?.scanChallenge?.file_3d;
-      console.log('has3DFile', has3DFile);
+    if (sendFlowTimerRef.current) {
+      clearTimeout(sendFlowTimerRef.current);
+      sendFlowTimerRef.current = null;
+    }
 
-      if (has3DFile && textureBase && starModels) {
-        console.log("🌟 Enviando modelo 3D desde SCAN_MODE");
-        const distanceDetect = {
-          isDetectionEnabled: true,
-          detectionDistance: 80,
-        };
-        unityRef.current.postMessage(
-            "Main Camera",
-            "SetDetectObjectState",
-            JSON.stringify(distanceDetect)
-        );
-        unityRef.current?.postMessage(
-            "Main Camera",
-            "LoadARContent",
-            JSON.stringify({
-              // bundleURL: "",
-              localBundlePath: bundleFile,
-              // localImagePath: selectedSite?.scanChallenge?.file_image || "",
-            })
-        );
-        sendModelDataToUnity();
-        if (hasSentModelDataOnce) {
-          sendSpawnData();
+    const cycleAtSchedule = sceneCycleRef.current;
 
+    sendFlowTimerRef.current = setTimeout(() => {
+      if (sceneCycleRef.current !== cycleAtSchedule) return;
+      if (!unityRef.current || !sceneIsReady) return;
 
+      // opcional: detección
+      const distanceDetect = { isDetectionEnabled: true, detectionDistance: 80 };
+      unityRef.current.postMessage("Main Camera", "SetDetectObjectState", JSON.stringify(distanceDetect));
+
+      const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
+      const readyForModel = !!validUserLocation && !!starModels && !!textureBase;
+
+      // GEO → solo modelo
+      if (mode === AR_MODES.GEO_TAG_MODE) {
+        if (!hasSentModelDataOnce && readyForModel) sendModelDataToUnity();
+        return;
+      }
+
+      // HUNT / SCAN con 3D → modelo → spawn
+      const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
+      const run3D = mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
+
+      if (run3D) {
+        if (!hasSentModelDataOnce && readyForModel) {
+          sendModelDataToUnity();         // Paso 1
+          return;
         }
-      } else {
-        console.log("📦 Descargando bundle de animación...");
-        downloadARBundle(selectedSite?.scanChallenge?.file_animation);
-        if (bundleFile !== null){
-          unityRef.current?.postMessage(
-              "Main Camera",
-              "LoadARContent",
-              JSON.stringify({
-                // bundleURL: "",
-                localBundlePath: bundleFile,
-                localImagePath: selectedSite?.scanChallenge?.file_image || "",
-              })
-          );
+        if (hasSentModelDataOnce && !sendSpawnModelData) {
+          sendSpawnData();                // Paso 2
+          PointsCount();
+          return;
         }
       }
+    }, AFTER_SCENE_COOLDOWN_MS);
+
+    return () => {
+      if (sendFlowTimerRef.current) {
+        clearTimeout(sendFlowTimerRef.current);
+        sendFlowTimerRef.current = null;
+      }
+    };
+  }, [
+    sceneIsReady,
+    pendingMode,
+    selectedSite?.selectedMode?.mode,
+    validUserLocation,
+    starModels,
+    textureBase,
+    hasSentModelDataOnce,
+    sendSpawnModelData,
+  ]);
+
+
+  useEffect(() => {
+    if (!unityRef.current || !selectedSite?.selectedMode?.mode || !sceneIsReady) return;
+
+    const mode = selectedSite.selectedMode.mode;
+
+    let show = [];
+    let hide = [];
+
+    switch (mode) {
+      case AR_MODES.GEO_TAG_MODE:
+        unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "",
+              arChallenge: true,
+              isLocation: false,
+            })
+        );
+
+        show = ["Back", "Details", "ArMode", "screen", "position", "points"];
+        hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+
+        unityRef.current.postMessage(
+            "CanvasController",
+            "ShowHideElements",
+            JSON.stringify({ show, hide })
+        );
+
+        unityRef.current.postMessage(
+            "ArMode",
+            "SetTextArModal",
+            JSON.stringify({
+              titleARMode: "Check-In Mode",
+              textlabel: "ArMode",
+              visibleLabel: true,
+            })
+        );
+        break;
+
+      case AR_MODES.SCAN_MODE:
+        unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "PHOTO",
+              arChallenge: true,
+              isLocation: false,
+            })
+        );
+
+        // Si ya llegó la foto o video desde Unity
+        // if (data?.photoVideoButton?.isPhoto) {
+        //   setCapturedImage(data.photoVideoButton.filepath);
+        //   setIsUnityLoaded(false);
+        //   setShouldRenderUnity(true);
+        //   setUnitySceneLoaded(false);
+        //   eraseFile();
+        // }
+        // if (data?.photoVideoButton?.isPhoto === false) {
+        //   setCapturedVideo(data.photoVideoButton.filepath);
+        //   setIsUnityLoaded(false);
+        //   setShouldRenderUnity(true);
+        //   setUnitySceneLoaded(false);
+        // }
+
+        const has3DModel = selectedSite?.scanChallenge?.file_3d;
+        show = has3DModel
+            ? ["Back", "Details", "ArMode", "screen", "points"]
+            : ["Back", "Details", "ArMode", "screen"];
+        hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+
+        unityRef.current.postMessage(
+            "CanvasController",
+            "ShowHideElements",
+            JSON.stringify({ show, hide })
+        );
+
+        unityRef.current.postMessage(
+            "ArMode",
+            "SetTextArModal",
+            JSON.stringify({
+              titleARMode: "Scan Mode",
+              textlabel: "ArMode",
+              visibleLabel: true,
+            })
+        );
+        break;
+
+      case AR_MODES.HUNT_MODE:
+        setTimeout(() => {
+          show = ["Back", "Details", "ArMode", "Stars", "points", "position"];
+          hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+
+          unityRef.current.postMessage(
+              "CanvasController",
+              "ShowHideElements",
+              JSON.stringify({ show, hide })
+          );
+
+          unityRef.current.postMessage(
+              "ArMode",
+              "SetTextArModal",
+              JSON.stringify({
+                titleARMode: "Hunt Mode",
+                textlabel: "ArMode",
+                visibleLabel: false,
+              })
+          );
+        }, 1000);
+        break;
+
+      default:
+        break;
     }
-  }, [selectedSite, unityRef, hasSentModelDataOnce, textureBase, bundleFile]);
+  }, [sceneIsReady, selectedSite?.selectedMode?.mode]);
+
+  // useEffect(() => {
+  //   // console.log("Verificando condiciones:");
+  //   // // console.log("unityRef.current:", unityRef.current);
+  //   // console.log("starModels:", starModels);
+  //   // console.log("textureBase:", textureBase);
+  //   // console.log("userLocation:", userLocation);
+  //   // console.log("hasSentModelDataOnce:", hasSentModelDataOnce);
+  //   // console.log("notificationMode:", notificationMode);
+  //   // console.log(
+  //   //     "Condición final:",
+  //   //     unityRef.current &&
+  //   //     starModels &&
+  //   //     textureBase &&
+  //   //     validUserLocation &&
+  //   //     !hasSentModelDataOnce &&
+  //   //     (notificationMode === "scan" || notificationMode === "hunt")
+  //   // );
+  //   if (
+  //       unityRef.current &&
+  //       starModels &&
+  //       textureBase &&
+  //       validUserLocation &&
+  //       !hasSentModelDataOnce &&
+  //       (notificationMode === "scan" || notificationMode === "hunt")
+  //   ) {
+  //     sendModelDataToUnity();
+  //   }
+  // }, [
+  //   isUnityLoaded,
+  //   starModels,
+  //   textureBase,
+  //   validUserLocation,
+  //   notificationMode,
+  //   hasSentModelDataOnce,
+  //   selectedChallengeOverride,
+  //   modelResource,
+  // ]);
+
+  // useEffect(() => {
+  //   if (!unityRef.current) return;
+  //
+  //   if (selectedSite?.selectedMode.mode === AR_MODES.SCAN_MODE) {
+  //     const has3DFile = selectedSite?.scanChallenge?.file_3d;
+  //     console.log('has3DFile', has3DFile);
+  //
+  //     if (has3DFile && textureBase && starModels) {
+  //       console.log("🌟 Enviando modelo 3D desde SCAN_MODE");
+  //       const distanceDetect = {
+  //         isDetectionEnabled: true,
+  //         detectionDistance: 80,
+  //       };
+  //       unityRef.current.postMessage(
+  //           "Main Camera",
+  //           "SetDetectObjectState",
+  //           JSON.stringify(distanceDetect)
+  //       );
+  //       unityRef.current?.postMessage(
+  //           "Main Camera",
+  //           "LoadARContent",
+  //           JSON.stringify({
+  //             // bundleURL: "",
+  //             localBundlePath: bundleFile,
+  //             // localImagePath: selectedSite?.scanChallenge?.file_image || "",
+  //           })
+  //       );
+  //       sendModelDataToUnity();
+  //       if (hasSentModelDataOnce) {
+  //         sendSpawnData();
+  //
+  //
+  //       }
+  //     } else {
+  //       console.log("📦 Descargando bundle de animación...");
+  //       downloadARBundle(selectedSite?.scanChallenge?.file_animation);
+  //       if (bundleFile !== null){
+  //         unityRef.current?.postMessage(
+  //             "Main Camera",
+  //             "LoadARContent",
+  //             JSON.stringify({
+  //               // bundleURL: "",
+  //               localBundlePath: bundleFile,
+  //               localImagePath: selectedSite?.scanChallenge?.file_image || "",
+  //             })
+  //         );
+  //       }
+  //     }
+  //   }
+  // }, [selectedSite, unityRef, hasSentModelDataOnce, textureBase, bundleFile]);
 
   useEffect(() => {
     if (!unityRef.current) return;
@@ -878,37 +1168,37 @@ const ARScreen = ({route}) => {
   //   modelResource,
   // ]);
 
-  useEffect(() => {
-    if (!unityRef.current || unitySceneLoaded) return;
-    // const show = ["Back", "Details", "ArMode",];
-    // const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-    //
-    // unityRef.current.postMessage(
-    //   "CanvasController",
-    //   "ShowHideElements",
-    //   JSON.stringify({show, hide})
-    // );
-    const shouldSendModel =
-      (isGeoTagMode || isHuntMode) &&
-      !hasSentModelDataOnce &&
-      validUserLocation &&
-      textureBase &&
-      starModels;
-
-    if (shouldSendModel) {
-      sendSpawnData();
-      PointsCount();
-    }
-  }, [
-    unitySceneLoaded,
-    isGeoTagMode,
-    isHuntMode,
-    userLocation,
-    textureBase,
-    starModels,
-    hasSentModelDataOnce,
-    sendSpawnModelData,
-  ]);
+  // useEffect(() => {
+  //   if (!unityRef.current || unitySceneLoaded) return;
+  //   // const show = ["Back", "Details", "ArMode",];
+  //   // const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+  //   //
+  //   // unityRef.current.postMessage(
+  //   //   "CanvasController",
+  //   //   "ShowHideElements",
+  //   //   JSON.stringify({show, hide})
+  //   // );
+  //   const shouldSendModel =
+  //     (isGeoTagMode || isHuntMode) &&
+  //     !hasSentModelDataOnce &&
+  //     validUserLocation &&
+  //     textureBase &&
+  //     starModels;
+  //
+  //   if (shouldSendModel) {
+  //     sendSpawnData();
+  //     PointsCount();
+  //   }
+  // }, [
+  //   unitySceneLoaded,
+  //   isGeoTagMode,
+  //   isHuntMode,
+  //   userLocation,
+  //   textureBase,
+  //   starModels,
+  //   hasSentModelDataOnce,
+  //   sendSpawnModelData,
+  // ]);
 
   useFocusEffect(
     useCallback(() => {
@@ -938,49 +1228,151 @@ const ARScreen = ({route}) => {
     }
   }, [isUnityLoaded, unityLoading, shouldRenderUnity]);
 
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     const timeout = setTimeout(() => {
+  //       if (!unitySceneLoaded) {
+  //         if (isGeoTagMode && !hasSentModelDataOnce) {
+  //           sendModelDataToUnity();
+  //         }
+  //         if (isHuntMode && !sendSpawnModelData && selectedSite?.scanChallenge?.file_3d ) {
+  //           sendSpawnData();
+  //           PointsCount();
+  //         }
+  //       }
+  //     }, 1500);
+  //     // if (isHuntMode && !unitySceneLoaded ) {
+  //     //   console.log("🔁 Reenviando sendSpawnData después de volver al foco");
+  //     //   sendSpawnData();
+  //     //   PointsCount();
+  //     // }
+  //     if (isFocusedRef.current) {
+  //       return;
+  //     }
+  //     isFocusedRef.current = true;
+  //     setShouldRenderUnity(true);
+  //     setUnityLoading(true);
+  //     setUnitySceneLoaded(true);
+  //     return () => {
+  //       clearTimeout(timeout);
+  //       // if (unityRef.current && unitySceneLoaded) {
+  //       //   resetUnityScene();
+  //       // }
+  //       setValidUserLocation(false);
+  //       setSelectedChallengeOverride(null);
+  //       setSelectedSite(null);
+  //       isFocusedRef.current = false;
+  //       setUnitySceneLoaded(false);
+  //       setShouldRenderUnity(false);
+  //       setUnityLoading(false);
+  //       setSendSpawnModelData(false);
+  //       setHasSentModelDataOnce(false);
+  //     };
+  //   }, [])
+  // );
+  useEffect(() => {
+    if (selectedSite?.selectedMode?.mode !== AR_MODES.SCAN_MODE) {
+      bundleRequestedRef.current = false;
+    }
+  }, [selectedSite?.selectedMode?.mode]);
   useFocusEffect(
-    useCallback(() => {
-      const timeout = setTimeout(() => {
-        if (!unitySceneLoaded) {
-          if (isGeoTagMode && !hasSentModelDataOnce) {
-            sendModelDataToUnity();
+      useCallback(() => {
+        const timeout = setTimeout(() => {
+          if (!unitySceneLoaded) {
+            const mode = selectedSite?.selectedMode?.mode;
+
+            // GEO: si todavía no se envió el modelo
+            if (mode === AR_MODES.GEO_TAG_MODE && !hasSentModelDataOnce) {
+              sendModelDataToUnity();
+            }
+
+            // HUNT / SCAN con 3D: si no spawneó aún, el orquestador lo hará una vez que vea hasSentModelDataOnce
+            // NO fuerces sendSpawnData acá (evitamos dobles).
           }
-          if (isHuntMode && !sendSpawnModelData) {
-            sendSpawnData();
-            PointsCount();
-          }
-        }
-      }, 1500);
-      // if (isHuntMode && !unitySceneLoaded ) {
-      //   console.log("🔁 Reenviando sendSpawnData después de volver al foco");
-      //   sendSpawnData();
-      //   PointsCount();
-      // }
-      if (isFocusedRef.current) {
-        return;
-      }
-      isFocusedRef.current = true;
-      setShouldRenderUnity(true);
-      setUnityLoading(true);
-      setUnitySceneLoaded(true);
-      return () => {
-        clearTimeout(timeout);
-        // if (unityRef.current && unitySceneLoaded) {
-        //   resetUnityScene();
-        // }
-        setValidUserLocation(false);
-        isFocusedRef.current = false;
-        setUnitySceneLoaded(false);
-        setShouldRenderUnity(false);
-        setUnityLoading(false);
-        setSendSpawnModelData(false);
-        setHasSentModelDataOnce(false);
-      };
-    }, [])
+        }, 1500);
+
+        if (isFocusedRef.current) return;
+
+        isFocusedRef.current = true;
+        setShouldRenderUnity(true);
+        setUnityLoading(true);
+        setUnitySceneLoaded(true);
+
+        return () => {
+          clearTimeout(timeout);
+          setValidUserLocation(false);
+          setSelectedChallengeOverride(null);
+          setSelectedSite(null);
+          isFocusedRef.current = false;
+          setUnitySceneLoaded(false);
+          setShouldRenderUnity(false);
+          setUnityLoading(false);
+          setSendSpawnModelData(false);
+          setHasSentModelDataOnce(false);
+        };
+      }, [])
   );
 
+  useEffect(() => {
+    if (!sceneIsReady || !unityRef.current) return;
+
+    const mode = selectedSite?.selectedMode?.mode;
+    if (mode !== AR_MODES.SCAN_MODE) return;
+
+    const has3D = !!selectedSite?.scanChallenge?.file_3d;
+    if (has3D) return; // si hay 3D, NO descargamos bundle aquí
+
+    const animUrl = selectedSite?.scanChallenge?.file_animation;
+    if (!animUrl) return;          // nada que descargar
+
+    if (bundleRequestedRef.current) return; // ya pedido
+    bundleRequestedRef.current = true;
+
+    // 🔽 tu función existente
+  }, [sceneIsReady, selectedSite?.selectedMode?.mode, selectedSite?.scanChallenge?.file_animation]);
+
+
+  // useEffect(() => {
+  //   const mode = selectedSite?.selectedMode?.mode;
+  //   if (!unityRef.current || !mode) return;
+  //
+  //   // evita recargar si el modo no cambió
+  //   if (!reloadLastModeRef.current) reloadLastModeRef.current = null;
+  //   if (reloadLastModeRef.current === mode) return;
+  //   reloadLastModeRef.current = mode;
+  //
+  //   setPendingMode(mode);
+  //
+  //   setSceneIsReady(false);
+  //   setHasSentModelDataOnce(false);
+  //   setSendSpawnModelData(false);
+  //   setUnityLoading(true);
+  //   setUnitySceneLoaded(true);
+  //
+  //   // pequeño delay para no chocar con otros postMessage del mismo render
+  //   const t = setTimeout(() => {
+  //     unityRef.current.postMessage("SceneLoader", "LoadSpecificSceneForce", SCENE_NAME);
+  //   }, 50);
+  //
+  //   return () => clearTimeout(t);
+  // }, [selectedSite?.selectedMode?.mode]);
+
   const resetArTest = () => {
-    unityRef.current.postMessage("ARResetController", "ResetARState","");
+    let show = ["Back", "Details", "ArMode",];
+    let hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+
+    unityRef.current.postMessage(
+        "CanvasController",
+        "ShowHideElements",
+        JSON.stringify({show, hide})
+    );
+    unityRef.current.postMessage(
+        "ArMode",
+        "SetTextArModal",
+        JSON.stringify({titleARMode: "AR MODE", textlabel: " ", visibleLabel: false})
+    );
+
+    // unityRef.current.postMessage("ARResetController", "ResetARState","");
     setSelectedSite(null)
     setSelectedChallengeOverride(null)
     console.log("se presiono ARTestReset")
@@ -1025,7 +1417,7 @@ const ARScreen = ({route}) => {
                 left: 0,
                 right: 0,
                 bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.99)",
+                backgroundColor: "rgba(0,0,0,0.50)",
                 justifyContent: "center",
                 alignItems: "center",
                 zIndex: 999,
