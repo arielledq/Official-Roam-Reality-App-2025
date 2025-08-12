@@ -23,6 +23,8 @@ import {ELEMENTSUNITY} from "../../constants";
 import Toast from "react-native-toast-message";
 import text from "components/text";
 import {Button} from "react-native-paper";
+import ViewInfoModal from "components/ViewInfoModal";
+import ViewInfoButton from "components/ViewInfoButton";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -36,6 +38,7 @@ const ARScreen = ({route}) => {
   const [notificationMode, setNotificationMode] = useState("scan");
   const [selectedSite, setSelectedSite] = useState(null);
   const navigation = useNavigation();
+  const [challengeInformationView, setChallengeInformationView] = useState(false);
 
   const lastSentLocationRef = useRef(null);
   const viewShotRef = useRef();
@@ -61,7 +64,7 @@ const ARScreen = ({route}) => {
   const [unitySceneLoaded, setUnitySceneLoaded] = useState(true);
   const [validUserLocation, setValidUserLocation] = useState(null);
   const unityRef = useRef(null);
-
+  const [infoText, setInfoText] = useState("");
   // Challenge derived states
   const challengeObj = selectedChallengeOverride;
   const isHuntMode = selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE;
@@ -389,6 +392,15 @@ const ARScreen = ({route}) => {
     }
   };
 
+  const viewInfoButtonHandler = () => {
+    setChallengeInformationView(true);
+    setIsUnityLoaded(false);
+  };
+
+  const closeViewInfoButtonHandler = () => {
+    setChallengeInformationView(false);
+    setIsUnityLoaded(true);
+  };
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
@@ -411,6 +423,9 @@ const ARScreen = ({route}) => {
         unityRef.current.postMessage("Main Camera", "ShowARObject");
       }
     }
+    if (data.infoButton?.isButton) {
+      setChallengeInformationView(data.infoButton?.isButton);
+    }
     if (buttonBack) {
       navigation?.goBack();
       if (Platform.OS === "android") {
@@ -420,19 +435,32 @@ const ARScreen = ({route}) => {
     }
     if (buttonARMode) {
       setOpenModalARMode(true);
-
+    }
+    if (data?.["Reset-AR"] && selectedSite.selectedMode?.mode === AR_MODES.HUNT_MODE) {
+      console.log("Reset AR");
+      //TODO Pending Reset Stars
+      startChallengeHandler()
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
       setSceneIsReady(true);
       setUnityLoading(false);
       setUnitySceneLoaded(false);
       if (!selectedSite?.selectedMode?.mode) {
-        const show = ["Back", "Details", "ArMode"];
+        const show = ["Back", "ArMode"];
         const hide = ELEMENTSUNITY.filter(name => !show.includes(name));
         unityRef.current.postMessage(
             "CanvasController",
             "ShowHideElements",
             JSON.stringify({show, hide})
+        );
+            unityRef.current.postMessage(
+            "ArMode",
+            "SetTextArModal",
+            JSON.stringify({
+              titleARMode: "AR-MODE",
+              textlabel: "",
+              visibleLabel: false,
+            })
         );
       }
     }
@@ -450,8 +478,6 @@ const ARScreen = ({route}) => {
           },
         });
       }
-
-
     }
 
     switch (selectedSite?.selectedMode?.mode) {
@@ -493,7 +519,29 @@ const ARScreen = ({route}) => {
     }
   };
 
+  const viewInfoModalContent = () => {
+    const mode = selectedSite?.selectedMode?.mode;
 
+    if (mode === AR_MODES.SCAN_MODE) {
+      console.log("selectedSite?.scanChallenge?.info;", selectedSite?.scanChallenge?.info)
+      setInfoText( selectedSite?.scanChallenge?.info);
+    } else if (mode === AR_MODES.GEO_TAG_MODE) {
+      setInfoText( selectedSite?.pin_challenge?.info)
+    } else if (mode === AR_MODES.HUNT_MODE) {
+      setInfoText( selectedSite?.huntChallenge?.geo_ar_star?.info)
+    } else {
+      // Retorna algo por defecto si no hay un modo que coincida, o null.
+      return null;
+    }
+  };
+
+  const modals = (
+      <ViewInfoModal
+          isVisible={challengeInformationView}
+          onClose={closeViewInfoButtonHandler}
+          content={infoText}
+      />
+  );
 
   const doneButtonHandler = async () => {
     const hasFilters = capturedImage && selectedSite?.ar_filters.length > 0;
@@ -739,14 +787,23 @@ const ARScreen = ({route}) => {
             "ShowHideElements",
             JSON.stringify({ show, hide })
         );
+        unityRef.current.postMessage(
+            "Scriptposition",
+            "SetTextReAnchor",
+            JSON.stringify({
+              titleARMode: "RESET AR",
+              textlabel: "",
+              visibleLabel: false,
+            })
+        );
 
         unityRef.current.postMessage(
             "ArMode",
             "SetTextArModal",
             JSON.stringify({
-              titleARMode: "Check-In Mode",
-              textlabel: "ArMode",
-              visibleLabel: true,
+              titleARMode: "Geo-Tag",
+              textlabel: "",
+              visibleLabel: false,
             })
         );
         break;
@@ -779,8 +836,8 @@ const ARScreen = ({route}) => {
             "SetTextArModal",
             JSON.stringify({
               titleARMode: "Scan Mode",
-              textlabel: "ArMode",
-              visibleLabel: true,
+              textlabel: "",
+              visibleLabel: false,
             })
         );
         break;
@@ -795,13 +852,21 @@ const ARScreen = ({route}) => {
               "ShowHideElements",
               JSON.stringify({ show, hide })
           );
-
+          unityRef.current.postMessage(
+              "Scriptposition",
+              "SetTextReAnchor",
+              JSON.stringify({
+                titleARMode: "RESET AR",
+                textlabel: "",
+                visibleLabel: false,
+              })
+          );
           unityRef.current.postMessage(
               "ArMode",
               "SetTextArModal",
               JSON.stringify({
                 titleARMode: "Hunt Mode",
-                textlabel: "ArMode",
+                textlabel: "",
                 visibleLabel: false,
               })
           );
@@ -960,9 +1025,9 @@ const ARScreen = ({route}) => {
 
 
   useEffect(() => {
-    if (selectedSite?.selectedMode?.mode !== AR_MODES.SCAN_MODE) {
-      bundleRequestedRef.current = false;
-    }
+  if (selectedSite?.selectedMode?.mode !== AR_MODES.SCAN_MODE) {
+    bundleRequestedRef.current = false;
+  }
   }, [selectedSite?.selectedMode?.mode]);
   useFocusEffect(
       useCallback(() => {
@@ -1018,26 +1083,26 @@ const ARScreen = ({route}) => {
   }, [sceneIsReady, selectedSite?.selectedMode?.mode, selectedSite?.scanChallenge?.file_animation]);
 
 
-  const resetArTest = () => {
-    let show = ["Back", "Details", "ArMode",];
-    let hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-
-    unityRef.current.postMessage(
-        "CanvasController",
-        "ShowHideElements",
-        JSON.stringify({show, hide})
-    );
-    unityRef.current.postMessage(
-        "ArMode",
-        "SetTextArModal",
-        JSON.stringify({titleARMode: "AR MODE", textlabel: " ", visibleLabel: false})
-    );
+  // const resetArTest = () => {
+  //   let show = ["Back", "Details", "ArMode",];
+  //   let hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+  //
+  //   unityRef.current.postMessage(
+  //       "CanvasController",
+  //       "ShowHideElements",
+  //       JSON.stringify({show, hide})
+  //   );
+  //   unityRef.current.postMessage(
+  //       "ArMode",
+  //       "SetTextArModal",
+  //       JSON.stringify({titleARMode: "AR MODE", textlabel: " ", visibleLabel: true})
+  //   );
 
     // unityRef.current.postMessage("ARResetController", "ResetARState","");
-    setSelectedSite(null)
-    setSelectedChallengeOverride(null)
-    console.log("se presiono ARTestReset")
-  };
+  //   setSelectedSite(null)
+  //   setSelectedChallengeOverride(null)
+  //   console.log("se presiono ARTestReset")
+  // };
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -1048,6 +1113,9 @@ const ARScreen = ({route}) => {
         flex: 1,
         backgroundColor: "#000",
       }}
+      modals={modals}
+      headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
+      scrollable={false}
     >
       {shouldRenderUnity && (
         <>
