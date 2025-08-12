@@ -290,14 +290,21 @@ class ARMemoriesViewSet(ViewSet):
     def create(self, request, *args, **kwargs):
         user_id = self.request.user.id
         request.data['user'] = user_id
-        challenges_id = request.data.get("challenges")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(challenges=challenges_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = Challenges.objects.get(pk=challenges_id)
-        # if len(results) < challengeObj.challenge_attempt:
-        request.data['points'] = challengeObj.points
-        request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
+        memory_type = request.data.get("memory_type", None)
+        if memory_type in ['PHOTO', 'VIDEO',]:
+            challenges_id = request.data.get("challenges")
+            criterion1 = Q(user=user_id)
+            criterion2 = Q(challenges=challenges_id)
+            results = ARMemories.objects.filter(criterion1 & criterion2)
+            challengeObj = Challenges.objects.get(pk=challenges_id)
+            # if len(results) < challengeObj.challenge_attempt:
+            request.data['points'] = challengeObj.points
+            request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
+        elif memory_type == 'SCAN_PHOTO':
+            scan_id = request.data.get("scan_id")
+            scan = ScanPicture.objects.get(pk=scan_id)
+            request.data['points'] = scan.points
+            request.data['scan_picture'] = scan_id
         serializer = ARMemoriesSerializer(data=request.data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
