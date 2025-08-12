@@ -108,7 +108,7 @@ export const AR_MODES = {
 export const AR_MODES_MENU = [
   {
     id: 1,
-    label: "Geo-Tag Mode",
+    label: "Geo-Tag",
     name: "Geo-Tag",
     listLabel: "Geo-Tags",
     mode: AR_MODES.GEO_TAG_MODE,
@@ -118,7 +118,7 @@ export const AR_MODES_MENU = [
   },
   {
     id: 2,
-    label: "Scan Mode",
+    label: "Scan",
     name: "Scan",
     listLabel: "Hidden Gems",
     mode: AR_MODES.SCAN_MODE,
@@ -128,7 +128,7 @@ export const AR_MODES_MENU = [
   },
   {
     id: 3,
-    label: "Hunt Mode",
+    label: "Hunt",
     name: "Hunt",
     listLabel: "Hunts",
     mode: AR_MODES.HUNT_MODE,

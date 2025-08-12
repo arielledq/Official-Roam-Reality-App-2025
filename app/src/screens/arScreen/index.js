@@ -378,6 +378,12 @@ const ARScreen = ({route}) => {
     }
   };
 
+  //TODO Pending
+  const unityStarsCount = () => {
+    if (unityRef.current) {
+      unityRef.current.postMessage("Scriptposition", "SetVisibleStars", JSON.stringify({stars: "1/1", isStarsView:true}));
+    }
+  };
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -870,6 +876,7 @@ const ARScreen = ({route}) => {
                 visibleLabel: false,
               })
           );
+
         }, 1000);
         break;
 
