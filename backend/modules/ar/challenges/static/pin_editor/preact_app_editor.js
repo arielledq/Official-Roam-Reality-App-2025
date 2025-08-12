@@ -200,11 +200,11 @@ function App(props) {
                         break;
 
                     case 'band':
-                        color = 'rgb(22,136,4)'
+                        color = 'rgb(43,85,255)'
                         break;
 
                     case 'hunt':
-                        color = 'rgb(236,206,16)'
+                        color = 'rgb(22,136,4)'
                         break;
 
                     default:
