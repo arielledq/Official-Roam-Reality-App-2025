@@ -175,7 +175,7 @@ const ARScreen = ({route}) => {
     setIsUnityLoaded(true);
     setShouldRenderUnity(true);
     setUnityLoading(true);
-    setUnitySceneLoaded(true);
+    setUnitySceneLoaded(false);
   };
 
   const playCameraSound = () => {
@@ -456,7 +456,7 @@ const ARScreen = ({route}) => {
     if (data?.["Reset-AR"] && selectedSite.selectedMode?.mode === AR_MODES.HUNT_MODE) {
       console.log("Reset AR");
       //TODO Pending Reset Stars
-      startChallengeHandler();
+      startChallengeHandler(selectedSite);
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
@@ -505,7 +505,7 @@ const ARScreen = ({route}) => {
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
-        setSelectedChallengeOverride(null)
+        // setSelectedChallengeOverride(null)
         unityRef.current.postMessage(
             "screen",
             "SetTypeChallenge",
@@ -526,7 +526,7 @@ const ARScreen = ({route}) => {
 
         break;
       case AR_MODES.SCAN_MODE:
-        setSelectedChallengeOverride(null);
+        // setSelectedChallengeOverride(null);
         unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
@@ -554,7 +554,7 @@ const ARScreen = ({route}) => {
 
         break;
       case AR_MODES.HUNT_MODE:
-        setSelectedChallengeOverride(null);
+        // setSelectedChallengeOverride(null);
         break;
       default:
         break;
@@ -666,7 +666,7 @@ const ARScreen = ({route}) => {
           challenge_id: huntChallenge?.pin_challenge?.id,
           model_file: huntChallenge?.pin_challenge?.model_file,
           parameters: huntChallenge?.pin_challenge?.parameters,
-          points: huntChallenge?.pin_challenge?.points,
+          points: huntChallenge?.pin_challenge?.points || 10,
           setVisibleButtonPosition: false,
           arChallenge: false,
           isLocation: true,
@@ -710,7 +710,12 @@ const ARScreen = ({route}) => {
     const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
     if (mode !== AR_MODES.SCAN_MODE) return;
 
-    const bundleURL = selectedSite?.scanChallenge?.file_animation || "";
+    let bundleURL = "";
+    if (Platform.OS === 'ios') {
+      bundleURL = selectedSite?.scanChallenge?.file_animation_iOS || "";
+    } else {
+      bundleURL = selectedSite?.scanChallenge?.file_animation || "";
+    }
     if (!bundleURL) return;
 
     if (loadArContentSentRef.current) return;
@@ -741,6 +746,7 @@ const ARScreen = ({route}) => {
     pendingMode,
     selectedSite?.selectedMode?.mode,
     selectedSite?.scanChallenge?.file_animation,
+    // selectedSite?.scanChallenge?.file_animation_iOS, //TODO Cuando exista
     selectedSite?.scanChallenge?.file_3d,
     selectedSite?.scanChallenge?.file_image,
   ]);
@@ -860,6 +866,7 @@ const ARScreen = ({route}) => {
             visibleLabel: false,
           })
         );
+        PointsCount()
         break;
 
       case AR_MODES.SCAN_MODE:
@@ -903,6 +910,7 @@ const ARScreen = ({route}) => {
             visibleLabel: false,
           })
         );
+        PointsCount()
         break;
 
       case AR_MODES.HUNT_MODE:
@@ -942,6 +950,7 @@ const ARScreen = ({route}) => {
               "SetDetectObjectState",
               JSON.stringify(distanceDetect)
           );
+          PointsCount()
           unityStarsCount()
         }, 1000);
         break;
@@ -1128,7 +1137,7 @@ const ARScreen = ({route}) => {
         return () => {
           clearTimeout(timeout);
           setValidUserLocation(false);
-          setSelectedChallengeOverride(null);
+          // setSelectedChallengeOverride(null);
           setSelectedSite(null); //Se puede Activar, Testeo pendiente
           isFocusedRef.current = false;
           setUnitySceneLoaded(false);
