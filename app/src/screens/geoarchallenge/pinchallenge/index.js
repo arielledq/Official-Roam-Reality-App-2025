@@ -52,7 +52,7 @@ const PinChallenge = () => {
   const [shouldRenderUnity, setShouldRenderUnity] = useState(false);
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-
+  console.log("-------------", selectedGeoSite,"-------------")
   const unityRef = useRef(null); // Unity reference
   const watchIdRef = useRef(null);
   const viewShotRef = useRef();
@@ -392,7 +392,7 @@ const PinChallenge = () => {
   };
 
   const viewNotification = () => {
-    if (!isMeInsideInSite) {
+    if (!isMeInsideInSite && unityRef.current) {
       unityRef.current.postMessage(
         "Scriptposition",
         "SetVisibleNotification",

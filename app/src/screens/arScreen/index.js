@@ -25,6 +25,7 @@ import text from "components/text";
 import {Button} from "react-native-paper";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
+import {convertMetersToFeets, findNearestLocationPoint, getLocationDistance, isLocationPointInPolygon} from "util/LocationLib";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -85,7 +86,8 @@ const ARScreen = ({route}) => {
   const [pendingMode, setPendingMode] = useState(null);
   const reloadLastModeRef = useRef(null);
   const bundleRequestedRef = useRef(false);
-
+  const [distanceInFeet, setDistanceInFeet] = useState(0);
+  const [isMeInsideInSite, setIsMeInsideInSite] = useState(false);
   const shouldRun3DFlow = mode => {
     if (!mode) return false;
     if (mode === AR_MODES.HUNT_MODE) return true;
@@ -263,6 +265,62 @@ const ARScreen = ({route}) => {
       }
     }
   };
+
+  // Devuelve el array de anillos (GeoJSON) del sitio activo o null
+  const getActiveBorderCoords = () => {
+    const mode = selectedSite?.selectedMode?.mode;
+
+    // HUNT: viene dentro de huntChallenge.geo_ar_star.geo_site
+    if (mode === AR_MODES.HUNT_MODE) {
+      return selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.geo_site_border?.coordinates || null;
+    }
+
+    // GEO_TAG: puede venir en el propio site o dentro de pin_challenge (fallback)
+    if (mode === AR_MODES.GEO_TAG_MODE) {
+      return (
+          selectedSite?.geo_site_border?.coordinates ||
+          null
+      );
+    }
+
+    // SCAN: normalmente no hay polígono
+    return null;
+  };
+
+
+// Normaliza cualquier objeto {latitude, longitude} a "coords-like"
+  const toCoordsWrapper = loc => ({ coords: { latitude: loc?.latitude, longitude: loc?.longitude } });
+  const isCurrentLocationIsInArea = (lat, lon) => {
+    const border = getActiveBorderCoords();
+    if (!border || lat == null || lon == null) {
+      setIsMeInsideInSite(false);
+      return false;
+    }
+    // Primer anillo (exterior)
+    const outer = border[0];
+    if (!outer || !outer.length) {
+      setIsMeInsideInSite(false);
+      return false;
+    }
+    const ring = outer.map(p => ({ latitude: p[1], longitude: p[0] }));
+    const inside = isLocationPointInPolygon({ latitude: lat, longitude: lon }, ring);
+    setIsMeInsideInSite(inside);
+    return inside;
+  };
+
+// Calcular distancia al punto más cercano del borde
+  const findNearPoint = (lat, lon) => {
+    const border = getActiveBorderCoords();
+    if (!border || lat == null || lon == null) {
+      setDistanceInFeet(0);
+      return;
+    }
+    const arrayPoints = border.flat().map(p => ({ latitude: p[1], longitude: p[0] }));
+    const nearestPoint = findNearestLocationPoint({ latitude: lat, longitude: lon }, arrayPoints);
+    const distance = getLocationDistance({ latitude: lat, longitude: lon }, nearestPoint);
+    setDistanceInFeet(convertMetersToFeets(distance));
+  };
+  console.log('--------------',toCoordsWrapper(),'--------------');
 
   const sendBloomValuesToUnity = () => {
     const bloomData = {threshold, intensity};
@@ -506,15 +564,15 @@ const ARScreen = ({route}) => {
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
         // setSelectedChallengeOverride(null)
-        unityRef.current.postMessage(
-            "screen",
-            "SetTypeChallenge",
-            JSON.stringify({
-              typeChallenge: "PHOTO",
-              arChallenge: true,
-              isLocation: false,
-            })
-        );
+        // unityRef.current.postMessage(
+        //     "screen",
+        //     "SetTypeChallenge",
+        //     JSON.stringify({
+        //       typeChallenge: "PHOTO",
+        //       arChallenge: true,
+        //       isLocation: false,
+        //     })
+        // );
 
           if (data?.photoVideoButton?.isPhoto) {
               setCapturedImage(data.photoVideoButton?.filepath);
@@ -773,7 +831,15 @@ const ARScreen = ({route}) => {
       const readyForModel = !!validUserLocation && !!starModels && !!textureBase;
 
       if (mode === AR_MODES.GEO_TAG_MODE) {
-        if (!hasSentModelDataOnce && readyForModel) sendModelDataToUnity();
+        if (!hasSentModelDataOnce && readyForModel) {
+          sendModelDataToUnity();
+          const messageData = {
+            typeChallenge: "PHOTO",
+            arChallenge: false,
+            isLocation: !!isMeInsideInSite,
+          };
+          unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
+        }
         return;
       }
 
@@ -810,6 +876,43 @@ const ARScreen = ({route}) => {
     sendSpawnModelData,
   ]);
 
+
+
+  useEffect(() => {
+    if (!unityRef.current) return;
+    if (!sceneIsReady) return;
+    if (selectedSite?.selectedMode?.mode !== AR_MODES.GEO_TAG_MODE) return;
+    console.log("isMeInsideInSite", isMeInsideInSite)
+    const messageData = {
+      typeChallenge: "PHOTO",
+      arChallenge: false,
+      isLocation: !!isMeInsideInSite,
+    };
+    unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
+    console.log("messageData", messageData);
+    // (Opcional) pequeño aviso cuando está fuera del área
+    if (!isMeInsideInSite) {
+      const dataNotificationUnity = {
+        isNotification: true,
+        textNotification: "Move inside the site area to take a photo",
+      };
+      unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleNotification",
+          JSON.stringify(dataNotificationUnity)
+      );
+      setTimeout(() => {
+        if (unityRef.current) {
+          unityRef.current.postMessage(
+              "Scriptposition",
+              "SetVisibleNotification",
+              JSON.stringify({ ...dataNotificationUnity, isNotification: false })
+          );
+        }
+      }, 3000);
+    }
+  }, [isMeInsideInSite, sceneIsReady, selectedSite?.selectedMode?.mode]);
+
   useEffect(() => {
     if (!unityRef.current || !selectedSite?.selectedMode?.mode || !sceneIsReady) return;
 
@@ -820,24 +923,6 @@ const ARScreen = ({route}) => {
 
     switch (mode) {
       case AR_MODES.GEO_TAG_MODE:
-        unityRef.current.postMessage(
-            "screen",
-            "SetTypeChallenge",
-            JSON.stringify({
-              typeChallenge: "PHOTO",
-              arChallenge: true,
-              isLocation: false,
-            })
-        );
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "",
-            arChallenge: true,
-            isLocation: false,
-          })
-        );
 
         show = ["Back", "Details", "ArMode", "screen", "position", "points"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
@@ -980,6 +1065,7 @@ const ARScreen = ({route}) => {
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
       position => {
+        const { latitude, longitude } = position.coords;
         if (
           position.coords.latitude === 0 ||
           position.coords.longitude === 0 ||
@@ -1006,6 +1092,10 @@ const ARScreen = ({route}) => {
 
         updateUnityLocation(newLocation);
         lastSentLocationRef.current = newLocation;
+        if (selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE) {
+          const inside = isCurrentLocationIsInArea(latitude, longitude);
+          if (!inside) findNearPoint(latitude, longitude);
+        }
       },
       error => {},
       {
@@ -1022,7 +1112,7 @@ const ARScreen = ({route}) => {
     return () => {
       Geolocation.clearWatch(watchId);
     };
-  }, [unityRef]);
+  }, [unityRef, selectedSite]);
 
   useEffect(() => {
     if (challengeObjParameters) {
@@ -1123,6 +1213,13 @@ const ARScreen = ({route}) => {
           // GEO: si todavía no se envió el modelo
           if (mode === AR_MODES.GEO_TAG_MODE && !hasSentModelDataOnce) {
             sendModelDataToUnity();
+            const messageData = {
+              typeChallenge: "PHOTO",
+              arChallenge: false,
+              isLocation: !!isMeInsideInSite,
+            };
+            unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
+
           }
         }
       }, 1500);
@@ -1137,6 +1234,9 @@ const ARScreen = ({route}) => {
         return () => {
           clearTimeout(timeout);
           setValidUserLocation(false);
+          setCapturedImage(null);
+          setCapturedVideo(null);
+          setIsUnityLoaded(true);
           // setSelectedChallengeOverride(null);
           setSelectedSite(null); //Se puede Activar, Testeo pendiente
           isFocusedRef.current = false;

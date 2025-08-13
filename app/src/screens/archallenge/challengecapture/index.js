@@ -201,6 +201,12 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
       setUnitySceneLoaded(true);
+      viewNotification(true);
+      setTimeout(() => {
+        if (unityRef.current) {
+          viewNotification(false);
+        }
+      }, 5000);
     }
     if (data.photoVideoButton?.isPhoto) {
       setCapturedImage(data.photoVideoButton?.filepath);
@@ -261,15 +267,16 @@ const ArChallengeCapture = ({route, navigation}) => {
   if (!isUnityLoaded) {
     screenPadding = {paddingBottom: 24};
   }
-  useEffect(() => {
-    viewNotification(true);
-
-    const timerId = setTimeout(() => {
-      if (unityRef.current) {
-        viewNotification(false);
-      }
-    }, 5000);
-  }, []);
+  // useEffect(() => {
+  //   if (unitySceneLoaded && unityRef.current) {
+  //     viewNotification(true);
+  //     setTimeout(() => {
+  //       if (unityRef.current) {
+  //         viewNotification(false);
+  //       }
+  //     }, 5000);
+  //   }
+  // }, []);
 
   useEffect(() => {
     const requestPermissions = async () => {
