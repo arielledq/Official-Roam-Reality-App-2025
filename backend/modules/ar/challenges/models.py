@@ -650,6 +650,7 @@ class ScanPicture(models.Model):
         verbose_name='Cooldown (in hours)'
     )
     points = models.IntegerField(verbose_name="Points", default=0)
+    elevation = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Scans"
@@ -723,6 +724,7 @@ class GeoArSite(models.Model):
     )
 
     scan_pictures = models.ManyToManyField(ScanPicture, related_name="geo_sites", blank=True, verbose_name="Scans")
+    elevation = models.IntegerField(null=True, blank=True)
 
     class Meta:
         verbose_name_plural = "Geo AR Site"

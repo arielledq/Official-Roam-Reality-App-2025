@@ -371,7 +371,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
         model = ScanPicture
         geo_field = ('coordinates',)
         fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',
-                  'attempts', 'points', "user_attempts", "cooldown",]
+                  'attempts', 'points', "user_attempts", "cooldown", "elevation",]
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
@@ -443,6 +443,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "scan_pictures",
             "checkin_cooldown",
             "hunt_cooldown",
+            "elevation",
         )
 
     def get_check_ins(self, obj):
