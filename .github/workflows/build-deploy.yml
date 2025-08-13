@@ -3,7 +3,7 @@ name: az-build-deploy
 on:
   push:
     branches:
-      - develop # Staging environment 
+      - develop # Staging environment
       - main    # Production environment
       - master  # Production environment
 env:
