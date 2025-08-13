@@ -1,9 +1,8 @@
-import {StyleSheet, Text, View, Image, SafeAreaView} from "react-native";
+import {StyleSheet, Text, View, Image} from "react-native";
 import {createMaterialBottomTabNavigator} from "react-native-paper/react-navigation";
 import {useTheme} from "react-native-paper";
 import {SafeAreaProvider} from "react-native-safe-area-context";
 
-import ARTipsScreen from "../screens/arTips";
 import Profile from "../screens/profile/profile";
 import Rally from "../screens/rally";
 import GeoArChallenge from "../screens/home";
@@ -12,13 +11,10 @@ import ScoreBoard from "../screens/scoreboard";
 import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
 import ARScreen from "screens/arScreen";
-import FunFactsScreen from "screens/challenges/FunFactsScreen";
-// import {getFocusedRouteNameFromRoute} from "@react-navigation/native";
 
 const Tab = createMaterialBottomTabNavigator();
 
 const BottomTabNavigator = () => {
-  // const BottomTabNavigator = ({route}: {route: any}) => {
   const theme = useTheme();
   theme.colors.secondaryContainer = "transparent";
 
@@ -31,9 +27,6 @@ const BottomTabNavigator = () => {
     );
   };
 
-  // const routeName = getFocusedRouteNameFromRoute(route) ?? "DefaultScreen";
-  // const tabBarStyle = routeName === "Go Navigate" ? {display: "none"} : {display: "flex"};
-
   return (
     <SafeAreaProvider style={styles.container}>
       <Tab.Navigator
@@ -42,9 +35,6 @@ const BottomTabNavigator = () => {
         activeColor="#FFFFFF"
         inactiveColor="#FFFFFF"
         theme={theme}
-        // screenOptions={({route}) => ({
-        //   tabBarStyle: routeName === "Go Navigate" ? {display: "none"} : {display: "flex"},
-        // })}
       >
         <Tab.Screen
           name="GeoArChallenge"
@@ -77,7 +67,6 @@ const BottomTabNavigator = () => {
         <Tab.Screen
           name="Go Navigate"
           // @ts-ignore
-          // component={FunFactsScreen}
           component={ARScreen}
           options={{
             tabBarLabel: "",
@@ -89,7 +78,6 @@ const BottomTabNavigator = () => {
                 style={styles.cameraTabStyle}
               />
             ),
-            // tabBarStyle: {display: "none"},
           }}
         />
         <Tab.Screen
