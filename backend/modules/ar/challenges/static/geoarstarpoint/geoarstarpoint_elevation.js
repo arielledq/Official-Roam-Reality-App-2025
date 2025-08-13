@@ -7,10 +7,13 @@ document.addEventListener('DOMContentLoaded', function(){
   elevField.parentNode.insertBefore(btn, elevField.nextSibling);
 
   btn.addEventListener('click', function(){
-    const raw = document.getElementById('id_location').value;
-    const point = JSON.parse(raw);
-    const [x, y] = point.coordinates;
-    const [lng, lat] = ol.proj.toLonLat([x, y]);
+    const lat = document.getElementById('id_latitude').value;
+    const lng = document.getElementById('id_longitude').value;
+    console.log("lat", lat, "lng", lng);
+    // const raw = document.getElementById('id_location').value;
+    // const point = JSON.parse(raw);
+    // const [x, y] = point.coordinates;
+    // const [lng, lat] = ol.proj.toLonLat([longitude, latitude]);
 
     const url =
       `https://api.mapbox.com/v4/` +

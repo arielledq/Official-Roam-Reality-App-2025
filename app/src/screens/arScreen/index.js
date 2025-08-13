@@ -175,7 +175,7 @@ const ARScreen = ({route}) => {
     setIsUnityLoaded(true);
     setShouldRenderUnity(true);
     setUnityLoading(true);
-    setUnitySceneLoaded(true);
+    setUnitySceneLoaded(false);
   };
 
   const playCameraSound = () => {
@@ -292,11 +292,17 @@ const ARScreen = ({route}) => {
           y: 1,
           z: 1,
         },
+        rotation: {x: 0, y: 0, z: 0},
         emissionIntensity: parseFloat(selectedChallengeOverride?.parameters?.emission_value) || 1,
         rotationSpeed: Number(selectedChallengeOverride?.parameters?.loop_delay) || 50,
+        // rotationSpeed:1,
         scaleSpeed: Number(selectedChallengeOverride?.parameters?.scale_sensitivity) || 0.01,
+        // scaleSpeed: 0.1,
         minScale: Number(selectedChallengeOverride?.parameters?.min_pinch_scale) || 1,
         maxScale: Number(selectedChallengeOverride?.parameters?.max_pinch_scale) || 1,
+        // minScale: 0.1,
+        // maxScale:  10,
+        // isRotationEnabled: true,
         isVisible: isGeoTagMode, //true
         position: {
           x: parseFloat(selectedChallengeOverride?.parameters?.positionX) || 0,
@@ -306,6 +312,8 @@ const ARScreen = ({route}) => {
         distanceCamera: 2,
         isHuntMode: huntLike, //true
         allowScale: huntLike, //true
+        // allowScale: true
+
       };
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
@@ -448,7 +456,10 @@ const ARScreen = ({route}) => {
     if (data?.["Reset-AR"] && selectedSite.selectedMode?.mode === AR_MODES.HUNT_MODE) {
       console.log("Reset AR");
       //TODO Pending Reset Stars
-      startChallengeHandler();
+      startChallengeHandler(selectedSite);
+    }
+    if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
+      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative 1") {
       setSceneIsReady(true);
@@ -494,28 +505,28 @@ const ARScreen = ({route}) => {
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
-        setSelectedChallengeOverride(null);
+        // setSelectedChallengeOverride(null)
         unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "PHOTO",
-            arChallenge: true,
-            isLocation: false,
-          })
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "PHOTO",
+              arChallenge: true,
+              isLocation: false,
+            })
         );
 
-        if (data?.photoVideoButton?.isPhoto) {
-          setCapturedImage(data.photoVideoButton?.filepath);
-          setIsUnityLoaded(false);
-          setShouldRenderUnity(true);
-          setUnitySceneLoaded(false);
-          eraseFile();
-        }
+          if (data?.photoVideoButton?.isPhoto) {
+              setCapturedImage(data.photoVideoButton?.filepath);
+              setIsUnityLoaded(false);
+              setShouldRenderUnity(true);
+              setUnitySceneLoaded(false);
+              eraseFile();
+          }
 
         break;
       case AR_MODES.SCAN_MODE:
-        setSelectedChallengeOverride(null);
+        // setSelectedChallengeOverride(null);
         unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
@@ -525,6 +536,7 @@ const ARScreen = ({route}) => {
             isLocation: false,
           })
         );
+
         if (data?.photoVideoButton?.isPhoto) {
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
@@ -532,10 +544,17 @@ const ARScreen = ({route}) => {
           setUnitySceneLoaded(false);
           eraseFile();
         }
+        // if (data?.photoVideoButton?.isPhoto == false) {
+        //   setCapturedVideo(data.photoVideoButton?.filepath);
+        //   setIsUnityLoaded(false);
+        //   setShouldRenderUnity(true);
+        //   setUnitySceneLoaded(false);
+        //   eraseFile();
+        // }
 
         break;
       case AR_MODES.HUNT_MODE:
-        setSelectedChallengeOverride(null);
+        // setSelectedChallengeOverride(null);
         break;
       default:
         break;
@@ -647,7 +666,7 @@ const ARScreen = ({route}) => {
           challenge_id: huntChallenge?.pin_challenge?.id,
           model_file: huntChallenge?.pin_challenge?.model_file,
           parameters: huntChallenge?.pin_challenge?.parameters,
-          points: huntChallenge?.pin_challenge?.points,
+          points: huntChallenge?.pin_challenge?.points || 10,
           setVisibleButtonPosition: false,
           arChallenge: false,
           isLocation: true,
@@ -674,13 +693,29 @@ const ARScreen = ({route}) => {
     }, 1000);
   };
 
+  useFocusEffect(
+      useCallback(() => {
+        const timeout = setTimeout(() => {
+          if (unityRef.current) {
+            unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
+          }
+        }, 500);
+
+        return () => clearTimeout(timeout);
+      }, [])
+  );
   useEffect(() => {
     if (!sceneIsReady || !unityRef.current) return;
 
     const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
     if (mode !== AR_MODES.SCAN_MODE) return;
 
-    const bundleURL = selectedSite?.scanChallenge?.file_animation || "";
+    let bundleURL = "";
+    if (Platform.OS === 'ios') {
+      bundleURL = selectedSite?.scanChallenge?.file_animation_iOS || "";
+    } else {
+      bundleURL = selectedSite?.scanChallenge?.file_animation || "";
+    }
     if (!bundleURL) return;
 
     if (loadArContentSentRef.current) return;
@@ -711,6 +746,7 @@ const ARScreen = ({route}) => {
     pendingMode,
     selectedSite?.selectedMode?.mode,
     selectedSite?.scanChallenge?.file_animation,
+    // selectedSite?.scanChallenge?.file_animation_iOS, //TODO Cuando exista
     selectedSite?.scanChallenge?.file_3d,
     selectedSite?.scanChallenge?.file_image,
   ]);
@@ -785,6 +821,15 @@ const ARScreen = ({route}) => {
     switch (mode) {
       case AR_MODES.GEO_TAG_MODE:
         unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "PHOTO",
+              arChallenge: true,
+              isLocation: false,
+            })
+        );
+        unityRef.current.postMessage(
           "screen",
           "SetTypeChallenge",
           JSON.stringify({
@@ -811,15 +856,6 @@ const ARScreen = ({route}) => {
             visibleLabel: false,
           })
         );
-        unityRef.current.postMessage(
-          "Scriptposition",
-          "SetTextReAnchor",
-          JSON.stringify({
-            titleARMode: "RESET AR",
-            textlabel: "",
-            visibleLabel: false,
-          })
-        );
 
         unityRef.current.postMessage(
           "ArMode",
@@ -830,6 +866,7 @@ const ARScreen = ({route}) => {
             visibleLabel: false,
           })
         );
+        PointsCount()
         break;
 
       case AR_MODES.SCAN_MODE:
@@ -873,6 +910,7 @@ const ARScreen = ({route}) => {
             visibleLabel: false,
           })
         );
+        PointsCount()
         break;
 
       case AR_MODES.HUNT_MODE:
@@ -912,6 +950,7 @@ const ARScreen = ({route}) => {
               "SetDetectObjectState",
               JSON.stringify(distanceDetect)
           );
+          PointsCount()
           unityStarsCount()
         }, 1000);
         break;
@@ -921,15 +960,16 @@ const ARScreen = ({route}) => {
     }
   }, [sceneIsReady, selectedSite?.selectedMode?.mode]);
 
-  useEffect(() => {
-    if (!unityRef.current) return;
-
-    const timeout = setTimeout(() => {
-      unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
-    }, 500);
-
-    return () => clearTimeout(timeout);
-  }, [unityLoading, isUnityLoaded]);
+  //
+  // useEffect(() => {
+  //   if (!unityRef.current) return;
+  //
+  //   const timeout = setTimeout(() => {
+  //     unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
+  //   }, 500);
+  //
+  //   return () => clearTimeout(timeout);
+  // }, [unityLoading, isUnityLoaded]);
 
   useEffect(() => {
     if (challengeObj && modelFile) {
@@ -1024,7 +1064,7 @@ const ARScreen = ({route}) => {
       return () => clearTimeout(timer);
     }
   }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
-
+//TODO Check
   useEffect(() => {
     if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
       startChallengeHandler(huntChallenge);
@@ -1094,19 +1134,19 @@ const ARScreen = ({route}) => {
       setUnityLoading(true);
       setUnitySceneLoaded(true);
 
-      return () => {
-        clearTimeout(timeout);
-        setValidUserLocation(false);
-        setSelectedChallengeOverride(null);
-        setSelectedSite(null);
-        isFocusedRef.current = false;
-        setUnitySceneLoaded(false);
-        setShouldRenderUnity(false);
-        setUnityLoading(false);
-        setSendSpawnModelData(false);
-        setHasSentModelDataOnce(false);
-      };
-    }, [])
+        return () => {
+          clearTimeout(timeout);
+          setValidUserLocation(false);
+          // setSelectedChallengeOverride(null);
+          setSelectedSite(null); //Se puede Activar, Testeo pendiente
+          isFocusedRef.current = false;
+          setUnitySceneLoaded(false);
+          setShouldRenderUnity(false);
+          setUnityLoading(false);
+          setSendSpawnModelData(false);
+          setHasSentModelDataOnce(false);
+        };
+      }, [])
   );
 
   useEffect(() => {

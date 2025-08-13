@@ -212,11 +212,28 @@ class ScanPictureForm(PointFieldForm, forms.ModelForm):
         model = ScanPicture
         fields = '__all__'
 
+    class Media:
+        js = (
+            'https://api.mapbox.com/mapbox-gl-js/v2.14.1/mapbox-gl.js',
+            'geoarstarpoint/geoarstarpoint_elevation.js',
+        )
+
 
 @admin.register(ScanPicture)
 class ScanPictureAdmin(admin.ModelAdmin):
     form = ScanPictureForm
+    change_form_template = 'admin/geoarstarpoint/change_form.html'
     list_display = ('name',)
+
+    def change_view(self, request, object_id, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['MAPBOX_TOKEN'] = settings.MAPBOX_TOKEN
+        return super().change_view(request, object_id, form_url, extra_context)
+
+    def add_view(self, request, form_url='', extra_context=None):
+        extra_context = extra_context or {}
+        extra_context['MAPBOX_TOKEN'] = settings.MAPBOX_TOKEN
+        return super().add_view(request, form_url, extra_context)
 
 
 class GeoARStarPointForm(PointFieldForm, forms.ModelForm):
