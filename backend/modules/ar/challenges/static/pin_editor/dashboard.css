@@ -58,3 +58,7 @@
     font-size: 1.2em;
     margin-left: 10px;
 }
+
+.mapboxgl-popup-content {
+  color: #000000;
+}
