@@ -1,24 +1,17 @@
-import { makeStyles } from "@rneui/themed";
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {FontFamily, FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 
 const useStyles = makeStyles(theme => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
   },
-  nameContainer: { flex: 1 },
+  nameContainer: {flex: 1},
   name: {
     ...fontGroup.nunitoBold,
     color: theme.colors.white,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH40,
-  },
-  name1: {
-    ...fontGroup.nunitoBold,
-    color: theme.colors.white,
-    fontSize: FontSizes.S30,
-    lineHeight: FontLineHeights.LH40,
-    marginTop: 150,
   },
   userName: {
     ...fontGroup.nunitoRegular,
