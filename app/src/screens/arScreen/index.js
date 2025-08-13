@@ -330,7 +330,7 @@ const ARScreen = ({route}) => {
       isHuntMode: false,
     };
 
-    if (selectedSite.selectedMode.mode === AR_MODES.HUNT_MODE) {
+    if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
       config = {
         ...config,
         latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
@@ -341,7 +341,7 @@ const ARScreen = ({route}) => {
         isHuntMode: true,
       };
     }
-    if (selectedSite.selectedMode.mode === AR_MODES.SCAN_MODE) {
+    if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
       config = {
         ...config,
         latitude: selectedSite?.scanChallenge?.coordinates?.coordinates[1], // ||  -25.296442,
@@ -380,8 +380,9 @@ const ARScreen = ({route}) => {
 
   //TODO Pending
   const unityStarsCount = () => {
-    if (unityRef.current) {
-      unityRef.current.postMessage("Scriptposition", "SetVisibleStars", JSON.stringify({stars: "1/1", isStarsView:true}));
+    if (unityRef.current && selectedSite?.huntChallenge) {
+
+      unityRef.current.postMessage("Scriptposition", "SetVisibleStars", JSON.stringify({stars: `${selectedSite?.huntChallenge?.captured_stars}/${selectedSite?.huntChallenge?.total_stars}`, isStarsView:true}));
     }
   };
 
@@ -527,16 +528,13 @@ const ARScreen = ({route}) => {
 
   const viewInfoModalContent = () => {
     const mode = selectedSite?.selectedMode?.mode;
-
     if (mode === AR_MODES.SCAN_MODE) {
-      console.log("selectedSite?.scanChallenge?.info;", selectedSite?.scanChallenge?.info)
-      setInfoText( selectedSite?.scanChallenge?.info);
+      return selectedSite?.scanChallenge?.info;
     } else if (mode === AR_MODES.GEO_TAG_MODE) {
-      setInfoText( selectedSite?.pin_challenge?.info)
+      return selectedSite?.pin_challenge?.info;
     } else if (mode === AR_MODES.HUNT_MODE) {
-      setInfoText( selectedSite?.huntChallenge?.geo_ar_star?.info)
+      return selectedSite?.huntChallenge?.geo_ar_star?.info;
     } else {
-      // Retorna algo por defecto si no hay un modo que coincida, o null.
       return null;
     }
   };
@@ -545,7 +543,7 @@ const ARScreen = ({route}) => {
       <ViewInfoModal
           isVisible={challengeInformationView}
           onClose={closeViewInfoButtonHandler}
-          content={infoText}
+          content={viewInfoModalContent()}
       />
   );
 
@@ -720,7 +718,7 @@ const ARScreen = ({route}) => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      const distanceDetect = { isDetectionEnabled: true, detectionDistance: 80 };
+      const distanceDetect = { isDetectionEnabled: true, detectionDistance: 10 };
       unityRef.current.postMessage("Main Camera", "SetDetectObjectState", JSON.stringify(distanceDetect));
 
       const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
@@ -824,6 +822,15 @@ const ARScreen = ({route}) => {
               isLocation: false,
             })
         );
+        const distanceDetect = {
+          isDetectionEnabled: true,
+          detectionDistance: 10,
+        };
+        unityRef.current.postMessage(
+            "Main Camera",
+            "SetDetectObjectState",
+            JSON.stringify(distanceDetect)
+        );
 
         const has3DModel = selectedSite?.scanChallenge?.file_3d;
         show = has3DModel
@@ -876,7 +883,16 @@ const ARScreen = ({route}) => {
                 visibleLabel: false,
               })
           );
-
+          const distanceDetect = {
+            isDetectionEnabled: true,
+            detectionDistance: 20,
+          };
+          unityRef.current.postMessage(
+              "Main Camera",
+              "SetDetectObjectState",
+              JSON.stringify(distanceDetect)
+          );
+          unityStarsCount()
         }, 1000);
         break;
 
@@ -1013,15 +1029,15 @@ const ARScreen = ({route}) => {
 
   useEffect(() => {
     if (unityRef.current && !unityLoading && shouldRenderUnity) {
-      const distanceDetect = {
-        isDetectionEnabled: true,
-        detectionDistance: 80,
-      };
-      unityRef.current.postMessage(
-        "Main Camera",
-        "SetDetectObjectState",
-        JSON.stringify(distanceDetect)
-      );
+      // const distanceDetect = {
+      //   isDetectionEnabled: true,
+      //   detectionDistance: 80,
+      // };
+      // unityRef.current.postMessage(
+      //   "Main Camera",
+      //   "SetDetectObjectState",
+      //   JSON.stringify(distanceDetect)
+      // );
       unityRef.current.postMessage(
         "OBJImport",
         "SetLoadingVisibility",

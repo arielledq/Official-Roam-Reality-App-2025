@@ -45,6 +45,7 @@ export const ELEMENTSUNITY = [
   "Stars",
   "Details",
   "CompassArrow",
+  "Distancia",
   "Arrow",]
 
 export const EXPERIENCE_TYPE_CHOICES = {
