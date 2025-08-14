@@ -2952,9 +2952,9 @@ camelize@^1.0.0:
   integrity sha512-dU+Tx2fsypxTgtLoE36npi3UqcjSSMNYfkqgmoEhtZrraP5VWq0K7FkWVTYa8eMPtnU/G2txVsfdCJTn9uzpuQ==
 
 caniuse-lite@^1.0.30001733:
-  version "1.0.30001734"
-  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001734.tgz#f97e08599e2d75664543ae4b6ef25dc2183c5cc6"
-  integrity sha512-uhE1Ye5vgqju6OI71HTQqcBCZrvHugk0MjLak7Q+HfoBgoq5Bi+5YnwjP4fjDgrtYr/l8MVRBvzz9dPD4KyK0A==
+  version "1.0.30001735"
+  resolved "https://registry.yarnpkg.com/caniuse-lite/-/caniuse-lite-1.0.30001735.tgz#ba658fd3fd24a4106fd68d5ce472a2c251494dbe"
+  integrity sha512-EV/laoX7Wq2J9TQlyIXRxTJqIw4sxfXS4OYgudGxBYRuTv0q7AM6yMEpU/Vo1I94thg9U6EZ2NfZx9GJq83u7w==
 
 chalk@^4.0.0, chalk@^4.1.0, chalk@^4.1.2:
   version "4.1.2"
@@ -5443,9 +5443,9 @@ jsonfile@^4.0.0:
     graceful-fs "^4.1.6"
 
 jsonfile@^6.0.1:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-6.1.0.tgz#bc55b2634793c679ec6403094eb13698a6ec0aae"
-  integrity sha512-5dgndWOriYSm5cnYaJNhalLNDKOqFwyDB/rr1E9ZsGciGvKPs8R2xYGCacuf3z6K1YKDz182fd+fY3cn3pMqXQ==
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/jsonfile/-/jsonfile-6.2.0.tgz#7c265bd1b65de6977478300087c99f1c84383f62"
+  integrity sha512-FGuPw30AdOIUTRMC2OMRtQV+jkVj2cfPqSeWXv1NEAJ1qZ5zb1X6z1mFhbfOB/iy3ssJCD+3KuZ8r8C3uVFlAg==
   dependencies:
     universalify "^2.0.0"
   optionalDependencies:
@@ -6782,10 +6782,10 @@ react-native-map-link@^3.9.0:
   resolved "https://registry.yarnpkg.com/react-native-map-link/-/react-native-map-link-3.9.0.tgz#488eeb6ffa6a8164f1952ce230ab9a224d7855c4"
   integrity sha512-3Aod4Y/5wtueR0ss6ffPzW5idz9oGYymm8WdnTJihJ89AXC6O1w/ausxdcBO0vmVGPhVlNicJPPZogp2l1oW8A==
 
-react-native-maps@1.20.1:
-  version "1.20.1"
-  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-1.20.1.tgz#f613364886b2f72db56cafcd2bd7d3a35f470dfb"
-  integrity sha512-NZI3B5Z6kxAb8gzb2Wxzu/+P2SlFIg1waHGIpQmazDSCRkNoHNY4g96g+xS0QPSaG/9xRBbDNnd2f2/OW6t6LQ==
+react-native-maps@1.24.3:
+  version "1.24.3"
+  resolved "https://registry.yarnpkg.com/react-native-maps/-/react-native-maps-1.24.3.tgz#05ab0ddedd03c8f63dd52141fe7f0583b1a5cb2e"
+  integrity sha512-cF5oTA8z24QqGIRFfDcsXLEs/gCd0RhaJ9KPv/2HiogKD5gpjh1naimZUJQ6IsEcUngSSk8iov6p2jd7dB+/bQ==
   dependencies:
     "@types/geojson" "^7946.0.13"
 
@@ -6885,9 +6885,9 @@ react-native-safe-area-context@^5.5.2:
   integrity sha512-tJas3YOdsuCg3kepCTGF3LWZp9onMbb9Agju2xfs2kRX8d/5TMUPmupBpjerk/B7Tv/zeJnk+qp5neA96Y0otQ==
 
 react-native-screens@^4.13.1:
-  version "4.13.1"
-  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.13.1.tgz#bf19f09b76dee90b5f7bd8aab3c951a565dd111d"
-  integrity sha512-EESsMAtyzYcL3gpAI2NKKiIo+Ew0fnX4P4b3Zy/+MTc6SJIo3foJbZwdIWd/SUBswOf7IYCvWBppg+D8tbwnsw==
+  version "4.14.1"
+  resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.14.1.tgz#7d440cb19752dc8dd46c07cca46222df10e4e38d"
+  integrity sha512-/7zxVdk2H4BH/dvqpQQh45VCA05UeC+LCE8TPtGfjn5A+9/UJfKPB8LHhAcWxciLYfMCyW8J2u5dGLGQJH/Ecg==
   dependencies:
     react-freeze "^1.0.0"
     react-native-is-edge-to-edge "^1.2.1"
@@ -7068,9 +7068,9 @@ reactotron-core-contract@0.2.5:
   integrity sha512-pxuXFG1jffAWQSdT0FBws+/Xvl8++6T6WrAi4g7AxIZU5FPeut2wq//0yDhDWx6lF82eAo5JTZK7zECQy45QxA==
 
 reactotron-react-native@^5.1.13:
-  version "5.1.14"
-  resolved "https://registry.yarnpkg.com/reactotron-react-native/-/reactotron-react-native-5.1.14.tgz#65d3e8ed0e1e94c9fdb84e374dd2aa455a403067"
-  integrity sha512-D4TVQ4qei4jYNyJQBs1/DDxnMrJLiYxHjrZbOziAGPr9WA0kBMZ1X7INdIR9CaJtqpw9770fgVzOyYXtayXZVg==
+  version "5.1.15"
+  resolved "https://registry.yarnpkg.com/reactotron-react-native/-/reactotron-react-native-5.1.15.tgz#ccf1e8e9cdb9becd81c332b657962cd1f1e42414"
+  integrity sha512-6uUqRirt5rflxr71w4tOsP8o02cGk7D1dne0E32+8c8/EX6YrIs5x5v+ghRvIGwRJ7cDwdvVWayWD2Qa1msY8w==
   dependencies:
     mitt "^3.0.1"
     reactotron-core-client "2.9.7"
