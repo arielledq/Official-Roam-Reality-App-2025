@@ -7,7 +7,7 @@ import Video from "react-native-video";
 import {useDispatch} from "react-redux";
 import {RouteProp} from "@react-navigation/native";
 
-import {SHARE_CONDITIONS_TEXT, SSNN} from "../../constants";
+import {AR_MODES, SHARE_CONDITIONS_TEXT, SSNN} from "../../constants";
 import {
   getARProfile,
   postArMemory,
@@ -47,6 +47,7 @@ const ArChallengeShare = () => {
   const [hasPermission, setHasPermission] = useState(false);
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
   const [disableBackButton, setDisableBackButton] = useState(false);
+  const [hideBackButton, setHideBackButton] = useState(false);
   const [socialPointsCounter, setSocialPointsCounter] = useState({
     facebook: 0,
     instagram: 0,
@@ -72,15 +73,10 @@ const ArChallengeShare = () => {
   const challengeType = route?.params?.challengeType;
   const isMemory = route?.params?.isMemory;
 
+  console.log("challengeObj", challengeObj);
+
   let screenTitle = "";
-  let challengePoints = 0;
-  if (challengeObj?.points) {
-    challengePoints =
-      challengeObj.points +
-      socialPointsCounter.facebook +
-      socialPointsCounter.instagram +
-      socialPointsCounter.others;
-  }
+  let challengePoints = challengeObj?.points || 0;
 
   let sponsor = challengeObj?.sponsored;
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
@@ -97,6 +93,24 @@ const ArChallengeShare = () => {
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
+      break;
+    case AR_MODES.SCAN_MODE:
+      sponsor = challengeObj?.sponsor;
+      sponsorImage = sponsor?.image;
+      sponsorName = sponsor?.name;
+      challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
+      challengePoints = challengeObj?.pin_challenge?.points || 0;
+      challengePoints +=
+        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
+      break;
+    case AR_MODES.GEO_TAG_MODE:
+      sponsor = challengeObj?.sponsor;
+      sponsorImage = sponsor?.image;
+      sponsorName = sponsor?.name;
+      challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
+      challengePoints = challengeObj?.pin_challenge?.points || 0;
+      challengePoints +=
+        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
       break;
     case CHALLENGES_TYPE.STAR:
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
@@ -115,6 +129,11 @@ const ArChallengeShare = () => {
       break;
 
     default:
+      challengePoints =
+        challengeObj.points +
+        socialPointsCounter.facebook +
+        socialPointsCounter.instagram +
+        socialPointsCounter.others;
       break;
   }
 
@@ -132,12 +151,11 @@ const ArChallengeShare = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.facebook;
           if (currCounter.facebook === 0) {
-            console.log("granting points for facebook");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
             setDisableBackButton(true);
           } else {
-            console.log(" not counting more points but allowing to share... ");
+            console.info(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -149,12 +167,11 @@ const ArChallengeShare = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.instagram;
           if (currCounter.instagram === 0) {
-            console.log("granting points for instagram");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
             setDisableBackButton(true);
           } else {
-            console.log(" not counting more points but allowing to share... ");
+            console.info(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -166,12 +183,11 @@ const ArChallengeShare = () => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.others;
           if (currCounter.others === 0) {
-            console.log("granting points for others");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
             setDisableBackButton(true);
           } else {
-            console.log(" not counting more points but allowing to share... ");
+            console.info(" not counting more points but allowing to share... ");
           }
           return {
             ...currCounter,
@@ -201,7 +217,13 @@ const ArChallengeShare = () => {
       if (challengeType === CHALLENGES_TYPE.PHOTO_VIDEO) {
         formData.append("challenges", challengeObj?.id);
         formData.append("memory_file", shareFile);
-        formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
+        let memoryType = "";
+        if (challengeObj?.memory_type) {
+          memoryType = challengeObj?.memory_type;
+        } else {
+          memoryType = fileExt == "mp4" ? "VIDEO" : "PHOTO";
+        }
+        formData.append("memory_type", memoryType);
         res = await postArMemory(formData);
       }
       if (challengeType === CHALLENGES_TYPE.PIN_CHECK_IN) {
@@ -211,19 +233,27 @@ const ArChallengeShare = () => {
 
         res = await postGeoPinCheckIn(formData);
       }
-      // case CHALLENGES_TYPE.STAR:
-      //   res = await starFoundAndSaveApi({
-      //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-      //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
-      //     geo_ar_star_point: challengeObj?.id, // id de la estrella
-      //     latitude: userLocation?.latitude,
-      //     longitude: userLocation?.longitude,
-      //   });
+      if (challengeType === AR_MODES.SCAN_MODE) {
+        formData.append("scan_id", challengeObj?.scanChallenge?.id);
+        shareFile = {
+          ...shareFile,
+          uri: capturedDataUri,
+        };
+        formData.append("memory_file", shareFile);
+        formData.append("memory_type", challengeObj?.memory_type);
+        res = await postArMemory(formData);
+      }
+      if (challengeType === AR_MODES.GEO_TAG_MODE) {
+        formData.append("geo_challenge", challengeObj?.pin_challenge?.id);
+        formData.append("geo_site", challengeObj?.id);
+        shareFile = {
+          ...shareFile,
+          uri: capturedDataUri,
+        };
+        formData.append("memory_file", shareFile);
 
-      //   const remainingStars = challengeObj?.remaining_stars;
-      //   // if (remainingStars > 1) {
-      //   //   successMessage = "Success, continue to the next Star.";
-      //   // }
+        res = await postGeoPinCheckIn(formData);
+      }
 
       if (res?.status === 1) {
         setHasSharedToRoamProfile(true);
@@ -286,11 +316,10 @@ const ArChallengeShare = () => {
   };
 
   const resetNavigation = () => {
-    console.log("resetNavigation");
     navigation.reset({
       index: 0,
       // @ts-ignore
-      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+      routes: [{name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}}],
     });
   };
 
@@ -350,6 +379,15 @@ const ArChallengeShare = () => {
     setViewWidth(width);
   };
 
+  useEffect(() => {
+    if (
+      challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
+      challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
+    ) {
+      setHideBackButton(true);
+    }
+  }, [challengeObj]);
+
   const baseOffset = 110;
   let offset = baseOffset;
   if (viewWidth >= 320) {
@@ -408,6 +446,7 @@ const ArChallengeShare = () => {
       style={{justifyContent: "space-between", flex: 1}}
       modals={screenModals}
       disableBackButton={disableBackButton}
+      hideBackButton={hideBackButton}
     >
       <View style={{flex: 1, paddingHorizontal: 32}}>
         <View style={{flex: 1}}>

@@ -237,12 +237,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
 
   const profilePicture = getProfilePicture(userProfile?.user_profile?.image);
-  
 
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-      <FastImage
+        <FastImage
           style={{
             width: "100%",
             height: height * 0.5,

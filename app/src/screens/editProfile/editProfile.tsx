@@ -31,6 +31,8 @@ import {Icons} from "../../assets/Icons";
 import WaiverDetailsModal from "screens/editProfile/WaiverDetailsModal";
 import Images from "../../assets/images";
 import {ProfilePlaceholder} from "assets/base64";
+import {updateUserProperties} from "redux/Login/reducer";
+import {useFocusEffect} from "@react-navigation/native";
 
 interface ImageData {
   uri: string | undefined;
@@ -60,7 +62,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const edit = route?.params?.edit;
   const userData = route?.params?.profileDetails;
   const onProfileUpdate = route?.params?.onProfileUpdate;
-  console.log("userData", userData);
 
   let dateOfBirth = null;
   if (userData?.date_of_birth) {
@@ -90,10 +91,12 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     label: userData?.gender ?? "",
     value: userData?.gender ?? "",
   });
-  const [detailsShow, setDetailsShow] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
+  const [waiverIsVisible, setWaiverIsVisible] = useState(false);
+  const [addProfilePictureIsVisible, setAddProfilePictureIsVisible] = useState(false);
   const [pendingValues, setPendingValues] = useState<any>(null);
+  const [updatedProfileValues, setUpdatedProfileValues] = useState<any>(null);
 
+  const formikRef = useRef(null);
   const dispatch = useDispatch();
   const _styles = useStyles();
   const nameRef = useRef();
@@ -138,15 +141,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     });
   }
 
-  const handleNavigation = () => {
-    if (edit) {
-      onProfileUpdate();
-      navigation.goBack();
-    } else {
-      setDetailsShow(true);
-    }
-  };
-
   const handleEditProfile = (values: any) => {
     const formattedDate = dateToString(bDate);
     // Check if country has a value, if not, use the existing value
@@ -173,8 +167,14 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     })
       .then(res => {
         if (res.status == 1) {
+          if (!!edit) {
+            onProfileUpdate();
+            navigation.goBack();
+          } else {
+            setWaiverIsVisible(true);
+          }
           showMessage("Details saved successfully!");
-          handleNavigation();
+          setUpdatedProfileValues(res?.user);
         } else {
           handleError(res);
         }
@@ -202,6 +202,23 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     return formatted;
   };
 
+  const acceptWaiverButtonHandler = () => {
+    setWaiverIsVisible(false);
+    dispatch(updateAccountFlag(true));
+    setIsLoading(true);
+
+    if (edit) return;
+
+    navigation.reset({
+      index: 0,
+      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+    });
+  };
+
+  const updateReduxProfileDetails = () => {
+    dispatch(updateUserProperties(updatedProfileValues));
+  };
+
   useEffect(() => {
     var config = {
       method: "get",
@@ -226,22 +243,19 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       .catch(function (error) {
         console.error(error);
       });
+
+    return () => {
+      setCountryData([]);
+    };
   }, []);
 
-  const acceptWaiverButtonHandler = () => {
-    setDetailsShow(false);
-    dispatch(updateAccountFlag(true));
-    setIsLoading(true);
-
-    if (edit) return;
-
-    navigation.reset({
-      index: 0,
-      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
-    });
-  };
-
-  const formikRef = useRef(null);
+  useFocusEffect(
+    React.useCallback(() => {
+      return () => {
+        updateReduxProfileDetails();
+      };
+    }, [])
+  );
 
   useEffect(() => {
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
@@ -256,7 +270,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         country: userData?.home_country || "",
         date_of_birth: dob ? dateToString(dob) : "",
       });
-      console.log("here")
       setPhotoDetails({
         uri: userData?.image,
         type: "image/png",
@@ -281,7 +294,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
           onSubmit={values => {
             if (!edit && photoDetails?.default) {
               setPendingValues(values);
-              setShowDialog(true);
+              setAddProfilePictureIsVisible(true);
             } else {
               handleEditProfile(values);
             }
@@ -364,7 +377,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       onBlur={() => {
                         setGenderDropDownFocused(false);
                       }}
-                      activeColor={theme.lightColors?.statBG}
+                      activeColor={theme.lightColors?.inputBlue}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -494,7 +507,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         borderWidth: 0,
                         backgroundColor: "transparent",
                       }}
-                      activeColor={theme.lightColors?.statBG}
+                      activeColor={theme.lightColors?.inputBlue}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
@@ -614,18 +627,20 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         </Formik>
       </KeyboardAwareScrollView>
 
-      <WaiverDetailsModal
-        isVisible={detailsShow}
-        confirmHandler={acceptWaiverButtonHandler}
-        cancelHandler={() => {
-          setDetailsShow(false);
-        }}
-      />
+      {waiverIsVisible && (
+        <WaiverDetailsModal
+          isVisible
+          confirmHandler={acceptWaiverButtonHandler}
+          cancelHandler={() => {
+            setWaiverIsVisible(false);
+          }}
+        />
+      )}
 
       <Portal>
         <Dialog
-          visible={showDialog}
-          onDismiss={() => setShowDialog(false)}
+          visible={addProfilePictureIsVisible}
+          onDismiss={() => setAddProfilePictureIsVisible(false)}
           style={{
             backgroundColor: "#1E1E2D",
             borderRadius: 12,
@@ -651,8 +666,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
               mode="text"
               onPress={() => {
                 if (pendingValues) {
+                  setAddProfilePictureIsVisible(false);
                   handleEditProfile(pendingValues);
-                  setShowDialog(false);
                 }
               }}
               textColor="#FF3B30"
@@ -672,7 +687,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
             <View style={{flex: 1}}>
               <AppButton
                 title="Add profile picture"
-                onPress={() => setShowDialog(false)}
+                onPress={() => setAddProfilePictureIsVisible(false)}
                 buttonStyle={{
                   height: 40,
                 }}

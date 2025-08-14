@@ -45,7 +45,6 @@ const ArChallengeCapture = ({route, navigation}) => {
   };
   useEffect(() => {
     if (unityRef.current) {
-      console.log("cambio de scena");
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");
     }
   }, [isUnityLoaded]);
@@ -62,21 +61,21 @@ const ArChallengeCapture = ({route, navigation}) => {
   };
 
   const pointsCount = async () => {
-      if (unityRef.current) {
-          const pointData = {
+    if (unityRef.current) {
+      const pointData = {
         points: challengeObj?.points,
         isPointView: true,
       };
-          unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
-      }
+      unityRef.current.postMessage("Scriptposition", "SetVisiblePoint", JSON.stringify(pointData));
+    }
   };
 
   const isLoadingUnity = () => {
-      if (!unityRef.current) return;
-      const currentTime = Date.now();
-      if (initialLoadTime.current === 0) {
-          initialLoadTime.current = currentTime;
-          setTimeout(() => {
+    if (!unityRef.current) return;
+    const currentTime = Date.now();
+    if (initialLoadTime.current === 0) {
+      initialLoadTime.current = currentTime;
+      setTimeout(() => {
         if (unityRef.current) {
           unityRef.current.postMessage(
             "OBJImport",
@@ -85,19 +84,19 @@ const ArChallengeCapture = ({route, navigation}) => {
           );
         }
       }, 2000);
-      } else {
-          if (unityRef.current) {
-              unityRef.current.postMessage(
+    } else {
+      if (unityRef.current) {
+        unityRef.current.postMessage(
           "OBJImport",
           "SetLoadingVisibility",
           JSON.stringify({isVisible: false})
         );
-          }
       }
+    }
   };
 
   const playCameraSound = () => {
-      try {
+    try {
       Sound.setCategory("Playback");
       const cameraSound = new Sound("camera-sound.mp3", Sound.MAIN_BUNDLE, error => {
         if (!error) cameraSound.play();
@@ -108,7 +107,7 @@ const ArChallengeCapture = ({route, navigation}) => {
   };
 
   const playRecordSound = () => {
-      try {
+    try {
       Sound.setCategory("Playback");
       const recordSound = new Sound("record.mp3", Sound.MAIN_BUNDLE, error => {
         if (!error) recordSound.play();
@@ -119,11 +118,11 @@ const ArChallengeCapture = ({route, navigation}) => {
   };
 
   const doneButtonHandler = async () => {
-      const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
-      let updatedData = capturedImage ? capturedImage : capturedVideo;
+    const hasFilters = capturedImage && challengeObj?.ar_filters.length > 0;
+    let updatedData = capturedImage ? capturedImage : capturedVideo;
 
     if (hasFilters) {
-        try {
+      try {
         const capturedUri = await viewShotRef.current.capture();
         updatedData = capturedUri;
       } catch (error) {
@@ -134,7 +133,7 @@ const ArChallengeCapture = ({route, navigation}) => {
     updatedData = await copyFileForDisplay(updatedData);
 
     // Navegar y pasar la captura actualizada
-      navigation.navigate({
+    navigation.navigate({
       name: "ArChallengeShare",
       params: {
         challengeObj: challengeObj,
@@ -143,37 +142,36 @@ const ArChallengeCapture = ({route, navigation}) => {
       },
     });
   };
-    const retakeButtonHandler = () => {
-        setCapturedImage(null);
-        setCapturedVideo(null);
-        if (openGallery) {
-            pickFromGallery();
-        } else {
-            setIsUnityLoaded(true);
-        }
-    };
+  const retakeButtonHandler = () => {
+    setCapturedImage(null);
+    setCapturedVideo(null);
+    if (openGallery) {
+      pickFromGallery();
+    } else {
+      setIsUnityLoaded(true);
+    }
+  };
   // const startRecordVideoHandler = () => {
 
-    //   if (capturedImage || capturedVideo) {
-    //     return;
-    //   }
-    //   startRecordVideo();
-    // };
+  //   if (capturedImage || capturedVideo) {
+  //     return;
+  //   }
+  //   startRecordVideo();
+  // };
   // const stopRecordVideoHandler = () => {
 
-    //   if (recordingStart) {
-    //     stopRecordVideo();
-    //   }
-    // };
+  //   if (recordingStart) {
+  //     stopRecordVideo();
+  //   }
+  // };
   const closeViewInfoButtonHandler = () => {
-
-      setChallengeInformationView(false);
-      setIsUnityLoaded(true);
+    setChallengeInformationView(false);
+    setIsUnityLoaded(true);
   };
-    const closeModalARMode = () => {
-        setOpenModalARMode(false);
-        setIsUnityLoaded(true);
-    };
+  const closeModalARMode = () => {
+    setOpenModalARMode(false);
+    setIsUnityLoaded(true);
+  };
   const modals = (
     <ViewInfoModal
       isVisible={challengeInformationView}
@@ -191,46 +189,44 @@ const ArChallengeCapture = ({route, navigation}) => {
   );
 
   const handleUnityMessage = result => {
-
-      const data = JSON.parse(result.nativeEvent.message);
-      const buttonInfo = data.enableButton;
-      const buttonBack = data.backPress;
-      const buttonARMode = data?.ARMode;
+    const data = JSON.parse(result.nativeEvent.message);
+    const buttonInfo = data.enableButton;
+    const buttonBack = data.backPress;
+    const buttonARMode = data?.ARMode;
     if (buttonBack) {
-
-        navigation?.goBack();
+      navigation?.goBack();
     }
-      if (buttonARMode) {
-          console.log("entroaqui ", openModalARMode);
+    if (buttonARMode) {
       setOpenModalARMode(true);
-
-      }
-      if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
-          console.log("✅ Escena ARReactNative 1 cargada correctamente desde Unity");
-          setUnitySceneLoaded(true);
-      }
-    if (data.photoVideoButton?.isPhoto) {
-
-        setCapturedImage(data.photoVideoButton?.filepath);
-        setIsUnityLoaded(false);
-        setUnitySceneLoaded(false);
-      eraseFile();
-
     }
-      if (data.photoVideoButton?.isPhoto == false) {
-          setCapturedVideo(data.photoVideoButton?.filepath);
-          setIsUnityLoaded(false);
-          setUnitySceneLoaded(false);
-      }
-      if (data.infoButton?.isButton) {
-          setChallengeInformationView(data.infoButton?.isButton);
-          setIsUnityLoaded(true);
-          setUnitySceneLoaded(true);
-      }
+    if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
+      setUnitySceneLoaded(true);
+      viewNotification(true);
+      setTimeout(() => {
+        if (unityRef.current) {
+          viewNotification(false);
+        }
+      }, 5000);
+    }
+    if (data.photoVideoButton?.isPhoto) {
+      setCapturedImage(data.photoVideoButton?.filepath);
+      setIsUnityLoaded(false);
+      setUnitySceneLoaded(false);
+      eraseFile();
+    }
+    if (data.photoVideoButton?.isPhoto == false) {
+      setCapturedVideo(data.photoVideoButton?.filepath);
+      setIsUnityLoaded(false);
+      setUnitySceneLoaded(false);
+    }
+    if (data.infoButton?.isButton) {
+      setChallengeInformationView(data.infoButton?.isButton);
+      setIsUnityLoaded(true);
+      setUnitySceneLoaded(true);
+    }
   };
   async function pickFromGallery() {
-
-      setIsUnityLoaded(false);
+    setIsUnityLoaded(false);
     setTimeout(() => {
       let mediaType = "photo";
       switch (challengeType) {
@@ -265,82 +261,79 @@ const ArChallengeCapture = ({route, navigation}) => {
         console.error("error opening launchImageLibrary", error);
       }
     }, 250);
-
   }
   let screenPadding = {};
 
   if (!isUnityLoaded) {
-
-      screenPadding = {paddingBottom: 24};
+    screenPadding = {paddingBottom: 24};
   }
-    useEffect(() => {
-        viewNotification(true);
+  // useEffect(() => {
+  //   if (unitySceneLoaded && unityRef.current) {
+  //     viewNotification(true);
+  //     setTimeout(() => {
+  //       if (unityRef.current) {
+  //         viewNotification(false);
+  //       }
+  //     }, 5000);
+  //   }
+  // }, []);
 
-        const timerId = setTimeout(() => {
-            if (unityRef.current) {
-                viewNotification(false);
-            }
-        }, 5000);
-    }, []);
+  useEffect(() => {
+    const requestPermissions = async () => {
+      if (Platform.OS === "android") {
+        await requestMultiple([
+          PERMISSIONS.ANDROID.CAMERA,
+          PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
+          PERMISSIONS.ANDROID.RECORD_AUDIO,
+          PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
+          PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
+        ]);
+      } else if (Platform.OS === "ios") {
+        await requestMultiple([
+          PERMISSIONS.IOS.CAMERA,
+          PERMISSIONS.IOS.MICROPHONE,
+          PERMISSIONS.IOS.PHOTO_LIBRARY,
+          PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
+        ]);
+      }
 
-    useEffect(() => {
-        const requestPermissions = async () => {
-            if (Platform.OS === "android") {
-                await requestMultiple([
-                    PERMISSIONS.ANDROID.CAMERA,
-                    PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-                    PERMISSIONS.ANDROID.RECORD_AUDIO,
-                    PERMISSIONS.ANDROID.ACCESS_MEDIA_LOCATION,
-                    PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-                ]);
-            } else if (Platform.OS === "ios") {
-                await requestMultiple([
-                    PERMISSIONS.IOS.CAMERA,
-                    PERMISSIONS.IOS.MICROPHONE,
-                    PERMISSIONS.IOS.PHOTO_LIBRARY,
-                    PERMISSIONS.IOS.PHOTO_LIBRARY_ADD_ONLY,
-                ]);
-            }
+      if (openGallery) {
+        pickFromGallery();
+      } else {
+        setIsUnityLoaded(true);
+      }
+    };
 
-            if (openGallery) {
-                pickFromGallery();
-            } else {
-                setIsUnityLoaded(true);
-            }
-        };
+    requestPermissions();
+  }, []);
+  useEffect(() => {
+    if (!unitySceneLoaded || !unityRef.current || !isUnityLoaded) return;
 
-        requestPermissions();
-    }, []);
-    useEffect(() => {
-        if (!unitySceneLoaded || !unityRef.current || !isUnityLoaded) return;
+    console.log("🎯 Unity listo. Ejecutando setup...");
 
-        console.log("🎯 Unity listo. Ejecutando setup...");
+    pointsCount();
+    isLoadingUnity();
 
-        pointsCount();
-        isLoadingUnity();
+    unityRef.current.postMessage(
+      "Scriptposition",
+      "SetVisibleButton",
+      JSON.stringify({
+        setVisibleButtonPosition: false,
+      })
+    );
 
-        unityRef.current.postMessage(
-            "Scriptposition",
-            "SetVisibleButton",
-            JSON.stringify({
-                setVisibleButtonPosition: false,
-            })
-        );
-
-        if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
-            console.log("challengeType", challengeType);
-            console.log('isUnityLoaded', isUnityLoaded);
-            unityRef.current.postMessage(
-                "screen",
-                "SetTypeChallenge",
-                JSON.stringify({
-                    typeChallenge: challengeType,
-                    arChallenge: true,
-                    isLocation: false,
-                })
-            );
-        }
-    }, [unitySceneLoaded, challengeType, isUnityLoaded]);
+    if (!!CAPTURE_CHALLENGE_TYPE[challengeType]) {
+      unityRef.current.postMessage(
+        "screen",
+        "SetTypeChallenge",
+        JSON.stringify({
+          typeChallenge: challengeType,
+          arChallenge: true,
+          isLocation: false,
+        })
+      );
+    }
+  }, [unitySceneLoaded, challengeType, isUnityLoaded]);
 
   return (
     <ChallengeScreen
@@ -369,17 +362,22 @@ const ArChallengeCapture = ({route, navigation}) => {
         isVideo={isVideo}
       />
       {!unitySceneLoaded && isUnityLoaded && (
-          <View style={{
-            position: 'absolute',
-            top: 0, left: 0, right: 0, bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.99)',
-            justifyContent: 'center',
-            alignItems: 'center',
-            zIndex: 999
-          }}>
-            <ActivityIndicator size="large" color="#fff" />
-            <Text style={{ color: '#fff', marginTop: 10 }}>Loading AR experience</Text>
-          </View>
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0,0,0,0.99)",
+            justifyContent: "center",
+            alignItems: "center",
+            zIndex: 999,
+          }}
+        >
+          <ActivityIndicator size="large" color="#fff" />
+          <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience</Text>
+        </View>
       )}
       {!isUnityLoaded && (
         <CameraControls

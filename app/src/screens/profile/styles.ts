@@ -81,7 +81,6 @@ const useStyles = makeStyles(theme => ({
   },
   avatarContainer: {
     position: "relative",
-    marginBottom: 10,
   },
   editButtonContainer: {
     position: "absolute",

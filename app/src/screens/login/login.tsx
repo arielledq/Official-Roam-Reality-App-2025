@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 
 import {Keyboard, Text, TouchableOpacity, View} from "react-native";
 
@@ -36,6 +36,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
   const _styles = useStyles();
   const dispatch = useDispatch();
   const newUser = useSelector(state => state.persist.newUser);
+  const token = useSelector(state => state.login?.data?.token);
   const [passwordVisibility, setPasswordVisibility] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const {setOnesignalDevice} = useOneSignal();
@@ -58,10 +59,25 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
           handleError(res);
         }
       })
-      .finally(() => {
+      .catch(err => {
+        console.log("err", err);
         setIsLoading(false);
       });
   };
+
+  useEffect(() => {
+    if (token) {
+      setIsLoading(true);
+      setTimeout(() => {
+        navigation.reset({
+          index: 0,
+          routes: [
+            {name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}},
+          ],
+        });
+      }, 250);
+    }
+  }, [token]);
 
   const navigateToResetPassword = () => {
     navigation.navigate("ForgotPassword");

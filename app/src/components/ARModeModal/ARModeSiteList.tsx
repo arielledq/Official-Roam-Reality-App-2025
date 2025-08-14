@@ -6,15 +6,15 @@ import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
 import Images from "assets/images";
 import Icon from "components/Icon";
-import useArScreenHook from "hooks/useArScreenHook";
+import useArScreenHook from "../../hooks/useArScreenHook";
 import fontGroup from "assets/fonts";
 import userLocationHook from "screens/drawerContent/location.hook";
 // @ts-ignore
 import {AR_MODES} from "constants";
 import ARChallengeItem from "./ARChallengeItem";
-import {showMessage} from "util/helpers";
 import Toast from "react-native-toast-message";
 import theme from "assets/theme";
+import {checkHuntCoolDownAPI, checkScansCoolDownAPI} from "network";
 
 interface ARModeSiteListProps {
   selectedMode: any;
@@ -33,7 +33,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   };
 
   const {initialUserLocation, getLocation} = userLocationHook();
-  const {getSites, sites, getNextStar: getNextStarApi}: any = useArScreenHook();
+  const {getSites, sites, getNextStar}: any = useArScreenHook();
   const [sponsorData, setSponsorData] = useState<any>([]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
   const [expandedSites, setExpandedSites] = useState<string[]>([]);
@@ -45,35 +45,103 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
       selectedMode,
     };
     switch (selectedMode?.mode) {
-      case AR_MODES.HUNT_MODE:
-        const huntData = await getNextStarApi(
-          site.id,
-          initialUserLocation.latitude,
-          initialUserLocation.longitude
-        );
-        if (huntData?.id) {
+      case AR_MODES.HUNT_MODE: {
+        let hasNextStar = false;
+        const params = {
+          geo_site_id: site.id,
+          lat: initialUserLocation.latitude,
+          lon: initialUserLocation.longitude,
+        };
+        try {
+          const huntChallenge = await getNextStar(params.geo_site_id, params.lat, params.lon);
+          if (huntChallenge?.id) {
+            hasNextStar = true;
+            updatedSiteData = {
+              ...updatedSiteData,
+              huntChallenge: {...huntChallenge},
+            };
+          }
+        } catch (error: any) {
+          Toast.show({
+            type: "error",
+            text1: "Error retrieving the challenge",
+            text2: error?.message || "There was an unexpected error. Please try again later.",
+          });
+        }
+
+        // Validate cool down period && Start challenge
+        if (hasNextStar) {
+          // Validate cool down period
+          const scanId = updatedSiteData?.huntChallenge?.geo_ar_star?.id;
+          let isInCoolDownPeriod = false;
+          try {
+            await checkHuntCoolDownAPI(scanId);
+            isInCoolDownPeriod = false;
+          } catch (e: any) {
+            isInCoolDownPeriod = true;
+            Toast.show({
+              type: "info",
+              text1: "Scan Challenge Info",
+              text2: e?.message?.message || "You are in cool down period. Please try again later.",
+            });
+          }
+
+          // Start challenge
+          if (!isInCoolDownPeriod) {
+            onStartChallenge(updatedSiteData);
+            onClose();
+          } else {
+            onClose();
+          }
+        } else {
+          onClose();
+        }
+
+        break;
+      }
+      case AR_MODES.SCAN_MODE: {
+        // Validate cool down period
+        const scanId = updatedSiteData?.scanChallenge?.id;
+        let isInCoolDownPeriod = false;
+        try {
+          const scanCoolDownRsp = await checkScansCoolDownAPI(scanId);
+          const isFirstScan = "ScanPicture None does not exist.";
+          if (scanCoolDownRsp?.status >= 200 && scanCoolDownRsp?.status < 300) {
+            isInCoolDownPeriod = false;
+          } else if (
+            scanCoolDownRsp?.errorStatus === 404 &&
+            scanCoolDownRsp?.message?.message === isFirstScan
+          ) {
+            isInCoolDownPeriod = false;
+          } else {
+            isInCoolDownPeriod = true;
+            throw new Error(scanCoolDownRsp?.message);
+          }
+        } catch (e: any) {
+          isInCoolDownPeriod = true;
+          Toast.show({
+            type: "error",
+            text1: "Error verifying your cool down period",
+            text2: e?.message?.message || "There was an unexpected error. Please try again later.",
+          });
+        }
+
+        // Start challenge
+        if (!isInCoolDownPeriod) {
           updatedSiteData = {
             ...updatedSiteData,
-            huntChallenge: huntData,
+            memory_type: "SCAN_PHOTO",
           };
           onStartChallenge(updatedSiteData);
           onClose();
         } else {
-          Toast.show({
-            type: "info",
-            text1: "Hunt Challenge Info",
-            text2: "You have collected all the stars in this hunt challenge",
-          });
+          onClose();
         }
-        break;
-
-      case AR_MODES.SCAN_MODE:
-        onStartChallenge(site);
-        onClose();
 
         break;
+      }
       case AR_MODES.GEO_TAG_MODE:
-        onStartChallenge(site);
+        onStartChallenge(updatedSiteData);
         onClose();
 
         break;
@@ -82,21 +150,15 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const getSitesHandler = (sponsorId: string = "") => {
     if (sponsorId) {
-      let updatedSites = sites.filter(
-        (site: any) => site?.pin_challenge?.sponsored?.id === Number(sponsorId)
-      );
+      let updatedSites;
       if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
-        const ArFiltersChallenges = sites[sites.length - 1];
-        const updatedChallenges = ArFiltersChallenges?.challenges?.filter(
-          (challenge: any) => challenge?.sponsored?.id === Number(sponsorId)
-        );
-        setFilteredSites([
-          ...updatedSites,
-          {...ArFiltersChallenges, challenges: updatedChallenges},
-        ]);
+        updatedSites = sites.filter((site: any) => site?.sponsor?.id === Number(sponsorId));
       } else {
-        setFilteredSites(updatedSites);
+        updatedSites = sites.filter(
+          (site: any) => site?.pin_challenge?.sponsored?.id === Number(sponsorId)
+        );
       }
+      setFilteredSites(updatedSites);
     } else if (
       typeof initialUserLocation?.latitude === "number" &&
       isFinite(initialUserLocation?.latitude) &&
@@ -236,13 +298,11 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         <Text style={{fontSize: 18, fontWeight: "bold", color: "white", flex: 1}}>
           {selectedMode?.listLabel} Available
         </Text>
-        <View style={{width: 90}}>
+        <View style={{width: 90, marginRight: 4}}>
           <AppButton
             // @ts-ignore
             customColors={[theme.lightColors?.grey4, theme.lightColors?.grey4]}
             containerStyle={{
-              paddingLeft: 0,
-              paddingRight: 4,
               paddingVertical: 0,
               borderRadius: 4,
               minHeight: 35,
@@ -250,7 +310,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             iconContainerStyle={{
               padding: 0,
             }}
-            titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold"}}
+            titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold", paddingRight: 4}}
             onPress={() => getSitesHandler()}
             title="Refresh"
             icon={
@@ -278,14 +338,14 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                 challenges = [site?.pin_challenge];
                 break;
               case AR_MODES.SCAN_MODE:
-                const numberChallengesAvailable = site?.challenges?.length || 1;
+                const numberChallengesAvailable = site?.scan_pictures?.length || 1;
                 challengesAvailable = `${numberChallengesAvailable} Gem${
                   numberChallengesAvailable === 1 ? "" : "s"
                 }`;
-                siteImage = site?.icon
-                  ? {uri: site.icon}
+                siteImage = site?.image
+                  ? {uri: site.image}
                   : require("../../assets/images/AppSettingsIcon.png");
-                challenges = site?.challenges || [site];
+                challenges = site?.scan_pictures;
                 break;
               case AR_MODES.HUNT_MODE:
                 challengesAvailable = "1 Hunt";
@@ -357,8 +417,8 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       let attemptsDetails = "";
                       let sponsorImage = "";
                       const points = item?.points || 0;
-                      const coolDownHours = item?.cooldownHours || 0;
-                      const onPressHandler = () => startChallengeHandler(site);
+                      let coolDownHours = item?.cooldownHours || 0;
+                      let onPressHandler = () => startChallengeHandler(site);
 
                       switch (selectedMode?.mode) {
                         case AR_MODES.GEO_TAG_MODE:
@@ -367,13 +427,25 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             site?.challenge_attempt || 0
                           } Check-Ins`;
                           sponsorImage = site?.sponsor?.image;
+                          coolDownHours = 0; // TODO: Missing cool down hours on the API response
                           break;
                         case AR_MODES.SCAN_MODE:
                           challengeTitle = item?.name;
                           attemptsDetails = `${item?.user_attempts || 0}/${
-                            item?.challenge_attempt || 0
+                            item?.attempts || 0
                           } Gems`;
-                          sponsorImage = item?.sponsored?.image || item?.sponsor?.image;
+                          sponsorImage = item?.sponsor?.image;
+                          coolDownHours = item?.cooldown_hours || 0;
+                          const updatedSite = {
+                            ...site,
+                            // Remove list of challenges
+                            scan_pictures: null,
+                            // Set the 'selected challenge'
+                            scanChallenge: {
+                              ...item,
+                            },
+                          };
+                          onPressHandler = () => startChallengeHandler(updatedSite);
                           break;
                         case AR_MODES.HUNT_MODE:
                           challengeTitle = site?.pin_challenge?.name;
@@ -381,6 +453,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             site?.challenge_attempt || 0
                           } Captures`;
                           sponsorImage = site?.sponsor?.image;
+                          coolDownHours = 0; // TODO: Missing cool down hours on the API response
                           break;
                       }
 

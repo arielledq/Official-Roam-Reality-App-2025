@@ -45,6 +45,7 @@ export const ELEMENTSUNITY = [
   "Stars",
   "Details",
   "CompassArrow",
+  "Distancia",
   "Arrow",]
 
 export const EXPERIENCE_TYPE_CHOICES = {
@@ -108,7 +109,7 @@ export const AR_MODES = {
 export const AR_MODES_MENU = [
   {
     id: 1,
-    label: "Check-In Mode",
+    label: "Geo-Tag",
     name: "Geo-Tag",
     listLabel: "Geo-Tags",
     mode: AR_MODES.GEO_TAG_MODE,
@@ -118,23 +119,23 @@ export const AR_MODES_MENU = [
   },
   {
     id: 2,
-    label: "Hunt Mode",
-    name: "Hunt",
-    listLabel: "Hunts",
-    mode: AR_MODES.HUNT_MODE,
-    modeSubTitle1: "Users are to follow the arrows to find hidden gems",
-    modeSubTitle2: "TAP the AR to Capture",
-    icon: "huntMode",
-  },
-  {
-    id: 3,
-    label: "Scan Mode",
+    label: "Scan",
     name: "Scan",
     listLabel: "Hidden Gems",
     mode: AR_MODES.SCAN_MODE,
     modeSubTitle1: "Users can scan their environment or QR Code to trigger the AR.",
     modeSubTitle2: "Snap a photo/video with the AR",
     icon: "scan",
+  },
+  {
+    id: 3,
+    label: "Hunt",
+    name: "Hunt",
+    listLabel: "Hunts",
+    mode: AR_MODES.HUNT_MODE,
+    modeSubTitle1: "Users are to follow the arrows to find hidden gems",
+    modeSubTitle2: "TAP the AR to Capture",
+    icon: "huntMode",
   },
 ];
 
