@@ -234,7 +234,7 @@ const ArChallengeShare = () => {
         res = await postGeoPinCheckIn(formData);
       }
       if (challengeType === AR_MODES.SCAN_MODE) {
-        formData.append("challenges", challengeObj?.scanChallenge?.id);
+        formData.append("scan_id", challengeObj?.scanChallenge?.id);
         shareFile = {
           ...shareFile,
           uri: capturedDataUri,
@@ -319,7 +319,7 @@ const ArChallengeShare = () => {
     navigation.reset({
       index: 0,
       // @ts-ignore
-      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+      routes: [{name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}}],
     });
   };
 

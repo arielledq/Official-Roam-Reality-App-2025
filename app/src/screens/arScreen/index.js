@@ -25,7 +25,12 @@ import text from "components/text";
 import {Button} from "react-native-paper";
 import ViewInfoModal from "components/ViewInfoModal";
 import ViewInfoButton from "components/ViewInfoButton";
-import {convertMetersToFeets, findNearestLocationPoint, getLocationDistance, isLocationPointInPolygon} from "util/LocationLib";
+import {
+  convertMetersToFeets,
+  findNearestLocationPoint,
+  getLocationDistance,
+  isLocationPointInPolygon,
+} from "util/LocationLib";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -263,24 +268,22 @@ const ARScreen = ({route}) => {
 
     // HUNT: viene dentro de huntChallenge.geo_ar_star.geo_site
     if (mode === AR_MODES.HUNT_MODE) {
-      return selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.geo_site_border?.coordinates || null;
+      return (
+        selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.geo_site_border?.coordinates || null
+      );
     }
 
     // GEO_TAG: puede venir en el propio site o dentro de pin_challenge (fallback)
     if (mode === AR_MODES.GEO_TAG_MODE) {
-      return (
-          selectedSite?.geo_site_border?.coordinates ||
-          null
-      );
+      return selectedSite?.geo_site_border?.coordinates || null;
     }
 
     // SCAN: normalmente no hay polígono
     return null;
   };
 
-
-// Normaliza cualquier objeto {latitude, longitude} a "coords-like"
-  const toCoordsWrapper = loc => ({ coords: { latitude: loc?.latitude, longitude: loc?.longitude } });
+  // Normaliza cualquier objeto {latitude, longitude} a "coords-like"
+  const toCoordsWrapper = loc => ({coords: {latitude: loc?.latitude, longitude: loc?.longitude}});
   const isCurrentLocationIsInArea = (lat, lon) => {
     const border = getActiveBorderCoords();
     if (!border || lat == null || lon == null) {
@@ -293,25 +296,25 @@ const ARScreen = ({route}) => {
       setIsMeInsideInSite(false);
       return false;
     }
-    const ring = outer.map(p => ({ latitude: p[1], longitude: p[0] }));
-    const inside = isLocationPointInPolygon({ latitude: lat, longitude: lon }, ring);
+    const ring = outer.map(p => ({latitude: p[1], longitude: p[0]}));
+    const inside = isLocationPointInPolygon({latitude: lat, longitude: lon}, ring);
     setIsMeInsideInSite(inside);
     return inside;
   };
 
-// Calcular distancia al punto más cercano del borde
+  // Calcular distancia al punto más cercano del borde
   const findNearPoint = (lat, lon) => {
     const border = getActiveBorderCoords();
     if (!border || lat == null || lon == null) {
       setDistanceInFeet(0);
       return;
     }
-    const arrayPoints = border.flat().map(p => ({ latitude: p[1], longitude: p[0] }));
-    const nearestPoint = findNearestLocationPoint({ latitude: lat, longitude: lon }, arrayPoints);
-    const distance = getLocationDistance({ latitude: lat, longitude: lon }, nearestPoint);
+    const arrayPoints = border.flat().map(p => ({latitude: p[1], longitude: p[0]}));
+    const nearestPoint = findNearestLocationPoint({latitude: lat, longitude: lon}, arrayPoints);
+    const distance = getLocationDistance({latitude: lat, longitude: lon}, nearestPoint);
     setDistanceInFeet(convertMetersToFeets(distance));
   };
-  console.log('--------------',toCoordsWrapper(),'--------------');
+  console.log("--------------", toCoordsWrapper(), "--------------");
 
   const sendBloomValuesToUnity = () => {
     const bloomData = {threshold, intensity};
@@ -576,6 +579,14 @@ const ARScreen = ({route}) => {
         //       isLocation: false,
         //     })
         // );
+
+        if (!isMeInsideInSite && data?.ispressed) {
+          Toast.show({
+            type: "info",
+            text1: "Geo Challenge Info",
+            text2: "You are outside the site area",
+          });
+        }
 
         if (data?.photoVideoButton?.isPhoto) {
           setCapturedImage(data.photoVideoButton?.filepath);
@@ -897,42 +908,40 @@ const ARScreen = ({route}) => {
     sendSpawnModelData,
   ]);
 
-
-
-  useEffect(() => {
-    if (!unityRef.current) return;
-    if (!sceneIsReady) return;
-    if (selectedSite?.selectedMode?.mode !== AR_MODES.GEO_TAG_MODE) return;
-    console.log("isMeInsideInSite", isMeInsideInSite)
-    const messageData = {
-      typeChallenge: "PHOTO",
-      arChallenge: false,
-      isLocation: !!isMeInsideInSite,
-    };
-    unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
-    console.log("messageData", messageData);
-    // (Opcional) pequeño aviso cuando está fuera del área
-    if (!isMeInsideInSite) {
-      const dataNotificationUnity = {
-        isNotification: true,
-        textNotification: "Move inside the site area to take a photo",
-      };
-      unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleNotification",
-          JSON.stringify(dataNotificationUnity)
-      );
-      setTimeout(() => {
-        if (unityRef.current) {
-          unityRef.current.postMessage(
-              "Scriptposition",
-              "SetVisibleNotification",
-              JSON.stringify({ ...dataNotificationUnity, isNotification: false })
-          );
-        }
-      }, 3000);
-    }
-  }, [isMeInsideInSite, sceneIsReady, selectedSite?.selectedMode?.mode]);
+  // useEffect(() => {
+  //   if (!unityRef.current) return;
+  //   if (!sceneIsReady) return;
+  //   if (selectedSite?.selectedMode?.mode !== AR_MODES.GEO_TAG_MODE) return;
+  //   console.log("isMeInsideInSite", isMeInsideInSite);
+  //   const messageData = {
+  //     typeChallenge: "PHOTO",
+  //     arChallenge: false,
+  //     isLocation: !!isMeInsideInSite,
+  //   };
+  //   unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
+  //   console.log("messageData", messageData);
+  //   // (Opcional) pequeño aviso cuando está fuera del área
+  //   if (!isMeInsideInSite) {
+  //     const dataNotificationUnity = {
+  //       isNotification: true,
+  //       textNotification: "Move inside the site area to take a photo",
+  //     };
+  //     unityRef.current.postMessage(
+  //       "Scriptposition",
+  //       "SetVisibleNotification",
+  //       JSON.stringify(dataNotificationUnity)
+  //     );
+  //     setTimeout(() => {
+  //       if (unityRef.current) {
+  //         unityRef.current.postMessage(
+  //           "Scriptposition",
+  //           "SetVisibleNotification",
+  //           JSON.stringify({...dataNotificationUnity, isNotification: false})
+  //         );
+  //       }
+  //     }, 3000);
+  //   }
+  // }, [isMeInsideInSite, sceneIsReady, selectedSite?.selectedMode?.mode]);
 
   useEffect(() => {
     if (!unityRef.current || !selectedSite?.selectedMode?.mode || !sceneIsReady) return;
@@ -944,7 +953,6 @@ const ARScreen = ({route}) => {
 
     switch (mode) {
       case AR_MODES.GEO_TAG_MODE:
-
         show = ["Back", "Details", "ArMode", "screen", "position", "points"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
@@ -1086,7 +1094,7 @@ const ARScreen = ({route}) => {
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
       position => {
-        const { latitude, longitude } = position.coords;
+        const {latitude, longitude} = position.coords;
         if (
           position.coords.latitude === 0 ||
           position.coords.longitude === 0 ||
@@ -1242,7 +1250,6 @@ const ARScreen = ({route}) => {
               isLocation: !!isMeInsideInSite,
             };
             unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
-
           }
         }
       }, 1500);
@@ -1254,22 +1261,22 @@ const ARScreen = ({route}) => {
       setUnityLoading(true);
       setUnitySceneLoaded(true);
 
-        return () => {
-          clearTimeout(timeout);
-          setValidUserLocation(false);
-          setCapturedImage(null);
-          setCapturedVideo(null);
-          setIsUnityLoaded(true);
-          // setSelectedChallengeOverride(null);
-          setSelectedSite(null); //Se puede Activar, Testeo pendiente
-          isFocusedRef.current = false;
-          setUnitySceneLoaded(false);
-          setShouldRenderUnity(false);
-          setUnityLoading(false);
-          setSendSpawnModelData(false);
-          setHasSentModelDataOnce(false);
-        };
-      }, [])
+      return () => {
+        clearTimeout(timeout);
+        setValidUserLocation(false);
+        setCapturedImage(null);
+        setCapturedVideo(null);
+        setIsUnityLoaded(true);
+        // setSelectedChallengeOverride(null);
+        setSelectedSite(null); //Se puede Activar, Testeo pendiente
+        isFocusedRef.current = false;
+        setUnitySceneLoaded(false);
+        setShouldRenderUnity(false);
+        setUnityLoading(false);
+        setSendSpawnModelData(false);
+        setHasSentModelDataOnce(false);
+      };
+    }, [])
   );
 
   useEffect(() => {
