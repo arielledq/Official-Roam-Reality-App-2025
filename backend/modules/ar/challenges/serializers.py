@@ -360,7 +360,8 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 
 class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
-    file_animation = RandomDownloadNameS3FileField()
+    file_animation_android = RandomDownloadNameS3FileField()
+    file_animation_ios = RandomDownloadNameS3FileField()
     file_3d = RandomDownloadNameS3FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
@@ -370,8 +371,8 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation', 'sponsor', 'info', 'coordinates',
-                  'attempts', 'points', "user_attempts", "cooldown", "elevation",]
+        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
+                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
@@ -392,7 +393,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
             attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
             return attempts_since.count()
         elif qs.exists():
-            return min(qs.count(), obj.challenge_attempt)
+            return min(qs.count(), obj.attempts)
         return 0
 
     def get_cooldown(self, obj):
