@@ -845,7 +845,7 @@ const ARScreen = ({route}) => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 100};
+      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 100} ;
       unityRef.current.postMessage(
         "Main Camera",
         "SetDetectObjectState",
