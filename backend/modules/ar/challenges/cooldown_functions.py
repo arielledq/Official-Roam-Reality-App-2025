@@ -99,7 +99,7 @@ def scan_cooldown_by_user(user, scan):
 
     used = qs.filter(created_at__gte=first_attempt.created_at).count()
 
-    if used < scan.challenge_attempt:
+    if used < scan.attempts:
         return 0
     cooldown_end = first_attempt.created_at + timedelta(hours=scan.cooldown_hours)
     remaining = cooldown_end - now
