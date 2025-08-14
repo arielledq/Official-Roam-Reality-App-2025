@@ -49,16 +49,16 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
   }, [isUnityLoaded]);
 
-  const viewNotification = isNotification => {
-    if (unityRef.current) {
-      const message = CAMERA_NOTIFICATION[challengeType] || "Default notification text";
-      unityRef.current.postMessage(
-        "Scriptposition",
-        "SetVisibleNotification",
-        JSON.stringify({textNotification: message, isNotification: isNotification})
-      );
-    }
-  };
+  // const viewNotification = isNotification => {
+  //   if (unityRef.current) {
+  //     const message = CAMERA_NOTIFICATION[challengeType] || "Default notification text";
+  //     unityRef.current.postMessage(
+  //       "Scriptposition",
+  //       "SetVisibleNotification",
+  //       JSON.stringify({textNotification: message, isNotification: isNotification})
+  //     );
+  //   }
+  // };
 
   const pointsCount = async () => {
     if (unityRef.current) {
@@ -201,10 +201,21 @@ const ArChallengeCapture = ({route, navigation}) => {
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
       setUnitySceneLoaded(true);
-      viewNotification(true);
+      const message = CAMERA_NOTIFICATION[challengeType] || "Default notification text";
+      unityRef.current.postMessage(
+        "Scriptposition",
+        "SetVisibleNotification",
+        JSON.stringify({textNotification: message, isNotification: true})
+      );
+
+      // viewNotification(true);
       setTimeout(() => {
         if (unityRef.current) {
-          viewNotification(false);
+          unityRef.current.postMessage(
+              "Scriptposition",
+              "SetVisibleNotification",
+              JSON.stringify({isNotification: false})
+          );
         }
       }, 5000);
     }

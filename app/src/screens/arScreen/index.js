@@ -350,7 +350,7 @@ const ARScreen = ({route}) => {
           y: 1,
           z: 1,
         },
-        rotation: {x: 0, y: 0, z: 0},
+        // rotation: {x: 0, y: 0, z: 0},
         emissionIntensity: parseFloat(selectedChallengeOverride?.parameters?.emission_value) || 1,
         rotationSpeed: Number(selectedChallengeOverride?.parameters?.loop_delay) || 50,
         // rotationSpeed:1,
@@ -360,7 +360,7 @@ const ARScreen = ({route}) => {
         maxScale: Number(selectedChallengeOverride?.parameters?.max_pinch_scale) || 1,
         // minScale: 0.1,
         // maxScale:  10,
-        // isRotationEnabled: true,
+        isRotationEnabled: true,
         isVisible: isGeoTagMode, //true
         position: {
           x: parseFloat(selectedChallengeOverride?.parameters?.positionX) || 0,
@@ -369,7 +369,9 @@ const ARScreen = ({route}) => {
         },
         distanceCamera: 2,
         isHuntMode: huntLike, //true
-        allowScale: huntLike, //true
+        // isHuntMode: true, //true
+        // allowScale: huntLike, //true
+        allowScale: true, //true
         // allowScale: true
 
       };
@@ -770,9 +772,9 @@ const ARScreen = ({route}) => {
 
     let bundleURL = "";
     if (Platform.OS === 'ios') {
-      bundleURL = selectedSite?.scanChallenge?.file_animation_iOS || "";
+      bundleURL = selectedSite?.scanChallenge?.file_animation_ios || "";
     } else {
-      bundleURL = selectedSite?.scanChallenge?.file_animation || "";
+      bundleURL = selectedSite?.scanChallenge?.file_animation_android || "";
     }
     if (!bundleURL) return;
 
@@ -803,8 +805,8 @@ const ARScreen = ({route}) => {
     sceneIsReady,
     pendingMode,
     selectedSite?.selectedMode?.mode,
-    selectedSite?.scanChallenge?.file_animation,
-    // selectedSite?.scanChallenge?.file_animation_iOS, //TODO Cuando exista
+    selectedSite?.scanChallenge?.file_animation_android,
+    selectedSite?.scanChallenge?.file_animation_iOS, //TODO Cuando exista
     selectedSite?.scanChallenge?.file_3d,
     selectedSite?.scanChallenge?.file_image,
   ]);
@@ -876,42 +878,40 @@ const ARScreen = ({route}) => {
     sendSpawnModelData,
   ]);
 
-
-
-  useEffect(() => {
-    if (!unityRef.current) return;
-    if (!sceneIsReady) return;
-    if (selectedSite?.selectedMode?.mode !== AR_MODES.GEO_TAG_MODE) return;
-    console.log("isMeInsideInSite", isMeInsideInSite)
-    const messageData = {
-      typeChallenge: "PHOTO",
-      arChallenge: false,
-      isLocation: !!isMeInsideInSite,
-    };
-    unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
-    console.log("messageData", messageData);
-    // (Opcional) pequeño aviso cuando está fuera del área
-    if (!isMeInsideInSite) {
-      const dataNotificationUnity = {
-        isNotification: true,
-        textNotification: "Move inside the site area to take a photo",
-      };
-      unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleNotification",
-          JSON.stringify(dataNotificationUnity)
-      );
-      setTimeout(() => {
-        if (unityRef.current) {
-          unityRef.current.postMessage(
-              "Scriptposition",
-              "SetVisibleNotification",
-              JSON.stringify({ ...dataNotificationUnity, isNotification: false })
-          );
-        }
-      }, 3000);
-    }
-  }, [isMeInsideInSite, sceneIsReady, selectedSite?.selectedMode?.mode]);
+  // useEffect(() => {
+  //   if (!unityRef.current) return;
+  //   if (!sceneIsReady) return;
+  //   if (selectedSite?.selectedMode?.mode !== AR_MODES.GEO_TAG_MODE) return;
+  //   console.log("isMeInsideInSite", isMeInsideInSite)
+  //   const messageData = {
+  //     typeChallenge: "PHOTO",
+  //     arChallenge: false,
+  //     isLocation: !!isMeInsideInSite,
+  //   };
+  //   unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
+  //   console.log("messageData", messageData);
+  //   // (Opcional) pequeño aviso cuando está fuera del área
+  //   if (!isMeInsideInSite) {
+  //     const dataNotificationUnity = {
+  //       isNotification: true,
+  //       textNotification: "Move inside the site area to take a photo",
+  //     };
+  //     unityRef.current.postMessage(
+  //         "Scriptposition",
+  //         "SetVisibleNotification",
+  //         JSON.stringify(dataNotificationUnity)
+  //     );
+  //     setTimeout(() => {
+  //       if (unityRef.current) {
+  //         unityRef.current.postMessage(
+  //             "Scriptposition",
+  //             "SetVisibleNotification",
+  //             JSON.stringify({ ...dataNotificationUnity, isNotification: false })
+  //         );
+  //       }
+  //     }, 3000);
+  //   }
+  // }, [isMeInsideInSite, sceneIsReady, selectedSite?.selectedMode?.mode]);
 
   useEffect(() => {
     if (!unityRef.current || !selectedSite?.selectedMode?.mode || !sceneIsReady) return;
