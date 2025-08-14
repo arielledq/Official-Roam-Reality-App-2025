@@ -393,7 +393,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
             attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
             return attempts_since.count()
         elif qs.exists():
-            return min(qs.count(), obj.challenge_attempt)
+            return min(qs.count(), obj.attempts)
         return 0
 
     def get_cooldown(self, obj):
