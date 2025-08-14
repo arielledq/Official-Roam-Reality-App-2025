@@ -493,9 +493,10 @@ const ARScreen = ({route}) => {
     }
     if (data?.objectDetect) {
       if (
-        selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge?.file_3d
+        selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
+        selectedSite?.scanChallenge?.file_3d
       ) {
-        unityRef.current.postMessage("Main Camera", "ShowARObject","");
+        unityRef.current.postMessage("Main Camera", "ShowARObject", "");
       }
     }
     if (data.infoButton?.isButton) {
@@ -638,7 +639,7 @@ const ARScreen = ({route}) => {
     setShouldRenderUnity(true);
 
     sendModelDataToUnity();
-  }
+  };
   const doneButtonHandler = async () => {
     try {
       const hasFilters = capturedImage && selectedSite?.ar_filters?.length > 0;
@@ -793,7 +794,7 @@ const ARScreen = ({route}) => {
     if (mode !== AR_MODES.SCAN_MODE) return;
 
     let bundleURL = "";
-    if (Platform.OS === 'ios') {
+    if (Platform.OS === "ios") {
       bundleURL = selectedSite?.scanChallenge?.file_animation_ios || "";
     } else {
       bundleURL = selectedSite?.scanChallenge?.file_animation_android || "";
@@ -901,8 +902,6 @@ const ARScreen = ({route}) => {
     sendSpawnModelData,
   ]);
 
-
-
   // useEffect(() => {
   //   if (!unityRef.current) return;
   //   if (!sceneIsReady) return;
@@ -948,8 +947,7 @@ const ARScreen = ({route}) => {
 
     switch (mode) {
       case AR_MODES.GEO_TAG_MODE:
-
-        show = ["Back", "Details", "ArMode", "screen", "position", "points", "loading"];
+        show = ["Back", "Details", "ArMode", "screen", "position", "points"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
         unityRef.current.postMessage(
@@ -1001,7 +999,7 @@ const ARScreen = ({route}) => {
 
         const has3DModel = selectedSite?.scanChallenge?.file_3d;
         show = has3DModel
-          ? ["Back", "Details", "ArMode", "screen", "points", "loading"]
+          ? ["Back", "Details", "ArMode", "screen", "points"]
           : ["Back", "Details", "ArMode", "screen"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
@@ -1025,7 +1023,7 @@ const ARScreen = ({route}) => {
 
       case AR_MODES.HUNT_MODE:
         setTimeout(() => {
-          show = ["Back", "Details", "ArMode", "Stars", "points", "position", "loading"];
+          show = ["Back", "Details", "ArMode", "Stars", "points", "position"];
           hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
           unityRef.current.postMessage(
