@@ -13,7 +13,6 @@ import LineIcon from "assets/ar/line.png";
 const { width } = Dimensions.get("window");
 
 const ViewInfoModal = ({ isVisible = false, onClose = () => {}, content = "" }) => {
-  console.log("MODALARMODE",isVisible, content);
   if (!isVisible) return null;
   return (
     <View style={styles.challengeInfoContainer}>

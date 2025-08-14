@@ -387,6 +387,24 @@ export const checkUniqueARChallengeDoneAPI = payload =>
     },
     logoutFunc
   );
+export const checkScansCoolDownAPI = scan_id =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/memories/check-scan-done/`,
+      method: "POST",
+      data: {scan: scan_id},
+    },
+    logoutFunc
+  );
+export const checkHuntCoolDownAPI = ar_star_id =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/memories/check-star-done/`,
+      method: "POST",
+      data: {ar_star: ar_star_id},
+    },
+    logoutFunc
+  );
 export const getProfieARMemoriesAPI = () =>
   Request.callWithToken(
     {

@@ -52,7 +52,7 @@ const PinChallenge = () => {
   const [shouldRenderUnity, setShouldRenderUnity] = useState(false);
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-
+  console.log("-------------", selectedGeoSite,"-------------")
   const unityRef = useRef(null); // Unity reference
   const watchIdRef = useRef(null);
   const viewShotRef = useRef();
@@ -392,7 +392,7 @@ const PinChallenge = () => {
   };
 
   const viewNotification = () => {
-    if (!isMeInsideInSite) {
+    if (!isMeInsideInSite && unityRef.current) {
       unityRef.current.postMessage(
         "Scriptposition",
         "SetVisibleNotification",
@@ -526,13 +526,8 @@ const PinChallenge = () => {
   }
 
   useEffect(() => {
-  if (isUnityLoaded === false) {
-    setUnitySceneLoaded(false);
-  }
-  else {
     setUnitySceneLoaded(true);
-  }
-}, [isUnityLoaded,]);
+  }, []);
 
 
 
@@ -574,29 +569,34 @@ const PinChallenge = () => {
     }
   }, [challengeObjParameters]);
 
-  useFocusEffect(() => {
+  useFocusEffect(
+      useCallback(() => {
+        const timer = setTimeout(() => {
+          if (!unityRef.current) return;
 
-    const timer = setTimeout(() => {
-      if (unityRef.current) {
-        PointsCount();
-        unityRef.current.postMessage(
-          "Scriptposition",
-          "SetVisibleButton",
-          JSON.stringify({
-            setVisibleButtonPosition: true,
-          })
-        );
-        if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded && !unitySceneLoaded) {
-          sendModelDataToUnitySpawn();
-          sendBloomValuesToUnity();
-        }
-        if (isUnityLoaded && isMeInsideInSite) {
-          enableButtonPhoto();
-        }
-      }
-    }, 700);
-    return () => clearTimeout(timer);
-  });
+          PointsCount();
+          unityRef.current.postMessage(
+              "Scriptposition",
+              "SetVisibleButton",
+              JSON.stringify({ setVisibleButtonPosition: true })
+          );
+
+          if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded && !unitySceneLoaded) {
+            sendModelDataToUnitySpawn();
+            sendBloomValuesToUnity();
+          }
+          if (isUnityLoaded && isMeInsideInSite) {
+            enableButtonPhoto();
+          }
+        }, 700);
+
+        return () => clearTimeout(timer);
+      }, [
+        isUnityLoaded, unitySceneLoaded, modelOBJ, textureBase, emissionValue,
+        textureEmission, isMeInsideInSite
+      ])
+  );
+
 console.log("isUnityLoaded, unitySceneLoaded", isUnityLoaded, unitySceneLoaded)
   useFocusEffect(
       useCallback(() => {

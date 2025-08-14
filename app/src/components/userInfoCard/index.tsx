@@ -1,5 +1,5 @@
 import React from "react";
-import { Pressable, View } from "react-native";
+import {Pressable, View} from "react-native";
 import useStyles from "./styles";
 import AppText from "../text";
 import Icon from "../Icon";
@@ -28,7 +28,7 @@ const UserInfoCard = ({
     <View style={styles.row}>
       {/* user details */}
       <View style={styles.nameContainer}>
-        <AppText style={image ? styles.name : styles.name1}>{name}</AppText>
+        <AppText style={styles.name}>{name}</AppText>
         <View style={styles.containerBottom}>
           <AppText style={styles.userName}>{truncatedEmail}</AppText>
           {reportAction && (

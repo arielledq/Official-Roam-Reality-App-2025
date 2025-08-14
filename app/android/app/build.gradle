@@ -82,8 +82,8 @@ android {
         applicationId 'com.roam_reality'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 62
-        versionName '1.0.62'
+        versionCode 66
+        versionName '1.0.66'
 
         multiDexEnabled true
     }

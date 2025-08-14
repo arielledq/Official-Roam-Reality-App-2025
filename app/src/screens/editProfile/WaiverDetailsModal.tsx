@@ -8,12 +8,12 @@ import {
   Text,
 } from "react-native";
 import React from "react";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 import theme from "../../assets/theme";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
-import { useSelector } from "react-redux";
+import {screenHorizontalPadding} from "../../util/AppDimensions";
+import {useSelector} from "react-redux";
 import RenderHTML from "react-native-render-html";
-import { AppButton, AppText } from "components";
+import {AppButton, AppText} from "components";
 
 const ConfirmationPopUp = ({
   confirmHandler = () => {},
@@ -22,7 +22,7 @@ const ConfirmationPopUp = ({
 }) => {
   const settings = useSelector((state: any) => state.ar?.arSettings);
   const htmlContent = settings?.waiver_details?.replace(/#000000/g, "#fff");
-  const { width } = useWindowDimensions();
+  const {width} = useWindowDimensions();
   return (
     <Modal visible={isVisible} transparent animationType="slide" onRequestClose={cancelHandler}>
       <View style={styles.modalContainer}>
@@ -34,25 +34,25 @@ const ConfirmationPopUp = ({
 
         {/* Button Header */}
         <ScrollView
-          contentContainerStyle={{ paddingBottom: 100 }}
+          contentContainerStyle={{paddingBottom: 100}}
           showsVerticalScrollIndicator={false}
-          style={{ flex: 1, width: "100%", padding: 24 }}
+          style={{flex: 1, width: "100%", padding: 24}}
         >
           <RenderHTML
             tagsStyles={{
-              p: { color: "#9CA3AF", fontSize: FontSizes.S14 },
-              ol: { color: "#9CA3AF", fontSize: FontSizes.S14 },
-              ul: { color: "#9CA3AF", fontSize: FontSizes.S14 },
-              em: { fontStyle: "italic" },
-              u: { textDecorationLine: "underline", },
-              s: { textDecorationLine: "line-through", },
-              strong: { color: "#fff", fontSize: FontSizes.S18 },
+              p: {color: "#9CA3AF", fontSize: FontSizes.S14},
+              ol: {color: "#9CA3AF", fontSize: FontSizes.S14},
+              ul: {color: "#9CA3AF", fontSize: FontSizes.S14},
+              em: {fontStyle: "italic"},
+              u: {textDecorationLine: "underline"},
+              s: {textDecorationLine: "line-through"},
+              strong: {color: "#fff", fontSize: FontSizes.S18},
             }}
-            source={{ html: htmlContent }}
+            source={{html: htmlContent}}
             contentWidth={width}
           />
         </ScrollView>
-        <View style={{ width: "100%", paddingHorizontal: 24 }}>
+        <View style={{width: "100%", paddingHorizontal: 24}}>
           <AppButton
             onPress={confirmHandler}
             buttonStyle={styles.buttonStyle}

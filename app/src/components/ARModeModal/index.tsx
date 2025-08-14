@@ -9,7 +9,7 @@ import {View, Text, StyleSheet} from "react-native";
 import ReactNativeModal from "react-native-modal";
 import {FontSizes} from "util/FontUtils";
 // @ts-ignore
-import {AR_MODES_MENU, ARModeMenuType} from "constants";
+import {AR_MODES_MENU, ARModeMenuType} from "../../constants";
 
 import {AppButton} from "components";
 import Icon from "components/Icon";

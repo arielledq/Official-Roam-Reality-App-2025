@@ -46,7 +46,6 @@ import GeoArChallenge from "../screens/home";
 import GeoArChallengeDetails from "../screens/geoarchallenge/destinationdetails";
 import GeoArSiteDetails from "../screens/geoarchallenge/sitedetails";
 import GeoArSiteRoutes from "../screens/geoarchallenge/siteroutes";
-import GeoArSiteNavigation from "../screens/geoarchallenge/navigationsite";
 import GeoArOutdoor from "../screens/geoarchallenge/outdoorgeoar";
 import ARFilter from "../screens/archallenge/FilterView";
 import Feedback from "../screens/support-send-feedback/Feedback";
@@ -84,10 +83,7 @@ const Navigation = () => {
   const token = useSelector((state: any) => state.login?.data?.token);
 
   const loginState = useSelector((state: any) => state.login);
-  const {newUser} = useSelector((state: any) => state.persist);
   const dispatch = useDispatch();
-
-  // const {checkForUpdates} = useCheckAppUpdates();
 
   useEffect(() => {
     // Define a callback function to handle storage changes
@@ -103,8 +99,6 @@ const Navigation = () => {
 
     // Subscribe to storage changes
     subscribeToStorageChanges(handleStorageChange);
-
-    // checkForUpdates();
 
     // Clean up the listener on component unmount
     return () => {
@@ -125,28 +119,19 @@ const Navigation = () => {
   const renderAuthStack = () => {
     return (
       <>
-        {newUser ? (
-          <>
-            {/* @ts-ignore */}
-            <Stack.Screen name="Onboarding" component={Onboarding} />
-            <Stack.Screen name="SignUp" component={SignUp} />
-            <Stack.Screen name="Login" component={Login} />
-          </>
-        ) : (
-          <>
-            {/* @ts-ignore */}
-            <Stack.Screen name="Onboarding" component={Onboarding} />
-            <Stack.Screen name="Login" component={Login} />
-            <Stack.Screen name="SignUp" component={SignUp} />
-          </>
-        )}
+        {/* @ts-ignore */}
+        <Stack.Screen name="Onboarding" component={Onboarding} />
+        <Stack.Screen name="SignUp" component={SignUp} />
+        <Stack.Screen name="Login" component={Login} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} />
         <Stack.Screen name="EmailVerification" component={EmailVerification} />
         <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
         <Stack.Screen name="Profile" component={Profile} />
         <Stack.Screen name="EditProfile" component={EditProfile} />
         <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+        {/* @ts-ignore */}
         <Stack.Screen name="Waiver" component={Waiver} />
+        {/* @ts-ignore */}
         <Stack.Screen name="UserAgreement" component={UserAgreement} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
@@ -174,20 +159,14 @@ const Navigation = () => {
       default:
         return (
           <>
-            <Stack.Screen name="TabNavigator" component={DrawerNav} />
-            <Stack.Screen name="EditProfile" component={EditProfile} />
-            <Stack.Screen name="Profile" component={Profile} />
+            {renderAuthStack()}
             <Stack.Screen name="PublicProfile" component={PublicProfile} />
             <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
             <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
             <Stack.Screen name="Friends" component={Friends} />
             <Stack.Screen name="AddFriend" component={AddFriendScreen} />
-            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
             <Stack.Screen name="SendFeedback" component={Feedback} />
             <Stack.Screen name="InviteFriends" component={InviteFriends} />
-            <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
-            <Stack.Screen name="Waiver" component={Waiver} />
-            <Stack.Screen name="UserAgreement" component={UserAgreement} />
             <Stack.Screen name="ARChallenge" component={ARChallenge} />
             <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} />
             <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
@@ -200,11 +179,11 @@ const Navigation = () => {
             <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
             <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
             <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
-            {/* <Stack.Screen name="GeoArSiteNavigation" component={GeoArSiteNavigation} /> */}
             <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
             <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
             <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
             <Stack.Screen name="PinChallenge" component={PinChallenge} />
+            {/* @ts-ignore */}
             <Stack.Screen name="ARScreen" component={ARScreen} />
             <Stack.Screen
               name="GeoUniqueArChallengeDetails"
@@ -214,12 +193,11 @@ const Navigation = () => {
             <Stack.Screen name="UniqueArChallengeShare" component={UniqueArChallengeShare} />
             <Stack.Screen name="Settings" component={Settings} />
             <Stack.Screen name="Privacy" component={Privacy} />
-            <Stack.Screen name="EmailVerification" component={EmailVerification} />
-            <Stack.Screen name="VerificationSuccess" component={VerificationSuccess} />
             <Stack.Screen name="ContactUs" component={ContactUs} />
             <Stack.Screen name="FAQ" component={FAQ} />
             <Stack.Screen name="Notifications" component={Notifications} />
             <Stack.Screen name="Legal" component={Legal} />
+            {/* @ts-ignore */}
             <Stack.Screen name="FunFactsScreen" component={FunFactsScreen} />
             {sharedRoutes}
           </>
