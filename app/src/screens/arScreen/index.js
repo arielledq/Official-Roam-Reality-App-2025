@@ -638,7 +638,7 @@ const ARScreen = ({route}) => {
     setShouldRenderUnity(true);
 
     sendModelDataToUnity();
-
+  }
   const doneButtonHandler = async () => {
     try {
       const hasFilters = capturedImage && selectedSite?.ar_filters?.length > 0;
@@ -845,7 +845,7 @@ const ARScreen = ({route}) => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 100} ;
+      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 100};
       unityRef.current.postMessage(
         "Main Camera",
         "SetDetectObjectState",
