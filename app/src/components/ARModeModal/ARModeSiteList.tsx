@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {View, Text, Image, TouchableOpacity, ScrollView, FlatList} from "react-native";
-
+import {View, Text, Image, TouchableOpacity, ScrollView, FlatList, Platform} from "react-native";
 import AppDropdown from "components/Dropdown";
 import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
@@ -263,7 +262,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           data={sponsorData}
           maxHeight={300}
           dropdownStyle={{zIndex:100}}
-          containerStyle={{flex: 1, borderRadius: 0, marginTop: 0, backgroundColor: theme.lightColors?.black, width:215,}}
+          containerStyle={{flex: 1, borderRadius: 0, marginLeft:3, marginTop: 0, backgroundColor: theme.lightColors?.black}}
           labelField="label"
           valueField="value"
           selectedTextStyle={{fontSize: 14, ...fontGroup.nunitoBold, fontWeight: "bold"}}
