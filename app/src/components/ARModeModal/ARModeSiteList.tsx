@@ -230,7 +230,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     setSponsorData(updatedSponsorsData);
     setSelectedSponsor(updatedSponsorsData[0]);
   }, [sites]);
-
+console.log("filtersitee",filteredSites)
   // Cuando se selecciona un sponsor, filtrar sites por sponsor
   useEffect(() => {
     if (selectedSponsor?.value) {
@@ -240,9 +240,35 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     }
   }, [selectedSponsor]);
 
+
+function formatCooldownTime(cooldown: string): number {
+  if (!cooldown) return 0;
+
+  const [hourStr] = cooldown.split(':');
+  const hours = parseInt(hourStr, 10);
+
+  return isNaN(hours) ? 0 : hours;
+}
+function getCooldownTotalMinutes(cooldown: string): number {
+  if (!cooldown || typeof cooldown !== 'string') return 0;
+
+  const parts = cooldown.split(':');
+
+  // Esperar al menos "hh:mm"
+  if (parts.length < 2) return 0;
+
+  const hours = parseInt(parts[0], 10);
+  const minutes = parseInt(parts[1], 10);
+
+  if (isNaN(hours) || isNaN(minutes)) return 0;
+
+  return hours * 60 + minutes;
+}
+
+
   return (
     <View style={{width: "100%", maxHeight: "85%"}}>
-      <View style={{flexDirection: "row", alignItems: "center", gap: 15}}>
+      <View style={{flexDirection: "row", alignItems: "center", justifyContent:'space-between'}}>
         <View
           style={{
             height: 75,
@@ -417,9 +443,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                       let attemptsDetails = "";
                       let sponsorImage = "";
                       const points = item?.points || 0;
-                      let coolDownHours = item?.cooldownHours || 0;
+                      let coolDownHours = 0;
+                      let coolDownMin = 0;
+                      let isDisabled = false;
                       let onPressHandler = () => startChallengeHandler(site);
-
+                      console.log("Challenge item:", item);
+                      console.log("Challenge SITE:", site);
                       switch (selectedMode?.mode) {
                         case AR_MODES.GEO_TAG_MODE:
                           challengeTitle = item?.name;
@@ -427,7 +456,10 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             site?.challenge_attempt || 0
                           } Check-Ins`;
                           sponsorImage = site?.sponsor?.image;
-                          coolDownHours = 0; // TODO: Missing cool down hours on the API response
+                          coolDownHours = formatCooldownTime(site?.checkin_cooldown) || 0;
+                          coolDownMin = getCooldownTotalMinutes(site?.checkin_cooldown) || 0;
+                          isDisabled = coolDownMin > 0;
+                          // coolDownHours = site?.checkin_cooldown || 8 ; // TODO: Missing cool down hours on the API response
                           break;
                         case AR_MODES.SCAN_MODE:
                           challengeTitle = item?.name;
@@ -435,7 +467,10 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             item?.attempts || 0
                           } Gems`;
                           sponsorImage = item?.sponsor?.image;
-                          coolDownHours = item?.cooldown_hours || 0;
+                          coolDownHours = formatCooldownTime(item.cooldown) || 0;
+                          coolDownMin = getCooldownTotalMinutes(item.cooldown) || 0;
+                          isDisabled = coolDownMin > 0;
+                          coolDownHours = formatCooldownTime(item?.cooldown) || 0;
                           const updatedSite = {
                             ...site,
                             // Remove list of challenges
@@ -453,7 +488,10 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                             site?.challenge_attempt || 0
                           } Captures`;
                           sponsorImage = site?.sponsor?.image;
-                          coolDownHours = 0; // TODO: Missing cool down hours on the API response
+                          coolDownHours = formatCooldownTime(site?.hunt_cooldownn) || 0;
+                          coolDownMin = getCooldownTotalMinutes(site?.hunt_cooldown) || 0;
+                          isDisabled = coolDownMin > 0;
+                          // coolDownHours = site?.hunt_cooldown || 8; // TODO: Missing cool down hours on the API response
                           break;
                       }
 
@@ -465,6 +503,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
                           coolDownHours={coolDownHours}
                           sponsorImage={sponsorImage}
                           onPress={onPressHandler}
+                          disabled={isDisabled}
                         />
                       );
                     }}

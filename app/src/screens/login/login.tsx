@@ -57,6 +57,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
           }
         } else {
           handleError(res);
+          setIsLoading(false);
         }
       })
       .catch(err => {

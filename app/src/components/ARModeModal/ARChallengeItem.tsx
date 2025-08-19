@@ -10,6 +10,7 @@ interface ARChallengeItemProps {
   attemptsDetails: string;
   coolDownHours: number;
   sponsorImage: string;
+  disabled: any;
 }
 
 const ARChallengeItem = ({
@@ -19,13 +20,16 @@ const ARChallengeItem = ({
   attemptsDetails,
   coolDownHours,
   sponsorImage,
+  disabled,
 }: ARChallengeItemProps) => {
   return (
     <View style={{marginTop: 10, marginLeft: 10}}>
       <TouchableOpacity
         activeOpacity={0.8}
+        disabled={disabled}
         onPress={() => onPress()}
         style={{
+          opacity: disabled ? 0.5 : 1,
           backgroundColor: theme.lightColors?.grey4,
           borderRadius: 4,
           flexDirection: "row",

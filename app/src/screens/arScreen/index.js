@@ -815,7 +815,7 @@ const ARScreen = ({route}) => {
         const img = selectedSite?.scanChallenge?.file_image || "";
         if (img) payload.localImagePath = img;
       }
-
+      console.log("---pay----",payload,"----load----")
       unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
       loadArContentSentRef.current = true;
     }, AFTER_SCENE_COOLDOWN_MS);
