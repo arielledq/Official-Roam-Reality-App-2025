@@ -262,7 +262,8 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         <AppDropdown
           data={sponsorData}
           maxHeight={300}
-          containerStyle={{flex: 1, borderRadius: 0}}
+          dropdownStyle={{zIndex:100}}
+          containerStyle={{flex: 1, borderRadius: 0, marginTop: 0, backgroundColor: theme.lightColors?.black, width:215,}}
           labelField="label"
           valueField="value"
           selectedTextStyle={{fontSize: 14, ...fontGroup.nunitoBold, fontWeight: "bold"}}
