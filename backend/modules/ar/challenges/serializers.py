@@ -385,6 +385,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
             user=user,
             created_at__gte=window_start,
             memory_type__in=['SCAN_PHOTO',],
+            scan_picture=obj,
         ).order_by('created_at')
 
         last_first_attempt = qs.filter(user_first_attempt=True).last()
