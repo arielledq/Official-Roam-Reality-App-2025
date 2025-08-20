@@ -32,11 +32,6 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
   const [timerVisible, setTimerVisible] = useState(false);
   const [firstEmailSent, setFirstEmailSent] = useState(false);
 
-  useEffect(() => {
-    if (!data) return;
-    dispatch(updateUserData(data));
-  }, [data]);
-
   const navigateToSuccess = () => {
     navigation.reset({
       index: 0,
@@ -65,6 +60,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
       .then(res => {
         if (res.status == 1) {
           navigateToSuccess();
+          dispatch(updateUserData(data));
         } else {
           handleError(res);
         }
@@ -76,6 +72,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
 
   const handleSkip = () => {
     console.log("navigating to TabNavigator");
+    dispatch(updateUserData(data));
 
     navigation.reset({
       index: 0,
