@@ -225,9 +225,58 @@ class ChallengesUploadSerializer(serializers.ModelSerializer):
         fields = ("id", "image", "model_file")
 
 
+class ScanPictureSerializer(serializers.ModelSerializer):
+    file_image = serializers.ImageField()
+    file_animation_android = RandomDownloadNameS3FileField()
+    file_animation_ios = RandomDownloadNameS3FileField()
+    file_3d = RandomDownloadNameS3FileField()
+    icon = serializers.ImageField()
+    sponsor = SponsorSerializer()
+    user_attempts = serializers.SerializerMethodField()
+    cooldown = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ScanPicture
+        geo_field = ('coordinates',)
+        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
+                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = ARMemories.objects.filter(
+            user=user,
+            created_at__gte=window_start,
+            memory_type__in=['SCAN_PHOTO',],
+            scan_picture=obj,
+        ).order_by('created_at')
+
+        last_first_attempt = qs.filter(user_first_attempt=True).last()
+
+        if last_first_attempt:
+            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
+            return attempts_since.count()
+        elif qs.exists():
+            return min(qs.count(), obj.attempts)
+        return 0
+
+    def get_cooldown(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        return scan_cooldown_by_user(user, obj)
+
+
 class ARMemoriesSerializerGet(serializers.ModelSerializer):
     memory_file = serializers.FileField()
     challenge_details = ChallengesSerializer(source='challenges', read_only=True)
+    scan_picture = ScanPictureSerializer()
 
     class Meta:
         model = ARMemories
@@ -242,6 +291,7 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "thumbnail_memory_video_file",
             "memory_type",
             "created_at",
+            "scan_picture",
         )
 
 
@@ -356,54 +406,6 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
             "latitude_longitude",
             "visibility_radius",
         )
-
-
-class ScanPictureSerializer(serializers.ModelSerializer):
-    file_image = serializers.ImageField()
-    file_animation_android = RandomDownloadNameS3FileField()
-    file_animation_ios = RandomDownloadNameS3FileField()
-    file_3d = RandomDownloadNameS3FileField()
-    icon = serializers.ImageField()
-    sponsor = SponsorSerializer()
-    user_attempts = serializers.SerializerMethodField()
-    cooldown = serializers.SerializerMethodField()
-
-    class Meta:
-        model = ScanPicture
-        geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
-                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
-
-    def get_user_attempts(self, obj):
-        request = self.context.get('request', None)
-        user = getattr(request, 'user', None)
-        if not user or not user.is_authenticated:
-            return 0
-
-        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
-        qs = ARMemories.objects.filter(
-            user=user,
-            created_at__gte=window_start,
-            memory_type__in=['SCAN_PHOTO',],
-            scan_picture=obj,
-        ).order_by('created_at')
-
-        last_first_attempt = qs.filter(user_first_attempt=True).last()
-
-        if last_first_attempt:
-            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
-            return attempts_since.count()
-        elif qs.exists():
-            return min(qs.count(), obj.attempts)
-        return 0
-
-    def get_cooldown(self, obj):
-        request = self.context.get('request', None)
-        user = getattr(request, 'user', None)
-        if not user or not user.is_authenticated:
-            return 0
-
-        return scan_cooldown_by_user(user, obj)
 
 
 class GeoStarSimpleSerializer(GeoModelSerializer):
