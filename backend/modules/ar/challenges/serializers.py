@@ -406,6 +406,48 @@ class ScanPictureSerializer(serializers.ModelSerializer):
         return scan_cooldown_by_user(user, obj)
 
 
+class GeoStarSimpleSerializer(GeoModelSerializer):
+    sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    user_attempts = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GeoARStar
+        fields = (
+            "id",
+            "name",
+            "fun_facts",
+            "info",
+            "visibility_radius",
+            "geo_site",
+            "challenges",
+            "sponsored",
+            "following_mode",
+            'attempts',
+            'user_attempts',
+        )
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = StarCollection.objects.filter(
+            user=request.user,
+            created_at__gte=window_start,
+        ).order_by('created_at')
+        total_stars = obj.stars.count()
+        collected_ids = list(qs.values_list('geo_ar_star_point_id', flat=True))
+
+        grouped = [
+            collected_ids[i:i + total_stars]
+            for i in range(0, len(collected_ids), total_stars)
+        ]
+        attempts_done = len([g for g in grouped if len(g) == total_stars])
+        return attempts_done
+
+
 class GeoArSiteSerializer(GeoModelSerializer):
     image = serializers.ImageField()
     pin_challenge = GeoARChallengesSerializer(read_only=True)
@@ -416,6 +458,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     scan_pictures = ScanPictureSerializer(many=True)
     checkin_cooldown = serializers.SerializerMethodField()
     hunt_cooldown = serializers.SerializerMethodField()
+    ar_star = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoArSite
@@ -446,6 +489,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "checkin_cooldown",
             "hunt_cooldown",
             "elevation",
+            "ar_star",
         )
 
     def get_check_ins(self, obj):
@@ -491,6 +535,11 @@ class GeoArSiteSerializer(GeoModelSerializer):
             ar_star = obj.geo_arstar_ar_site.first()
             return hunt_cooldown_by_user(user, ar_star)
         return 0
+
+    def get_ar_star(self, obj):
+        if ar_star := obj.geo_arstar_ar_site.first():
+            return GeoStarSimpleSerializer(ar_star).data
+        return None
 
 
 class GeoRegionSerializer(GeoModelSerializer):
