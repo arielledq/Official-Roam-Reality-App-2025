@@ -831,6 +831,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
     geo_ar_star = GeoStarSerializer()
     remaining_stars = serializers.SerializerMethodField()
     captured_stars = serializers.SerializerMethodField()
+    hunt_captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
     image = serializers.ImageField()
     sponsors = SponsorSerializer(many=True)
@@ -845,6 +846,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "order",
             "remaining_stars",
             "captured_stars",
+            "hunt_captured_stars",
             "total_stars",
             "image",
             "fun_facts",
@@ -866,6 +868,20 @@ class GeoStarPointSerializer(GeoModelSerializer):
             'geo_ar_star_point_id', flat=True)
         remaining = ar_star.stars.filter(id__in=visited_points).count()
         return remaining
+
+    def get_hunt_captured_stars(self, instance):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=instance.cooldown_hours)
+        qs = StarCollection.objects.filter(
+            user=request.user,
+            created_at__gte=window_start,
+        ).order_by('created_at').count()
+
+        return qs
 
     def get_total_stars(self, instance):
         ar_star = instance.geo_ar_star
