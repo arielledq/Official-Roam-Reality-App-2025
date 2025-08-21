@@ -130,7 +130,7 @@ const ArChallengeShare = () => {
 
     default:
       challengePoints =
-        challengeObj.points +
+        challengeObj?.points +
         socialPointsCounter.facebook +
         socialPointsCounter.instagram +
         socialPointsCounter.others;
@@ -484,7 +484,7 @@ const ArChallengeShare = () => {
                     margin: 0,
                   }}
                 >
-                  {challengePoints}
+                  {challengePoints || 0}
                 </AppText>
                 <AppText
                   style={{

@@ -118,7 +118,7 @@ export const AR_MODES_MENU = [
     icon: "pinlocation",
   },
   {
-    id: 2,
+    id: 3,
     label: "Scan",
     name: "Scan",
     listLabel: "Hidden Gems",
@@ -128,7 +128,7 @@ export const AR_MODES_MENU = [
     icon: "scan",
   },
   {
-    id: 3,
+    id: 2,
     label: "Hunt",
     name: "Hunt",
     listLabel: "Hunts",

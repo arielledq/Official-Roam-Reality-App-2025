@@ -22,8 +22,8 @@ const MemoryContainer = ({
 
   const isMemory = true;
   const capturedDataUri = item?.memory_file;
-  const filePath = capturedDataUri.split("?")[0];
-  const fileExt = filePath.split(".").pop() || "";
+  const filePath = capturedDataUri?.split("?")[0];
+  const fileExt = filePath?.split(".").pop() || "";
 
   const permissionsGrantedHandler = () => {
     setHasPermission(true);

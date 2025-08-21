@@ -375,7 +375,7 @@ function getCooldownTotalMinutes(cooldown: string): number {
                 break;
               case AR_MODES.HUNT_MODE:
                 challengesAvailable = "1 Hunt";
-                challenges = [site?.pin_challenge];
+                challenges = [site?.huntChallenge];
                 break;
             }
 
@@ -447,8 +447,8 @@ function getCooldownTotalMinutes(cooldown: string): number {
                       let coolDownMin = 0;
                       let isDisabled = false;
                       let onPressHandler = () => startChallengeHandler(site);
-                      console.log("Challenge item:", item);
-                      console.log("Challenge SITE:", site);
+                      // console.log("Challenge item:", item);
+                      // console.log("Challenge SITE:", site);
                       switch (selectedMode?.mode) {
                         case AR_MODES.GEO_TAG_MODE:
                           challengeTitle = item?.name;
@@ -483,9 +483,9 @@ function getCooldownTotalMinutes(cooldown: string): number {
                           onPressHandler = () => startChallengeHandler(updatedSite);
                           break;
                         case AR_MODES.HUNT_MODE:
-                          challengeTitle = site?.pin_challenge?.name;
-                          attemptsDetails = `${site?.user_attempts || 0}/${
-                            site?.challenge_attempt || 0
+                          challengeTitle = site?.ar_star?.name;
+                          attemptsDetails = `${site?.ar_star?.user_attempts || 0}/${
+                            site?.ar_star?.attempts || 0
                           } Captures`;
                           sponsorImage = site?.sponsor?.image;
                           coolDownHours = formatCooldownTime(site?.hunt_cooldownn) || 0;

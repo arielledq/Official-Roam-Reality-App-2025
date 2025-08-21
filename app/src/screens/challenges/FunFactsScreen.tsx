@@ -254,7 +254,7 @@ const FunFactsScreen = ({route}: any) => {
     if (remainingStars >= 1) {
       const huntChallenge = {
         ...challengeObj,
-        selectedMode: AR_MODES_MENU[1],
+        selectedMode: AR_MODES_MENU[2],
         huntChallenge: newHuntPointChallenge,
       };
       navigationParams = {
@@ -270,7 +270,7 @@ const FunFactsScreen = ({route}: any) => {
       // @ts-ignore
       navigation.navigate("TabNavigator", {
         screen: "Tab",
-        params: {screen: "Go Navigate", params: navigationParams},
+        params: {screen: "Go Navigate"}, //TODO Temp
       });
     }, 250);
   };

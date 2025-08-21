@@ -416,7 +416,7 @@ export const getProfieARMemoriesAPI = () =>
 export const getPublicProfieARMemoriesAPI = user_id =>
   Request.callWithToken(
     {
-      url: `modules/challenges/memories/public/?user_id=${user_id}`,
+      url: `modules/challenges/all-memories/public/?user_id=${user_id}`,
       method: "GET",
     },
     logoutFunc

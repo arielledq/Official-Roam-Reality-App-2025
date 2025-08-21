@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import { handleError } from "../../util/helpers";
-import { getARChallenges, getARProfile, getARStettings } from "../../network";
+import { getARChallenges, getARProfile, getARStettings, getMyRank } from "../../network";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import AppText from "../../components/text";
@@ -31,6 +31,8 @@ const ArChallenge = ({}) => {
   const [sponsoredData, setSponsoredData] = useState([]);
   const arProfile = useSelector(state => state.ar?.arProfile);
   const navigation = useNavigation();
+  const [globalPoints, setGlobalPoints] = useState(0)
+  const [globalRank, setGlobalRank] = useState(0)
 
   const ARSposored = () => {
     setIsLoading(true);
@@ -91,11 +93,26 @@ const ArChallenge = ({}) => {
     setChallengeChoice(choice);
     setSponsoredData(sponsoredDataAll.filter(x => x.challenge_requirement.includes(choice)));
   };
+  const getMyRankPoints = (destination = "") => {
+    getMyRank(destination)
+      .then(response => {
+        if (response) {
+          console.log("response", JSON.stringify(response, null, 2));
+          setGlobalRank(response?.my_rank || 0);
+          setGlobalPoints(response?.my_points || 0);
 
+          // setRankMine(response);
+        }
+      })
+      .finally(() => {
+        fetchARUserProfile();
+      });
+  };
   useEffect(() => {
     ARSposored();
     ARUserProfile();
     getSettings();
+    getMyRankPoints()
   }, []);
 
   const navigateToChallengeDetails = obj => {
@@ -139,7 +156,7 @@ const ArChallenge = ({}) => {
           }}
           imageSource={PointBoardBG}
         >
-          <AppText style={[_styles.pointsText]}>{arProfile?.points}</AppText>
+          <AppText style={[_styles.pointsText]}>{globalPoints}</AppText>
           <AppText style={[_styles.yourPointsText]}>Your Total Points</AppText>
         </BackgroundWithImage>
       </View>

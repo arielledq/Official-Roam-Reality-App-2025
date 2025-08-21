@@ -439,18 +439,27 @@ const ARScreen = ({route}) => {
   };
 
   //TODO Pending
-  const unityStarsCount = () => {
-    if (unityRef.current && selectedSite?.huntChallenge) {
-      unityRef.current.postMessage(
-        "Scriptposition",
-        "SetVisibleStars",
-        JSON.stringify({
-          stars: `${selectedSite?.huntChallenge?.captured_stars}/${selectedSite?.huntChallenge?.total_stars}`,
-          isStarsView: true,
-        })
-      );
-    }
-  };
+const unityStarsCount = () => {
+  if (unityRef?.current && selectedSite?.huntChallenge) {
+    const hunt = selectedSite.huntChallenge;
+
+    const total = hunt.total_stars || 4;
+    const captured = hunt.captured_stars || 0;
+
+    let capturedThisAttempt = captured % total;
+
+    const displayCaptured = capturedThisAttempt === 0 ? 1 : capturedThisAttempt;
+
+    unityRef.current.postMessage(
+      "Scriptposition",
+      "SetVisibleStars",
+      JSON.stringify({
+        stars: `${displayCaptured}/${total}`,
+        isStarsView: true,
+      })
+    );
+  }
+};
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -826,7 +835,7 @@ const ARScreen = ({route}) => {
     pendingMode,
     selectedSite?.selectedMode?.mode,
     selectedSite?.scanChallenge?.file_animation_android,
-    selectedSite?.scanChallenge?.file_animation_iOS, //TODO Cuando exista
+    selectedSite?.scanChallenge?.file_animation_ios, //TODO Cuando exista
     selectedSite?.scanChallenge?.file_3d,
     selectedSite?.scanChallenge?.file_image,
   ]);
@@ -1258,6 +1267,8 @@ const ARScreen = ({route}) => {
       return () => {
         clearTimeout(timeout);
         setValidUserLocation(false);
+        setSendSpawnModelData(false);
+        setHasSentModelDataOnce(false);
         setCapturedImage(null);
         setCapturedVideo(null);
         setIsUnityLoaded(true);
@@ -1267,12 +1278,34 @@ const ARScreen = ({route}) => {
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);
         setUnityLoading(false);
-        setSendSpawnModelData(false);
-        setHasSentModelDataOnce(false);
       };
     }, [])
   );
 
+  useEffect(() => {
+  if (!sceneIsReady) return;
+
+  Geolocation.getCurrentPosition(
+    pos => {
+      const { latitude, longitude, accuracy } = pos.coords || {};
+      if (latitude && longitude) {
+        const firstLoc = { latitude, longitude, accuracy };
+        setUserLocation(firstLoc);
+        setValidUserLocation(firstLoc);
+        updateUnityLocation(firstLoc);
+        lastSentLocationRef.current = firstLoc;
+      }
+    },
+    err => {
+      // opcional: log
+    },
+    {
+      enableHighAccuracy: true,
+      timeout: 10000,
+      maximumAge: 0,
+    }
+  );
+}, [sceneIsReady]);
   useEffect(() => {
     if (!sceneIsReady || !unityRef.current) return;
 
