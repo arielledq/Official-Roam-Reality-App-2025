@@ -875,7 +875,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
         if not user or not user.is_authenticated:
             return 0
 
-        window_start = timezone.now() - timedelta(hours=instance.cooldown_hours)
+        window_start = timezone.now() - timedelta(hours=instance.geo_ar_star.cooldown_hours)
         qs = StarCollection.objects.filter(
             user=request.user,
             created_at__gte=window_start,
