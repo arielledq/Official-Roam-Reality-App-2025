@@ -540,7 +540,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
 
     def get_ar_star(self, obj):
         if ar_star := obj.geo_arstar_ar_site.first():
-            return GeoStarSimpleSerializer(ar_star).data
+            return GeoStarSimpleSerializer(ar_star, context=self.context).data
         return None
 
 
