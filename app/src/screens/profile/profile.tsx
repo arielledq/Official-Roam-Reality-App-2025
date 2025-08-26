@@ -312,10 +312,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     </KeyboardAwareScrollView>
   );
 
-  const navigateToShare = (captureData: any, challengeObj: any) => {
+  const navigateToShare = (captureData: any, challengeObj: any, scan_picture: any) => {
     // @ts-ignore
     navigation.navigate("ArChallengeShare", {
       challengeObj: challengeObj,
+      scan_picture: scan_picture,
       captureData,
       hideBottomTab: true,
       isMemory: true,
@@ -341,7 +342,16 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => <MemoryContainer item={item} onPressAction={navigateToShare} />}
+          renderItem={({item}) => <MemoryContainer
+    item={item}
+    onPressAction={() =>
+      navigateToShare(
+        item?.memory_file,                 
+        item?.challenge_details ?? null,   
+        item?.scan_picture ?? item?.challenges ?? null // scan_picture
+      )
+    }
+  />}
           keyExtractor={(item: any) => item?.id?.toString()}
         />
       </View>

@@ -99,7 +99,8 @@ const ARScreen = ({route}) => {
     if (mode === AR_MODES.SCAN_MODE) return !!selectedSite?.scanChallenge?.file_3d; // solo si hay 3D
     return false; // GEO no entra acá (manejo aparte)
   };
-
+  const [loading, setLoading] = useState(false);
+  
   // espera breve tras sceneLoaded antes de enviar datos (ajustable)
   const AFTER_SCENE_COOLDOWN_MS = 400;
 
@@ -107,6 +108,9 @@ const ARScreen = ({route}) => {
   const sceneCycleRef = useRef(0);
   const sendBundleTimerRef = useRef(null);
   const loadArContentSentRef = useRef(false);
+  const challenge_type_value = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
+  ? CHALLENGES_TYPE.PIN_CHECK_IN
+  : null;
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -140,6 +144,7 @@ const ARScreen = ({route}) => {
   };
 
   const unzipModelFile = async (sourcePath, targetPath) => {
+    setLoading(true);
     const extractedData = await handleUnzipProcess(sourcePath, targetPath);
 
     if (extractedData.success) {
@@ -154,6 +159,7 @@ const ARScreen = ({route}) => {
       setTextureBase(null);
       setTextureEmission(null);
     }
+    setLoading(false);
   };
 
   const checkIfModelExist = () => {
@@ -314,7 +320,6 @@ const ARScreen = ({route}) => {
     const distance = getLocationDistance({latitude: lat, longitude: lon}, nearestPoint);
     setDistanceInFeet(convertMetersToFeets(distance));
   };
-  // console.log("--------------", toCoordsWrapper(), "--------------");
 
   const sendBloomValuesToUnity = () => {
     const bloomData = {threshold, intensity};
@@ -355,7 +360,7 @@ const ARScreen = ({route}) => {
         // minScale: 0.1,
         // maxScale:  10,
         isRotationEnabled: true,
-        isVisible: isGeoTagMode, //true
+        isVisible: !huntLike, //true
         position: {
           x: parseFloat(selectedChallengeOverride?.parameters?.positionX) || 0,
           y: parseFloat(selectedChallengeOverride?.parameters?.positionY) || 0,
@@ -372,8 +377,12 @@ const ARScreen = ({route}) => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
       // setSendModelData(true);
+        unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({isVisible: false})
+      );
       setHasSentModelDataOnce(true);
-      console.log("HUNTLIKE", huntLike, "/n", modelData);
     }
   };
 
@@ -419,7 +428,6 @@ const ARScreen = ({route}) => {
         },
       ],
     };
-    console.log("Se Envio SpawnDAta", spawnData);
     unityRef.current.postMessage(
       "ObjectSpawner",
       "SpawnObjectsFromReact",
@@ -443,12 +451,15 @@ const unityStarsCount = () => {
   if (unityRef?.current && selectedSite?.huntChallenge) {
     const hunt = selectedSite.huntChallenge;
 
-    const total = hunt.total_stars || 4;
-    const captured = hunt.captured_stars || 0;
+    const total = hunt?.total_stars || 4;
+    const captured = hunt?.hunt_captured_stars || 0;
 
-    let capturedThisAttempt = captured % total;
+    let capturedThisAttempt = hunt.hunt_captured_stars % hunt.total_stars;
+    if (capturedThisAttempt === 0 && hunt.hunt_captured_stars > 0) {
+      capturedThisAttempt = hunt.total_stars;
+    }
 
-    const displayCaptured = capturedThisAttempt === 0 ? 1 : capturedThisAttempt;
+    const displayCaptured = capturedThisAttempt
 
     unityRef.current.postMessage(
       "Scriptposition",
@@ -486,7 +497,7 @@ const unityStarsCount = () => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    console.log("dataUnity", data);
+    // console.log("dataUnity", data);
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
@@ -522,7 +533,6 @@ const unityStarsCount = () => {
       setOpenModalARMode(true);
     }
     if (data?.["Reset-AR"] && selectedSite.selectedMode?.mode === AR_MODES.HUNT_MODE) {
-      console.log("Reset AR");
       //TODO Pending Reset Stars
       startChallengeHandler(selectedSite);
     }
@@ -593,6 +603,7 @@ const unityStarsCount = () => {
         }
 
         if (data?.photoVideoButton?.isPhoto) {
+          setHasSentModelDataOnce(false)
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
@@ -638,20 +649,22 @@ const unityStarsCount = () => {
   };
 
   const retakeButtonHandler = () => {
+    setHasSentModelDataOnce(false)
     setCapturedImage(null);
     setCapturedVideo(null);
     setIsUnityLoaded(true);
     setUnitySceneLoaded(true);
 
     setSceneIsReady(true);
-    setUnityLoading(false);
-    setShouldRenderUnity(true);
+    
+    // setUnityLoading(false);
+    // setShouldRenderUnity(true);
 
-    sendModelDataToUnity();
+    // sendModelDataToUnity();
   };
   const doneButtonHandler = async () => {
     try {
-      const hasFilters = capturedImage && selectedSite?.ar_filters?.length > 0;
+      const hasFilters = capturedImage && isGeoTagMode;
       let updatedData = capturedImage ? capturedImage : capturedVideo;
 
       if (hasFilters) {
@@ -715,7 +728,7 @@ const unityStarsCount = () => {
 
   const startChallengeHandler = async site => {
     let mode = site?.selectedMode?.mode;
-    console.log("[ARScreen] startChallengeHandler site", site);
+    // console.log("[ARScreen] startChallengeHandler site", site);
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -824,7 +837,6 @@ const unityStarsCount = () => {
         const img = selectedSite?.scanChallenge?.file_image || "";
         if (img) payload.localImagePath = img;
       }
-      console.log("---pay----",payload,"----load----")
       unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
       loadArContentSentRef.current = true;
     }, AFTER_SCENE_COOLDOWN_MS);
@@ -867,7 +879,9 @@ const unityStarsCount = () => {
 
       if (mode === AR_MODES.GEO_TAG_MODE) {
         if (!hasSentModelDataOnce && readyForModel) {
+
           sendModelDataToUnity();
+//          sendBloomValuesToUnity()
           const messageData = {
             typeChallenge: "PHOTO",
             arChallenge: false,
@@ -888,7 +902,9 @@ const unityStarsCount = () => {
         }
         if (hasSentModelDataOnce && !sendSpawnModelData) {
           sendSpawnData();
+          unityStarsCount(); 
           PointsCount();
+          // sendBloomValuesToUnity()
           return;
         }
       }
@@ -956,7 +972,7 @@ const unityStarsCount = () => {
 
     switch (mode) {
       case AR_MODES.GEO_TAG_MODE:
-        show = ["Back", "Details", "ArMode", "screen", "position", "points"];
+        show = ["Back", "Details", "ArMode", "screen", "position", "points", "loading"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
         unityRef.current.postMessage(
@@ -1008,14 +1024,24 @@ const unityStarsCount = () => {
 
         const has3DModel = selectedSite?.scanChallenge?.file_3d;
         show = has3DModel
-          ? ["Back", "Details", "ArMode", "screen", "points"]
-          : ["Back", "Details", "ArMode", "screen"];
+          ? ["Back", "Details", "ArMode", "screen", "points", "position"]
+          : ["Back", "Details", "ArMode", "screen", "points", "position"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
         unityRef.current.postMessage(
           "CanvasController",
           "ShowHideElements",
           JSON.stringify({show, hide})
+        );
+
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetTextReAnchor",
+          JSON.stringify({
+            titleARMode: "RESET AR",
+            textlabel: "",
+            visibleLabel: false,
+          })
         );
 
         unityRef.current.postMessage(
@@ -1068,7 +1094,6 @@ const unityStarsCount = () => {
             JSON.stringify(distanceDetect)
           );
           PointsCount();
-          unityStarsCount();
         }, 1000);
         break;
 
@@ -1224,11 +1249,11 @@ const unityStarsCount = () => {
       //   "SetDetectObjectState",
       //   JSON.stringify(distanceDetect)
       // );
-      unityRef.current.postMessage(
-        "OBJImport",
-        "SetLoadingVisibility",
-        JSON.stringify({isVisible: false})
-      );
+      // unityRef.current.postMessage(
+      //   "OBJImport",
+      //   "SetLoadingVisibility",
+      //   JSON.stringify({isVisible: false})
+      // );
     }
   }, [isUnityLoaded, unityLoading, shouldRenderUnity]);
 
@@ -1269,6 +1294,8 @@ const unityStarsCount = () => {
         setValidUserLocation(false);
         setSendSpawnModelData(false);
         setHasSentModelDataOnce(false);
+        setTextureBase(false);
+        setStarModels(false);
         setCapturedImage(null);
         setCapturedVideo(null);
         setIsUnityLoaded(true);
@@ -1306,6 +1333,18 @@ const unityStarsCount = () => {
     }
   );
 }, [sceneIsReady]);
+
+useEffect(() => {
+  if (loading == true && unityRef.current){
+    console.log("entro aqui")
+     unityRef.current.postMessage(
+        "OBJImport",
+        "SetLoadingVisibility",
+        JSON.stringify({isVisible: true})
+      );
+  }
+}, [loading, unityRef.current]);
+
   useEffect(() => {
     if (!sceneIsReady || !unityRef.current) return;
 
@@ -1377,8 +1416,17 @@ const unityStarsCount = () => {
             isUnityLoaded={isUnityLoaded}
             capturedImage={capturedImage}
             capturedVideo={capturedVideo}
-            imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
+              // imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
+            imageFilter={{
+            challengeObj: {
+              ...selectedSite,
+              challenge_type: challenge_type_value,
+            },
+            viewShotRef: viewShotRef,
+            }}
+
           />
+          
           {unitySceneLoaded === true && (
             <View
               style={{
@@ -1403,7 +1451,7 @@ const unityStarsCount = () => {
         <CameraControls
           hasCapturedContent={!!capturedImage || !!capturedVideo}
           onRetake={
-            selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE ? retakeButtonHandler : null
+            selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE ? retakeButtonHandler : retakeButtonHandler
           }
           onDone={doneButtonHandler}
           isVideo={!!capturedVideo}

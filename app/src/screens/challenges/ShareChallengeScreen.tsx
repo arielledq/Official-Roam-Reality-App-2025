@@ -39,6 +39,7 @@ interface ShareChallengeRouteParams {
   captureData: string;
   challengeType: string;
   isMemory: boolean;
+  scan_picture: any
 }
 
 const ArChallengeShare = () => {
@@ -72,13 +73,14 @@ const ArChallengeShare = () => {
   const captureData = route?.params?.captureData;
   const challengeType = route?.params?.challengeType;
   const isMemory = route?.params?.isMemory;
+  const scan_picture = route?.params?.scan_picture;
 
-  console.log("challengeObj", challengeObj);
+  console.log("challengeObj", route.params);
 
   let screenTitle = "";
-  let challengePoints = challengeObj?.points || 0;
+  let challengePoints = challengeObj?.points ||scan_picture?.points;
 
-  let sponsor = challengeObj?.sponsored;
+  let sponsor = challengeObj?.sponsored || scan_picture?.sponsor;
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
   let sponsorImage = sponsor?.image || "";
   let sponsorName = sponsor?.name || "";
@@ -582,7 +584,7 @@ const ArChallengeShare = () => {
               </View>
 
               {/* Completion date */}
-              <Text
+              { !scan_picture && <Text
                 style={{
                   ...fontGroup.nunitoLight,
                   fontWeight: "300",
@@ -591,7 +593,7 @@ const ArChallengeShare = () => {
                 }}
               >
                 Completed on: {startDate}
-              </Text>
+                </Text>}
             </View>
           </View>
 

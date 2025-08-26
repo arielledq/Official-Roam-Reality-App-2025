@@ -20,6 +20,36 @@ interface ARModeSiteListProps {
   onStartChallenge: (site: any) => void;
   onClose: () => void;
 }
+async function checkHuntGate(starId: number) {
+  try {
+    const rsp = await checkHuntCoolDownAPI(starId);
+    console.log("[HUNT CHECK raw rsp]", rsp);
+
+    if (rsp?.status === 1) {
+      return { ok: true, reason: rsp?.message || "OK" };
+    }
+
+    if (rsp?.status >= 200 && rsp?.status < 300) {
+      return { ok: true, reason: rsp?.message || "OK" };
+    }
+
+    if (rsp?.errorStatus) {
+      const msg = rsp?.message?.message || rsp?.message;
+      const first = rsp?.errorStatus === 404 && /None does not exist/i.test(String(msg || ""));
+      if (first) return { ok: true, reason: "FIRST_ATTEMPT" };
+      return { ok: false, reason: msg || `HTTP ${rsp.errorStatus}` };
+    }
+
+    return { ok: true, reason: rsp?.message || "OK" };
+  } catch (e: any) {
+    const status = e?.response?.status || e?.errorStatus || "n/a";
+    const msg = e?.response?.data?.message || e?.message?.message || e?.message || "Blocked";
+    console.log("[HUNT CHECK thrown error]", status, e?.response?.data || e);
+    return { ok: false, reason: `${msg} (status ${status})` };
+  }
+}
+
+
 
 const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteListProps) => {
   const DEFAULT_SPONSOR = {
@@ -45,59 +75,71 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     };
     switch (selectedMode?.mode) {
       case AR_MODES.HUNT_MODE: {
-        let hasNextStar = false;
-        const params = {
-          geo_site_id: site.id,
-          lat: initialUserLocation.latitude,
-          lon: initialUserLocation.longitude,
-        };
-        try {
-          const huntChallenge = await getNextStar(params.geo_site_id, params.lat, params.lon);
-          if (huntChallenge?.id) {
-            hasNextStar = true;
-            updatedSiteData = {
-              ...updatedSiteData,
-              huntChallenge: {...huntChallenge},
-            };
-          }
-        } catch (error: any) {
-          Toast.show({
-            type: "error",
-            text1: "Error retrieving the challenge",
-            text2: error?.message || "There was an unexpected error. Please try again later.",
-          });
-        }
+        console.log("[HUNT] startChallengeHandler()", {
+        siteId: site?.id,
+        starId: site?.ar_star?.id,
+        loc: initialUserLocation,
+      });
 
-        // Validate cool down period && Start challenge
-        if (hasNextStar) {
-          // Validate cool down period
-          const scanId = updatedSiteData?.huntChallenge?.geo_ar_star?.id;
-          let isInCoolDownPeriod = false;
-          try {
-            await checkHuntCoolDownAPI(scanId);
-            isInCoolDownPeriod = false;
-          } catch (e: any) {
-            isInCoolDownPeriod = true;
-            Toast.show({
-              type: "info",
-              text1: "Scan Challenge Info",
-              text2: e?.message?.message || "You are in cool down period. Please try again later.",
-            });
-          }
+  const starId = Number(site?.ar_star?.id);
+  const geoSiteId = site?.id;
 
-          // Start challenge
-          if (!isInCoolDownPeriod) {
-            onStartChallenge(updatedSiteData);
-            onClose();
-          } else {
-            onClose();
-          }
-        } else {
-          onClose();
-        }
+  if (!geoSiteId || !starId) {
+    Toast.show({ type: "error", text1: "Hunt Challenge", text2: "Falta ar_star.id del sitio." });
+    onClose(); return;
+  }
 
-        break;
-      }
+  const gate = await checkHuntGate(starId);
+  console.log("[HUNT CHECK] starId:", starId, "->", gate);
+
+  if (!gate.ok) {
+    Toast.show({
+      type: "info",
+      text1: "Hunt Cooldown",
+      text2: String(gate.reason || "Cooldown activo. Intenta más tarde."),
+    });
+    onClose(); return;
+  }
+
+  let { latitude: lat, longitude: lon } = initialUserLocation || {};
+  const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    await wait(300);
+    ({ latitude: lat, longitude: lon } = initialUserLocation || {});
+  }
+  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    Toast.show({ type: "info", text1: "Ubicación", text2: "No se obtuvo ubicación aún. Intenta de nuevo." });
+    onClose(); return;
+  }
+
+  let hasNextStar = false;
+  try {
+    const huntChallenge = await getNextStar(geoSiteId, lat as number, lon as number);
+    if (huntChallenge?.id) {
+      hasNextStar = true;
+      updatedSiteData = { ...updatedSiteData, huntChallenge: { ...huntChallenge } };
+    }
+  } catch (error: any) {
+    Toast.show({ type: "error", text1: "Hunt Challenge", text2: error?.message || "No se pudo obtener la siguiente estrella." });
+  }
+
+  if (!hasNextStar) {
+    Toast.show({
+      type: "success",
+      text1: "Hunt completo",
+      text2: gate?.reason || "You have collected all the stars.",
+    });
+    getSitesHandler(selectedSponsor?.value?.toString() || "");
+    onClose(); 
+    return;
+  }
+
+  onStartChallenge(updatedSiteData);
+  onClose();
+  break;
+}
+
+
       case AR_MODES.SCAN_MODE: {
         // Validate cool down period
         const scanId = updatedSiteData?.scanChallenge?.id;
@@ -230,7 +272,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     setSponsorData(updatedSponsorsData);
     setSelectedSponsor(updatedSponsorsData[0]);
   }, [sites]);
-console.log("filtersitee",filteredSites)
   // Cuando se selecciona un sponsor, filtrar sites por sponsor
   useEffect(() => {
     if (selectedSponsor?.value) {

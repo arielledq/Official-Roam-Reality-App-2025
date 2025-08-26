@@ -59,10 +59,10 @@ const ARFilter = ({challengeObj, captureData, viewShotRef}) => {
     var admin_area_2 = null;
     var sublocality_level_2 = null;
     var sublocality_level_1 = null;
-    var details = fullLocation.results[0].address_components;
+    var details = fullLocation?.results[0].address_components;
 
-    for (var i = details.length - 1; i >= 0; i--) {
-      for (var j = 0; j < details[i].types.length; j++) {
+    for (var i = details?.length - 1; i >= 0; i--) {
+      for (var j = 0; j < details[i]?.types.length; j++) {
         if (details[i].types[j] == "sublocality_level_2") {
           sublocality_level_2 = details[i].long_name;
         }

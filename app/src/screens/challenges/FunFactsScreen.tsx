@@ -50,7 +50,10 @@ const FunFactsScreen = ({route}: any) => {
       socialPointsCounter.others;
   }
   const fileExt = "png";
-
+  const endOnceRef = useRef(false);
+  const lastPressRef = useRef(0);
+  const [lockInputs, setLockInputs] = useState(false);
+  const [isEnding, setIsEnding] = useState(false);
   const handleCaptureScreenshot = async () => {
     try {
       const uri = await captureRef(funFactCardRef, {
@@ -68,7 +71,12 @@ const FunFactsScreen = ({route}: any) => {
       console.error("Screenshot capture error:", error);
     }
   };
-
+  const pressedTooSoon = (ms = 1000) => {
+  const now = Date.now();
+  if (now - lastPressRef.current < ms) return true;
+  lastPressRef.current = now;
+  return false;
+  };
   const countSocialPoints = (
     selectedSSNN: string,
     grantSocialPointsHandler: (selectedSSNN: string) => {}
@@ -221,58 +229,57 @@ const FunFactsScreen = ({route}: any) => {
   };
 
   const endFunFactsButtonHandler = async () => {
+    if (pressedTooSoon(1000)) return;
+    if (endOnceRef.current) return;
+    endOnceRef.current = true;
+    setLockInputs(true);
+    setIsEnding(true);
+
     const geoSiteId = challengeObj?.huntChallenge?.geo_ar_star?.geo_site?.id;
     const challengeId = challengeObj?.huntChallenge?.geo_ar_star?.id;
     const starPointId = challengeObj?.huntChallenge?.id;
     const lat = challengeObj?.lat_long?.coordinates[1];
     const lon = challengeObj?.lat_long?.coordinates[0];
 
-    // Record hunt challenge
     try {
       await starFoundAndSaveApi({
-        geo_site: geoSiteId, // Site ID
-        geo_ar_star: challengeId, // Challenge ID
-        geo_ar_star_point: starPointId, // Star/Hunt Point ID
+        geo_site: geoSiteId,
+        geo_ar_star: challengeId,
+        geo_ar_star_point: starPointId,
         latitude: lat,
         longitude: lon,
       });
-    } catch (error) {
-      console.error("Error al guardar el desafío:", error);
-    }
 
-    let newHuntPointChallenge: any;
-    try {
-      newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
-    } catch (error) {
-      console.error("Error al obtener el siguiente desafío:", error);
-    }
-
-    // Extract remaining hunt pins
+      const newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
     const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
 
-    let navigationParams = {};
+    let navigationParams: any = {};
     if (remainingStars >= 1) {
-      const huntChallenge = {
+        const huntChallenge = {
         ...challengeObj,
         selectedMode: AR_MODES_MENU[2],
         huntChallenge: newHuntPointChallenge,
-      };
-      navigationParams = {
-        huntChallenge,
-      };
+        };
+        navigationParams = {huntChallenge};
     } else {
-      navigationParams = {
-        huntChallengeFinished: true,
-      };
-    }
+      navigationParams = {huntChallengeFinished: true};
+      }
 
     setTimeout(() => {
-      // @ts-ignore
-      navigation.navigate("TabNavigator", {
-        screen: "Tab",
-        params: {screen: "Go Navigate"}, //TODO Temp
-      });
-    }, 250);
+    // @ts-ignore
+    navigation.navigate("TabNavigator", {
+      screen: "Tab",
+      params: {screen: "Go Navigate"},
+    });
+  }, 250);
+    } catch (error) {
+      console.error("Error al finalizar:", error);
+
+      // si quieres permitir reintento cuando falle:
+      endOnceRef.current = false;     // quitar si NO quieres reintentar
+      setLockInputs(false);
+      setIsEnding(false);
+    }
   };
 
   const closeShareToSocialMediaButtonHandler = () => {
@@ -501,19 +508,23 @@ const FunFactsScreen = ({route}: any) => {
         </View>
 
         {/* Buttons */}
-        <View style={{flexDirection: "row", gap: 16}}>
+        <View style={{flexDirection: "row", gap: 16}}
+          pointerEvents={lockInputs ? "none" : "auto"}
+        >
           <AppButton
             onPress={handleCaptureScreenshot}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
             titleStyle={{fontSize: FontSizes.S12, fontWeight: "bold"}}
             title={"Share To Socials"}
+            disabled={lockInputs}
           />
 
           <AppButton
             onPress={endFunFactsButtonHandler}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
             titleStyle={{fontSize: FontSizes.S12, fontWeight: "bold"}}
-            title={"End"}
+            title={isEnding ? "Ending..." : "End"}
+            disabled={isEnding}
           />
         </View>
       </View>

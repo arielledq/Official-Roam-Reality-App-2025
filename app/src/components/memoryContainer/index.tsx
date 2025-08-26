@@ -67,7 +67,7 @@ const MemoryContainer = ({
             }}
           >
             <AppText numberOfLines={1} style={styles.title}>
-              {truncateText(item?.challenge_details?.name, 8)}
+              {truncateText(item?.challenge_details?.name || item?.scan_picture?.name, 8)}
             </AppText>
             <TouchableOpacity
               onPress={saveToGalleryButtonHandler}
@@ -77,7 +77,7 @@ const MemoryContainer = ({
             </TouchableOpacity>
           </View>
           <AppText numberOfLines={2} style={styles.description}>
-            {truncateText(item?.challenge_details?.description.replace(/<[^>]*>?/gm, " "), 30)}
+            {truncateText(item?.challenge_details?.description.replace(/<[^>]*>?/gm, " ") || item?.scan_picture?.sponsor?.description.replace(/<[^>]*>?/gm, " "), 30)}
           </AppText>
         </View>
       </View>
