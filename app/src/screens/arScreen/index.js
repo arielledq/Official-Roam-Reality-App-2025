@@ -532,10 +532,13 @@ const unityStarsCount = () => {
     if (buttonARMode) {
       setOpenModalARMode(true);
     }
-    if (data?.["Reset-AR"] && selectedSite.selectedMode?.mode === AR_MODES.HUNT_MODE) {
-      //TODO Pending Reset Stars
-      startChallengeHandler(selectedSite);
-    }
+    if (data?.["Reset-AR"] && (
+          selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
+          (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge?.file_3d)
+        )) 
+        {
+        startChallengeHandler(selectedSite);
+        }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
     }
@@ -629,6 +632,9 @@ const unityStarsCount = () => {
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
           setUnitySceneLoaded(false);
+          setSendSpawnModelData(false)
+          setHasSentModelDataOnce(false)
+
           eraseFile();
         }
         // if (data?.photoVideoButton?.isPhoto == false) {
@@ -650,11 +656,11 @@ const unityStarsCount = () => {
 
   const retakeButtonHandler = () => {
     setHasSentModelDataOnce(false)
+    setSendSpawnModelData(false)
     setCapturedImage(null);
     setCapturedVideo(null);
     setIsUnityLoaded(true);
     setUnitySceneLoaded(true);
-
     setSceneIsReady(true);
     
     // setUnityLoading(false);
@@ -1021,11 +1027,9 @@ const unityStarsCount = () => {
           "SetDetectObjectState",
           JSON.stringify(distanceDetect)
         );
-
-        const has3DModel = selectedSite?.scanChallenge?.file_3d;
-        show = has3DModel
-          ? ["Back", "Details", "ArMode", "screen", "points", "position"]
-          : ["Back", "Details", "ArMode", "screen", "points", "position"];
+        setTimeout(() => {
+        // const has3DModel = selectedSite?.scanChallenge?.file_3d;
+        show = ["Back", "Details", "ArMode", "screen", "points", "position"];
         hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
         unityRef.current.postMessage(
@@ -1054,6 +1058,7 @@ const unityStarsCount = () => {
           })
         );
         PointsCount();
+        }, 300);
         break;
 
       case AR_MODES.HUNT_MODE:
@@ -1451,7 +1456,7 @@ useEffect(() => {
         <CameraControls
           hasCapturedContent={!!capturedImage || !!capturedVideo}
           onRetake={
-            selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE ? retakeButtonHandler : retakeButtonHandler
+            retakeButtonHandler
           }
           onDone={doneButtonHandler}
           isVideo={!!capturedVideo}
