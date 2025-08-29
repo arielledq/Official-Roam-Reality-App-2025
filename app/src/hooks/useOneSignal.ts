@@ -8,13 +8,15 @@ export const useOneSignal = (onNotificationClick?: NotificationClickHandler) => 
   const setOnesignalDevice = async () => {
     try {
       const pushSubscription = OneSignal.User.pushSubscription;
-      const subscriptionId = await pushSubscription.getPushSubscriptionId();
-      const optedIn = await pushSubscription.getOptedIn();
+      const subscriptionId = await pushSubscription.getIdAsync();        // antes: getPushSubscriptionId()
+      const optedIn = await pushSubscription.getOptedInAsync();          // antes: getOptedIn()
+//       const token = await pushSubscription.getTokenAsync();              // APNs/FCM token
+
+//     console.log("🆔 OneSignal:", { subscriptionId, optedIn, hasToken: !!token });
+
+//       console.log("pushSubscription, subscriptionId, optedIn", pushSubscription, subscriptionId, optedIn)
       if (subscriptionId && optedIn) {
-        const deviceData = {
-          userId: subscriptionId,
-          active: optedIn,
-        };
+        const deviceData = { userId: subscriptionId, active: optedIn };
         setDevice(deviceData)
           .then(res => {
             console.log("Device Data Updated Successfully", res);

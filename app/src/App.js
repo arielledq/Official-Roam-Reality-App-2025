@@ -6,11 +6,13 @@ import "react-native-devsettings/withAsyncStorage";
 import {GestureHandlerRootView} from "react-native-gesture-handler";
 import Geocoder from "react-native-geocoding";
 import Toast, {ErrorToast, SuccessToast} from "react-native-toast-message";
-import {OneSignal} from "react-native-onesignal";
+import {LogLevel, OneSignal} from "react-native-onesignal";
 import "react-native-get-random-values";
 import {PersistGate} from "redux-persist/integration/react";
 import {Provider as PaperProvider} from "react-native-paper";
 import {enableScreens} from "react-native-screens";
+import {useOneSignal} from "./hooks/useOneSignal"
+
 
 import Config from "./config";
 import {persistor, store} from "./store";
@@ -24,14 +26,26 @@ if (__DEV__) {
 
 enableScreens();
 Geocoder.init(Config.GEOCODER_API_KEY);
-
+//OneSignal.Debug.setLogLevel(LogLevel.Verbose);
 // INFO: react-native-onesignal setup
 OneSignal.initialize(Config.ONE_SIGNAL_APP_ID);
 OneSignal.Notifications.requestPermission(true);
 OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
+//  console.log("EVENTE NOTIFICATION ----------------",event)
   const notification = event.getNotification();
   event.complete(notification);
 });
+
+//OneSignal.User.pushSubscription.addEventListener("change", async () => {
+//  try {
+//    const id = await OneSignal.User.pushSubscription.getIdAsync();
+//    const token = await OneSignal.User.pushSubscription.getTokenAsync();
+//    const optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
+//    console.log("📣 pushSubscription change:", { id, hasToken: !!token, optedIn });
+//  } catch (e) {
+//    console.log("pushSubscription change error:", e);
+//  }
+//});
 
 const toastConfig = {
   success: props => <SuccessToast {...props} text2NumberOfLines={2} text1NumberOfLines={2} />,
@@ -39,6 +53,14 @@ const toastConfig = {
 };
 
 const App = () => {
+//  const { setOnesignalDevice } = useOneSignal();
+//  useEffect(() => {
+//    LogBox.ignoreLogs(["Warning: ..."]);
+//    LogBox.ignoreAllLogs();
+//    // Llama una vez para registrar el device en tu backend y loguear id/permiso
+//    setOnesignalDevice();
+//  }, [setOnesignalDevice]);
+
   useEffect(() => {
     LogBox.ignoreLogs(["Warning: ..."]);
     LogBox.ignoreAllLogs();

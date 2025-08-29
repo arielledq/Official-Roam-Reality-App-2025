@@ -650,7 +650,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
           <Dialog.Title style={{color: "white"}}>Make sure to add a profile picture</Dialog.Title>
           <Dialog.Content>
             <Text style={{color: "#B8B8B8", fontSize: 14, lineHeight: 20}}>
-              Are you sure you want to continue without a profile picture?
+              Do you wish to go back and choose a profile picture?
             </Text>
           </Dialog.Content>
           <Dialog.Actions
@@ -686,7 +686,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
             <View style={{flex: 1}}>
               <AppButton
-                title="Add profile picture"
+                title="Go Back"
                 onPress={() => setAddProfilePictureIsVisible(false)}
                 buttonStyle={{
                   height: 40,
