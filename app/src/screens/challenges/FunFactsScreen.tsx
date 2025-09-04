@@ -1,5 +1,5 @@
-import React, {useRef, useState} from "react";
-import {Image, Text, View, Dimensions} from "react-native";
+import React, {useRef, useState, useMemo} from "react";
+import {Image, Text, View, Dimensions, PixelRatio} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 // @ts-ignore
 import ViewShot, {captureRef} from "react-native-view-shot";
@@ -21,17 +21,170 @@ import BGArShare from "assets/ar/bg-ar-share.png";
 import useArScreenHook from "../../hooks/useArScreenHook";
 import RenderHTML from "react-native-render-html";
 
+const SHARE_PRESETS = {
+  instagramStory: { width: 1080, height: 1920 },
+  instagramPost45: { width: 1080, height: 1350 },
+  instagramSquare: { width: 1080, height: 1080 },
+  facebookFeed: { width: 1200, height: 1500 },
+} as const;
+type PresetKey = keyof typeof SHARE_PRESETS;
+
+const pxToDp = (px: number) => px / PixelRatio.get();
+type FitMode = "contain" | "cover";
+
+const FIT_MODE: FitMode = "contain";
+
+const OffscreenShareCard = React.forwardRef<any, {
+  widthDp: number;
+  heightDp: number;
+  funFactImage?: string;
+  siteImage?: string;
+  siteName?: string;
+  funFactDetail?: string;
+  onReady?: () => void;
+}>(({ widthDp, heightDp, funFactImage, siteImage, siteName, funFactDetail, onReady }, ref) => {
+  const [cardSize, setCardSize] = useState<{w: number; h: number}>({ w: 0, h: 0 });
+
+  const { scale, containerStyle } = useMemo(() => {
+    const w = Math.max(1, cardSize.w);
+    const h = Math.max(1, cardSize.h);
+    if (!w || !h) {
+      return {
+        scale: 1,
+        containerStyle: { justifyContent: "center", alignItems: "center" } as const,
+      };
+    }
+    const sx = widthDp / w;
+    const sy = heightDp / h;
+
+    const s = FIT_MODE === "cover" ? Math.max(sx, sy) : Math.min(sx, sy);
+
+    return {
+      scale: s,
+      containerStyle: { justifyContent: "center", alignItems: "center" } as const,
+    };
+  }, [cardSize, widthDp, heightDp]);
+
+  return (
+    <View
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        opacity: 0,          
+        pointerEvents: "none",
+        width: widthDp,
+        height: heightDp,
+      }}
+      onLayout={onReady}
+    >
+      <ViewShot
+        ref={ref}
+        options={{ format: "png", quality: 1 }}
+        style={{
+          width: "100%",
+          height: "100%",
+          backgroundColor: "#272741",
+        }}
+        collapsable={false}
+      >
+        <View style={{ width: "100%", height: "100%", ...containerStyle }}>
+          <View style={{ transform: [{ scale }] }}>
+            <View
+              onLayout={(e) => {
+                const { width, height } = e.nativeEvent.layout;
+                if (width && height) {
+                  setCardSize({ w: width, h: height });
+                }
+              }}
+              style={{ width: widthDp }}
+            >
+              <View
+                style={{
+                  backgroundColor: "#272741",
+                  gap: 16,
+                  borderRadius: 12,
+                  overflow: "hidden",
+                  paddingBottom: 16,
+                }}
+              >
+                <Image
+                  source={{ uri: funFactImage }}
+                  style={{
+                    width: "100%",
+                    height: undefined,
+                    aspectRatio: 1,
+                    backgroundColor: "transparent",
+                  }}
+                  resizeMode="cover"
+                />
+
+                <View style={{ paddingHorizontal: 16, gap: 16 }}>
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
+                    {!!siteImage && (
+                      <Image
+                        style={{ width: 25, height: 25, borderRadius: 25 }}
+                        source={{ uri: siteImage }}
+                      />
+                    )}
+                    <Text
+                      style={{
+                        fontWeight: "700",
+                        fontSize: 20,
+                        color: "#fff",
+                      }}
+                      numberOfLines={1}
+                    >
+                      {siteName}
+                    </Text>
+                  </View>
+
+                  <RenderHTML
+                    contentWidth={widthDp }
+                    tagsStyles={{
+                      p: { color: "#9CA3AF", fontSize: 14 },
+                      strong: { color: "#fff", fontSize: 14 },
+                      ol: { color: "#fff" },
+                      li: { color: "#fff" },
+                      em: { fontStyle: "italic" },
+                      u: { textDecorationLine: "underline" },
+                      s: { textDecorationLine: "line-through" },
+                    }}
+                    source={{ html: `${funFactDetail ?? ""}` }}
+                  />
+
+                  <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+                    <Text style={{ fontWeight: "700", fontSize: 14, color: "#fff" }}>
+                      Brought to you by
+                    </Text>
+                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                      {!!siteImage && <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: siteImage }} />}
+                      {!!siteImage && <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: siteImage }} />}
+                      {!!siteImage && <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: siteImage }} />}
+                    </View>
+                  </View>
+                </View>
+              </View>
+            </View>
+          </View>
+        </View>
+      </ViewShot>
+    </View>
+  );
+});
+
+
+
+
 const FunFactsScreen = ({route}: any) => {
   const [shareToSocialsIsOpen, setShareToSocialsIsOpen] = useState(false);
-  const [socialPointsCounter, setSocialPointsCounter] = useState({
-    facebook: 0,
-    instagram: 0,
-    others: 0,
-  });
+  const [socialPointsCounter, setSocialPointsCounter] = useState({ facebook: 0, instagram: 0, others: 0 });
   const [filePath, setFilePath] = useState("");
 
   const funFactCardRef = useRef(null);
 
+  const offscreenRef = useRef(null);
+  const [isOffscreenReady, setIsOffscreenReady] = useState(false);
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const dispatch = useDispatch();
 
@@ -54,28 +207,41 @@ const FunFactsScreen = ({route}: any) => {
   const lastPressRef = useRef(0);
   const [lockInputs, setLockInputs] = useState(false);
   const [isEnding, setIsEnding] = useState(false);
-  const handleCaptureScreenshot = async () => {
-    try {
-      const uri = await captureRef(funFactCardRef, {
-        format: "png",
-        quality: 0.9,
-        result: "tmpfile", // or 'data-uri' if you prefer base64
-      });
-      setFilePath(uri);
-      console.log("Screenshot URI:", uri);
 
-      // Optional: Open share modal
-      setShareToSocialsIsOpen(true);
-      // or pass URI to ShareToSocialsModal
-    } catch (error) {
-      console.error("Screenshot capture error:", error);
-    }
+  const SELECTED_PRESET_KEY: PresetKey = "instagramStory";
+  const SELECTED_PRESET = SHARE_PRESETS[SELECTED_PRESET_KEY];
+  const offWdp = pxToDp(SELECTED_PRESET.width);
+  const offHdp = pxToDp(SELECTED_PRESET.height);
+
+  const captureForNetwork = async (presetKey: PresetKey) => {
+    const { width, height } = SHARE_PRESETS[presetKey];
+    const uri = await captureRef(offscreenRef, {
+      format: "jpg",
+      quality: 0.9,
+      result: "tmpfile",
+      useRenderInContext: true,
+    });
+    return uri;
   };
+
+const handleCaptureScreenshot = async () => {
+  try {
+    if (!isOffscreenReady) {
+      await new Promise(r => setTimeout(r, 0));
+    }
+    const uri = await captureForNetwork(SELECTED_PRESET_KEY);
+    setFilePath(uri);
+    setShareToSocialsIsOpen(true);
+  } catch (error) {
+    console.error("Screenshot capture error:", error);
+  }
+};
+
   const pressedTooSoon = (ms = 1000) => {
-  const now = Date.now();
-  if (now - lastPressRef.current < ms) return true;
-  lastPressRef.current = now;
-  return false;
+    const now = Date.now();
+    if (now - lastPressRef.current < ms) return true;
+    lastPressRef.current = now;
+    return false;
   };
   const countSocialPoints = (
     selectedSSNN: string,
@@ -86,139 +252,36 @@ const FunFactsScreen = ({route}: any) => {
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.facebook;
           if (currCounter.facebook === 0) {
-            // console.log("granting points for facebook");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
-          } else {
-            // console.log(" not counting more points but allowing to share... ");
           }
-          return {
-            ...currCounter,
-            facebook: updatedCounter,
-          };
+          return { ...currCounter, facebook: updatedCounter };
         });
         break;
       case SSNN.INSTAGRAM:
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.instagram;
           if (currCounter.instagram === 0) {
-            // console.log("granting points for instagram");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
-          } else {
-            // console.log(" not counting more points but allowing to share... ");
           }
-          return {
-            ...currCounter,
-            instagram: updatedCounter,
-          };
+          return { ...currCounter, instagram: updatedCounter };
         });
         break;
       case SSNN.OTHERS:
         setSocialPointsCounter(currCounter => {
           let updatedCounter = currCounter.others;
           if (currCounter.others === 0) {
-            // console.log("granting points for others");
             updatedCounter = 1;
             grantSocialPointsHandler(selectedSSNN);
-          } else {
-            // console.log(" not counting more points but allowing to share... ");
           }
-          return {
-            ...currCounter,
-            others: updatedCounter,
-          };
+          return { ...currCounter, others: updatedCounter };
         });
         break;
-
       default:
         break;
     }
   };
-
-  // const shareToRoamProfile = async (endExperienceHandler?: () => void) => {
-  //   let filename = capturedDataUri.split("/").pop();
-  //   let shareFile = {
-  //     uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
-  //     type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
-  //     name: filename,
-  //   };
-
-  //   const formData = new FormData();
-  //   let res;
-
-  //   try {
-  //     // let successMessage = "Successfully, completed your challenge.";
-  //     switch (challengeType) {
-  //       case CHALLENGES_TYPE.PHOTO_VIDEO:
-  //         formData.append("challenges", challengeObj.id);
-  //         formData.append("memory_file", shareFile);
-  //         formData.append("memory_type", fileExt == "mp4" ? "VIDEO" : "PHOTO");
-  //         res = await postArMemory(formData);
-  //         break;
-
-  //       case CHALLENGES_TYPE.PIN_CHECK_IN:
-  //         formData.append("geo_challenge", challengeObj.id);
-  //         formData.append("geo_site", challengeObj?.geo_site?.id);
-  //         formData.append("memory_file", shareFile);
-
-  //         res = await postGeoPinCheckIn(formData);
-  //         break;
-  //       // case CHALLENGES_TYPE.STAR:
-  //       //   res = await starFoundAndSaveApi({
-  //       //     geo_site: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
-  //       //     geo_ar_star: challengeObj?.geo_ar_star?.id, // challenge
-  //       //     geo_ar_star_point: challengeObj?.id, // id de la estrella
-  //       //     latitude: userLocation?.latitude,
-  //       //     longitude: userLocation?.longitude,
-  //       //   });
-
-  //       //   const remainingStars = challengeObj?.remaining_stars;
-  //       //   // if (remainingStars > 1) {
-  //       //   //   successMessage = "Success, continue to the next Star.";
-  //       //   // }
-
-  //       //   break;
-
-  //       default:
-  //         break;
-  //     }
-
-  //     setHasSharedToRoamProfile(true);
-  //     ARUserProfile();
-
-  //     if (res.status === 1) {
-  //       if (endExperienceHandler) {
-  //         endExperienceHandler();
-  //       }
-  //     } else {
-  //       console.error("Success - Error al compartir el desafío:", res);
-  //       handleError("There was an error sharing your challenge: " + res?.message);
-  //     }
-  //   } catch (error) {
-  //     console.error("Catch - Error al compartir el desafío:", error);
-  //     handleError("There was an error sharing your challenge: " + error);
-  //   }
-  // };
-
-  // useEffect(() => {
-  //   if (
-  //     !hasSharedToRoamProfile &&
-  //     (socialPointsCounter.facebook === 1 ||
-  //       socialPointsCounter.instagram === 1 ||
-  //       socialPointsCounter.others === 1)
-  //   ) {
-  //     shareToRoamProfile();
-  //   }
-  // }, [socialPointsCounter, hasSharedToRoamProfile]);
-
-  // const ARUserProfile = () => {
-  //   getARProfile().then(res => {
-  //     if (res.status == 1) {
-  //       dispatch(updateARUserData(res));
-  //     }
-  //   });
-  // };
 
   const resetNavigation = () => {
     navigation.reset({
@@ -251,32 +314,30 @@ const FunFactsScreen = ({route}: any) => {
       });
 
       const newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
-    const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
+      const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
 
-    let navigationParams: any = {};
-    if (remainingStars >= 1) {
+      let navigationParams: any = {};
+      if (remainingStars >= 1) {
         const huntChallenge = {
-        ...challengeObj,
-        selectedMode: AR_MODES_MENU[2],
-        huntChallenge: newHuntPointChallenge,
+          ...challengeObj,
+          selectedMode: AR_MODES_MENU[2],
+          huntChallenge: newHuntPointChallenge,
         };
         navigationParams = {huntChallenge};
-    } else {
-      navigationParams = {huntChallengeFinished: true};
+      } else {
+        navigationParams = {huntChallengeFinished: true};
       }
 
-    setTimeout(() => {
-    // @ts-ignore
-    navigation.navigate("TabNavigator", {
-      screen: "Tab",
-      params: {screen: "Go Navigate"},
-    });
-  }, 250);
+      setTimeout(() => {
+        // @ts-ignore
+        navigation.navigate("TabNavigator", {
+          screen: "Tab",
+          params: {screen: "Go Navigate"},
+        });
+      }, 250);
     } catch (error) {
       console.error("Error al finalizar:", error);
-
-      // si quieres permitir reintento cuando falle:
-      endOnceRef.current = false;     // quitar si NO quieres reintentar
+      endOnceRef.current = false;
       setLockInputs(false);
       setIsEnding(false);
     }
@@ -303,28 +364,25 @@ const FunFactsScreen = ({route}: any) => {
   const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
   const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
   const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
-  // const funFactImage = "https://placehold.co/400x400.png";
-  // const siteImage = "https://placehold.co/80x80.png";
-  // const siteName = "Fort James Tobago";
-  // const funFactDetail =
-  //   "Built by the British in 1770, Fort James was named after King James Il of England. It was one of the main military outposts in Tobago, guarding the western coastline from invaders and pirates";
-
-  const funFactSponsors = [];
 
   return (
     <ChallengeScreen
       title="Fun Facts"
-      style={{
-        justifyContent: "space-between",
-        gap: 16,
-        paddingHorizontal: 24,
-        paddingBottom: 50,
-      }}
+      style={{ justifyContent: "space-between", gap: 16, paddingHorizontal: 24, paddingBottom: 50 }}
       modals={screenModals}
       hideBackButton
       scrollable
     >
-      {/* Fun facts card */}
+    <OffscreenShareCard
+      ref={offscreenRef}
+      widthDp={offWdp}
+      heightDp={offHdp}
+      funFactImage={funFactImage}
+      siteImage={siteImage}
+      siteName={siteName}
+      funFactDetail={funFactDetail}
+      onReady={() => setIsOffscreenReady(true)}
+    />
       <ViewShot ref={funFactCardRef} options={{format: "png", quality: 0.9}}>
         <View
           style={{
@@ -335,7 +393,6 @@ const FunFactsScreen = ({route}: any) => {
             paddingBottom: 16,
           }}
         >
-          {/* Card Image */}
           <Image
             resizeMode={"contain"}
             source={{uri: funFactImage}}
@@ -348,16 +405,8 @@ const FunFactsScreen = ({route}: any) => {
               backgroundColor: "transparent",
             }}
           />
-
-          {/* Card Content */}
           <View style={{paddingHorizontal: 16, gap: 16}}>
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: 16,
-              }}
-            >
+            <View style={{flexDirection: "row", alignItems: "center", gap: 16}}>
               <Image style={{width: 25, height: 25, borderRadius: 25}} source={{uri: siteImage}} />
               <Text
                 style={{
@@ -375,37 +424,19 @@ const FunFactsScreen = ({route}: any) => {
               <RenderHTML
                 contentWidth={width}
                 tagsStyles={{
-                  p: {
-                    color: "#9CA3AF",
-                    fontSize: FontSizes.S14,
-                  },
-                  strong: {
-                    color: "#fff",
-                    fontSize: FontSizes.S14,
-                  },
-                  ol: {
-                    color: "#fff",
-                  },
-                  li: {
-                    color: "#fff",
-                  },
-                  em: {fontStyle: "italic"},
-                  u: {textDecorationLine: "underline"},
-                  s: {textDecorationLine: "line-through"},
+                  p: { color: "#9CA3AF", fontSize: FontSizes.S14 },
+                  strong: { color: "#fff", fontSize: FontSizes.S14 },
+                  ol: { color: "#fff" },
+                  li: { color: "#fff" },
+                  em: { fontStyle: "italic" },
+                  u: { textDecorationLine: "underline" },
+                  s: { textDecorationLine: "line-through" },
                 }}
-                source={{
-                  html: `${funFactDetail}`,
-                }}
+                source={{ html: `${funFactDetail}` }}
               />
             </View>
 
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "space-between",
-              }}
-            >
+            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
               <Text
                 style={{
                   ...fontGroup.nunitoBold,
@@ -436,7 +467,6 @@ const FunFactsScreen = ({route}: any) => {
           paddingBottom: 24,
         }}
       >
-        {/* Points */}
         <View style={{flexDirection: "row", gap: 16}}>
           <View
             style={{
@@ -451,15 +481,8 @@ const FunFactsScreen = ({route}: any) => {
           >
             <BackgroundWithImage
               imageSource={BGArShare}
-              style={{
-                backgroundColor: "transparent",
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                left: 0,
-                right: 0,
-              }}
-            ></BackgroundWithImage>
+              style={{ backgroundColor: "transparent", position: "absolute", top: 0, bottom: 0, left: 0, right: 0 }}
+            />
             <AppText
               style={{
                 ...fontGroup.nunitoBold,
@@ -507,10 +530,7 @@ const FunFactsScreen = ({route}: any) => {
           </View>
         </View>
 
-        {/* Buttons */}
-        <View style={{flexDirection: "row", gap: 16}}
-          pointerEvents={lockInputs ? "none" : "auto"}
-        >
+        <View style={{flexDirection: "row", gap: 16}} pointerEvents={lockInputs ? "none" : "auto"}>
           <AppButton
             onPress={handleCaptureScreenshot}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}
@@ -518,7 +538,6 @@ const FunFactsScreen = ({route}: any) => {
             title={"Share To Socials"}
             disabled={lockInputs}
           />
-
           <AppButton
             onPress={endFunFactsButtonHandler}
             containerStyle={{flex: 1, height: 30, justifyContent: "center"}}

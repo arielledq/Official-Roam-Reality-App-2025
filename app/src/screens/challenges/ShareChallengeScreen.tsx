@@ -235,14 +235,22 @@ const ArChallengeShare = () => {
 
         res = await postGeoPinCheckIn(formData);
       }
+      // if (challengeType === AR_MODES.SCAN_MODE) {
+      //   formData.append("scan_id", challengeObj?.scanChallenge?.id);
+      //   shareFile = {
+      //     ...shareFile,
+      //     uri: capturedDataUri,
+      //   };
+      //   formData.append("memory_file", shareFile);
+      //   formData.append("memory_type", challengeObj?.memory_type);
+      //   res = await postArMemory(formData);
+      // }
+
       if (challengeType === AR_MODES.SCAN_MODE) {
         formData.append("scan_id", challengeObj?.scanChallenge?.id);
-        shareFile = {
-          ...shareFile,
-          uri: capturedDataUri,
-        };
-        formData.append("memory_file", shareFile);
-        formData.append("memory_type", challengeObj?.memory_type);
+        const fixedShareFile = { ...shareFile, uri: capturedDataUri };
+        formData.append("memory_file", fixedShareFile);
+        formData.append("memory_type", "SCAN_PHOTO");
         res = await postArMemory(formData);
       }
       if (challengeType === AR_MODES.GEO_TAG_MODE) {

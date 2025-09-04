@@ -16,6 +16,8 @@ import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
 import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../util/helpers";
 
+import { getElevationAPI } from "../../network";
+
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
 import CameraControls from "components/CameraControls";
@@ -100,10 +102,10 @@ const ARScreen = ({route}) => {
     return false; // GEO no entra acá (manejo aparte)
   };
   const [loading, setLoading] = useState(false);
-  
+  const [spawnHeight, setSpawnHeight] = useState(1);
+  const [heightReady, setHeightReady] = useState(false);
   // espera breve tras sceneLoaded antes de enviar datos (ajustable)
   const AFTER_SCENE_COOLDOWN_MS = 400;
-
   const sendFlowTimerRef = useRef(null); // timer del orquestador
   const sceneCycleRef = useRef(0);
   const sendBundleTimerRef = useRef(null);
@@ -393,7 +395,7 @@ const ARScreen = ({route}) => {
       latitude: -25.296442, // selectedSite?.scanChallenge?.coordinates[1] , // ||
       longitude: -57.58958, //selectedSite?.scanChallenge?.coordinates[0], //||
       scale: 1.0,
-      height: 1,
+      height: spawnHeight,
       isVisible: true,
       updateRadius: 14.0,
       isHuntMode: false,
@@ -404,7 +406,7 @@ const ARScreen = ({route}) => {
         ...config,
         latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
         longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
-        height: 1,
+        height: spawnHeight,
         isVisible: true,
         updateRadius: 14.0, // verificar
         isHuntMode: true,
@@ -415,7 +417,7 @@ const ARScreen = ({route}) => {
         ...config,
         latitude: selectedSite?.scanChallenge?.coordinates?.coordinates[1], // ||  -25.296442,
         longitude: selectedSite?.scanChallenge?.coordinates?.coordinates[0], //||  -57.589580,
-        height: 1,
+        height: spawnHeight,
         isVisible: true,
         updateRadius: 14.0, // verificar
         isHuntMode: true,
@@ -495,9 +497,44 @@ const unityStarsCount = () => {
     setIsUnityLoaded(true);
   };
 
+const HIDE_ARROW_MS = 3000;
+const hideArrowTimerRef = useRef(null);
+
+const setArrowVisible = visible => {
+  if (unityRef.current) {
+    unityRef.current.postMessage("CompassTester", "SetArrowVisible", visible ? "false" : "true");
+  }
+};
+
+const scheduleHideArrow = () => {
+  if (hideArrowTimerRef.current) {
+    clearTimeout(hideArrowTimerRef.current);
+  }
+  hideArrowTimerRef.current = setTimeout(() => {
+    setArrowVisible(false);
+    hideArrowTimerRef.current = null;
+  }, HIDE_ARROW_MS);
+};
+
+const onObjectDetected = () => {
+  setArrowVisible(true);   // mostrar flecha
+  scheduleHideArrow();     // rearmar timer de inactividad
+};
+
+// limpiar timer al desmontar o salir de la pantalla
+useEffect(() => {
+  return () => {
+    if (hideArrowTimerRef.current) {
+      clearTimeout(hideArrowTimerRef.current);
+      hideArrowTimerRef.current = null;
+    }
+  };
+}, []);
+
+  
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    // console.log("dataUnity", data);
+    console.log("dataUnity", data);
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
@@ -517,6 +554,7 @@ const unityStarsCount = () => {
         selectedSite?.scanChallenge?.file_3d
       ) {
         unityRef.current.postMessage("Main Camera", "ShowARObject", "");
+        onObjectDetected();
       }
     }
     if (data.infoButton?.isButton) {
@@ -567,12 +605,20 @@ const unityStarsCount = () => {
     }
 
     if (data?.touchEvent?.objectTouched === true) {
-      if (
-        selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
-        selectedSite?.scanChallenge?.file_3d
-      ) {
-        unityRef.current.postMessage("Main Camera", "ShowARObject");
-      }
+      // if (
+      //   selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
+      //   selectedSite?.scanChallenge?.file_3d
+      // ) {
+      //   let hide = ["Arrow"];
+      //   unityRef.current.postMessage(
+      //       "CanvasController",
+      //       "ShowHideElements",
+      //       JSON.stringify({hide})
+      //     );
+      //     console.log("OCULTANDOOCULTANDO")
+      //   unityRef.current.postMessage("Main Camera", "ShowARObject", "");
+        
+      // }
       if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
         // notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
         navigation.navigate({
@@ -586,16 +632,7 @@ const unityStarsCount = () => {
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
-        // setSelectedChallengeOverride(null)
-        // unityRef.current.postMessage(
-        //     "screen",
-        //     "SetTypeChallenge",
-        //     JSON.stringify({
-        //       typeChallenge: "PHOTO",
-        //       arChallenge: true,
-        //       isLocation: false,
-        //     })
-        // );
+
 
         if (!isMeInsideInSite && data?.ispressed) {
           Toast.show({
@@ -613,20 +650,18 @@ const unityStarsCount = () => {
           setUnitySceneLoaded(false);
           eraseFile();
         }
-
+        
+        if (data?.photoVideoButton?.isPhoto == false) {
+          setHasSentModelDataOnce(false)
+          setCapturedVideo(data.photoVideoButton?.filepath);
+          setIsUnityLoaded(false);
+          setShouldRenderUnity(true);
+          setUnitySceneLoaded(false);
+          eraseFile();
+        }
         break;
       case AR_MODES.SCAN_MODE:
         // setSelectedChallengeOverride(null);
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "PHOTO",
-            arChallenge: true,
-            isLocation: false,
-          })
-        );
-
         if (data?.photoVideoButton?.isPhoto) {
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
@@ -634,17 +669,26 @@ const unityStarsCount = () => {
           setUnitySceneLoaded(false);
           setSendSpawnModelData(false)
           setHasSentModelDataOnce(false)
-
           eraseFile();
         }
-        // if (data?.photoVideoButton?.isPhoto == false) {
-        //   setCapturedVideo(data.photoVideoButton?.filepath);
-        //   setIsUnityLoaded(false);
-        //   setShouldRenderUnity(true);
-        //   setUnitySceneLoaded(false);
-        //   eraseFile();
-        // }
-
+        if (data?.photoVideoButton?.isPhoto == false) {
+          setCapturedVideo(data.photoVideoButton?.filepath);
+          setIsUnityLoaded(false);
+          setShouldRenderUnity(true);
+          setUnitySceneLoaded(false);
+          setSendSpawnModelData(false)
+          setHasSentModelDataOnce(false)
+          eraseFile();
+        }
+        unityRef.current.postMessage(
+          "screen",
+          "SetTypeChallenge",
+          JSON.stringify({
+            typeChallenge: "PHOTOVIDEO",
+            arChallenge: true,
+            isLocation: false,
+          })
+        );
         break;
       case AR_MODES.HUNT_MODE:
         // setSelectedChallengeOverride(null);
@@ -762,7 +806,7 @@ const unityStarsCount = () => {
           selectedMode: "Scan",
           setVisibleButtonPosition: false,
         };
-
+        
         break;
       case AR_MODES.HUNT_MODE:
         const huntChallenge = site?.huntChallenge?.geo_ar_star?.geo_site;
@@ -873,7 +917,7 @@ const unityStarsCount = () => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 100};
+      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 50};
       unityRef.current.postMessage(
         "Main Camera",
         "SetDetectObjectState",
@@ -889,7 +933,7 @@ const unityStarsCount = () => {
           sendModelDataToUnity();
 //          sendBloomValuesToUnity()
           const messageData = {
-            typeChallenge: "PHOTO",
+            typeChallenge: "PHOTOVIDEO",
             arChallenge: false,
             isLocation: !!isMeInsideInSite,
           };
@@ -907,11 +951,11 @@ const unityStarsCount = () => {
           return;
         }
         if (hasSentModelDataOnce && !sendSpawnModelData) {
-          sendSpawnData();
-          unityStarsCount(); 
-          PointsCount();
-          // sendBloomValuesToUnity()
-          return;
+          if (heightReady) 
+            sendSpawnData();
+            unityStarsCount(); 
+            PointsCount();
+            return;
         }
       }
     }, AFTER_SCENE_COOLDOWN_MS);
@@ -1009,18 +1053,9 @@ const unityStarsCount = () => {
         break;
 
       case AR_MODES.SCAN_MODE:
-        unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "PHOTO",
-            arChallenge: true,
-            isLocation: false,
-          })
-        );
         const distanceDetect = {
           isDetectionEnabled: true,
-          detectionDistance: 100,
+          detectionDistance: 50,
         };
         unityRef.current.postMessage(
           "Main Camera",
@@ -1058,7 +1093,17 @@ const unityStarsCount = () => {
           })
         );
         PointsCount();
+             unityRef.current.postMessage(
+          "screen",
+          "SetTypeChallenge",
+          JSON.stringify({
+            typeChallenge: "PHOTOVIDEO",
+            arChallenge: true,
+            isLocation: false,
+          })
+        );
         }, 300);
+    
         break;
 
       case AR_MODES.HUNT_MODE:
@@ -1091,7 +1136,7 @@ const unityStarsCount = () => {
           );
           const distanceDetect = {
             isDetectionEnabled: true,
-            detectionDistance: 100,
+            detectionDistance: 50,
           };
           unityRef.current.postMessage(
             "Main Camera",
@@ -1200,17 +1245,15 @@ const unityStarsCount = () => {
           })
         );
 
-        if (!!CAPTURE_CHALLENGE_TYPE[selectedChallengeOverride?.challenge_requirement]) {
           unityRef.current.postMessage(
             "screen",
             "SetTypeChallenge",
             JSON.stringify({
-              typeChallenge: selectedChallengeOverride?.challenge_requirement,
+              typeChallenge: "PHOTOVIDEO",
               arChallenge: selectedChallengeOverride?.arChallenge,
               isLocation: selectedChallengeOverride?.isLocation,
             })
-          );
-        }
+          );        
       }, 500);
 
       return () => clearTimeout(timer);
@@ -1278,7 +1321,7 @@ const unityStarsCount = () => {
           if (mode === AR_MODES.GEO_TAG_MODE && !hasSentModelDataOnce) {
             sendModelDataToUnity();
             const messageData = {
-              typeChallenge: "PHOTO",
+              typeChallenge: "PHOTOVIDEO",
               arChallenge: false,
               isLocation: !!isMeInsideInSite,
             };
@@ -1388,6 +1431,80 @@ useEffect(() => {
   //   setSelectedChallengeOverride(null)
   //   console.log("se presiono ARTestReset")
   // };
+
+useEffect(() => {
+  const mode = selectedSite?.selectedMode?.mode;
+
+  // SCAN: solo aplica si hay 3D (porque ahí sí haces spawn)
+  const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
+  const modeSupported =
+    mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
+
+  if (!modeSupported) {
+    setSpawnHeight(1);
+    setHeightReady(true);
+    return;
+  }
+
+  // Elevación del sitio según modo
+  const siteElevation =
+    (mode === AR_MODES.HUNT_MODE
+      ? (selectedSite?.huntChallenge?.elevation ??
+         selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation)
+      : (selectedSite?.scanChallenge?.elevation)) ?? 0;
+
+
+  // sin elevación → fallback=1
+  if (!siteElevation || Number(siteElevation) === 0) {
+    setSpawnHeight(1);
+    setHeightReady(true);
+    return;
+  }
+
+  // necesitamos tu posición actual
+  if (!userLocation?.latitude || !userLocation?.longitude) {
+    setHeightReady(false);
+    return;
+  }
+
+  let cancelled = false;
+  (async () => {
+    try {
+      const { latitude, longitude } = userLocation;
+
+      const res = await getElevationAPI({ lat: latitude, lng: longitude });
+
+      const myElevation = typeof res?.elevation === "number" ? res.elevation : null;
+      if (cancelled) return;
+
+      if (myElevation == null) {
+        setSpawnHeight(1);
+        setHeightReady(true);
+        return;
+      }
+
+      let delta = Math.round(Number(siteElevation - myElevation));
+
+      setSpawnHeight(delta);
+      setHeightReady(true);
+    } catch (e) {
+      setSpawnHeight(1);
+      setHeightReady(true);
+    }
+  })();
+
+  return () => { cancelled = true; };
+}, [
+  selectedSite?.selectedMode?.mode,
+  selectedSite?.huntChallenge?.elevation,
+  selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation,
+  selectedSite?.scanChallenge?.elevation,
+  selectedSite?.scanChallenge?.file_3d,          // para recalcular si cambia
+  userLocation?.latitude,
+  userLocation?.longitude
+]);
+
+  // console.log("selectedsitselectedsitselectedsitselectedsite, ", selectedSite)
   return (
     <ChallengeScreen
       title="AR Star Hunt "

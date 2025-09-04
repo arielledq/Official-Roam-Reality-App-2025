@@ -86,7 +86,6 @@ const Navigation = () => {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    // Define a callback function to handle storage changes
     const handleStorageChange = async ({key, value}: {key: string; value: any}) => {
       if (key === "userToken" && !value) {
         await GoogleSignin.revokeAccess().catch(err => console.error(err));
@@ -96,26 +95,16 @@ const Navigation = () => {
         dispatch(resetState());
       }
     };
-
-    // Subscribe to storage changes
     subscribeToStorageChanges(handleStorageChange);
-
-    // Clean up the listener on component unmount
     return () => {
       unsubscribeFromStorageChanges(handleStorageChange);
     };
-  }, []);
+  }, [dispatch]);
 
-  useEffect(() => {
-    if (!token && navigationRef.current?.isReady()) {
-      console.log("Token is missing, resetting to Login");
-      navigationRef.current?.reset({
-        index: 0,
-        routes: [{name: "Login"}],
-      });
-    }
-  }, [token]);
+  // ⛔️ Eliminado el efecto que forzaba reset → Login cuando !token
+  // Splash y el stack resolverán correctamente el flujo.
 
+  // --- Auth stack: SOLO pantallas de autenticación/onboarding ---
   const renderAuthStack = () => {
     return (
       <>
@@ -135,18 +124,19 @@ const Navigation = () => {
         <Stack.Screen name="UserAgreement" component={UserAgreement} />
         <Stack.Screen name="FPChangePassword" component={FPChangePassword} />
         <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-        <Stack.Screen name="TabNavigator" component={DrawerNav} />
+        {/* <Stack.Screen name="TabNavigator" component={DrawerNav} /> */}
       </>
     );
   };
 
-  const renderCommonStack = () => {
+  const renderAppStack = () => {
     const userType = loginState?.data?.user?.type;
     const sharedRoutes = (
       <>
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
       </>
     );
+
     switch (userType) {
       case USER_TYPES.BAND:
         return (
@@ -155,11 +145,16 @@ const Navigation = () => {
             {sharedRoutes}
           </>
         );
-
       default:
         return (
           <>
-            {renderAuthStack()}
+            <Stack.Screen name="TabNavigator" component={DrawerNav} />
+            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+            <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+            {/* @ts-ignore */}
+            <Stack.Screen name="Waiver" component={Waiver} />
+            {/* @ts-ignore */}
+            <Stack.Screen name="UserAgreement" component={UserAgreement} />
             <Stack.Screen name="PublicProfile" component={PublicProfile} />
             <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
             <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
@@ -172,6 +167,7 @@ const Navigation = () => {
             <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
             <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
             <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+            {/* @ts-ignore */}
             <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
             {/* @ts-ignore */}
             <Stack.Screen name="ARFilter" component={ARFilter} />
@@ -219,24 +215,22 @@ const Navigation = () => {
     );
   };
 
-  const StackNav = () => {
-    return (
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: "slide_from_right",
-        }}
+    const StackNav = () => {
+      const navKey = !splashShown ? "splash" : token ? "app" : "auth";
+      return (
+        <Stack.Navigator
+         key={navKey} // 👈 clave para remount
+         screenOptions={{ headerShown: false, animation: "slide_from_right" }}
+         initialRouteName={!splashShown ? "AnimatedSplash" : token ? "TabNavigator" : "Login"} // 👈 Auth inicia en Login
       >
-        {splashShown ? (
-          token ? (
-            renderCommonStack()
-          ) : (
-            renderAuthStack()
-          )
-        ) : (
+        {!splashShown ? (
           <>
             <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
           </>
+        ) : token ? (
+          renderAppStack()
+        ) : (
+          renderAuthStack()
         )}
       </Stack.Navigator>
     );

@@ -41,44 +41,33 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
   const [isLoading, setIsLoading] = useState(false);
   const {setOnesignalDevice} = useOneSignal();
 
-  const handleLogin = v => {
-    setIsLoading(true);
-    login({
-      username: v.email.toLowerCase(),
-      password: v.password,
-    })
-      .then(res => {
-        if (res.status == 1) {
-          setItemWithListener("userToken", res?.token);
-          dispatch(updateUserData(res));
-          setOnesignalDevice();
-          if (newUser) {
-            dispatch(updateAsOldUser());
-          }
-        } else {
-          handleError(res);
-          setIsLoading(false);
-        }
-      })
-      .catch(err => {
-        console.log("err", err);
-        setIsLoading(false);
-      });
-  };
+const handleLogin = v => {
+  setIsLoading(true);
+  login({ username: v.email.toLowerCase(), password: v.password })
+    .then(res => {
+      if (res.status == 1) {
+        setItemWithListener("userToken", res?.token);
+        dispatch(updateUserData(res));
+        setOnesignalDevice();
+        if (newUser) dispatch(updateAsOldUser());
 
-  useEffect(() => {
-    if (token) {
-      setIsLoading(true);
-      setTimeout(() => {
         navigation.reset({
           index: 0,
           routes: [
-            {name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}},
+            { name: "TabNavigator", params: { screen: "Tab", params: { screen: "GeoArChallenge" } } },
           ],
         });
-      }, 250);
-    }
-  }, [token]);
+      } else {
+        handleError(res);
+        setIsLoading(false);
+      }
+    })
+    .catch(err => {
+      console.log("err", err);
+      setIsLoading(false);
+    });
+};
+
 
   const navigateToResetPassword = () => {
     navigation.navigate("ForgotPassword");

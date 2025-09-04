@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {View, StyleSheet, Image, TouchableOpacity} from "react-native";
 import {DrawerContentScrollView} from "@react-navigation/drawer";
 import theme from "../../assets/theme";
-import {useNavigation} from "@react-navigation/native";
+import {useNavigation, DrawerActions} from "@react-navigation/native";
 import Images from "../../assets/images";
 import Icon from "../../components/Icon";
 import AppText from "../../components/text";
@@ -42,10 +42,6 @@ const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, 
     return customIcons.includes(icon) ? "custom" : "antdesign";
   }
 
-  const toggleLiveLocationButtonHandler = () => {
-    toggleUserLocation();
-  };
-
   const renderDrawerItem = () => {
     return (
       <View
@@ -63,7 +59,7 @@ const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, 
         </View>
         {navigateTo === "toggleLocation" ? (
           <AppSwitch
-            onValueChange={toggleLiveLocationButtonHandler}
+            onValueChange={toggleUserLocation}
             value={locationIsEnabled}
             loading={loading}
           />
@@ -129,13 +125,46 @@ const DrawerItems = ({onPress}) => {
     );
   });
 };
+
 function DrawerContent(props) {
   const navigation = useNavigation();
+  const stackNav = navigation.getParent && navigation.getParent(); // Stack raíz
   const dispatch = useDispatch();
   const [popupDetails, setPopupDetails] = useState({});
   const [isConfirmationVisible, setConfirmationVisible] = useState(false);
 
+  // Cierra el drawer si existe este método
+ const closeDrawerIfPossible = () => {
+  // preferimos el navigation que viene por props del Drawer
+  const nav = props?.navigation || navigation;
+
+  // 1) método directo (el más confiable cuando existe)
+  if (nav && typeof nav.closeDrawer === 'function') {
+    try { nav.closeDrawer(); return; } catch (e) {}
+  }
+
+  // 2) fallback con DrawerActions (algunas versiones no exponen closeDrawer)
+  if (nav && typeof nav.dispatch === 'function') {
+    try { nav.dispatch(DrawerActions.closeDrawer()); return; } catch (e) {}
+  }
+
+  // 3) último recurso: el navigation del hook
+  if (navigation && typeof navigation.closeDrawer === 'function') {
+    try { navigation.closeDrawer(); return; } catch (e) {}
+  }
+  if (navigation && typeof navigation.dispatch === 'function') {
+    try { navigation.dispatch(DrawerActions.closeDrawer()); return; } catch (e) {}
+  }
+};
+
+  // Espera 2 frames para dejar que el árbol de navegación se re-monte (Auth/App)
+  const waitNextFrame = () =>
+    new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+
   const onPressHandler = navigateTo => {
+    // Siempre cerramos el drawer antes de navegar
+    closeDrawerIfPossible();
+
     switch (navigateTo) {
       case "delete": {
         setPopupDetails({
@@ -156,50 +185,60 @@ function DrawerContent(props) {
         break;
       }
       case "toggleLocation": {
+        // no navegamos; lo maneja el switch
         break;
       }
       case "Home": {
-        navigation.reset({
-          index: 0,
-          routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
-        });
+        // Reinicia al home del TabNavigator desde el stack raíz
+        if (stackNav && typeof stackNav.reset === "function") {
+          stackNav.reset({
+            index: 0,
+            routes: [{name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}}],
+          });
+        } else {
+          navigation.reset({
+            index: 0,
+            routes: [{name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}}],
+          });
+        }
         break;
       }
 
       default:
-        navigation.navigate(navigateTo);
+        // Navegamos SIEMPRE por el stack padre (donde están Settings, Friends, etc.)
+        if (stackNav && typeof stackNav.navigate === "function") {
+          stackNav.navigate(navigateTo);
+        } else {
+          navigation.navigate(navigateTo);
+        }
         break;
     }
   };
 
   const handleLogOutButton = async () => {
     try {
-      await GoogleSignin.revokeAccess();
-      await GoogleSignin.signOut();
-    } catch (error) {
-      console.error("GoogleSignin error", error);
-    }
-    try {
-      await removeItem("fbToken");
-      await removeItem("instaToken");
-    } catch (error) {
-      console.error("removeItem error", error);
-    }
-    try {
-      logout();
-    } catch (error) {
-      console.error("logout error", error);
-    }
-    try {
-      dispatch(resetState());
-    } catch (error) {
-      console.error("dispatch error", error);
-    }
+      // Cerrar modal y drawer primero
+      setConfirmationVisible(false);
+      closeDrawerIfPossible();
 
-    navigation.reset({
-      index: 0,
-      routes: [{name: "Login"}],
-    });
+      // Logout de proveedores externos
+      try { await GoogleSignin.revokeAccess(); } catch (error) { console.error("GoogleSignin revokeAccess error", error); }
+      try { await GoogleSignin.signOut(); } catch (error) { console.error("GoogleSignin signOut error", error); }
+      try { await removeItem("fbToken"); } catch (error) { console.error("removeItem fbToken error", error); }
+      try { await removeItem("instaToken"); } catch (error) { console.error("removeItem instaToken error", error); }
+      try { logout(); } catch (error) { console.error("logout error", error); }
+
+      // Limpia Redux (esto cambia AppStack → AuthStack)
+      try { dispatch(resetState()); } catch (error) { console.error("dispatch error", error); }
+
+      // Esperar a que el árbol de navegación se re-monte y recién resetear a Login
+      await waitNextFrame();
+
+      const rootNav = (navigation.getParent && navigation.getParent()) || navigation;
+      
+    } catch (error) {
+      console.error("handleLogOutButton error", error);
+    }
   };
 
   const closeModalHandler = () => {
@@ -212,7 +251,7 @@ function DrawerContent(props) {
         handleLogOutButton();
         showMessage("Your account has been deleted successfully");
       } else {
-        showMessage(res.message.error, "error");
+        showMessage(res.message?.error || "Error deleting account", "error");
       }
     });
   };

@@ -737,3 +737,12 @@ export const getGeoARDestinationsMini = () =>
     },
     logoutFunc
   );
+
+export const getElevationAPI = ({ lat, lng }) =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/api/elevation/?lat=${lat}&lng=${lng}`,
+      method: "GET",
+    },
+    logoutFunc
+  );

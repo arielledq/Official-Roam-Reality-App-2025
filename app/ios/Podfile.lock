@@ -1473,7 +1473,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-contacts (8.0.6):
+  - react-native-contacts (8.0.7):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -1897,7 +1897,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - react-native-webview (13.15.0):
+  - react-native-webview (13.16.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2535,7 +2535,7 @@ PODS:
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
     - Yoga
-  - RNScreens (4.15.1):
+  - RNScreens (4.16.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -2559,9 +2559,9 @@ PODS:
     - ReactCodegen
     - ReactCommon/turbomodule/bridging
     - ReactCommon/turbomodule/core
-    - RNScreens/common (= 4.15.1)
+    - RNScreens/common (= 4.16.0)
     - Yoga
-  - RNScreens/common (4.15.1):
+  - RNScreens/common (4.16.0):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3092,7 +3092,7 @@ SPEC CHECKSUMS:
   React-microtasksnativemodule: c8ed30f8ec30affbc73411c54207bd67b1125bbb
   react-native-blur: 06d0f9906ecd6cde3a42de16c6cd829a2bf0710c
   react-native-cameraroll: 126bff3dd6d0844dcbc69ebc34785138791c0ab3
-  react-native-contacts: bcc0ccbbf55f37908007d54e8ec742ee7db958b6
+  react-native-contacts: 5eafcc6139858ba9608cf7406a18ac1911100e10
   react-native-date-picker: e687e018f66da4734b3db3ddf3d323e930425d56
   react-native-fbsdk-next: 52f81e60eb3e8e0e06cf9728b4572d3509ca9d01
   react-native-geolocation: d43962eb0be1b0056ba5c1f95e94fb7907494268
@@ -3109,7 +3109,7 @@ SPEC CHECKSUMS:
   react-native-unity: 9bf992c92225077eca177f71734e54d0a9a65444
   react-native-video: 8b867791128487bf82c9b6070ceddd2697bfabec
   react-native-view-shot: 57c7b8158751f19f32cb885109574712955ea016
-  react-native-webview: 85c8fc8ca09f4e67b68afbc86207a1442af5dc80
+  react-native-webview: 1d8659a52cb8b8504f6c965555d1b27bdd313880
   React-NativeModulesApple: 8a465be9a58afc56f48c1322331ffbdecd3d4877
   React-oscompat: 74eb4badd12e93899f37a5dbb03d8a638011a292
   React-perflogger: dba4ffef10c54537fa33cb2580cf6d4c48458d36
@@ -3155,7 +3155,7 @@ SPEC CHECKSUMS:
   RNImageCropPicker: b0afedeefd8655254a15c34103718455fde6ce59
   RNPermissions: 149e4ced4546cfeace340e87c5d33cf382bef29e
   RNReanimated: 730ffe6cf7b931f78b795e6b6e0920dcab9c8beb
-  RNScreens: db1cb3dc9556b8540e0623e5d9172f3910d644cf
+  RNScreens: 824a29c178e253fe8b08fb0b2903195d35f724f2
   RNShare: a60af5971cb114a8d31df642b108e3fe00e5b987
   RNSound: 314cc5226453ef4a3314a196c65e8a65e5106a7b
   RNSVG: ba53827311fd9f8a14e06626365a749ce7713975
