@@ -523,7 +523,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     def get_checkin_cooldown(self, obj):
         request = self.context.get('request', None)
         user = getattr(request, 'user', None)
-        if not user or not user.is_authenticated:
+        if not user or not user.is_authenticated or not obj or not obj.pin_challenge:
             return 0
         return geo_cooldown_by_user(user, obj, obj.pin_challenge.id)
 

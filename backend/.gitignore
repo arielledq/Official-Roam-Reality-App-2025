@@ -91,3 +91,4 @@ myvenv/
 mediafiles/
 .local
 .python_history
+/.idea/*
