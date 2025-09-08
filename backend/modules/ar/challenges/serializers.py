@@ -225,9 +225,58 @@ class ChallengesUploadSerializer(serializers.ModelSerializer):
         fields = ("id", "image", "model_file")
 
 
+class ScanPictureSerializer(serializers.ModelSerializer):
+    file_image = serializers.ImageField()
+    file_animation_android = RandomDownloadNameS3FileField()
+    file_animation_ios = RandomDownloadNameS3FileField()
+    file_3d = RandomDownloadNameS3FileField()
+    icon = serializers.ImageField()
+    sponsor = SponsorSerializer()
+    user_attempts = serializers.SerializerMethodField()
+    cooldown = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ScanPicture
+        geo_field = ('coordinates',)
+        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
+                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
+
+    def get_user_attempts(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
+        qs = ARMemories.objects.filter(
+            user=user,
+            created_at__gte=window_start,
+            memory_type__in=['SCAN_PHOTO',],
+            scan_picture=obj,
+        ).order_by('created_at')
+
+        last_first_attempt = qs.filter(user_first_attempt=True).last()
+
+        if last_first_attempt:
+            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
+            return attempts_since.count()
+        elif qs.exists():
+            return min(qs.count(), obj.attempts)
+        return 0
+
+    def get_cooldown(self, obj):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        return scan_cooldown_by_user(user, obj)
+
+
 class ARMemoriesSerializerGet(serializers.ModelSerializer):
     memory_file = serializers.FileField()
     challenge_details = ChallengesSerializer(source='challenges', read_only=True)
+    scan_picture = ScanPictureSerializer()
 
     class Meta:
         model = ARMemories
@@ -242,6 +291,7 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "thumbnail_memory_video_file",
             "memory_type",
             "created_at",
+            "scan_picture",
         )
 
 
@@ -358,21 +408,25 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
         )
 
 
-class ScanPictureSerializer(serializers.ModelSerializer):
-    file_image = serializers.ImageField()
-    file_animation_android = RandomDownloadNameS3FileField()
-    file_animation_ios = RandomDownloadNameS3FileField()
-    file_3d = RandomDownloadNameS3FileField()
-    icon = serializers.ImageField()
-    sponsor = SponsorSerializer()
+class GeoStarSimpleSerializer(GeoModelSerializer):
+    sponsored = SponsorSerializer(source='sponsor', read_only=True)
     user_attempts = serializers.SerializerMethodField()
-    cooldown = serializers.SerializerMethodField()
 
     class Meta:
-        model = ScanPicture
-        geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
-                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
+        model = GeoARStar
+        fields = (
+            "id",
+            "name",
+            "fun_facts",
+            "info",
+            "visibility_radius",
+            "geo_site",
+            "challenges",
+            "sponsored",
+            "following_mode",
+            'attempts',
+            'user_attempts',
+        )
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
@@ -381,28 +435,19 @@ class ScanPictureSerializer(serializers.ModelSerializer):
             return 0
 
         window_start = timezone.now() - timedelta(hours=obj.cooldown_hours)
-        qs = ARMemories.objects.filter(
-            user=user,
+        qs = StarCollection.objects.filter(
+            user=request.user,
             created_at__gte=window_start,
-            memory_type__in=['SCAN_PHOTO',],
         ).order_by('created_at')
+        total_stars = obj.stars.count()
+        collected_ids = list(qs.values_list('geo_ar_star_point_id', flat=True))
 
-        last_first_attempt = qs.filter(user_first_attempt=True).last()
-
-        if last_first_attempt:
-            attempts_since = qs.filter(created_at__gte=last_first_attempt.created_at)
-            return attempts_since.count()
-        elif qs.exists():
-            return min(qs.count(), obj.attempts)
-        return 0
-
-    def get_cooldown(self, obj):
-        request = self.context.get('request', None)
-        user = getattr(request, 'user', None)
-        if not user or not user.is_authenticated:
-            return 0
-
-        return scan_cooldown_by_user(user, obj)
+        grouped = [
+            collected_ids[i:i + total_stars]
+            for i in range(0, len(collected_ids), total_stars)
+        ]
+        attempts_done = len([g for g in grouped if len(g) == total_stars])
+        return attempts_done
 
 
 class GeoArSiteSerializer(GeoModelSerializer):
@@ -415,6 +460,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     scan_pictures = ScanPictureSerializer(many=True)
     checkin_cooldown = serializers.SerializerMethodField()
     hunt_cooldown = serializers.SerializerMethodField()
+    ar_star = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoArSite
@@ -445,6 +491,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
             "checkin_cooldown",
             "hunt_cooldown",
             "elevation",
+            "ar_star",
         )
 
     def get_check_ins(self, obj):
@@ -476,7 +523,7 @@ class GeoArSiteSerializer(GeoModelSerializer):
     def get_checkin_cooldown(self, obj):
         request = self.context.get('request', None)
         user = getattr(request, 'user', None)
-        if not user or not user.is_authenticated:
+        if not user or not user.is_authenticated or not obj or not obj.pin_challenge:
             return 0
         return geo_cooldown_by_user(user, obj, obj.pin_challenge.id)
 
@@ -490,6 +537,11 @@ class GeoArSiteSerializer(GeoModelSerializer):
             ar_star = obj.geo_arstar_ar_site.first()
             return hunt_cooldown_by_user(user, ar_star)
         return 0
+
+    def get_ar_star(self, obj):
+        if ar_star := obj.geo_arstar_ar_site.first():
+            return GeoStarSimpleSerializer(ar_star, context=self.context).data
+        return None
 
 
 class GeoRegionSerializer(GeoModelSerializer):
@@ -779,6 +831,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
     geo_ar_star = GeoStarSerializer()
     remaining_stars = serializers.SerializerMethodField()
     captured_stars = serializers.SerializerMethodField()
+    hunt_captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
     image = serializers.ImageField()
     sponsors = SponsorSerializer(many=True)
@@ -793,6 +846,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "order",
             "remaining_stars",
             "captured_stars",
+            "hunt_captured_stars",
             "total_stars",
             "image",
             "fun_facts",
@@ -814,6 +868,20 @@ class GeoStarPointSerializer(GeoModelSerializer):
             'geo_ar_star_point_id', flat=True)
         remaining = ar_star.stars.filter(id__in=visited_points).count()
         return remaining
+
+    def get_hunt_captured_stars(self, instance):
+        request = self.context.get('request', None)
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return 0
+
+        window_start = timezone.now() - timedelta(hours=instance.geo_ar_star.cooldown_hours)
+        qs = StarCollection.objects.filter(
+            user=request.user,
+            created_at__gte=window_start,
+        ).order_by('created_at').count()
+
+        return qs
 
     def get_total_stars(self, instance):
         ar_star = instance.geo_ar_star
