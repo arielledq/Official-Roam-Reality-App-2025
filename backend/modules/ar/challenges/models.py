@@ -742,6 +742,13 @@ class GeoARStar(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
+
+    model_file = models.FileField(_("3D Model"), upload_to="ar/geo_star/", null=True, blank=True)
+    parameter_settings = models.ForeignKey(
+        ARChallengeParameterSettings, on_delete=models.CASCADE,
+        related_name="geo_ar_stars", null=True, blank=True, verbose_name=_("Parameter Settings")
+    )
+
     # star_location = gis_models.MultiPointField(_("Star Location"), blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     info = RichTextField(_("Info"), blank=True, null=True)

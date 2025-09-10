@@ -411,7 +411,7 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 class GeoStarSimpleSerializer(GeoModelSerializer):
     sponsored = SponsorSerializer(source='sponsors', many=True, read_only=True)
     user_attempts = serializers.SerializerMethodField()
-
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     class Meta:
         model = GeoARStar
         fields = (
@@ -426,6 +426,9 @@ class GeoStarSimpleSerializer(GeoModelSerializer):
             "following_mode",
             'attempts',
             'user_attempts',
+            "model_file",
+            "parameters",
+
         )
 
     def get_user_attempts(self, obj):
