@@ -18,32 +18,43 @@ const AnimatedSplash = () => {
   const token   = useSelector((state:any) => state.login?.data?.token);
   const newUser = useSelector((state:any) => state.persist?.newUser); // true en primera ejecución
 
+  // const routeDecision = () => {
+  //   // ocultar splash en tu redux si corresponde
+  //   dispatch(update(null));
+  //
+  //   if (token) {
+  //     // 👉 Usuario autenticado: directo al Home
+  //     // @ts-ignore
+  //     navigation.reset({
+  //       index: 0,
+  //       routes: [
+  //         { name: "TabNavigator", params: { screen: "Tab", params: { screen: "GeoArChallenge" } } },
+  //       ],
+  //     });
+  //     return;
+  //   }
+  //
+  //   if (newUser) {
+  //     // 👉 Primera vez: Onboarding
+  //     // @ts-ignore
+  //     navigation.reset({ index: 0, routes: [{ name: "Onboarding" }] });
+  //   } else {
+  //     // 👉 Usuario recurrente sin token: Login
+  //     // @ts-ignore
+  //     navigation.reset({ index: 0, routes: [{ name: "Login" }] });
+  //   }
+  // };
+
   const routeDecision = () => {
-    // ocultar splash en tu redux si corresponde
-    dispatch(update(null));
-
-    if (token) {
-      // 👉 Usuario autenticado: directo al Home
-      // @ts-ignore
-      navigation.reset({
-        index: 0,
-        routes: [
-          { name: "TabNavigator", params: { screen: "Tab", params: { screen: "GeoArChallenge" } } },
-        ],
-      });
-      return;
-    }
-
-    if (newUser) {
-      // 👉 Primera vez: Onboarding
-      // @ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "Onboarding" }] });
-    } else {
-      // 👉 Usuario recurrente sin token: Login
-      // @ts-ignore
-      navigation.reset({ index: 0, routes: [{ name: "Login" }] });
-    }
+    // ✅ Solo marcar que el splash terminó. NO navega aquí.
+    dispatch(update(true)); // asegúrate que `update(true)` ponga splashShown = true
   };
+
+  // const checkAppUpdateHandler = async () => {
+  //   const isUpdated = await checkAppLatestUpdate();
+  //   setAppIsUpdated(isUpdated);
+  //   if (isUpdated) routeDecision();
+  // };
 
   const checkAppUpdateHandler = async () => {
     const isUpdated = await checkAppLatestUpdate();

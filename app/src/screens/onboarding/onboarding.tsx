@@ -6,7 +6,8 @@ import {AppButton, AppText} from "../../components";
 import Strings from "../../constants/Strings";
 import Images from "../../assets/images";
 import useStyles from "./styles";
-import {useSelector} from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
+import {updateAsOldUser} from "redux/Persist";
 
 const onboardingScreens = [
   {
@@ -17,11 +18,13 @@ const onboardingScreens = [
 
 const Onboarding = ({navigation}) => {
   const styles = useStyles();
+  const dispatch = useDispatch();
   const [activeIndex, setActiveIndex] = useState(1);
   const {newUser} = useSelector(state => state.persist);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
+      dispatch(updateAsOldUser());
       if (activeIndex === onboardingScreens.length) {
         navigation.reset({
           index: 0,
@@ -32,12 +35,13 @@ const Onboarding = ({navigation}) => {
       }
     }, 3000);
     return () => clearTimeout(timeout);
-  }, [activeIndex]);
+  }, [activeIndex, dispatch, navigation, newUser]);
 
   const getImageSource = () => onboardingScreens[activeIndex - 1] || onboardingScreens[0];
   const {backgroundImage, device} = getImageSource();
 
   const continueHandler = () => {
+    dispatch(updateAsOldUser());
     navigation.reset({
       index: 0,
       routes: [{name: newUser ? "SignUp" : "Login"}],

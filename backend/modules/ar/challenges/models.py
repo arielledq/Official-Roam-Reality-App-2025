@@ -634,10 +634,8 @@ class ScanPicture(models.Model):
     file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/", null=True, blank=True)
     file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
     icon = models.ImageField(_("Icon"), upload_to="scanpicture/icon/", null=True, blank=True)
-    file_animation_android = models.FileField(_("Animation android"), upload_to="scanpicture/animation_android/",
-                                              null=True, blank=True)
-    file_animation_ios = models.FileField(_("Animation ios"), upload_to="scanpicture/animation_ios/",
-                                          null=True, blank=True)
+    file_animation_android = models.FileField(_("Animation android"), upload_to="scanpicture/animation_android/")
+    file_animation_ios = models.FileField(_("Animation ios"), upload_to="scanpicture/animation_ios/")
     sponsor = models.ForeignKey(
         Sponsor,
         on_delete=models.CASCADE,

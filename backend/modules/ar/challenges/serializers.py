@@ -409,7 +409,7 @@ class UniqueChallengeSiteSerializer(GeoModelSerializer):
 
 
 class GeoStarSimpleSerializer(GeoModelSerializer):
-    sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    sponsored = SponsorSerializer(source='sponsors', many=True, read_only=True)
     user_attempts = serializers.SerializerMethodField()
 
     class Meta:
@@ -785,7 +785,7 @@ class ScanPictureMarkerSaveSerializer(serializers.ModelSerializer):
 class GeoStarSerializer(GeoModelSerializer):
     geo_site = GeoArSiteSerializer(read_only=True)
     challenges = GeoARChallengesSerializer(read_only=True)
-    sponsored = SponsorSerializer(source='sponsor', read_only=True)
+    sponsored = SponsorSerializer(source='sponsors', many=True, read_only=True)
     user_attempts = serializers.SerializerMethodField()
 
     class Meta:

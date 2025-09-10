@@ -71,7 +71,7 @@ const OffscreenShareCard = React.forwardRef<any, {
         position: "absolute",
         top: 0,
         left: 0,
-        opacity: 0,          
+        opacity: 0,
         pointerEvents: "none",
         width: widthDp,
         height: heightDp,
@@ -316,8 +316,8 @@ const handleCaptureScreenshot = async () => {
       const newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
       const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
 
-      let navigationParams: any = {};
-      if (remainingStars >= 1) {
+      let navigationParams: any = {}; //TODO Verificar con tiempo
+      if (remainingStars >= 0) {
         const huntChallenge = {
           ...challengeObj,
           selectedMode: AR_MODES_MENU[2],
@@ -332,7 +332,7 @@ const handleCaptureScreenshot = async () => {
         // @ts-ignore
         navigation.navigate("TabNavigator", {
           screen: "Tab",
-          params: {screen: "Go Navigate"},
+          params: {screen: "Go Navigate", params: navigationParams},
         });
       }, 250);
     } catch (error) {

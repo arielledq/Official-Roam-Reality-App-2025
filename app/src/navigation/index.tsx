@@ -217,16 +217,16 @@ const Navigation = () => {
 
     const StackNav = () => {
       const navKey = !splashShown ? "splash" : token ? "app" : "auth";
+      const { newUser } = useSelector((state:any) => state.persist);
+      const authInitial = newUser ? "Onboarding" : "Login";
       return (
         <Stack.Navigator
-         key={navKey} // 👈 clave para remount
+         key={navKey}
          screenOptions={{ headerShown: false, animation: "slide_from_right" }}
-         initialRouteName={!splashShown ? "AnimatedSplash" : token ? "TabNavigator" : "Login"} // 👈 Auth inicia en Login
+         initialRouteName={!splashShown ? "AnimatedSplash" : token ? "TabNavigator" : authInitial}
       >
         {!splashShown ? (
-          <>
             <Stack.Screen name="AnimatedSplash" component={AnimatedSplash} />
-          </>
         ) : token ? (
           renderAppStack()
         ) : (
