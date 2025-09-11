@@ -1293,8 +1293,6 @@ useEffect(() => {
   useEffect(() => {
     if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
       startChallengeHandler(huntChallenge);
-    } else {
-      setSelectedSite(null)
     }
   }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
 
