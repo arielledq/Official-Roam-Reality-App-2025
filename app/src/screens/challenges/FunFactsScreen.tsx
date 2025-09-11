@@ -1,5 +1,5 @@
 import React, {useRef, useState, useMemo} from "react";
-import {Image, Text, View, Dimensions, PixelRatio} from "react-native";
+import {Image, Text, View, Dimensions, PixelRatio, FlatList} from "react-native";
 import {useNavigation} from "@react-navigation/native";
 // @ts-ignore
 import ViewShot, {captureRef} from "react-native-view-shot";
@@ -39,10 +39,11 @@ const OffscreenShareCard = React.forwardRef<any, {
   heightDp: number;
   funFactImage?: string;
   siteImage?: string;
+  sponsors?: string;
   siteName?: string;
   funFactDetail?: string;
   onReady?: () => void;
-}>(({ widthDp, heightDp, funFactImage, siteImage, siteName, funFactDetail, onReady }, ref) => {
+}>(({ widthDp, heightDp, funFactImage, siteImage, sponsors, siteName, funFactDetail, onReady }, ref) => {
   const [cardSize, setCardSize] = useState<{w: number; h: number}>({ w: 0, h: 0 });
 
   const { scale, containerStyle } = useMemo(() => {
@@ -157,11 +158,21 @@ const OffscreenShareCard = React.forwardRef<any, {
                     <Text style={{ fontWeight: "700", fontSize: 14, color: "#fff" }}>
                       Brought to you by
                     </Text>
-                    <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                      {!!siteImage && <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: siteImage }} />}
-                      {!!siteImage && <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: siteImage }} />}
-                      {!!siteImage && <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: siteImage }} />}
-                    </View>
+                      <FlatList
+                          data={sponsors}
+                          horizontal
+                          style={{ flex: 1, marginLeft: 8 }}
+                          contentContainerStyle={{ paddingLeft: 0 }}
+                          showsHorizontalScrollIndicator={false}
+                          keyExtractor={(item, idx) => item?.id?.toString?.() ?? String(idx)}
+                          renderItem={({ item }) => (
+                              <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: item?.image }}
+                              />
+                          )}
+                          ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+
+                          ListEmptyComponent={<View />}
+                      />
                   </View>
                 </View>
               </View>
@@ -328,13 +339,10 @@ const handleCaptureScreenshot = async () => {
         navigationParams = {huntChallengeFinished: true};
       }
 
-      setTimeout(() => {
-        // @ts-ignore
         navigation.navigate("TabNavigator", {
           screen: "Tab",
           params: {screen: "Go Navigate", params: navigationParams},
         });
-      }, 250);
     } catch (error) {
       console.error("Error al finalizar:", error);
       endOnceRef.current = false;
@@ -361,8 +369,9 @@ const handleCaptureScreenshot = async () => {
   );
 
   const funFactImage = challengeObj?.huntChallenge?.image;
-  const siteImage = challengeObj?.geo_ar_star?.geo_site?.image;
-  const siteName = challengeObj?.geo_ar_star?.geo_site?.name;
+  const siteImage = challengeObj?.huntChallenge?.image;
+  const sponsors = challengeObj?.huntChallenge?.sponsors ?? [];
+  const siteName = challengeObj?.huntChallenge?.title;
   const funFactDetail = challengeObj?.huntChallenge?.fun_facts;
 
   return (
@@ -380,6 +389,7 @@ const handleCaptureScreenshot = async () => {
       funFactImage={funFactImage}
       siteImage={siteImage}
       siteName={siteName}
+      sponsors={sponsors}
       funFactDetail={funFactDetail}
       onReady={() => setIsOffscreenReady(true)}
     />
@@ -436,7 +446,7 @@ const handleCaptureScreenshot = async () => {
               />
             </View>
 
-            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+            <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between", gap:8}}>
               <Text
                 style={{
                   ...fontGroup.nunitoBold,
@@ -447,11 +457,19 @@ const handleCaptureScreenshot = async () => {
               >
                 Brought to you by
               </Text>
-              <View style={{flexDirection: "row", alignItems: "center", gap: 8}}>
-                <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
-                <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
-                <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: siteImage}} />
-              </View>
+              <FlatList
+                  data={sponsors}
+                  horizontal
+                  style={{ flex: 1, marginLeft: 8 }}              // para que la lista ocupe el espacio restante
+                  contentContainerStyle={{ paddingLeft: 0 }}      // opcional
+                  showsHorizontalScrollIndicator={false}
+                  keyExtractor={(item, idx) => item?.id?.toString?.() ?? String(idx)}
+                  renderItem={({ item }) => (
+                  <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: item?.image }}/>
+                  )}
+                  ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
+                ListEmptyComponent={<View />}
+                />
             </View>
           </View>
         </View>

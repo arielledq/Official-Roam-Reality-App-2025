@@ -37,7 +37,7 @@ import {
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
   const selectedDestination = useSelector(state => state.ar);
-
+  const [textLoading, setTextLoading] = useState("Loading AR Experience");
   const [openModalARMode, setOpenModalARMode] = useState(false);
   const [userLocation, setUserLocation] = useState(null);
   const starChallengeObj = selectedDestination.starChallenge;
@@ -78,9 +78,11 @@ const ARScreen = ({route}) => {
   const isHuntMode = selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE;
   const isGeoTagMode = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE;
   const isScanMode = selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE;
-  const modelFile =
-    challengeObj?.model_file ||
-    selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
+  const modelFile = isHuntMode ? selectedSite?.ar_star?.model_file
+      : (
+          challengeObj?.model_file ||
+          selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file
+      );
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
   // const huntChallenge = TEST_HUNT_CHALLENGE;
@@ -113,7 +115,12 @@ const ARScreen = ({route}) => {
   const challenge_type_value = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
   ? CHALLENGES_TYPE.PIN_CHECK_IN
   : null;
-  const huntParameters = selectedSite?.huntChallenge?.geo_ar_star?.challenges?.parameters || selectedSite?.pin_challenge?.parameters;
+  const huntParameters = isHuntMode
+      ? selectedSite?.ar_star?.parameters
+      : (
+          selectedSite?.huntChallenge?.geo_ar_star?.challenges?.parameters ||
+          selectedSite?.pin_challenge?.parameters
+      );
   const showNotificationTimerRef = useRef(null);
 
   const checkPermission = () => {
@@ -136,6 +143,7 @@ const ARScreen = ({route}) => {
   };
 
   const downloadModelFile = (sourcePath, targetPath) => {
+    setTextLoading("Downloading AR model...");
     RNFetchBlob.config({
       fileCache: true,
       path: sourcePath,
@@ -148,7 +156,7 @@ const ARScreen = ({route}) => {
   };
 
   const unzipModelFile = async (sourcePath, targetPath) => {
-    setLoading(true);
+    setTextLoading("Unzipping AR model...");
     const extractedData = await handleUnzipProcess(sourcePath, targetPath);
 
     if (extractedData.success) {
@@ -156,14 +164,14 @@ const ARScreen = ({route}) => {
       setModelResource(extractedData.mtlFile);
       setTextureBase(extractedData.baseTexture);
       setTextureEmission(extractedData.emissionTexture);
+      setTextLoading("Loading AR Experience...");
     } else {
       console.error("Failed to unzip model file:", extractedData.error);
-
       setModelResource(null);
       setTextureBase(null);
       setTextureEmission(null);
     }
-    setLoading(false);
+    setUnitySceneLoaded(false)
   };
   // useEffect(() => {
   //   console.log("se seleccionaron los sitios, verificar parametros", selectedSite, huntParameters
@@ -178,10 +186,13 @@ const ARScreen = ({route}) => {
 
       RNFS.exists(sourcePath)
         .then(exists => {
-          // console.log("exists", exists);
-          if (exists) {
+            if (exists) {
+              setTextLoading("Unzipping AR model...");
+              setUnitySceneLoaded(true);
             unzipModelFile(sourcePath, targetPath);
           } else {
+            setTextLoading("Downloading AR model...");
+            setUnitySceneLoaded(true);
             downloadModelFile(sourcePath, targetPath);
           }
         })
@@ -1240,11 +1251,11 @@ useEffect(() => {
   }, [unityRef, selectedSite]);
 
   useEffect(() => {
-    if (challengeObjParameters) {
-      setThreshold(parseFloat(challengeObjParameters?.bloom_threshold) || parseFloat(huntParameters?.bloom_threshold) ||  0.9);
-      setIntensity(parseFloat(challengeObjParameters?.bloom_intensity) || parseFloat(huntParameters?.bloom_threshold) || 1);
+    if (selectedSite) {
+      setThreshold(parseFloat(huntParameters?.bloom_threshold)|| 0.9);
+      setIntensity(parseFloat(huntParameters?.bloom_intensity) || 1);
     }
-  }, [challengeObjParameters]);
+  }, [selectedSite]);
 
   useEffect(() => {
     checkPermission();
@@ -1279,11 +1290,13 @@ useEffect(() => {
   }, [isUnityLoaded, isScanMode, selectedChallengeOverride]);
 
   //TODO Check
-  // useEffect(() => {
-  //   if (!selectedSite && !unitySceneLoaded) {
-  //     startChallengeHandler(huntChallenge);
-  //   }
-  // }, [selectedSite, unitySceneLoaded]);
+  useEffect(() => {
+    if (isContinuingHuntChallenge && !selectedSite && !unitySceneLoaded) {
+      startChallengeHandler(huntChallenge);
+    } else {
+      setSelectedSite(null)
+    }
+  }, [isContinuingHuntChallenge, selectedSite, unitySceneLoaded]);
 
   // useEffect(() => {
   //   if (huntChallengeFinished) {
@@ -1409,7 +1422,7 @@ useEffect(() => {
 }, [sceneIsReady]);
 
 useEffect(() => {
-  if (loading == true && unityRef.current){
+  if (loading === true && unityRef.current){
      unityRef.current.postMessage(
         "OBJImport",
         "SetLoadingVisibility",
@@ -1538,7 +1551,7 @@ useEffect(() => {
     };
   }, []);
 
-  // console.log("selectedsitselectedsitselectedsitselectedsite, ", selectedSite)
+  console.log("selectedsitselectedsitselectedsitselectedsite, ", selectedSite)
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -1598,7 +1611,7 @@ useEffect(() => {
               }}
             >
               <ActivityIndicator size="large" color="#fff" />
-              <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience</Text>
+              <Text style={{color: "#fff", marginTop: 10}}>{textLoading}</Text>
             </View>
           )}
         </>

@@ -179,6 +179,10 @@ const Navigation = () => {
             <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
             <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
             <Stack.Screen name="PinChallenge" component={PinChallenge} />
+            <Stack.Screen name="EditProfile" component={EditProfile} />
+            <Stack.Screen name="EmailVerification" component={EmailVerification} />
+
+
             {/* @ts-ignore */}
             <Stack.Screen name="ARScreen" component={ARScreen} />
             <Stack.Screen
