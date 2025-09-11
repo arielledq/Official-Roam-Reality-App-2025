@@ -130,7 +130,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
       text2: gate?.reason || "You have collected all the stars.",
     });
     getSitesHandler(selectedSponsor?.value?.toString() || "");
-    onClose(); 
+    onClose();
     return;
   }
 
@@ -329,9 +329,10 @@ function getCooldownTotalMinutes(cooldown: string): number {
           data={sponsorData}
           maxHeight={300}
           dropdownStyle={{zIndex:100}}
-          containerStyle={{flex: 1, borderRadius: 0, marginLeft:3, marginTop: 0, backgroundColor: theme.lightColors?.black}}
+          containerStyle={{flex: 1, borderRadius: 0, marginTop: 0, backgroundColor: theme.lightColors?.black}}
           labelField="label"
           valueField="value"
+          containerStyles={{marginTop: -35, width: 246}}
           selectedTextStyle={{fontSize: 14, ...fontGroup.nunitoBold, fontWeight: "bold"}}
           itemTextStyle={{
             ...fontGroup.nunitoBold,
@@ -528,7 +529,7 @@ function getCooldownTotalMinutes(cooldown: string): number {
                           attemptsDetails = `${site?.ar_star?.user_attempts || 0}/${
                             site?.ar_star?.attempts || 0
                           } Captures`;
-                          sponsorImage = site?.sponsor?.image;
+                          sponsorImage = site?.ar_star?.sponsored?.[0]?.image;
                           coolDownHours = formatCooldownTime(site?.hunt_cooldownn) || 0;
                           coolDownMin = getCooldownTotalMinutes(site?.hunt_cooldown) || 0;
                           isDisabled = coolDownMin > 0;
