@@ -807,6 +807,7 @@ class GeoARStarPoint(models.Model):
         help_text="Order of the star when following mode is 'SPECIFIC ORDER'"
     )
     image = models.FileField(upload_to="ar/geo_star_point/", blank=True, null=True)
+    title = models.CharField(_("Title"), max_length=255, blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     elevation = models.IntegerField(null=True, blank=True)
     sponsors = models.ManyToManyField(Sponsor, related_name="stars", blank=True)

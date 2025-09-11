@@ -852,6 +852,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "hunt_captured_stars",
             "total_stars",
             "image",
+            "title",
             "fun_facts",
             "elevation",
             "sponsors",
