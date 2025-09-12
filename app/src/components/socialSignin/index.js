@@ -3,7 +3,7 @@ import {Platform, StyleSheet, TouchableOpacity, View} from "react-native";
 import {GoogleSignin, statusCodes} from "@react-native-google-signin/google-signin";
 import DividerWithText from "../dividerwithtextcomponent";
 import {AppleIcon, FacebookIcon, GoogleIcon} from "../../assets/svg";
-import {AccessToken, AuthenticationToken, LoginManager, Settings} from "react-native-fbsdk-next";
+import {AccessToken, AuthenticationToken, LoginManager} from "react-native-fbsdk-next";
 import "react-native-get-random-values";
 import uuid from "react-native-uuid";
 import appleAuth, {appleAuthAndroid} from "@invertase/react-native-apple-authentication";

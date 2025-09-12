@@ -14,7 +14,6 @@ import {showMessage} from "util/helpers";
 import Config from "config";
 import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../constants";
 
-import {ShareDialog} from "react-native-fbsdk-next";
 import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
 
 /**
@@ -142,98 +141,126 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       }
     }
 
-    // Determine MIME type based on file extension
-    const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
-
     // Share the file
-    let shareOptions = {};
+    let hasSharedToSSNN = false;
 
-    const shareMessage = `${
-      sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
-    }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
-
-    switch (selectedSSNN) {
-      case SSNN.INSTAGRAM:
-        shareOptions = {
-          social: Share.Social.INSTAGRAM_STORIES,
-          appId: Config.FACEBOOK_APP_ID,
-        };
-        if (fileExt === "mp4") {
-          shareOptions = {...shareOptions, backgroundVideo: updatedFileUri};
-        } else {
-          shareOptions = {...shareOptions, backgroundImage: updatedFileUri};
-        }
-        break;
-      case SSNN.FACEBOOK:
-        if (Platform.OS === "ios") {
-          if (fileExt === "mp4") {
-            shareOptions = {
-              contentType: "video",
-              video: {
-                localUrl: updatedFileUri,
-              },
-            };
-          } else {
-            shareOptions = {
-              contentType: "photo",
-              photos: [
-                {
-                  imageUrl: updatedFileUri,
-                },
-              ],
-            };
-          }
-        } else {
-          shareOptions = {
-            social: Share.Social.FACEBOOK,
+    try {
+      switch (selectedSSNN) {
+        case SSNN.INSTAGRAM: {
+          // Keep using react-native-share for Instagram
+          let shareOptions = {
+            social: Share.Social.INSTAGRAM_STORIES,
             appId: Config.FACEBOOK_APP_ID,
-            message: shareMessage,
           };
 
-          // Convert the file to a base64 data URI
-          const dataUri = await getBase64DataUri(updatedFileUri, fileExt);
-          if (!dataUri) {
-            Alert.alert("Error", "Failed to convert content for Facebook");
-            return;
+          if (fileExt === "mp4") {
+            // @ts-ignore
+            shareOptions = {...shareOptions, backgroundVideo: updatedFileUri};
+          } else {
+            // @ts-ignore
+            shareOptions = {...shareOptions, backgroundImage: updatedFileUri};
           }
 
-          shareOptions = {...shareOptions, url: dataUri};
-        }
-
-        break;
-      case SSNN.OTHERS:
-        shareOptions = {
-          url: updatedFileUri,
-          type: mimeType,
-          message: shareMessage,
-        };
-        break;
-
-      default:
-        break;
-    }
-
-    let hasSharedToSSNN = false;
-    try {
-      if (selectedSSNN === SSNN.OTHERS) {
-        await Share.open(shareOptions);
-        hasSharedToSSNN = true;
-      } else {
-        if (Platform.OS === "ios" && selectedSSNN === SSNN.FACEBOOK) {
-          await ShareDialog.canShow(shareOptions);
-          const resultDialog = await ShareDialog.show(shareOptions);
-          if (resultDialog?.isCancelled) {
-            throw new Error("Share cancelled");
-          }
-          hasSharedToSSNN = true;
-        } else {
           // @ts-ignore
           await Share.shareSingle(shareOptions);
           hasSharedToSSNN = true;
+          break;
         }
+
+        case SSNN.FACEBOOK: {
+          const shareMessage = `${
+            sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
+          }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
+          try {
+            // For Facebook, we need to use a different approach depending on the platform
+            if (Platform.OS === "ios") {
+              // On iOS, we can use the Facebook app-specific sharing
+              const shareOptions = {
+                title: "Share via",
+                message: shareMessage,
+                url: updatedFileUri,
+                social: Share.Social.FACEBOOK,
+                type: fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`,
+              };
+
+              // @ts-ignore
+              await Share.shareSingle(shareOptions);
+              hasSharedToSSNN = true;
+            } else {
+              // On Android, we need to handle Facebook sharing differently
+              if (fileExt === "mp4") {
+                // For videos on Android, we need to use a public URL
+                // You might need to upload the video to a server first
+                Alert.alert(
+                  "Info",
+                  "Video sharing to Facebook on Android requires the video to be publicly accessible online."
+                );
+              } else {
+                // For images on Android
+                const shareOptions = {
+                  title: "Share via",
+                  message: shareMessage,
+                  url: updatedFileUri,
+                  social: Share.Social.FACEBOOK,
+                  type: `image/${fileExt}`,
+                };
+
+                // @ts-ignore
+                await Share.shareSingle(shareOptions);
+                hasSharedToSSNN = true;
+              }
+            }
+          } catch (error) {
+            console.error("Facebook share error:", error);
+
+            // Fallback to generic share if Facebook-specific sharing fails
+            try {
+              const shareOptions = {
+                title: "Share via",
+                message: shareMessage,
+                url: updatedFileUri,
+                type: fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`,
+              };
+
+              await Share.open(shareOptions);
+              hasSharedToSSNN = true;
+            } catch (fallbackError) {
+              console.error("Fallback share error:", fallbackError);
+              Alert.alert("Error", "Failed to share to Facebook");
+            }
+          }
+          break;
+        }
+        case SSNN.OTHERS: {
+          // Use react-native-share for other platforms
+          const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
+          const shareMessage = `${
+            sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
+          }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
+
+          const shareOptions = {
+            url: updatedFileUri,
+            type: mimeType,
+            message: shareMessage,
+          };
+
+          await Share.open(shareOptions);
+          hasSharedToSSNN = true;
+          break;
+        }
+
+        default:
+          break;
       }
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
+
+      // Show appropriate error message
+      if (error.message?.includes("not installed") || error.message?.includes("No app")) {
+        Alert.alert("Error", "The required app is not installed on your device");
+      } else {
+        Alert.alert("Error", "Failed to share content");
+      }
     } finally {
       setShowChooseIGPostType(false);
     }
@@ -298,13 +325,13 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
         <View style={{flexDirection: "row", gap: 16}}>
           <IGPostTypeButton
-            onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM_STORIES)}
+            onPress={() => share(SSNN.INSTAGRAM)}
             text="Share to Stories"
             imageSource={require("../assets/images/ig_stories.png")}
           />
 
           <IGPostTypeButton
-            onPress={() => share(SSNN.INSTAGRAM, Share.Social.INSTAGRAM)}
+            onPress={() => share(SSNN.INSTAGRAM)}
             text="Share to Feed"
             imageSource={require("../assets/images/ig_post.png")}
           />
