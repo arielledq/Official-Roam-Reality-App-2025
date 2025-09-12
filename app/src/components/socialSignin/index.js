@@ -1,27 +1,21 @@
-import React, { useEffect } from "react";
-import { Platform, StyleSheet, TouchableOpacity, View } from "react-native";
-import { GoogleSignin, statusCodes } from "@react-native-google-signin/google-signin";
+import React, {useEffect} from "react";
+import {Platform, StyleSheet, TouchableOpacity, View} from "react-native";
+import {GoogleSignin, statusCodes} from "@react-native-google-signin/google-signin";
 import DividerWithText from "../dividerwithtextcomponent";
-import { AppleIcon, FacebookIcon, GoogleIcon } from "../../assets/svg";
-import {
-  AccessToken,
-  AuthenticationToken,
-  GraphRequest,
-  GraphRequestManager,
-  LoginManager,
-} from "react-native-fbsdk-next";
+import {AppleIcon, FacebookIcon, GoogleIcon} from "../../assets/svg";
+import {AccessToken, AuthenticationToken, LoginManager, Settings} from "react-native-fbsdk-next";
 import "react-native-get-random-values";
 import uuid from "react-native-uuid";
-import appleAuth, { appleAuthAndroid } from "@invertase/react-native-apple-authentication";
-import { APPLE_CLIENT_ID, APPLE_REDIRECT_URL } from "../../network/config";
-import { googleLogin, appleLogin } from "../../network";
-import { useDispatch, useSelector } from "react-redux";
-import { updateUserData } from "../../redux/Login";
-import { updateAsOldUser } from "../../redux/Persist";
-import { handleError, showMessage } from "../../util/helpers";
+import appleAuth, {appleAuthAndroid} from "@invertase/react-native-apple-authentication";
+import {APPLE_CLIENT_ID, APPLE_REDIRECT_URL} from "../../network/config";
+import {googleLogin, appleLogin, facebookLogin} from "../../network";
+import {useDispatch, useSelector} from "react-redux";
+import {updateUserData} from "../../redux/Login";
+import {updateAsOldUser} from "../../redux/Persist";
+import {handleError, showMessage} from "../../util/helpers";
 import Config from "config";
 
-const SocialSignin = ({ setLoading }) => {
+const SocialSignin = ({setLoading}) => {
   const dispatch = useDispatch();
   const newUser = useSelector(state => state.persist.newUser);
 
@@ -65,46 +59,114 @@ const SocialSignin = ({ setLoading }) => {
         // play services not available or outdated
       } else {
         // some other error happened
-        console.error({ errorHere: error });
+        console.error({errorHere: error});
       }
       setLoading(false);
     }
   };
 
-  const _fblogin = () => {
-    LoginManager.logOut();
-    return LoginManager.logInWithPermissions(["email", "public_profile"]).then(
-      res => {
-        if (res.declinedPermissions && res.declinedPermissions.includes("email")) {
-          showMessage("Email is required", "error");
-        }
-        if (res.isCancelled) {
-          console.error("err");
-        } else {
-          const req = new GraphRequest("/me?fields=email,name,picture", null, (err, result) => {
-            if (err) {
-              console.error("err", err);
-              return;
-            } else {
-              AccessToken.getCurrentAccessToken().then(data => {
-                // --
-              });
-            }
-          });
-          new GraphRequestManager().addRequest(req).start();
-        }
-      },
-      err => {
-        console.error("error in login", err);
-      }
-    );
-  };
-
   const handleFBLogin = async () => {
+    setLoading(true);
     try {
-      await _fblogin();
-    } catch (err) {
-      console.error("err in catch", err);
+      // Log out first to clear any previous state
+      LoginManager.logOut();
+
+      let result;
+      if (Platform.OS === "ios") {
+        // For iOS, use limited login to comply with Apple's privacy requirements
+        result = await LoginManager.logInWithPermissions(["email", "public_profile"], "limited");
+      } else {
+        // For Android, use standard login
+        result = await LoginManager.logInWithPermissions(["email", "public_profile"]);
+      }
+
+      if (result.isCancelled) {
+        console.log("Login cancelled");
+        setLoading(false);
+        return;
+      }
+
+      if (result.declinedPermissions && result.declinedPermissions.includes("email")) {
+        showMessage("Email permission is required", "error");
+        setLoading(false);
+        return;
+      }
+
+      let token;
+      if (Platform.OS === "ios") {
+        // For iOS limited login, we get an authentication token
+        const authToken = await AuthenticationToken.getAuthenticationTokenIOS();
+        token = authToken?.authenticationToken;
+
+        if (!token) {
+          throw new Error("Failed to get authentication token");
+        }
+
+        // Send the authentication token to the backend
+        facebookLogin({token})
+          .then(res => {
+            if (res.status == 1) {
+              dispatch(updateUserData(res));
+              if (newUser) {
+                dispatch(updateAsOldUser());
+              }
+            } else {
+              handleError(res);
+            }
+          })
+          .catch(err => {
+            console.error("facebookLogin", err);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      } else {
+        // For Android, we get an access token
+        const accessTokenData = await AccessToken.getCurrentAccessToken();
+        token = accessTokenData?.accessToken;
+
+        if (!token) {
+          throw new Error("Failed to get access token");
+        }
+
+        // With the access token, we can directly fetch user info
+        const response = await fetch(
+          `https://graph.facebook.com/v12.0/me?fields=email,name,picture.type(large)&access_token=${token}`
+        );
+        const userInfo = await response.json();
+
+        if (userInfo.error) {
+          throw new Error(userInfo.error.message);
+        }
+
+        // Send user info to your backend
+        facebookLogin({
+          token,
+          email: userInfo.email,
+          name: userInfo.name,
+          picture: userInfo.picture?.data?.url,
+        })
+          .then(res => {
+            if (res.status == 1) {
+              dispatch(updateUserData(res));
+              if (newUser) {
+                dispatch(updateAsOldUser());
+              }
+            } else {
+              handleError(res);
+            }
+          })
+          .catch(err => {
+            console.error("facebookLogin", err);
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      }
+    } catch (error) {
+      console.error("Facebook login error", error);
+      showMessage("Facebook login failed", "error");
+      setLoading(false);
     }
   };
 
@@ -141,7 +203,7 @@ const SocialSignin = ({ setLoading }) => {
             }
           })
           .catch(err => {
-            console.error({ err });
+            console.error({err});
           })
           .finally(() => {
             setLoading(false);
@@ -182,13 +244,13 @@ const SocialSignin = ({ setLoading }) => {
           }
         })
         .catch(err => {
-          console.error({ err });
+          console.error({err});
         })
         .finally(() => {
           setLoading(false);
         });
     } catch (err) {
-      console.error({ err });
+      console.error({err});
     }
   };
 
@@ -211,7 +273,6 @@ const SocialSignin = ({ setLoading }) => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
-        {/* TODO: Re enable after Arielle's FB Console setup - 2025-03-26 */}
         {/* <TouchableOpacity onPress={handleFBLogin}>
           <FacebookIcon style={styles.socialSIicon} />
         </TouchableOpacity> */}
