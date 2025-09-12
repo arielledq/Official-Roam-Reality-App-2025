@@ -52,7 +52,6 @@ const PinChallenge = () => {
   const [shouldRenderUnity, setShouldRenderUnity] = useState(false);
 
   const selectedGeoSite = useSelector(state => state.ar?.selectedGeoSite);
-  console.log("-------------", selectedGeoSite,"-------------")
   const unityRef = useRef(null); // Unity reference
   const watchIdRef = useRef(null);
   const viewShotRef = useRef();
@@ -126,7 +125,6 @@ const PinChallenge = () => {
 
       RNFS.exists(sourcePath)
         .then(exists => {
-          console.log("exists", exists);
           if (exists) {
             unzipModelFile(sourcePath, targetPath);
           } else {
@@ -136,7 +134,10 @@ const PinChallenge = () => {
         .catch(console.error);
     }
   };
-
+console.log(modelOBJ,
+    textureBase,
+    emissionValue,
+    challengeObjParameters)
   const sendModelDataToUnitySpawn = () => {
     if (
       unityRef.current &&
@@ -158,7 +159,7 @@ const PinChallenge = () => {
         emissionIntensity: emissionValue,
         rotationSpeed: 10,
         scaleSpeed: Number(challengeObjParameters?.scale_sensitivity) || 0.01,
-        minScale: Number(challengeObjParameters?.min_pinch_scale) || 1,
+        minScale: Number(challengeObjParameters?.min_pinch_scale) || 10,
         maxScale: Number(challengeObjParameters?.max_pinch_scale) || 1,
         isRotationEnabled: true,
         distanceCamera: 2,
@@ -168,6 +169,7 @@ const PinChallenge = () => {
           y: parseFloat(challengeObjParameters.positionY) || 0,
           z: 2 || 0.4,
         },
+        allowScale: true
       };
       // setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
@@ -533,7 +535,6 @@ const PinChallenge = () => {
 
   useEffect(() => {
     if (unityRef.current) {
-      console.log("cambio de scena");
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative");
     }
   }, [unityRef.current]);
@@ -581,7 +582,7 @@ const PinChallenge = () => {
               JSON.stringify({ setVisibleButtonPosition: true })
           );
 
-          if (modelOBJ && textureBase && emissionValue && textureEmission && isUnityLoaded && !unitySceneLoaded) {
+          if (modelOBJ && textureBase && emissionValue && isUnityLoaded && !unitySceneLoaded) {
             sendModelDataToUnitySpawn();
             sendBloomValuesToUnity();
           }

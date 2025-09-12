@@ -17,7 +17,7 @@ import {useNavigation, useRoute} from "@react-navigation/native";
 import {confirmCode, sendCode} from "../../network";
 import {handleError, showMessage} from "../../util/helpers";
 import {useDispatch} from "react-redux";
-import {updateUserData} from "../../redux/Login";
+import {updateUserData, updateVerified} from "../../redux/Login";
 import Timer from "../../components/timer";
 
 const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerification"> = () => {
@@ -56,27 +56,39 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
       return;
     }
     setIsLoading(true);
-    confirmCode({email: email, otp: values.code})
-      .then(res => {
-        if (res.status == 1) {
-          navigateToSuccess();
-          dispatch(updateUserData(data));
-        } else {
-          handleError(res);
-        }
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
+    confirmCode({ email, otp: values.code })
+        .then(res => {
+          if (res.status == 1) {
+            if (profile) {
+              // Caso: abierto desde Profile (app stack)
+              showMessage("Email verified successfully");
+              // marca verificado si lo manejás en redux (opcional)
+              setTimeout(() =>dispatch(updateVerified(true))
+              , 500);
+
+              navigation.goBack();
+            } else {
+
+              navigation.navigate("VerificationSuccess", {
+                ChangePassword: false,
+                nextLoginData: data,
+              });
+            }
+          } else {
+            handleError(res);
+          }
+        })
+        .finally(() => setIsLoading(false));
   };
 
   const handleSkip = () => {
-    console.log("navigating to TabNavigator");
-    dispatch(updateUserData(data));
+    setTimeout(() =>
+        dispatch(updateUserData(data))
+        , 300);
 
     navigation.reset({
       index: 0,
-      routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+      routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
     });
   };
 

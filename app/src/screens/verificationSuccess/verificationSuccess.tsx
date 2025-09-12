@@ -1,5 +1,5 @@
 import React from "react";
-import {Image, View} from "react-native";
+import {Image, InteractionManager, View} from "react-native";
 import useStyles from "./styles";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import AppButton from "../../components/button";
@@ -9,7 +9,8 @@ import AppText from "../../components/text";
 import Images from "../../assets/images";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useDispatch} from "react-redux";
-import {updateVerified} from "../../redux/Login";
+import {updateUserData, updateVerified} from "../../redux/Login";
+import {navigationRef} from "services/navigationService.ts";
 
 const VerificationSuccess: ScreenStackComponent<RootStackParamList, "VerificationSuccess"> = () => {
   const _styles = useStyles();
@@ -17,6 +18,8 @@ const VerificationSuccess: ScreenStackComponent<RootStackParamList, "Verificatio
   const dispatch = useDispatch();
   const route = useRoute();
   const ChangePassword = route?.params?.ChangePassword;
+  const nextLoginData = route?.params?.nextLoginData; // <-- NUEVO
+console.log("nextLoginData", nextLoginData);
   const successText = ChangePassword
     ? "password has been successfully changed"
     : "email address has been successfully verified";
@@ -26,13 +29,22 @@ const VerificationSuccess: ScreenStackComponent<RootStackParamList, "Verificatio
     if (ChangePassword) {
       navigation.reset({
         index: 0,
-        routes: [{name: "Login"}],
+        routes: [{ name: "Login" }],
       });
     } else {
-      dispatch(updateVerified(true));
-      navigation.reset({
-        index: 0,
-        routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}],
+      if (nextLoginData) {
+
+        dispatch(updateUserData(nextLoginData));
+        dispatch(updateVerified(true));
+      } else {
+        dispatch(updateVerified(true));
+      }
+
+      InteractionManager.runAfterInteractions(() => {
+        navigationRef.resetRoot({
+          index: 0,
+          routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+        });
       });
     }
   };
