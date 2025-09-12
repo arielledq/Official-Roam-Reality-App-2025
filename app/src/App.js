@@ -11,8 +11,7 @@ import "react-native-get-random-values";
 import {PersistGate} from "redux-persist/integration/react";
 import {Provider as PaperProvider} from "react-native-paper";
 import {enableScreens} from "react-native-screens";
-import {useOneSignal} from "./hooks/useOneSignal"
-
+import {useOneSignal} from "./hooks/useOneSignal";
 
 import Config from "./config";
 import {persistor, store} from "./store";
@@ -31,7 +30,7 @@ Geocoder.init(Config.GEOCODER_API_KEY);
 OneSignal.initialize(Config.ONE_SIGNAL_APP_ID);
 OneSignal.Notifications.requestPermission(true);
 OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
-//  console.log("EVENTE NOTIFICATION ----------------",event)
+  //  console.log("EVENTE NOTIFICATION ----------------",event)
   const notification = event.getNotification();
   event.complete(notification);
 });
@@ -53,13 +52,13 @@ const toastConfig = {
 };
 
 const App = () => {
-//  const { setOnesignalDevice } = useOneSignal();
-//  useEffect(() => {
-//    LogBox.ignoreLogs(["Warning: ..."]);
-//    LogBox.ignoreAllLogs();
-//    // Llama una vez para registrar el device en tu backend y loguear id/permiso
-//    setOnesignalDevice();
-//  }, [setOnesignalDevice]);
+  //  const { setOnesignalDevice } = useOneSignal();
+  //  useEffect(() => {
+  //    LogBox.ignoreLogs(["Warning: ..."]);
+  //    LogBox.ignoreAllLogs();
+  //    // Llama una vez para registrar el device en tu backend y loguear id/permiso
+  //    setOnesignalDevice();
+  //  }, [setOnesignalDevice]);
 
   useEffect(() => {
     LogBox.ignoreLogs(["Warning: ..."]);

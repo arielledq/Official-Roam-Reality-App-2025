@@ -134,7 +134,7 @@ export const appleLogin = data => {
     data,
   });
 };
-export const fbLogin = data => {
+export const facebookLogin = data => {
   return Request.call({
     url: `modules/social-auth/facebook/login/`,
     method: "POST",
@@ -738,7 +738,7 @@ export const getGeoARDestinationsMini = () =>
     logoutFunc
   );
 
-export const getElevationAPI = ({ lat, lng }) =>
+export const getElevationAPI = ({lat, lng}) =>
   Request.callWithToken(
     {
       url: `modules/challenges/api/elevation/?lat=${lat}&lng=${lng}`,
