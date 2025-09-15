@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {View, Text, TouchableOpacity, Image, Alert, Platform} from "react-native";
 import RNFS from "react-native-fs";
+import {ShareDialog, SharePhotoContent, ShareVideoContent} from "react-native-fbsdk-next";
 
 import Share from "react-native-share";
 import ReactNativeModal from "react-native-modal";
@@ -174,27 +175,60 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           try {
             // For Facebook, we need to use a different approach depending on the platform
             if (Platform.OS === "ios") {
-              // On iOS, we can use the Facebook app-specific sharing
-              const shareOptions = {
-                title: "Share via",
-                message: shareMessage,
-                url: updatedFileUri,
-                social: Share.Social.FACEBOOK,
-                type: fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`,
-              };
+              if (fileExt === "mp4") {
+                const shareLinkContent = {
+                  contentType: "video",
+                  video: {localUrl: updatedFileUri},
+                } as ShareVideoContent;
 
-              // @ts-ignore
-              await Share.shareSingle(shareOptions);
+                const canShow = await ShareDialog.canShow(shareLinkContent);
+
+                if (canShow) {
+                  try {
+                    const result = await ShareDialog.show(shareLinkContent);
+                    if (result.isCancelled) {
+                      console.log("Sharing cancelled");
+                    } else {
+                      hasSharedToSSNN = true;
+                    }
+                  } catch (error) {
+                    throw error;
+                  }
+                }
+              } else {
+                const shareLinkContent = {
+                  contentType: "photo",
+                  photos: [{imageUrl: updatedFileUri, userGenerated: true}],
+                  commonParameters: {hashtag: shareMessage},
+                } as SharePhotoContent;
+
+                const canShow = await ShareDialog.canShow(shareLinkContent);
+
+                if (canShow) {
+                  try {
+                    await ShareDialog.show(shareLinkContent);
+                    hasSharedToSSNN = true;
+                  } catch (error) {
+                    throw error;
+                  }
+                }
+              }
+
               hasSharedToSSNN = true;
             } else {
               // On Android, we need to handle Facebook sharing differently
               if (fileExt === "mp4") {
-                // For videos on Android, we need to use a public URL
-                // You might need to upload the video to a server first
-                Alert.alert(
-                  "Info",
-                  "Video sharing to Facebook on Android requires the video to be publicly accessible online."
-                );
+                const shareOptions = {
+                  title: "Share via",
+                  message: shareMessage,
+                  url: fileUri,
+                  social: Share.Social.FACEBOOK,
+                  type: fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`,
+                };
+
+                // @ts-ignore
+                await Share.shareSingle(shareOptions);
+                hasSharedToSSNN = true;
               } else {
                 // For images on Android
                 const shareOptions = {
@@ -231,6 +265,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           }
           break;
         }
+
         case SSNN.OTHERS: {
           // Use react-native-share for other platforms
           const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
