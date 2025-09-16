@@ -55,25 +55,27 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     open url: URL,
     options: [UIApplication.OpenURLOptionsKey: Any] = [:]
   ) -> Bool {
-      // Facebook handler
-      if ApplicationDelegate.shared.application(
-          app,
-          open: url,
-          sourceApplication: options[.sourceApplication] as? String,
-          annotation: options[.annotation]
-      ) {
-          return true
-      }
+    
+    // INFO: react-native-fbsdk-next setup
+    if ApplicationDelegate.shared.application(
+        app,
+        open: url,
+        sourceApplication: options[.sourceApplication] as? String,
+        annotation: options[.annotation]
+    ) {
+        return true
+    }
 
-      if GIDSignIn.sharedInstance.handle(url) {
-          return true
-      }
+    // INFO: @react-native-google-signin/google-signin setup
+    if GIDSignIn.sharedInstance.handle(url) {
+        return true
+    }
 
-      if RCTLinkingManager.application(app, open: url, options: options) {
-          return true
-      }
+    if RCTLinkingManager.application(app, open: url, options: options) {
+        return true
+    }
 
-      return false
+    return false
   }
 }
 
