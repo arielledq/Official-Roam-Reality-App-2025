@@ -36,18 +36,16 @@ console.log("nextLoginData", nextLoginData);
 
         dispatch(updateUserData(nextLoginData));
         dispatch(updateVerified(true));
+        setTimeout(()=> { 
+        navigationRef.current?.reset({
+        index: 0,
+        routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}]})
+      },200)
       } else {
         dispatch(updateVerified(true));
-      }
-
-      InteractionManager.runAfterInteractions(() => {
-        navigationRef.resetRoot({
-          index: 0,
-          routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
-        });
-      });
-    }
+      }      
   };
+    }
 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>

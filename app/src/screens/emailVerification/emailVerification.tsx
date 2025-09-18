@@ -81,16 +81,33 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
         .finally(() => setIsLoading(false));
   };
 
-  const handleSkip = () => {
-    setTimeout(() =>
-        dispatch(updateUserData(data))
-        , 300);
+const handleSkip = () => {
+  dispatch(updateUserData(data))
 
+  setTimeout(() => {
     navigation.reset({
       index: 0,
-      routes: [{ name: "TabNavigator", params: { screen: "GeoArChallenge" } }],
+      routes: [
+        {
+          name: "TabNavigator",
+          state: {
+            routes: [
+              {
+                name: "Tab",
+                state: {
+                  routes: [{ name: "GeoArChallenge" }],
+                  index: 0,
+                },
+              },
+            ],
+            index: 0,
+          },
+        },
+      ],
     });
-  };
+  }, 100);
+};
+
 
   useEffect(() => {
     if (profile && !firstEmailSent && email) {

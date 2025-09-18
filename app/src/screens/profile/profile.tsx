@@ -236,7 +236,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     });
   };
 
-  const profilePicture = getProfilePicture(userProfile?.user_profile?.image);
+  const profilePicture = getProfilePicture(profileDetails?.image || userProfile?.user_profile?.image);
 
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
