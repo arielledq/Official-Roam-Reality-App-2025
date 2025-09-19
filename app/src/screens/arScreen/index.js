@@ -78,11 +78,9 @@ const ARScreen = ({route}) => {
   const isHuntMode = selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE;
   const isGeoTagMode = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE;
   const isScanMode = selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE;
-  const modelFile = isHuntMode ? selectedSite?.ar_star?.model_file
-      : (
-          challengeObj?.model_file ||
-          selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file
-      );
+  const modelFile =
+      challengeObj?.model_file ||
+      selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
   // const huntChallenge = TEST_HUNT_CHALLENGE;
@@ -165,39 +163,45 @@ const ARScreen = ({route}) => {
       setTextureBase(extractedData.baseTexture);
       setTextureEmission(extractedData.emissionTexture);
       setTextLoading("Loading AR Experience...");
+      setUnitySceneLoaded(false)
     } else {
       console.error("Failed to unzip model file:", extractedData.error);
       setModelResource(null);
       setTextureBase(null);
       setTextureEmission(null);
     }
-    setUnitySceneLoaded(false)
+
   };
   // useEffect(() => {
   //   console.log("se seleccionaron los sitios, verificar parametros", selectedSite, huntParameters
   //       );
   // }, [selectedSite]);
   const checkIfModelExist = () => {
-    if (challengeObj && modelFile) {
-      const filename = modelFile.split("/").pop().split("?")[0];
-      const withoutExtFilename = filename.split(".")[0];
-      const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
-      const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+    if (!modelFile) return;
 
-      RNFS.exists(sourcePath)
-        .then(exists => {
-            if (exists) {
-              setTextLoading("Unzipping AR model...");
-              setUnitySceneLoaded(true);
-            unzipModelFile(sourcePath, targetPath);
-          } else {
-            setTextLoading("Downloading AR model...");
-            setUnitySceneLoaded(true);
-            downloadModelFile(sourcePath, targetPath);
-          }
-        })
-        .catch(console.error);
-    }
+    const filename = modelFile.split("/").pop().split("?")[0];
+    const withoutExtFilename = filename.split(".")[0];
+    const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
+    const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
+
+    RNFS.exists(targetPath).then(async (unzipped) => {
+      if (unzipped) {
+        setTextLoading("Loading AR Experience...");
+        setUnitySceneLoaded(false);
+        await unzipModelFile(sourcePath, targetPath);
+        return;
+      }
+
+      RNFS.exists(sourcePath).then(exists => {
+        if (exists) {
+          setTextLoading("Unzipping AR model...");
+          unzipModelFile(sourcePath, targetPath);
+        } else {
+          setTextLoading("Downloading AR model...");
+          downloadModelFile(sourcePath, targetPath);
+        }
+      });
+    }).catch(console.error);
   };
 
   const playCameraSound = () => {
@@ -347,6 +351,8 @@ const ARScreen = ({route}) => {
   };
 
   const sendModelDataToUnity = () => {
+    if (hasSentModelDataOnce) return;
+    if (!unityRef.current || !textureBase || !starModels || !validUserLocation) return;
     if (
       unityRef.current &&
       textureBase &&
@@ -405,7 +411,7 @@ const ARScreen = ({route}) => {
   };
 
   const sendSpawnData = () => {
-    if (!unityRef?.current) return;
+    if (!unityRef.current || !hasSentModelDataOnce || sendSpawnModelData) return;
     let config = {
       id: "1",
       latitude: -25.296442, // selectedSite?.scanChallenge?.coordinates[1] , // ||
@@ -416,7 +422,8 @@ const ARScreen = ({route}) => {
       height: spawnHeight,
       isVisible: true,
       updateRadius: 14.0,
-      isHuntMode: false,
+      isHuntMode: true,
+      shouldRotate: true
     };
 
     if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
@@ -429,6 +436,7 @@ const ARScreen = ({route}) => {
         isVisible: true,
         updateRadius: 14.0, // verificar
         isHuntMode: true,
+        shouldRotate: true,
       };
     }
     if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
@@ -441,6 +449,7 @@ const ARScreen = ({route}) => {
         updateRadius: 14.0, // verificar
         isHuntMode: true,
         scale: huntParameters?.scale_object || 0.01,
+        shouldRotate: false,
       };
     }
     const spawnData = {
@@ -834,7 +843,7 @@ useEffect(() => {
           lat_long: huntChallenge?.lat_long,
           challenge_requirement: huntChallenge?.pin_challenge?.challenge_requirement,
           challenge_id: huntChallenge?.pin_challenge?.id,
-          model_file: huntChallenge?.pin_challenge?.model_file,
+          model_file: site?.ar_star?.model_file,
           parameters: huntChallenge?.pin_challenge?.parameters,
           points: huntChallenge?.pin_challenge?.points || 10,
           setVisibleButtonPosition: false,
@@ -931,8 +940,7 @@ useEffect(() => {
   ]);
 
   useEffect(() => {
-    if (!unityRef.current) return;
-    if (!sceneIsReady) return;
+    if (!unityRef.current || !sceneIsReady) return;
 
     if (sendFlowTimerRef.current) {
       clearTimeout(sendFlowTimerRef.current);
@@ -945,46 +953,41 @@ useEffect(() => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      const distanceDetect = {isDetectionEnabled: true, detectionDistance: 50};
+      // Habilitar detección (como ya haces)
       unityRef.current.postMessage(
-        "Main Camera",
-        "SetDetectObjectState",
-        JSON.stringify(distanceDetect)
+          "Main Camera",
+          "SetDetectObjectState",
+          JSON.stringify({isDetectionEnabled: true, detectionDistance: 50})
       );
 
-      const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
+      const mode = (pendingMode ?? selectedSite?.selectedMode?.mode);
+      const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
+      const run3D = mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
+
       const readyForModel = !!validUserLocation && !!starModels && !!textureBase;
 
       if (mode === AR_MODES.GEO_TAG_MODE) {
         if (!hasSentModelDataOnce && readyForModel) {
-
-          sendModelDataToUnity();
-         sendBloomValuesToUnity()
-          const messageData = {
-            typeChallenge: "PHOTOVIDEO",
-            arChallenge: false,
-            isLocation: !!isMeInsideInSite,
-          };
-          unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
+          sendModelDataToUnity();   // 1) SIEMPRE VA PRIMERO
+          sendBloomValuesToUnity();
+          unityRef.current.postMessage("screen", "SetTypeChallenge",
+              JSON.stringify({ typeChallenge: "PHOTOVIDEO", arChallenge: false, isLocation: !!isMeInsideInSite })
+          );
         }
         return;
       }
 
-      const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
-      const run3D = mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
-
       if (run3D) {
         if (!hasSentModelDataOnce && readyForModel) {
-          sendModelDataToUnity();
-          return;
+          sendModelDataToUnity();   // 1) MODELO PRIMERO
+          return;                   // esperar siguiente ciclo
         }
-        if (hasSentModelDataOnce && !sendSpawnModelData) {
-          if (heightReady)
-            sendSpawnData();
-            sendBloomValuesToUnity()
-            unityStarsCount();
-            PointsCount();
-            return;
+        if (hasSentModelDataOnce && !sendSpawnModelData && heightReady) {
+          sendBloomValuesToUnity();
+          unityStarsCount();
+          PointsCount();
+          sendSpawnData();          // 2) SPAWN DESPUÉS
+          return;
         }
       }
     }, AFTER_SCENE_COOLDOWN_MS);
@@ -1004,6 +1007,7 @@ useEffect(() => {
     textureBase,
     hasSentModelDataOnce,
     sendSpawnModelData,
+    heightReady,
   ]);
 
   // useEffect(() => {
@@ -1385,7 +1389,11 @@ useEffect(() => {
           clearTimeout(showNotificationTimerRef.current);
           showNotificationTimerRef.current = null;
         }
-
+        setTextureBase(false);
+        setStarModels(false);
+        setCapturedImage(null);
+        setCapturedVideo(null);
+        setIsUnityLoaded(true);
         isFocusedRef.current = false;
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);

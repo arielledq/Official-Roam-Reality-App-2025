@@ -443,6 +443,9 @@ class GeoStarSimpleSerializer(GeoModelSerializer):
             created_at__gte=window_start,
         ).order_by('created_at')
         total_stars = obj.stars.count()
+        if total_stars == 0:
+            return 0
+
         collected_ids = list(qs.values_list('geo_ar_star_point_id', flat=True))
 
         grouped = [

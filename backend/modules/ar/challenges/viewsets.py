@@ -803,7 +803,7 @@ class MemoryCheckinViewSet(ViewSet):
 class ArSiteViewSet(viewsets.GenericViewSet, viewsets.mixins.ListModelMixin,):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    queryset = GeoArSite.objects.all()
+    queryset = GeoArSite.objects.filter(is_active=True)
     serializer_class = GeoArSiteSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = ArSiteFilterSet

@@ -23,6 +23,7 @@ import AppButton from "../../../components/button";
 import BGArShare from "../../../assets/ar/bg-ar-share.png";
 import theme from "assets/theme";
 import Toast from "react-native-toast-message";
+import {fonts} from "assets/fonts";
 
 const {width} = Dimensions.get("window");
 
@@ -312,6 +313,8 @@ const ChallengeDetails: ScreenStackComponent<RootStackParamList, "ChallengeDetai
               lineHeight: 19.1,
               color: "#fff",
               fontSize: FontSizes.S18,
+              fontFamily: fonts.nunitoBold,
+              fontWeight: "700",
             },
           }}
           source={{

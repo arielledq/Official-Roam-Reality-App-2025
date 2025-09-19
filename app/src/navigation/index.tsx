@@ -148,39 +148,40 @@ const Navigation = () => {
       default:
         return (
           <>
-            <Stack.Screen name="TabNavigator" component={DrawerNav} />
-            <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
-            <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
-            {/* @ts-ignore */}
-            <Stack.Screen name="Waiver" component={Waiver} />
-            {/* @ts-ignore */}
-            <Stack.Screen name="UserAgreement" component={UserAgreement} />
-            <Stack.Screen name="PublicProfile" component={PublicProfile} />
-            <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
-            <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
-            <Stack.Screen name="Friends" component={Friends} />
-            <Stack.Screen name="AddFriend" component={AddFriendScreen} />
-            <Stack.Screen name="SendFeedback" component={Feedback} />
-            <Stack.Screen name="InviteFriends" component={InviteFriends} />
-            <Stack.Screen name="ARChallenge" component={ARChallenge} />
-            <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} />
-            <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
-            <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
-            <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
-            {/* @ts-ignore */}
-            <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
-            {/* @ts-ignore */}
-            <Stack.Screen name="ARFilter" component={ARFilter} />
-            <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
-            <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
-            <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
-            <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
-            <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
-            <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
-            <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
-            <Stack.Screen name="PinChallenge" component={PinChallenge} />
-            <Stack.Screen name="EditProfile" component={EditProfile} />
-            <Stack.Screen name="EmailVerification" component={EmailVerification} />
+              <Stack.Screen name="TabNavigator" component={DrawerNav} />
+              <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
+              <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
+              {/* @ts-ignore */}
+              <Stack.Screen name="Waiver" component={Waiver} />
+              {/* @ts-ignore */}
+              <Stack.Screen name="UserAgreement" component={UserAgreement} />
+              <Stack.Screen name="PublicProfile" component={PublicProfile} />
+              <Stack.Screen name="ArStarChallengeShare" component={ArStarChallengeShare} />
+              <Stack.Screen name="ScoreBoard" component={ScoreBoard} />
+              <Stack.Screen name="Friends" component={Friends} />
+              <Stack.Screen name="AddFriend" component={AddFriendScreen} />
+              <Stack.Screen name="SendFeedback" component={Feedback} />
+              <Stack.Screen name="InviteFriends" component={InviteFriends} />
+              <Stack.Screen name="ARChallenge" component={ARChallenge} />
+              <Stack.Screen name="ChallengeDetails" component={ChallengeDetails} />
+              <Stack.Screen name="ChallengeExamples" component={ChallengeExamples} />
+              <Stack.Screen name="ArChallengeCapture" component={ArChallengeCapture} />
+              <Stack.Screen name="ArChallengeShare" component={ArChallengeShare} />
+              {/* @ts-ignore */}
+              <Stack.Screen name="GeoArOutdoor" component={GeoArOutdoor} />
+              {/* @ts-ignore */}
+              <Stack.Screen name="ARFilter" component={ARFilter} />
+              <Stack.Screen name="GeoArChallenge" component={GeoArChallenge} />
+              <Stack.Screen name="GeoArChallengeDetails" component={GeoArChallengeDetails} />
+              <Stack.Screen name="GeoArSiteDetails" component={GeoArSiteDetails} />
+              <Stack.Screen name="GeoArSiteRoutes" component={GeoArSiteRoutes} />
+              <Stack.Screen name="GeoArSiteArrived" component={GeoArSiteArrived} />
+              <Stack.Screen name="ChallengeSelection" component={ChallengeSelection} />
+              <Stack.Screen name="UniqueArChallenge" component={UniqueArChallenge} />
+              <Stack.Screen name="PinChallenge" component={PinChallenge} />
+              <Stack.Screen name="EditProfile" component={EditProfile} />
+              <Stack.Screen name="EmailVerification" component={EmailVerification} />
+
 
 
             {/* @ts-ignore */}

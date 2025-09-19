@@ -63,7 +63,7 @@ class ArSiteFilterSet(filters.FilterSet):
 
         site_type = int(value)
         if site_type == self.SiteType.SITE:
-            return qs.filter(geo_arstar_ar_site__isnull=True)
+            return qs
         elif site_type == self.SiteType.SITE_STAR:
             return qs.filter(geo_arstar_ar_site__isnull=False).distinct()
         else:
