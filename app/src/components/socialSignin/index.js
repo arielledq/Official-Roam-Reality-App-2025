@@ -65,107 +65,64 @@ const SocialSignin = ({setLoading}) => {
     }
   };
 
+  // Add this utility function
+  const isFBAccessTokenValid = expirationTime => {
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+    return expirationTime > currentTime;
+  };
+
   const handleFBLogin = async () => {
     setLoading(true);
     try {
-      // Log out first to clear any previous state
-      LoginManager.logOut();
-
-      let result;
-      if (Platform.OS === "ios") {
-        // For iOS, use limited login to comply with Apple's privacy requirements
-        result = await LoginManager.logInWithPermissions(["email", "public_profile"], "limited");
-      } else {
-        // For Android, use standard login
-        result = await LoginManager.logInWithPermissions(["email", "public_profile"]);
-      }
-
-      if (result.isCancelled) {
-        console.log("Login cancelled");
-        setLoading(false);
-        return;
-      }
-
-      if (result.declinedPermissions && result.declinedPermissions.includes("email")) {
-        showMessage("Email permission is required", "error");
-        setLoading(false);
-        return;
-      }
-
-      let token;
-      if (Platform.OS === "ios") {
-        // For iOS limited login, we get an authentication token
-        const authToken = await AuthenticationToken.getAuthenticationTokenIOS();
-        token = authToken?.authenticationToken;
-
-        if (!token) {
-          throw new Error("Failed to get authentication token");
+      // Attempt to get current token first
+      let accessTokenData = await AccessToken.getCurrentAccessToken();
+      console.log("accessTokenData", accessTokenData);
+      // If no token or token expired, request new login
+      if (!accessTokenData || !isFBAccessTokenValid(accessTokenData.expirationTime)) {
+        LoginManager.logOut();
+        const result = await LoginManager.logInWithPermissions(["email"]);
+        console.log("result", result);
+        if (result.isCancelled) {
+          setLoading(false);
+          return;
         }
 
-        // Send the authentication token to the backend
-        facebookLogin({token})
-          .then(res => {
-            if (res.status == 1) {
-              dispatch(updateUserData(res));
-              if (newUser) {
-                dispatch(updateAsOldUser());
-              }
-            } else {
-              handleError(res);
+        accessTokenData = await AccessToken.getCurrentAccessToken();
+        console.log("accessTokenData", accessTokenData);
+        if (!accessTokenData) {
+          throw new Error("Failed to get access token after login");
+        }
+      }
+
+      // Verify token is still valid
+      if (!isFBAccessTokenValid(accessTokenData.expirationTime)) {
+        throw new Error("Token expired immediately after retrieval");
+      }
+
+      const token = accessTokenData.accessToken;
+      console.log("token", token);
+      // Send to backend
+      facebookLogin({
+        access_token: token,
+      })
+        .then(res => {
+          if (res.status == 1) {
+            dispatch(updateUserData(res));
+            if (newUser) {
+              dispatch(updateAsOldUser());
             }
-          })
-          .catch(err => {
-            console.error("facebookLogin", err);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      } else {
-        // For Android, we get an access token
-        const accessTokenData = await AccessToken.getCurrentAccessToken();
-        token = accessTokenData?.accessToken;
-
-        if (!token) {
-          throw new Error("Failed to get access token");
-        }
-
-        // With the access token, we can directly fetch user info
-        const response = await fetch(
-          `https://graph.facebook.com/v12.0/me?fields=email,name,picture.type(large)&access_token=${token}`
-        );
-        const userInfo = await response.json();
-
-        if (userInfo.error) {
-          throw new Error(userInfo.error.message);
-        }
-
-        // Send user info to your backend
-        facebookLogin({
-          token,
-          email: userInfo.email,
-          name: userInfo.name,
-          picture: userInfo.picture?.data?.url,
+          } else {
+            handleError(res);
+          }
         })
-          .then(res => {
-            if (res.status == 1) {
-              dispatch(updateUserData(res));
-              if (newUser) {
-                dispatch(updateAsOldUser());
-              }
-            } else {
-              handleError(res);
-            }
-          })
-          .catch(err => {
-            console.error("facebookLogin", err);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      }
+        .catch(err => {
+          console.error("facebookLogin API error", err);
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } catch (error) {
       console.error("Facebook login error", error);
-      showMessage("Facebook login failed", "error");
       setLoading(false);
     }
   };
@@ -273,9 +230,9 @@ const SocialSignin = ({setLoading}) => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
-        {/* <TouchableOpacity onPress={handleFBLogin}>
+        <TouchableOpacity onPress={handleFBLogin}>
           <FacebookIcon style={styles.socialSIicon} />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
         </TouchableOpacity>
