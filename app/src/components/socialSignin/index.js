@@ -230,9 +230,11 @@ const SocialSignin = ({setLoading}) => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
-        <TouchableOpacity onPress={handleFBLogin}>
-          <FacebookIcon style={styles.socialSIicon} />
-        </TouchableOpacity>
+        {Platform.OS === "android" && (
+          <TouchableOpacity onPress={handleFBLogin}>
+            <FacebookIcon style={styles.socialSIicon} />
+          </TouchableOpacity>
+        )}
         <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
         </TouchableOpacity>
