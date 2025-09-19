@@ -36,14 +36,14 @@ console.log("nextLoginData", nextLoginData);
 
         dispatch(updateUserData(nextLoginData));
         dispatch(updateVerified(true));
-        setTimeout(()=> { 
+        setTimeout(()=> {
         navigationRef.current?.reset({
         index: 0,
         routes: [{name: "TabNavigator", params: {screen: "GeoArChallenge"}}]})
-      },200)
+      },100)
       } else {
         dispatch(updateVerified(true));
-      }      
+      }
   };
     }
 

@@ -17,7 +17,7 @@ const fontGroup = {
   },
   nunitoBold: {
     fontFamily: fonts.nunitoBold,
-    fontWeight: "700",
+    fontWeight: "800",
   },
 };
 

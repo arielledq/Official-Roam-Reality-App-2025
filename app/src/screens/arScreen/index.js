@@ -423,6 +423,7 @@ const ARScreen = ({route}) => {
       isVisible: true,
       updateRadius: 14.0,
       isHuntMode: true,
+      shouldRotate: true
     };
 
     if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
@@ -435,6 +436,7 @@ const ARScreen = ({route}) => {
         isVisible: true,
         updateRadius: 14.0, // verificar
         isHuntMode: true,
+        shouldRotate: true,
       };
     }
     if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
@@ -447,6 +449,7 @@ const ARScreen = ({route}) => {
         updateRadius: 14.0, // verificar
         isHuntMode: true,
         scale: huntParameters?.scale_object || 0.01,
+        shouldRotate: false,
       };
     }
     const spawnData = {
