@@ -65,107 +65,93 @@ const SocialSignin = ({setLoading}) => {
     }
   };
 
+  // Add this utility function
+  const isFBAccessTokenValid = expirationTime => {
+    const currentTime = Math.floor(Date.now() / 1000); // Current time in seconds
+    return expirationTime > currentTime;
+  };
+
   const handleFBLogin = async () => {
     setLoading(true);
     try {
-      // Log out first to clear any previous state
       LoginManager.logOut();
 
-      let result;
+      // Platform-specific login configuration
+      let loginResult;
       if (Platform.OS === "ios") {
-        // For iOS, use limited login to comply with Apple's privacy requirements
-        result = await LoginManager.logInWithPermissions(["email", "public_profile"], "limited");
+        // iOS Limited Login with nonce
+        loginResult = await LoginManager.logInWithPermissions(
+          ["public_profile", "email"],
+          "limited",
+          "my_custom_nonce_" + Date.now() // Optional but recommended
+        );
       } else {
-        // For Android, use standard login
-        result = await LoginManager.logInWithPermissions(["email", "public_profile"]);
+        // Android standard login
+        loginResult = await LoginManager.logInWithPermissions(["public_profile", "email"]);
       }
 
-      if (result.isCancelled) {
+      if (loginResult.isCancelled) {
         console.log("Login cancelled");
         setLoading(false);
         return;
       }
 
-      if (result.declinedPermissions && result.declinedPermissions.includes("email")) {
-        showMessage("Email permission is required", "error");
-        setLoading(false);
-        return;
-      }
-
+      // Platform-specific token handling
       let token;
+      let tokenType;
+
       if (Platform.OS === "ios") {
-        // For iOS limited login, we get an authentication token
+        // Get Authentication Token for iOS (OIDC token)
         const authToken = await AuthenticationToken.getAuthenticationTokenIOS();
         token = authToken?.authenticationToken;
+        tokenType = "oidc_token";
 
         if (!token) {
-          throw new Error("Failed to get authentication token");
+          throw new Error("Failed to get authentication token on iOS");
         }
 
-        // Send the authentication token to the backend
-        facebookLogin({token})
-          .then(res => {
-            if (res.status == 1) {
-              dispatch(updateUserData(res));
-              if (newUser) {
-                dispatch(updateAsOldUser());
-              }
-            } else {
-              handleError(res);
-            }
-          })
-          .catch(err => {
-            console.error("facebookLogin", err);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
+        console.log("iOS OIDC Token:", token.substring(0, 20) + "...");
       } else {
-        // For Android, we get an access token
+        // Get Access Token for Android
         const accessTokenData = await AccessToken.getCurrentAccessToken();
         token = accessTokenData?.accessToken;
+        tokenType = "access_token";
 
         if (!token) {
-          throw new Error("Failed to get access token");
+          throw new Error("Failed to get access token on Android");
         }
 
-        // With the access token, we can directly fetch user info
-        const response = await fetch(
-          `https://graph.facebook.com/v12.0/me?fields=email,name,picture.type(large)&access_token=${token}`
-        );
-        const userInfo = await response.json();
-
-        if (userInfo.error) {
-          throw new Error(userInfo.error.message);
-        }
-
-        // Send user info to your backend
-        facebookLogin({
-          token,
-          email: userInfo.email,
-          name: userInfo.name,
-          picture: userInfo.picture?.data?.url,
-        })
-          .then(res => {
-            if (res.status == 1) {
-              dispatch(updateUserData(res));
-              if (newUser) {
-                dispatch(updateAsOldUser());
-              }
-            } else {
-              handleError(res);
-            }
-          })
-          .catch(err => {
-            console.error("facebookLogin", err);
-          })
-          .finally(() => {
-            setLoading(false);
-          });
+        console.log("Android Access Token:", token.substring(0, 20) + "...");
       }
+
+      // Send to backend with platform context
+      facebookLogin({
+        access_token: token,
+        token_type: tokenType,
+        platform: Platform.OS,
+        // Include additional fields for backend processing
+        ...(Platform.OS === "ios" && {is_limited_login: true}),
+      })
+        .then(res => {
+          if (res.status == 1) {
+            dispatch(updateUserData(res));
+            if (newUser) {
+              dispatch(updateAsOldUser());
+            }
+          } else {
+            handleError(res);
+          }
+        })
+        .catch(err => {
+          console.error("facebookLogin API error", err);
+          showMessage("Facebook login failed. Please try again.", "error");
+        })
+        .finally(() => {
+          setLoading(false);
+        });
     } catch (error) {
       console.error("Facebook login error", error);
-      showMessage("Facebook login failed", "error");
+      showMessage("Facebook login failed. Please try again.", "error");
       setLoading(false);
     }
   };
@@ -273,9 +259,9 @@ const SocialSignin = ({setLoading}) => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
-        {/* <TouchableOpacity onPress={handleFBLogin}>
+        <TouchableOpacity onPress={handleFBLogin}>
           <FacebookIcon style={styles.socialSIicon} />
-        </TouchableOpacity> */}
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
         </TouchableOpacity>
