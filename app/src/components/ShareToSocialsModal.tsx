@@ -169,16 +169,27 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         }
 
         case SSNN.FACEBOOK: {
-          const shareMessage = `${
+          let shareMessage = `${
             sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
           }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
           try {
             // For Facebook, we need to use a different approach depending on the platform
             if (Platform.OS === "ios") {
+              shareMessage = sponsor?.tags?.replace("\n", "") || "";
+              // also, extract only the first word that starts with #
+              const firstHashtagPosition = shareMessage.indexOf("#");
+              const firstHashtagWordEndPosition = shareMessage.indexOf(" ", firstHashtagPosition);
+              shareMessage = shareMessage.substring(
+                firstHashtagPosition,
+                firstHashtagWordEndPosition
+              );
               if (fileExt === "mp4") {
                 const shareLinkContent = {
                   contentType: "video",
                   video: {localUrl: updatedFileUri},
+                  commonParameters: {
+                    hashtag: shareMessage,
+                  },
                 } as ShareVideoContent;
 
                 const canShow = await ShareDialog.canShow(shareLinkContent);
@@ -199,8 +210,12 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
                 const shareLinkContent = {
                   contentType: "photo",
                   photos: [{imageUrl: updatedFileUri, userGenerated: true}],
-                  commonParameters: {hashtag: shareMessage},
+                  commonParameters: {
+                    hashtag: shareMessage,
+                  },
                 } as SharePhotoContent;
+
+                console.log("ShareLinkContent", shareLinkContent);
 
                 const canShow = await ShareDialog.canShow(shareLinkContent);
 
