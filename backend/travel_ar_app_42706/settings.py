@@ -101,7 +101,7 @@ SITE_ID = 1
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
 
-
+FACEBOOK_APP_ID = env.str("FACEBOOK_APP_ID", "")
 # Application definition
 
 INSTALLED_APPS = [
