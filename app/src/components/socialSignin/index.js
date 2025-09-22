@@ -74,36 +74,63 @@ const SocialSignin = ({setLoading}) => {
   const handleFBLogin = async () => {
     setLoading(true);
     try {
-      // Attempt to get current token first
-      let accessTokenData = await AccessToken.getCurrentAccessToken();
-      console.log("accessTokenData", accessTokenData);
-      // If no token or token expired, request new login
-      if (!accessTokenData || !isFBAccessTokenValid(accessTokenData.expirationTime)) {
-        LoginManager.logOut();
-        const result = await LoginManager.logInWithPermissions(["email"]);
-        console.log("result", result);
-        if (result.isCancelled) {
-          setLoading(false);
-          return;
-        }
+      LoginManager.logOut();
 
-        accessTokenData = await AccessToken.getCurrentAccessToken();
-        console.log("accessTokenData", accessTokenData);
-        if (!accessTokenData) {
-          throw new Error("Failed to get access token after login");
-        }
+      // Platform-specific login configuration
+      let loginResult;
+      if (Platform.OS === "ios") {
+        // iOS Limited Login with nonce
+        loginResult = await LoginManager.logInWithPermissions(
+          ["public_profile", "email"],
+          "limited",
+          "my_custom_nonce_" + Date.now() // Optional but recommended
+        );
+      } else {
+        // Android standard login
+        loginResult = await LoginManager.logInWithPermissions(["public_profile", "email"]);
       }
 
-      // Verify token is still valid
-      if (!isFBAccessTokenValid(accessTokenData.expirationTime)) {
-        throw new Error("Token expired immediately after retrieval");
+      if (loginResult.isCancelled) {
+        console.log("Login cancelled");
+        setLoading(false);
+        return;
       }
 
-      const token = accessTokenData.accessToken;
-      console.log("token", token);
-      // Send to backend
+      // Platform-specific token handling
+      let token;
+      let tokenType;
+
+      if (Platform.OS === "ios") {
+        // Get Authentication Token for iOS (OIDC token)
+        const authToken = await AuthenticationToken.getAuthenticationTokenIOS();
+        token = authToken?.authenticationToken;
+        tokenType = "oidc_token";
+
+        if (!token) {
+          throw new Error("Failed to get authentication token on iOS");
+        }
+
+        console.log("iOS OIDC Token:", token.substring(0, 20) + "...");
+      } else {
+        // Get Access Token for Android
+        const accessTokenData = await AccessToken.getCurrentAccessToken();
+        token = accessTokenData?.accessToken;
+        tokenType = "access_token";
+
+        if (!token) {
+          throw new Error("Failed to get access token on Android");
+        }
+
+        console.log("Android Access Token:", token.substring(0, 20) + "...");
+      }
+
+      // Send to backend with platform context
       facebookLogin({
         access_token: token,
+        token_type: tokenType,
+        platform: Platform.OS,
+        // Include additional fields for backend processing
+        ...(Platform.OS === "ios" && {is_limited_login: true}),
       })
         .then(res => {
           if (res.status == 1) {
@@ -117,12 +144,14 @@ const SocialSignin = ({setLoading}) => {
         })
         .catch(err => {
           console.error("facebookLogin API error", err);
+          showMessage("Facebook login failed. Please try again.", "error");
         })
         .finally(() => {
           setLoading(false);
         });
     } catch (error) {
       console.error("Facebook login error", error);
+      showMessage("Facebook login failed. Please try again.", "error");
       setLoading(false);
     }
   };
@@ -230,11 +259,9 @@ const SocialSignin = ({setLoading}) => {
     <View>
       <DividerWithText containerStyle={styles.divider} label={"OR"} />
       <View style={styles.socialSUcontainer}>
-        {Platform.OS === "android" && (
-          <TouchableOpacity onPress={handleFBLogin}>
-            <FacebookIcon style={styles.socialSIicon} />
-          </TouchableOpacity>
-        )}
+        <TouchableOpacity onPress={handleFBLogin}>
+          <FacebookIcon style={styles.socialSIicon} />
+        </TouchableOpacity>
         <TouchableOpacity onPress={handleGoogleLogin}>
           <GoogleIcon style={styles.socialSIicon} />
         </TouchableOpacity>
