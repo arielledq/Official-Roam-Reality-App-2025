@@ -58,13 +58,14 @@ class FacebookLogin(SocialLoginView):
                 user_data = get_facebook_user(token, settings.FACEBOOK_APP_ID)
                 facebook_id = user_data["facebookUserId"]
                 name = user_data.get("facebookUserName", "")
+                email = user_data.get("facebookUserEmail", "")
 
                 social_account = SocialAccount.objects.filter(uid=facebook_id, provider="facebook").first()
                 if social_account:
                     user = social_account.user
                 else:
                     # New user
-                    user = User.objects.create(username=f"fb_{facebook_id}", first_name=name)
+                    user = User.objects.create(username=email.split('@')[0], first_name=name, email=email)
                     user.set_unusable_password()
                     user.save()
 
