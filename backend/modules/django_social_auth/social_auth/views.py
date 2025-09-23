@@ -47,7 +47,9 @@ class FacebookLogin(SocialLoginView):
 
     def post(self, request, *args, **kwargs):
         try:
-            return super().post(request, *args, **kwargs)
+            super().post(request, *args, **kwargs)
+            user = self.user
+            token = self.token
         except Exception as e:
             token = request.data.get("access_token")
             if not token:
@@ -71,40 +73,39 @@ class FacebookLogin(SocialLoginView):
                                                  extra_data={"name": name})
                 # Generate token
                 token, _ = Token.objects.get_or_create(user=user)
-
-                if ReportedContent.objects.filter(reported_user=user, block_reported_user=True).exists():
-                    return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
-
-                user_profile, _ = UserProfile.objects.get_or_create(user=user)
-                user_profile.is_verified = True
-                user_profile.save()
-
-                profileObj, created = ARUserProfile.objects.get_or_create(user=user)
-                if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
-                    profileObj.points += configs.POINTS_GIFT
-                    profileObj.save()
-                    sponsor = Sponsor.objects.get(name='BONUS')
-                    geo_location = GeoLocation.objects.get(name='BONUS')
-                    ARMemories.objects.create(
-                        points=configs.POINTS_GIFT,
-                        sponsor=sponsor,
-                        geo_location=geo_location,
-                        memory_type='BONUS',
-                        user=user,
-                    )
-                    configs.NUMBER_USER_POINT_GIFT += 1
-                    send_notification(
-                        NotificationTypes.DEFAULT,
-                        user,
-                        title="🎁 Surprise!",
-                        description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
-                    )
-
-                serializer = UserSerializer(user)
-                return Response({'token': token.key, 'user': serializer.data})
-
             except Exception as ex:
                 return Response({"error": str(ex)}, status=status.HTTP_401_UNAUTHORIZED)
+
+        if ReportedContent.objects.filter(reported_user=user, block_reported_user=True).exists():
+            return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
+
+        user_profile, _ = UserProfile.objects.get_or_create(user=user)
+        user_profile.is_verified = True
+        user_profile.save()
+
+        profileObj, created = ARUserProfile.objects.get_or_create(user=user)
+        if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
+            profileObj.points += configs.POINTS_GIFT
+            profileObj.save()
+            sponsor = Sponsor.objects.get(name='BONUS')
+            geo_location = GeoLocation.objects.get(name='BONUS')
+            ARMemories.objects.create(
+                points=configs.POINTS_GIFT,
+                sponsor=sponsor,
+                geo_location=geo_location,
+                memory_type='BONUS',
+                user=user,
+            )
+            configs.NUMBER_USER_POINT_GIFT += 1
+            send_notification(
+                NotificationTypes.DEFAULT,
+                user,
+                title="🎁 Surprise!",
+                description=f'We’ve added {configs.POINTS_GIFT} bonus points to your Roam Reality account—just for being one of the first {configs.LIMIT_USER_POINT_GIFT} roamers to download the app!',
+            )
+
+        serializer = UserSerializer(user)
+        return Response({'token': token.key, 'user': serializer.data})
     
 
 class GoogleLogin(SocialLoginView): 
