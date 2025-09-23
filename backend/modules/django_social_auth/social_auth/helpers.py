@@ -44,6 +44,7 @@ def get_limited_facebook_user(token: str, app_id: str):
     return {
         "facebookUserId": decoded["sub"],
         "facebookUserName": decoded.get("name"),  # 'name' may not always exist
+        "facebookUserEmail": decoded.get("email"),
     }
 
 
