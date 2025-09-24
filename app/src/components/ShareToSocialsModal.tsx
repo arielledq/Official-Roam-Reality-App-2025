@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {View, Text, TouchableOpacity, Image, Alert, Platform} from "react-native";
 import RNFS from "react-native-fs";
 import {ShareDialog, SharePhotoContent, ShareVideoContent} from "react-native-fbsdk-next";
@@ -28,10 +28,7 @@ import {
 interface ShareToSocialsModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onPointsGranted: (
-    selectedSSNN: string,
-    grantSocialPointsHandler: (selectedSSNN: string) => void
-  ) => void;
+  onPointsGranted?: (selectedSSNN: string) => void;
   fileUri?: string | undefined;
   fileExt?: string | undefined;
   sponsor?: {description: string; tags: string} | undefined;
@@ -49,15 +46,15 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 }) => {
   const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
   const [loading, setLoading] = useState(false);
+  const isMounted = useRef(true);
 
   const share = async (selectedSSNN: SSNN_TYPE, postType: "stories" | "feed" = "stories") => {
     const ext = normalizeFileExt(fileExt); // "mp4", "png", etc.
 
     try {
-      // Use the helper function to prepare the file
-      setLoading(true);
+      safeSetLoading(true);
       const updatedFileUri = await prepareFileForSharing(fileUri || "", ext);
-      setLoading(false);
+      safeSetLoading(false);
 
       const shareMessageBase = prepareShareMessage(sponsor);
       const firstHashtag = extractFirstHashtag(sponsor?.tags);
@@ -71,7 +68,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             postType === "feed" ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES;
 
           let shareOptions: any = {
-            social: socialType, // Use the determined type
+            social: socialType,
             appId: Config.FACEBOOK_APP_ID,
           };
           if (ext === "mp4") {
@@ -163,28 +160,34 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       // Handle points granting if sharing was successful
       if (!isMemory && hasSharedToSSNN) {
         try {
-          const grantSocialPointsHandler = async (selectedSSNNStr: string) => {
-            await socialPointsARUpdateAPI({social_network: selectedSSNNStr});
-            showMessage(
-              "You've been granted points for sharing to your socials",
-              "success",
-              "Socials points granted!"
-            );
-          };
-          onPointsGranted(selectedSSNN, grantSocialPointsHandler);
+          await socialPointsARUpdateAPI({social_network: selectedSSNN});
+          showMessage(
+            "You've been granted points for sharing to your socials",
+            "success",
+            "Socials points granted!"
+          );
+          if (onPointsGranted) onPointsGranted(selectedSSNN);
         } catch (error: any) {
           console.error("Error assigning points:", error?.message, error);
         }
       }
     } catch (error: any) {
-      console.error("Error sharing media:", error?.message, error);
-      if (error?.message?.includes("not installed") || error?.message?.includes("No app")) {
-        showMessage("The app is not installed.", "error");
-      } else if (!error?.message?.includes("No file URI available")) {
-        showMessage("The content could not be shared.", "error");
-      }
+      handleSharingError(error);
     } finally {
-      setShowChooseIGPostType(false);
+      safeSetShowChooseIGPostType(false);
+    }
+  };
+
+  const handleSharingError = (error: any) => {
+    console.error("Sharing error:", error);
+
+    if (error?.message?.includes("not installed") || error?.message?.includes("No app")) {
+      Alert.alert("App Required", "The required app is not installed on your device.");
+    } else if (error?.message?.includes("User did not share")) {
+      // Silent handling for user cancellation
+      return;
+    } else if (!error?.message?.includes("No file URI available")) {
+      Alert.alert("Sharing Failed", "The content could not be shared. Please try again.");
     }
   };
 
@@ -240,6 +243,24 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       </View>
     </>
   );
+
+  const safeSetLoading = (value: boolean) => {
+    if (isMounted.current) {
+      setLoading(value);
+    }
+  };
+
+  const safeSetShowChooseIGPostType = (value: boolean) => {
+    if (isMounted.current) {
+      setShowChooseIGPostType(value);
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      isMounted.current = false;
+    };
+  }, []);
 
   return (
     <ReactNativeModal
