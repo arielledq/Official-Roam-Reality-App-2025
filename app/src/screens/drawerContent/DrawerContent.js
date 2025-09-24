@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useEffect} from "react";
 import {View, StyleSheet, Image, TouchableOpacity} from "react-native";
 import {DrawerContentScrollView} from "@react-navigation/drawer";
 import theme from "../../assets/theme";
@@ -36,11 +36,18 @@ const DrawerList = [
 
 const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, onPress}) => {
   const {loading, locationIsEnabled, toggleUserLocation} = userLocationHook();
-
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
   function getIconFamily(icon) {
     const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet", "pin"];
     return customIcons.includes(icon) ? "custom" : "antdesign";
   }
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsInitialLoad(false);
+    }, 5000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const renderDrawerItem = () => {
     return (
@@ -59,6 +66,7 @@ const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, 
         </View>
         {navigateTo === "toggleLocation" ? (
           <AppSwitch
+            disabled={isInitialLoad}
             onValueChange={toggleUserLocation}
             value={locationIsEnabled}
             loading={loading}

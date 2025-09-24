@@ -389,14 +389,14 @@ const ArChallengeShare = () => {
     setViewWidth(width);
   };
 
-  // useEffect(() => {
-  //   if (
-  //     challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
-  //     challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
-  //   ) {
-  //     setHideBackButton(true);
-  //   }
-  // }, [challengeObj]);
+  useEffect(() => {
+    if (
+      challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
+      challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE || challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE
+    ) {
+      setHideBackButton(true);
+    }
+  }, [challengeObj]);
 
   const baseOffset = 110;
   let offset = baseOffset;

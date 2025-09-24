@@ -83,8 +83,12 @@ const ARScreen = ({route}) => {
       selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
+  const initialCheckDoneRef = useRef(false);
+  const [modal, setModal] = useState(true)
+
   // const huntChallenge = TEST_HUNT_CHALLENGE;
-  const huntChallenge = route.params?.huntChallenge;
+  const [huntChallenge, setHuntChallenge] = useState(route?.params?.huntChallenge)
+  // const huntChallenge = route.params?.huntChallenge;
   const huntChallengeFinished = route.params?.huntChallengeFinished;
   const isContinuingHuntChallenge = !!huntChallenge;
   const [bundleFile, setBundleFile] = useState(null);
@@ -502,6 +506,13 @@ const unityStarsCount = () => {
     );
   }
 };
+
+  useEffect(() => {
+
+    if (modal && unitySceneLoaded && sceneIsReady && selectedSite === null) {
+      setOpenModalARMode(true);
+    }
+  }, [sceneIsReady, selectedSite, modal]); 
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -1349,7 +1360,7 @@ useEffect(() => {
       const timeout = setTimeout(() => {
         if (!unitySceneLoaded) {
           const mode = selectedSite?.selectedMode?.mode;
-
+          setModal(true);
           // GEO: si todavía no se envió el modelo
           if (mode === AR_MODES.GEO_TAG_MODE && !hasSentModelDataOnce) {
             sendModelDataToUnity();
@@ -1362,6 +1373,7 @@ useEffect(() => {
           }
         }
       }, 1500);
+      setModal(true);
 
       if (isFocusedRef.current) return;
 
@@ -1384,6 +1396,9 @@ useEffect(() => {
           setCapturedVideo(null);
           setIsUnityLoaded(true);
           setSelectedSite(null);
+          setHuntChallenge(null);
+          setModal(false);
+
         }
         if (showNotificationTimerRef.current) {
           clearTimeout(showNotificationTimerRef.current);
@@ -1398,6 +1413,9 @@ useEffect(() => {
         setUnitySceneLoaded(false);
         setShouldRenderUnity(false);
         setUnityLoading(false);
+        // initialCheckDoneRef.current = false;
+        setModal(false);
+        
       };
     }, [])
   );
@@ -1617,7 +1635,7 @@ useEffect(() => {
               }}
             >
               <ActivityIndicator size="large" color="#fff" />
-              <Text style={{color: "#fff", marginTop: 10}}>{textLoading}</Text>
+              <Text style={{color: "#fff", marginTop: 10}}>Loading AR Experience</Text>
             </View>
           )}
         </>
