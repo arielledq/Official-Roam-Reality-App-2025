@@ -5,23 +5,23 @@ import {ShareDialog} from "react-native-fbsdk-next";
 import Share from "react-native-share";
 import ReactNativeModal from "react-native-modal";
 
-import AppButton from "./button";
+import AppButton from "../button";
 import theme from "assets/theme";
 import {FontFamily, FontSizes} from "util/FontUtils";
 import {socialPointsARUpdateAPI} from "network";
 import Images from "assets/images";
 import {showMessage} from "util/helpers";
 import Config from "config";
-import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../constants";
+import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../../constants";
 
-import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
+import FullScreenLoadingSpinner from "../FullScreenLoadingSpinner";
 
 import {
   prepareFileForSharing,
   extractFirstHashtag,
   prepareShareMessage,
   normalizeFileExt,
-} from "../util/helpers";
+} from "../../util/helpers";
 
 interface ShareToSocialsModalProps {
   isVisible: boolean;
