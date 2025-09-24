@@ -30,7 +30,7 @@ interface ShareToSocialsModalProps {
   onClose: () => void;
   onPointsGranted: (
     selectedSSNN: string,
-    grantSocialPointsHandler: (selectedSSNN: string) => {}
+    grantSocialPointsHandler: (selectedSSNN: string) => void
   ) => void;
   fileUri?: string | undefined;
   fileExt?: string | undefined;
@@ -50,7 +50,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const share = async (selectedSSNN: SSNN_TYPE) => {
+  const share = async (selectedSSNN: SSNN_TYPE, postType: "stories" | "feed" = "stories") => {
     const ext = normalizeFileExt(fileExt); // "mp4", "png", etc.
 
     try {
@@ -66,8 +66,12 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
       switch (selectedSSNN) {
         case SSNN.INSTAGRAM: {
+          // Determine the social type based on postType
+          const socialType =
+            postType === "feed" ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES;
+
           let shareOptions: any = {
-            social: Share.Social.INSTAGRAM_STORIES,
+            social: socialType, // Use the determined type
             appId: Config.FACEBOOK_APP_ID,
           };
           if (ext === "mp4") {
@@ -222,13 +226,13 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
         <View style={{flexDirection: "row", gap: 16}}>
           <IGPostTypeButton
-            onPress={() => share(SSNN.INSTAGRAM)}
+            onPress={() => share(SSNN.INSTAGRAM, "stories")}
             text="Share to Stories"
             imageSource={require("../assets/images/ig_stories.png")}
           />
 
           <IGPostTypeButton
-            onPress={() => share(SSNN.INSTAGRAM)}
+            onPress={() => share(SSNN.INSTAGRAM, "feed")}
             text="Share to Feed"
             imageSource={require("../assets/images/ig_post.png")}
           />
