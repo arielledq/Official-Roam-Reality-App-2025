@@ -1,6 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
 import {View, Text, TouchableOpacity, Image, Alert, Platform} from "react-native";
-import RNFS from "react-native-fs";
 import {ShareDialog, SharePhotoContent, ShareVideoContent} from "react-native-fbsdk-next";
 
 import Share from "react-native-share";
@@ -16,7 +15,6 @@ import Config from "config";
 import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../constants";
 
 import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
-import IGPostTypeButton from "./ShareToSocialsModal/IGPostTypeButton";
 
 import {
   prepareFileForSharing,
@@ -66,7 +64,17 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     }
   };
 
-  const share = async (selectedSSNN: SSNN_TYPE, postType: "stories" | "feed" = "stories") => {
+  const shareToOthers = async (fileUri: string, ext: string, shareMessageBase: string) => {
+    const mimeType = ext === "mp4" ? "video/mp4" : `image/${ext}`;
+    const shareOptions = {
+      url: fileUri,
+      type: mimeType,
+      message: shareMessageBase,
+    };
+    await Share.open(shareOptions);
+  };
+
+  const share = async (selectedSSNN: SSNN_TYPE) => {
     const ext = normalizeFileExt(fileExt); // "mp4", "png", etc.
 
     try {
@@ -78,14 +86,19 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
       let hasSharedToSSNN = false;
 
+      const shareToOtherHandler = async () => {
+        try {
+          await shareToOthers(updatedFileUri, ext, shareMessageBase);
+          hasSharedToSSNN = true;
+        } catch (error) {
+          handleSharingError(error);
+        }
+      };
+
       switch (selectedSSNN) {
         case SSNN.INSTAGRAM: {
-          // Determine the social type based on postType
-          const socialType =
-            postType === "feed" ? Share.Social.INSTAGRAM : Share.Social.INSTAGRAM_STORIES;
-
           let shareOptions: any = {
-            social: socialType,
+            social: Share.Social.INSTAGRAM_STORIES,
             appId: Config.FACEBOOK_APP_ID,
           };
           if (ext === "mp4") {
@@ -143,29 +156,14 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               await Share.shareSingle(shareOptions);
               hasSharedToSSNN = true;
             }
-          } catch (error) {
-            // Fallback to generic share
-            const shareOptions = {
-              title: "Share via",
-              message: shareMessageBase,
-              url: updatedFileUri,
-              type: ext === "mp4" ? "video/mp4" : `image/${ext}`,
-            };
-            await Share.open(shareOptions);
-            hasSharedToSSNN = true;
+          } catch (_error) {
+            shareToOtherHandler();
           }
           break;
         }
 
         case SSNN.OTHERS: {
-          const mimeType = ext === "mp4" ? "video/mp4" : `image/${ext}`;
-          const shareOptions = {
-            url: updatedFileUri,
-            type: mimeType,
-            message: shareMessageBase,
-          };
-          await Share.open(shareOptions);
-          hasSharedToSSNN = true;
+          shareToOtherHandler();
           break;
         }
 
