@@ -20,7 +20,6 @@ const ARFilter = ({challengeObj, captureData, viewShotRef}) => {
     : `file://${captureData}`;
   const challenge_type = challengeObj?.challenge_type;
   const is_pin_challenge = challenge_type === CHALLENGES_TYPE.PIN_CHECK_IN;
-
   const [fullLocation, setFullLocation] = useState(null);
   const [currentPage, setCurrentPage] = useState(0);
 
@@ -199,7 +198,7 @@ const ARFilter = ({challengeObj, captureData, viewShotRef}) => {
               {fullLocation && (
                 <View
                   style={{
-                    backgroundColor: challengeObj?.color || theme.lightColors?.grey2,
+                    backgroundColor: challengeObj?.color || challengeObj.pin_challenge.color || theme.lightColors?.grey2,
                     padding: 8,
                     borderRadius: 6,
                   }}

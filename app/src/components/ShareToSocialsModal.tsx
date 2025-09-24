@@ -96,204 +96,135 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 }) => {
   const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const share = async (selectedSSNN: SSNN_TYPE) => {
-    // Construct the full file:// URI more explicitly
+    let ext = (fileExt || "").replace(/^\./, "").toLowerCase(); // "mp4", "png", etc.
+
     let updatedFileUri = fileUri || "";
-
-    if (updatedFileUri) {
-      // Check if fileUri is not null or undefined
-      if (!updatedFileUri.startsWith("file://") && !updatedFileUri.startsWith("http")) {
-        if (updatedFileUri.startsWith("/")) {
-          updatedFileUri = `file://${updatedFileUri}`; // Correctly handle paths starting with /
-        } else {
-          updatedFileUri = `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`; // If relative, assume it's in cache (adjust if needed) - requires react-native-fs
-        }
-      } else if (updatedFileUri.startsWith("http")) {
-        // download image and get local uri
-        try {
-          setLoading(true);
-          // Get the filename from the URL
-          const filename = updatedFileUri.split("?")[0].split("/").pop();
-
-          // Determine the local file path
+    try {
+      if (updatedFileUri) {
+        const isHttp = updatedFileUri.startsWith("http");
+        const isFile = updatedFileUri.startsWith("file://");
+        if (!isHttp && !isFile) {
+          updatedFileUri = updatedFileUri.startsWith("/")
+              ? `file://${updatedFileUri}`
+              : `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`;
+        } else if (isHttp) {
+          setLoading?.(true);
+          const urlNoQuery = updatedFileUri.split("?")[0];
+          const filename = urlNoQuery.split("/").pop() || `shared_${Date.now()}.${ext || "bin"}`;
           const localFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
-
-          // Download the file
-          const download = RNFS.downloadFile({
+          const { statusCode } = await RNFS.downloadFile({
             fromUrl: updatedFileUri,
             toFile: localFilePath,
-          });
-
-          const downloadResult = await download.promise;
-
-          if (downloadResult.statusCode === 200) {
+          }).promise;
+          if (statusCode === 200) {
             updatedFileUri = `file://${localFilePath}`;
           } else {
-            console.error("Failed to download file:", downloadResult);
-            // Handle download error appropriately
+            throw new Error(`Download failed with status ${statusCode}`);
           }
-        } catch (error) {
-          console.error("Error downloading media:", error);
-          // Handle sharing error appropriately
-        } finally {
-          setLoading(false);
         }
       }
+    } catch (e) {
+      console.error("Error preparando media para compartir:", e);
+      setLoading?.(false);
+      Alert.alert("Error", "No se pudo preparar el archivo para compartir.");
+      return;
+    } finally {
+      setLoading?.(false);
     }
 
-    // Share the file
-    let hasSharedToSSNN = false;
+    if (!updatedFileUri) {
+      Alert.alert("Error", "No hay archivo para compartir.");
+      return;
+    }
 
+    const cleanDescription =
+        sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : "";
+    const tagsRaw = sponsor?.tags || "";
+    const tagsMulti = tagsRaw.replace(/,\s*/g, "\n");
+    let shareMessageBase = `${cleanDescription}${cleanDescription && tagsMulti ? "\n\n" : ""}${tagsMulti}`.trim();
+
+    const firstHashtag = (() => {
+      const m = tagsRaw.match(/#[^\s#,]+/);
+      return m ? m[0] : undefined;
+    })();
+
+    let hasSharedToSSNN = false;
     try {
       switch (selectedSSNN) {
         case SSNN.INSTAGRAM: {
-          // Keep using react-native-share for Instagram
-          let shareOptions = {
+          let shareOptions: any = {
             social: Share.Social.INSTAGRAM_STORIES,
             appId: Config.FACEBOOK_APP_ID,
           };
-
-          if (fileExt === "mp4") {
-            // @ts-ignore
-            shareOptions = {...shareOptions, backgroundVideo: updatedFileUri};
+          if (ext === "mp4") {
+            shareOptions = { ...shareOptions, backgroundVideo: updatedFileUri };
           } else {
-            // @ts-ignore
-            shareOptions = {...shareOptions, backgroundImage: updatedFileUri};
+            shareOptions = { ...shareOptions, backgroundImage: updatedFileUri };
           }
-
-          // @ts-ignore
           await Share.shareSingle(shareOptions);
           hasSharedToSSNN = true;
           break;
         }
 
         case SSNN.FACEBOOK: {
-          let shareMessage = `${
-            sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
-          }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
           try {
-            // For Facebook, we need to use a different approach depending on the platform
             if (Platform.OS === "ios") {
-              shareMessage = sponsor?.tags?.replace("\n", "") || "";
-              // also, extract only the first word that starts with #
-              const firstHashtagPosition = shareMessage.indexOf("#");
-              const firstHashtagWordEndPosition = shareMessage.indexOf(" ", firstHashtagPosition);
-              shareMessage = shareMessage.substring(
-                firstHashtagPosition,
-                firstHashtagWordEndPosition
-              );
-              if (fileExt === "mp4") {
-                const shareLinkContent = {
+              if (ext === "mp4") {
+                const shareLinkContent: ShareVideoContent = {
                   contentType: "video",
-                  video: {localUrl: updatedFileUri},
-                  commonParameters: {
-                    hashtag: shareMessage,
-                  },
-                } as ShareVideoContent;
-
+                  video: { localUrl: updatedFileUri }, // usar SIEMPRE updatedFileUri
+                  commonParameters: firstHashtag ? { hashtag: firstHashtag } : undefined,
+                };
                 const canShow = await ShareDialog.canShow(shareLinkContent);
-
                 if (canShow) {
-                  try {
-                    const result = await ShareDialog.show(shareLinkContent);
-                    if (result.isCancelled) {
-                      console.log("Sharing cancelled");
-                    } else {
-                      hasSharedToSSNN = true;
-                    }
-                  } catch (error) {
-                    throw error;
-                  }
+                  const result = await ShareDialog.show(shareLinkContent);
+                  if (!result.isCancelled) hasSharedToSSNN = true;
                 }
               } else {
-                const shareLinkContent = {
+                const shareLinkContent: SharePhotoContent = {
                   contentType: "photo",
-                  photos: [{imageUrl: updatedFileUri, userGenerated: true}],
-                  commonParameters: {
-                    hashtag: shareMessage,
-                  },
-                } as SharePhotoContent;
-
-                console.log("ShareLinkContent", shareLinkContent);
-
+                  photos: [{ imageUrl: updatedFileUri, userGenerated: true }],
+                  commonParameters: firstHashtag ? { hashtag: firstHashtag } : undefined,
+                };
                 const canShow = await ShareDialog.canShow(shareLinkContent);
-
                 if (canShow) {
-                  try {
-                    await ShareDialog.show(shareLinkContent);
-                    hasSharedToSSNN = true;
-                  } catch (error) {
-                    throw error;
-                  }
+                  await ShareDialog.show(shareLinkContent);
+                  hasSharedToSSNN = true;
                 }
               }
-
-              hasSharedToSSNN = true;
             } else {
-              // On Android, we need to handle Facebook sharing differently
-              if (fileExt === "mp4") {
-                const shareOptions = {
-                  title: "Share via",
-                  message: shareMessage,
-                  url: fileUri,
-                  social: Share.Social.FACEBOOK,
-                  type: fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`,
-                };
-
-                // @ts-ignore
-                await Share.shareSingle(shareOptions);
-                hasSharedToSSNN = true;
-              } else {
-                // For images on Android
-                const shareOptions = {
-                  title: "Share via",
-                  message: shareMessage,
-                  url: updatedFileUri,
-                  social: Share.Social.FACEBOOK,
-                  type: `image/${fileExt}`,
-                };
-
-                // @ts-ignore
-                await Share.shareSingle(shareOptions);
-                hasSharedToSSNN = true;
-              }
+              const shareOptions: any = {
+                title: "Share via",
+                message: shareMessageBase,
+                url: updatedFileUri,
+                social: Share.Social.FACEBOOK,
+                type: ext === "mp4" ? "video/mp4" : `image/${ext}`,
+              };
+              await Share.shareSingle(shareOptions);
+              hasSharedToSSNN = true;
             }
           } catch (error) {
             console.error("Facebook share error:", error);
-
-            // Fallback to generic share if Facebook-specific sharing fails
-            try {
-              const shareOptions = {
-                title: "Share via",
-                message: shareMessage,
-                url: updatedFileUri,
-                type: fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`,
-              };
-
-              await Share.open(shareOptions);
-              hasSharedToSSNN = true;
-            } catch (fallbackError) {
-              console.error("Fallback share error:", fallbackError);
-              Alert.alert("Error", "Failed to share to Facebook");
-            }
+            const shareOptions = {
+              title: "Share via",
+              message: shareMessageBase,
+              url: updatedFileUri,
+              type: ext === "mp4" ? "video/mp4" : `image/${ext}`,
+            };
+            await Share.open(shareOptions);
+            hasSharedToSSNN = true;
           }
           break;
         }
 
         case SSNN.OTHERS: {
-          // Use react-native-share for other platforms
-          const mimeType = fileExt === "mp4" ? "video/mp4" : `image/${fileExt}`;
-          const shareMessage = `${
-            sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : ""
-          }\n\n${sponsor?.tags ? sponsor.tags.replace(",", "\n") : ""}`;
-
+          const mimeType = ext === "mp4" ? "video/mp4" : `image/${ext}`;
           const shareOptions = {
             url: updatedFileUri,
             type: mimeType,
-            message: shareMessage,
+            message: shareMessageBase,
           };
-
           await Share.open(shareOptions);
           hasSharedToSSNN = true;
           break;
@@ -304,36 +235,32 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       }
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
-
-      // Show appropriate error message
-      if (error.message?.includes("not installed") || error.message?.includes("No app")) {
-        Alert.alert("Error", "The required app is not installed on your device");
+      if (error?.message?.includes("not installed") || error?.message?.includes("No app")) {
+        Alert.alert("Error", "No tienes la app requerida instalada.");
       } else {
-        Alert.alert("Error", "Failed to share content");
+        Alert.alert("Error", "No se pudo compartir el contenido.");
       }
     } finally {
-      setShowChooseIGPostType(false);
+      setShowChooseIGPostType?.(false);
     }
 
     if (!isMemory && hasSharedToSSNN) {
       try {
-        const grantSocialPointsHandler = async (selectedSSNN: string) => {
-          await socialPointsARUpdateAPI({
-            social_network: selectedSSNN,
-          });
-
-          showMessage(
-            "You've been granted points for sharing to your socials",
-            "success",
-            `Socials points granted!`
+        const grantSocialPointsHandler = async (selectedSSNNStr: string) => {
+          await socialPointsARUpdateAPI({ social_network: selectedSSNNStr });
+          showMessage?.(
+              "You've been granted points for sharing to your socials",
+              "success",
+              `Socials points granted!`
           );
         };
-        onPointsGranted(selectedSSNN, grantSocialPointsHandler);
-      } catch (error: any) {
-        console.error("Error assigning points:", error?.message, error);
+        onPointsGranted?.(selectedSSNN, grantSocialPointsHandler);
+      } catch (e: any) {
+        console.error("Error assigning points:", e?.message, e);
       }
     }
   };
+
 
   if (!isVisible) return null;
 

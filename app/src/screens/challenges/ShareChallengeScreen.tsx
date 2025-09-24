@@ -649,7 +649,7 @@ const ArChallengeShare = () => {
               onPress={saveToGalleryButtonHandler}
               containerStyle={{flex: 1, justifyContent: "center"}}
               titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
-              title={"Save Image"}
+              title={isVideo ? "Save Video" : "Save Image"}
             />
           </View>
           {!isMemory && (
