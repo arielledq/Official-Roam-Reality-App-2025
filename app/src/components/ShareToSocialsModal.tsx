@@ -18,6 +18,13 @@ import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../constants";
 import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
 import IGPostTypeButton from "./ShareToSocialsModal/IGPostTypeButton";
 
+import {
+  prepareFileForSharing,
+  extractFirstHashtag,
+  prepareShareMessage,
+  normalizeFileExt,
+} from "../util/helpers";
+
 interface ShareToSocialsModalProps {
   isVisible: boolean;
   onClose: () => void;
@@ -42,64 +49,19 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 }) => {
   const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
   const [loading, setLoading] = useState(false);
+
   const share = async (selectedSSNN: SSNN_TYPE) => {
-    let ext = (fileExt || "").replace(/^\./, "").toLowerCase(); // "mp4", "png", etc.
+    const ext = normalizeFileExt(fileExt); // "mp4", "png", etc.
 
-    let updatedFileUri = fileUri || "";
     try {
-      if (updatedFileUri) {
-        const isHttp = updatedFileUri.startsWith("http");
-        const isFile = updatedFileUri.startsWith("file://");
-        if (!isHttp && !isFile) {
-          updatedFileUri = updatedFileUri.startsWith("/")
-            ? `file://${updatedFileUri}`
-            : `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`;
-        } else if (isHttp) {
-          setLoading?.(true);
-          const urlNoQuery = updatedFileUri.split("?")[0];
-          const filename = urlNoQuery.split("/").pop() || `shared_${Date.now()}.${ext || "bin"}`;
-          const localFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
-          const {statusCode} = await RNFS.downloadFile({
-            fromUrl: updatedFileUri,
-            toFile: localFilePath,
-          }).promise;
-          if (statusCode === 200) {
-            updatedFileUri = `file://${localFilePath}`;
-          } else {
-            throw new Error(`Download failed with status ${statusCode}`);
-          }
-        }
-      }
-    } catch (e) {
-      console.error("Error preparando media para compartir:", e);
-      setLoading?.(false);
-      Alert.alert("Error", "No se pudo preparar el archivo para compartir.");
-      return;
-    } finally {
-      setLoading?.(false);
-    }
+      // Use the helper function to prepare the file
+      const updatedFileUri = await prepareFileForSharing(fileUri || "", ext, setLoading);
 
-    if (!updatedFileUri) {
-      Alert.alert("Error", "No hay archivo para compartir.");
-      return;
-    }
+      const shareMessageBase = prepareShareMessage(sponsor);
+      const firstHashtag = extractFirstHashtag(sponsor?.tags);
 
-    const cleanDescription = sponsor?.description
-      ? sponsor.description.replace(/<[^>]*>/g, "")
-      : "";
-    const tagsRaw = sponsor?.tags || "";
-    const tagsMulti = tagsRaw.replace(/,\s*/g, "\n");
-    let shareMessageBase = `${cleanDescription}${
-      cleanDescription && tagsMulti ? "\n\n" : ""
-    }${tagsMulti}`.trim();
+      let hasSharedToSSNN = false;
 
-    const firstHashtag = (() => {
-      const m = tagsRaw.match(/#[^\s#,]+/);
-      return m ? m[0] : undefined;
-    })();
-
-    let hasSharedToSSNN = false;
-    try {
       switch (selectedSSNN) {
         case SSNN.INSTAGRAM: {
           let shareOptions: any = {
@@ -122,7 +84,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               if (ext === "mp4") {
                 const shareLinkContent: ShareVideoContent = {
                   contentType: "video",
-                  video: {localUrl: updatedFileUri}, // usar SIEMPRE updatedFileUri
+                  video: {localUrl: updatedFileUri},
                   commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
                 };
                 const canShow = await ShareDialog.canShow(shareLinkContent);
@@ -154,7 +116,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               hasSharedToSSNN = true;
             }
           } catch (error) {
-            console.error("Facebook share error:", error);
+            // Fallback to generic share
             const shareOptions = {
               title: "Share via",
               message: shareMessageBase,
@@ -182,31 +144,32 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         default:
           break;
       }
+
+      // Handle points granting if sharing was successful
+      if (!isMemory && hasSharedToSSNN) {
+        try {
+          const grantSocialPointsHandler = async (selectedSSNNStr: string) => {
+            await socialPointsARUpdateAPI({social_network: selectedSSNNStr});
+            showMessage(
+              "You've been granted points for sharing to your socials",
+              "success",
+              "Socials points granted!"
+            );
+          };
+          onPointsGranted(selectedSSNN, grantSocialPointsHandler);
+        } catch (error: any) {
+          console.error("Error assigning points:", error?.message, error);
+        }
+      }
     } catch (error: any) {
       console.error("Error sharing media:", error?.message, error);
       if (error?.message?.includes("not installed") || error?.message?.includes("No app")) {
-        Alert.alert("Error", "No tienes la app requerida instalada.");
-      } else {
-        Alert.alert("Error", "No se pudo compartir el contenido.");
+        showMessage("The app is not installed.", "error");
+      } else if (!error?.message?.includes("No file URI available")) {
+        showMessage("The content could not be shared.", "error");
       }
     } finally {
-      setShowChooseIGPostType?.(false);
-    }
-
-    if (!isMemory && hasSharedToSSNN) {
-      try {
-        const grantSocialPointsHandler = async (selectedSSNNStr: string) => {
-          await socialPointsARUpdateAPI({social_network: selectedSSNNStr});
-          showMessage?.(
-            "You've been granted points for sharing to your socials",
-            "success",
-            `Socials points granted!`
-          );
-        };
-        onPointsGranted?.(selectedSSNN, grantSocialPointsHandler);
-      } catch (e: any) {
-        console.error("Error assigning points:", e?.message, e);
-      }
+      setShowChooseIGPostType(false);
     }
   };
 

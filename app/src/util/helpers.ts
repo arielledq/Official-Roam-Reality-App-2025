@@ -636,3 +636,86 @@ export const eraseFile = async () => {
     }
   }
 };
+
+/**
+ * Normalizes file extension by removing leading dots and converting to lowercase
+ */
+export const normalizeFileExt = (fileExt?: string): string => {
+  return (fileExt || "").replace(/^\./, "").toLowerCase();
+};
+
+/**
+ * Prepares file URI for sharing - handles local paths and downloads remote files
+ */
+export const prepareFileForSharing = async (
+  fileUri: string,
+  fileExt: string,
+  setLoading?: (loading: boolean) => void
+): Promise<string> => {
+  let updatedFileUri = fileUri;
+
+  try {
+    if (updatedFileUri) {
+      const isHttp = updatedFileUri.startsWith("http");
+      const isFile = updatedFileUri.startsWith("file://");
+
+      if (!isHttp && !isFile) {
+        updatedFileUri = updatedFileUri.startsWith("/")
+          ? `file://${updatedFileUri}`
+          : `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`;
+      } else if (isHttp) {
+        setLoading?.(true);
+        const urlNoQuery = updatedFileUri.split("?")[0];
+        const filename = urlNoQuery.split("/").pop() || `shared_${Date.now()}.${fileExt || "bin"}`;
+        const localFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
+
+        const {statusCode} = await RNFS.downloadFile({
+          fromUrl: updatedFileUri,
+          toFile: localFilePath,
+        }).promise;
+
+        if (statusCode === 200) {
+          updatedFileUri = `file://${localFilePath}`;
+        } else {
+          throw new Error(`Download failed with status ${statusCode}`);
+        }
+      }
+    }
+
+    if (!updatedFileUri) {
+      throw new Error("No file URI available");
+    }
+
+    return updatedFileUri;
+  } catch (error) {
+    console.error("Error preparing media for sharing:", error);
+    throw error;
+  } finally {
+    setLoading?.(false);
+  }
+};
+
+/**
+ * Extracts the first hashtag from sponsor tags
+ */
+export const extractFirstHashtag = (tags?: string): string | undefined => {
+  const match = tags?.match(/#[^\s#,]+/);
+  return match ? match[0] : undefined;
+};
+
+export interface Sponsor {
+  description?: string;
+  tags?: string;
+}
+
+/**
+ * Prepares share message from sponsor data
+ */
+export const prepareShareMessage = (sponsor?: Sponsor): string => {
+  const cleanDescription = sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : "";
+
+  const tagsRaw = sponsor?.tags || "";
+  const tagsMulti = tagsRaw.replace(/,\s*/g, "\n");
+
+  return `${cleanDescription}${cleanDescription && tagsMulti ? "\n\n" : ""}${tagsMulti}`.trim();
+};
