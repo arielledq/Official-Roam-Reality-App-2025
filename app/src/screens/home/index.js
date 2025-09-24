@@ -46,7 +46,6 @@ const GeoArChallenge = ({}) => {
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [destinationDataMini, setDestinationDataMini] = useState([]);
-  // const [destinationData, setDestinationData] = useState([]);
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
@@ -94,12 +93,7 @@ const GeoArChallenge = ({}) => {
     getGeoARDestinations()
       .then(res => {
         if (res.status == 1) {
-          // setDestinationData(res.data);
           dispatch(updateDestinationData(res.data));
-          // for (let i = 0; i < res.data.length; i++) {
-          //   const d = res.data[i];
-          //   getARStarSites(d.id);
-          // }
         }
       })
       .finally(() => {
