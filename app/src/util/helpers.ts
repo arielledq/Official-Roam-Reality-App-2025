@@ -647,11 +647,7 @@ export const normalizeFileExt = (fileExt?: string): string => {
 /**
  * Prepares file URI for sharing - handles local paths and downloads remote files
  */
-export const prepareFileForSharing = async (
-  fileUri: string,
-  fileExt: string,
-  setLoading?: (loading: boolean) => void
-): Promise<string> => {
+export const prepareFileForSharing = async (fileUri: string, fileExt: string): Promise<string> => {
   let updatedFileUri = fileUri;
 
   try {
@@ -664,7 +660,6 @@ export const prepareFileForSharing = async (
           ? `file://${updatedFileUri}`
           : `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`;
       } else if (isHttp) {
-        setLoading?.(true);
         const urlNoQuery = updatedFileUri.split("?")[0];
         const filename = urlNoQuery.split("/").pop() || `shared_${Date.now()}.${fileExt || "bin"}`;
         const localFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
@@ -690,8 +685,6 @@ export const prepareFileForSharing = async (
   } catch (error) {
     console.error("Error preparing media for sharing:", error);
     throw error;
-  } finally {
-    setLoading?.(false);
   }
 };
 

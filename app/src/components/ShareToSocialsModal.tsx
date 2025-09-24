@@ -55,7 +55,9 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
     try {
       // Use the helper function to prepare the file
-      const updatedFileUri = await prepareFileForSharing(fileUri || "", ext, setLoading);
+      setLoading(true);
+      const updatedFileUri = await prepareFileForSharing(fileUri || "", ext);
+      setLoading(false);
 
       const shareMessageBase = prepareShareMessage(sponsor);
       const firstHashtag = extractFirstHashtag(sponsor?.tags);
@@ -84,9 +86,18 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               if (ext === "mp4") {
                 const shareLinkContent: ShareVideoContent = {
                   contentType: "video",
-                  video: {localUrl: updatedFileUri},
                   commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
+                  contentUrl: "",
+                  video: {localUrl: ""},
                 };
+                const isHttp = updatedFileUri.startsWith("http");
+                const isFile = updatedFileUri.startsWith("file://");
+
+                if (isHttp) {
+                  shareLinkContent.contentUrl = updatedFileUri;
+                } else if (isFile) {
+                  shareLinkContent.video = {localUrl: updatedFileUri};
+                }
                 const canShow = await ShareDialog.canShow(shareLinkContent);
                 if (canShow) {
                   const result = await ShareDialog.show(shareLinkContent);
@@ -173,8 +184,6 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     }
   };
 
-  if (!isVisible) return null;
-
   const ChooseSocialNetwork = (
     <>
       <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}>
@@ -229,23 +238,30 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   );
 
   return (
-    <View style={{flex: 1, position: "absolute"}}>
-      <ReactNativeModal isVisible={isVisible} onDismiss={onClose} onBackdropPress={onClose}>
-        <View
-          style={{
-            backgroundColor: theme.lightColors?.grey4,
-            borderRadius: 8,
-            paddingHorizontal: 16,
-            paddingVertical: 24,
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
-          {showChooseIGPostType ? ChooseInstagramPostType : ChooseSocialNetwork}
-          <FullScreenLoadingSpinner isLoading={loading} />
-        </View>
-      </ReactNativeModal>
-    </View>
+    <ReactNativeModal
+      isVisible={isVisible}
+      onDismiss={onClose}
+      onBackdropPress={onClose}
+      style={{margin: 0}}
+    >
+      <View
+        style={{
+          backgroundColor: theme.lightColors?.grey4,
+          borderRadius: 8,
+          paddingHorizontal: 16,
+          paddingVertical: 24,
+          alignItems: "center",
+          gap: 16,
+          marginHorizontal: 20,
+          alignSelf: "center",
+          marginTop: "auto",
+          marginBottom: "auto",
+        }}
+      >
+        {showChooseIGPostType ? ChooseInstagramPostType : ChooseSocialNetwork}
+        <FullScreenLoadingSpinner isLoading={loading} />
+      </View>
+    </ReactNativeModal>
   );
 };
 
