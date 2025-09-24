@@ -44,9 +44,27 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   sponsor,
   isMemory = false,
 }) => {
-  const [showChooseIGPostType, setShowChooseIGPostType] = useState(false);
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
+
+  const handleSharingError = (error: any) => {
+    console.error("Sharing error:", error);
+
+    if (error?.message?.includes("not installed") || error?.message?.includes("No app")) {
+      Alert.alert("App Required", "The required app is not installed on your device.");
+    } else if (error?.message?.includes("User did not share")) {
+      // Silent handling for user cancellation
+      return;
+    } else if (!error?.message?.includes("No file URI available")) {
+      Alert.alert("Sharing Failed", "The content could not be shared. Please try again.");
+    }
+  };
+
+  const safeSetLoading = (value: boolean) => {
+    if (isMounted.current) {
+      setLoading(value);
+    }
+  };
 
   const share = async (selectedSSNN: SSNN_TYPE, postType: "stories" | "feed" = "stories") => {
     const ext = normalizeFileExt(fileExt); // "mp4", "png", etc.
@@ -54,7 +72,6 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     try {
       safeSetLoading(true);
       const updatedFileUri = await prepareFileForSharing(fileUri || "", ext);
-      safeSetLoading(false);
 
       const shareMessageBase = prepareShareMessage(sponsor);
       const firstHashtag = extractFirstHashtag(sponsor?.tags);
@@ -85,11 +102,10 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           try {
             if (Platform.OS === "ios") {
               if (ext === "mp4") {
+                // @ts-ignore
                 const shareLinkContent: ShareVideoContent = {
                   contentType: "video",
                   commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
-                  contentUrl: "",
-                  video: {localUrl: ""},
                 };
                 const isHttp = updatedFileUri.startsWith("http");
                 const isFile = updatedFileUri.startsWith("file://");
@@ -174,85 +190,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     } catch (error: any) {
       handleSharingError(error);
     } finally {
-      safeSetShowChooseIGPostType(false);
-    }
-  };
-
-  const handleSharingError = (error: any) => {
-    console.error("Sharing error:", error);
-
-    if (error?.message?.includes("not installed") || error?.message?.includes("No app")) {
-      Alert.alert("App Required", "The required app is not installed on your device.");
-    } else if (error?.message?.includes("User did not share")) {
-      // Silent handling for user cancellation
-      return;
-    } else if (!error?.message?.includes("No file URI available")) {
-      Alert.alert("Sharing Failed", "The content could not be shared. Please try again.");
-    }
-  };
-
-  const ChooseSocialNetwork = (
-    <>
-      <Text style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}>
-        Share To Socials
-      </Text>
-
-      <Text style={{fontSize: FontSizes.S12, color: theme.lightColors?.grey0}}>
-        {SHARE_CONDITIONS_TEXT}
-      </Text>
-
-      <View style={{flexDirection: "row", justifyContent: "center", gap: 32}}>
-        <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
-          <Image source={Images.Instagram} style={{height: 40, width: 40}} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
-          <Image source={Images.Facebook} style={{height: 40, width: 40}} />
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
-          <Image source={Images.TikTokShare} style={{height: 40, width: 68}} />
-        </TouchableOpacity>
-      </View>
-
-      <AppButton
-        onPress={onClose}
-        buttonStyle={{height: 45, width: 95}}
-        containerStyle={{}}
-        title={"Done"}
-      />
-    </>
-  );
-
-  const ChooseInstagramPostType = (
-    <>
-      <View style={{alignItems: "center", gap: 16}}>
-        <Text style={{color: theme.lightColors?.white}}>Choose how to share on Instagram</Text>
-
-        <View style={{flexDirection: "row", gap: 16}}>
-          <IGPostTypeButton
-            onPress={() => share(SSNN.INSTAGRAM, "stories")}
-            text="Share to Stories"
-            imageSource={require("../assets/images/ig_stories.png")}
-          />
-
-          <IGPostTypeButton
-            onPress={() => share(SSNN.INSTAGRAM, "feed")}
-            text="Share to Feed"
-            imageSource={require("../assets/images/ig_post.png")}
-          />
-        </View>
-      </View>
-    </>
-  );
-
-  const safeSetLoading = (value: boolean) => {
-    if (isMounted.current) {
-      setLoading(value);
-    }
-  };
-
-  const safeSetShowChooseIGPostType = (value: boolean) => {
-    if (isMounted.current) {
-      setShowChooseIGPostType(value);
+      safeSetLoading(false);
     }
   };
 
@@ -283,7 +221,34 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           marginBottom: "auto",
         }}
       >
-        {showChooseIGPostType ? ChooseInstagramPostType : ChooseSocialNetwork}
+        <Text
+          style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}
+        >
+          Share To Socials
+        </Text>
+
+        <Text style={{fontSize: FontSizes.S12, color: theme.lightColors?.grey0}}>
+          {SHARE_CONDITIONS_TEXT}
+        </Text>
+
+        <View style={{flexDirection: "row", justifyContent: "center", gap: 32}}>
+          <TouchableOpacity onPress={() => share(SSNN.INSTAGRAM)}>
+            <Image source={Images.Instagram} style={{height: 40, width: 40}} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => share(SSNN.FACEBOOK)}>
+            <Image source={Images.Facebook} style={{height: 40, width: 40}} />
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => share(SSNN.OTHERS)}>
+            <Image source={Images.TikTokShare} style={{height: 40, width: 68}} />
+          </TouchableOpacity>
+        </View>
+
+        <AppButton
+          onPress={onClose}
+          buttonStyle={{height: 45, width: 95}}
+          containerStyle={{}}
+          title={"Done"}
+        />
         <FullScreenLoadingSpinner isLoading={loading} />
       </View>
     </ReactNativeModal>
