@@ -1,6 +1,6 @@
 import React, {useEffect, useRef, useState} from "react";
 import {View, Text, TouchableOpacity, Image, Alert, Platform} from "react-native";
-import {ShareDialog, SharePhotoContent, ShareVideoContent} from "react-native-fbsdk-next";
+import {ShareDialog} from "react-native-fbsdk-next";
 
 import Share from "react-native-share";
 import ReactNativeModal from "react-native-modal";
@@ -120,15 +120,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
                 shareLinkContent.commonParameters = firstHashtag
                   ? {hashtag: firstHashtag}
                   : undefined;
-
-                const isHttp = updatedFileUri.startsWith("http");
-                const isFile = updatedFileUri.startsWith("file://");
-
-                if (isHttp) {
-                  shareLinkContent.contentUrl = updatedFileUri;
-                } else if (isFile) {
-                  shareLinkContent.video = {localUrl: updatedFileUri};
-                }
+                shareLinkContent.video = {localUrl: updatedFileUri};
               } else {
                 shareLinkContent.contentType = "photo";
                 shareLinkContent.photos = [{imageUrl: updatedFileUri, userGenerated: true}];
@@ -144,7 +136,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             } else {
               shareToOtherHandler();
             }
-          } catch (_error) {
+          } catch (error) {
+            console.error("Error sharing to Facebook:", error);
             shareToOtherHandler();
           }
           break;
@@ -191,27 +184,10 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       isVisible={isVisible}
       onDismiss={onClose}
       onBackdropPress={onClose}
-      style={{margin: 0}}
+      style={styles.modal}
     >
-      <View
-        style={{
-          backgroundColor: theme.lightColors?.grey4,
-          borderRadius: 8,
-          paddingHorizontal: 16,
-          paddingVertical: 24,
-          alignItems: "center",
-          gap: 16,
-          marginHorizontal: 20,
-          alignSelf: "center",
-          marginTop: "auto",
-          marginBottom: "auto",
-        }}
-      >
-        <Text
-          style={{fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white}}
-        >
-          Share To Socials
-        </Text>
+      <View style={styles.content}>
+        <Text style={styles.title}>Share To Socials</Text>
 
         <Text style={{fontSize: FontSizes.S12, color: theme.lightColors?.grey0}}>
           {SHARE_CONDITIONS_TEXT}
@@ -242,18 +218,20 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 };
 
 const styles = {
-  modal: {
+  modal: {margin: 0},
+  content: {
     backgroundColor: theme.lightColors?.grey4,
     borderRadius: 8,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+    alignItems: "center",
+    gap: 16,
+    marginHorizontal: 20,
+    alignSelf: "center",
+    marginTop: "auto",
+    marginBottom: "auto",
   },
-  title: {
-    fontSize: 26,
-    color: theme.lightColors?.white,
-    fontFamily: FontFamily.PoppinsBold,
-    fontWeight: 600,
-    marginBottom: 8,
-  },
+  title: {fontSize: FontSizes.S20, fontWeight: "bold", color: theme.lightColors?.white},
   subTitle: {
     fontSize: 18,
     color: theme.lightColors?.white,
