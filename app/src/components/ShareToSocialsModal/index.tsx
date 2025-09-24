@@ -115,23 +115,20 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           try {
             if (Platform.OS === "ios") {
               const shareLinkContent: any = {};
-              if (ext === "mp4") {
-                shareLinkContent.contentType = "video";
-                shareLinkContent.commonParameters = firstHashtag
-                  ? {hashtag: firstHashtag}
-                  : undefined;
-                shareLinkContent.video = {localUrl: updatedFileUri};
-              } else {
+              if (ext !== "mp4") {
                 shareLinkContent.contentType = "photo";
                 shareLinkContent.photos = [{imageUrl: updatedFileUri, userGenerated: true}];
                 shareLinkContent.commonParameters = firstHashtag
                   ? {hashtag: firstHashtag}
                   : undefined;
-              }
-              const canShow = await ShareDialog.canShow(shareLinkContent);
-              if (canShow) {
-                const result = await ShareDialog.show(shareLinkContent);
-                if (!result.isCancelled) hasSharedToSSNN = true;
+
+                const canShow = await ShareDialog.canShow(shareLinkContent);
+                if (canShow) {
+                  const result = await ShareDialog.show(shareLinkContent);
+                  if (!result.isCancelled) hasSharedToSSNN = true;
+                }
+              } else {
+                shareToOtherHandler();
               }
             } else {
               shareToOtherHandler();
