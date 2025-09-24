@@ -16,61 +16,7 @@ import Config from "config";
 import {SHARE_CONDITIONS_TEXT, SSNN, SSNN_TYPE} from "../constants";
 
 import FullScreenLoadingSpinner from "./FullScreenLoadingSpinner";
-
-/**
- * Converts a local file to a base64 data URI.
- * @param {string} fileUri - The local file URI.
- * @param {string} fileExt - The file extension (e.g., 'jpg', 'png', or 'mp4').
- * @returns {Promise<string|null>} The data URI or null if there was an error.
- */
-const getBase64DataUri = async (fileUri = "", fileExt = "") => {
-  // Ensure the URI doesn't include the "file://" prefix for RNFS.readFile
-  const normalizedUri = fileUri.startsWith("file://") ? fileUri.replace("file://", "") : fileUri;
-
-  try {
-    const base64Data = await RNFS.readFile(normalizedUri, "base64");
-    if (fileExt === "mp4") {
-      // For videos, note that large files may become impractical as base64 strings
-      return `data:video/mp4;base64,${base64Data}`;
-    } else {
-      // For images
-      return `data:image/${fileExt};base64,${base64Data}`;
-    }
-  } catch (error) {
-    console.error("Error converting file to base64:", error);
-    return null;
-  }
-};
-
-interface IGPostTypeButtonProps {
-  onPress: () => {};
-  imageSource: any | {uri: string};
-  text: string;
-}
-
-const IGPostTypeButton = ({onPress, imageSource, text}: IGPostTypeButtonProps) => {
-  return (
-    <TouchableOpacity
-      onPress={onPress}
-      style={{
-        paddingHorizontal: 8,
-        paddingVertical: 16,
-        borderRadius: 8,
-        justifyContent: "flex-end",
-        alignItems: "center",
-        gap: 16,
-        borderColor: theme.lightColors?.purple,
-        borderWidth: 3,
-        width: 124,
-      }}
-    >
-      <View style={{height: 64, width: 64, justifyContent: "center", alignItems: "center"}}>
-        <Image source={imageSource} />
-      </View>
-      <Text style={{color: theme.lightColors?.white, fontSize: 12}}>{text}</Text>
-    </TouchableOpacity>
-  );
-};
+import IGPostTypeButton from "./ShareToSocialsModal/IGPostTypeButton";
 
 interface ShareToSocialsModalProps {
   isVisible: boolean;
@@ -106,14 +52,14 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         const isFile = updatedFileUri.startsWith("file://");
         if (!isHttp && !isFile) {
           updatedFileUri = updatedFileUri.startsWith("/")
-              ? `file://${updatedFileUri}`
-              : `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`;
+            ? `file://${updatedFileUri}`
+            : `file://${RNFS.CachesDirectoryPath}/${updatedFileUri}`;
         } else if (isHttp) {
           setLoading?.(true);
           const urlNoQuery = updatedFileUri.split("?")[0];
           const filename = urlNoQuery.split("/").pop() || `shared_${Date.now()}.${ext || "bin"}`;
           const localFilePath = `${RNFS.CachesDirectoryPath}/${filename}`;
-          const { statusCode } = await RNFS.downloadFile({
+          const {statusCode} = await RNFS.downloadFile({
             fromUrl: updatedFileUri,
             toFile: localFilePath,
           }).promise;
@@ -138,11 +84,14 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       return;
     }
 
-    const cleanDescription =
-        sponsor?.description ? sponsor.description.replace(/<[^>]*>/g, "") : "";
+    const cleanDescription = sponsor?.description
+      ? sponsor.description.replace(/<[^>]*>/g, "")
+      : "";
     const tagsRaw = sponsor?.tags || "";
     const tagsMulti = tagsRaw.replace(/,\s*/g, "\n");
-    let shareMessageBase = `${cleanDescription}${cleanDescription && tagsMulti ? "\n\n" : ""}${tagsMulti}`.trim();
+    let shareMessageBase = `${cleanDescription}${
+      cleanDescription && tagsMulti ? "\n\n" : ""
+    }${tagsMulti}`.trim();
 
     const firstHashtag = (() => {
       const m = tagsRaw.match(/#[^\s#,]+/);
@@ -158,9 +107,9 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             appId: Config.FACEBOOK_APP_ID,
           };
           if (ext === "mp4") {
-            shareOptions = { ...shareOptions, backgroundVideo: updatedFileUri };
+            shareOptions = {...shareOptions, backgroundVideo: updatedFileUri};
           } else {
-            shareOptions = { ...shareOptions, backgroundImage: updatedFileUri };
+            shareOptions = {...shareOptions, backgroundImage: updatedFileUri};
           }
           await Share.shareSingle(shareOptions);
           hasSharedToSSNN = true;
@@ -173,8 +122,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               if (ext === "mp4") {
                 const shareLinkContent: ShareVideoContent = {
                   contentType: "video",
-                  video: { localUrl: updatedFileUri }, // usar SIEMPRE updatedFileUri
-                  commonParameters: firstHashtag ? { hashtag: firstHashtag } : undefined,
+                  video: {localUrl: updatedFileUri}, // usar SIEMPRE updatedFileUri
+                  commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
                 };
                 const canShow = await ShareDialog.canShow(shareLinkContent);
                 if (canShow) {
@@ -184,8 +133,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
               } else {
                 const shareLinkContent: SharePhotoContent = {
                   contentType: "photo",
-                  photos: [{ imageUrl: updatedFileUri, userGenerated: true }],
-                  commonParameters: firstHashtag ? { hashtag: firstHashtag } : undefined,
+                  photos: [{imageUrl: updatedFileUri, userGenerated: true}],
+                  commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
                 };
                 const canShow = await ShareDialog.canShow(shareLinkContent);
                 if (canShow) {
@@ -247,11 +196,11 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
     if (!isMemory && hasSharedToSSNN) {
       try {
         const grantSocialPointsHandler = async (selectedSSNNStr: string) => {
-          await socialPointsARUpdateAPI({ social_network: selectedSSNNStr });
+          await socialPointsARUpdateAPI({social_network: selectedSSNNStr});
           showMessage?.(
-              "You've been granted points for sharing to your socials",
-              "success",
-              `Socials points granted!`
+            "You've been granted points for sharing to your socials",
+            "success",
+            `Socials points granted!`
           );
         };
         onPointsGranted?.(selectedSSNN, grantSocialPointsHandler);
@@ -260,7 +209,6 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
       }
     }
   };
-
 
   if (!isVisible) return null;
 
