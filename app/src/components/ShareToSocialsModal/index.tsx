@@ -75,7 +75,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   };
 
   const share = async (selectedSSNN: SSNN_TYPE) => {
-    const ext = normalizeFileExt(fileExt); // "mp4", "png", etc.
+    const ext = normalizeFileExt(fileExt);
 
     try {
       safeSetLoading(true);
