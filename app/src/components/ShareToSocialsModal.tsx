@@ -114,12 +114,13 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
         case SSNN.FACEBOOK: {
           try {
             if (Platform.OS === "ios") {
+              const shareLinkContent: any = {};
               if (ext === "mp4") {
-                // @ts-ignore
-                const shareLinkContent: ShareVideoContent = {
-                  contentType: "video",
-                  commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
-                };
+                shareLinkContent.contentType = "video";
+                shareLinkContent.commonParameters = firstHashtag
+                  ? {hashtag: firstHashtag}
+                  : undefined;
+
                 const isHttp = updatedFileUri.startsWith("http");
                 const isFile = updatedFileUri.startsWith("file://");
 
@@ -128,33 +129,20 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
                 } else if (isFile) {
                   shareLinkContent.video = {localUrl: updatedFileUri};
                 }
-                const canShow = await ShareDialog.canShow(shareLinkContent);
-                if (canShow) {
-                  const result = await ShareDialog.show(shareLinkContent);
-                  if (!result.isCancelled) hasSharedToSSNN = true;
-                }
               } else {
-                const shareLinkContent: SharePhotoContent = {
-                  contentType: "photo",
-                  photos: [{imageUrl: updatedFileUri, userGenerated: true}],
-                  commonParameters: firstHashtag ? {hashtag: firstHashtag} : undefined,
-                };
-                const canShow = await ShareDialog.canShow(shareLinkContent);
-                if (canShow) {
-                  await ShareDialog.show(shareLinkContent);
-                  hasSharedToSSNN = true;
-                }
+                shareLinkContent.contentType = "photo";
+                shareLinkContent.photos = [{imageUrl: updatedFileUri, userGenerated: true}];
+                shareLinkContent.commonParameters = firstHashtag
+                  ? {hashtag: firstHashtag}
+                  : undefined;
+              }
+              const canShow = await ShareDialog.canShow(shareLinkContent);
+              if (canShow) {
+                const result = await ShareDialog.show(shareLinkContent);
+                if (!result.isCancelled) hasSharedToSSNN = true;
               }
             } else {
-              const shareOptions: any = {
-                title: "Share via",
-                message: shareMessageBase,
-                url: updatedFileUri,
-                social: Share.Social.FACEBOOK,
-                type: ext === "mp4" ? "video/mp4" : `image/${ext}`,
-              };
-              await Share.shareSingle(shareOptions);
-              hasSharedToSSNN = true;
+              shareToOtherHandler();
             }
           } catch (_error) {
             shareToOtherHandler();
