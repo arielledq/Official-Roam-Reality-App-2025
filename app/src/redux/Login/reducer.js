@@ -29,7 +29,6 @@ export const sliceLogin = createSlice({
         return;
       }
       state.data.user.ar_user_profile_user.current_location = {
-        ...state.data.user.ar_user_profile_user.current_location,
         coordinates: [longitude, latitude],
       };
     },

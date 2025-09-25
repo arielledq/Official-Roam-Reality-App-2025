@@ -14,8 +14,8 @@ const GET_LOCATION_CONFIG = {
 
 const WATCH_POSITION_CONFIG = {
     ...GET_LOCATION_CONFIG,
-    distanceFilter: 15,
-    interval: 30000,
+    distanceFilter: 1,
+    interval: 10000,
 };
 
 const userLocationHook = () => {
@@ -24,16 +24,15 @@ const userLocationHook = () => {
         latitude: null,
         longitude: null,
     });
+    const [locationIsEnabled, setLocationIsEnabled] = useState(false);
     const watchIdRef = useRef(null);
     const lastCoordsRef = useRef(null);
     const userData = useSelector(state => state?.login?.data);
     const userType = userData?.user?.type || 0;
     const siteId = userData?.user?.geo_site || 0;
     const dispatch = useDispatch();
-
-    const userLocation = userData?.user?.ar_user_profile_user?.current_location?.coordinates;
-    const locationIsEnabled = !!userLocation?.length;
-
+    const lastCallRef = useRef(0);
+    const THROTTLE_DELAY = 7000; // 15 seconds in milliseconds
     const getLocation = async () => {
         const hasPermission = await hasLocationPermission();
         if (!hasPermission) {
@@ -61,34 +60,46 @@ const userLocationHook = () => {
         );
     };
 
+    const watchPositionPromise = () => {
+        return new Promise((resolve, reject) => {
+            Geolocation.watchPosition(
+                position => {
+                    const coords = {
+                        latitude: position?.coords?.latitude,
+                        longitude: position?.coords?.longitude,
+                    };
+                    resolve(coords)
+                },
+                error => {
+                    reject(error);
+                },
+                WATCH_POSITION_CONFIG
+            );
+        })
+    }
     const watchLocation = async () => {
         const hasPermission = await hasLocationPermission();
         if (!hasPermission) {
             return;
         }
         setLoading(true);
-        Geolocation.watchPosition(
-            position => {
-                const coords = {
-                    latitude: position?.coords?.latitude,
-                    longitude: position?.coords?.longitude,
-                };
-                updateUserLocationAPI(coords);
-                setLoading(false);
-            },
-            error => {
-                console.error(
-                    `[${new Date().toLocaleTimeString()}] [location.hook] Geolocation.watchPosition error callback (WATCH_POSITION_CONFIG) - Loading state before set to FALSE: ${loading}`,
-                    error
-                );
-                setLoading(false);
-                clearLocation();
-            },
-            WATCH_POSITION_CONFIG
-        );
+        try {
+            const coords = await watchPositionPromise()
+            updateUserLocationAPI(coords);
+        } catch (error) {
+            console.log(error)
+            clearLocation();
+        } finally {
+            setLoading(false)
+        }
     };
 
     const toggleUserLocation = () => {
+        const now = new Date().getTime();
+        if (now - lastCallRef.current < THROTTLE_DELAY) {
+            return;
+        }
+        lastCallRef.current = now;
         if (locationIsEnabled) {
             clearLocation();
         } else {
@@ -96,10 +107,13 @@ const userLocationHook = () => {
         }
     };
 
-
     const updatePlayerUserLocationAPI = (latitude, longitude) => {
-        updateUserLocation({latitude, longitude});
-        dispatch(updateUserLocationData({latitude, longitude}));
+        try{
+            const rsp = updateUserLocation({latitude, longitude});
+            setLocationIsEnabled(true)
+        } catch (error) {
+            setLocationIsEnabled(false)
+        }
     };
 
     const clearPlayerUserLocation = () => {
@@ -140,6 +154,7 @@ const userLocationHook = () => {
     };
 
     const clearLocation = () => {
+        setLocationIsEnabled(false)
         Geolocation.stopObserving();
         switch (userType) {
             case USER_TYPES.BAND:
@@ -155,7 +170,6 @@ const userLocationHook = () => {
     return {
         initialUserLocation,
         loading,
-        userLocation,
         locationIsEnabled,
         toggleUserLocation,
         getLocation,

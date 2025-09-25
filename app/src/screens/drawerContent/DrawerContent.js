@@ -16,8 +16,7 @@ import {GoogleSignin} from "@react-native-google-signin/google-signin";
 import {DEBOUNCE_TIME, removeItem, showMessage} from "../../util/helpers";
 import AppSwitch from "../../components/Switch";
 import userLocationHook from "./location.hook";
-import useDebounce from "hooks/debounce";
-import useDebounceApi from "hooks/useDebounceApi";
+
 
 const DrawerList = [
     {icon: "earth", label: "AR Challenges", navigateTo: "ARChallenge"},
@@ -37,22 +36,12 @@ const DrawerList = [
 ];
 
 const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, onPress}) => {
-    const { locationIsEnabled, toggleUserLocation} = userLocationHook();
-    const [loading, setLoading] = useState(false);
+    const {loading, locationIsEnabled, toggleUserLocation} = userLocationHook();
+
     function getIconFamily(icon) {
         const customIcons = ["Contact", "Question", "Folder", "Invite", "Wallet", "pin"];
         return customIcons.includes(icon) ? "custom" : "antdesign";
     }
-
-    const debouncedUserLocationApi = useDebounceApi(() => {
-        toggleUserLocation();
-        setLoading(false);
-    }, 5000);
-
-    const locationToggleHandler = () => {
-        setLoading(true);
-        debouncedUserLocationApi();
-    };
 
     const renderDrawerItem = () => {
         return (
@@ -71,8 +60,7 @@ const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, 
                 </View>
                 {navigateTo === "toggleLocation" ? (
                     <AppSwitch
-                        // disabled={loading}
-                        onValueChange={locationToggleHandler}
+                        onValueChange={toggleUserLocation}
                         value={locationIsEnabled}
                         loading={loading}
                     />
