@@ -509,10 +509,10 @@ const unityStarsCount = () => {
 
   useEffect(() => {
 
-    if (modal && unitySceneLoaded && sceneIsReady && selectedSite === null) {
+    if (modal && !unitySceneLoaded && sceneIsReady && selectedSite === null) {
       setOpenModalARMode(true);
     }
-  }, [sceneIsReady, selectedSite, modal]); 
+  }, [sceneIsReady, selectedSite, modal]);
 
   const closeModalARMode = () => {
     setOpenModalARMode(false);
@@ -1415,7 +1415,7 @@ useEffect(() => {
         setUnityLoading(false);
         // initialCheckDoneRef.current = false;
         setModal(false);
-        
+
       };
     }, [])
   );

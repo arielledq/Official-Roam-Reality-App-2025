@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {View, Text, Image, TouchableOpacity, ScrollView, FlatList, Platform} from "react-native";
+import {View, Text, Image, TouchableOpacity, ScrollView, FlatList, Platform, RefreshControl, ActivityIndicator} from "react-native";
 import AppDropdown from "components/Dropdown";
 import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
@@ -554,6 +554,25 @@ function getCooldownTotalMinutes(cooldown: string): number {
               </View>
             );
           })}
+         {!filteredSites || filteredSites.length === 0 ? (
+             <View style={{alignItems: "center", justifyContent: "center", paddingVertical: 20}}>
+                 <ActivityIndicator size="small" color="#fff" />
+                 <Text style={{color: "#fff", marginTop: 8}}>Loading Sites…</Text>
+               </View>
+           ) : (
+             <ScrollView style={{marginTop: 15}}>
+                 {filteredSites?.length > 0 &&
+                     filteredSites.map((site: any, index: number) => {
+                         // ...tu render actual
+                           })
+                   }
+                 {(!filteredSites || filteredSites.length === 0) && (
+                     <View style={{alignItems: "center", paddingVertical: 20}}>
+                         <Text style={{color: "#7e8493"}}>No seats available</Text>
+                       </View>
+                   )}
+               </ScrollView>
+           )}
       </ScrollView>
     </View>
   );
