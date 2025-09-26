@@ -101,10 +101,7 @@ const Navigation = () => {
     };
   }, [dispatch]);
 
-  // ⛔️ Eliminado el efecto que forzaba reset → Login cuando !token
-  // Splash y el stack resolverán correctamente el flujo.
 
-  // --- Auth stack: SOLO pantallas de autenticación/onboarding ---
   const renderAuthStack = () => {
     return (
       <>

@@ -176,10 +176,7 @@ const ARScreen = ({route}) => {
     }
 
   };
-  // useEffect(() => {
-  //   console.log("se seleccionaron los sitios, verificar parametros", selectedSite, huntParameters
-  //       );
-  // }, [selectedSite]);
+
   const checkIfModelExist = () => {
     if (!modelFile) return;
 
@@ -294,27 +291,22 @@ const ARScreen = ({route}) => {
     }
   };
 
-  // Devuelve el array de anillos (GeoJSON) del sitio activo o null
   const getActiveBorderCoords = () => {
     const mode = selectedSite?.selectedMode?.mode;
 
-    // HUNT: viene dentro de huntChallenge.geo_ar_star.geo_site
     if (mode === AR_MODES.HUNT_MODE) {
       return (
         selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.geo_site_border?.coordinates || null
       );
     }
 
-    // GEO_TAG: puede venir en el propio site o dentro de pin_challenge (fallback)
     if (mode === AR_MODES.GEO_TAG_MODE) {
       return selectedSite?.geo_site_border?.coordinates || null;
     }
 
-    // SCAN: normalmente no hay polígono
     return null;
   };
 
-  // Normaliza cualquier objeto {latitude, longitude} a "coords-like"
   const toCoordsWrapper = loc => ({coords: {latitude: loc?.latitude, longitude: loc?.longitude}});
   const isCurrentLocationIsInArea = (lat, lon) => {
     const border = getActiveBorderCoords();
@@ -322,7 +314,6 @@ const ARScreen = ({route}) => {
       setIsMeInsideInSite(false);
       return false;
     }
-    // Primer anillo (exterior)
     const outer = border[0];
     if (!outer || !outer.length) {
       setIsMeInsideInSite(false);
@@ -334,7 +325,6 @@ const ARScreen = ({route}) => {
     return inside;
   };
 
-  // Calcular distancia al punto más cercano del borde
   const findNearPoint = (lat, lon) => {
     const border = getActiveBorderCoords();
     if (!border || lat == null || lon == null) {
@@ -438,7 +428,7 @@ const ARScreen = ({route}) => {
         height: spawnHeight,
         scale: huntParameters?.scale_object || 0.01,
         isVisible: true,
-        updateRadius: 14.0, // verificar
+        updateRadius: 14.0,
         isHuntMode: true,
         shouldRotate: true,
       };
@@ -557,11 +547,10 @@ const scheduleHideArrow = () => {
 };
 
 const onObjectDetected = () => {
-  setArrowVisible(true);   // mostrar flecha
-  scheduleHideArrow();     // rearmar timer de inactividad
+  setArrowVisible(true);
+  scheduleHideArrow();
 };
 
-// limpiar timer al desmontar o salir de la pantalla
 useEffect(() => {
   return () => {
     if (hideArrowTimerRef.current) {
@@ -574,7 +563,6 @@ useEffect(() => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    // console.log("dataUnity", data);
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
@@ -604,7 +592,6 @@ useEffect(() => {
       navigation?.goBack();
       if (Platform.OS === "android") {
         setShouldRenderUnity(false);
-        // unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena");
       }
     }
     if (buttonARMode) {
@@ -655,12 +642,10 @@ useEffect(() => {
       //       "ShowHideElements",
       //       JSON.stringify({hide})
       //     );
-      //     console.log("OCULTANDOOCULTANDO")
       //   unityRef.current.postMessage("Main Camera", "ShowARObject", "");
 
       // }
       if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
-        // notificationUnity("Se Presiono sobre la estrella", "Auxiliooooooooooooooo");
         navigation.navigate({
           name: "FunFactsScreen",
           params: {
@@ -818,7 +803,6 @@ useEffect(() => {
 
   const startChallengeHandler = async site => {
     let mode = site?.selectedMode?.mode;
-    // console.log("[ARScreen] startChallengeHandler site", site);
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
@@ -838,11 +822,11 @@ useEffect(() => {
           model_file: scanChallenge?.file_3d,
           lat_long: scanChallenge?.coordinates,
           challenge_requirement: site?.pin_challenge?.challenge_requirement,
-          arChallenge: true, //vERIFICAR CODIGO DE UNITY
-          isLocation: false, //vERIFICAR CODIGO DE UNITY
+          arChallenge: true,
+          isLocation: false,
           challenge_id: scanChallenge?.id,
-          parameters: null, // Verificar uso para objeto 3d -modificaciones- ---- Falta que venga del Backend
-          points: scanChallenge?.points || 0, // Falta que venga del Backend
+          parameters: null,
+          points: scanChallenge?.points || 0,
           selectedMode: "Scan",
           setVisibleButtonPosition: false,
         };
@@ -964,7 +948,6 @@ useEffect(() => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      // Habilitar detección (como ya haces)
       unityRef.current.postMessage(
           "Main Camera",
           "SetDetectObjectState",
@@ -979,7 +962,7 @@ useEffect(() => {
 
       if (mode === AR_MODES.GEO_TAG_MODE) {
         if (!hasSentModelDataOnce && readyForModel) {
-          sendModelDataToUnity();   // 1) SIEMPRE VA PRIMERO
+          sendModelDataToUnity();
           sendBloomValuesToUnity();
           unityRef.current.postMessage("screen", "SetTypeChallenge",
               JSON.stringify({ typeChallenge: "PHOTOVIDEO", arChallenge: false, isLocation: !!isMeInsideInSite })
@@ -990,14 +973,14 @@ useEffect(() => {
 
       if (run3D) {
         if (!hasSentModelDataOnce && readyForModel) {
-          sendModelDataToUnity();   // 1) MODELO PRIMERO
-          return;                   // esperar siguiente ciclo
+          sendModelDataToUnity();
+          return;
         }
         if (hasSentModelDataOnce && !sendSpawnModelData && heightReady) {
           sendBloomValuesToUnity();
           unityStarsCount();
           PointsCount();
-          sendSpawnData();          // 2) SPAWN DESPUÉS
+          sendSpawnData();
           return;
         }
       }
@@ -1033,7 +1016,6 @@ useEffect(() => {
   //   };
   //   unityRef.current.postMessage("screen", "SetTypeChallenge", JSON.stringify(messageData));
   //   console.log("messageData", messageData);
-  //   // (Opcional) pequeño aviso cuando está fuera del área
   //   if (!isMeInsideInSite) {
   //     const dataNotificationUnity = {
   //       isNotification: true,
@@ -1361,7 +1343,6 @@ useEffect(() => {
         if (!unitySceneLoaded) {
           const mode = selectedSite?.selectedMode?.mode;
           setModal(true);
-          // GEO: si todavía no se envió el modelo
           if (mode === AR_MODES.GEO_TAG_MODE && !hasSentModelDataOnce) {
             sendModelDataToUnity();
             const messageData = {
@@ -1462,12 +1443,12 @@ useEffect(() => {
     if (mode !== AR_MODES.SCAN_MODE) return;
 
     const has3D = !!selectedSite?.scanChallenge?.file_3d;
-    if (has3D) return; // si hay 3D, NO descargamos bundle aquí
+    if (has3D) return;
 
     const animUrl = selectedSite?.scanChallenge?.file_animation;
-    if (!animUrl) return; // nada que descargar
+    if (!animUrl) return;
 
-    if (bundleRequestedRef.current) return; // ya pedido
+    if (bundleRequestedRef.current) return;
     bundleRequestedRef.current = true;
 
     // 🔽 tu función existente
@@ -1497,7 +1478,6 @@ useEffect(() => {
 useEffect(() => {
   const mode = selectedSite?.selectedMode?.mode;
 
-  // SCAN: solo aplica si hay 3D (porque ahí sí haces spawn)
   const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
   const modeSupported =
     mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
@@ -1508,7 +1488,6 @@ useEffect(() => {
     return;
   }
 
-  // Elevación del sitio según modo
   const siteElevation =
     (mode === AR_MODES.HUNT_MODE
       ? (selectedSite?.huntChallenge?.elevation ??
@@ -1516,14 +1495,12 @@ useEffect(() => {
       : (selectedSite?.scanChallenge?.elevation)) ?? 0;
 
 
-  // sin elevación → fallback=1
   if (!siteElevation || Number(siteElevation) === 0) {
     setSpawnHeight(1);
     setHeightReady(true);
     return;
   }
 
-  // necesitamos tu posición actual
   if (!userLocation?.latitude || !userLocation?.longitude) {
     setHeightReady(false);
     return;

@@ -324,25 +324,26 @@ const handleCaptureScreenshot = async () => {
         longitude: lon,
       });
 
-      const newHuntPointChallenge = await getNextStarApi(geoSiteId, lat, lon);
-      const remainingStars = newHuntPointChallenge?.remaining_stars || 0;
 
-      let navigationParams: any = {}; //TODO Verificar con tiempo
-      if (remainingStars >= 0) {
-        const huntChallenge = {
-          ...challengeObj,
-          selectedMode: AR_MODES_MENU[2],
-          huntChallenge: newHuntPointChallenge,
-        };
-        navigationParams = {huntChallenge};
-      } else {
-        navigationParams = {huntChallengeFinished: true};
-      }
+      const nextHunt = await getNextStarApi(geoSiteId, lat, lon);
 
+      if (!nextHunt) {
         navigation.navigate("TabNavigator", {
           screen: "Tab",
-          params: {screen: "Go Navigate", params: navigationParams},
+          params: {screen: "Go Navigate", params: {huntChallengeFinished: true}},
         });
+        return;
+      }
+
+      const huntChallenge = {
+        ...challengeObj,
+        selectedMode: AR_MODES_MENU[2],
+        huntChallenge: nextHunt,
+      };
+      navigation.navigate("TabNavigator", {
+        screen: "Tab",
+        params: {screen: "Go Navigate", params: {huntChallenge}},
+      });
     } catch (error) {
       console.error("Error al finalizar:", error);
       endOnceRef.current = false;
@@ -458,18 +459,18 @@ const handleCaptureScreenshot = async () => {
                 Brought to you by
               </Text>
               <FlatList
-                  data={sponsors}
-                  horizontal
-                  style={{ flex: 1, marginLeft: 8 }}              // para que la lista ocupe el espacio restante
-                  contentContainerStyle={{ paddingLeft: 0 }}      // opcional
-                  showsHorizontalScrollIndicator={false}
-                  keyExtractor={(item, idx) => item?.id?.toString?.() ?? String(idx)}
-                  renderItem={({ item }) => (
-                  <Image style={{ width: 40, height: 40, borderRadius: 8 }} source={{ uri: item?.image }}/>
-                  )}
-                  ItemSeparatorComponent={() => <View style={{ width: 8 }} />}
-                ListEmptyComponent={<View />}
-                />
+                data={sponsors}
+                horizontal
+                style={{flex: 1, marginLeft: 8}}
+                contentContainerStyle={{paddingLeft: 0}}
+                showsHorizontalScrollIndicator={false}
+                keyExtractor={(item, idx) => item?.id?.toString?.() ?? String(idx)}
+                renderItem={({item}) => (
+                  <Image style={{width: 40, height: 40, borderRadius: 8}} source={{uri: item?.image}}/>
+                )}
+                ItemSeparatorComponent={() => <View style={{width: 8}}/>}
+                ListEmptyComponent={<View/>}
+              />
             </View>
           </View>
         </View>

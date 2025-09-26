@@ -76,7 +76,6 @@ const PinChallenge = () => {
     siteLongitude = selectedGeoSite.lat_long.coordinates[0];
   }
 
-  // Descargar modelo y gestionar archivos
   const downloadModelFile = (sourcePath, targetPath) => {
     RNFetchBlob.config({
       fileCache: true,
@@ -144,7 +143,7 @@ console.log(modelOBJ,
       modelOBJ &&
       textureBase &&
       emissionValue &&
-      textureEmission &&
+      // textureEmission &&
       challengeObjParameters
     ) {
       // Add challengeObjParameters
@@ -300,7 +299,6 @@ console.log(modelOBJ,
       if (unityRef.current) {
         unityRef.current.postMessage("ScreenCapture", "CaptureScreenshotFromReact", "");
 
-        // Obtén la ruta base según la plataforma
         const basePath =
           Platform.OS === "android"
             ? "/storage/emulated/0/Android/data/com.roam_reality/files/"
@@ -308,11 +306,9 @@ console.log(modelOBJ,
 
         setProcessingMedia(true);
 
-        // Agregar un retraso para asegurarse de que la captura se ha guardado
         setTimeout(() => {
           RNFS.readDir(basePath)
             .then(files => {
-              console.info("Archivos encontrados en el directorio:", files);
 
               if (Array.isArray(files) && files.length > 0) {
                 // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'

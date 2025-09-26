@@ -85,7 +85,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   const geoSiteId = site?.id;
 
   if (!geoSiteId || !starId) {
-    Toast.show({ type: "error", text1: "Hunt Challenge", text2: "Falta ar_star.id del sitio." });
+    Toast.show({ type: "error", text1: "Hunt Challenge", text2: "Missing ar_star.id from the site." });
     onClose(); return;
   }
 
@@ -96,7 +96,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     Toast.show({
       type: "info",
       text1: "Hunt Cooldown",
-      text2: String(gate.reason || "Cooldown activo. Intenta más tarde."),
+      text2: String(gate.reason || "Cooldown active. Please try again later."),
     });
     onClose(); return;
   }
@@ -108,7 +108,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     ({ latitude: lat, longitude: lon } = initialUserLocation || {});
   }
   if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    Toast.show({ type: "info", text1: "Ubicación", text2: "No se obtuvo ubicación aún. Intenta de nuevo." });
+    Toast.show({ type: "info", text1: "Location", text2: "No location found yet. Please try again." });
     onClose(); return;
   }
 
@@ -120,13 +120,13 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
       updatedSiteData = { ...updatedSiteData, huntChallenge: { ...huntChallenge } };
     }
   } catch (error: any) {
-    Toast.show({ type: "error", text1: "Hunt Challenge", text2: error?.message || "No se pudo obtener la siguiente estrella." });
+    Toast.show({ type: "error", text1: "Hunt Challenge", text2: error?.message || "The next star could not be obtained." });
   }
 
   if (!hasNextStar) {
     Toast.show({
       type: "success",
-      text1: "Hunt completo",
+      text1: "Complete Hunt",
       text2: gate?.reason || "You have collected all the stars.",
     });
     getSitesHandler(selectedSponsor?.value?.toString() || "");
@@ -141,7 +141,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
 
       case AR_MODES.SCAN_MODE: {
-        // Validate cool down period
         const scanId = updatedSiteData?.scanChallenge?.id;
         let isInCoolDownPeriod = false;
         try {
@@ -222,7 +221,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     }
   };
 
-  // Obtiene la ubicación del usuario
   useEffect(() => {
     getLocation();
   }, []);

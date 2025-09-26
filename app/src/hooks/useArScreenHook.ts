@@ -17,7 +17,7 @@ const useArScreenHook = () => {
   };
 
   const getNextStar = async (geoSiteId: number, lat: number, lon: number) => {
-    let huntChallenge = {};
+    let huntChallenge: any = null;
     try {
       const params: any = {
         geo_site_id: geoSiteId,
@@ -36,6 +36,7 @@ const useArScreenHook = () => {
           text1: "Hunt Challenge Info",
           text2: "You have collected all the stars in this hunt challenge",
         });
+        return null;
       }
     } catch (error: any) {
       Toast.show({
