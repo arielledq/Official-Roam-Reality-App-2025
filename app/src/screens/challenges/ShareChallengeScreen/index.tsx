@@ -218,7 +218,9 @@ const ArChallengeShare = () => {
     if (
       challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
       challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE ||
-      challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE
+      challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
+      screenTitle === CHALLENGES_TYPE.PIN_CHECK_IN_TITLE ||
+      screenTitle === CHALLENGES_TYPE.PHOTO_VIDEO_TITLE
     ) {
       setHideBackButton(true);
     }
