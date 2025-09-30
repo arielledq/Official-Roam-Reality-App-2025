@@ -4,6 +4,31 @@ import {postArMemory, postGeoPinCheckIn} from "network";
 import {handleError} from "util/helpers";
 import moment from "moment";
 
+export interface Sponsor {
+  name: string;
+  image?: string;
+}
+export interface ShareChallengeRouteParams {
+  challengeObj: {
+    points?: number;
+    sponsored?: Sponsor;
+    sponsor?: Sponsor;
+    pin_challenge?: {points: number};
+    geo_ar_star?: {
+      geo_site?: {
+        pin_challenge?: {points: number; sponsored?: Sponsor};
+      };
+    };
+    remaining_stars?: number;
+    created_at?: string;
+    selectedMode?: {mode: string};
+  };
+  captureData: string;
+  challengeType: string;
+  isMemory: boolean;
+  scan_picture?: any;
+}
+
 export const challengeData = (
   challengeObj?: any,
   scan_picture?: any,
@@ -97,7 +122,9 @@ export const countSocialPoints = (
         let updatedCounter = currCounter.facebook;
         if (currCounter.facebook === 0) {
           updatedCounter = 1;
-          grantSocialPointsHandler(selectedSSNN);
+          if (grantSocialPointsHandler) {
+            grantSocialPointsHandler(selectedSSNN);
+          }
           setDisableBackButton(true);
         } else {
           console.info(" not counting more points but allowing to share... ");
@@ -113,7 +140,9 @@ export const countSocialPoints = (
         let updatedCounter = currCounter.instagram;
         if (currCounter.instagram === 0) {
           updatedCounter = 1;
-          grantSocialPointsHandler(selectedSSNN);
+          if (grantSocialPointsHandler) {
+            grantSocialPointsHandler(selectedSSNN);
+          }
           setDisableBackButton(true);
         } else {
           console.info(" not counting more points but allowing to share... ");
@@ -129,7 +158,9 @@ export const countSocialPoints = (
         let updatedCounter = currCounter.others;
         if (currCounter.others === 0) {
           updatedCounter = 1;
-          grantSocialPointsHandler(selectedSSNN);
+          if (grantSocialPointsHandler) {
+            grantSocialPointsHandler(selectedSSNN);
+          }
           setDisableBackButton(true);
         } else {
           console.info(" not counting more points but allowing to share... ");

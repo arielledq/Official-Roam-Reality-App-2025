@@ -26,7 +26,10 @@ import {
 interface ShareToSocialsModalProps {
   isVisible: boolean;
   onClose: () => void;
-  onPointsGranted?: (selectedSSNN: string) => void;
+  onPointsGranted?: (
+    selectedSSNN: string,
+    grantSocialPointsHandler: (selectedSSNN: string) => {}
+  ) => void;
   fileUri?: string | undefined;
   fileExt?: string | undefined;
   sponsor?: {description: string; tags: string} | undefined;

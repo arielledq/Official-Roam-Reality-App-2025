@@ -24,32 +24,12 @@ import BGArShare from "assets/ar/bg-ar-share.png";
 import {GeolocationContext} from "GeolocationProvider";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 import ResponsiveMedia from "components/ResponsiveMedia";
-import {challengeData, countSocialPoints, shareToRoamProfile} from "./shareChallengeUtils";
-
-interface Sponsor {
-  name: string;
-  image?: string;
-}
-interface ShareChallengeRouteParams {
-  challengeObj: {
-    points?: number;
-    sponsored?: Sponsor;
-    sponsor?: Sponsor;
-    pin_challenge?: {points: number};
-    geo_ar_star?: {
-      geo_site?: {
-        pin_challenge?: {points: number; sponsored?: Sponsor};
-      };
-    };
-    remaining_stars?: number;
-    created_at?: string;
-    selectedMode?: {mode: string};
-  };
-  captureData: string;
-  challengeType: string;
-  isMemory: boolean;
-  scan_picture?: any;
-}
+import {
+  challengeData,
+  countSocialPoints,
+  ShareChallengeRouteParams,
+  shareToRoamProfile,
+} from "./shareChallengeUtils";
 
 const ArChallengeShare = () => {
   const [isLoading, setIsLoading] = useState(false);
