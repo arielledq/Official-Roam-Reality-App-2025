@@ -1,7 +1,6 @@
-import React, {useContext, useEffect, useRef, useState} from "react";
+import React, {useCallback, useContext, useEffect, useState} from "react";
 import {Image, Text, View, Dimensions, StyleSheet} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
-import moment from "moment";
 import {useDispatch} from "react-redux";
 import {RouteProp} from "@react-navigation/native";
 
@@ -25,14 +24,31 @@ import BGArShare from "assets/ar/bg-ar-share.png";
 import {GeolocationContext} from "GeolocationProvider";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 import ResponsiveMedia from "components/ResponsiveMedia";
-import {countSocialPoints, shareToRoamProfile} from "./shareChallengeUtils";
+import {challengeData, countSocialPoints, shareToRoamProfile} from "./shareChallengeUtils";
 
+interface Sponsor {
+  name: string;
+  image?: string;
+}
 interface ShareChallengeRouteParams {
-  challengeObj: any; // Replace 'any' with proper type if available
+  challengeObj: {
+    points?: number;
+    sponsored?: Sponsor;
+    sponsor?: Sponsor;
+    pin_challenge?: {points: number};
+    geo_ar_star?: {
+      geo_site?: {
+        pin_challenge?: {points: number; sponsored?: Sponsor};
+      };
+    };
+    remaining_stars?: number;
+    created_at?: string;
+    selectedMode?: {mode: string};
+  };
   captureData: string;
   challengeType: string;
   isMemory: boolean;
-  scan_picture: any;
+  scan_picture?: any;
 }
 
 const ArChallengeShare = () => {
@@ -48,9 +64,7 @@ const ArChallengeShare = () => {
     others: 0,
   });
   const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
-
   const [viewHeight, setViewHeight] = useState(0);
-  const viewRef = useRef(null);
 
   const {userLocation} = useContext(GeolocationContext);
   const dispatch = useDispatch();
@@ -68,67 +82,16 @@ const ArChallengeShare = () => {
   const isMemory = route?.params?.isMemory;
   const scan_picture = route?.params?.scan_picture;
 
-  let screenTitle = "";
-  let challengePoints = challengeObj?.points || scan_picture?.points;
-
-  let sponsor = challengeObj?.sponsored || scan_picture?.sponsor;
-  let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-  let sponsorImage = sponsor?.image || "";
-  let sponsorName = sponsor?.name || "";
-  const startDate = isMemory
-    ? moment(challengeObj?.created_at).format("MM-DD-YYYY")
-    : moment().format("MM-DD-YYYY");
-  let endChallengeButtonText = "End & Share to Roam Profile";
-
-  switch (challengeType) {
-    case CHALLENGES_TYPE.PHOTO_VIDEO:
-      screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
-      break;
-    case CHALLENGES_TYPE.PIN_CHECK_IN:
-      screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
-      break;
-    case AR_MODES.SCAN_MODE:
-      sponsor = challengeObj?.sponsor;
-      sponsorImage = sponsor?.image;
-      sponsorName = sponsor?.name;
-      challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-      challengePoints = challengeObj?.pin_challenge?.points || 0;
-      challengePoints +=
-        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
-      break;
-    case AR_MODES.GEO_TAG_MODE:
-      sponsor = challengeObj?.sponsor;
-      sponsorImage = sponsor?.image;
-      sponsorName = sponsor?.name;
-      challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-      challengePoints = challengeObj?.pin_challenge?.points || 0;
-      challengePoints +=
-        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
-      break;
-    case CHALLENGES_TYPE.STAR:
-      screenTitle = CHALLENGES_TYPE.STAR_TITLE;
-
-      sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
-      sponsorImage = sponsor?.image;
-      sponsorName = sponsor?.name;
-      const remainingStars = challengeObj?.remaining_stars;
-      if (remainingStars > 1) {
-        challengePoints = 0;
-        challengeTitle = "";
-        endChallengeButtonText = "Continue to the next Star";
-      } else {
-        challengePoints = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points;
-      }
-      break;
-
-    default:
-      challengePoints =
-        challengeObj?.points +
-        socialPointsCounter.facebook +
-        socialPointsCounter.instagram +
-        socialPointsCounter.others;
-      break;
-  }
+  const {
+    screenTitle,
+    challengePoints,
+    sponsor,
+    challengeTitle,
+    sponsorImage,
+    sponsorName,
+    startDate,
+    endChallengeButtonText,
+  } = challengeData(challengeObj, scan_picture, challengeType, isMemory, socialPointsCounter);
 
   const capturedDataUri = captureData;
   const isVideo = capturedDataUri?.includes(".mp4");
@@ -176,7 +139,7 @@ const ArChallengeShare = () => {
 
   const endExperience = async () => {
     if (challengeType === CHALLENGES_TYPE.STAR) {
-      const remainingStars = challengeObj?.remaining_stars;
+      const remainingStars = challengeObj?.remaining_stars || 0;
 
       if (remainingStars > 1) {
         const updatedChallengeObj = await getNextStar();
@@ -235,7 +198,7 @@ const ArChallengeShare = () => {
   };
 
   const handleLayout = (event: any) => {
-    const {width, height} = event.nativeEvent.layout;
+    const {height} = event.nativeEvent.layout;
     setViewHeight(height);
   };
 
@@ -246,6 +209,18 @@ const ArChallengeShare = () => {
       setIsLoadingDisplay(false);
     }
   };
+
+  const handlePointsGranted = useCallback(
+    (selectedSSNN: string, grantSocialPointsHandler: (selectedSSNN: string) => {}) => {
+      countSocialPoints(
+        selectedSSNN,
+        grantSocialPointsHandler,
+        setSocialPointsCounter,
+        setDisableBackButton
+      );
+    },
+    []
+  );
 
   useEffect(() => {
     if (
@@ -269,10 +244,16 @@ const ArChallengeShare = () => {
   }, [challengeObj]);
 
   useEffect(() => {
-    if (!isMemory) {
+    let isMounted = true;
+
+    if (!isMemory && isMounted) {
       updateUserPointAPI({points: challengePoints});
     }
-  }, [isMemory]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isMemory, challengePoints]);
 
   const screenModals = (
     <>
@@ -282,17 +263,7 @@ const ArChallengeShare = () => {
         isVisible={shareToSocialsIsOpen}
         isMemory={isMemory}
         sponsor={sponsor}
-        onPointsGranted={(
-          selectedSSNN: string,
-          grantSocialPointsHandler: (selectedSSNN: string) => {}
-        ) =>
-          countSocialPoints(
-            selectedSSNN,
-            grantSocialPointsHandler,
-            setSocialPointsCounter,
-            setDisableBackButton
-          )
-        }
+        onPointsGranted={handlePointsGranted}
         onClose={closeShareToSocialMediaButtonHandler}
       />
       <FullScreenLoadingSpinner isLoading={isLoading} />
@@ -334,7 +305,6 @@ const ArChallengeShare = () => {
               },
               styles.mediaResponsiveContainer,
             ]}
-            ref={viewRef}
             onLayout={handleLayout}
           >
             <ResponsiveMedia

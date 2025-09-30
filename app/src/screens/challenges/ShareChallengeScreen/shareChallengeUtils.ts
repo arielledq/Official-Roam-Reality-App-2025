@@ -2,6 +2,88 @@ import {Platform} from "react-native";
 import {AR_MODES, CHALLENGES_TYPE, SSNN} from "../../../constants";
 import {postArMemory, postGeoPinCheckIn} from "network";
 import {handleError} from "util/helpers";
+import moment from "moment";
+
+export const challengeData = (
+  challengeObj?: any,
+  scan_picture?: any,
+  challengeType?: string,
+  isMemory?: boolean,
+  socialPointsCounter?: any
+) => {
+  let screenTitle = "";
+  let challengePoints = challengeObj?.points || scan_picture?.points;
+
+  let sponsor = challengeObj?.sponsored || scan_picture?.sponsor;
+  let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
+  let sponsorImage = sponsor?.image || "";
+  let sponsorName = sponsor?.name || "";
+  const startDate = isMemory
+    ? moment(challengeObj?.created_at).format("MM-DD-YYYY")
+    : moment().format("MM-DD-YYYY");
+  let endChallengeButtonText = "End & Share to Roam Profile";
+
+  switch (challengeType) {
+    case CHALLENGES_TYPE.PHOTO_VIDEO:
+      screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
+      break;
+    case CHALLENGES_TYPE.PIN_CHECK_IN:
+      screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
+      break;
+    case AR_MODES.SCAN_MODE:
+      sponsor = challengeObj?.sponsor;
+      sponsorImage = sponsor?.image;
+      sponsorName = sponsor?.name;
+      challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
+      challengePoints = challengeObj?.pin_challenge?.points || 0;
+      challengePoints +=
+        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
+      break;
+    case AR_MODES.GEO_TAG_MODE:
+      sponsor = challengeObj?.sponsor;
+      sponsorImage = sponsor?.image;
+      sponsorName = sponsor?.name;
+      challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
+      challengePoints = challengeObj?.pin_challenge?.points || 0;
+      challengePoints +=
+        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
+      break;
+    case CHALLENGES_TYPE.STAR:
+      screenTitle = CHALLENGES_TYPE.STAR_TITLE;
+
+      sponsor = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.sponsored;
+      sponsorImage = sponsor?.image;
+      sponsorName = sponsor?.name;
+      const remainingStars = challengeObj?.remaining_stars;
+      if (remainingStars > 1) {
+        challengePoints = 0;
+        challengeTitle = "";
+        endChallengeButtonText = "Continue to the next Star";
+      } else {
+        challengePoints = challengeObj?.geo_ar_star?.geo_site?.pin_challenge?.points;
+      }
+      break;
+
+    default:
+      challengePoints =
+        challengeObj?.points +
+        socialPointsCounter.facebook +
+        socialPointsCounter.instagram +
+        socialPointsCounter.others;
+      break;
+  }
+
+  return {
+    screenTitle: screenTitle || "",
+    challengePoints: challengePoints || 0,
+    sponsor: sponsor || {},
+    challengeTitle: challengeTitle || "",
+    sponsorImage: sponsorImage || "",
+    sponsorName: sponsorName || "",
+    startDate: startDate || "",
+    endChallengeButtonText: endChallengeButtonText || "",
+  };
+};
 
 export const countSocialPoints = (
   selectedSSNN: string,
