@@ -16,7 +16,7 @@ const ResponsiveMedia = ({
           source={source}
           style={[styles.image, {height: containerHeight}, imageStyle]}
           resizeMode="contain"
-          onLoad={onLoadEnd}
+          onLoadEnd={onLoadEnd}
         />
       ) : (
         <Video

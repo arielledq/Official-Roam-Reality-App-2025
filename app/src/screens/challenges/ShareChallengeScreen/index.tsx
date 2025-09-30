@@ -93,6 +93,7 @@ const ArChallengeShare = () => {
   const getNextStar = async () => {
     try {
       const params = {
+        // @ts-ignore
         geo_site_id: challengeObj?.geo_ar_star?.geo_site?.id, // sitio
         // geo_site_id: selectedGeoARSiteStars[0]?.id,
         lat: userLocation?.latitude,
