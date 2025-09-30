@@ -33,13 +33,14 @@ import theme from "assets/theme";
 import BGArShare from "assets/ar/bg-ar-share.png";
 import {GeolocationContext} from "GeolocationProvider";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
+import ResponsiveMedia from "components/ResponsiveMedia";
 
 interface ShareChallengeRouteParams {
   challengeObj: any; // Replace 'any' with proper type if available
   captureData: string;
   challengeType: string;
   isMemory: boolean;
-  scan_picture: any
+  scan_picture: any;
 }
 
 const ArChallengeShare = () => {
@@ -56,7 +57,7 @@ const ArChallengeShare = () => {
   });
   const [hasSharedToRoamProfile, setHasSharedToRoamProfile] = useState(false);
 
-  const [viewWidth, setViewWidth] = useState(0);
+  const [viewHeight, setViewHeight] = useState(0);
   const viewRef = useRef(null);
 
   const {userLocation} = useContext(GeolocationContext);
@@ -75,10 +76,8 @@ const ArChallengeShare = () => {
   const isMemory = route?.params?.isMemory;
   const scan_picture = route?.params?.scan_picture;
 
-  console.log("challengeObj", route.params);
-
   let screenTitle = "";
-  let challengePoints = challengeObj?.points ||scan_picture?.points;
+  let challengePoints = challengeObj?.points || scan_picture?.points;
 
   let sponsor = challengeObj?.sponsored || scan_picture?.sponsor;
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
@@ -87,6 +86,9 @@ const ArChallengeShare = () => {
   const startDate = isMemory
     ? moment(challengeObj?.created_at).format("MM-DD-YYYY")
     : moment().format("MM-DD-YYYY");
+  console.log("scan_picture", scan_picture);
+  console.log("startDate", startDate);
+  console.log("challengeObj?.created_at", challengeObj?.created_at);
   let endChallengeButtonText = "End & Share to Roam Profile";
 
   switch (challengeType) {
@@ -248,7 +250,7 @@ const ArChallengeShare = () => {
 
       if (challengeType === AR_MODES.SCAN_MODE) {
         formData.append("scan_id", challengeObj?.scanChallenge?.id);
-        const fixedShareFile = { ...shareFile, uri: capturedDataUri };
+        const fixedShareFile = {...shareFile, uri: capturedDataUri};
         formData.append("memory_file", fixedShareFile);
         formData.append("memory_type", "SCAN_PHOTO");
         res = await postArMemory(formData);
@@ -386,35 +388,18 @@ const ArChallengeShare = () => {
 
   const handleLayout = (event: any) => {
     const {width, height} = event.nativeEvent.layout;
-    setViewWidth(width);
+    setViewHeight(height);
   };
 
   useEffect(() => {
     if (
       challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
-      challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE || challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE
+      challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE ||
+      challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE
     ) {
       setHideBackButton(true);
     }
   }, [challengeObj]);
-
-  const baseOffset = 110;
-  let offset = baseOffset;
-  if (viewWidth >= 320) {
-    offset = baseOffset - (viewWidth / 300) * 8;
-  }
-  if (viewWidth >= 300 && viewWidth < 320) {
-    offset = baseOffset - (viewWidth / 300) * 24;
-  }
-  if (viewWidth < 300) {
-    offset = 150;
-  }
-
-  const aspectWidth = viewWidth - offset;
-  const aspectHeight = (aspectWidth * 16) / 9; // Calculate height based on 9:16 aspect ratio
-
-  const mediaContainerWidth = aspectWidth;
-  const mediaContainerHeight = aspectHeight;
 
   let shareButtonTextSize = FontSizes.S16;
   if (width < 420) {
@@ -533,43 +518,34 @@ const ArChallengeShare = () => {
               borderRadius: 12,
               alignItems: "center",
             }}
-            ref={viewRef}
-            onLayout={handleLayout}
           >
-            <View style={{flex: 1, justifyContent: "center", opacity: isLoadingDisplay ? 0 : 1}}>
-              {fileExt == "mp4" || isVideo ? (
-                <Video
-                  resizeMode={"contain"}
-                  onLoadStart={() => toggleLoading(true)}
-                  onReadyForDisplay={() => toggleLoading(false)}
-                  repeat={true}
-                  style={{
-                    width: mediaContainerWidth,
-                    height: mediaContainerHeight,
-                    justifyContent: "flex-end",
-                    alignItems: "flex-end",
-                  }}
-                  source={{
-                    uri: capturedDataUri,
-                  }}
-                />
-              ) : (
-                <Image
-                  resizeMode={"contain"}
-                  source={{uri: capturedDataUri}}
-                  onLoadStart={() => toggleLoading(true)}
-                  onLoad={() => toggleLoading(false)}
-                  style={{
-                    width: mediaContainerWidth,
-                    height: mediaContainerHeight,
-                    backgroundColor: "transparent",
-                  }}
-                />
-              )}
+            <View
+              style={{
+                flex: 1,
+                width: "100%",
+                height: "100%",
+                justifyContent: "center",
+                opacity: isLoadingDisplay ? 0 : 1,
+              }}
+              ref={viewRef}
+              onLayout={handleLayout}
+            >
+              <ResponsiveMedia
+                source={{uri: capturedDataUri}}
+                containerHeight={viewHeight}
+                isImage={fileExt !== "mp4" && !isVideo}
+                onLoadEnd={() => toggleLoading(false)}
+              />
             </View>
-            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
 
-            <View style={{alignItems: "center"}}>
+            <View
+              style={{
+                width: "100%",
+                height: 55,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               {/* Sponsor row */}
               <View
                 style={{
@@ -592,7 +568,8 @@ const ArChallengeShare = () => {
               </View>
 
               {/* Completion date */}
-              { !scan_picture && <Text
+              {/* {!scan_picture && ( */}
+              <Text
                 style={{
                   ...fontGroup.nunitoLight,
                   fontWeight: "300",
@@ -601,8 +578,11 @@ const ArChallengeShare = () => {
                 }}
               >
                 Completed on: {startDate}
-                </Text>}
+              </Text>
+              {/* )} */}
             </View>
+
+            <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
           </View>
 
           <View
