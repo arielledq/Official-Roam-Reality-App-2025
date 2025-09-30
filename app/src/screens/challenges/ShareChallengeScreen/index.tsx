@@ -1,24 +1,17 @@
 import React, {useContext, useEffect, useRef, useState} from "react";
-import {Image, Platform, Text, View, Dimensions, StyleSheet} from "react-native";
+import {Image, Text, View, Dimensions, StyleSheet} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import moment from "moment";
 import {useDispatch} from "react-redux";
 import {RouteProp} from "@react-navigation/native";
 
-import {AR_MODES, SHARE_CONDITIONS_TEXT, SSNN} from "../../constants";
-import {
-  getARProfile,
-  postArMemory,
-  postGeoPinCheckIn,
-  // starFoundAndSaveApi,
-  getNextStar as getNextStarApi,
-  updateUserPointAPI,
-} from "network";
+import {AR_MODES, SHARE_CONDITIONS_TEXT} from "../../../constants";
+import {getARProfile, getNextStar as getNextStarApi, updateUserPointAPI} from "network";
 import {fontGroup, FontSizes} from "util/FontUtils";
-import {getFileExtension, handleError, saveToGallery} from "util/helpers";
+import {getFileExtension, saveToGallery} from "util/helpers";
 // @ts-ignore
 import {CHALLENGES_TYPE} from "constants";
-import {updateARUserData} from "../../redux/AR";
+import {updateARUserData} from "../../../redux/AR";
 
 import BackgroundWithImage from "components/background";
 import AppText from "components/text";
@@ -32,6 +25,7 @@ import BGArShare from "assets/ar/bg-ar-share.png";
 import {GeolocationContext} from "GeolocationProvider";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 import ResponsiveMedia from "components/ResponsiveMedia";
+import {countSocialPoints, shareToRoamProfile} from "./shareChallengeUtils";
 
 interface ShareChallengeRouteParams {
   challengeObj: any; // Replace 'any' with proper type if available
@@ -141,142 +135,6 @@ const ArChallengeShare = () => {
   const filePath = isMemory ? captureData : capturedDataUri?.split("?")[0];
   const fileExt = isMemory ? getFileExtension(captureData) : filePath?.split(".").pop() || "";
 
-  const countSocialPoints = (
-    selectedSSNN: string,
-    grantSocialPointsHandler: (selectedSSNN: string) => {}
-  ) => {
-    switch (selectedSSNN) {
-      case SSNN.FACEBOOK:
-        setSocialPointsCounter(currCounter => {
-          let updatedCounter = currCounter.facebook;
-          if (currCounter.facebook === 0) {
-            updatedCounter = 1;
-            grantSocialPointsHandler(selectedSSNN);
-            setDisableBackButton(true);
-          } else {
-            console.info(" not counting more points but allowing to share... ");
-          }
-          return {
-            ...currCounter,
-            facebook: updatedCounter,
-          };
-        });
-        break;
-      case SSNN.INSTAGRAM:
-        setSocialPointsCounter(currCounter => {
-          let updatedCounter = currCounter.instagram;
-          if (currCounter.instagram === 0) {
-            updatedCounter = 1;
-            grantSocialPointsHandler(selectedSSNN);
-            setDisableBackButton(true);
-          } else {
-            console.info(" not counting more points but allowing to share... ");
-          }
-          return {
-            ...currCounter,
-            instagram: updatedCounter,
-          };
-        });
-        break;
-      case SSNN.OTHERS:
-        setSocialPointsCounter(currCounter => {
-          let updatedCounter = currCounter.others;
-          if (currCounter.others === 0) {
-            updatedCounter = 1;
-            grantSocialPointsHandler(selectedSSNN);
-            setDisableBackButton(true);
-          } else {
-            console.info(" not counting more points but allowing to share... ");
-          }
-          return {
-            ...currCounter,
-            others: updatedCounter,
-          };
-        });
-        break;
-
-      default:
-        break;
-    }
-  };
-
-  const shareToRoamProfile = async (endExperienceHandler?: () => void) => {
-    setIsLoading(true);
-    let filename = capturedDataUri.split("/").pop();
-    let shareFile = {
-      uri: Platform.OS === "android" ? `file://${capturedDataUri}` : capturedDataUri,
-      type: fileExt == "mp4" ? "video/mp4" : `image/{${fileExt}}`,
-      name: filename,
-    };
-
-    const formData = new FormData();
-    let res;
-
-    try {
-      switch (challengeType) {
-        case CHALLENGES_TYPE.PHOTO_VIDEO:
-          formData.append("challenges", challengeObj?.id);
-          formData.append("memory_file", shareFile);
-          let memoryType = "";
-          if (challengeObj?.memory_type) {
-            memoryType = challengeObj?.memory_type;
-          } else {
-            memoryType = fileExt == "mp4" ? "VIDEO" : "PHOTO";
-          }
-          formData.append("memory_type", memoryType);
-          res = await postArMemory(formData);
-          break;
-
-        case CHALLENGES_TYPE.PIN_CHECK_IN:
-          formData.append("geo_challenge", challengeObj?.id);
-          formData.append("geo_site", challengeObj?.geo_site?.id);
-          formData.append("memory_file", shareFile);
-
-          res = await postGeoPinCheckIn(formData);
-          break;
-
-        case AR_MODES.SCAN_MODE:
-          formData.append("scan_id", challengeObj?.scanChallenge?.id);
-          const fixedShareFile = {...shareFile, uri: capturedDataUri};
-          formData.append("memory_file", fixedShareFile);
-          formData.append("memory_type", "SCAN_PHOTO");
-          res = await postArMemory(formData);
-          break;
-
-        case AR_MODES.GEO_TAG_MODE:
-          formData.append("geo_challenge", challengeObj?.pin_challenge?.id);
-          formData.append("geo_site", challengeObj?.id);
-          shareFile = {
-            ...shareFile,
-            uri: capturedDataUri,
-          };
-          formData.append("memory_file", shareFile);
-
-          res = await postGeoPinCheckIn(formData);
-          break;
-
-        default:
-          break;
-      }
-
-      if (res?.status === 1) {
-        setHasSharedToRoamProfile(true);
-        ARUserProfile();
-        if (endExperienceHandler) {
-          endExperienceHandler();
-        }
-      } else {
-        console.error("Success - Error al compartir el desafío:", res);
-        handleError("There was an error sharing your challenge");
-      }
-    } catch (error) {
-      console.error("Catch - Error al compartir el desafío:", error);
-      handleError("There was an error sharing your challenge");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const ARUserProfile = () => {
     getARProfile()
       .then(res => {
@@ -336,7 +194,16 @@ const ArChallengeShare = () => {
     if (hasSharedToRoamProfile) {
       endExperience();
     } else {
-      shareToRoamProfile(() => endExperience());
+      shareToRoamProfile(
+        endExperience,
+        capturedDataUri,
+        fileExt,
+        challengeType,
+        challengeObj,
+        setIsLoading,
+        setHasSharedToRoamProfile,
+        ARUserProfile
+      );
     }
   };
 
@@ -415,7 +282,17 @@ const ArChallengeShare = () => {
         isVisible={shareToSocialsIsOpen}
         isMemory={isMemory}
         sponsor={sponsor}
-        onPointsGranted={countSocialPoints}
+        onPointsGranted={(
+          selectedSSNN: string,
+          grantSocialPointsHandler: (selectedSSNN: string) => {}
+        ) =>
+          countSocialPoints(
+            selectedSSNN,
+            grantSocialPointsHandler,
+            setSocialPointsCounter,
+            setDisableBackButton
+          )
+        }
         onClose={closeShareToSocialMediaButtonHandler}
       />
       <FullScreenLoadingSpinner isLoading={isLoading} />
@@ -486,15 +363,7 @@ const ArChallengeShare = () => {
       </View>
 
       <View style={styles.footer}>
-        <View
-          style={[
-            {
-              marginTop: isMemory ? 16 : 0,
-            },
-            styles.footerButtonContainer,
-          ]}
-        >
-          {/* Share to socials button */}
+        <View style={[{marginTop: isMemory ? 16 : 0}, styles.footerButtonContainer]}>
           <AppButton
             onPress={shareToSocialMediaButtonHandler}
             containerStyle={styles.footerButton}
