@@ -210,21 +210,22 @@ const ArChallengeShare = () => {
         socialPointsCounter.instagram === 1 ||
         socialPointsCounter.others === 1)
     ) {
+      setHideBackButton(true);
       shareToRoamProfile();
     }
   }, [socialPointsCounter, hasSharedToRoamProfile]);
 
-  useEffect(() => {
-    if (
-      challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
-      challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE ||
-      challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
-      screenTitle === CHALLENGES_TYPE.PIN_CHECK_IN_TITLE ||
-      screenTitle === CHALLENGES_TYPE.PHOTO_VIDEO_TITLE
-    ) {
-      setHideBackButton(true);
-    }
-  }, [challengeObj]);
+  // useEffect(() => {
+  //   if (
+  //     challengeObj?.selectedMode?.mode === AR_MODES.SCAN_MODE ||
+  //     challengeObj?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE ||
+  //     challengeObj?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
+  //     screenTitle === CHALLENGES_TYPE.PIN_CHECK_IN_TITLE ||
+  //     screenTitle === CHALLENGES_TYPE.PHOTO_VIDEO_TITLE
+  //   ) {
+  //     setHideBackButton(true);
+  //   }
+  // }, [challengeObj]);
 
   useEffect(() => {
     let isMounted = true;
