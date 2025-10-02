@@ -513,7 +513,7 @@ const unityStarsCount = () => {
 
   const resetUnityScene = () => {
     if (unityRef.current) {
-      unityRef.current.postMessage("CloseAndReset", "ReiniciarEscena");
+      unityRef.current.postMessage("CloseAndReset", "RestartScene");
     }
   };
 
@@ -542,6 +542,9 @@ const scheduleHideArrow = () => {
   }
   hideArrowTimerRef.current = setTimeout(() => {
     setArrowVisible(false);
+    if (unityRef.current) {
+      unityRef.current.postMessage("Main Camera", "HideARObject", "");
+    }
     hideArrowTimerRef.current = null;
   }, HIDE_ARROW_MS);
 };
@@ -1552,7 +1555,6 @@ useEffect(() => {
     };
   }, []);
 
-  console.log("selectedsitselectedsitselectedsitselectedsite, ", selectedSite)
   return (
     <ChallengeScreen
       title="AR Star Hunt "
