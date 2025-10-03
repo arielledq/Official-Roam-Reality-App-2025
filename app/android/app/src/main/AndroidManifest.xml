@@ -174,4 +174,11 @@
       <action android:name="android.intent.action.MAIN" />
     </intent>
   </queries>
+
+  <queries>
+    <package android:name="com.facebook.katana" />
+    <package android:name="com.instagram.android" />
+    <package android:name="com.twitter.android" />
+    <package android:name="com.zhiliaoapp.musically" />
+  </queries>
 </manifest>
