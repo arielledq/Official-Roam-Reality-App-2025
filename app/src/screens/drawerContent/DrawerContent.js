@@ -129,17 +129,17 @@ const DrawerItems = ({onPress}) => {
 
 function DrawerContent(props) {
     const navigation = useNavigation();
-    const stackNav = navigation.getParent && navigation.getParent(); // Stack raíz
+    const stackNav = navigation.getParent && navigation.getParent(); // Root stack
     const dispatch = useDispatch();
     const [popupDetails, setPopupDetails] = useState({});
     const [isConfirmationVisible, setConfirmationVisible] = useState(false);
 
-    // Cierra el drawer si existe este método
+    // Close the drawer if this method exists
     const closeDrawerIfPossible = () => {
         // preferimos el navigation que viene por props del Drawer
         const nav = props?.navigation || navigation;
 
-        // 1) método directo (el más confiable cuando existe)
+        // 1) direct method (the most reliable when it exists)
         if (nav && typeof nav.closeDrawer === 'function') {
             try {
                 nav.closeDrawer();
@@ -157,7 +157,7 @@ function DrawerContent(props) {
             }
         }
 
-        // 3) último recurso: el navigation del hook
+        // 3) last resort: the navigation from the hook
         if (navigation && typeof navigation.closeDrawer === 'function') {
             try {
                 navigation.closeDrawer();
@@ -174,7 +174,7 @@ function DrawerContent(props) {
         }
     };
 
-    // Espera 2 frames para dejar que el árbol de navegación se re-monte (Auth/App)
+    // Wait 2 frames to let the navigation tree re-mount (Auth/App)
     const waitNextFrame = () =>
         new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
 
@@ -206,7 +206,7 @@ function DrawerContent(props) {
                 break;
             }
             case "Home": {
-                // Reinicia al home del TabNavigator desde el stack raíz
+                // Reset to the TabNavigator home from the root stack
                 if (stackNav && typeof stackNav.reset === "function") {
                     stackNav.reset({
                         index: 0,
@@ -222,7 +222,7 @@ function DrawerContent(props) {
             }
 
             default:
-                // Navegamos SIEMPRE por el stack padre (donde están Settings, Friends, etc.)
+                // We ALWAYS navigate through the parent stack (where Settings, Friends, etc. are)
                 if (stackNav && typeof stackNav.navigate === "function") {
                     stackNav.navigate(navigateTo);
                 } else {
@@ -272,7 +272,7 @@ function DrawerContent(props) {
                 console.error("dispatch error", error);
             }
 
-            // Esperar a que el árbol de navegación se re-monte y recién resetear a Login
+            // Wait for the navigation tree to re-mount and then reset to Login
             await waitNextFrame();
 
             const rootNav = (navigation.getParent && navigation.getParent()) || navigation;

@@ -39,20 +39,20 @@
 // import pinRosa from "assets/Icons/pinrosa.svg";
 // import {getNextStar as getNextStarApi} from "network";
 // import {GeolocationContext} from "GeolocationProvider";
-// // CAMBIO CLAVE: Agregada la propiedad 'description' a cada patrocinador.
+// // KEY CHANGE: Added the 'description' property to each sponsor.
 // // const SPONSORS_DATA = [
-// //   { id: '1', name: 'Coca-Cola', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/coca_cola_logo_icon_147253.png' }, description: 'Disfruta de la chispa de la vida con Coca-Cola. Refresca tus momentos.' },
-// //   { id: '2', name: 'Red Bull', logo: { uri: 'https://cdn.icon-icons.com/icons2/2386/PNG/512/red_bull_logo_icon_145453.png' }, description: 'Red Bull te da aaalas. Despierta tu potencial con nuestra bebida energética.' },
-// //   { id: '3', name: 'Shell', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/shell_icon_147252.png' }, description: 'Shell: Energía para tus viajes. Calidad y confianza en cada carga.' },
-// //   { id: '4', name: 'KFC', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/kfc_logo_icon_147251.png' }, description: 'KFC: El sabor original del pollo frito. Una tradición que deleita.' },
-// //   { id: '5', name: 'Pepsi', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/pepsi_logo_icon_147250.png' }, description: 'Pepsi: Elige tu propio ritmo. El sabor que desafía lo convencional.' },
-// //   { id: '6', name: 'McDonalds', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/mcdonalds_logo_icon_147249.png' }, description: 'McDonalds: Un clásico para todos. Hamburguesas, papas y momentos felices.' },
+// //   { id: '1', name: 'Coca-Cola', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/coca_cola_logo_icon_147253.png' }, description: 'Enjoy the spark of life with Coca-Cola. Refresh your moments.' },
+// //   { id: '2', name: 'Red Bull', logo: { uri: 'https://cdn.icon-icons.com/icons2/2386/PNG/512/red_bull_logo_icon_145453.png' }, description: 'Red Bull gives you wings. Awaken your potential with our energy drink.' },
+// //   { id: '3', name: 'Shell', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/shell_icon_147252.png' }, description: 'Shell: Energy for your travels. Quality and trust in every charge.' },
+// //   { id: '4', name: 'KFC', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/kfc_logo_icon_147251.png' }, description: 'KFC: The original taste of fried chicken. A tradition that delights.' },
+// //   { id: '5', name: 'Pepsi', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/pepsi_logo_icon_147250.png' }, description: 'Pepsi: Choose your own rhythm. The taste that challenges the conventional.' },
+// //   { id: '6', name: 'McDonalds', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/mcdonalds_logo_icon_147249.png' }, description: 'McDonalds: A classic for everyone. Burgers, fries and happy moments.' },
 // //   { id: '7', name: 'Adidas', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/adidas_logo_icon_147248.png' }, description: 'Adidas: Imposible es nada. Ropa y calzado deportivo para tu mejor rendimiento.' },
-// //   { id: '8', name: 'Nike', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/nike_logo_icon_147247.png' }, description: 'Nike: Just Do It. Innovación y estilo en cada paso.' },
-// //   { id: '9', name: 'Samsung', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/samsung_logo_icon_147246.png' }, description: 'Samsung: Desbloquea tu mundo. Tecnología que transforma la experiencia.' },
-// //   { id: '10', name: 'Apple', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/apple_logo_icon_147245.png' }, description: 'Apple: Piensa diferente. Diseño y simplicidad que inspiran.' },
-// //   { id: '11', name: 'Microsoft', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/microsoft_logo_icon_147244.png' }, description: 'Microsoft: Potenciando a cada persona y organización. Software que impulsa el futuro.' },
-// //   { id: '12', name: 'Google', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/google_logo_icon_147243.png' }, description: 'Google: Organizando la información mundial. Innovación al alcance de tu mano.' },
+// //   { id: '8', name: 'Nike', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/nike_logo_icon_147247.png' }, description: 'Nike: Just Do It. Innovation and style in every step.' },
+// //   { id: '9', name: 'Samsung', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/samsung_logo_icon_147246.png' }, description: 'Samsung: Unlock your world. Technology that transforms the experience.' },
+// //   { id: '10', name: 'Apple', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/apple_logo_icon_147245.png' }, description: 'Apple: Think different. Design and simplicity that inspire.' },
+// //   { id: '11', name: 'Microsoft', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/microsoft_logo_icon_147244.png' }, description: 'Microsoft: Empowering every person and organization. Software that drives the future.' },
+// //   { id: '12', name: 'Google', logo: { uri: 'https://cdn.icon-icons.com/icons2/2429/PNG/512/google_logo_icon_147243.png' }, description: 'Google: Organizing the world\'s information. Innovation at your fingertips.' },
 // // ];
 // // const mapAllDestinationsToSponsors = (destinations = []) => {
 // //   return destinations.map(destination => ({
@@ -61,8 +61,8 @@
 // //     backgroundImage: {
 // //       uri: destination.image,
 // //     },
-// //     hunts: 5,  // Valor estático
-// //     miles: 100, // Valor estático
+// //     hunts: 5,  // Static value
+// //     miles: 100, // Static value
 // //     challenges: (destination.star_ar_sites || [])
 // //         .filter(site => site.pin_challenge && site.sponsored)
 // //         .map(site => ({
@@ -266,7 +266,7 @@
 //       challenges: (destination?.star_ar_sites || [])
 //           .filter(site => site?.pin_challenge && site?.pin_challenge?.sponsored)
 //           .map(site => ({
-//             ...site, // 🔥 Aquí incluimos toda la data del sitio original
+//             ...site, // 🔥 Here we include all the original site data
 //             id: site?.id.toString(),
 //             title: site?.name,
 //             points: site?.pin_challenge?.points || 0,

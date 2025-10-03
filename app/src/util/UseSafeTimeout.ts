@@ -13,7 +13,7 @@ export function useSafeTimeout() {
     (fn: () => void, ms: number) => {
       const token = cycleRef.current;
       const id = setTimeout(() => {
-        // si cambió el ciclo, no ejecutes
+        // if the cycle changed, don't execute
         if (token !== cycleRef.current) return;
         // ejecuta protegido
         fn();
@@ -34,7 +34,7 @@ export function useSafeTimeout() {
   // Limpia en unmount
   useEffect(() => clearAllTimeouts, [clearAllTimeouts]);
 
-  // Limpia cada vez que la pantalla pierde foco (salís o navegás)
+  // Clean every time the screen loses focus (you exit or navigate)
   useFocusEffect(
     useCallback(() => {
       // al ganar foco, nada

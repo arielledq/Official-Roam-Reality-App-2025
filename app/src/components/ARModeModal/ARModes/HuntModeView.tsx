@@ -43,12 +43,12 @@ const HuntModeView = ({
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
         };
-        console.log("Ubicación actual:", newLocation);
-        setUserLocation(newLocation); // ✅ Estado local
-        updateUnityLocation(newLocation); // Enviás a Unity
+        console.log("Current location:", newLocation);
+        setUserLocation(newLocation); // ✅ Local state
+        updateUnityLocation(newLocation); // Send to Unity
       },
       error => {
-        console.error("Error obteniendo ubicación:", error);
+        console.error("Error getting location:", error);
       },
       {
         accuracy: {
@@ -99,7 +99,7 @@ const HuntModeView = ({
       "SpawnObjectsFromReact",
       JSON.stringify(spawnData)
     );
-    onChallengeSelect?.(challenge); // Comunica al padre que se seleccionó uno
+    onChallengeSelect?.(challenge); // Communicate to parent that one was selected
   };
 
   const selectAllSponsors = () => {

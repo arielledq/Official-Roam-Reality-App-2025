@@ -161,8 +161,8 @@ const UniqueArChallengeCapture = () => {
     if (unityRef.current) {
       unityRef.current.postMessage(
         "TestReact", // Nombre del GameObject en Unity
-        "ReceiveMessageFromReact", // Nombre del método en Unity
-        "pressButton" // Mensaje que quieres enviar
+        "ReceiveMessageFromReact", // Method name in Unity
+        "pressButton" // Message you want to send
       );
     } else {
       ("NOOOOO NEEEEEE");
@@ -170,7 +170,7 @@ const UniqueArChallengeCapture = () => {
     console.log("NADA DE NADA onUnityMessages {", unityRef?.current?.onUnityMessage, "}");
   };
 
-  // Función para manejar el mensaje de Unity
+  // Function to handle the Unity message
   const handleUnityMessage = result => {
     console.log("Mensaje recibido desde Unity:", result.nativeEvent.message);
     Alert.alert("Mensaje de Unity", result.nativeEvent.message);

@@ -16,7 +16,7 @@ const AnimatedSplash = () => {
   const navigation = useNavigation();
 
   const token   = useSelector((state:any) => state.login?.data?.token);
-  const newUser = useSelector((state:any) => state.persist?.newUser); // true en primera ejecución
+  const newUser = useSelector((state:any) => state.persist?.newUser); // true on first execution
 
   // const routeDecision = () => {
   //   // ocultar splash en tu redux si corresponde
@@ -46,8 +46,8 @@ const AnimatedSplash = () => {
   // };
 
   const routeDecision = () => {
-    // ✅ Solo marcar que el splash terminó. NO navega aquí.
-    dispatch(update(true)); // asegúrate que `update(true)` ponga splashShown = true
+    // ✅ Only mark that the splash finished. DON'T navigate here.
+    dispatch(update(true)); // make sure that `update(true)` sets splashShown = true
   };
 
   // const checkAppUpdateHandler = async () => {
@@ -63,7 +63,7 @@ const AnimatedSplash = () => {
   };
 
   useEffect(() => {
-    // mismo delay que tenías
+    // same delay you had
     const t = setTimeout(checkAppUpdateHandler, 2000);
     return () => clearTimeout(t);
   }, []);

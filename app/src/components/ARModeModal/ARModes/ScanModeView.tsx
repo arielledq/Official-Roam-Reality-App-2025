@@ -152,7 +152,7 @@ const ScanModeView = ({
                         closeModalHandler();
                         onPointsGranted("scan", () => challengeData);
 
-                        // Mostrar la notificación luego de un pequeño delay
+                        // Show the notification after a small delay
                         setTimeout(() => {
                           setNotificationMode("scan");
                           setShowNotification(true);

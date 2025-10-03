@@ -266,11 +266,11 @@ export const shareToRoamProfile = async (
         endExperienceHandler();
       }
     } else {
-      console.error("Success - Error al compartir el desafío:", res);
+      console.error("Success - Error sharing the challenge:", res);
       handleError("There was an error sharing your challenge");
     }
   } catch (error) {
-    console.error("Catch - Error al compartir el desafío:", error);
+    console.error("Catch - Error sharing the challenge:", error);
     handleError("There was an error sharing your challenge");
   } finally {
     if (setIsLoading) setIsLoading(false);

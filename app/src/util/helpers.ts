@@ -588,7 +588,7 @@ export const handleUnzipProcess = async (sourcePath, targetPath) => {
   } catch (err) {
     // Handle errors and return an object indicating failure
     console.error("Error during zip processing or extraction:", err);
-    console.error("Error descomprimiendo el archivo:", err);
+    console.error("Error decompressing the file:", err);
     return {
       objFile: null,
       mtlFile: null,
@@ -614,9 +614,9 @@ export const keepFileMostRecent = async (ruta, extension = "") => {
     }
     filteredFiles.sort((a, b) => b.mtime - a.mtime);
 
-    const archivosParaEliminar = filteredFiles.slice(1);
+    const filesToDelete = filteredFiles.slice(1);
 
-    for (const file of archivosParaEliminar) {
+    for (const file of filesToDelete) {
       await RNFS.unlink(file.path);
     }
   } catch (error) {

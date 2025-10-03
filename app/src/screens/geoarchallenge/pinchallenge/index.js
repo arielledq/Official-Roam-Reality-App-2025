@@ -311,7 +311,7 @@ console.log(modelOBJ,
             .then(files => {
 
               if (Array.isArray(files) && files.length > 0) {
-                // Busca un archivo con el prefijo 'screenshot' y la extensión '.png'
+                // Look for a file with the 'screenshot' prefix and '.png' extension
                 const foundFile = files.find(
                   file =>
                     file.isFile() && file.name.includes("screenshot") && file.name.endsWith(".png")
@@ -322,10 +322,10 @@ console.log(modelOBJ,
                   setCapturedImage(foundFile.path); // Actualiza capturedImage
                   setIsUnityLoaded(false); // Desmonta UnityView al capturar la imagen
                 } else {
-                  console.error("No se encontró ningún archivo .png en el directorio.");
+                  console.error("No .png file found in the directory.");
                 }
               } else {
-                console.error("El directorio está vacío o 'files' no es un array válido.");
+                console.error("The directory is empty or 'files' is not a valid array.");
               }
             })
             .catch(err => {
@@ -334,7 +334,7 @@ console.log(modelOBJ,
             .finally(() => {
               setProcessingMedia(false);
             });
-        }, 2000); // Asegúrate de que el archivo esté listo
+        }, 2000); // Make sure the file is ready
       }
     } else {
       showMessage("Pin Not Found.", "error");

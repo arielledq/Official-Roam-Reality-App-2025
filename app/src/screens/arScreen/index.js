@@ -103,7 +103,7 @@ const ARScreen = ({route}) => {
     if (!mode) return false;
     if (mode === AR_MODES.HUNT_MODE) return true;
     if (mode === AR_MODES.SCAN_MODE) return !!selectedSite?.scanChallenge?.file_3d; // solo si hay 3D
-    return false; // GEO no entra acá (manejo aparte)
+    return false; // GEO doesn't enter here (handled separately)
   };
   const [loading, setLoading] = useState(false);
   const [spawnHeight, setSpawnHeight] = useState(1);
@@ -249,10 +249,10 @@ const ARScreen = ({route}) => {
                 setCapturedImage(foundFile.path);
                 setShouldRenderUnity(false);
               } else {
-                console.error("No se encontró ningún archivo .png en el directorio.");
+                console.error("No .png file found in the directory.");
               }
             } else {
-              console.error("El directorio está vacío o 'files' no es un array válido.");
+              console.error("The directory is empty or 'files' is not a valid array.");
             }
           })
           .catch(err => {
@@ -1454,7 +1454,7 @@ useEffect(() => {
     if (bundleRequestedRef.current) return;
     bundleRequestedRef.current = true;
 
-    // 🔽 tu función existente
+    // 🔽 your existing function
   }, [sceneIsReady, selectedSite?.selectedMode?.mode, selectedSite?.scanChallenge?.file_animation]);
 
   // const resetArTest = () => {

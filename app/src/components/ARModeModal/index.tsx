@@ -1,8 +1,8 @@
-// Debido a la longitud y estructura del código, lo dividiré en dos partes:
-// 1. Archivo principal del modal (`ARModeModal.tsx`)
-// 2. Componentes separados para cada modo (`ARModeView`, `ScanModeView`, `HuntModeView`)
+// Due to the length and structure of the code, I'll divide it into two parts:
+// 1. Main modal file (`ARModeModal.tsx`)
+// 2. Separate components for each mode (`ARModeView`, `ScanModeView`, `HuntModeView`)
 
-// Comenzamos creando el archivo principal con uso de ModeRenderer
+// We start by creating the main file using ModeRenderer
 
 import React, {useState, useEffect} from "react";
 import {View, Text, StyleSheet} from "react-native";

@@ -62,7 +62,7 @@ const EmailVerification: ScreenStackComponent<RootStackParamList, "EmailVerifica
             if (profile) {
               // Caso: abierto desde Profile (app stack)
               showMessage("Email verified successfully");
-              // marca verificado si lo manejás en redux (opcional)
+              // mark as verified if you handle it in redux (optional)
               setTimeout(() =>dispatch(updateVerified(true))
               , 500);
 
