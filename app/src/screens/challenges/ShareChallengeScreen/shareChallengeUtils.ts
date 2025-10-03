@@ -48,30 +48,37 @@ export const challengeData = (
     : moment().format("MM-DD-YYYY");
   let endChallengeButtonText = "End & Share to Roam Profile";
 
+  const addSocialPoints = (basePoints: number) => {
+    return (
+      basePoints +
+      socialPointsCounter.facebook +
+      socialPointsCounter.instagram +
+      socialPointsCounter.others
+    );
+  };
+
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;
+      challengePoints = addSocialPoints(challengePoints);
       break;
     case CHALLENGES_TYPE.PIN_CHECK_IN:
       screenTitle = CHALLENGES_TYPE.PIN_CHECK_IN_TITLE;
+      challengePoints = addSocialPoints(challengePoints);
       break;
     case AR_MODES.SCAN_MODE:
       sponsor = challengeObj?.sponsor;
       sponsorImage = sponsor?.image;
       sponsorName = sponsor?.name;
       challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-      challengePoints = challengeObj?.pin_challenge?.points || 0;
-      challengePoints +=
-        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
+      challengePoints = addSocialPoints(challengePoints);
       break;
     case AR_MODES.GEO_TAG_MODE:
       sponsor = challengeObj?.sponsor;
       sponsorImage = sponsor?.image;
       sponsorName = sponsor?.name;
       challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
-      challengePoints = challengeObj?.pin_challenge?.points || 0;
-      challengePoints +=
-        socialPointsCounter.facebook + socialPointsCounter.instagram + socialPointsCounter.others;
+      challengePoints = addSocialPoints(challengePoints);
       break;
     case CHALLENGES_TYPE.STAR:
       screenTitle = CHALLENGES_TYPE.STAR_TITLE;
@@ -90,11 +97,9 @@ export const challengeData = (
       break;
 
     default:
-      challengePoints =
-        challengeObj?.points +
-        socialPointsCounter.facebook +
-        socialPointsCounter.instagram +
-        socialPointsCounter.others;
+      challengePoints = addSocialPoints(
+        challengeObj?.pin_challenge?.points || challengeObj?.points
+      );
       break;
   }
 
@@ -110,6 +115,17 @@ export const challengeData = (
   };
 };
 
+const tryGrantSocialPoints = (
+  selectedSSNN: string,
+  grantSocialPointsHandler: (selectedSSNN: string) => {}
+) => {
+  try {
+    grantSocialPointsHandler(selectedSSNN);
+  } catch (error) {
+    console.error("Error granting social points:", error);
+  }
+};
+
 export const countSocialPoints = (
   selectedSSNN: string,
   grantSocialPointsHandler: (selectedSSNN: string) => {},
@@ -122,9 +138,7 @@ export const countSocialPoints = (
         let updatedCounter = currCounter.facebook;
         if (currCounter.facebook === 0) {
           updatedCounter = 1;
-          if (grantSocialPointsHandler) {
-            grantSocialPointsHandler(selectedSSNN);
-          }
+          tryGrantSocialPoints(selectedSSNN, grantSocialPointsHandler);
           setDisableBackButton(true);
         } else {
           console.info(" not counting more points but allowing to share... ");
@@ -140,9 +154,7 @@ export const countSocialPoints = (
         let updatedCounter = currCounter.instagram;
         if (currCounter.instagram === 0) {
           updatedCounter = 1;
-          if (grantSocialPointsHandler) {
-            grantSocialPointsHandler(selectedSSNN);
-          }
+          tryGrantSocialPoints(selectedSSNN, grantSocialPointsHandler);
           setDisableBackButton(true);
         } else {
           console.info(" not counting more points but allowing to share... ");
@@ -158,9 +170,7 @@ export const countSocialPoints = (
         let updatedCounter = currCounter.others;
         if (currCounter.others === 0) {
           updatedCounter = 1;
-          if (grantSocialPointsHandler) {
-            grantSocialPointsHandler(selectedSSNN);
-          }
+          tryGrantSocialPoints(selectedSSNN, grantSocialPointsHandler);
           setDisableBackButton(true);
         } else {
           console.info(" not counting more points but allowing to share... ");

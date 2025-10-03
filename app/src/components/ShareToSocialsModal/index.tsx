@@ -8,7 +8,7 @@ import ReactNativeModal from "react-native-modal";
 import AppButton from "../button";
 import theme from "assets/theme";
 import {FontFamily, FontSizes} from "util/FontUtils";
-import {socialPointsARUpdateAPI} from "network";
+import {socialPointsARUpdateAPI, updateUserPointAPI} from "network";
 import Images from "assets/images";
 import {showMessage} from "util/helpers";
 import Config from "config";
@@ -34,6 +34,8 @@ interface ShareToSocialsModalProps {
   fileExt?: string | undefined;
   sponsor?: {description: string; tags: string} | undefined;
   isMemory?: boolean;
+  challengePoints?: number;
+  socialPointsCounter?: any;
 }
 
 const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
@@ -44,6 +46,8 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   fileExt,
   sponsor,
   isMemory = false,
+  challengePoints,
+  socialPointsCounter,
 }) => {
   const [loading, setLoading] = useState(false);
   const isMounted = useRef(true);
@@ -94,6 +98,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
           await shareToOthers(updatedFileUri, ext, shareMessageBase);
           hasSharedToSSNN = true;
         } catch (error) {
+          console.error("error sharing to others", error);
           handleSharingError(error);
         }
       };
@@ -131,20 +136,20 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
                   if (!result.isCancelled) hasSharedToSSNN = true;
                 }
               } else {
-                shareToOtherHandler();
+                await shareToOtherHandler();
               }
             } else {
-              shareToOtherHandler();
+              await shareToOtherHandler();
             }
           } catch (error) {
             console.error("Error sharing to Facebook:", error);
-            shareToOtherHandler();
+            await shareToOtherHandler();
           }
           break;
         }
 
         case SSNN.OTHERS: {
-          shareToOtherHandler();
+          await shareToOtherHandler();
           break;
         }
 
@@ -154,6 +159,23 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
       // Handle points granting if sharing was successful
       if (!isMemory && hasSharedToSSNN) {
+        if (
+          socialPointsCounter.facebook === 0 &&
+          socialPointsCounter.instagram === 0 &&
+          socialPointsCounter.others === 0
+        ) {
+          try {
+            await updateUserPointAPI({points: challengePoints});
+            showMessage(
+              "You've been granted points for completing the challenge!",
+              "success",
+              "Challenge points granted!"
+            );
+          } catch (error: any) {
+            console.error("Error assigning points:", error?.message, error);
+          }
+        }
+
         try {
           await socialPointsARUpdateAPI({social_network: selectedSSNN});
           showMessage(
@@ -161,6 +183,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
             "success",
             "Socials points granted!"
           );
+          // @ts-ignore
           if (onPointsGranted) onPointsGranted(selectedSSNN);
         } catch (error: any) {
           console.error("Error assigning points:", error?.message, error);

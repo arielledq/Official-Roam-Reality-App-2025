@@ -227,18 +227,6 @@ const ArChallengeShare = () => {
   //   }
   // }, [challengeObj]);
 
-  useEffect(() => {
-    let isMounted = true;
-
-    if (!isMemory && isMounted) {
-      updateUserPointAPI({points: challengePoints});
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [isMemory, challengePoints]);
-
   const screenModals = (
     <>
       <ShareToSocialsModal
@@ -247,6 +235,8 @@ const ArChallengeShare = () => {
         isVisible={shareToSocialsIsOpen}
         isMemory={isMemory}
         sponsor={sponsor}
+        challengePoints={challengePoints}
+        socialPointsCounter={socialPointsCounter}
         onPointsGranted={handlePointsGranted}
         onClose={closeShareToSocialMediaButtonHandler}
       />
