@@ -137,7 +137,7 @@ class ScoreboardAdmin(admin.ModelAdmin):
             .annotate(
                 total=Sum(
                     Case(
-                        When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS', 'SCAN_PHOTO', 'STAR',],
+                        When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS', 'SCAN_PHOTO', 'STAR', 'SOCIAL_POINTS',],
                              then=F('points')),
                         When(memory_type='DEDUCTED',
                              then=F('points') * Value(-1)),

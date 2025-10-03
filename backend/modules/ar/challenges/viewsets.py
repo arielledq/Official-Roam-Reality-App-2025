@@ -2,6 +2,8 @@ import json
 from itertools import chain
 from operator import attrgetter
 import requests
+from django.shortcuts import get_object_or_404
+
 from configuration import configs
 from travel_ar_app_42706 import settings
 from .cooldown_functions import geo_cooldown_by_user, scan_cooldown_by_user, hunt_cooldown_by_user
@@ -332,11 +334,38 @@ class ARProfileViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='update-ar-social-points', name='AR SOCIAL POINT UPDATE')
     def update_points_for_social(self, request):
-        social_network = request.data.get("social_network", "")
-        profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        profileObj.points = F('points') + SOCIAL_POINTS
-        profileObj.save()
-        return Response({'message': "Points are updated!"}, status=status.HTTP_200_OK)
+        data = request.data
+        challenge_id = data.get("challenges")
+        geo_location_id = data.get("geo_location")
+        geo_challenge_id = data.get("geo_challenge")
+        scan_id = data.get("scan_id")
+        sponsor_id = data.get("sponsor")
+
+        if not (challenge_id or geo_challenge_id or scan_id):
+            return Response({'error': "At least challenge_id, geo_challenge_id or scan_id must "
+                                      "be provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            challenge = get_object_or_404(Challenges, pk=challenge_id) if challenge_id else None
+            geo_location = get_object_or_404(GeoLocation, pk=geo_location_id) if geo_location_id else None
+            sponsor = get_object_or_404(Sponsor, pk=sponsor_id) if sponsor_id else None
+            geo_challenge = get_object_or_404(GeoARChallenges, pk=geo_challenge_id) if geo_challenge_id else None
+            scan = get_object_or_404(ScanPicture, pk=scan_id) if scan_id else None
+
+            ARMemories.objects.create(
+                user=request.user,
+                memory_type='SOCIAL_POINTS',
+                challenges=challenge,
+                sponsor=sponsor,
+                geo_challenge=geo_challenge,
+                geo_location=geo_location,
+                points=SOCIAL_POINTS,
+                scan_picture=scan,
+            )
+
+            return Response({'message': "Points have been updated successfully!"}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['post'], url_path='update-user-location', name='Update User Location')
     def update_user_location(self, request, *args, **kwargs):

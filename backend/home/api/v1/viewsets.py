@@ -247,7 +247,7 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
             .values('user')
             .annotate(total=Sum(
                 Case(
-                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS', 'SCAN_PHOTO', 'STAR',], then=F('points')),
+                    When(memory_type__in=['PHOTO', 'VIDEO', 'BONUS', 'SCAN_PHOTO', 'STAR', 'SOCIAL_POINTS'], then=F('points')),
                     When(memory_type='DEDUCTED', then=F('points') * Value(-1)),
                     default=Value(0),
                     output_field=IntegerField()
