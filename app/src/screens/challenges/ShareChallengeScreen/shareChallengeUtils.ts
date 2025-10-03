@@ -37,7 +37,8 @@ export const challengeData = (
   socialPointsCounter?: any
 ) => {
   let screenTitle = "";
-  let challengePoints = challengeObj?.points || scan_picture?.points;
+  let challengePoints =
+    challengeObj?.points || scan_picture?.points || challengeObj?.pin_challenge?.points;
 
   let sponsor = challengeObj?.sponsored || scan_picture?.sponsor;
   let challengeTitle = `Congrats on completing the ${sponsor?.name} AR Experience!`;
@@ -56,6 +57,9 @@ export const challengeData = (
       socialPointsCounter.others
     );
   };
+
+  console.log("challengeType", challengeType);
+  console.log("challengeObj", challengeObj);
 
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
