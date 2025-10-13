@@ -6622,10 +6622,10 @@ react-native-animatable@1.4.0:
   dependencies:
     prop-types "^15.8.1"
 
-react-native-contacts@^8.0.4:
-  version "8.0.7"
-  resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-8.0.7.tgz#486fcc1cc267a2c5bceb51f46263a3e10dbb2650"
-  integrity sha512-9JyH+3MXZcOD1+Lm+kl1DeQzT24ayZ//LonTSZM2cln66mHgC2MzW1wBQAJ7EL9eu5NSjSav4c4BIWuOsods6Q==
+react-native-contacts@8.0.5:
+  version "8.0.5"
+  resolved "https://registry.yarnpkg.com/react-native-contacts/-/react-native-contacts-8.0.5.tgz#61c6a77f10e4229b3bdbe539baba36d1046cb369"
+  integrity sha512-MhZOAa2IZyJTqtaa7xo1twU2A1ygt4eD2IF+0Hl9P+HhnvxlFCwQBzCmZvpOwaSpW6QSLyHzM5BWKxWyMcSxog==
 
 react-native-date-picker@^5.0.12:
   version "5.0.13"
@@ -6903,7 +6903,7 @@ react-native-safe-area-context@^5.5.2:
   resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-5.6.1.tgz#cb4d249ef1a6f7e8fd0cfdfa9764838dffda26b6"
   integrity sha512-/wJE58HLEAkATzhhX1xSr+fostLsK8Q97EfpfMDKo8jlOc1QKESSX/FQrhk7HhQH/2uSaox4Y86sNaI02kteiA==
 
-react-native-screens@^4.13.1:
+react-native-screens@^4.16.0:
   version "4.16.0"
   resolved "https://registry.yarnpkg.com/react-native-screens/-/react-native-screens-4.16.0.tgz#efa42e77a092aa0b5277c9ae41391ea0240e0870"
   integrity sha512-yIAyh7F/9uWkOzCi1/2FqvNvK6Wb9Y1+Kzn16SuGfN9YFJDTbwlzGRvePCNTOX0recpLQF3kc2FmvMUhyTCH1Q==

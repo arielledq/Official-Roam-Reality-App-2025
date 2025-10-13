@@ -1,5 +1,15 @@
 import React, {useEffect, useState} from "react";
-import {View, Text, Image, TouchableOpacity, ScrollView, FlatList, Platform, RefreshControl, ActivityIndicator} from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  FlatList,
+  Platform,
+  RefreshControl,
+  ActivityIndicator,
+} from "react-native";
 import AppDropdown from "components/Dropdown";
 import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
@@ -26,30 +36,28 @@ async function checkHuntGate(starId: number) {
     console.log("[HUNT CHECK raw rsp]", rsp);
 
     if (rsp?.status === 1) {
-      return { ok: true, reason: rsp?.message || "OK" };
+      return {ok: true, reason: rsp?.message || "OK"};
     }
 
     if (rsp?.status >= 200 && rsp?.status < 300) {
-      return { ok: true, reason: rsp?.message || "OK" };
+      return {ok: true, reason: rsp?.message || "OK"};
     }
 
     if (rsp?.errorStatus) {
       const msg = rsp?.message?.message || rsp?.message;
       const first = rsp?.errorStatus === 404 && /None does not exist/i.test(String(msg || ""));
-      if (first) return { ok: true, reason: "FIRST_ATTEMPT" };
-      return { ok: false, reason: msg || `HTTP ${rsp.errorStatus}` };
+      if (first) return {ok: true, reason: "FIRST_ATTEMPT"};
+      return {ok: false, reason: msg || `HTTP ${rsp.errorStatus}`};
     }
 
-    return { ok: true, reason: rsp?.message || "OK" };
+    return {ok: true, reason: rsp?.message || "OK"};
   } catch (e: any) {
     const status = e?.response?.status || e?.errorStatus || "n/a";
     const msg = e?.response?.data?.message || e?.message?.message || e?.message || "Blocked";
     console.log("[HUNT CHECK thrown error]", status, e?.response?.data || e);
-    return { ok: false, reason: `${msg} (status ${status})` };
+    return {ok: false, reason: `${msg} (status ${status})`};
   }
 }
-
-
 
 const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteListProps) => {
   const DEFAULT_SPONSOR = {
@@ -76,69 +84,83 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     switch (selectedMode?.mode) {
       case AR_MODES.HUNT_MODE: {
         console.log("[HUNT] startChallengeHandler()", {
-        siteId: site?.id,
-        starId: site?.ar_star?.id,
-        loc: initialUserLocation,
-      });
+          siteId: site?.id,
+          starId: site?.ar_star?.id,
+          loc: initialUserLocation,
+        });
 
-  const starId = Number(site?.ar_star?.id);
-  const geoSiteId = site?.id;
+        const starId = Number(site?.ar_star?.id);
+        const geoSiteId = site?.id;
 
-  if (!geoSiteId || !starId) {
-    Toast.show({ type: "error", text1: "Hunt Challenge", text2: "Missing ar_star.id from the site." });
-    onClose(); return;
-  }
+        if (!geoSiteId || !starId) {
+          Toast.show({
+            type: "error",
+            text1: "Hunt Challenge",
+            text2: "Missing ar_star.id from the site.",
+          });
+          onClose();
+          return;
+        }
 
-  const gate = await checkHuntGate(starId);
-  console.log("[HUNT CHECK] starId:", starId, "->", gate);
+        const gate = await checkHuntGate(starId);
+        console.log("[HUNT CHECK] starId:", starId, "->", gate);
 
-  if (!gate.ok) {
-    Toast.show({
-      type: "info",
-      text1: "Hunt Cooldown",
-      text2: String(gate.reason || "Cooldown active. Please try again later."),
-    });
-    onClose(); return;
-  }
+        if (!gate.ok) {
+          Toast.show({
+            type: "info",
+            text1: "Hunt Cooldown",
+            text2: String(gate.reason || "Cooldown active. Please try again later."),
+          });
+          onClose();
+          return;
+        }
 
-  let { latitude: lat, longitude: lon } = initialUserLocation || {};
-  const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    await wait(300);
-    ({ latitude: lat, longitude: lon } = initialUserLocation || {});
-  }
-  if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-    Toast.show({ type: "info", text1: "Location", text2: "No location found yet. Please try again." });
-    onClose(); return;
-  }
+        let {latitude: lat, longitude: lon} = initialUserLocation || {};
+        const wait = (ms: number) => new Promise(r => setTimeout(r, ms));
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          await wait(300);
+          ({latitude: lat, longitude: lon} = initialUserLocation || {});
+        }
+        if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+          Toast.show({
+            type: "info",
+            text1: "Location",
+            text2: "No location found yet. Please try again.",
+          });
+          onClose();
+          return;
+        }
 
-  let hasNextStar = false;
-  try {
-    const huntChallenge = await getNextStar(geoSiteId, lat as number, lon as number);
-    if (huntChallenge?.id) {
-      hasNextStar = true;
-      updatedSiteData = { ...updatedSiteData, huntChallenge: { ...huntChallenge } };
-    }
-  } catch (error: any) {
-    Toast.show({ type: "error", text1: "Hunt Challenge", text2: error?.message || "The next star could not be obtained." });
-  }
+        let hasNextStar = false;
+        try {
+          const huntChallenge = await getNextStar(geoSiteId, lat as number, lon as number);
+          if (huntChallenge?.id) {
+            hasNextStar = true;
+            updatedSiteData = {...updatedSiteData, huntChallenge: {...huntChallenge}};
+          }
+        } catch (error: any) {
+          Toast.show({
+            type: "error",
+            text1: "Hunt Challenge",
+            text2: error?.message || "The next star could not be obtained.",
+          });
+        }
 
-  if (!hasNextStar) {
-    Toast.show({
-      type: "success",
-      text1: "Complete Hunt",
-      text2: gate?.reason || "You have collected all the stars.",
-    });
-    getSitesHandler(selectedSponsor?.value?.toString() || "");
-    onClose();
-    return;
-  }
+        if (!hasNextStar) {
+          Toast.show({
+            type: "success",
+            text1: "Complete Hunt",
+            text2: gate?.reason || "You have collected all the stars.",
+          });
+          getSitesHandler(selectedSponsor?.value?.toString() || "");
+          onClose();
+          return;
+        }
 
-  onStartChallenge(updatedSiteData);
-  onClose();
-  break;
-}
-
+        onStartChallenge(updatedSiteData);
+        onClose();
+        break;
+      }
 
       case AR_MODES.SCAN_MODE: {
         const scanId = updatedSiteData?.scanChallenge?.id;
@@ -190,6 +212,7 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const getSitesHandler = (sponsorId: string = "") => {
     if (sponsorId) {
+      console.log("Filtering sites by sponsorId:", sponsorId);
       let updatedSites;
       if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
         updatedSites = sites.filter((site: any) => site?.sponsor?.id === Number(sponsorId));
@@ -279,35 +302,33 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     }
   }, [selectedSponsor]);
 
+  function formatCooldownTime(cooldown: string): number {
+    if (!cooldown) return 0;
 
-function formatCooldownTime(cooldown: string): number {
-  if (!cooldown) return 0;
+    const [hourStr] = cooldown.split(":");
+    const hours = parseInt(hourStr, 10);
 
-  const [hourStr] = cooldown.split(':');
-  const hours = parseInt(hourStr, 10);
+    return isNaN(hours) ? 0 : hours;
+  }
+  function getCooldownTotalMinutes(cooldown: string): number {
+    if (!cooldown || typeof cooldown !== "string") return 0;
 
-  return isNaN(hours) ? 0 : hours;
-}
-function getCooldownTotalMinutes(cooldown: string): number {
-  if (!cooldown || typeof cooldown !== 'string') return 0;
+    const parts = cooldown.split(":");
 
-  const parts = cooldown.split(':');
+    // Esperar al menos "hh:mm"
+    if (parts.length < 2) return 0;
 
-  // Esperar al menos "hh:mm"
-  if (parts.length < 2) return 0;
+    const hours = parseInt(parts[0], 10);
+    const minutes = parseInt(parts[1], 10);
 
-  const hours = parseInt(parts[0], 10);
-  const minutes = parseInt(parts[1], 10);
+    if (isNaN(hours) || isNaN(minutes)) return 0;
 
-  if (isNaN(hours) || isNaN(minutes)) return 0;
-
-  return hours * 60 + minutes;
-}
-
+    return hours * 60 + minutes;
+  }
 
   return (
     <View style={{width: "100%", maxHeight: "85%"}}>
-      <View style={{flexDirection: "row", alignItems: "center", justifyContent:'space-between'}}>
+      <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
         <View
           style={{
             height: 75,
@@ -326,8 +347,13 @@ function getCooldownTotalMinutes(cooldown: string): number {
         <AppDropdown
           data={sponsorData}
           maxHeight={300}
-          dropdownStyle={{zIndex:100}}
-          containerStyle={{flex: 1, borderRadius: 0, marginTop: 0, backgroundColor: theme.lightColors?.black}}
+          dropdownStyle={{zIndex: 100}}
+          containerStyle={{
+            flex: 1,
+            borderRadius: 0,
+            marginTop: 0,
+            backgroundColor: theme.lightColors?.black,
+          }}
           labelField="label"
           valueField="value"
           containerStyles={{marginTop: -35, width: 246}}
@@ -552,25 +578,24 @@ function getCooldownTotalMinutes(cooldown: string): number {
               </View>
             );
           })}
-         {!filteredSites || filteredSites.length === 0 ? (
-             <View style={{alignItems: "center", justifyContent: "center", paddingVertical: 20}}>
-                 <ActivityIndicator size="small" color="#fff" />
-                 <Text style={{color: "#fff", marginTop: 8}}>Loading Sites…</Text>
-               </View>
-           ) : (
-             <ScrollView style={{marginTop: 15}}>
-                 {filteredSites?.length > 0 &&
-                     filteredSites.map((site: any, index: number) => {
-                         // ...tu render actual
-                           })
-                   }
-                 {(!filteredSites || filteredSites.length === 0) && (
-                     <View style={{alignItems: "center", paddingVertical: 20}}>
-                         <Text style={{color: "#7e8493"}}>No seats available</Text>
-                       </View>
-                   )}
-               </ScrollView>
-           )}
+        {!filteredSites || filteredSites.length === 0 ? (
+          <View style={{alignItems: "center", justifyContent: "center", paddingVertical: 20}}>
+            <ActivityIndicator size="small" color="#fff" />
+            <Text style={{color: "#fff", marginTop: 8}}>Loading Sites…</Text>
+          </View>
+        ) : (
+          <ScrollView style={{marginTop: 15}}>
+            {filteredSites?.length > 0 &&
+              filteredSites.map((site: any, index: number) => {
+                // ...tu render actual
+              })}
+            {(!filteredSites || filteredSites.length === 0) && (
+              <View style={{alignItems: "center", paddingVertical: 20}}>
+                <Text style={{color: "#7e8493"}}>No seats available</Text>
+              </View>
+            )}
+          </ScrollView>
+        )}
       </ScrollView>
     </View>
   );

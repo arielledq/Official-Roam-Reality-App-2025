@@ -113,6 +113,15 @@ yarn build-apk
 yarn build-aab
 ```
 
+#### Android Build Instructions
+
+implementation fileTree(dir: 'libs', include: ['*.jar', '*.aar'])
+// implementation(name: 'MvnCorder', ext:'aar')
+// implementation(name: 'arcore_client', ext:'aar')
+// implementation(name: 'ARPresto', ext:'aar')
+// implementation(name: 'unityandroidpermissions', ext:'aar')
+// implementation(name: 'UnityARCore', ext:'aar')
+
 ### iOS Release
 
 Follow standard iOS release procedures through Xcode.
