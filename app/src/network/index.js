@@ -361,10 +361,10 @@ export const getGeoPinCheckInAPI = payload =>
     },
     logoutFunc
   );
-export const getAllMemories = () =>
+export const getAllMemories = (pageNo, page_size) =>
   Request.callWithToken(
     {
-      url: `modules/challenges/all-memories/`,
+      url: `modules/challenges/all-memories/?page=${pageNo}&page_size=${page_size}`,
       method: "GET",
     },
     logoutFunc

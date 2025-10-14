@@ -1,19 +1,24 @@
-import React, { useState } from "react";
-import { Pressable, TouchableOpacity, View } from "react-native";
+import React, {useState} from "react";
+import {Pressable, TouchableOpacity, View} from "react-native";
 import useStyles from "./styles";
 import AppText from "../text";
 import FastImage from "react-native-fast-image";
 //@ts-ignore
 import DownloadImg from "../../assets/ar/download.svg";
-import { saveToGallery, truncateText } from "../../util/helpers";
+import {saveToGallery, truncateText} from "../../util/helpers";
 import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
+import Icon from "components/Icon";
 
 const MemoryContainer = ({
   item,
   onPressAction,
+  onChnagePrivacy = (item: any, privacy: any) => {
+    // Function to handle privacy change
+  },
 }: {
   item: any;
   onPressAction?: (file: any, details: any) => void;
+  onChnagePrivacy?: (item: any, privacy: any) => void;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
@@ -58,28 +63,42 @@ const MemoryContainer = ({
               item.memory_type == "VIDEO" ? item?.thumbnail_memory_video_file : item?.memory_file,
           }}
         />
-        <View style={styles.cardContent}>
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <AppText numberOfLines={1} style={styles.title}>
-              {truncateText(item?.challenge_details?.name || item?.scan_picture?.name, 8)}
-            </AppText>
-            <TouchableOpacity
-              onPress={saveToGalleryButtonHandler}
-              style={{ marginStart: 10, padding: 4 }}
-            >
-              <DownloadImg style={{ width: 16, height: 12 }} />
-            </TouchableOpacity>
-          </View>
-          <AppText numberOfLines={2} style={styles.description}>
-            {truncateText(item?.challenge_details?.description.replace(/<[^>]*>?/gm, " ") || item?.scan_picture?.sponsor?.description.replace(/<[^>]*>?/gm, " "), 30)}
-          </AppText>
-        </View>
+      </View>
+      <View style={styles.cardContent}>
+        <AppText numberOfLines={1} style={styles.title}>
+          {item?.challenge_details?.name}
+        </AppText>
+
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+          onPress={() => onChnagePrivacy(item, item?.privacy === "public" ? "private" : "public")}
+        >
+          <AppText style={styles.buttonText}>Privacy</AppText>
+          {item?.privacy == "public" ? (
+            <Icon name="eye-outline" family="ionicon" size={15} color={"#fff"} />
+          ) : (
+            <Icon name="eye-off-outline" family="ionicon" size={15} color={"#fff"} />
+          )}
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+          }}
+          onPress={saveToGalleryButtonHandler}
+        >
+          <AppText style={styles.buttonText}>Download</AppText>
+
+          <Icon name="download" family="antdesign" size={15} color={"#fff"} />
+        </TouchableOpacity>
       </View>
       <FullScreenLoadingSpinner isLoading={isLoading} />
     </Pressable>

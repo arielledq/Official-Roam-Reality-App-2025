@@ -171,8 +171,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     try {
       getAllMemories(currentPage, pageSize)
         .then(res => {
+          console.log("re", JSON.stringify(res, null, 2));
           if (res.status == 1) {
-            setARMemories(res.results);
+            setARMemories(res.data);
             console.log("re", JSON.stringify(res, null, 2));
             setTotalLength(res.total_record);
           } else {
@@ -260,18 +261,18 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       privacy: value,
     };
     console.log("Privacy updated successfully", payLoadData);
-    updateArrMemories(payLoadData)
-      .then(res => {
-        console.log("Privacy updated successfully", res);
-        if (res.status === 1) {
-          console.log("Privacy updated successfully");
-        } else {
-          console.error("Error updating privacy: ", res.message);
-        }
-      })
-      .catch(err => {
-        console.error("Error updating privacy: ", err);
-      });
+    // updateArrMemories(payLoadData)
+    //   .then(res => {
+    //     console.log("Privacy updated successfully", res);
+    //     if (res.status === 1) {
+    //       console.log("Privacy updated successfully");
+    //     } else {
+    //       console.error("Error updating privacy: ", res.message);
+    //     }
+    //   })
+    //   .catch(err => {
+    //     console.error("Error updating privacy: ", err);
+    //   });
   };
 
   const lodeMoreData = () => {
@@ -432,7 +433,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           // contentContainerStyle={{ paddingHorizontal: 20, gap: 18 }}
           data={arMemories}
           key={(item: any) => item?.id?.toString()}
-          numColumns={2}
+          numColumns={3}
           onEndReachedThreshold={0.5}
           onEndReached={lodeMoreData}
           showsVerticalScrollIndicator={false}

@@ -1,15 +1,16 @@
-import { makeStyles } from "@rneui/themed";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 const useStyles = makeStyles(theme => ({
   cardWrapper: {
-    width: 115,
+    width: "30%",
 
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
 
-    backgroundColor: theme.colors.grey4,
+    backgroundColor: theme.colors.boxStatBG,
     borderRadius: 12,
 
     paddingTop: 8,
@@ -30,7 +31,8 @@ const useStyles = makeStyles(theme => ({
     borderRadius: 10,
   },
   cardContent: {
-    gap: 4,
+    gap: 8,
+    width: "100%",
   },
   title: {
     ...(fontGroup.nunitoBold as any),
@@ -44,6 +46,12 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S10,
     fontWeight: 500,
     lineHeight: FontLineHeights.LH12,
+    color: theme.colors.white,
+  },
+  buttonText: {
+    ...(fontGroup.nunitoRegular as any),
+    fontSize: FontSizes.S10,
+    fontWeight: 400,
     color: theme.colors.white,
   },
 }));
