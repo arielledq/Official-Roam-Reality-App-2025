@@ -15,6 +15,7 @@
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		A50B02812E57B182006016F0 /* MvnCorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCE85A232E0ADFEB00F33757 /* MvnCorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		A50B02822E57B182006016F0 /* NativeScreenRecorder.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DCE85A222E0ADFEB00F33757 /* NativeScreenRecorder.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		AB2C5A5AD35942499D50C3FA /* index.js in Resources */ = {isa = PBXBuildFile; fileRef = 9FE2CAF2CA784A97934EA14A /* index.js */; };
 		DC0CBB042DB81C3C0028089D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */; };
 		DC9325EF2DC1491A008D2FD2 /* AntDesign.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DC9325EE2DC1491A008D2FD2 /* AntDesign.ttf */; };
 		DCBC73FB2DE0C16400B8792D /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = DCBC73F42DE0C16300B8792D /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -24,6 +25,7 @@
 		DCC84F972DBBD7E000CE38ED /* NunitoSans10ptBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F942DBBD7DF00CE38ED /* NunitoSans10ptBold.ttf */; };
 		DCC84F982DBBD7E000CE38ED /* NunitoSans10ptRegular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F952DBBD7DF00CE38ED /* NunitoSans10ptRegular.ttf */; };
 		DCC84F992DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DCC84F962DBBD7E000CE38ED /* NunitoSans10ptExtraLight.ttf */; };
+		EBAC6691AF564F909BC66E4E /* NunitoSans7ptBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 77EC82C080B04BF49B8EDD72 /* NunitoSans7ptBold.ttf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -69,9 +71,11 @@
 		13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = PrivacyInfo.xcprivacy; path = travel_ar_app_42706/PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		65ACA42FEDFDF505F43C9AC4 /* Pods-travel_ar_app_42706.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.debug.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.debug.xcconfig"; sourceTree = "<group>"; };
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = travel_ar_app_42706/AppDelegate.swift; sourceTree = "<group>"; };
+		77EC82C080B04BF49B8EDD72 /* NunitoSans7ptBold.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = NunitoSans7ptBold.ttf; path = ../src/assets/fonts/NunitoSans7ptBold.ttf; sourceTree = "<group>"; };
 		7CB84F6BD408437111678443 /* libPods-travel_ar_app_42706.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-travel_ar_app_42706.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = travel_ar_app_42706/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		95107F0B0B9F28CC6248EE3A /* Pods-travel_ar_app_42706.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-travel_ar_app_42706.release.xcconfig"; path = "Target Support Files/Pods-travel_ar_app_42706/Pods-travel_ar_app_42706.release.xcconfig"; sourceTree = "<group>"; };
+		9FE2CAF2CA784A97934EA14A /* index.js */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = index.js; path = ../src/assets/fonts/index.js; sourceTree = "<group>"; };
 		A7469F00C732C84BCE76ECDE /* Pods-OneSignalNotificationServiceExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		DC0CBAF32DB81AD20028089D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		DC0CBAF42DB81AD20028089D /* NotificationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
@@ -114,6 +118,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0FDB3338BDC24DFA97C46EEC /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				77EC82C080B04BF49B8EDD72 /* NunitoSans7ptBold.ttf */,
+				9FE2CAF2CA784A97934EA14A /* index.js */,
+			);
+			name = Resources;
+			path = "";
+			sourceTree = "<group>";
+		};
 		13B07FAE1A68108700A75B9A /* travel_ar_app_42706 */ = {
 			isa = PBXGroup;
 			children = (
@@ -163,6 +177,7 @@
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				BBD78D7AC51CEA395F1C20DB /* Pods */,
 				DC0CBB032DB81C3C0028089D /* GoogleService-Info.plist */,
+				0FDB3338BDC24DFA97C46EEC /* Resources */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -306,6 +321,8 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				5323A6AEF295D11A1C03C6EF /* PrivacyInfo.xcprivacy in Resources */,
+				EBAC6691AF564F909BC66E4E /* NunitoSans7ptBold.ttf in Resources */,
+				AB2C5A5AD35942499D50C3FA /* index.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -690,7 +707,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "$(inherited) DEBUG";
@@ -759,7 +779,10 @@
 					"-DFOLLY_CFG_NO_COROUTINES=1",
 					"-DFOLLY_HAVE_CLOCK_GETTIME=1",
 				);
-				OTHER_LDFLAGS = "$(inherited)  ";
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					" ",
+				);
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				USE_HERMES = true;

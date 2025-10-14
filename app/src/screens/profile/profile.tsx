@@ -1,8 +1,9 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {FlatList, Image, TouchableOpacity, View} from "react-native";
+import {FlatList, Image, ImageBackground, Platform, TouchableOpacity, View} from "react-native";
 import useStyles from "./styles";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
+import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import {MenuIcon} from "../../assets/svg";
 import UserInfoCard from "../../components/userInfoCard";
@@ -20,17 +21,19 @@ import {
   getAllMemories,
   getProfieDetails,
   getUserCollectedStarCount,
-  getMyRank,
+  getUserRankCount,
+  sendCode,
+  updateArrMemories,
 } from "../../network";
 import {useDispatch, useSelector} from "react-redux";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
+import FastImage from "react-native-fast-image";
 import ScreenLoader from "../../components/screenLoader";
 import {updateARUserData} from "../../redux/AR";
 import {BlurView} from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
 import {height} from "util/AppDimensions";
-import {getProfilePicture} from "util/imageUtils";
-import FastImage from "react-native-fast-image";
+import {heightPercentageToDP} from "react-native-responsive-screen";
 
 const SCROLL_AMOUNT = 150;
 
@@ -39,16 +42,19 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const userProfile = useSelector((state: any) => state.login?.data?.user);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] = useState(30);
+  const [totalLength, setTotalLength] = useState(0);
   const [profileDetails, setProfileDetails] = useState<any>(null);
-  const [arMemories, setARMemories] = useState([]);
+  const [arMemories, setARMemories] = useState<any[]>([]);
   const [loading, setloading] = useState(true);
   const arProfile = useSelector((state: any) => state.ar?.arProfile);
+  const [showArMemories, setShowArMemories] = useState(true);
   const [isProfileUpdated, setIsProfileUpdated] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [starsCount, setStarsCount] = useState(0);
   const [countryCount, setCountryCount] = useState(0);
   const [globalRank, setGlobalRank] = useState(0);
-  const [globalPoints, setGlobalPoints] = useState(0);
   const [myCheckIns, setMyCheckIns] = useState(0);
   const scrollPositionRef = useRef(0); // Ref to hold the scroll position
   const flatListRef = useRef(null);
@@ -66,7 +72,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
     // Scroll to the new position
     // @ts-ignore
-    flatListRef.current?.scrollToOffset({offset: newPosition, animated: true});
+    flatListRef.current?.scrollToOffset({
+      offset: newPosition,
+      animated: true,
+    });
 
     // Update the ref with the new position immediately
     scrollPositionRef.current = newPosition;
@@ -128,20 +137,19 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       .finally(() => setloading(false));
   };
 
-  const getMyRankPoints = (destination = "") => {
-    getMyRank(destination)
-      .then(response => {
-        if (response) {
-          console.log("response", JSON.stringify(response, null, 2));
-          setGlobalRank(response?.my_rank || 0);
-          setGlobalPoints(response?.my_points || 0);
-
-          // setRankMine(response);
+  const getRank = async () => {
+    getUserRankCount({
+      user_id: userProfile.id,
+    })
+      .then(res => {
+        if (res.status == 1) {
+          setGlobalRank(res.rank);
         }
       })
-      .finally(() => {
-        fetchARUserProfile();
-      });
+      .catch(err => {
+        console.error("Error", "Error fetching ar memories: ");
+      })
+      .finally(() => setloading(false));
   };
 
   const getCountry = async () => {
@@ -161,10 +169,12 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   const getProfieARMemories = async () => {
     try {
-      getAllMemories()
+      getAllMemories(currentPage, pageSize)
         .then(res => {
           if (res.status == 1) {
-            setARMemories(res.data);
+            setARMemories(res.results);
+            console.log("re", JSON.stringify(res, null, 2));
+            setTotalLength(res.total_record);
           } else {
             console.error("Error", "Error fetching ar memories: ");
           }
@@ -186,7 +196,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getProfieARMemories();
       fetchARUserProfile();
       getUserCollectedStar();
-      getMyRankPoints();
+      getRank();
       getCountry();
     }, [])
   );
@@ -216,9 +226,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
 
   const data = [
-    {id: 1, value: starsCount, property: "Stars"},
-    {id: 2, value: arProfile?.challenge_completed, property: "AR Challenges"},
-    {id: 3, value: profileDetails?.friends?.length, property: "Friends"},
+    {id: 1, value: myCheckIns, property: "Sites Visited"},
+    {id: 2, value: starsCount, property: "Stars"},
+    {id: 3, value: arProfile?.challenge_completed, property: "AR Challenges"},
+    {id: 4, value: profileDetails?.friends?.length, property: "Friends"},
   ];
   // Split the data into chunks of 3 for each row
   const rows = [];
@@ -226,19 +237,60 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     rows.push(data.slice(i, i + 3));
   }
   const navigateToVerifyMail = (email: string) => {
-    if (!email) return;
-    // sendCode({email: email.toLowerCase()});
+    // sendCode({ email: email.toLowerCase() });
     setIsTransitioning(true);
-    // @ts-ignore
+    // @ts-expect-error
     navigation.navigate("EmailVerification", {
       email: email.toLowerCase(),
       profile: true,
     });
   };
 
-  const profilePicture = getProfilePicture(
-    profileDetails?.image || userProfile?.user_profile?.image
-  );
+  const handleChaangePrivacy = (item: any, value: any) => {
+    const Memories = arMemories.map((memory: any) => {
+      if (memory.id === item.id) {
+        return {...memory, privacy: value};
+      }
+      return memory;
+    });
+    setARMemories(Memories);
+
+    const payLoadData = {
+      id: item.id,
+      privacy: value,
+    };
+    console.log("Privacy updated successfully", payLoadData);
+    updateArrMemories(payLoadData)
+      .then(res => {
+        console.log("Privacy updated successfully", res);
+        if (res.status === 1) {
+          console.log("Privacy updated successfully");
+        } else {
+          console.error("Error updating privacy: ", res.message);
+        }
+      })
+      .catch(err => {
+        console.error("Error updating privacy: ", err);
+      });
+  };
+
+  const lodeMoreData = () => {
+    if (arMemories.length < totalLength) {
+      setCurrentPage(prevPage => prevPage + 1);
+      getAllMemories(currentPage + 1, pageSize)
+        .then(res => {
+          if (res.status == 1) {
+            setARMemories(prevMemories => [...prevMemories, ...res.results]);
+          } else {
+            console.error("Error", "Error fetching more memories: ");
+          }
+        })
+        .catch(err => {
+          console.error("Error", "Error fetching more memories: ", err);
+        });
+    }
+  };
+
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
@@ -340,11 +392,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     </KeyboardAwareScrollView>
   );
 
-  const navigateToShare = (captureData: any, challengeObj: any, scan_picture: any) => {
+  const navigateToShare = (captureData: any, challengeObj: any) => {
     // @ts-ignore
     navigation.navigate("ArChallengeShare", {
       challengeObj: challengeObj,
-      scan_picture: scan_picture,
       captureData,
       hideBottomTab: true,
       isMemory: true,
@@ -355,41 +406,50 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     <View style={_styles.scroll}>
       <View style={_styles.headingView}>
         <AppText style={_styles.heading}>Player AR Memories</AppText>
-        <TouchableOpacity onPress={scrollRegionsPressHandler}>
-          <Image source={Images.ForwardIcon} />
-        </TouchableOpacity>
+        <AppButton
+          containerStyle={_styles.shadowBoxImage}
+          customColors={["#7a00cf", "#5532ff"]}
+          showButton={false}
+        >
+          <TouchableOpacity onPress={() => setShowArMemories(!showArMemories)}>
+            {showArMemories ? (
+              <Icon name="down" family="antdesign" size={25} color={"#fff"} />
+            ) : (
+              <Icon name="up" family="antdesign" size={25} color={"#fff"} />
+            )}
+          </TouchableOpacity>
+        </AppButton>
       </View>
-      <View style={{marginHorizontal: -10, marginBottom: 50}}>
+      {showArMemories && (
         <FlatList
           ref={flatListRef}
-          onScroll={handleScroll}
-          scrollEventThrottle={32} // Adjust this value for performance
-          style={{width: "100%"}}
-          contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
+          // onScroll={handleScroll}
+          // scrollEventThrottle={32} // Adjust this value for performance
+          columnWrapperStyle={{
+            justifyContent: "space-between",
+            marginBottom: 20,
+          }}
+          // contentContainerStyle={{ paddingHorizontal: 20, gap: 18 }}
           data={arMemories}
-          horizontal={true}
+          key={(item: any) => item?.id?.toString()}
+          numColumns={2}
+          onEndReachedThreshold={0.5}
+          onEndReached={lodeMoreData}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => (
             <MemoryContainer
               item={item}
-              onPressAction={() =>
-                navigateToShare(
-                  item?.memory_file,
-                  item?.challenge_details ?? null,
-                  item?.scan_picture ?? item?.challenges ?? null // scan_picture
-                )
-              }
+              onPressAction={navigateToShare}
+              onChnagePrivacy={(item: any, privacy: any) => {
+                handleChaangePrivacy(item, privacy);
+              }}
             />
           )}
           keyExtractor={(item: any) => item?.id?.toString()}
         />
-      </View>
+      )}
     </View>
-  );
-
-  const renderItem = ({item}: any) => (
-    <BoxStatContainer key={item.id} boxId={item.id} value={item.value} property={item.property} />
   );
 
   return (
@@ -399,10 +459,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           <ScreenLoader style={{}} />
         ) : (
           <FlatList
-            data={data}
             contentContainerStyle={_styles.container_style}
             keyExtractor={item => item.id.toString()}
-            renderItem={renderItem}
             ListHeaderComponent={renderHeader}
             numColumns={3}
             nestedScrollEnabled={true}
@@ -410,24 +468,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           />
         )}
         <View style={_styles.blurView}>
-          <BlurView
-            blurType="light"
-            overlayColor="#00000050"
-            enabled={!isTransitioning}
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              bottom: 0,
-              right: 0,
-            }}
-          />
-
-          <AppHeader
-            containerStyle={_styles.headerContainer}
-            title={"Profile"}
-            leftComponent={handleMenuButton()}
-          />
+          <BlurView blurType="light" overlayColor="#00000050" enabled={!isTransitioning}>
+            <AppHeader
+              containerStyle={_styles.headerContainer}
+              title={"Profile"}
+              leftComponent={handleMenuButton()}
+            />
+          </BlurView>
         </View>
       </>
     </ScreenContainer>

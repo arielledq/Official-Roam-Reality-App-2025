@@ -1,10 +1,12 @@
 import {makeStyles} from "@rneui/themed";
 import {FontFamily, FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 const useStyles = makeStyles(theme => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
+    paddingLeft: widthPercentageToDP(4),
   },
   nameContainer: {flex: 1},
   name: {

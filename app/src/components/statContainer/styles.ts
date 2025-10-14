@@ -1,26 +1,28 @@
-import { makeStyles } from "@rneui/themed";
-import { widthPercentageToDP as wp } from "react-native-responsive-screen";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
-import { Platform } from "react-native";
+import {makeStyles} from "@rneui/themed";
+import {widthPercentageToDP as wp} from "react-native-responsive-screen";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {Platform} from "react-native";
 
 const useStyles = makeStyles(theme => ({
   cardInner: {
-    justifyContent: "center",
-    alignContent: "center",
-    alignItems: "center",
+    // justifyContent: "center",
+    // alignContent: "center",
+    // alignItems: "center",
   },
   cardContainer: {
-    height: 190,
     width: wp("27%"),
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 56,
-    backgroundColor: theme.colors.statBG,
+    paddingBottom: wp("10%"),
+    paddingTop: wp("2%"),
+    gap: 10,
+    backgroundColor: theme.colors.boxStatBG,
     ...Platform.select({
       ios: {
         shadowColor: "black",
-        shadowOffset: { width: 0, height: 0 },
+        shadowOffset: {width: 0, height: 0},
         shadowOpacity: 0.5,
         shadowRadius: 4,
       },
@@ -30,17 +32,17 @@ const useStyles = makeStyles(theme => ({
     }),
   },
   cardBottomContent: {
-    alignContent: "center",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: -20,
+    // alignContent: "center",
+    // alignItems: "center",
+    // justifyContent: "center",
+    // marginTop: -20,
   },
   valueStyle: {
-    ...fontGroup.nunitoBold,
-    fontSize: FontSizes.S16,
-    lineHeight: FontLineHeights.LH22,
+    ...fontGroup.nutinoExtraBold,
+    fontSize: FontSizes.S26,
+
     color: theme.colors.white,
-    marginTop: 7,
+    // marginTop: 7,
   },
   Text: {
     ...fontGroup.nunitoRegular,
@@ -50,8 +52,11 @@ const useStyles = makeStyles(theme => ({
     opacity: 0.8,
   },
   iconStyle: {
-    marginTop: -42,
-    marginBottom: 2,
+    width: wp("22%"),
+    height: wp("22%"),
+    borderRadius: 200,
+    justifyContent: "center",
+    alignItems: "center",
   },
 }));
 

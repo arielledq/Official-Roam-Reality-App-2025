@@ -8,6 +8,7 @@ import LinearGradient from "react-native-linear-gradient";
 
 interface AppButtonProps extends ButtonPropsRN {
   innerContainerStyle?: StyleProp<ViewStyle>;
+  showButton?: boolean;
 }
 
 const AppButton: FC<AppButtonProps> = (props: AppButtonProps) => {
@@ -18,6 +19,7 @@ const AppButton: FC<AppButtonProps> = (props: AppButtonProps) => {
     innerContainerStyle,
     customColors,
     radius,
+    showButton = true,
     ...otherProps
   } = props;
 
@@ -43,26 +45,30 @@ const AppButton: FC<AppButtonProps> = (props: AppButtonProps) => {
           containerStyle,
         ]}
       >
-        <View
-          style={[
-            {
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: 10,
-            },
-            innerContainerStyle,
-          ]}
-        >
-          <Button
-            loadingStyle={{backgroundColor: "transparent"}}
-            disabledStyle={{backgroundColor: "transparent"}}
-            buttonStyle={[styles.buttonStyle, buttonStyle]}
-            containerStyle={[styles.containerStyle, otherProps?.loading && {minWidth: 100}]}
-            titleStyle={[styles.titleStyle, titleStyle]}
-            {...otherProps}
-          />
-        </View>
+        {showButton ? (
+          <View
+            style={[
+              {
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 10,
+              },
+              innerContainerStyle,
+            ]}
+          >
+            <Button
+              loadingStyle={{backgroundColor: "transparent"}}
+              disabledStyle={{backgroundColor: "transparent"}}
+              buttonStyle={[styles.buttonStyle, buttonStyle]}
+              containerStyle={[styles.containerStyle, otherProps?.loading && {minWidth: 100}]}
+              titleStyle={[styles.titleStyle, titleStyle]}
+              {...otherProps}
+            />
+          </View>
+        ) : (
+          props.children
+        )}
       </LinearGradient>
     </TouchableOpacity>
   );
