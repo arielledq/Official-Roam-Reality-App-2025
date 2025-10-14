@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from "react-redux";
 import AppHeader from "../../components/header";
 import ScreenContainer from "components/ScreenContainer";
 import PanicPopUp from "../geoarchallenge/panicpopup";
+import Icon from "components/Icon";
 
 import {accountSetupIsComplete, handleError, showMessage} from "../../util/helpers";
 import {
@@ -40,12 +41,16 @@ import useStyles from "./styles";
 import {GIFT_POINTS} from "../../constants";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useOneSignal} from "../../hooks/useOneSignal";
+import {heightPercentageToDP} from "react-native-responsive-screen";
+import theme from "assets/theme";
+import Images from "assets/images";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
   const dispatch = useDispatch();
   const [isLoading, setIsLoading] = useState(false);
   const [destinationDataMini, setDestinationDataMini] = useState([]);
+  const [userPofileImage, setUserPofileImage] = useState("");
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
@@ -235,14 +240,22 @@ const GeoArChallenge = ({}) => {
                   marginEnd: 10,
                 }}
               >
-                <StarSiteIcon style={{width: 48, height: 48}} />
+                <Image
+                  source={Images.Neo_GR}
+                  style={{
+                    transform: [{scale: 2}],
+                    width: 48,
+                    height: 48,
+                  }}
+                />
+
                 <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
-                <Text style={_styles.s_list_text}>Star Sites</Text>
+                <Text style={_styles.s_list_text}>Hunts</Text>
               </View>
               <View style={{alignItems: "center", justifyContent: "center"}}>
                 <ArIcon style={{width: 48, height: 48}} />
                 <Text style={_styles.s_list_count}>{obj?.unique_ar_sites_cnt || 0}</Text>
-                <Text style={_styles.s_list_text}>AR Challenges</Text>
+                <Text style={_styles.s_list_text}>Non-Geo AR</Text>
               </View>
             </View>
           </View>
@@ -254,7 +267,7 @@ const GeoArChallenge = ({}) => {
     return (
       <TouchableOpacity
         onPress={() => navigation.dispatch(DrawerActions.openDrawer)}
-        style={{paddingLeft: 5}}
+        style={{paddingLeft: 5, marginTop: heightPercentageToDP("1%")}}
       >
         <MenuIcon />
       </TouchableOpacity>
@@ -265,11 +278,20 @@ const GeoArChallenge = ({}) => {
     return (
       <TouchableOpacity
         onPress={() => {
-          setOpenPanicPopup(true);
+          navigation.navigate("Profile");
         }}
-        style={{paddingRight: 5}}
       >
-        <SOSIcon width={30} height={30} />
+        {userPofileImage ? (
+          <Image source={{uri: userPofileImage}} style={_styles.profileImage} />
+        ) : (
+          <View
+            style={{
+              marginTop: heightPercentageToDP("1%"),
+            }}
+          >
+            <Icon name={"user"} family={"antdesign"} size={30} color={theme.lightColors.white} />
+          </View>
+        )}
       </TouchableOpacity>
     );
   };
@@ -279,6 +301,7 @@ const GeoArChallenge = ({}) => {
       const response = await getProfieDetails({id: userProfileId});
 
       if (response.status == 1) {
+        setUserPofileImage(response.image);
         const accountIsComplete = accountSetupIsComplete(response);
         if (!accountIsComplete) {
           setTimeout(() => {
@@ -331,7 +354,7 @@ const GeoArChallenge = ({}) => {
         rightComponent={<MenuRightComponent />}
         leftComponent={handleMenuButton()}
         centerComponent={{
-          text: "AR Experiences",
+          text: "Pick Your Destination",
           style: [_styles.heading],
         }}
         backgroundColor="transparent"

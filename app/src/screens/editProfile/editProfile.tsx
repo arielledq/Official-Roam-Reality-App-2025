@@ -76,9 +76,11 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     address: userData?.home_address ?? "",
     country: userData?.home_country ?? "",
     date_of_birth: dateOfBirth ?? "",
+    instagram: userData?.instagram_handle ?? "", // new field
   };
 
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isInstagramInputFocused, setInstagramInputFocused] = useState(false);
   const [isNameInputFocused, setNameInputFocused] = useState(false);
   const [isMobileInputFocused, setMobileInputFocused] = useState(false);
   const [isAddressInputFocused, setAddressInputFocused] = useState(false);
@@ -157,6 +159,11 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     gender.value ? updatedProfileData.append("gender", updatedGender) : {};
     updatedProfileData.append("home_country", updatedCountry);
     formattedDate ? updatedProfileData.append("date_of_birth", updatedDateOfBirth) : {};
+
+    if (values.instagram && values.instagram.trim()) {
+      // new field appended if provided
+      updatedProfileData.append("instagram_handle", values.instagram);
+    }
     if (!photoDetails?.default && photoDetails?.uri) {
       updatedProfileData.append("image", photoDetails);
     }
@@ -188,18 +195,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     // Remove non-digit characters
     const cleaned = input.replace(/\D/g, "");
 
-    // Apply desired format
-    let formatted = "";
-    for (let i = 0; i < cleaned.length; i++) {
-      if (i == 0) {
-        formatted += "1-";
-      } else if (i === 4 || i === 7) {
-        formatted += `-${cleaned[i]}`;
-      } else {
-        formatted += cleaned[i];
-      }
-    }
-    return formatted;
+    return cleaned;
   };
 
   const acceptWaiverButtonHandler = () => {
@@ -269,6 +265,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         address: userData?.home_address || "",
         country: userData?.home_country || "",
         date_of_birth: dob ? dateToString(dob) : "",
+        instagram_handle: userData?.instagram || "", // update instagram value
       });
       setPhotoDetails({
         uri: userData?.image,
@@ -466,7 +463,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         : theme.lightColors?.grey0
                     }
                     selectionColor={"white"}
-                    placeholder="Hometown"
+                    placeholder="City/Town"
                     value={values.address}
                     onChangeText={value => setFieldValue("address", value)}
                     errorMessage={touched.address && errors?.address ? errors.address : undefined}
@@ -507,6 +504,15 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         borderWidth: 0,
                         backgroundColor: "transparent",
                       }}
+                      inputSearchStyle={{
+                        color: theme.lightColors?.white,
+                        fontSize: FontSizes.S14,
+                        borderWidth: 0,
+                        borderBottomWidth: 1,
+                        backgroundColor: theme.lightColors?.inputBG,
+                      }}
+                      searchPlaceholder="Search Country"
+                      searchPlaceholderTextColor={theme.lightColors?.grey0}
                       activeColor={theme.lightColors?.inputBlue}
                       itemContainerStyle={_styles.itemContainerStyle}
                       itemTextStyle={_styles.placeholderStyle}
@@ -516,6 +522,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       maxHeight={300}
                       labelField="label"
                       placeholder="Home Country"
+                      search
                       valueField="value"
                       value={values.country}
                       onChange={item => {
@@ -603,6 +610,46 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                     onCancel={hideDatePicker}
                   />
 
+                  {/* Instagram Handle - new optional field */}
+                  <View style={{marginTop: 20}} />
+                  <AppInput
+                    inputContainerStyle={[
+                      _styles.input,
+                      isInstagramInputFocused ? _styles.focusedInput : {},
+                    ]}
+                    onFocus={() => setInstagramInputFocused(true)}
+                    onBlur={() => setInstagramInputFocused(false)}
+                    onSubmitEditing={Keyboard.dismiss}
+                    placeholder="Instagram Handle"
+                    placeholderTextColor={
+                      isInstagramInputFocused ? theme.lightColors?.white : theme.lightColors?.grey0
+                    }
+                    selectionColor={"white"}
+                    value={values.instagram}
+                    onChangeText={value => setFieldValue("instagram", value)}
+                    autoCapitalize="none"
+                    leftIcon={
+                      <Icon
+                        name={"instagram"}
+                        family="feather"
+                        color={
+                          isInstagramInputFocused
+                            ? theme.lightColors?.white
+                            : theme.lightColors?.grey0
+                        }
+                        size={24}
+                      />
+                    }
+                  />
+
+                  <AppButton
+                    buttonStyle={_styles.buttonStyle}
+                    containerStyle={_styles.buttonContainer}
+                    title={"Save & Continue"}
+                    onPress={handleSubmit}
+                    loading={isLoading}
+                  />
+
                   <View style={_styles.privacyContainer}>
                     <View style={{marginRight: 10}}>
                       <Icons.Shield />
@@ -612,14 +659,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       other information is kept confidential.
                     </AppText>
                   </View>
-
-                  <AppButton
-                    buttonStyle={_styles.buttonStyle}
-                    containerStyle={_styles.buttonContainer}
-                    title={"Save & Continue"}
-                    onPress={handleSubmit}
-                    loading={isLoading}
-                  />
                 </View>
               </View>
             );

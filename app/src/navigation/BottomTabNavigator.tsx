@@ -11,6 +11,7 @@ import ScoreBoard from "../screens/scoreboard";
 import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
 import ARScreen from "screens/arScreen";
+import ARTipsScreen from "screens/arTips";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -30,7 +31,6 @@ const BottomTabNavigator = () => {
   return (
     <SafeAreaProvider style={styles.container}>
       <Tab.Navigator
-        initialRouteName="GeoArChallenge"
         barStyle={styles.tabBarStyle}
         activeColor="#FFFFFF"
         inactiveColor="#FFFFFF"
@@ -81,15 +81,15 @@ const BottomTabNavigator = () => {
           }}
         />
         <Tab.Screen
-          name="Rally"
-          component={Rally}
+          name="FAQ’s"
+          component={ARTipsScreen}
           options={{
             // @ts-ignore
-            tabBarLabel: <Text style={styles.tabBarLabelStyle}>Rally</Text>,
+            tabBarLabel: <Text style={styles.tabBarLabelStyle}>FAQ’s</Text>,
             tabBarIcon: ({focused}) => (
               <View style={{position: "relative"}}>
                 {focused && glowEffect()}
-                <Icon name={"UnselectedFlagIcon"} family="custom" size={25} />
+                <Icon name={"infocirlceo"} family="antdesign" size={25} color="#ffffffc0" />
               </View>
             ),
           }}

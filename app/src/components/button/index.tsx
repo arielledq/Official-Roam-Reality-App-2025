@@ -21,7 +21,8 @@ const AppButton: FC<AppButtonProps> = (props: AppButtonProps) => {
     ...otherProps
   } = props;
 
-  const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
+  // const defaultColors = ["#B816E0", "#1158F4", "#9003E0"];
+  const defaultColors = ["#7a00cf", "#5532ff"];
   const colors = customColors || defaultColors;
   return (
     <TouchableOpacity

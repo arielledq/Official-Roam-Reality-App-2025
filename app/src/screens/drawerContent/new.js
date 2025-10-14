@@ -120,8 +120,7 @@ const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, 
       {index === 0 ? (
         <TouchableOpacity onPress={() => onPress(navigateTo)}>
           <LinearGradient
-            // colors={["#9003E0", "#1158F4", "#9003E0"]}
-            colors={["#7a00cf", "#5532ff"]}
+            colors={["#9003E0", "#1158F4", "#9003E0"]}
             style={{...styles.linearGradient}}
             start={{x: 0, y: 0}}
             end={{x: 1, y: 0}}
@@ -265,7 +264,7 @@ function DrawerContent(props) {
       case "FAQ": {
         navigation.reset({
           index: 0,
-          routes: [{name: "TabNavigator", params: {screen: "Tab", params: {screen: "FAQ’s"}}}],
+          routes: [{name: "TabNavigator", params: {screen: "FAQ"}}],
         });
         break;
       }

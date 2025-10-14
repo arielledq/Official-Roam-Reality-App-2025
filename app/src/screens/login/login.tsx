@@ -41,33 +41,32 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
   const [isLoading, setIsLoading] = useState(false);
   const {setOnesignalDevice} = useOneSignal();
 
-const handleLogin = v => {
-  setIsLoading(true);
-  login({ username: v.email.toLowerCase(), password: v.password })
-    .then(res => {
-      if (res.status == 1) {
-        setItemWithListener("userToken", res?.token);
-        dispatch(updateUserData(res));
-        setOnesignalDevice();
-        if (newUser) dispatch(updateAsOldUser());
+  const handleLogin = v => {
+    setIsLoading(true);
+    login({username: v.email.toLowerCase(), password: v.password})
+      .then(res => {
+        if (res.status == 1) {
+          setItemWithListener("userToken", res?.token);
+          dispatch(updateUserData(res));
+          setOnesignalDevice();
+          if (newUser) dispatch(updateAsOldUser());
 
-        navigation.reset({
-          index: 0,
-          routes: [
-            { name: "TabNavigator", params: { screen: "Tab", params: { screen: "GeoArChallenge" } } },
-          ],
-        });
-      } else {
-        handleError(res);
+          navigation.reset({
+            index: 0,
+            routes: [
+              {name: "TabNavigator", params: {screen: "Tab", params: {screen: "GeoArChallenge"}}},
+            ],
+          });
+        } else {
+          handleError(res);
+          setIsLoading(false);
+        }
+      })
+      .catch(err => {
+        console.log("err", err);
         setIsLoading(false);
-      }
-    })
-    .catch(err => {
-      console.log("err", err);
-      setIsLoading(false);
-    });
-};
-
+      });
+  };
 
   const navigateToResetPassword = () => {
     navigation.navigate("ForgotPassword");
@@ -80,7 +79,7 @@ const handleLogin = v => {
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={[_styles.headerText]}>Welcome back!</AppText>
+      <AppText style={[_styles.headerText]}>Welcome !</AppText>
       <AppText style={_styles.subHeaderText}>
         Login to ROAM a new dimension with captivating AR experiences.
       </AppText>
@@ -146,18 +145,26 @@ const handleLogin = v => {
                 Forgot Password?
               </AppText>
 
-              {/* login Button */}
-              <AppButton
-                buttonStyle={_styles.buttonStyle}
-                containerStyle={_styles.buttonContainerStyle}
-                title={"Sign In"}
-                onPress={handleSubmit}
-                loading={isLoading}
-                disabled={isLoading}
-              />
+              <View style={_styles.buttonWrapper}>
+                <AppButton
+                  buttonStyle={_styles.buttonStyle}
+                  containerStyle={_styles.buttonContainerStyle}
+                  title={"LOGIN"}
+                  onPress={handleSubmit}
+                  loading={isLoading}
+                  disabled={isLoading}
+                />
+                <AppButton
+                  buttonStyle={_styles.buttonStyle}
+                  containerStyle={_styles.buttonContainerStyle}
+                  title={"SIGN UP"}
+                  onPress={navigateToSignUp}
+                  disabled={isLoading}
+                />
+              </View>
 
               {/* Terms and Conditions */}
-              <AppText style={_styles.termsAndConditionstext}>
+              {/* <AppText style={_styles.termsAndConditionstext}>
                 {` By clicking "Sign in" you agree to our `}
                 <AppText
                   style={_styles.TandCLink}
@@ -176,7 +183,7 @@ const handleLogin = v => {
                 >
                   {` Privacy Policy.`}
                 </AppText>
-              </AppText>
+              </AppText> */}
 
               {/* social sign in options */}
               <SocialSignin setLoading={setIsLoading} />
@@ -192,7 +199,9 @@ const handleLogin = v => {
           marginBottom: 50,
         }}
       >
-        <AppText style={_styles.alreadyHaveAccount}>Don’t have an account? {""}</AppText>
+        {/* <AppText style={_styles.alreadyHaveAccount}>
+          Don’t have an account? {""}
+        </AppText>
         <TouchableOpacity
           onPress={navigateToSignUp}
           style={{
@@ -209,7 +218,28 @@ const handleLogin = v => {
           >
             Sign Up
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
+
+        <AppText style={_styles.termsAndConditionstext}>
+          {` By clicking "Sign in" you agree to our `}
+          <AppText
+            style={_styles.TandCLink}
+            onPress={() => {
+              navigation.navigate("TermsAndConditions");
+            }}
+          >
+            {`Terms and Conditions `}
+          </AppText>
+          and
+          <AppText
+            style={_styles.TandCLink}
+            onPress={() => {
+              navigation.navigate("PrivacyPolicy");
+            }}
+          >
+            {` Privacy Policy.`}
+          </AppText>
+        </AppText>
       </View>
     </BackgroundWithImage>
   );

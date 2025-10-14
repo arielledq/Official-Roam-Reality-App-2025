@@ -1,6 +1,7 @@
-import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {screenHorizontalPadding} from "../../util/AppDimensions";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -13,7 +14,7 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: screenHorizontalPadding,
     paddingBottom: 20,
   },
-  container: { marginTop: "10%" },
+  container: {marginTop: "10%"},
   headerText: {
     ...fontGroup.nunitoBold,
     fontSize: FontSizes.S40,
@@ -43,11 +44,12 @@ const useStyles = makeStyles(theme => ({
     textAlign: "right",
     marginTop: -10,
   },
+
   buttonStyle: {
     height: 50,
   },
   buttonContainerStyle: {
-    marginTop: 20,
+    width: widthPercentageToDP("42%"),
   },
   divider: {
     marginVertical: "10%",
@@ -79,9 +81,17 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.purple,
     textDecorationLine: "underline",
   },
-  socialSUcontainer: { flexDirection: "row", alignItems: "center", justifyContent: "center" },
+  socialSUcontainer: {flexDirection: "row", alignItems: "center", justifyContent: "center"},
   socialSIicon: {
     marginHorizontal: 10,
+  },
+  buttonWrapper: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+    width: "100%",
+    gap: 20,
   },
 }));
 
