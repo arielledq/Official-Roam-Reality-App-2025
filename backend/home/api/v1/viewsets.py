@@ -1,7 +1,12 @@
 import logging
+import math
+
 from django_filters.rest_framework import DjangoFilterBackend
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import ListModelMixin
+from rest_framework.pagination import PageNumberPagination
+
 from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet, GenericViewSet
@@ -218,6 +223,24 @@ class AccountSetupViewset(ModelViewSet):
             return UserProfile.objects.filter(user=self.request.user)
 
 
+class CustomScoreboardPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
+
+    def get_paginated_response(self, data):
+        total_record = self.page.paginator.count
+        page_size = self.get_page_size(self.request) or self.page.paginator.per_page
+        total_pages_count = math.ceil(total_record / page_size) if page_size else 1
+        total_pages = list(range(1, total_pages_count + 1))
+        return Response({
+            'total_record': total_record,
+            'page_size': page_size,
+            'current_page': self.page.number,
+            'total_pages': total_pages,
+            'results': data
+        })
+
 class ScoreViewSet(GenericViewSet, ListModelMixin):
     """
     Users for listing, searching and filtering.
@@ -231,6 +254,8 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
     filter_backends = [SearchFilter, DjangoFilterBackend]
     filterset_class = ScoreFilterSet
     search_fields = ['name', ]
+    pagination_class = CustomScoreboardPagination
+
 
     def get_queryset(self):
         qs = super().get_queryset().exclude(
@@ -283,6 +308,48 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
         )
 
         return qs.order_by('-calculated_points', '-ar_user_profile_user__updated_at', 'id')  #, 'id'
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Number of records to return per page',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page_size',
+                        summary='Show 10 records per page',
+                        value=10,
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='page',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Page number for pagination',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page',
+                        summary='Go to page 2',
+                        value=1,
+                    )
+                ]
+            ),
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        qs = self.filter_queryset(self.get_queryset())
+        # Remove manual slicing, use DRF pagination
+        page = self.paginate_queryset(qs)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
 
     @action(detail=False, methods=['get'], url_path='my-rank')
     def my_rank(self, request):

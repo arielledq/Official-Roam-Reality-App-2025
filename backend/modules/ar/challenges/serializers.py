@@ -292,6 +292,7 @@ class ARMemoriesSerializerGet(serializers.ModelSerializer):
             "memory_type",
             "created_at",
             "scan_picture",
+            "privacy"
         )
 
 
@@ -316,7 +317,8 @@ class ARMemoriesSerializer(serializers.ModelSerializer):
             "points",
             "sponsor",
             "geo_location",
-            "scan_picture"
+            "scan_picture",
+            "privacy"
         )
 
 
