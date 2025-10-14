@@ -236,77 +236,105 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     });
   };
 
-  const profilePicture = getProfilePicture(profileDetails?.image || userProfile?.user_profile?.image);
-
+  const profilePicture = getProfilePicture(
+    profileDetails?.image || userProfile?.user_profile?.image
+  );
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-        <FastImage
-          style={{
-            width: "100%",
-            height: height * 0.5,
-          }}
-          source={{uri: profilePicture}}
-          resizeMode="cover"
-        />
-        <LinearGradient
-          colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
-          start={{x: 0.5, y: 1}}
-          end={{x: 0.5, y: 0.7}}
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 1,
-          }}
-        />
-
-        <AppButton
-          customColors={["#7B16FF", "#1158F4"]}
-          buttonStyle={_styles.editButton}
-          containerStyle={_styles.editButtonContainer}
-          onPress={() => {
-            setIsTransitioning(true);
-            //  @ts-ignore
-            navigation.navigate("EditProfile", {
-              edit: true,
-              profileDetails,
-              onProfileUpdate,
-            });
-          }}
-        >
-          <Icon name={"edit"} family="antdesign" color={"white"} size={16} />
-          {/* @ts-ignore */}
-          <AppText style={_styles.buttonText}>Edit Profile </AppText>
-        </AppButton>
+        {profileDetails?.image ? (
+          <>
+            <FastImage
+              style={{
+                width: "100%",
+                height: height * 0.5,
+              }}
+              //  @ts-ignore
+              source={{uri: profileDetails?.image}}
+              resizeMode={FastImage.resizeMode.cover}
+            />
+            <LinearGradient
+              colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}
+              start={{x: 0.5, y: 1}}
+              end={{x: 0.5, y: 0.7}}
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                zIndex: 1,
+              }}
+            />
+          </>
+        ) : (
+          <>
+            <View
+              style={{
+                width: "100%",
+                height: 200,
+              }}
+            />
+          </>
+        )}
       </View>
 
       <View style={_styles.scroll}>
-        <UserInfoCard
-          // @ts-ignore
-          image={profileDetails?.image ? true : false}
-          name={profileDetails?.user.name}
-          email={profileDetails?.user.email}
-          verifyAction={() => navigateToVerifyMail(profileDetails?.user?.email)}
-          isVerified={userProfile?.user_profile?.is_verified}
-        />
+        <View
+          style={{
+            width: "100%",
+            flexDirection: "row",
+
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <View style={{width: "70%"}}>
+            <UserInfoCard
+              // @ts-ignore
+              image={profileDetails?.image ? true : false}
+              name={profileDetails?.user.name}
+              email={profileDetails?.user.email}
+              verifyAction={() => navigateToVerifyMail(profileDetails?.user.email)}
+              isVerified={userProfile?.user_profile?.is_verified}
+            />
+          </View>
+
+          <AppButton
+            customColors={["#7a00cf", "#5532ff"]}
+            buttonStyle={_styles.editButton}
+            containerStyle={[_styles.editButtonContainer]}
+            onPress={() => {
+              setIsTransitioning(true);
+              //  @ts-ignore
+              navigation.navigate("EditProfile", {
+                edit: true,
+                profileDetails,
+                onProfileUpdate,
+              });
+            }}
+          >
+            <Icon name={"edit"} family="antdesign" color={"white"} size={16} />
+            {/* @ts-ignore */}
+            <AppText style={_styles.buttonText}>Edit Profile </AppText>
+          </AppButton>
+        </View>
         <View style={_styles.scoreboardContainer}>
           <AppText
-            // @ts-ignore
-            onPress={() => navigation.navigate("Scores")}
             adjustsFontSizeToFit={true}
             numberOfLines={1}
+            // @ts-ignore
+            onPress={() => navigation.navigate("ScoreBoard")}
+            // @ts-ignore
             style={_styles.scoreboard}
           >
             SCOREBOARD
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={globalRank?.toString()} property={"Global Rank"} />
-          <StatContainer value={globalPoints?.toString()} property={"Points"} />
-          <StatContainer value={myCheckIns?.toString()} property={"Sites Visited"} />
+          <StatContainer value={"" + globalRank} property={"Global Rank"} />
+          <StatContainer value={arProfile?.points} property={"Points"} />
+          <StatContainer value={profileDetails?.friends?.length} property={"Friends"} />
         </View>
       </View>
     </KeyboardAwareScrollView>
@@ -342,16 +370,18 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => <MemoryContainer
-    item={item}
-    onPressAction={() =>
-      navigateToShare(
-        item?.memory_file,                 
-        item?.challenge_details ?? null,   
-        item?.scan_picture ?? item?.challenges ?? null // scan_picture
-      )
-    }
-  />}
+          renderItem={({item}) => (
+            <MemoryContainer
+              item={item}
+              onPressAction={() =>
+                navigateToShare(
+                  item?.memory_file,
+                  item?.challenge_details ?? null,
+                  item?.scan_picture ?? item?.challenges ?? null // scan_picture
+                )
+              }
+            />
+          )}
           keyExtractor={(item: any) => item?.id?.toString()}
         />
       </View>

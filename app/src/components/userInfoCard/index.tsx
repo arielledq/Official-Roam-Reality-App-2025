@@ -28,9 +28,8 @@ const UserInfoCard = ({
     <View style={styles.row}>
       {/* user details */}
       <View style={styles.nameContainer}>
-        <AppText style={styles.name}>{name}</AppText>
+        <AppText style={image ? styles.name : styles.name1}>{name}</AppText>
         <View style={styles.containerBottom}>
-          <AppText style={styles.userName}>{truncatedEmail}</AppText>
           {reportAction && (
             <View style={styles.verifyNowContainer}>
               <Pressable style={styles.verifyButton} onPress={reportAction}>
@@ -41,7 +40,7 @@ const UserInfoCard = ({
           {!isVerified && (
             <View style={styles.verifyNowContainer}>
               <Pressable style={styles.verifyButton} onPress={verifyAction}>
-                <AppText style={styles.verifyAccountText}>Verify Your Account</AppText>
+                <AppText style={styles.verifyAccountText}>Verify My Profile</AppText>
               </Pressable>
             </View>
           )}

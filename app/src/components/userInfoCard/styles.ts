@@ -13,6 +13,13 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH40,
   },
+  name1: {
+    ...fontGroup.nunitoBold,
+    color: theme.colors.white,
+    fontSize: FontSizes.S30,
+    lineHeight: FontLineHeights.LH40,
+    marginTop: 150,
+  },
   userName: {
     ...fontGroup.nunitoRegular,
     color: theme.colors.white,
@@ -21,7 +28,7 @@ const useStyles = makeStyles(theme => ({
   },
   containerBottom: {
     flexDirection: "row",
-    alignItems: "center",
+
     marginTop: "6%",
   },
   verificationIcon: {
@@ -33,10 +40,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S10,
     lineHeight: FontLineHeights.LH14,
   },
-  verifyNowContainer: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
+  verifyNowContainer: {},
   verifyNow: {
     ...fontGroup.nunitoBold,
     color: theme.colors.inputRed,
@@ -45,7 +49,7 @@ const useStyles = makeStyles(theme => ({
   },
   verifyAccountText: {
     ...fontGroup.nunitoBold,
-    color: theme.colors.yellow,
+    color: theme.colors.green,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
   },
