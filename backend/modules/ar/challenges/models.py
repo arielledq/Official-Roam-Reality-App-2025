@@ -482,6 +482,21 @@ class ARUserProfileScoreboard(ARUserProfile):
         verbose_name_plural = _("Scoreboard")
 
 
+
+class ARChallengeModels(models.Model):
+    class Meta:
+        verbose_name_plural = "AR Challenge Models"
+        verbose_name = "AR Challenge Models"
+        db_table = "ar_challenge_models"
+
+    name = models.CharField(max_length=255, blank=True, null=True, unique=True)
+    image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
+    model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.name
+
 class ARMemories(models.Model):
     memory_file = models.FileField(upload_to="ar/memories/", blank=True, null=True)
     thumbnail_memory_video_file = models.ImageField(upload_to="ar/memories/thumbnails/", blank=True, null=True)
@@ -533,6 +548,19 @@ class ARMemories(models.Model):
         blank=True,
         null=True,
     )
+
+    PRIVACY_CHOICES = (
+        ('public', 'Public'),
+        ('private', 'Private'),
+    )
+
+    privacy = models.CharField(
+        max_length=10,
+        choices=PRIVACY_CHOICES,
+        default='public',
+        help_text='Control whether this memory is public or private'
+    )
+
     created_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
     points = models.IntegerField(verbose_name="Points", default=0)
     user_first_attempt = models.BooleanField(default=False)

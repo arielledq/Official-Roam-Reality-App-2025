@@ -89,7 +89,7 @@ class UserProfile(CommonModel):
     phone_number = models.CharField(max_length=15, blank=True, null=True)
     account_setup = models.BooleanField(default=False)
     friends = models.ManyToManyField(User, related_name='friends')
-
+    instagram_handle = models.CharField(max_length=255, blank=True, null=True)
     def get_image_url(self):
         """Return the image URL or placeholder if no image is set"""
         if self.image and hasattr(self.image, 'url'):

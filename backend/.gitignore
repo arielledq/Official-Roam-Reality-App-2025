@@ -92,3 +92,6 @@ mediafiles/
 .local
 .python_history
 /.idea/*
+LOCAL_SETUP_GUIDE.md
+requirements.txt
+QUICK_START.md

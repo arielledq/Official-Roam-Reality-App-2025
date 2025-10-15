@@ -159,6 +159,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
         instance.phone_number = validated_data.get('phone_number', instance.phone_number)
         instance.account_setup = validated_data.get('account_setup', instance.account_setup)
         instance.image = validated_data.get('image', instance.image)
+        instance.instagram_handle = validated_data.get('instagram_handle', instance.instagram_handle)
         instance.user.name = validated_data.get('name', instance.user.name)
         instance.user.has_receive_points = validated_data.get('has_receive_points', instance.user.has_receive_points)
         instance.user.save()
