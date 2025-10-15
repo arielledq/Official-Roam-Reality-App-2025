@@ -1,6 +1,7 @@
 import {makeStyles} from "@rneui/themed";
 import {screenHorizontalPadding} from "../../util/AppDimensions";
 import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.

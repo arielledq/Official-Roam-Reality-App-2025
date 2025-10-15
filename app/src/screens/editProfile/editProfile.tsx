@@ -5,7 +5,7 @@ import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {Dropdown} from "react-native-element-dropdown";
 import DatePicker from "react-native-date-picker";
 import axios from "axios";
-import {Asset, CameraOptions, launchImageLibrary} from "react-native-image-picker";
+import {Asset} from "react-native-image-picker";
 import {useDispatch, useSelector} from "react-redux";
 import {Button, Dialog, Portal} from "react-native-paper";
 
@@ -33,6 +33,7 @@ import Images from "../../assets/images";
 import {ProfilePlaceholder} from "assets/base64";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useFocusEffect} from "@react-navigation/native";
+import ImagePicker from "react-native-image-crop-picker";
 
 interface ImageData {
   uri: string | undefined;
@@ -119,6 +120,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   };
 
   function uploadProfileImage(image: Asset) {
+    console.log("Image to be uploaded: ", image);
     setPhotoDetails({
       uri: image.uri,
       type: image.type,
@@ -128,19 +130,26 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   }
 
   async function pickImage(setFieldValue: (field: string, value: any) => {}) {
-    const options = {
-      mediaType: "photo",
-      includeBase64: false,
-      quality: 1,
-    } as CameraOptions;
+    try {
+      // Use ImagePicker directly for picking and cropping in one step
+      const croppedImage = await ImagePicker.openPicker({
+        mediaType: "photo",
+        width: 300,
+        height: 300,
+        cropping: true,
 
-    await launchImageLibrary(options, response => {
-      if (response?.assets) {
-        const selectedImageUri = response?.assets?.[0]?.uri;
-        setFieldValue("pImage", selectedImageUri);
-        uploadProfileImage(response?.assets?.[0]);
-      }
-    });
+        compressImageMaxWidth: 300,
+        compressImageMaxHeight: 300,
+        compressImageQuality: 0.8,
+        includeBase64: false,
+      });
+
+      console.log("Cropped Image: ", croppedImage);
+      setFieldValue("pImage", croppedImage.path);
+      uploadProfileImage(croppedImage);
+    } catch (error) {
+      console.log("Image picker cancelled or error:", error);
+    }
   }
 
   const handleEditProfile = (values: any) => {
@@ -167,6 +176,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (!photoDetails?.default && photoDetails?.uri) {
       updatedProfileData.append("image", photoDetails);
     }
+    console.log("Updated Profile Data:", updatedProfileData);
     setIsLoading(true);
     updateProfile({
       id: userProfile.user_profile.id,
