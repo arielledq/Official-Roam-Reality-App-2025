@@ -289,6 +289,16 @@ export const getARProfile = () =>
     },
     logoutFunc
   );
+export const updateArrMemories = (id, payload) =>
+  Request.callWithToken(
+    {
+      url: `modules/challenges/memories/${id}/`,
+      method: "PATCH",
+      data: payload,
+    },
+    logoutFunc
+  );
+
 export const postArMemory = payload =>
   Request.multiPartCall(
     {
@@ -553,7 +563,7 @@ export const getUserFriendList = () =>
 export const getScoreboardList = (pageNumber = 1, destination = "", sponsor = "") => {
   const queryParams =
     `?page=${pageNumber}` +
-    (sponsor ? `&sponsor=${sponsor}` : "") +
+    ``(sponsor ? `&sponsor=${sponsor}` : "") +
     (destination ? `&destination=${destination}` : "");
   return Request.callWithToken(
     {

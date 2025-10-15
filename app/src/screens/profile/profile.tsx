@@ -171,10 +171,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     try {
       getAllMemories(currentPage, pageSize)
         .then(res => {
-          console.log("re", JSON.stringify(res, null, 2));
           if (res.status == 1) {
-            setARMemories(res.data);
-            console.log("re", JSON.stringify(res, null, 2));
+            setARMemories(res.results);
+
             setTotalLength(res.total_record);
           } else {
             console.error("Error", "Error fetching ar memories: ");
@@ -257,22 +256,18 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     setARMemories(Memories);
 
     const payLoadData = {
-      id: item.id,
       privacy: value,
     };
-    console.log("Privacy updated successfully", payLoadData);
-    // updateArrMemories(payLoadData)
-    //   .then(res => {
-    //     console.log("Privacy updated successfully", res);
-    //     if (res.status === 1) {
-    //       console.log("Privacy updated successfully");
-    //     } else {
-    //       console.error("Error updating privacy: ", res.message);
-    //     }
-    //   })
-    //   .catch(err => {
-    //     console.error("Error updating privacy: ", err);
-    //   });
+
+    updateArrMemories(item.id, payLoadData)
+      .then(res => {
+        if (res.status === 1) {
+        } else {
+        }
+      })
+      .catch(err => {
+        console.error("Error updating privacy: ", err);
+      });
   };
 
   const lodeMoreData = () => {
@@ -430,13 +425,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       {showArMemories && (
         <FlatList
           ref={flatListRef}
-          // onScroll={handleScroll}
-          // scrollEventThrottle={32} // Adjust this value for performance
-          columnWrapperStyle={{
-            justifyContent: "space-between",
-            marginBottom: 20,
+          style={{
+            paddingHorizontal: 10,
           }}
-          // contentContainerStyle={{ paddingHorizontal: 20, gap: 18 }}
+          columnWrapperStyle={{
+            gap: heightPercentageToDP("2%"),
+            marginBottom: 10,
+          }}
           data={arMemories}
           key={(item: any) => item?.id?.toString()}
           numColumns={3}

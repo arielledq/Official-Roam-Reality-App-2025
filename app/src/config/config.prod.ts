@@ -11,7 +11,7 @@ export default {
   // APPLE_REDIRECT_URL:
   //   "https://travel-ar-app-42706-32103.azurewebsites.net/accounts/apple/login/callback/", // Production Azure
   BASE_URL: "https://travel-ar-app-42706-staging.azurewebsites.net/", // Staging Azure
-  // BASE_URL: "https://7d2fb9cc8b1e.ngrok-free.app/",
+  // BASE_URL: "https://689d0cbed73f.ngrok-free.app/",
   APPLE_REDIRECT_URL:
     "https://travel-ar-app-42706-staging.azurewebsites.net/accounts/apple/login/callback/", // Staging Azure
   ONE_SIGNAL_APP_ID: "ceda5dd2-8fd2-4180-9532-7b7f127a612d",
