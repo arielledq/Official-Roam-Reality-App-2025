@@ -297,10 +297,16 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       <View style={_styles.avatarContainer}>
         {profileDetails?.image ? (
           <>
+            <View
+              style={{
+                width: "100%",
+                height: height * 0.12,
+              }}
+            />
             <FastImage
               style={{
                 width: "100%",
-                height: height * 0.5,
+                height: height * 0.4,
               }}
               //  @ts-ignore
               source={{uri: profileDetails?.image}}
@@ -325,7 +331,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
             <View
               style={{
                 width: "100%",
-                height: 200,
+                height: height * 0.52,
               }}
             />
           </>

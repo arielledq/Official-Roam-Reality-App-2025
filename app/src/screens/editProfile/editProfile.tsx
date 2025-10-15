@@ -34,7 +34,8 @@ import {ProfilePlaceholder} from "assets/base64";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useFocusEffect} from "@react-navigation/native";
 import ImagePicker from "react-native-image-crop-picker";
-
+import {widthPercentageToDP} from "react-native-responsive-screen";
+import {height} from "util/AppDimensions";
 interface ImageData {
   uri: string | undefined;
   type: string | undefined;
@@ -119,12 +120,16 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     setDatePickerVisibility(true);
   };
 
+  const getFileName = (filePath: any) => {
+    return filePath.split("/").pop();
+  };
+
   function uploadProfileImage(image: Asset) {
-    console.log("Image to be uploaded: ", image);
     setPhotoDetails({
-      uri: image.uri,
-      type: image.type,
-      name: Date.now() + ".jpeg",
+      uri: image.path,
+      name: getFileName(image.path),
+      type: image.mime,
+
       default: false,
     });
   }
@@ -134,17 +139,12 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       // Use ImagePicker directly for picking and cropping in one step
       const croppedImage = await ImagePicker.openPicker({
         mediaType: "photo",
-        width: 300,
-        height: 300,
+        width: widthPercentageToDP("100%"),
+        height: height * 0.4,
         cropping: true,
-
-        compressImageMaxWidth: 300,
-        compressImageMaxHeight: 300,
-        compressImageQuality: 0.8,
         includeBase64: false,
       });
 
-      console.log("Cropped Image: ", croppedImage);
       setFieldValue("pImage", croppedImage.path);
       uploadProfileImage(croppedImage);
     } catch (error) {
