@@ -36,6 +36,8 @@ import {EXPERIENCE_TYPE_CHOICES} from "../../../constants";
 import RNFS from "react-native-fs";
 import theme from "assets/theme";
 import MapSkeletonLoader from "components/MapSkeletonLoader";
+import TransparentSearchBar from "components/transparentSearchBar";
+import {heightPercentageToDP} from "react-native-responsive-screen";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 60 seconds
@@ -69,6 +71,10 @@ const GeoArChallengeDetails = ({}) => {
   const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
   const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
   const [shouldShowMap, setShouldShowMap] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [markersFullyLoaded, setMarkersFullyLoaded] = useState(false);
+  const markerRefs = useRef({});
+  const autoTooltipShownRef = useRef(false);
 
   const bandLocationUpdatesIntervalId = useRef(null);
   const friendsLocationUpdatesIntervalId = useRef(null);
@@ -249,6 +255,11 @@ const GeoArChallengeDetails = ({}) => {
     if (o?.lat_long) {
       return (
         <Marker
+          ref={ref => {
+            if (ref) {
+              markerRefs.current[`marker-${o.id}`] = ref;
+            }
+          }}
           key={`marker-${o.id}`}
           coordinate={{
             latitude: o?.lat_long.coordinates[1],
@@ -343,6 +354,7 @@ const GeoArChallengeDetails = ({}) => {
     getUserFriendList()
       .then(response => {
         if (response) {
+          console.log("Friend List Response:", response);
           setFriendList(response?.data[0]?.friends || []);
         }
       })
@@ -433,9 +445,28 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
+  const showAutoTooltipOnFirstMarker = () => {
+    if (filteredUpdatedMarkers.length > 0 && !autoTooltipShownRef.current) {
+      // Get the first marker that has a valid location
+      const firstValidMarker = filteredUpdatedMarkers.find(marker => marker?.lat_long);
+
+      if (firstValidMarker) {
+        const markerRef = markerRefs.current[`marker-${firstValidMarker.id}`];
+        if (markerRef) {
+          // Delay to ensure marker is rendered and ready
+          setTimeout(() => {
+            markerRef.showCallout();
+            autoTooltipShownRef.current = true;
+          }, 800);
+        }
+      }
+    }
+  };
+
   const debounceSetMarkersData = markers => {
     setUpdatedMarkers(markers);
     setFilteredUpdatedMarkers(markers);
+    setMarkersFullyLoaded(false);
 
     setTimeout(() => {
       setFilteredUpdatedMarkers([]);
@@ -444,6 +475,7 @@ const GeoArChallengeDetails = ({}) => {
     setTimeout(() => {
       setLoadingCustomMarkers(false);
       setFilteredUpdatedMarkers(markers);
+      setMarkersFullyLoaded(true);
     }, 500);
   };
 
@@ -456,6 +488,36 @@ const GeoArChallengeDetails = ({}) => {
     getBandLocationUpdates();
   };
 
+  const searchLocation = () => {
+    if (!searchQuery.trim() || !filteredUpdatedMarkers.length) return;
+
+    const lowercaseQuery = searchQuery.trim().toLowerCase();
+    const matchedMarker = filteredUpdatedMarkers.find(
+      marker => marker.name && marker.name.toLowerCase().includes(lowercaseQuery)
+    );
+
+    if (matchedMarker && matchedMarker.lat_long) {
+      const markerCoordinate = {
+        latitude: matchedMarker.lat_long.coordinates[1],
+        longitude: matchedMarker.lat_long.coordinates[0],
+        latitudeDelta: 0.01, // Closer zoom for better visibility of the marker
+        longitudeDelta: 0.01,
+      };
+
+      // First animate to the marker location
+      mapView.current?.animateToRegion(markerCoordinate, 1000);
+
+      // After animation completes, show the callout
+      setTimeout(() => {
+        const markerRef = markerRefs.current[`marker-${matchedMarker.id}`];
+        if (markerRef) {
+          markerRef.showCallout();
+        }
+      }, 1500); // Wait a bit after animation to show callout
+    } else {
+      showMessage("No locations found matching your search.", "error", "Search failed");
+    }
+  };
   useEffect(() => {
     if (
       !selectedDestination.geo_location ||
@@ -577,9 +639,19 @@ const GeoArChallengeDetails = ({}) => {
     }
   }, [arSitesOn]);
 
+  // Auto show tooltip when all markers are fully loaded
+  useEffect(() => {
+    if (markersFullyLoaded && filteredUpdatedMarkers.length > 0 && !loadingCustomMarkers) {
+      showAutoTooltipOnFirstMarker();
+    }
+  }, [markersFullyLoaded, filteredUpdatedMarkers, loadingCustomMarkers]);
+
   useFocusEffect(
     useCallback(() => {
       setShouldShowMap(true);
+      // Reset auto tooltip flag when screen is focused
+      autoTooltipShownRef.current = false;
+      setMarkersFullyLoaded(false);
 
       return () => {
         setShouldShowMap(false);
@@ -599,15 +671,32 @@ const GeoArChallengeDetails = ({}) => {
 
       <View
         style={{
+          width: "100%",
+          paddingTop: heightPercentageToDP(2),
+          paddingBottom: heightPercentageToDP(2),
+          alignItems: "center",
+          flexDirection: "row",
+          gap: 10,
+        }}
+      >
+        <TransparentSearchBar
+          placeholder="Search Locations"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmitEditing={searchLocation}
+        />
+        <TouchableOpacity onPress={scrollRegionsPressHandler} style={_styles.scrollButton}>
+          <Icon name={"doubleright"} family="antdesign" size={25} color="gray" />
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
           marginBottom: 10,
           alignItems: "flex-end",
           gap: 10,
         }}
       >
-        <TouchableOpacity onPress={scrollRegionsPressHandler}>
-          <Icon name={"doubleright"} family="antdesign" size={25} color="gray" />
-        </TouchableOpacity>
-
         {isEvent ? (
           <FlatList
             style={{width: "100%", height: 50}}
@@ -753,56 +842,11 @@ const GeoArChallengeDetails = ({}) => {
         )}
       </View>
       <View>
-        <Text style={_styles.s_list_text}>Tap the pin to see more details</Text>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%",
-          alignItems: "flex-start",
-          marginTop: 20,
-          marginBottom: 30,
-        }}
-      >
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 70,
-          }}
-        >
-          <ARSiteCountBG style={{width: 48, height: 48}}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>
-            {isEvent
-              ? selectedDestination?.ar_event_sites?.length
-              : selectedDestination?.star_ar_sites?.length}
-          </Text>
-          <Text style={_styles.s_list_text}>Sites</Text>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 70,
-          }}
-        >
-          <ARSiteCountBG style={{width: 48, height: 48}}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{starsSites}</Text>
-          <Text style={_styles.s_list_text}>Star Sites</Text>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 100,
-          }}
-        >
-          <ARSiteCountBG style={{width: 48, height: 48}}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
-          <Text style={_styles.s_list_text}>AR Experiences</Text>
+        <View style={_styles.textView}>
+          <Text style={_styles.s_list_text}>Click the pins to see more details.</Text>
         </View>
       </View>
+
       {popUpFacts && (
         <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
           <DestinationFactPopUp

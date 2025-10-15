@@ -1,6 +1,7 @@
-import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../../util/AppDimensions";
-import { FontFamily, FontLineHeights, FontSizes, fontGroup } from "../../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {screenHorizontalPadding} from "../../../util/AppDimensions";
+import {FontFamily, FontLineHeights, FontSizes, fontGroup} from "../../../util/FontUtils";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -21,7 +22,7 @@ const useStyles = makeStyles(theme => ({
     paddingHorizontal: screenHorizontalPadding,
     justifyContent: "flex-start",
   },
-  container: { marginTop: "10%" },
+  container: {marginTop: "10%"},
   headerText: {
     ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
@@ -105,12 +106,9 @@ const useStyles = makeStyles(theme => ({
     top: 15,
   },
   s_list_text: {
-    ...fontGroup.nunitoRegular,
-    fontSize: 11,
+    ...fontGroup.nunitoBold,
+    fontSize: FontSizes.S20,
     color: theme.colors.white,
-    alignItems: "center",
-    textAlign: "center",
-    marginTop: 10,
   },
   gradient: {
     position: "absolute",
@@ -135,6 +133,23 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     flex: 0.45,
     justifyContent: "space-between",
+  },
+  textView: {
+    width: "100%",
+    paddingBottom: heightPercentageToDP(4),
+    paddingTop: heightPercentageToDP(2),
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scrollButton: {
+    backgroundColor: "#77777750",
+    borderColor: "#6B7280",
+    borderRadius: 2,
+    borderWidth: 1,
+    height: heightPercentageToDP(5),
+    width: heightPercentageToDP(5),
+    justifyContent: "center",
+    alignItems: "center",
   },
 }));
 
