@@ -1,8 +1,11 @@
 import json
+import math
 from itertools import chain
 from operator import attrgetter
 import requests
 from django.shortcuts import get_object_or_404
+from drf_spectacular.utils import OpenApiParameter, OpenApiExample, extend_schema
+from rest_framework.pagination import PageNumberPagination
 
 from configuration import configs
 from travel_ar_app_42706 import settings
@@ -19,7 +22,7 @@ from .serializers import ARMemoriesSerializerGet, \
     GeoStarPointSerializer, GeoArSiteCategorySerializer, ARAllMemoriesSerializer, GeoLocationMiniSerializer, \
     ElevationRequestSerializer, ARScanSerializer
 from rest_framework import viewsets, exceptions
-from rest_framework.viewsets import ViewSet
+from rest_framework.viewsets import ViewSet, GenericViewSet
 from rest_framework.parsers import FileUploadParser, FormParser
 from rest_framework.views import APIView
 from rest_framework import permissions, status
@@ -785,26 +788,75 @@ class DestinationFactsViewSet(ViewSet):
         serializer = DestinationFactsSerializer(objs, many=True)
         return Response(serializer.data)
 
+class CustomMemoryPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 100
 
-class MemoryCheckinViewSet(ViewSet):
+    def get_paginated_response(self, data):
+        total_record = self.page.paginator.count
+        page_size = self.get_page_size(self.request) or self.page.paginator.per_page
+        total_pages_count = math.ceil(total_record / page_size) if page_size else 1
+        total_pages = list(range(1, total_pages_count + 1))
+        return Response({
+            'total_record': total_record,
+            'page_size': page_size,
+            'current_page': self.page.number,
+            'total_pages': total_pages,
+            'results': data
+        })
+
+class MemoryCheckinViewSet(GenericViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-
+    pagination_class = CustomMemoryPagination
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Number of records to return per page',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page_size',
+                        summary='Show 10 records per page',
+                        value=10,
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='page',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Page number for pagination',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page',
+                        summary='Go to page 2',
+                        value=1,
+                    )
+                ]
+            ),
+        ]
+    )
     def list(self, request):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
-            all_user_memories = ARMemories.objects.filter(user=request.user.id, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
+            all_user_memories = ARMemories.objects.filter(user=request.user.id)
             result_list = sorted(
                 chain(all_user_check_in, all_user_memories),
                 key=attrgetter('created_at'),
                 reverse=True
             )
-            serializer = ARAllMemoriesSerializer(
-                result_list,
-                many=True,
-                context={'request': request}
-            )
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            page = self.paginate_queryset(result_list)
+            if page is not None:
+                serializer = ARAllMemoriesSerializer(page, many=True, context={'request': request})
+                return self.get_paginated_response(serializer.data)
+            serializer = ARAllMemoriesSerializer(result_list, many=True, context={'request': request})
+            return Response(serializer.data)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
