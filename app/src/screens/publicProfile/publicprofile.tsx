@@ -263,7 +263,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
         <FlatList
           scrollEventThrottle={32} // Adjust this value for performance
           style={{width: "100%"}}
-          // contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
+          contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
@@ -278,6 +278,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
                   item?.scan_picture ?? item?.challenges ?? null // scan_picture
                 )
               }
+              cardStyle={{width: 115}}
             />
           )}
           keyExtractor={(item: any) => item?.id?.toString()}

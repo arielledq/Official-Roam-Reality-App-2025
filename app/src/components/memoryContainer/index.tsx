@@ -15,10 +15,12 @@ const MemoryContainer = ({
   onChnagePrivacy = (item: any, privacy: any) => {
     // Function to handle privacy change
   },
+  cardStyle = {},
 }: {
   item: any;
   onPressAction?: (file: any, details: any) => void;
   onChnagePrivacy?: (item: any, privacy: any) => void;
+  cardStyle?: object;
 }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState(false);
@@ -51,7 +53,7 @@ const MemoryContainer = ({
 
   return (
     <Pressable
-      style={styles.cardWrapper}
+      style={[styles.cardWrapper, cardStyle]}
       onPress={() => onPressAction && onPressAction(item?.memory_file, item?.challenge_details)}
     >
       <View style={styles.cardContainer}>
