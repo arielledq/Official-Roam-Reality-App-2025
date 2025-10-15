@@ -5,7 +5,6 @@ import {widthPercentageToDP} from "react-native-responsive-screen";
 const useStyles = makeStyles(theme => ({
   cardWrapper: {
     width: "30%",
-
     alignContent: "center",
     alignItems: "center",
     justifyContent: "center",

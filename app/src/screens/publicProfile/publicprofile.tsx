@@ -177,10 +177,16 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
+        <View
+          style={{
+            width: "100%",
+            height: height * 0.13,
+          }}
+        />
         <Image
           style={{
             width: "100%",
-            height: height * 0.5,
+            height: height * 0.4,
           }}
           source={{uri: profilePicture}}
           resizeMode="cover"
@@ -241,7 +247,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       scan_picture: scan_picture,
       captureData,
       hideBottomTab: true,
-//       isMemory: true,
+      //       isMemory: true,
     });
   };
 
@@ -257,18 +263,23 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
         <FlatList
           scrollEventThrottle={32} // Adjust this value for performance
           style={{width: "100%"}}
-          contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
+          // contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
           data={arMemories}
           horizontal={true}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
-          renderItem={({item}) => <MemoryContainer item={item} onPressAction={() =>
-      navigateToShare(
-        item?.memory_file,                 
-        item?.challenge_details ?? null,   
-        item?.scan_picture ?? item?.challenges ?? null // scan_picture
-      )
-    } />}
+          renderItem={({item}) => (
+            <MemoryContainer
+              item={item}
+              onPressAction={() =>
+                navigateToShare(
+                  item?.memory_file,
+                  item?.challenge_details ?? null,
+                  item?.scan_picture ?? item?.challenges ?? null // scan_picture
+                )
+              }
+            />
+          )}
           keyExtractor={(item: any) => item?.id?.toString()}
         />
       </View>

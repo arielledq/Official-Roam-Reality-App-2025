@@ -1,6 +1,6 @@
-import { makeStyles } from "@rneui/themed";
-import { screenHorizontalPadding } from "../../util/AppDimensions";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {screenHorizontalPadding} from "../../util/AppDimensions";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -58,6 +58,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+    padding: 10,
   },
   boxstatContainerStyle: {
     flexDirection: "row",

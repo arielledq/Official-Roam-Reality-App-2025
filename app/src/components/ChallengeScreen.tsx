@@ -17,6 +17,8 @@ interface CaptureChallengeScreenProps {
   scrollable?: boolean;
   style?: ViewStyle;
   disableBackButton?: boolean;
+  centerComponentStyle?: ViewStyle;
+  fonsize?: number;
 }
 
 const ChallengeScreen = ({
@@ -29,6 +31,8 @@ const ChallengeScreen = ({
   appHeader = true,
   scrollable = true,
   disableBackButton = false,
+  centerComponentStyle = {},
+  fonsize,
 }: CaptureChallengeScreenProps) => {
   const {height, width} = useWindowDimensions();
 
@@ -68,12 +72,13 @@ const ChallengeScreen = ({
             numberOfLines: 2,
             // @ts-ignore
             style: {
-              fontSize: FontSizes.S14,
+              fontSize: fonsize ? fonsize : FontSizes.S14,
               lineHeight: FontLineHeights.LH20,
               color: theme.lightColors?.white,
               textAlign: "center",
               ...fontGroup.nunitoBold,
             },
+            ...centerComponentStyle,
           }}
           centerContainerStyle={{alignItems: "center", justifyContent: "center"}}
           backgroundColor="transparent"

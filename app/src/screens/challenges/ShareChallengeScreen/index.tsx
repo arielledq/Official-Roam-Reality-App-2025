@@ -1,5 +1,5 @@
 import React, {useCallback, useContext, useEffect, useState} from "react";
-import {Image, Text, View, Dimensions, StyleSheet} from "react-native";
+import {Image, Text, View, Dimensions, StyleSheet, TouchableOpacity} from "react-native";
 import {useNavigation, useRoute} from "@react-navigation/native";
 import {useDispatch} from "react-redux";
 import {RouteProp} from "@react-navigation/native";
@@ -30,6 +30,9 @@ import {
   ShareChallengeRouteParams,
   shareToRoamProfile,
 } from "./shareChallengeUtils";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
+import App from "App";
+import Icon from "components/Icon";
 
 const ArChallengeShare = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -248,29 +251,17 @@ const ArChallengeShare = () => {
 
   return (
     <ChallengeScreen
-      title={screenTitle}
+      title={"Location Check-In Challenge"}
       style={styles.screenContainer}
       modals={screenModals}
       disableBackButton={disableBackButton}
       hideBackButton={hideBackButton}
+      centerComponentStyle={{
+        width: widthPercentageToDP("100%"),
+      }}
+      fonsize={FontSizes.S18}
     >
       <View style={styles.content}>
-        {challengeTitle && (
-          <View style={styles.titleContainer}>
-            <View style={styles.pointsBox}>
-              <BackgroundWithImage
-                imageSource={BGArShare}
-                style={styles.pointsBoxBackground}
-              ></BackgroundWithImage>
-              <AppText style={styles.pointsBoxText}>{challengePoints || 0}</AppText>
-              <AppText style={styles.pointsBoxTextTitle}>Points</AppText>
-            </View>
-            <AppText numberOfLines={3} style={styles.titleText}>
-              {challengeTitle}
-            </AppText>
-          </View>
-        )}
-
         <View style={styles.mediaContainer}>
           <View
             style={[
@@ -290,23 +281,22 @@ const ArChallengeShare = () => {
           </View>
 
           <View style={styles.mediaFooterContainer}>
-            <View style={styles.mediaFooterSponsorContainer}>
-              <Image style={styles.mediaFooterSponsorImage} source={{uri: sponsorImage}} />
-              <Text style={styles.mediaFooterSponsorText}>{sponsorName}</Text>
-            </View>
+            <AppButton containerStyle={styles.pointsBox} showButton={false}>
+              <AppText style={styles.pointsBoxText}>{challengePoints || 0}</AppText>
+              <AppText style={styles.pointsBoxTextTitle}>Points</AppText>
+            </AppButton>
 
-            <Text style={styles.mediaFooterCompletionDateText}>Completed on: {startDate}</Text>
+            <View style={styles.mediaFooterSponsorContainer}>
+              <Text style={styles.mediaFooterSponsorText}>{sponsorName}</Text>
+              <Text style={styles.mediaFooterCompletionDateText}>Completed on: {startDate}</Text>
+            </View>
           </View>
 
           <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
         </View>
-
-        <View style={styles.conditionsContainer}>
-          {!isMemory && <Text style={styles.conditionsText}>{SHARE_CONDITIONS_TEXT}</Text>}
-        </View>
       </View>
 
-      <View style={styles.footer}>
+      {/* <View style={styles.footer}>
         <View style={[{marginTop: isMemory ? 16 : 0}, styles.footerButtonContainer]}>
           <AppButton
             onPress={shareToSocialMediaButtonHandler}
@@ -332,6 +322,108 @@ const ArChallengeShare = () => {
             loading={isLoading}
             disabled={isLoading}
           />
+        )}
+      </View> */}
+      <View
+        style={{
+          gap: 8,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "space-between",
+          marginVertical: 8,
+        }}
+      >
+        {/* Share to socials button */}
+
+        <AppButton
+          containerStyle={{
+            width: widthPercentageToDP(12),
+            height: widthPercentageToDP(12),
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          showButton={false}
+          onPress={saveToGalleryButtonHandler}
+        >
+          <TouchableOpacity onPress={saveToGalleryButtonHandler}>
+            <Icon
+              family="entypo"
+              name="download"
+              size={widthPercentageToDP(8)}
+              color={theme.lightColors?.white}
+            />
+          </TouchableOpacity>
+        </AppButton>
+        <AppButton
+          containerStyle={{
+            width: widthPercentageToDP(30),
+
+            height: widthPercentageToDP(12),
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+          showButton={false}
+          onPress={shareToSocialMediaButtonHandler}
+        >
+          <TouchableOpacity onPress={shareToSocialMediaButtonHandler}>
+            <Text
+              style={{
+                ...fontGroup.nunitoRegular,
+                fontWeight: "400",
+                fontSize: FontSizes.S20,
+                color: theme.lightColors?.white,
+              }}
+            >
+              Share
+            </Text>
+          </TouchableOpacity>
+        </AppButton>
+
+        {!isMemory && (
+          <AppButton
+            containerStyle={{
+              width: widthPercentageToDP(30),
+
+              height: widthPercentageToDP(12),
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+            showButton={false}
+            loading={isLoading}
+            onPress={endShareProfileButtonHandler}
+          >
+            <TouchableOpacity onPress={endShareProfileButtonHandler}>
+              <Text
+                style={{
+                  ...fontGroup.nunitoRegular,
+                  fontWeight: "400",
+                  fontSize: FontSizes.S20,
+                  color: theme.lightColors?.white,
+                }}
+              >
+                {"End"}
+              </Text>
+            </TouchableOpacity>
+          </AppButton>
+        )}
+      </View>
+      <View
+        style={{
+          flexDirection: "column",
+          gap: 16,
+        }}
+      >
+        {!isMemory && (
+          <Text
+            style={{
+              fontSize: FontSizes.S12,
+              color: theme.lightColors?.white,
+              fontFamily: fontGroup.nunitoBold,
+              textAlign: "center",
+            }}
+          >
+            Must share to at least one social media to earn your points.
+          </Text>
         )}
       </View>
     </ChallengeScreen>
@@ -394,9 +486,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#272741",
     gap: 8,
-    paddingVertical: 8,
-    marginTop: 16,
-    marginBottom: 8,
+
+    marginTop: 10,
+
     borderRadius: 12,
     alignItems: "center",
   },
@@ -408,15 +500,13 @@ const styles = StyleSheet.create({
   },
   mediaFooterContainer: {
     width: "100%",
-    height: 55,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  mediaFooterSponsorContainer: {
     flexDirection: "row",
+    paddingHorizontal: widthPercentageToDP("4%"),
     alignItems: "center",
-    justifyContent: "center",
+    paddingBottom: heightPercentageToDP("2%"),
+    gap: 12,
   },
+  mediaFooterSponsorContainer: {},
   mediaFooterSponsorImage: {
     width: 20,
     height: 20,
@@ -431,7 +521,7 @@ const styles = StyleSheet.create({
   mediaFooterCompletionDateText: {
     ...fontGroup.nunitoLight,
     fontWeight: "300",
-    fontSize: FontSizes.S10,
+    fontSize: FontSizes.S12,
     color: theme.lightColors?.white,
   },
   conditionsContainer: {
