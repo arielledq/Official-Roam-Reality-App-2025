@@ -33,6 +33,7 @@ import {
 import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import App from "App";
 import Icon from "components/Icon";
+import {fonts} from "assets/fonts";
 
 const ArChallengeShare = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -298,7 +299,7 @@ const ArChallengeShare = () => {
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          marginVertical: 8,
+          marginVertical: heightPercentageToDP("2%"),
         }}
       >
         {/* Share to socials button */}
@@ -386,7 +387,8 @@ const ArChallengeShare = () => {
             style={{
               fontSize: FontSizes.S12,
               color: theme.lightColors?.white,
-              fontFamily: fontGroup.nunitoBold,
+              fontFamily: fonts.nunitoBold,
+              fontWeight: "700",
               textAlign: "center",
             }}
           >

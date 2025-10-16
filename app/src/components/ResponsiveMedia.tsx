@@ -39,8 +39,8 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: undefined,
-    borderTopStartRadius: 12,
-    borderTopEndRadius: 12,
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
     overflow: "hidden",
   },
 });
