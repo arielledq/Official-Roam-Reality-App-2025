@@ -37,7 +37,8 @@ import RNFS from "react-native-fs";
 import theme from "assets/theme";
 import MapSkeletonLoader from "components/MapSkeletonLoader";
 import TransparentSearchBar from "components/transparentSearchBar";
-import {heightPercentageToDP} from "react-native-responsive-screen";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
+import Images from "assets/images";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 60 seconds
@@ -75,6 +76,7 @@ const GeoArChallengeDetails = ({}) => {
   const [markersFullyLoaded, setMarkersFullyLoaded] = useState(false);
   const markerRefs = useRef({});
   const autoTooltipShownRef = useRef(false);
+  const [friendImageStates, setFriendImageStates] = useState({});
 
   const bandLocationUpdatesIntervalId = useRef(null);
   const friendsLocationUpdatesIntervalId = useRef(null);
@@ -198,13 +200,28 @@ const GeoArChallengeDetails = ({}) => {
       .finally(() => {});
   };
 
+  const updateFriendImageState = (friendId, updates) => {
+    setFriendImageStates(prev => ({
+      ...prev,
+      [friendId]: {
+        ...prev[friendId],
+        ...updates,
+      },
+    }));
+  };
+
   const f_markerView = o => {
     const friendHasLocation =
       !!o?.ar_user_profile_user?.current_location &&
       !!o?.ar_user_profile_user?.current_location?.coordinates?.length;
+
     if (friendHasLocation) {
       const friendLat = o?.ar_user_profile_user?.current_location.coordinates[1];
       const friendLong = o?.ar_user_profile_user?.current_location.coordinates[0];
+
+      const hasUserImage = !!o?.user_profile?.image;
+      const imageState = friendImageStates[o.id] || {loaded: false, error: false};
+
       return (
         <Marker
           key={o.id}
@@ -234,8 +251,55 @@ const GeoArChallengeDetails = ({}) => {
             </Callout>
           )}
           {useCustomMarkers && (
-            <View style={{width: 30, height: 30}}>
-              <FriendsMarkerIcon />
+            <View
+              style={{
+                width: widthPercentageToDP(10),
+                height: widthPercentageToDP(10),
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <>
+                {/* Always show placeholder first, then actual image when loaded */}
+                <Image
+                  resizeMode="cover"
+                  style={{
+                    width: widthPercentageToDP(6.5),
+                    height: widthPercentageToDP(6.5),
+                    position: "absolute",
+                    top: 3,
+                    borderRadius: 100,
+                    zIndex: imageState.loaded && !imageState.error ? 998 : 999,
+                    backgroundColor: "#fff",
+                  }}
+                  source={Images.Person}
+                />
+
+                {/* Show actual user image if available */}
+                {hasUserImage && !imageState.error && (
+                  <Image
+                    resizeMode="cover"
+                    style={{
+                      width: widthPercentageToDP(6.5),
+                      height: widthPercentageToDP(6.5),
+                      position: "absolute",
+                      top: 3,
+                      borderRadius: 100,
+                      zIndex: 999,
+                      backgroundColor: "#fff",
+                      opacity: imageState.loaded ? 1 : 0,
+                    }}
+                    source={{uri: o?.user_profile?.image}}
+                    onLoad={() => updateFriendImageState(o.id, {loaded: true})}
+                    onError={() => updateFriendImageState(o.id, {error: true, loaded: false})}
+                  />
+                )}
+              </>
+              <MarkerIcon
+                color={theme.lightColors.green}
+                width={widthPercentageToDP(10)}
+                height={widthPercentageToDP(10)}
+              />
             </View>
           )}
         </Marker>
@@ -285,8 +349,8 @@ const GeoArChallengeDetails = ({}) => {
           {useCustomMarkers && (
             <View
               style={{
-                width: 30,
-                height: 30,
+                width: widthPercentageToDP(10),
+                height: widthPercentageToDP(10),
                 alignItems: "center",
                 justifyContent: "flex-start",
               }}
@@ -294,15 +358,19 @@ const GeoArChallengeDetails = ({}) => {
               <Image
                 resizeMode="cover"
                 style={{
-                  width: 19,
-                  height: 19,
+                  width: widthPercentageToDP(7),
+                  height: widthPercentageToDP(7),
                   position: "absolute",
                   top: 2.5,
                   borderRadius: 100,
                 }}
                 source={{uri: o.localFilePath}}
               />
-              <MarkerIcon color={o?.category?.color} />
+              <MarkerIcon
+                color={o?.category?.color}
+                width={widthPercentageToDP(10)}
+                height={widthPercentageToDP(10)}
+              />
             </View>
           )}
         </Marker>
@@ -447,11 +515,53 @@ const GeoArChallengeDetails = ({}) => {
 
   const showAutoTooltipOnFirstMarker = () => {
     if (filteredUpdatedMarkers.length > 0 && !autoTooltipShownRef.current) {
-      // Get the first marker that has a valid location
-      const firstValidMarker = filteredUpdatedMarkers.find(marker => marker?.lat_long);
+      // Function to calculate distance between two coordinates (in meters)
+      const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // Earth's radius in meters
+        const φ1 = (lat1 * Math.PI) / 180;
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lon2 - lon1) * Math.PI) / 180;
 
-      if (firstValidMarker) {
-        const markerRef = markerRefs.current[`marker-${firstValidMarker.id}`];
+        const a =
+          Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+      };
+
+      // Find a marker that has no friends nearby
+      const markerWithoutNearbyFriends = filteredUpdatedMarkers.find(marker => {
+        if (!marker?.lat_long) return false;
+
+        const markerLat = marker.lat_long.coordinates[1];
+        const markerLon = marker.lat_long.coordinates[0];
+
+        // Check if any friend is nearby (within 100 meters)
+        const hasNearbyFriend = friendList.some(friend => {
+          const friendHasLocation =
+            !!friend?.ar_user_profile_user?.current_location &&
+            !!friend?.ar_user_profile_user?.current_location?.coordinates?.length;
+
+          if (!friendHasLocation) return false;
+
+          const friendLat = friend.ar_user_profile_user.current_location.coordinates[1];
+          const friendLon = friend.ar_user_profile_user.current_location.coordinates[0];
+
+          const distance = calculateDistance(markerLat, markerLon, friendLat, friendLon);
+          return distance <= 100; // 100 meters threshold
+        });
+
+        return !hasNearbyFriend;
+      });
+
+      // If no marker without nearby friends found, fallback to first valid marker
+      const targetMarker =
+        markerWithoutNearbyFriends || filteredUpdatedMarkers.find(marker => marker?.lat_long);
+
+      if (targetMarker) {
+        const markerRef = markerRefs.current[`marker-${targetMarker.id}`];
         if (markerRef) {
           // Delay to ensure marker is rendered and ready
           setTimeout(() => {
