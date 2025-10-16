@@ -256,9 +256,6 @@ const ArChallengeShare = () => {
       modals={screenModals}
       disableBackButton={disableBackButton}
       hideBackButton={hideBackButton}
-      centerComponentStyle={{
-        width: widthPercentageToDP("100%"),
-      }}
       fonsize={FontSizes.S18}
     >
       <View style={styles.content}>
@@ -295,35 +292,6 @@ const ArChallengeShare = () => {
           <FullScreenLoadingSpinner isLoading={isLoadingDisplay} />
         </View>
       </View>
-
-      {/* <View style={styles.footer}>
-        <View style={[{marginTop: isMemory ? 16 : 0}, styles.footerButtonContainer]}>
-          <AppButton
-            onPress={shareToSocialMediaButtonHandler}
-            containerStyle={styles.footerButton}
-            titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
-            title={"Share To Socials"}
-          />
-
-          <AppButton
-            onPress={saveToGalleryButtonHandler}
-            containerStyle={styles.footerButton}
-            titleStyle={{fontSize: shareButtonTextSize, fontWeight: "bold"}}
-            title={isVideo ? "Save Video" : "Save Image"}
-          />
-        </View>
-        {!isMemory && (
-          <AppButton
-            onPress={endShareProfileButtonHandler}
-            buttonStyle={{height: 55}}
-            containerStyle={{flex: 1}}
-            titleStyle={{fontSize: FontSizes.S18, fontWeight: "bold"}}
-            title={endChallengeButtonText}
-            loading={isLoading}
-            disabled={isLoading}
-          />
-        )}
-      </View> */}
       <View
         style={{
           gap: 8,
@@ -451,8 +419,8 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderRadius: 8,
     backgroundColor: "transparent",
-    width: 55,
-    height: 55,
+    width: widthPercentageToDP("12%"),
+    height: widthPercentageToDP("12%"),
   },
   pointsBoxBackground: {
     backgroundColor: "transparent",

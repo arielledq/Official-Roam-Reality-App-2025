@@ -172,7 +172,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getAllMemories(currentPage, pageSize)
         .then(res => {
           if (res.status == 1) {
-            setARMemories(res.results);
+            setARMemories(res.data);
 
             setTotalLength(res.total_record);
           } else {
