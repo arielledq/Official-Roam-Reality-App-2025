@@ -23,6 +23,8 @@ import {FontSizes} from "util/FontUtils";
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import useScoreboardHook from "hooks/useScoreboardHook";
 import {getProfilePicture} from "util/imageUtils";
+import LinearGradient from "react-native-linear-gradient";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 const ITEM_WIDTH = 60;
 
@@ -380,17 +382,23 @@ const ScoreBoard = ({}) => {
 
       <Text style={_styles.rankTitle}>Your Rank</Text>
       <View style={{height: 68, width: "100%"}}>
-        <RankBG style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: -1}} />
-        <View
+        {/* <RankBG style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: -1}} /> */}
+        <LinearGradient
           style={{
-            flex: 1,
-            paddingHorizontal: 16,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+            width: "100%",
+            borderRadius: 6,
+            height: heightPercentageToDP(8),
           }}
+          colors={["#7a00cf", "#5532ff"]}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
         >
-          <View style={{flexDirection: "row", alignItems: "center"}}>
+          <View
+            style={{marginLeft: widthPercentageToDP(4), flexDirection: "row", alignItems: "center"}}
+          >
             <View style={{alignItems: "center"}}>
               <Text style={_styles.rankText}>Rank</Text>
               <Text style={_styles.rankTextPosition}>{rankMine?.my_rank}</Text>
@@ -418,11 +426,11 @@ const ScoreBoard = ({}) => {
             </ImageBackground>
             <Text style={_styles.nameText}>{userProfile?.name ? userProfile?.name : "You"}</Text>
           </View>
-          <View style={{marginEnd: 10, alignItems: "center"}}>
+          <View style={{marginEnd: widthPercentageToDP(6), alignItems: "center"}}>
             <Text style={_styles.rankText}>Points</Text>
             <Text style={_styles.pointsText}>{rankMine?.my_points}</Text>
           </View>
-        </View>
+        </LinearGradient>
       </View>
 
       <Text style={_styles.leaderboardTitle}>Leaderboard</Text>
