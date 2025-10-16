@@ -28,10 +28,13 @@ const ITEM_WIDTH = 60;
 
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(30);
+  const [total_record, setTotalLength] = React.useState(0);
   const [rankMine, setRankMine] = useState<any>();
   const [destinations, setDestinations] = useState<any>();
   const [selectedDestination, setSelectedDestination] = useState<any>();
-  const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
+  const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.SPONSOR);
   const [refreshing, setRefreshing] = useState(false);
   const [profileDetails, setProfileDetails] = useState<any>();
   const {sponsors} = useScoreboardHook();
@@ -60,7 +63,7 @@ const ScoreBoard = ({}) => {
         (_: any, index: number) => index !== selectedDestinationIndex
       );
       // Insert the selected item at position 1
-      filtersData = [filteredData[0], selectedDestinationItem, ...filteredData.slice(1)];
+      // filtersData = [filteredData[0], selectedDestinationItem, ...filteredData.slice(1)];
     }
   }
 
@@ -98,9 +101,11 @@ const ScoreBoard = ({}) => {
     try {
       const scoreBoardResponse = await getScoreboardList(pageNumber, destination, sponsor);
       const scoreboardUsers = scoreBoardResponse?.results || [];
+
       setUsers((prevUsers: any) =>
         pageNumber === 1 ? scoreboardUsers : [...prevUsers, ...scoreboardUsers]
       );
+      setTotalLength(scoreBoardResponse?.total_record || 0);
     } catch (error) {
       console.error(error);
     } finally {
@@ -109,8 +114,10 @@ const ScoreBoard = ({}) => {
   };
 
   const filterDestinations = (o: any) => {
+    let pageToSet = 1;
+    setPageNumber(pageToSet);
     setSelectedDestination(o);
-    const newPage = 1;
+
     let destination = "";
     let sponsor = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
@@ -118,7 +125,7 @@ const ScoreBoard = ({}) => {
     } else {
       sponsor = o.id || "";
     }
-    getScoreboard(newPage, destination, sponsor);
+    getScoreboard(pageToSet, destination, sponsor);
   };
 
   const handleMenuButton = () => {
@@ -134,6 +141,7 @@ const ScoreBoard = ({}) => {
 
   const handlePullDownToRefresh = () => {
     const newPage = 1;
+    setPageNumber(newPage);
     let destination = "";
     let sponsor = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
@@ -158,6 +166,7 @@ const ScoreBoard = ({}) => {
 
   const getInitialData = () => {
     const newPage = 1;
+    setPageNumber(newPage);
     let destination = "";
     let sponsor = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
@@ -238,6 +247,21 @@ const ScoreBoard = ({}) => {
       </TouchableOpacity>
     );
   });
+
+  const loadMore = () => {
+    if (users.length < total_record) {
+      const newPage = pageNumber + 1;
+      setPageNumber(newPage);
+      let destination = "";
+      let sponsor = "";
+      if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
+        destination = selectedDestination?.id || "";
+      } else {
+        sponsor = selectedDestination?.id || "";
+      }
+      getScoreboard(newPage, destination, sponsor);
+    }
+  };
 
   const Item = React.memo(({obj, index}: {obj: any; index: number}) => {
     const userPosition = index + 1;
@@ -436,9 +460,11 @@ const ScoreBoard = ({}) => {
         refreshing={refreshing}
         onRefresh={handlePullDownToRefresh}
         contentContainerStyle={{flexGrow: 1}}
-        initialNumToRender={10}
-        maxToRenderPerBatch={10}
+        initialNumToRender={30}
+        maxToRenderPerBatch={30}
         windowSize={5}
+        onEndReachedThreshold={0.5}
+        onEndReached={loadMore}
       />
     </ScreenContainer>
   );
