@@ -9,6 +9,7 @@ import {
   ImageBackground,
   Keyboard,
   Image,
+  TouchableOpacity,
 } from "react-native";
 import Contacts from "react-native-contacts";
 import {useNavigation} from "@react-navigation/native";
@@ -21,6 +22,9 @@ import {DEBOUNCE_TIME, showMessage, truncateText} from "../../util/helpers";
 import Images from "../../assets/images";
 import Icon from "components/Icon";
 import {getImageSourceWithProps, getProfilePicture} from "util/imageUtils";
+import LinearGradient from "react-native-linear-gradient";
+import {heightPercentageToDP} from "react-native-responsive-screen";
+import {width} from "util/AppDimensions";
 
 interface Contact {
   id?: string;
@@ -158,9 +162,16 @@ const ContactsTab = () => {
             </Text>
           </View>
         </View>
-        <Pressable onPress={() => onAddFriendClick(item)} style={{marginLeft: 10, padding: 16}}>
-          <Text style={localStyle.addButton}>Add as friend</Text>
-        </Pressable>
+        <TouchableOpacity onPress={() => onAddFriendClick(item)}>
+          <LinearGradient
+            style={localStyle.addButtonContainer}
+            colors={["#7a00cf", "#5532ff"]}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 0}}
+          >
+            <Text style={localStyle.addButton}>Add</Text>
+          </LinearGradient>
+        </TouchableOpacity>
       </View>
     );
   };
@@ -221,7 +232,7 @@ const localStyle = {
     paddingHorizontal: 20,
   },
   addButton: {
-    color: theme.lightColors?.green,
+    color: theme.lightColors?.white,
   },
   contactContainer: {
     flexDirection: "row" as const,
@@ -250,6 +261,13 @@ const localStyle = {
     width: 30,
     aspectRatio: 1,
     borderRadius: 5,
+  },
+  addButtonContainer: {
+    width: width * 0.2,
+    height: heightPercentageToDP(4),
+    borderRadius: 6,
+    justifyContent: "center",
+    alignItems: "center",
   },
 };
 

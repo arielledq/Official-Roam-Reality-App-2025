@@ -468,10 +468,10 @@ const ScoreBoard = ({}) => {
         refreshing={refreshing}
         onRefresh={handlePullDownToRefresh}
         contentContainerStyle={{flexGrow: 1}}
-        initialNumToRender={30}
-        maxToRenderPerBatch={30}
+        initialNumToRender={10}
+        maxToRenderPerBatch={10}
         windowSize={5}
-        onEndReachedThreshold={0.5}
+        onEndReachedThreshold={0.7}
         onEndReached={loadMore}
       />
     </ScreenContainer>
