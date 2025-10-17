@@ -13,9 +13,9 @@
     "build-apk": "./scripts/build-apk.sh",
     "clean": "./scripts/clean.sh",
     "reinstall": "./scripts/reinstall.sh",
-    "switch:ios": "yarn clean:modules && git checkout DevelopBasit && yarn install",
+    "switch:ios": "yarn clean:modules && git checkout develop_basit && yarn install",
     "switch:android": "yarn pull:code && yarn clean:all && yarn install",
-    "pull:code": "git fetch origin DevelopBasit && git checkout origin/DevelopBasit -- . ':!package.json' ':!yarn.lock'",
+    "pull:code": "git fetch develop_basit  && git checkout develop_basit -- . ':!package.json' ':!yarn.lock'",
     "clean:modules": "rm -rf node_modules",
     "clean:all": "yarn clean:modules && cd android && ./gradlew clean && cd .."
   },
