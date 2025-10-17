@@ -12,7 +12,12 @@
     "build-aab": "./scripts/build-aab.sh",
     "build-apk": "./scripts/build-apk.sh",
     "clean": "./scripts/clean.sh",
-    "reinstall": "./scripts/reinstall.sh"
+    "reinstall": "./scripts/reinstall.sh",
+    "switch:ios": "yarn clean:modules && git checkout DevelopBasit && yarn install",
+    "switch:android": "yarn pull:code && yarn clean:all && yarn install",
+    "pull:code": "git fetch origin DevelopBasit && git checkout origin/DevelopBasit -- . ':!package.json' ':!yarn.lock'",
+    "clean:modules": "rm -rf node_modules",
+    "clean:all": "yarn clean:modules && cd android && ./gradlew clean && cd .."
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.11",
