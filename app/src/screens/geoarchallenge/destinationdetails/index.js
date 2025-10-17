@@ -220,8 +220,8 @@ const GeoArChallengeDetails = ({}) => {
       const friendLong = o?.ar_user_profile_user?.current_location.coordinates[0];
 
       const hasUserImage = !!o?.user_profile?.image;
+      const localImagePath = o?.user_profile?.localImagePath;
       const imageState = friendImageStates[o.id] || {loaded: false, error: false};
-
       return (
         <Marker
           key={o.id}
@@ -272,28 +272,8 @@ const GeoArChallengeDetails = ({}) => {
                     zIndex: imageState.loaded && !imageState.error ? 998 : 999,
                     backgroundColor: "#fff",
                   }}
-                  source={Images.Person}
+                  source={localImagePath ? {uri: localImagePath} : {uri: o?.user_profile?.image}}
                 />
-
-                {/* Show actual user image if available */}
-                {hasUserImage && !imageState.error && (
-                  <Image
-                    resizeMode="cover"
-                    style={{
-                      width: widthPercentageToDP(6.5),
-                      height: widthPercentageToDP(6.5),
-                      position: "absolute",
-                      top: 3,
-                      borderRadius: 100,
-                      zIndex: 999,
-                      backgroundColor: "#fff",
-                      opacity: imageState.loaded ? 1 : 0,
-                    }}
-                    source={{uri: o?.user_profile?.image}}
-                    onLoad={() => updateFriendImageState(o.id, {loaded: true})}
-                    onError={() => updateFriendImageState(o.id, {error: true, loaded: false})}
-                  />
-                )}
               </>
               <MarkerIcon
                 color={theme.lightColors.green}
@@ -420,10 +400,75 @@ const GeoArChallengeDetails = ({}) => {
   const getFriends = () => {
     setLoadingCustomMarkers(true);
     getUserFriendList()
-      .then(response => {
+      .then(async response => {
         if (response) {
           console.log("Friend List Response:", response);
-          setFriendList(response?.data[0]?.friends || []);
+          const friends = response?.data[0]?.friends || [];
+
+          // Download and cache friend profile images
+          const friendsWithLocalImages = await Promise.all(
+            friends.map(async (friend, index) => {
+              if (friend?.user_profile?.image) {
+                try {
+                  const url = friend.user_profile.image;
+                  const fileName =
+                    `friend_${friend.id}_${index}_` +
+                    url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+                  const localFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+                  // Check if file already exists to avoid re-downloading
+                  const fileExists = await RNFS.exists(localFilePath);
+
+                  if (!fileExists) {
+                    const downloadResult = await RNFS.downloadFile({
+                      fromUrl: url,
+                      toFile: localFilePath,
+                      background: false,
+                      discretionary: true,
+                      cacheable: true,
+                    }).promise;
+
+                    if (downloadResult.statusCode === 200) {
+                      const updatedLocalFilePath =
+                        Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+                      return {
+                        ...friend,
+                        user_profile: {
+                          ...friend.user_profile,
+                          localImagePath: updatedLocalFilePath,
+                        },
+                      };
+                    } else {
+                      // Download failed, keep original
+                      return friend;
+                    }
+                  } else {
+                    // File exists, use cached version
+                    const updatedLocalFilePath =
+                      Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+                    return {
+                      ...friend,
+                      user_profile: {
+                        ...friend.user_profile,
+                        localImagePath: updatedLocalFilePath,
+                      },
+                    };
+                  }
+                } catch (error) {
+                  console.error("Error downloading friend image:", error);
+                  // Return original friend data if download fails
+                  return friend;
+                }
+              } else {
+                // No profile image, return as is
+                return friend;
+              }
+            })
+          );
+
+          // Reset friend image states for new friends
+          setFriendImageStates({});
+          setFriendList(friendsWithLocalImages);
         }
       })
       .catch(error => {
