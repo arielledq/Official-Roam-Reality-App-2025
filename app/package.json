@@ -14,8 +14,7 @@
     "clean": "./scripts/clean.sh",
     "reinstall": "./scripts/reinstall.sh",
     "switch:ios": "git checkout develop_basit && rm -rf node_modules && yarn install",
-    "switch:android": "git checkout  PatchAndroid && git pull origin develop_basit && rm -rf node_modules && cd android && ./gradlew clean && cd .. && yarn install",
-    "clean:modules": "rm -rf node_modules"
+    "switch:android": "git checkout PatchAndroid && git fetch origin && git merge origin/develop_basit && rm -rf node_modules && cd android && ./gradlew clean && cd .. && yarn install"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.11",
