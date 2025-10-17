@@ -927,7 +927,7 @@ const GeoArChallengeDetails = ({}) => {
           <View style={_styles.selectionsContainer}>
             <View>
               <Text style={_styles.selectionTextHeading}>Sites</Text>
-              <Text style={_styles.selectionTextDetails}>Sites with AR</Text>
+              <Text style={_styles.selectionTextDetails}>Site with AR</Text>
             </View>
             <AppSwitch
               onValueChange={() => setARSitesOnSwitch(currState => !currState)}
