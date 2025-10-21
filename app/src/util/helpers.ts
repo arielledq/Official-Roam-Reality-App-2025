@@ -416,7 +416,6 @@ export const checkAppLatestUpdate = async () => {
 
       // Extract app version from API response
       const configurations = await getConfiguration();
-
       const configurationItemKeys = Object.keys(configurations);
       configurationItemKeys.forEach(configItemKey => {
         const configurationContent = Object.keys(configurations[configItemKey]);
