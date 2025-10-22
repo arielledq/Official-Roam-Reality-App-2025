@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState, useCallback} from "react";
-import {Platform, View, ActivityIndicator, Text} from "react-native";
+import {Platform, View, ActivityIndicator, Text, TouchableOpacity} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
@@ -9,14 +9,14 @@ import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
-import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
+import {AR_MODES_MENU, CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
 import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../util/helpers";
 
-import {getElevationAPI} from "../../network";
+import {getElevationAPI, starFoundAndSaveApi} from "../../network";
 
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
@@ -33,9 +33,11 @@ import {
   getLocationDistance,
   isLocationPointInPolygon,
 } from "util/LocationLib";
+import useArScreenHook from "../../hooks/useArScreenHook";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
+  const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
   const [textLoading, setTextLoading] = useState("Loading AR Experience");
   const [openModalARMode, setOpenModalARMode] = useState(false);
@@ -91,6 +93,9 @@ const ARScreen = ({route}) => {
   // const huntChallenge = route.params?.huntChallenge;
   const huntChallengeFinished = route.params?.huntChallengeFinished;
   const isContinuingHuntChallenge = !!huntChallenge;
+
+  const [continueHuntChallenge, setContinuingHuntChallenge] = useState(false);
+
   const [bundleFile, setBundleFile] = useState(null);
   const SCENE_NAME = "ARReactNative 1"; // tu escena
   const [sceneIsReady, setSceneIsReady] = useState(false);
@@ -635,6 +640,7 @@ const ARScreen = ({route}) => {
     }
 
     if (data?.touchEvent?.objectTouched === true) {
+      console.log("OBJECT TOUCHED");
       // if (
       //   selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
       //   selectedSite?.scanChallenge?.file_3d
@@ -649,12 +655,13 @@ const ARScreen = ({route}) => {
 
       // }
       if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
-        navigation.navigate({
-          name: "FunFactsScreen",
-          params: {
-            challengeObj: selectedSite,
-          },
-        });
+        // navigation.navigate({
+        //   name: "FunFactsScreen",
+        //   params: {
+        //     challengeObj: selectedSite,
+        //   },
+        // });
+        handleNextHunt();
       }
     }
 
@@ -721,6 +728,39 @@ const ARScreen = ({route}) => {
         break;
       default:
         break;
+    }
+  };
+
+  const handleNextHunt = async () => {
+    const geoSiteId = selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.id;
+    const challengeId = selectedSite?.huntChallenge?.geo_ar_star?.id;
+    const starPointId = selectedSite?.huntChallenge?.id;
+    const lat = selectedSite?.lat_long?.coordinates[1];
+    const lon = selectedSite?.lat_long?.coordinates[0];
+
+    try {
+      await starFoundAndSaveApi({
+        geo_site: geoSiteId,
+        geo_ar_star: challengeId,
+        geo_ar_star_point: starPointId,
+        latitude: lat,
+        longitude: lon,
+      });
+
+      const nextHunt = await getNextStarApi(geoSiteId, lat, lon);
+      if (!nextHunt) {
+        return;
+      } else {
+        const Challenge = {
+          ...selectedSite,
+          selectedMode: AR_MODES_MENU[2],
+          huntChallenge: nextHunt,
+        };
+        setHuntChallenge(Challenge);
+        startChallengeHandler(Challenge);
+      }
+    } catch (error) {
+      console.error("Error saving star found:", error);
     }
   };
 
@@ -851,6 +891,7 @@ const ARScreen = ({route}) => {
       default:
         break;
     }
+
     setStarModels(null);
     setModelResource(null);
     setTextureBase(null);
@@ -1413,6 +1454,7 @@ const ARScreen = ({route}) => {
     Geolocation.getCurrentPosition(
       pos => {
         const {latitude, longitude, accuracy} = pos.coords || {};
+        console.log("Initial position:", latitude, longitude);
         if (latitude && longitude) {
           const firstLoc = {latitude, longitude, accuracy};
           setUserLocation(firstLoc);
