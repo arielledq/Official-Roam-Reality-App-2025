@@ -80,13 +80,35 @@ class ExampleVideoSerializer(serializers.ModelSerializer):
         fields = ["id", "ar_example", "video_file",]
 
 
+class SimpleScanPictureSerializer(serializers.ModelSerializer):
+    """Simplified serializer for ScanPicture in ARExample context"""
+    file_image = serializers.ImageField()
+    icon = serializers.ImageField()
+    
+    class Meta:
+        model = ScanPicture
+        fields = ["id", "name", "file_image", "icon", "info", "coordinates", "points"]
+
+
+class SimpleGeoARStarPointSerializer(serializers.ModelSerializer):
+    """Simplified serializer for GeoARStarPoint in ARExample context"""
+    image = serializers.ImageField()
+    model_file = serializers.FileField()
+    
+    class Meta:
+        model = GeoARStarPoint
+        fields = ["id", "title", "image", "model_file", "fun_facts", "elevation", "points", "order"]
+
+
 class ExamplesSerializer(serializers.ModelSerializer):
     images = ExampleImageSerializer(many=True)
     videos = ExampleVideoSerializer(many=True)
+    geo_ar_scan = SimpleScanPictureSerializer(many=True, read_only=True)
+    geo_ar_hunt_point = SimpleGeoARStarPointSerializer(many=True, read_only=True)
 
     class Meta:
         model = ARExample
-        fields = ["id", "name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
+        fields = ["id", "name", "description", "any_where_challenges", "geo_challenges", "images", "videos", "geo_ar_scan", "geo_ar_hunt_point",]
 
 
 class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
@@ -428,7 +450,6 @@ class GeoStarSimpleSerializer(GeoModelSerializer):
             "following_mode",
             'attempts',
             'user_attempts',
-            "model_file",
             "parameters",
 
         )
@@ -842,6 +863,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
     hunt_captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
     image = serializers.ImageField()
+    model_file = serializers.FileField()
     sponsors = SponsorSerializer(many=True)
 
     class Meta:
@@ -857,6 +879,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "hunt_captured_stars",
             "total_stars",
             "image",
+            "model_file",
             "title",
             "fun_facts",
             "elevation",
