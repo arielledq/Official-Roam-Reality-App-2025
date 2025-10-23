@@ -15,7 +15,7 @@ from ..models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings,
     ARChallengeParameterSettings, ARChallengeFilters, UniqueChallengeSite, GeoARChallenges, GeoRegion, \
     GeoARSiteActivity, StarCollection, \
     ARSitePinCheckIn, GeoARGoldStar, PanicMessage, ARExampleImage, ARExampleVideo, GeoARStarPoint, ARExperience, \
-    GeoArSiteCategory, ScanPicture, ARChallengeModels
+    GeoArSiteCategory, ScanPicture
 from .widgets import GoogleMapsOpenLayersWidget, GoogleMapsOpenLayersWidgetZoom
 from django.contrib.gis.db.models import MultiPolygonField, PointField, MultiLineStringField, MultiPointField
 from django.contrib.gis.admin import OSMGeoAdmin, GeoModelAdmin
@@ -112,9 +112,6 @@ class ARChallengeAdmin(admin.ModelAdmin):
     pass
 
 
-@admin.register(ARChallengeModels)
-class ARChallengeModelsAdmin(admin.ModelAdmin):
-    list_display = ('name',)
 
 @admin.register(Challenges)
 class ARChallengeUpdatedAdmin(admin.ModelAdmin):

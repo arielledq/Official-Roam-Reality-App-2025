@@ -6,7 +6,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('challenges', '0167_auto_20251014_1037'),
+        ('challenges', '0164_alter_armemories_memory_type'),
     ]
 
     operations = [

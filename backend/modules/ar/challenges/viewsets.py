@@ -86,6 +86,20 @@ class ARExamplesViewSet(viewsets.ModelViewSet):
         serializer = ExamplesSerializer(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @action(detail=False, methods=['get'], url_path='get-by-scan-id', name='AR Scan')
+    def get_by_scan(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_ar_scan=id)
+        serializer = ExamplesSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='get-by-hunt-point-id', name='AR Hunt Point')
+    def get_by_hunt_point(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_ar_hunt_point=id)
+        serializer = ExamplesSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PanicMessageViewSet(ViewSet):
     """
