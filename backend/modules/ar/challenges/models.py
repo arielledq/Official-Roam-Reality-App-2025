@@ -811,9 +811,8 @@ class ARExample(models.Model):
     geo_ar_scan = models.ManyToManyField(ScanPicture, verbose_name="Geo AR Scan",
                                             related_name="geo_ar_scan", blank=True, default=None)
 
-    geo_ar_hunt_point = models.ManyToManyField(GeoARStarPoint, verbose_name="Geo AR Hunt Point",
-                                            related_name="geo_ar_hunt_point", blank=True, default=None)
-
+    geo_ar_hunt = models.ManyToManyField(GeoARStar, verbose_name="Geo AR Hunt",
+                                            related_name="geo_ar_hunt", blank=True, default=None)
 
     def __str__(self):
         return str(

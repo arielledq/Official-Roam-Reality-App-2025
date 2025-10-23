@@ -86,6 +86,27 @@ class ARExamplesViewSet(viewsets.ModelViewSet):
         serializer = ExamplesSerializer(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='Scan ID to filter AR examples',
+                examples=[
+                    OpenApiExample(
+                        'Example 1',
+                        summary='Get AR examples for scan ID 123',
+                        value=123
+                    )
+                ]
+            )
+        ],
+        responses={200: ExamplesSerializer(many=True)},
+        summary='Get AR examples by scan ID',
+        description='Retrieve AR examples associated with a specific scan ID'
+    )
     @action(detail=False, methods=['get'], url_path='get-by-scan-id', name='AR Scan')
     def get_by_scan(self, request):
         id = request.GET.get("id")
@@ -97,6 +118,34 @@ class ARExamplesViewSet(viewsets.ModelViewSet):
     def get_by_hunt_point(self, request):
         id = request.GET.get("id")
         objs = self.queryset.filter(geo_ar_hunt_point=id)
+        serializer = ExamplesSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='Hunt ID to filter AR examples',
+                examples=[
+                    OpenApiExample(
+                        'Example 1',
+                        summary='Get AR examples for hunt ID 456',
+                        value=456
+                    )
+                ]
+            )
+        ],
+        responses={200: ExamplesSerializer(many=True)},
+        summary='Get AR examples by hunt ID',
+        description='Retrieve AR examples associated with a specific hunt ID'
+    )
+    @action(detail=False, methods=['get'], url_path='get-by-hunt-id', name='AR Hunt')
+    def get_by_hunt_id(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_ar_hunt=id)
         serializer = ExamplesSerializer(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
