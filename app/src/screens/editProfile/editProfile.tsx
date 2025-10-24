@@ -12,7 +12,7 @@ import {Button, Dialog, Portal} from "react-native-paper";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import {DateFormat, formatDate} from "../../util/DateUtils";
 import {FontSizes} from "../../util/FontUtils";
-import {updateProfile} from "../../network";
+import {DeleteProfilePicture, updateProfile} from "../../network";
 import {accountSetupIsComplete, handleError, showMessage} from "../../util/helpers";
 import {updateAccountFlag} from "../../redux/Login";
 import {EditProfileSchema} from "../../util/ValidationSchemas";
@@ -286,6 +286,11 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     }
   }, [userData]);
 
+  const handleDeleteAccount = async () => {
+    const rest = await DeleteProfilePicture();
+    console.log("Delete Profile Picture Response:", rest);
+  };
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -317,6 +322,17 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <ProfileAvatar
                     onChangeProfilePic={() => pickImage(setFieldValue)}
                     avatarUrl={values.pImage}
+                    onDeleteProfilePic={async () => {
+                      setFieldValue("pImage", undefined);
+                      setPhotoDetails({
+                        uri: undefined,
+                        type: undefined,
+                        name: "",
+                        default: true,
+                      });
+                      const res = await DeleteProfilePicture();
+                      console.log("Delete Profile Picture Response:", res);
+                    }}
                   />
 
                   {/* Name */}

@@ -159,6 +159,14 @@ export const updateProfile = payload =>
     },
     logoutFunc
   );
+export const DeleteProfilePicture = payload =>
+  Request.multiPartCall(
+    {
+      url: `${commonApiRoute}account-setup/delete-profile-image/`,
+      method: "DELETE",
+    },
+    logoutFunc
+  );
 export const getARChallenges = () =>
   Request.callWithToken(
     {

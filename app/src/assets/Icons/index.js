@@ -45,6 +45,7 @@ import scan from "./scan.svg";
 import huntMode from "./huntMode.svg";
 import pinlocation from "./pinlocation.svg";
 import clock from "./clock.svg";
+import bin from "./bin.svg";
 
 export const Icons = {
   password,
@@ -94,4 +95,5 @@ export const Icons = {
   huntMode,
   pinlocation,
   clock,
+  bin,
 };
