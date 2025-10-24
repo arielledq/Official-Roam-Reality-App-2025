@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState, useCallback} from "react";
-import {Platform, View, ActivityIndicator, Text} from "react-native";
+import {Platform, View, ActivityIndicator, Text, TouchableOpacity} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
@@ -9,14 +9,19 @@ import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
-import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
+import {AR_MODES_MENU, CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
-import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../util/helpers";
+import {copyFileForDisplay, eraseFile, handleUnzipProcess, showMessage} from "../../util/helpers";
 
-import {getElevationAPI} from "../../network";
+import {
+  getArHuntExamples,
+  getArScanExamples,
+  getElevationAPI,
+  starFoundAndSaveApi,
+} from "../../network";
 
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
@@ -33,9 +38,11 @@ import {
   getLocationDistance,
   isLocationPointInPolygon,
 } from "util/LocationLib";
+import useArScreenHook from "../../hooks/useArScreenHook";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
+  const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
   const [textLoading, setTextLoading] = useState("Loading AR Experience");
   const [openModalARMode, setOpenModalARMode] = useState(false);
@@ -91,6 +98,9 @@ const ARScreen = ({route}) => {
   // const huntChallenge = route.params?.huntChallenge;
   const huntChallengeFinished = route.params?.huntChallengeFinished;
   const isContinuingHuntChallenge = !!huntChallenge;
+
+  const [continueHuntChallenge, setContinuingHuntChallenge] = useState(false);
+
   const [bundleFile, setBundleFile] = useState(null);
   const SCENE_NAME = "ARReactNative 1"; // tu escena
   const [sceneIsReady, setSceneIsReady] = useState(false);
@@ -649,12 +659,14 @@ const ARScreen = ({route}) => {
 
       // }
       if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
-        navigation.navigate({
-          name: "FunFactsScreen",
-          params: {
-            challengeObj: selectedSite,
-          },
-        });
+        unityRef.current.postMessage("OBJImport", "SpawnCollectionEffect", "");
+        // navigation.navigate({
+        //   name: "FunFactsScreen",
+        //   params: {
+        //     challengeObj: selectedSite,
+        //   },
+        // });
+        handleNextHunt();
       }
     }
 
@@ -724,6 +736,39 @@ const ARScreen = ({route}) => {
     }
   };
 
+  const handleNextHunt = async () => {
+    const geoSiteId = selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.id;
+    const challengeId = selectedSite?.huntChallenge?.geo_ar_star?.id;
+    const starPointId = selectedSite?.huntChallenge?.id;
+    const lat = selectedSite?.lat_long?.coordinates[1];
+    const lon = selectedSite?.lat_long?.coordinates[0];
+
+    try {
+      await starFoundAndSaveApi({
+        geo_site: geoSiteId,
+        geo_ar_star: challengeId,
+        geo_ar_star_point: starPointId,
+        latitude: lat,
+        longitude: lon,
+      });
+
+      const nextHunt = await getNextStarApi(geoSiteId, lat, lon);
+      if (!nextHunt) {
+        return;
+      } else {
+        const Challenge = {
+          ...selectedSite,
+          selectedMode: AR_MODES_MENU[2],
+          huntChallenge: nextHunt,
+        };
+        setHuntChallenge(Challenge);
+        startChallengeHandler(Challenge);
+      }
+    } catch (error) {
+      console.error("Error saving star found:", error);
+    }
+  };
+
   const retakeButtonHandler = () => {
     setHasSentModelDataOnce(false);
     setSendSpawnModelData(false);
@@ -785,6 +830,11 @@ const ARScreen = ({route}) => {
       isVisible={challengeInformationView}
       onClose={closeViewInfoButtonHandler}
       content={viewInfoModalContent()}
+      onPressExample={() => {
+        setChallengeInformationView(false);
+        setIsUnityLoaded(true);
+        openExample();
+      }}
     />
   );
   const notificationUnity = (title, text) => {
@@ -851,6 +901,7 @@ const ARScreen = ({route}) => {
       default:
         break;
     }
+
     setStarModels(null);
     setModelResource(null);
     setTextureBase(null);
@@ -1413,6 +1464,7 @@ const ARScreen = ({route}) => {
     Geolocation.getCurrentPosition(
       pos => {
         const {latitude, longitude, accuracy} = pos.coords || {};
+        console.log("Initial position:", latitude, longitude);
         if (latitude && longitude) {
           const firstLoc = {latitude, longitude, accuracy};
           setUserLocation(firstLoc);
@@ -1559,6 +1611,38 @@ const ARScreen = ({route}) => {
     };
   }, []);
 
+  const openExample = async () => {
+    if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
+      try {
+        const result = await getArHuntExamples(selectedSite?.ar_star?.id);
+        const examples = result?.data;
+        const examplesList = examples?.length ? examples[0] : null;
+        if (examplesList) {
+          navigation.navigate("ChallengeExamples", {examples: examplesList});
+        } else {
+          showMessage("We are working on adding examples to this challenge.", "info");
+        }
+      } catch (error) {
+        showMessage("Error fetching examples. Please try again later.", "danger");
+      }
+    }
+    if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
+      console.log("selectedSite?.scanChallenge?.id", selectedSite?.scanChallenge?.id);
+      try {
+        const result = await getArScanExamples(selectedSite?.scanChallenge?.id);
+        const examples = result?.data;
+        const examplesList = examples?.length ? examples[0] : null;
+        if (examplesList) {
+          navigation.navigate("ChallengeExamples", {examples: examplesList});
+        } else {
+          showMessage("We are working on adding examples to this challenge.", "info");
+        }
+      } catch (error) {
+        showMessage("Error fetching examples. Please try again later.", "danger");
+      }
+    }
+  };
+
   return (
     <ChallengeScreen
       title="AR Star Hunt "
@@ -1570,7 +1654,7 @@ const ARScreen = ({route}) => {
         backgroundColor: "#000",
       }}
       modals={modals}
-      headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
+      // headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
       scrollable={false}
     >
       {shouldRenderUnity && (
@@ -1601,6 +1685,21 @@ const ARScreen = ({route}) => {
               viewShotRef: viewShotRef,
             }}
           />
+
+          {/* <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 40,
+              left: 20,
+              backgroundColor: "rgba(0,0,0,0.5)",
+              padding: 10,
+              borderRadius: 5,
+              zIndex: 1000,
+            }}
+            onPress={openExample}
+          >
+            <Text style={{color: "#fff", fontSize: 16}}>Examples</Text>
+          </TouchableOpacity> */}
 
           {unitySceneLoaded === true && (
             <View

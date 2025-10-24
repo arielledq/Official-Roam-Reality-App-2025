@@ -247,6 +247,23 @@ export const starFoundAndSaveApi = payload =>
     },
     logoutFunc
   );
+
+export const getArHuntExamples = id =>
+  Request.callAR(
+    {
+      url: `modules/challenges/examples/get-by-hunt-id/?id=${id}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+export const getArScanExamples = id =>
+  Request.callAR(
+    {
+      url: `modules/challenges/examples/get-by-scan-id/?id=${id}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
 export const getARSitesHiddenStars = payload =>
   Request.callWithToken(
     {

@@ -1,5 +1,13 @@
 import React, {useCallback, useEffect, useRef, useState} from "react";
-import {FlatList, Image, ImageBackground, Platform, TouchableOpacity, View} from "react-native";
+import {
+  Alert,
+  FlatList,
+  Image,
+  ImageBackground,
+  Platform,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import useStyles from "./styles";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
@@ -172,7 +180,11 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getAllMemories(currentPage, pageSize)
         .then(res => {
           if (res.status == 1) {
-            setARMemories(res.results);
+            const filteredMemories = res.results.filter(
+              (memory: any) => memory.memory_file !== null && memory.memory_file !== ""
+            );
+            setARMemories(filteredMemories);
+            console.log("AR Memories: ", res.results);
 
             setTotalLength(res.total_record);
           } else {
@@ -276,7 +288,10 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getAllMemories(currentPage + 1, pageSize)
         .then(res => {
           if (res.status == 1) {
-            setARMemories(prevMemories => [...prevMemories, ...res.results]);
+            const filteredMemories = res.results.filter(
+              (memory: any) => memory.memory_file !== null && memory.memory_file !== ""
+            );
+            setARMemories(prevMemories => [...prevMemories, ...filteredMemories]);
           } else {
             console.error("Error", "Error fetching more memories: ");
           }
@@ -396,6 +411,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
 
   const navigateToShare = (captureData: any, challengeObj: any) => {
     // @ts-ignore
+
     navigation.navigate("ArChallengeShare", {
       challengeObj: challengeObj,
       captureData,

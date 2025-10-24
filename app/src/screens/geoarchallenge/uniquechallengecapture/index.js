@@ -1,14 +1,6 @@
-import React, { useRef, useState } from "react";
-import {
-  TouchableOpacity,
-  View,
-  Image,
-  Text,
-  Platform,
-  Dimensions,
-  ScrollView,
-} from "react-native";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import React, {useRef, useState} from "react";
+import {TouchableOpacity, View, Image, Text, Platform, Dimensions, ScrollView} from "react-native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import AppHeader from "../../../components/header";
 import useStyles from "./styles";
 import RenderHTML from "react-native-render-html";
@@ -18,7 +10,7 @@ import BackgroundWithImage from "../../../components/background";
 import CameraControls from "components/CameraControls";
 import UnityARCamera from "components/UnityArView";
 
-const { width } = Dimensions.get("window");
+const {width} = Dimensions.get("window");
 const VIDEO_RECORD_TIME = 10;
 
 const UniqueArChallengeCapture = () => {
@@ -37,14 +29,14 @@ const UniqueArChallengeCapture = () => {
   const [capturedImage, setCapturedImage] = useState(null);
   const [capturedVideo, setCapturedVideo] = useState(null);
   const [isUnityLoaded, setIsUnityLoaded] = useState(false); // Initial state for Unity loading
-  const [unityViewDimensions, setUnityViewDimensions] = useState({ width: 0, height: 0 });
+  const [unityViewDimensions, setUnityViewDimensions] = useState({width: 0, height: 0});
   const [processingMedia, setProcessingMedia] = useState(false);
 
   const isPhotoChallenge = challengeObj?.challenge_requirement === "PHOTO";
 
   const handleUnityViewLayout = event => {
-    const { width, height } = event.nativeEvent.layout;
-    setUnityViewDimensions({ width, height });
+    const {width, height} = event.nativeEvent.layout;
+    setUnityViewDimensions({width, height});
   };
 
   const startTimer = () => {
@@ -179,8 +171,8 @@ const UniqueArChallengeCapture = () => {
   const ChallengeDetailView = () => (
     <View style={styles.challengeInfoContainer}>
       <Text style={styles.challengeInfoHeader}>Challenge Details</Text>
-      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
-        <RenderHTML contentWidth={width} source={{ html: challengeObj.description }} />
+      <ScrollView contentContainerStyle={{paddingBottom: 100}}>
+        <RenderHTML contentWidth={width} source={{html: challengeObj.description}} />
       </ScrollView>
       <TouchableOpacity
         activeOpacity={0.6}
@@ -227,10 +219,10 @@ const UniqueArChallengeCapture = () => {
       <ScrollView contentContainerStyle={styles.innerContainer}>
         <View style={styles.viewDetailsIconContainer}>
           <View style={styles.viewDetailsIconContainerWrapper}>
-            <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
+            <View style={{flexDirection: "row", alignItems: "center", flex: 1}}>
               <Image
                 style={styles.viewDetailsIcon}
-                source={{ uri: challengeObj?.sponsored?.image }}
+                source={{uri: challengeObj?.sponsored?.image}}
               />
               <Text style={styles.challengeSponsorName}>{challengeObj?.sponsored?.name}</Text>
             </View>

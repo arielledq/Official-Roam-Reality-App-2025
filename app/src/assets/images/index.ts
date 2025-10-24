@@ -31,6 +31,7 @@ const Images = {
   Earth: require("./Earth.png"),
   WAVE: require("./wave.png"),
   Neo_GR: require("./neoGr.png"),
+  Person: require("./person.png"),
 };
 
 export default Images;
