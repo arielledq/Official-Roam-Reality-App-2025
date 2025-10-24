@@ -213,7 +213,7 @@ class AccountSetupViewset(ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = AccountSetupSerializer
-    http_method_names = ["get", "patch"]
+    http_method_names = ["get", "patch", "delete"]
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk')
@@ -221,6 +221,43 @@ class AccountSetupViewset(ModelViewSet):
             return UserProfile.objects.filter(pk=user_id)
         else:
             return UserProfile.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['delete'], url_path='delete-profile-image')
+    def delete_profile_image(self, request):
+        """
+        Delete user's profile image
+        """
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            
+            # Delete the image file if it exists
+            if user_profile.image:
+                # Delete the file from storage
+                user_profile.image.delete(save=False)
+                # Set the image field to None
+                user_profile.image = None
+                user_profile.save()
+                
+                return Response({
+                    "message": "Profile image deleted successfully",
+                    "status": "success"
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "message": "No profile image found to delete",
+                    "status": "info"
+                }, status=status.HTTP_404_NOT_FOUND)
+                
+        except UserProfile.DoesNotExist:
+            return Response({
+                "message": "User profile not found",
+                "status": "error"
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                "message": f"Error deleting profile image: {str(e)}",
+                "status": "error"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomScoreboardPagination(PageNumberPagination):
