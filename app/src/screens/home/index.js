@@ -44,6 +44,8 @@ import {useOneSignal} from "../../hooks/useOneSignal";
 import {heightPercentageToDP} from "react-native-responsive-screen";
 import theme from "assets/theme";
 import Images from "assets/images";
+import {getProfilePicture} from "util/imageUtils";
+import FastImage from "react-native-fast-image";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -51,6 +53,7 @@ const GeoArChallenge = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [destinationDataMini, setDestinationDataMini] = useState([]);
   const [userPofileImage, setUserPofileImage] = useState("");
+
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
@@ -275,6 +278,7 @@ const GeoArChallenge = ({}) => {
   };
 
   const MenuRightComponent = () => {
+    const profilePicture = getProfilePicture(userPofileImage?.image || user?.user_profile?.image);
     return (
       <TouchableOpacity
         onPress={() => {
@@ -282,15 +286,17 @@ const GeoArChallenge = ({}) => {
         }}
       >
         {userPofileImage ? (
-          <Image source={{uri: userPofileImage}} style={_styles.profileImage} />
+          <FastImage
+            source={{uri: profilePicture}}
+            style={_styles.profileImage}
+            resizeMode={FastImage.resizeMode.cover}
+          />
         ) : (
           <View
             style={{
               marginTop: heightPercentageToDP("1%"),
             }}
-          >
-            <Icon name={"user"} family={"antdesign"} size={30} color={theme.lightColors.white} />
-          </View>
+          ></View>
         )}
       </TouchableOpacity>
     );
@@ -301,7 +307,7 @@ const GeoArChallenge = ({}) => {
       const response = await getProfieDetails({id: userProfileId});
 
       if (response.status == 1) {
-        setUserPofileImage(response.image);
+        setUserPofileImage(response);
         const accountIsComplete = accountSetupIsComplete(response);
         if (!accountIsComplete) {
           setTimeout(() => {

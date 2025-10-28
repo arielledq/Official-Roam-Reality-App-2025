@@ -32,6 +32,7 @@ import {
   getUserRankCount,
   sendCode,
   updateArrMemories,
+  getMyRank,
 } from "../../network";
 import {useDispatch, useSelector} from "react-redux";
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
@@ -42,6 +43,7 @@ import {BlurView} from "@react-native-community/blur";
 import ScreenContainer from "components/ScreenContainer";
 import {height} from "util/AppDimensions";
 import {heightPercentageToDP} from "react-native-responsive-screen";
+import {getProfilePicture} from "util/imageUtils";
 
 const SCROLL_AMOUNT = 150;
 
@@ -53,6 +55,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(30);
   const [totalLength, setTotalLength] = useState(0);
+  const [globalPoints, setGlobalPoints] = useState(0);
   const [profileDetails, setProfileDetails] = useState<any>(null);
   const [arMemories, setARMemories] = useState<any[]>([]);
   const [loading, setloading] = useState(true);
@@ -89,6 +92,21 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     scrollPositionRef.current = newPosition;
   };
 
+  const getMyRankPoints = (destination = "") => {
+    getMyRank(destination)
+      .then(response => {
+        if (response) {
+          setGlobalRank(response?.my_rank || 0);
+          setGlobalPoints(response?.my_points || 0);
+
+          // setRankMine(response);
+        }
+      })
+      .finally(() => {
+        fetchARUserProfile();
+      });
+  };
+
   const getMyCheckInsCount = () => {
     getCheckInCount({})
       .then(res => {
@@ -106,6 +124,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       })
         .then(res => {
           if (res.status == 1) {
+            console.log("res", res);
             setProfileDetails(res);
           } else {
             console.error("Error", "Error fetching profile details: ");
@@ -145,20 +164,20 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       .finally(() => setloading(false));
   };
 
-  const getRank = async () => {
-    getUserRankCount({
-      user_id: userProfile.id,
-    })
-      .then(res => {
-        if (res.status == 1) {
-          setGlobalRank(res.rank);
-        }
-      })
-      .catch(err => {
-        console.error("Error", "Error fetching ar memories: ");
-      })
-      .finally(() => setloading(false));
-  };
+  // const getRank = async () => {
+  //   getUserRankCount({
+  //     user_id: userProfile.id,
+  //   })
+  //     .then(res => {
+  //       if (res.status == 1) {
+  //         setGlobalRank(res.rank);
+  //       }
+  //     })
+  //     .catch(err => {
+  //       console.error("Error", "Error fetching ar memories: ");
+  //     })
+  //     .finally(() => setloading(false));
+  // };
 
   const getCountry = async () => {
     getCountryCount({
@@ -180,11 +199,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getAllMemories(currentPage, pageSize)
         .then(res => {
           if (res.status == 1) {
-            const filteredMemories = res.results.filter(
-              (memory: any) => memory.memory_file !== null && memory.memory_file !== ""
-            );
-            setARMemories(filteredMemories);
-            console.log("AR Memories: ", res.results);
+            setARMemories(res.results);
 
             setTotalLength(res.total_record);
           } else {
@@ -208,7 +223,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       getProfieARMemories();
       fetchARUserProfile();
       getUserCollectedStar();
-      getRank();
+      getMyRankPoints();
       getCountry();
     }, [])
   );
@@ -283,15 +298,13 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   };
 
   const lodeMoreData = () => {
+    console.log("lodeMoreData called", totalLength, arMemories.length);
     if (arMemories.length < totalLength) {
       setCurrentPage(prevPage => prevPage + 1);
       getAllMemories(currentPage + 1, pageSize)
         .then(res => {
           if (res.status == 1) {
-            const filteredMemories = res.results.filter(
-              (memory: any) => memory.memory_file !== null && memory.memory_file !== ""
-            );
-            setARMemories(prevMemories => [...prevMemories, ...filteredMemories]);
+            setARMemories(prevMemories => [...prevMemories, ...res.results]);
           } else {
             console.error("Error", "Error fetching more memories: ");
           }
@@ -302,10 +315,14 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     }
   };
 
+  const profilePicture = getProfilePicture(
+    profileDetails?.image || userProfile?.user_profile?.image
+  );
+
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
       <View style={_styles.avatarContainer}>
-        {profileDetails?.image ? (
+        {profilePicture ? (
           <>
             <View
               style={{
@@ -319,7 +336,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
                 height: height * 0.4,
               }}
               //  @ts-ignore
-              source={{uri: profileDetails?.image}}
+              source={{uri: profilePicture}}
               resizeMode={FastImage.resizeMode.cover}
             />
             <LinearGradient
@@ -353,9 +370,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           style={{
             width: "100%",
             flexDirection: "row",
-
+            marginTop: heightPercentageToDP(1),
             justifyContent: "space-between",
-            alignItems: "center",
           }}
         >
           <View style={{width: "70%"}}>
@@ -401,8 +417,8 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"" + globalRank} property={"Global Rank"} />
-          <StatContainer value={arProfile?.points} property={"Points"} />
+          <StatContainer value={globalRank?.toString()} property={"Global Rank"} />
+          <StatContainer value={globalPoints?.toString()} property={"Points"} />
           <StatContainer value={profileDetails?.friends?.length} property={"Friends"} />
         </View>
       </View>
@@ -431,9 +447,9 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
         >
           <TouchableOpacity onPress={() => setShowArMemories(!showArMemories)}>
             {showArMemories ? (
-              <Icon name="down" family="antdesign" size={25} color={"#fff"} />
+              <Icon name="chevron-down" family="ionicon" size={26} color={"#fff"} />
             ) : (
-              <Icon name="up" family="antdesign" size={25} color={"#fff"} />
+              <Icon name="chevron-up" family="ionicon" size={26} color={"#fff"} />
             )}
           </TouchableOpacity>
         </AppButton>

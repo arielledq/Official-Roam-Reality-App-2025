@@ -34,7 +34,7 @@ import {ProfilePlaceholder} from "assets/base64";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useFocusEffect} from "@react-navigation/native";
 import ImagePicker from "react-native-image-crop-picker";
-import {widthPercentageToDP} from "react-native-responsive-screen";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import {height} from "util/AppDimensions";
 interface ImageData {
   uri: string | undefined;
@@ -534,8 +534,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         color: theme.lightColors?.white,
                         fontSize: FontSizes.S14,
                         borderWidth: 0,
-                        borderBottomWidth: 1,
+                        borderBottomWidth: 0,
                         backgroundColor: theme.lightColors?.inputBG,
+                        marginTop: -8,
                       }}
                       searchPlaceholder="Search Country"
                       searchPlaceholderTextColor={theme.lightColors?.grey0}

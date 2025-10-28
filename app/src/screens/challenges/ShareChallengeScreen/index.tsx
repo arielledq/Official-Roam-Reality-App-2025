@@ -385,7 +385,7 @@ const ArChallengeShare = () => {
         {!isMemory && (
           <Text
             style={{
-              fontSize: FontSizes.S12,
+              fontSize: FontSizes.S10,
               color: theme.lightColors?.white,
               fontFamily: fonts.nunitoBold,
               fontWeight: "700",
@@ -455,7 +455,7 @@ const styles = StyleSheet.create({
   mediaContainer: {
     flex: 1,
     backgroundColor: "#272741",
-    gap: 8,
+    // gap: 8,
 
     marginTop: 10,
 
@@ -473,7 +473,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingHorizontal: widthPercentageToDP("4%"),
     alignItems: "center",
-    paddingBottom: heightPercentageToDP("2%"),
+    marginVertical: heightPercentageToDP("1.5%"),
     gap: 12,
   },
   mediaFooterSponsorContainer: {},
