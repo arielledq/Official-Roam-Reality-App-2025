@@ -1676,7 +1676,7 @@ PODS:
   - react-native-onesignal (5.2.13):
     - OneSignalXCFramework (= 5.2.14)
     - React (< 1.0.0, >= 0.13.0)
-  - react-native-pager-view (6.9.1):
+  - react-native-pager-view (6.7.1):
     - DoubleConversion
     - glog
     - hermes-engine
@@ -3151,7 +3151,7 @@ SPEC CHECKSUMS:
   react-native-maps: a48f905ccf2048f130c0a55996880d479299bc1c
   react-native-netinfo: cec9c4e86083cb5b6aba0e0711f563e2fbbff187
   react-native-onesignal: 0829ce2a504db26dd80eaf14d4e0211ea626fe62
-  react-native-pager-view: f79b095ad2f207028f17626dd7aaf8411c42accc
+  react-native-pager-view: f238ed7fb53458bd03366944a33686f067c83e9a
   react-native-render-html: 5afc4751f1a98621b3009432ef84c47019dcb2bd
   react-native-safe-area-context: 895c49ee2613865f90318789be89a8e286fe7b69
   react-native-unity: 9bf992c92225077eca177f71734e54d0a9a65444
