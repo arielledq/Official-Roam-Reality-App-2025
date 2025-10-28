@@ -90,6 +90,7 @@ const useStyles = makeStyles(theme => ({
     // position: "absolute",
     right: 10,
     zIndex: 10,
+    marginTop: heightPercentageToDP(0.5),
 
     // top: heightPercentageToDP(1),
   },

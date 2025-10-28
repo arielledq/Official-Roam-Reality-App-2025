@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Image, Keyboard, Pressable, Text, View} from "react-native";
+import {Image, Keyboard, Pressable, Text, TextInput, View} from "react-native";
 import {Formik} from "formik";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {Dropdown} from "react-native-element-dropdown";
@@ -89,6 +89,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false);
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null);
   const [countryData, setCountryData] = useState<[]>([]);
+  const [filteredCountryData, setFilteredCountryData] = useState<[]>([]);
+  const [countrySearchText, setCountrySearchText] = useState("");
   const [bDate, setBDate] = useState<Date>(dateOfBirth);
   const [isLoading, setIsLoading] = useState(false);
   const [gender, setGender] = useState({
@@ -208,6 +210,18 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     return cleaned;
   };
 
+  const filterCountries = (searchText: string) => {
+    if (!searchText.trim()) {
+      setFilteredCountryData(countryData);
+      return;
+    }
+
+    const filtered = countryData.filter((country: any) =>
+      country.label.toLowerCase().startsWith(searchText.toLowerCase())
+    );
+    setFilteredCountryData(filtered);
+  };
+
   const acceptWaiverButtonHandler = () => {
     setWaiverIsVisible(false);
     dispatch(updateAccountFlag(true));
@@ -245,6 +259,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
           });
         }
         setCountryData(countryArray);
+        setFilteredCountryData(countryArray);
       })
       .catch(function (error) {
         console.error(error);
@@ -252,6 +267,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
     return () => {
       setCountryData([]);
+      setFilteredCountryData([]);
     };
   }, []);
 
@@ -299,7 +315,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         backgroundColor="transparent"
       />
 
-      <KeyboardAwareScrollView nestedScrollEnabled>
+      <KeyboardAwareScrollView>
         <Formik
           innerRef={formikRef}
           initialValues={initialFormValues}
@@ -512,8 +528,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <View style={_styles.dropdownParentView}>
                     <Dropdown
                       autoScroll={false}
+                      mode="default"
                       style={[
                         _styles.dropdown,
+
                         touched.country && errors?.country && !values.country
                           ? _styles.inputError
                           : {},
@@ -528,25 +546,49 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       }}
                       containerStyle={{
                         borderWidth: 0,
-                        backgroundColor: "transparent",
+                        backgroundColor: theme.lightColors?.grey4,
+                        marginTop: heightPercentageToDP("0.5%"),
                       }}
-                      inputSearchStyle={{
-                        color: theme.lightColors?.white,
-                        fontSize: FontSizes.S14,
-                        borderWidth: 0,
-                        borderBottomWidth: 0,
-                        backgroundColor: theme.lightColors?.inputBG,
-                        marginTop: -8,
-                      }}
+                      // inputSearchStyle={{
+                      //   color: theme.lightColors?.white,
+                      //   fontSize: FontSizes.S14,
+                      //   borderWidth: 1,
+                      //   borderBottomWidth: 0,
+                      //   backgroundColor: theme.lightColors?.inputBG,
+
+                      // }}
+                      renderInputSearch={() => (
+                        <TextInput
+                          style={{
+                            ..._styles.input,
+                            backgroundColor: theme.lightColors?.inputBG,
+                            borderWidth: 1,
+                            borderColor: theme.lightColors?.white,
+                            color: theme.lightColors?.white,
+                          }}
+                          placeholder="Search Country"
+                          placeholderTextColor={theme.lightColors?.grey0}
+                          selectionColor={"white"}
+                          autoCapitalize="none"
+                          value={countrySearchText}
+                          onChangeText={text => {
+                            setCountrySearchText(text);
+                            filterCountries(text);
+                          }}
+                        />
+                      )}
                       searchPlaceholder="Search Country"
                       searchPlaceholderTextColor={theme.lightColors?.grey0}
                       activeColor={theme.lightColors?.inputBlue}
-                      itemContainerStyle={_styles.itemContainerStyle}
+                      itemContainerStyle={{
+                        color: theme.lightColors?.grey0,
+                      }}
+                      keyboardAvoiding={true}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
                       iconStyle={_styles.iconStyle}
-                      data={countryData}
-                      maxHeight={300}
+                      data={filteredCountryData}
+                      // maxHeight={300}
                       labelField="label"
                       placeholder="Home Country"
                       search

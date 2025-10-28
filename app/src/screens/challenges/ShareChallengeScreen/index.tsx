@@ -252,7 +252,7 @@ const ArChallengeShare = () => {
 
   return (
     <ChallengeScreen
-      title={"Location Check-In Challenge"}
+      title={"Share Your Content"}
       style={styles.screenContainer}
       modals={screenModals}
       disableBackButton={disableBackButton}
