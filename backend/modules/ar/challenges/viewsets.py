@@ -470,8 +470,6 @@ class ARProfileViewSet(ViewSet):
             )
         )
         for item in qs:
-            print(item.rank)
-            print(item.user.id)
             if item.user.id == user_id:
                 return Response({"rank": item.rank}, status=status.HTTP_200_OK)
 
@@ -778,7 +776,7 @@ class StarCollectionViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='user-stars-count', name='Check all-count')
     def star_call_count(self, request):
-        user_id = request.data.get("user_id")
+        user_id = self.request.user.id
         criterion1 = Q(user=user_id)
         count = StarCollection.objects.filter(criterion1).count()
         return Response({'count': count}, status=status.HTTP_200_OK)
