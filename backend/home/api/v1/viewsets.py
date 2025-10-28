@@ -6,7 +6,6 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import ListModelMixin
 from rest_framework.pagination import PageNumberPagination
-
 from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet, GenericViewSet
@@ -73,16 +72,17 @@ class SignupViewSet(ModelViewSet):
             if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
                 profileObj.points += configs.POINTS_GIFT
                 profileObj.save()
-                sponsor = Sponsor.objects.get(name='BONUS')
-                geo_location = GeoLocation.objects.get(name='BONUS')
-                ARMemories.objects.create(
-                    points=configs.POINTS_GIFT,
-                    sponsor=sponsor,
-                    geo_location=geo_location,
-                    memory_type='BONUS',
-                    user=user,
-                )
-                configs.NUMBER_USER_POINT_GIFT += 1
+                # sponsor = Sponsor.objects.get(name='BONUS')
+                # geo_location = GeoLocation.objects.get(name='BONUS')
+                # ARMemories.objects.create(
+                #     points=configs.POINTS_GIFT,
+                #     sponsor=sponsor,
+                #     geo_location=geo_location,
+                #     memory_type='BONUS',
+                #     user=user,
+                # )
+                
+                # configs.NUMBER_USER_POINT_GIFT += 1
 
                 send_notification(
                     NotificationTypes.DEFAULT,
