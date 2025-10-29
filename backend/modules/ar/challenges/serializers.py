@@ -254,6 +254,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     file_3d = RandomDownloadNameS3FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     user_attempts = serializers.SerializerMethodField()
     cooldown = serializers.SerializerMethodField()
 
@@ -261,7 +262,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
         model = ScanPicture
         geo_field = ('coordinates',)
         fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
-                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
+                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation", 'parameters']
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
