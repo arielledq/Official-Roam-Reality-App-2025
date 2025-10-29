@@ -290,6 +290,7 @@ const GeoArChallenge = ({}) => {
             source={{uri: profilePicture}}
             style={_styles.profileImage}
             resizeMode={FastImage.resizeMode.cover}
+            defaultSource={Images.AppLogo}
           />
         ) : (
           <View

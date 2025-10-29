@@ -32,6 +32,7 @@ const Images = {
   WAVE: require("./wave.png"),
   Neo_GR: require("./neoGr.png"),
   Person: require("./person.png"),
+  AppLogo: require("./AppIcon.jpg"),
 };
 
 export default Images;

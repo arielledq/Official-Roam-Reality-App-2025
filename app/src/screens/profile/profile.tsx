@@ -318,6 +318,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const profilePicture = getProfilePicture(
     profileDetails?.image || userProfile?.user_profile?.image
   );
+  console.log("profilePicture");
 
   const renderHeader = () => (
     <KeyboardAwareScrollView style={_styles.header}>
@@ -338,6 +339,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
               //  @ts-ignore
               source={{uri: profilePicture}}
               resizeMode={FastImage.resizeMode.cover}
+              defaultSource={Images.AppLogo}
             />
             <LinearGradient
               colors={["rgba(32, 33, 54, 1)", "rgba(32, 33, 54, 0)"]}

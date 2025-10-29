@@ -305,6 +305,7 @@ const ScoreBoard = ({}) => {
               }}
               source={{uri: profilePicture}}
               resizeMode={FastImage.resizeMode.cover}
+              defaultSource={Images.AppLogo}
             />
           </ImageBackground>
           <Text numberOfLines={2} style={_styles.nameText}>
@@ -423,6 +424,7 @@ const ScoreBoard = ({}) => {
                   height: 40,
                 }}
                 source={{uri: profilePicture}}
+                defaultSource={Images.AppLogo}
                 resizeMode={FastImage.resizeMode.cover}
               />
             </ImageBackground>
