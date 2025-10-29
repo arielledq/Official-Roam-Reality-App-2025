@@ -1,13 +1,18 @@
 import * as React from "react";
-import {View, TouchableOpacity, Text, Image} from "react-native";
+import {View, TouchableOpacity, Text, Image, StyleSheet} from "react-native";
 import theme from "assets/theme";
 import Icon from "components/Icon";
 import AppButton from "components/button";
+import HalfCircleProgress from "components/HalfCircleProgress";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
+import {FontSizes} from "util/FontUtils";
 interface ARChallengeItemProps {
   onPress: () => void;
   points: number;
   title: string;
   attemptsDetails: string;
+  totalAttempts?: number; // Total attempts allowed
+  currentAttempts?: number; // Current attempts used
   coolDownHours: number;
   sponsorImage: string;
   disabled: any;
@@ -18,12 +23,24 @@ const ARChallengeItem = ({
   points,
   title,
   attemptsDetails,
+  totalAttempts = 100,
+  currentAttempts = 30,
   coolDownHours,
   sponsorImage,
   disabled,
 }: ARChallengeItemProps) => {
+  const CapitalFirstLetter = (str: string) => {
+    /// capitalize first letter and letter after spaces
+    return str.replace(/\b\w/g, char => char.toUpperCase());
+  };
+
+  const calculateProgress = () => {
+    if (totalAttempts == 0) return 0;
+    if (currentAttempts == 0) return 0;
+    return Math.min((currentAttempts / totalAttempts) * 100, 100);
+  };
   return (
-    <View style={{marginTop: 10, marginLeft: 10}}>
+    <View style={{marginTop: 10}}>
       <TouchableOpacity
         activeOpacity={0.8}
         disabled={disabled}
@@ -39,7 +56,7 @@ const ARChallengeItem = ({
           marginBottom: 10,
         }}
       >
-        <View style={{width: 50}}>
+        {/* <View style={{width: 50}}>
           <AppButton
             customColors={[
               theme.lightColors?.pink || "",
@@ -74,27 +91,105 @@ const ARChallengeItem = ({
               </View>
             }
           />
+        </View> */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            width: widthPercentageToDP("45%"),
+          }}
+        >
+          <Image
+            source={{uri: sponsorImage}}
+            style={{
+              width: widthPercentageToDP("14%"),
+              height: widthPercentageToDP("14%"),
+              borderRadius: 10,
+            }}
+          />
+          <Text
+            style={{
+              color: "white",
+              fontSize: FontSizes.S12,
+              fontWeight: "bold",
+              width: widthPercentageToDP("30%"),
+            }}
+            numberOfLines={1}
+          >
+            {CapitalFirstLetter(title)}
+          </Text>
         </View>
 
-        <View style={{flex: 1, marginLeft: 10}}>
-          <Text style={{color: "white", fontSize: 12, fontWeight: "bold"}}>{title}</Text>
-          <View style={{flexDirection: "row", alignItems: "center", marginTop: 2, gap: 8}}>
-            <View style={{flexDirection: "row", alignItems: "center", gap: 2}}>
-              <Icon name="pinrosa" family="custom" size={14} />
-              <Text style={{color: theme.lightColors?.grey0, fontSize: 10}}>{attemptsDetails}</Text>
-            </View>
-            <View style={{flexDirection: "row", alignItems: "center", gap: 2}}>
-              <Icon name="clock" family="custom" size={14} />
-              <Text style={{color: theme.lightColors?.grey0, fontSize: 10}}>
-                {coolDownHours || 0} Hrs Cooldown
-              </Text>
-            </View>
+        <View
+          style={{
+            alignItems: "center",
+            flex: 1,
+            flexDirection: "row",
+            gap: 10,
+          }}
+        >
+          <View style={styles.contBox}>
+            <Text
+              style={{
+                color: theme.lightColors?.white,
+                fontSize: FontSizes.S18,
+                fontWeight: "bold",
+
+                marginBottom: 2,
+              }}
+            >
+              {points || 0}
+            </Text>
+
+            <Text style={styles.attemptsText}>Points</Text>
+          </View>
+          <View style={styles.contBox}>
+            <HalfCircleProgress
+              progress={calculateProgress()}
+              radius={18}
+              strokeWidth={6}
+              text={attemptsDetails}
+              textStyle={{color: theme.lightColors?.grey0, fontSize: 6, fontWeight: "bold"}}
+            />
+            <Text style={styles.attemptsText}>Attempts</Text>
+          </View>
+          <View style={styles.contBox}>
+            <Text
+              style={{
+                color: theme.lightColors?.white,
+                fontSize: FontSizes.S18,
+                fontWeight: "bold",
+
+                marginBottom: 2,
+              }}
+            >
+              {coolDownHours || 0}H
+            </Text>
+
+            <Text style={styles.attemptsText}>Cooldown</Text>
           </View>
         </View>
-        <Image source={{uri: sponsorImage}} style={{width: 40, height: 40, borderRadius: 20}} />
       </TouchableOpacity>
     </View>
   );
 };
 
 export default ARChallengeItem;
+
+const styles = StyleSheet.create({
+  contBox: {
+    width: heightPercentageToDP("5%"),
+    height: heightPercentageToDP("5%"),
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000000c0",
+  },
+  attemptsText: {
+    color: theme.lightColors?.white,
+    fontSize: 7,
+    fontWeight: "bold",
+    textAlign: "center",
+  },
+});

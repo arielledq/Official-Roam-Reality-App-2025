@@ -167,8 +167,15 @@ const ARScreen = ({route}) => {
   };
 
   const unzipModelFile = async (sourcePath, targetPath) => {
+    console.log("Unzipping model file from:", sourcePath, "to:", targetPath);
     setTextLoading("Unzipping AR model...");
-    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
+    const extractedData = {
+      success: true,
+      objFile: "travelApp/models/star.obj",
+      mtlFile: " travelApp/models/star.mtl",
+      baseTexture: "travelApp/models/star_base.png",
+      emissionTexture: "travelApp/models/star_emission.png",
+    };
 
     if (extractedData.success) {
       setStarModels(extractedData.objFile);
@@ -186,6 +193,7 @@ const ARScreen = ({route}) => {
   };
 
   const checkIfModelExist = () => {
+    console.log("Checking if model exists for file:", modelFile);
     if (!modelFile) return;
 
     const filename = modelFile.split("/").pop().split("?")[0];
@@ -355,6 +363,7 @@ const ARScreen = ({route}) => {
   };
 
   const sendModelDataToUnity = () => {
+    console.log("Sending model data to Unity. Has sent once:", hasSentModelDataOnce);
     if (hasSentModelDataOnce) return;
     if (!unityRef.current || !textureBase || !starModels || !validUserLocation) return;
     if (
@@ -369,6 +378,7 @@ const ARScreen = ({route}) => {
       const huntLike = isHuntMode || (isScanMode && !!selectedSite?.scanChallenge?.file_3d);
       const modelData = {
         objFile: starModels.replace("file://", ""),
+        url: selectedChallengeOverride.model_file || "",
         mtlFile: modelResource ? modelResource.replace("file://", "") : "",
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
@@ -401,9 +411,14 @@ const ARScreen = ({route}) => {
         allowScale: true, //true
         // allowScale: true
       };
+
+      console.log("Model Data being sent to Unity:", modelData.url);
+
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+        // handleNextHunt();
       }, 500);
+
       // setSendModelData(true);
       unityRef.current.postMessage(
         "OBJImport",
@@ -753,6 +768,7 @@ const ARScreen = ({route}) => {
       });
 
       const nextHunt = await getNextStarApi(geoSiteId, lat, lon);
+      console.log("NEXT HUNT STAR:", nextHunt);
       if (!nextHunt) {
         return;
       } else {
@@ -853,6 +869,7 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
+    console.log("Starting challenge with site:", site?.scanChallenge?.file_3d);
     let mode = site?.selectedMode?.mode;
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
