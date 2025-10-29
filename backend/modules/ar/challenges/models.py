@@ -628,6 +628,15 @@ class ScanPicture(models.Model):
     )
     points = models.IntegerField(verbose_name="Points", default=0)
     elevation = models.IntegerField(null=True, blank=True)
+    parameter_settings = models.ForeignKey(
+        ARChallengeParameterSettings,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="parameter_settings_scan_picture",
+        verbose_name=_("Parameter Settings")
+    )
 
     class Meta:
         verbose_name_plural = "Scans"
@@ -781,7 +790,7 @@ class GeoARStarPoint(models.Model):
     model_file = models.FileField(_("3D Model"), upload_to="ar/geo_star_point/", null=True, blank=True)
     title = models.CharField(_("Title"), max_length=255, blank=True, null=True)
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
-    elevation = models.IntegerField(null=True, blank=True)
+    elevation = models.IntegerField(_("Elevation"), null=True, blank=True, help_text="Elevation for this AR point")
     sponsors = models.ManyToManyField(Sponsor, related_name="stars", blank=True)
     points = models.IntegerField(verbose_name="Points", default=0)
 
