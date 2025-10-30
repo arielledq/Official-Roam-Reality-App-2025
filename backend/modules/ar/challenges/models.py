@@ -605,13 +605,16 @@ class ScanPicture(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
+    screen_title = models.CharField(
+        _("Screen Title"), max_length=200, blank=True, null=True, help_text="Title to display on the screen"
+    )
     file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/", null=True, blank=True)
     file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
     icon = models.ImageField(_("Icon"), upload_to="scanpicture/icon/", null=True, blank=True)
     file_animation_android = models.FileField(_("Animation android"), upload_to="scanpicture/animation_android/",
-                                              null=True, blank=False)
+                                              null=True, blank=True)
     file_animation_ios = models.FileField(_("Animation ios"), upload_to="scanpicture/animation_ios/",
-                                          null=True, blank=False)
+                                          null=True, blank=True)
     sponsor = models.ForeignKey(
         Sponsor,
         on_delete=models.CASCADE,
@@ -789,6 +792,9 @@ class GeoARStarPoint(models.Model):
     image = models.FileField(upload_to="ar/geo_star_point/", blank=True, null=True)
     model_file = models.FileField(_("3D Model"), upload_to="ar/geo_star_point/", null=True, blank=True)
     title = models.CharField(_("Title"), max_length=255, blank=True, null=True)
+    screen_title = models.CharField(
+        _("Screen Title"), max_length=200, blank=True, null=True, help_text="Title to display on the screen"
+    )
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     elevation = models.IntegerField(_("Elevation"), null=True, blank=True, help_text="Elevation for this AR point")
     sponsors = models.ManyToManyField(Sponsor, related_name="stars", blank=True)

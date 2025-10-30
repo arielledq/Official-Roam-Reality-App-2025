@@ -261,7 +261,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
+        fields = ['id', 'name', 'screen_title', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
                   'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation", 'parameters']
 
     def get_user_attempts(self, obj):
@@ -882,6 +882,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "image",
             "model_file",
             "title",
+            "screen_title",
             "fun_facts",
             "elevation",
             "sponsors",

@@ -40,7 +40,9 @@ from home.api.v1.serializers import (
     SignupSerializer,
     UserProfileSerializer,
     UserSerializer,
+    ModeSerializer,
 )
+from home.models import Mode
 from django.db.models import Q
 import re
 from functools import reduce
@@ -547,3 +549,23 @@ class FindFriendsAPIView(APIView):
 
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ModeViewSet(ModelViewSet):
+    """
+    ViewSet for managing Modes (Geo-tag, Band, Hunt, Scans)
+    Provides list and retrieve actions.
+    """
+    serializer_class = ModeSerializer
+    queryset = Mode.objects.all()
+    permission_classes = []
+    authentication_classes = []
+    http_method_names = ['get']  # Only allow GET requests (list and retrieve)
+    
+    def get_queryset(self):
+        """Return all modes, optionally filter by status"""
+        queryset = Mode.objects.all()
+        status_param = self.request.query_params.get('status', None)
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        return queryset
