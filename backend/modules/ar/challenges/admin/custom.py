@@ -224,7 +224,7 @@ class ScanPictureForm(PointFieldForm, forms.ModelForm):
 class ScanPictureAdmin(admin.ModelAdmin):
     form = ScanPictureForm
     change_form_template = 'admin/geoarstarpoint/change_form.html'
-    list_display = ('name',)
+    list_display = ('name', 'screen_title')
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}
@@ -261,6 +261,7 @@ class GeoARStarPointForm(PointFieldForm, forms.ModelForm):
 class GeoARStarPointAdmin(GeoArChallengeAdmin):
     form = GeoARStarPointForm
     change_form_template = 'admin/geoarstarpoint/change_form.html'
+    list_display = ('order', 'title', 'screen_title', 'points')
 
     def change_view(self, request, object_id, form_url='', extra_context=None):
         extra_context = extra_context or {}

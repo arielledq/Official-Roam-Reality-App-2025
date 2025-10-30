@@ -11,6 +11,8 @@ class CustomAppleSocialLoginSerializer(SocialLoginSerializer):
     access_token = serializers.CharField(required=False, allow_blank=True)
     code = serializers.CharField(required=False, allow_blank=True)
     id_token = serializers.CharField(required=False, allow_blank=True)
+    first_name = serializers.CharField(required=False, allow_blank=True)
+    last_name = serializers.CharField(required=False, allow_blank=True)
 
     def _get_request(self):
         request = self.context.get("request")
@@ -123,6 +125,15 @@ class CustomAppleSocialLoginSerializer(SocialLoginSerializer):
 
             login.lookup()
             login.save(request, connect=True)
+            
+            # Save first_name and last_name from Apple Sign In (only provided on first login)
+            user = login.account.user
+            if attrs.get('first_name') and not user.first_name:
+                user.first_name = attrs.get('first_name')
+            if attrs.get('last_name') and not user.last_name:
+                user.last_name = attrs.get('last_name')
+            if user.first_name or user.last_name:
+                user.save()
 
         attrs["user"] = login.account.user
         return attrs

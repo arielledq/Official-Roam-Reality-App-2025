@@ -50,6 +50,30 @@ class FacebookLogin(SocialLoginView):
             super().post(request, *args, **kwargs)
             user = self.user
             token = self.token
+            
+            # Get and save username from Facebook for standard flow
+            try:
+                social_account = SocialAccount.objects.get(user=user, provider='facebook')
+                extra_data = social_account.extra_data
+                # Extract name information from Facebook's extra_data
+                first_name = extra_data.get('first_name', '')
+                last_name = extra_data.get('last_name', '')
+                name = extra_data.get('name', '')
+                # Update user's first_name and last_name if not already set
+                if not user.first_name and first_name:
+                    user.first_name = first_name
+                if not user.last_name and last_name:
+                    user.last_name = last_name
+                # Set full name as first_name if individual names not available
+                if not user.first_name and not user.last_name and name:
+                    name_parts = name.split(' ', 1)
+                    user.first_name = name_parts[0]
+                    if len(name_parts) > 1:
+                        user.last_name = name_parts[1]
+                user.save()
+            except SocialAccount.DoesNotExist:
+                pass
+                
         except Exception as e:
             token = request.data.get("access_token")
             if not token:
@@ -57,21 +81,54 @@ class FacebookLogin(SocialLoginView):
             try:
                 user_data = get_facebook_user(token, settings.FACEBOOK_APP_ID)
                 facebook_id = user_data["facebookUserId"]
+                first_name = user_data.get("facebookFirstName", "")
+                last_name = user_data.get("facebookLastName", "")
                 name = user_data.get("facebookUserName", "")
                 email = user_data.get("facebookUserEmail", "")
 
                 social_account = SocialAccount.objects.filter(uid=facebook_id, provider="facebook").first()
                 if social_account:
                     user = social_account.user
+                    # Update existing user's name if not set
+                    if not user.first_name and first_name:
+                        user.first_name = first_name
+                    if not user.last_name and last_name:
+                        user.last_name = last_name
+                    # Fallback to splitting full name
+                    if not user.first_name and not user.last_name and name:
+                        name_parts = name.split(' ', 1)
+                        user.first_name = name_parts[0]
+                        if len(name_parts) > 1:
+                            user.last_name = name_parts[1]
+                    user.save()
                 else:
                     # New user
-                    user = User.objects.create(username=email.split('@')[0], first_name=name, email=email)
+                    if not first_name and not last_name and name:
+                        # Split full name if individual names not provided
+                        name_parts = name.split(' ', 1)
+                        first_name = name_parts[0]
+                        last_name = name_parts[1] if len(name_parts) > 1 else ""
+                    
+                    user = User.objects.create(
+                        username=email.split('@')[0] if email else facebook_id,
+                        first_name=first_name,
+                        last_name=last_name,
+                        email=email
+                    )
                     user.set_unusable_password()
                     user.save()
 
                     # Create SocialAccount
-                    SocialAccount.objects.create(user=user, uid=facebook_id, provider="facebook",
-                                                 extra_data={"name": name})
+                    SocialAccount.objects.create(
+                        user=user,
+                        uid=facebook_id,
+                        provider="facebook",
+                        extra_data={
+                            "name": name,
+                            "first_name": first_name,
+                            "last_name": last_name
+                        }
+                    )
                 # Generate token
                 token, _ = Token.objects.get_or_create(user=user)
             except Exception as ex:
@@ -88,16 +145,16 @@ class FacebookLogin(SocialLoginView):
         if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
-            sponsor = Sponsor.objects.get(name='BONUS')
-            geo_location = GeoLocation.objects.get(name='BONUS')
-            ARMemories.objects.create(
-                points=configs.POINTS_GIFT,
-                sponsor=sponsor,
-                geo_location=geo_location,
-                memory_type='BONUS',
-                user=user,
-            )
-            configs.NUMBER_USER_POINT_GIFT += 1
+            # sponsor = Sponsor.objects.get(name='BONUS')
+            # geo_location = GeoLocation.objects.get(name='BONUS')
+            # ARMemories.objects.create(
+            #     points=configs.POINTS_GIFT,
+            #     sponsor=sponsor,
+            #     geo_location=geo_location,
+            #     memory_type='BONUS',
+            #     user=user,
+            # )
+            # configs.NUMBER_USER_POINT_GIFT += 1
             send_notification(
                 NotificationTypes.DEFAULT,
                 user,
@@ -118,7 +175,7 @@ class GoogleLogin(SocialLoginView):
 
     def get_serializer(self, *args, **kwargs): 
         serializer_class = self.get_serializer_class() 
-        kwargs['context'] = self.get_serializer_context() 
+        kwargs['context'] = self.get_serializer_context()
         return serializer_class(*args, **kwargs)
 
     def get_response(self):
@@ -126,6 +183,27 @@ class GoogleLogin(SocialLoginView):
         user = self.user
         if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
             return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get and save username from Google
+        try:
+            social_account = SocialAccount.objects.get(user=user, provider='google')
+            extra_data = social_account.extra_data
+            # Extract name information from Google's extra_data
+            given_name = extra_data.get('given_name', '')
+            family_name = extra_data.get('family_name', '')
+            full_name = extra_data.get('name', '')
+            # Update user's first_name and last_name if not already set
+            if not user.first_name and given_name:
+                user.first_name = given_name
+            if not user.last_name and family_name:
+                user.last_name = family_name
+            # Set full name as first_name if individual names not available
+            if not user.first_name and not user.last_name and full_name:
+                user.first_name = full_name
+            user.save()
+        except SocialAccount.DoesNotExist:
+            pass
+        
         user_profile = UserProfile.objects.get(user=user)
         user_profile.is_verified = True
         user_profile.save()
@@ -134,16 +212,16 @@ class GoogleLogin(SocialLoginView):
         if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
-            sponsor = Sponsor.objects.get(name='BONUS')
-            geo_location = GeoLocation.objects.get(name='BONUS')
-            ARMemories.objects.create(
-                points=configs.POINTS_GIFT,
-                sponsor=sponsor,
-                geo_location=geo_location,
-                memory_type='BONUS',
-                user=user,
-            )
-            configs.NUMBER_USER_POINT_GIFT += 1
+            # sponsor = Sponsor.objects.get(name='BONUS')
+            # geo_location = GeoLocation.objects.get(name='BONUS')
+            # ARMemories.objects.create(
+            #     points=configs.POINTS_GIFT,
+            #     sponsor=sponsor,
+            #     geo_location=geo_location,
+            #     memory_type='BONUS',
+            #     user=user,
+            # )
+            # configs.NUMBER_USER_POINT_GIFT += 1
             send_notification(
                 NotificationTypes.DEFAULT,
                 user,
@@ -172,6 +250,19 @@ class AppleLogin(SocialLoginView):
         user = self.user
         if ReportedContent.objects.filter(reported_user=user,block_reported_user=True).exists():
             return Response({"message": "Your account has been blocked."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        # Get and save username from Apple (if provided in request)
+        # Apple only sends name on first authentication, so we save it if available
+        first_name = self.request.data.get('first_name')
+        last_name = self.request.data.get('last_name')
+        
+        if first_name and not user.first_name:
+            user.first_name = first_name
+        if last_name and not user.last_name:
+            user.last_name = last_name
+        if first_name or last_name:
+            user.save()
+        
         user_profile = UserProfile.objects.get(user=user)
         user_profile.is_verified = True
         user_profile.save()
@@ -180,16 +271,16 @@ class AppleLogin(SocialLoginView):
         if created and configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
             profileObj.points += configs.POINTS_GIFT
             profileObj.save()
-            sponsor = Sponsor.objects.get(name='BONUS')
-            geo_location = GeoLocation.objects.get(name='BONUS')
-            ARMemories.objects.create(
-                points=configs.POINTS_GIFT,
-                sponsor=sponsor,
-                geo_location=geo_location,
-                memory_type='BONUS',
-                user=user,
-            )
-            configs.NUMBER_USER_POINT_GIFT += 1
+            # sponsor = Sponsor.objects.get(name='BONUS')
+            # geo_location = GeoLocation.objects.get(name='BONUS')
+            # ARMemories.objects.create(
+            #     points=configs.POINTS_GIFT,
+            #     sponsor=sponsor,
+            #     geo_location=geo_location,
+            #     memory_type='BONUS',
+            #     user=user,
+            # )
+            # configs.NUMBER_USER_POINT_GIFT += 1
             send_notification(
                 NotificationTypes.DEFAULT,
                 user,

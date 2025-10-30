@@ -11,6 +11,7 @@ from home.api.v1.viewsets import (
     SendEmailOtpViewset,
     SignupViewSet,
     LoginViewSet, ScoreViewSet,
+    ModeViewSet,
 )
 
 router = DefaultRouter()
@@ -21,6 +22,7 @@ router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_e
 router.register("account-setup", AccountSetupViewset, basename="account-setup")
 router.register("scoreboard", ScoreViewSet, basename="scoreboard")
 router.register("friends", FriendshipViewSet, basename="friends")
+router.register("modes", ModeViewSet, basename="modes")
 
 urlpatterns = [
     path("", include(router.urls)),

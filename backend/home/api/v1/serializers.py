@@ -15,6 +15,7 @@ from users.models import FriendshipRequest, Notification, UserProfile
 from rest_framework.authtoken.models import Token
 
 from home.utils import EmailOTP
+from home.models import Mode
 
 
 User = get_user_model()
@@ -91,7 +92,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'user_profile', 'ar_user_profile_user', 'type', 'geo_ar_site_band_user',
+        fields = ['id', 'email', 'name', 'first_name','last_name', 'user_profile', 'ar_user_profile_user', 'type', 'geo_ar_site_band_user',
                   'is_band_location_active', 'has_receive_points',]
 
     def get_is_band_location_active(self, instance):
@@ -188,3 +189,10 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+
+
+class ModeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mode
+        fields = ['id', 'name', 'status', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']

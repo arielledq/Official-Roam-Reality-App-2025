@@ -7,17 +7,23 @@ def get_standard_facebook_user(token: str):
     Try to fetch Facebook user info using the Graph API.
     """
     url = "https://graph.facebook.com/me"
-    params = {"fields": "id,name", "access_token": token}
+    params = {"fields": "id,name,first_name,last_name,email", "access_token": token}
     response = requests.get(url, params=params)
 
     if response.status_code != 200:
         response.raise_for_status()
 
     data = response.json()
-    if "id" not in data or "name" not in data:
-        raise ValueError("Invalid token (missing id or name)")
+    if "id" not in data:
+        raise ValueError("Invalid token (missing id)")
 
-    return {"facebookUserId": data["id"], "facebookUserName": data["name"]}
+    return {
+        "facebookUserId": data["id"],
+        "facebookUserName": data.get("name", ""),
+        "facebookFirstName": data.get("first_name", ""),
+        "facebookLastName": data.get("last_name", ""),
+        "facebookUserEmail": data.get("email", "")
+    }
 
 
 def get_limited_facebook_user(token: str, app_id: str):
@@ -43,8 +49,10 @@ def get_limited_facebook_user(token: str, app_id: str):
 
     return {
         "facebookUserId": decoded["sub"],
-        "facebookUserName": decoded.get("name"),  # 'name' may not always exist
-        "facebookUserEmail": decoded.get("email"),
+        "facebookUserName": decoded.get("name", ""),
+        "facebookFirstName": decoded.get("given_name", ""),
+        "facebookLastName": decoded.get("family_name", ""),
+        "facebookUserEmail": decoded.get("email", ""),
     }
 
 
