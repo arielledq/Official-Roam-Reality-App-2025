@@ -39,6 +39,7 @@ import {
   isLocationPointInPolygon,
 } from "util/LocationLib";
 import useArScreenHook from "../../hooks/useArScreenHook";
+import {title} from "process";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
@@ -363,7 +364,6 @@ const ARScreen = ({route}) => {
   };
 
   const sendModelDataToUnity = () => {
-    console.log("Sending model data to Unity. Has sent once:", hasSentModelDataOnce);
     if (hasSentModelDataOnce) return;
     if (!unityRef.current || !textureBase || !starModels || !validUserLocation) return;
     if (
@@ -379,6 +379,7 @@ const ARScreen = ({route}) => {
       const modelData = {
         objFile: starModels.replace("file://", ""),
         url: selectedChallengeOverride.model_file || "",
+        title: selectedChallengeOverride.title || "",
         mtlFile: modelResource ? modelResource.replace("file://", "") : "",
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
@@ -412,11 +413,10 @@ const ARScreen = ({route}) => {
         // allowScale: true
       };
 
-      console.log("Model Data being sent to Unity:", modelData.url);
+      console.log("Model Data being sent to Unity:", modelData.url, modelData.title);
 
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
-        // handleNextHunt();
       }, 500);
 
       // setSendModelData(true);
@@ -869,7 +869,7 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
-    console.log("Starting challenge with site:", site?.scanChallenge?.file_3d);
+    console.log("Starting challenge with site:", site);
     let mode = site?.selectedMode?.mode;
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
@@ -889,6 +889,7 @@ const ARScreen = ({route}) => {
         challengeData = {
           model_file: scanChallenge?.file_3d,
           lat_long: scanChallenge?.coordinates,
+          title: scanChallenge?.screen_title,
           challenge_requirement: site?.pin_challenge?.challenge_requirement,
           arChallenge: true,
           isLocation: false,
@@ -898,22 +899,23 @@ const ARScreen = ({route}) => {
           selectedMode: "Scan",
           setVisibleButtonPosition: false,
         };
-
         break;
       case AR_MODES.HUNT_MODE:
         const huntChallenge = site?.huntChallenge?.geo_ar_star?.geo_site;
+        const starHuntChallenge = site?.huntChallenge;
+
         challengeData = {
           lat_long: huntChallenge?.lat_long,
           challenge_requirement: huntChallenge?.pin_challenge?.challenge_requirement,
           challenge_id: huntChallenge?.pin_challenge?.id,
-          model_file: site?.ar_star?.model_file,
+          model_file: starHuntChallenge?.model_file,
+          title: starHuntChallenge?.screen_title,
           parameters: huntChallenge?.pin_challenge?.parameters,
           points: huntChallenge?.pin_challenge?.points || 10,
           setVisibleButtonPosition: false,
           arChallenge: false,
           isLocation: true,
         };
-
         break;
       default:
         break;
@@ -1702,8 +1704,8 @@ const ARScreen = ({route}) => {
               viewShotRef: viewShotRef,
             }}
           />
-
-          {/* <TouchableOpacity
+          {/* 
+          <TouchableOpacity
             style={{
               position: "absolute",
               top: 40,
@@ -1713,7 +1715,7 @@ const ARScreen = ({route}) => {
               borderRadius: 5,
               zIndex: 1000,
             }}
-            onPress={openExample}
+            onPress={handleNextHunt}
           >
             <Text style={{color: "#fff", fontSize: 16}}>Examples</Text>
           </TouchableOpacity> */}

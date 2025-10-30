@@ -313,7 +313,11 @@ const GeoArChallenge = ({}) => {
         if (!accountIsComplete) {
           setTimeout(() => {
             // @ts-ignore
-            navigation.replace("EditProfile", {profileDetails: response});
+            navigation.replace("EditProfile", {
+              profileDetails: response,
+              accountNotComplete: true,
+              extraInfo: user,
+            });
           }, 300);
         }
       } else {

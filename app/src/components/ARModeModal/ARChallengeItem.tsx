@@ -113,9 +113,9 @@ const ARChallengeItem = ({
               color: "white",
               fontSize: FontSizes.S12,
               fontWeight: "bold",
-              width: widthPercentageToDP("30%"),
+              width: widthPercentageToDP("25%"),
             }}
-            numberOfLines={1}
+            numberOfLines={2}
           >
             {CapitalFirstLetter(title)}
           </Text>

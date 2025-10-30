@@ -63,16 +63,22 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 }) => {
   const edit = route?.params?.edit;
   const userData = route?.params?.profileDetails;
+  const extraInfo = route?.params?.extraInfo;
+  const accountNotComplete = route?.params?.accountNotComplete;
   const onProfileUpdate = route?.params?.onProfileUpdate;
 
+  console.log("User Data in Edit Profile:", extraInfo, accountNotComplete);
   let dateOfBirth = null;
   if (userData?.date_of_birth) {
     const [year, month, day] = userData.date_of_birth.split("-").map(Number);
     dateOfBirth = new Date(year, month - 1, day);
   }
+
   const initialFormValues = {
     pImage: userData?.image ?? undefined,
-    name: userData?.user?.name ?? "",
+    name: accountNotComplete
+      ? `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`
+      : userData?.user?.name ?? "",
     gender: userData?.gender ?? undefined,
     phoneNumber: userData?.phone_number ?? "",
     address: userData?.home_address ?? "",
@@ -285,7 +291,9 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
       // @ts-ignore
       formikRef.current.setValues({
         pImage: userData?.image,
-        name: userData?.user?.name || "",
+        name: accountNotComplete
+          ? `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`
+          : userData?.user?.name ?? "",
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
         address: userData?.home_address || "",

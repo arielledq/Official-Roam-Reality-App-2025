@@ -33,6 +33,8 @@ const Images = {
   Neo_GR: require("./neoGr.png"),
   Person: require("./person.png"),
   AppLogo: require("./AppIcon.jpg"),
+  Done: require("./done.png"),
+  retake: require("./retake.png"),
 };
 
 export default Images;
