@@ -246,12 +246,22 @@ export const getNextStar = payload =>
     },
     logoutFunc
   );
+
 export const starFoundAndSaveApi = payload =>
   Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-star-collect/`,
       method: "POST",
       data: payload,
+    },
+    logoutFunc
+  );
+
+export const getAvailableARModes = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}modes/`,
+      method: "GET",
     },
     logoutFunc
   );

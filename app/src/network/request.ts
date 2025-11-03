@@ -7,7 +7,7 @@ class RequestClass {
   serverBaseUrl: string;
 
   constructor() {
-    this.axios = axios.create({timeout: 60000});
+    this.axios = axios.create({timeout: 300000});
     this.serverBaseUrl = BASE_URL;
   }
 

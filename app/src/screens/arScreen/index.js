@@ -14,11 +14,14 @@ import {AR_MODES_MENU, CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../cons
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
+import UnityHeader from "components/UnityHeader";
+import SideMenu from "components/SideMenu";
 import {copyFileForDisplay, eraseFile, handleUnzipProcess, showMessage} from "../../util/helpers";
 
 import {
   getArHuntExamples,
   getArScanExamples,
+  getAvailableARModes,
   getElevationAPI,
   starFoundAndSaveApi,
 } from "../../network";
@@ -40,9 +43,14 @@ import {
 } from "util/LocationLib";
 import useArScreenHook from "../../hooks/useArScreenHook";
 import {title} from "process";
+import {useIsFocused} from "@react-navigation/native";
+import theme from "assets/theme";
+import ARModeSiteList from "components/ARModeModal/ARModeSiteList";
+import {FontSizes} from "util/FontUtils";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
+  const [screentitle, setSceenTitle] = useState("Choose your AR MODE");
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
   const [textLoading, setTextLoading] = useState("Loading AR Experience");
@@ -54,6 +62,7 @@ const ARScreen = ({route}) => {
   const [notificationMode, setNotificationMode] = useState("scan");
   const [selectedSite, setSelectedSite] = useState(null);
   const navigation = useNavigation();
+  const [selectedMode, setSelectedMode] = useState(null);
   const [challengeInformationView, setChallengeInformationView] = useState(false);
 
   const lastSentLocationRef = useRef(null);
@@ -125,6 +134,7 @@ const ARScreen = ({route}) => {
   const sceneCycleRef = useRef(0);
   const sendBundleTimerRef = useRef(null);
   const loadArContentSentRef = useRef(false);
+  const isFocused = useIsFocused();
   const challenge_type_value =
     selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
       ? CHALLENGES_TYPE.PIN_CHECK_IN
@@ -134,6 +144,61 @@ const ARScreen = ({route}) => {
     : selectedSite?.huntChallenge?.geo_ar_star?.challenges?.parameters ||
       selectedSite?.pin_challenge?.parameters;
   const showNotificationTimerRef = useRef(null);
+
+  // Unity Header states
+  const [selectedHeaderMode, setSelectedHeaderMode] = useState("Live");
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  // Side Menu states
+  const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
+
+  useEffect(() => {
+    if (isFocused && unityRef.current) {
+      getAvailableModes();
+      setSelectedMode(null);
+      setSceenTitle("Choose your AR MODE");
+      setSelectedHeaderMode("Live");
+      setShowOverlay(false);
+      setIsSideMenuVisible(false);
+    }
+  }, [isFocused, unityRef.current]);
+
+  useEffect(() => {
+    if (selectedSite && isFocused && unityRef.current) {
+      console.log("Selected Site change:", selectedSite);
+      const currentMode = selectedSite.selectedMode.mode;
+
+      if (currentMode == AR_MODES.HUNT_MODE) {
+        const starHuntChallenge = selectedSite?.huntChallenge?.screen_title || "AR Hunt Challenge";
+        setSceenTitle(starHuntChallenge);
+
+        setSelectedMode(AR_MODES_MENU[2]);
+      } else if (currentMode == AR_MODES.GEO_TAG_MODE) {
+        setSelectedMode(AR_MODES_MENU[0]);
+      } else if (currentMode == AR_MODES.SCAN_MODE) {
+        setSceenTitle(selectedSite.scanChallenge.screen_title || "AR Challenge");
+        setSelectedMode(AR_MODES_MENU[1]);
+      }
+    }
+  }, [selectedSite, isFocused, unityRef.current]);
+
+  const getAvailableModes = async () => {
+    try {
+      let response = await getAvailableARModes();
+      console.log("Available AR Modes response", response);
+
+      // Check if the response is successful
+      if (response?.status === 1) {
+        console.log("AR Modes data:", response.data);
+      } else {
+        console.error("API Error:", response?.message || response?.error);
+        showMessage("Failed to fetch available AR modes.", "error");
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      showMessage("Failed to fetch available AR modes.", "error");
+    }
+  };
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -413,7 +478,7 @@ const ARScreen = ({route}) => {
         // allowScale: true
       };
 
-      console.log("Model Data being sent to Unity:", modelData.url, modelData.title);
+      console.log("Model Data being sent to Unity:", modelData.url);
 
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
@@ -551,6 +616,26 @@ const ARScreen = ({route}) => {
     setIsUnityLoaded(true);
   };
 
+  // Unity Header handlers
+  const handleModeChange = mode => {
+    setSelectedHeaderMode(mode);
+
+    // Show overlay for Map and List modes, hide for Live mode
+    if (mode === "Map" || mode === "List") {
+      setShowOverlay(true);
+    } else {
+      setShowOverlay(false);
+    }
+  };
+
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  const handleSideMenuToggle = () => {
+    setIsSideMenuVisible(!isSideMenuVisible);
+  };
+
   const HIDE_ARROW_MS = 3000;
   const hideArrowTimerRef = useRef(null);
 
@@ -592,6 +677,9 @@ const ARScreen = ({route}) => {
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
+    const ButtonHuntMode = data?.HuntMode;
+    const ButtonScanMode = data?.ScanMode;
+    const ButtonGeoTagMode = data?.GeoTagMode;
     console.log("DATA FROM UNITY: ", data);
     let show = [];
     let hide = [];
@@ -621,8 +709,24 @@ const ARScreen = ({route}) => {
         setShouldRenderUnity(false);
       }
     }
+
     if (buttonARMode) {
       setOpenModalARMode(true);
+    }
+    if (ButtonScanMode || ButtonHuntMode || ButtonGeoTagMode) {
+      setSceenTitle("Find AR at this site,in list format");
+      setSelectedHeaderMode("List");
+      setShowOverlay(true);
+    }
+
+    if (ButtonGeoTagMode) {
+      setSelectedMode(AR_MODES_MENU[0]);
+    }
+    if (ButtonHuntMode) {
+      setSelectedMode(AR_MODES_MENU[2]);
+    }
+    if (ButtonScanMode) {
+      setSelectedMode(AR_MODES_MENU[1]);
     }
     if (
       data?.["Reset-AR"] &&
@@ -776,7 +880,10 @@ const ARScreen = ({route}) => {
           ...selectedSite,
           selectedMode: AR_MODES_MENU[2],
           huntChallenge: nextHunt,
+          userAttempt: nextHunt.attempt_number,
         };
+
+        console.log("NEXT CHALLENGE OBJECT:", Challenge);
         setHuntChallenge(Challenge);
         startChallengeHandler(Challenge);
       }
@@ -870,6 +977,7 @@ const ARScreen = ({route}) => {
 
   const startChallengeHandler = async site => {
     console.log("Starting challenge with site:", site);
+
     let mode = site?.selectedMode?.mode;
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
@@ -920,6 +1028,10 @@ const ARScreen = ({route}) => {
       default:
         break;
     }
+
+    setSelectedHeaderMode("Live");
+    setShowOverlay(false);
+    setSceenTitle(challengeData.title || "AR Challenge");
 
     setStarModels(null);
     setModelResource(null);
@@ -1686,6 +1798,30 @@ const ARScreen = ({route}) => {
           {/* children={'resetArTest'}>*/}
           {/*</Button>*/}
           {/*</View>*/}
+
+          {/* Unity Header Component */}
+          {isUnityLoaded && (
+            <UnityHeader
+              title={screentitle}
+              selectedMode={selectedHeaderMode}
+              onModeChange={handleModeChange}
+              onBackPress={handleBackPress}
+            />
+          )}
+
+          {/* Side Menu Component */}
+          {isUnityLoaded && selectedSite?.id && selectedHeaderMode != "List" && (
+            <SideMenu
+              isVisible={isSideMenuVisible}
+              onToggle={handleSideMenuToggle}
+              selectedSite={selectedSite}
+              onPressInfo={() => {
+                setIsSideMenuVisible(false);
+                setChallengeInformationView(true);
+              }}
+            />
+          )}
+
           <UnityARCamera
             width={"100%"}
             height={"100%"}
@@ -1704,8 +1840,53 @@ const ARScreen = ({route}) => {
               viewShotRef: viewShotRef,
             }}
           />
-          {/* 
-          <TouchableOpacity
+
+          {/* Overlay for Map and List modes */}
+          {showOverlay && (
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: theme.lightColors?.inputBG,
+                zIndex: 500,
+              }}
+            >
+              {selectedHeaderMode == "List" && (
+                <>
+                  {selectedMode?.id ? (
+                    <ARModeSiteList
+                      selectedMode={selectedMode}
+                      onStartChallenge={startChallengeHandler}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        flex: 1,
+                        justifyContent: "center",
+                        alignItems: "center",
+                      }}
+                    >
+                      <Text
+                        style={{
+                          color: theme.lightColors?.white,
+                          fontSize: FontSizes.S20,
+                          width: "80%",
+                          textAlign: "center",
+                        }}
+                      >
+                        Please select an AR Mode to see available sites.
+                      </Text>
+                    </View>
+                  )}
+                </>
+              )}
+            </View>
+          )}
+
+          {/* <TouchableOpacity
             style={{
               position: "absolute",
               top: 40,
@@ -1749,13 +1930,13 @@ const ARScreen = ({route}) => {
           challengeHasFilters={challengeHasFilters}
         />
       )}
-
+      {/* 
       <ARModeModal
         isVisible={openModalARMode}
         onClose={closeModalARMode}
         selectedDestination={destinationData}
         onStartChallenge={startChallengeHandler}
-      />
+      /> */}
 
       {selectedSite?.selectedMode?.mode && (
         <NotificationModal

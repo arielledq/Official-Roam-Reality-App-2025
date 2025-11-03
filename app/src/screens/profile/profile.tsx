@@ -96,6 +96,7 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     getMyRank(destination)
       .then(response => {
         if (response) {
+          console.log("My Rank Point", response);
           setGlobalRank(response?.my_rank || 0);
           setGlobalPoints(response?.my_points || 0);
 

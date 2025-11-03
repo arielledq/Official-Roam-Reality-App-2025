@@ -329,7 +329,14 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   }
 
   return (
-    <View style={{width: "100%", height: "85%", paddingHorizontal: 6}}>
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        paddingTop: heightPercentageToDP("20%"),
+        paddingHorizontal: widthPercentageToDP("4%"),
+      }}
+    >
       <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
         <View
           style={{
