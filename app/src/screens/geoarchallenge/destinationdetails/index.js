@@ -61,6 +61,7 @@ const GeoArChallengeDetails = ({}) => {
   const navigation = useNavigation();
   const mapView = useRef();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination);
+  const [androidTrackViewChnages, setAndroidTrackViewChanges] = useState(true);
   const regions = selectedDestination?.regions;
   const [fullRegion, setFullRegion] = useState(null);
   const [friendList, setFriendList] = useState([]);
@@ -234,7 +235,7 @@ const GeoArChallengeDetails = ({}) => {
             navigation.navigate("PublicProfile", {userData: o});
           }}
           pinColor={pinColor}
-          tracksViewChanges={tracksViewChanges}
+          tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
         >
           {Platform.OS === "ios" && (
             <Callout
@@ -673,6 +674,11 @@ const GeoArChallengeDetails = ({}) => {
       showMessage("No locations found matching your search.", "error", "Search failed");
     }
   };
+
+  setTimeout(() => {
+    setAndroidTrackViewChanges(false);
+  }, 10000);
+
   useEffect(() => {
     if (
       !selectedDestination.geo_location ||

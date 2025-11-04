@@ -288,12 +288,18 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   useEffect(() => {
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
+
+      let name = "";
+      if (accountNotComplete && extraInfo?.first_name !== "" && extraInfo?.last_name !== "") {
+        name = `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`;
+      } else {
+        name = userData?.user?.name ?? "";
+      }
       // @ts-ignore
+
       formikRef.current.setValues({
         pImage: userData?.image,
-        name: accountNotComplete
-          ? `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`
-          : userData?.user?.name ?? "",
+        name: name,
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
         address: userData?.home_address || "",

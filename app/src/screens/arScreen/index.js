@@ -652,7 +652,7 @@ const ARScreen = ({route}) => {
     hideArrowTimerRef.current = setTimeout(() => {
       setArrowVisible(false);
       if (unityRef.current) {
-        unityRef.current.postMessage("Main Camera", "HideARObject", "");
+        // unityRef.current.postMessage("Main Camera", "HideARObject", "");
       }
       hideArrowTimerRef.current = null;
     }, HIDE_ARROW_MS);
@@ -696,7 +696,7 @@ const ARScreen = ({route}) => {
         selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
         selectedSite?.scanChallenge?.file_3d
       ) {
-        unityRef.current.postMessage("Main Camera", "ShowARObject", "");
+        // unityRef.current.postMessage("Main Camera", "ShowARObject", "");
         onObjectDetected();
       }
     }
@@ -1103,7 +1103,7 @@ const ARScreen = ({route}) => {
         const img = selectedSite?.scanChallenge?.file_image || "";
         if (img) payload.localImagePath = img;
       }
-      unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
+      // unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
       loadArContentSentRef.current = true;
     }, AFTER_SCENE_COOLDOWN_MS);
 
@@ -1132,11 +1132,11 @@ const ARScreen = ({route}) => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      unityRef.current.postMessage(
-        "Main Camera",
-        "SetDetectObjectState",
-        JSON.stringify({isDetectionEnabled: true, detectionDistance: 50})
-      );
+      // unityRef.current.postMessage(
+      //   "Main Camera",
+      //   "SetDetectObjectState",
+      //   JSON.stringify({isDetectionEnabled: true, detectionDistance: 50})
+      // );
 
       const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
       const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
@@ -1273,11 +1273,11 @@ const ARScreen = ({route}) => {
           isDetectionEnabled: true,
           detectionDistance: 50,
         };
-        unityRef.current.postMessage(
-          "Main Camera",
-          "SetDetectObjectState",
-          JSON.stringify(distanceDetect)
-        );
+        // unityRef.current.postMessage(
+        //   "Main Camera",
+        //   "SetDetectObjectState",
+        //   JSON.stringify(distanceDetect)
+        // );
         setTimeout(() => {
           // const has3DModel = selectedSite?.scanChallenge?.file_3d;
           show = ["Back", "Details", "ArMode", "screen", "points", "position"];
@@ -1354,11 +1354,11 @@ const ARScreen = ({route}) => {
             isDetectionEnabled: true,
             detectionDistance: 50,
           };
-          unityRef.current.postMessage(
-            "Main Camera",
-            "SetDetectObjectState",
-            JSON.stringify(distanceDetect)
-          );
+          // unityRef.current.postMessage(
+          //   "Main Camera",
+          //   "SetDetectObjectState",
+          //   JSON.stringify(distanceDetect)
+          // );
           PointsCount();
         }, 1000);
         break;
