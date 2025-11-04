@@ -12,6 +12,8 @@ from home.api.v1.viewsets import (
     SignupViewSet,
     LoginViewSet, ScoreViewSet,
     ModeViewSet,
+    ScanMapViewSet,
+    HuntMapViewSet,
 )
 
 router = DefaultRouter()
@@ -23,6 +25,8 @@ router.register("account-setup", AccountSetupViewset, basename="account-setup")
 router.register("scoreboard", ScoreViewSet, basename="scoreboard")
 router.register("friends", FriendshipViewSet, basename="friends")
 router.register("modes", ModeViewSet, basename="modes")
+router.register("map/scans", ScanMapViewSet, basename="map-scans")
+router.register("map/hunts", HuntMapViewSet, basename="map-hunts")
 
 urlpatterns = [
     path("", include(router.urls)),
