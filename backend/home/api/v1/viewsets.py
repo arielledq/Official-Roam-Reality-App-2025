@@ -20,7 +20,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from home.api.v1.filters import ScoreFilterSet
-from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation, ARSitePinCheckIn
+from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation, ARSitePinCheckIn, ScanPicture, GeoARStar
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
@@ -41,6 +41,8 @@ from home.api.v1.serializers import (
     UserProfileSerializer,
     UserSerializer,
     ModeSerializer,
+    ScanMapSerializer,
+    HuntMapSerializer,
 )
 from home.models import Mode
 from django.db.models import Q
@@ -392,20 +394,71 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
 
     @action(detail=False, methods=['get'], url_path='my-rank')
     def my_rank(self, request):
-        qs = self.filter_queryset(self.get_queryset()).values_list('pk', 'calculated_points')
         user = request.user
-
+        
+        # Get the filtered queryset (this may exclude the current user)
+        filtered_qs = self.filter_queryset(self.get_queryset())
+        
+        # Get the full queryset to ensure we can find the user
+        full_qs = self.get_queryset()
+        
+        # Get user's stored points from ARUserProfile (not calculated_points)
+        # Points are stored in ar_user_profile_user.points
+        try:
+            user_profile = user.ar_user_profile_user
+            user_points = user_profile.points if user_profile.points is not None else 0
+        except ARUserProfile.DoesNotExist:
+            # User doesn't have an ARUserProfile
+            return Response({
+                'my_rank': None,
+                'my_points': 0
+            })
+        
+        # Check if user is in the filtered queryset
+        user_in_filtered = filtered_qs.filter(pk=user.id).exists()
+        
+        # Get the queryset to use for ranking (filtered or full)
+        qs_for_rank = filtered_qs if user_in_filtered else full_qs
+        
+        # Rank based on stored points in ARUserProfile
+        # Create a queryset ordered by stored points from ARUserProfile
+        ranked_qs = qs_for_rank.select_related('ar_user_profile_user').order_by(
+            '-ar_user_profile_user__points',
+            '-ar_user_profile_user__updated_at',
+            'id'
+        )
+        
+        # Convert to list to find rank
+        users_list = list(ranked_qs.values_list(
+            'pk', 
+            'ar_user_profile_user__points',
+            'ar_user_profile_user__updated_at',
+            'id'
+        ))
+        
         rank = None
-        points = 0
-        for idx, user_data in enumerate(qs, start=1):
-            if user_data[0] == user.id:
+        for idx, (user_pk, points, updated_at, user_id) in enumerate(users_list, start=1):
+            if user_pk == user.id:
                 rank = idx
-                points = user_data[1]
                 break
-
+        
+        # If user not found in queryset, calculate rank using count
+        if rank is None:
+            # Count users with more stored points, or same points but earlier updated_at/id
+            rank = ranked_qs.filter(
+                Q(ar_user_profile_user__points__gt=user_points) |
+                (
+                    Q(ar_user_profile_user__points=user_points) & 
+                    (
+                        Q(ar_user_profile_user__updated_at__gt=user_profile.updated_at) |
+                        (Q(ar_user_profile_user__updated_at=user_profile.updated_at) & Q(id__lt=user.id))
+                    )
+                )
+            ).count() + 1
+        
         return Response({
             'my_rank': rank,
-            'my_points': points
+            'my_points': user_points
         })
 
 
@@ -569,3 +622,129 @@ class ModeViewSet(ModelViewSet):
         if status_param:
             queryset = queryset.filter(status=status_param)
         return queryset
+
+
+class ScanMapViewSet(GenericViewSet, ListModelMixin):
+    """
+    API endpoint for Scan mode - returns all scans with latitude, longitude and details.
+    Used for map display in Scan mode.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ScanMapSerializer
+    http_method_names = ['get']
+    queryset = ScanPicture.objects.filter(coordinates__isnull=False).select_related('sponsor', 'parameter_settings')
+    
+    def get_queryset(self):
+        """Return all scans that have coordinates (lat/long)"""
+        return self.queryset.all()
+    
+    @extend_schema(
+        operation_id="map_scans_list",
+        summary="Get all scans for map view",
+        description="Returns all scans with their latitude, longitude coordinates and details for map display in Scan mode. "
+                   "Only scans with valid coordinates are returned.",
+        tags=["Map"],
+        responses={
+            200: ScanMapSerializer(many=True),
+            401: {"description": "Authentication credentials were not provided."},
+        },
+        examples=[
+            OpenApiExample(
+                "Example Response",
+                value=[
+                    {
+                        "id": 1,
+                        "name": "Scan Name",
+                        "screen_title": "Screen Title",
+                        "latitude": 36.9075,
+                        "longitude": -76.3077,
+                        "points": 100,
+                        "attempts": 3,
+                        "cooldown_hours": 24,
+                        "elevation": 10,
+                        "info": "Scan information",
+                        "sponsor": None,
+                        "parameters": None
+                    }
+                ],
+                response_only=True
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List all scans with coordinates for map view"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class HuntMapViewSet(GenericViewSet, ListModelMixin):
+    """
+    API endpoint for Hunt mode - returns all hunts with latitude, longitude, star points and details.
+    Used for map display in Hunt mode.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = HuntMapSerializer
+    http_method_names = ['get']
+    queryset = GeoARStar.objects.filter(
+        geo_site__lat_long__isnull=False
+    ).select_related('geo_site', 'parameter_settings').prefetch_related('stars', 'sponsors')
+    
+    def get_queryset(self):
+        """Return all hunts that have a geo_site with coordinates (lat/long)"""
+        return self.queryset.all()
+    
+    @extend_schema(
+        operation_id="map_hunts_list",
+        summary="Get all hunts for map view",
+        description="Returns all hunts with their latitude, longitude coordinates, star points and details for map display in Hunt mode. "
+                   "Each hunt includes all associated star points with their own coordinates. "
+                   "Only hunts with valid geo_site coordinates are returned.",
+        tags=["Map"],
+        responses={
+            200: HuntMapSerializer(many=True),
+            401: {"description": "Authentication credentials were not provided."},
+        },
+        examples=[
+            OpenApiExample(
+                "Example Response",
+                value=[
+                    {
+                        "id": 1,
+                        "name": "Hunt Name",
+                        "latitude": 36.9075,
+                        "longitude": -76.3077,
+                        "fun_facts": "Fun facts about the hunt",
+                        "info": "Hunt information",
+                        "visibility_radius": 50,
+                        "following_mode": "PROXIMITY",
+                        "attempts": 1,
+                        "cooldown_hours": 24,
+                        "sponsor": [],
+                        "parameters": None,
+                        "star_points": [
+                            {
+                                "id": 1,
+                                "title": "Star Point 1",
+                                "screen_title": "Screen Title",
+                                "latitude": 36.9076,
+                                "longitude": -76.3078,
+                                "order": 1,
+                                "points": 50,
+                                "elevation": 10,
+                                "fun_facts": "Star point fun facts"
+                            }
+                        ]
+                    }
+                ],
+                response_only=True
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List all hunts with coordinates and star points for map view"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
