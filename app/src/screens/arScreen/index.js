@@ -122,7 +122,11 @@ const ARScreen = ({route}) => {
   const shouldRun3DFlow = mode => {
     if (!mode) return false;
     if (mode === AR_MODES.HUNT_MODE) return true;
-    if (mode === AR_MODES.SCAN_MODE) return !!selectedSite?.scanChallenge?.file_3d; // solo si hay 3D
+    if (mode === AR_MODES.SCAN_MODE)
+      return (
+        !!selectedSite?.scanChallenge?.file_animation_android ||
+        !!selectedSite?.scanChallenge?.file_animation_ios
+      ); // solo si hay 3D
     return false; // GEO doesn't enter here (handled separately)
   };
   const [loading, setLoading] = useState(false);
@@ -165,7 +169,6 @@ const ARScreen = ({route}) => {
 
   useEffect(() => {
     if (selectedSite && isFocused && unityRef.current) {
-      console.log("Selected Site change:", selectedSite);
       const currentMode = selectedSite.selectedMode.mode;
 
       if (currentMode == AR_MODES.HUNT_MODE) {
@@ -185,11 +188,9 @@ const ARScreen = ({route}) => {
   const getAvailableModes = async () => {
     try {
       let response = await getAvailableARModes();
-      console.log("Available AR Modes response", response);
 
       // Check if the response is successful
       if (response?.status === 1) {
-        console.log("AR Modes data:", response.data);
       } else {
         console.error("API Error:", response?.message || response?.error);
         showMessage("Failed to fetch available AR modes.", "error");
@@ -220,6 +221,7 @@ const ARScreen = ({route}) => {
   };
 
   const downloadModelFile = (sourcePath, targetPath) => {
+    console.log("Downloading model file from:", modelFile, "to:", targetPath);
     setTextLoading("Downloading AR model...");
     RNFetchBlob.config({
       fileCache: true,
@@ -429,6 +431,7 @@ const ARScreen = ({route}) => {
   };
 
   const sendModelDataToUnity = () => {
+    console.log("Attempting to send model data to Unity...");
     if (hasSentModelDataOnce) return;
     if (!unityRef.current || !textureBase || !starModels || !validUserLocation) return;
     if (
@@ -440,18 +443,23 @@ const ARScreen = ({route}) => {
       // !hasSentModelDataOnce &&
       // (isGeoTagMode || isHuntMode ) //TODO Verificar
     ) {
-      const huntLike = isHuntMode || (isScanMode && !!selectedSite?.scanChallenge?.file_3d);
+      const huntLike =
+        isHuntMode ||
+        (isScanMode && !!selectedSite?.scanChallenge?.file_animation_android) ||
+        !!selectedSite?.scanChallenge?.file_animation_ios;
       const modelData = {
         objFile: starModels.replace("file://", ""),
         url: selectedChallengeOverride.model_file || "",
+        url_android: selectedChallengeOverride?.animationAndroid,
+        url_ios: selectedChallengeOverride?.animationIOS,
         title: selectedChallengeOverride.title || "",
         mtlFile: modelResource ? modelResource.replace("file://", "") : "",
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
         scale: {
-          x: 1,
-          y: 1,
-          z: 1,
+          x: 5,
+          y: 5,
+          z: 5,
         },
         // rotation: {x: 0, y: 0, z: 0},
         emissionIntensity: parseFloat(selectedChallengeOverride?.parameters?.emission_value) || 1,
@@ -478,7 +486,7 @@ const ARScreen = ({route}) => {
         // allowScale: true
       };
 
-      console.log("Model Data being sent to Unity:", modelData.url);
+      console.log("Model Data being sent to Unity:", modelData);
 
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
@@ -995,7 +1003,9 @@ const ARScreen = ({route}) => {
       case AR_MODES.SCAN_MODE:
         const scanChallenge = site?.scanChallenge;
         challengeData = {
-          model_file: scanChallenge?.file_3d,
+          model_file: scanChallenge?.file_animation_ios || scanChallenge?.file_animation_android,
+          animationAndroid: scanChallenge?.file_animation_android,
+          animationIOS: scanChallenge?.file_animation_ios,
           lat_long: scanChallenge?.coordinates,
           title: scanChallenge?.screen_title,
           challenge_requirement: site?.pin_challenge?.challenge_requirement,
@@ -1017,6 +1027,8 @@ const ARScreen = ({route}) => {
           challenge_requirement: huntChallenge?.pin_challenge?.challenge_requirement,
           challenge_id: huntChallenge?.pin_challenge?.id,
           model_file: starHuntChallenge?.model_file,
+          animationAndroid: starHuntChallenge?.file_animation_android,
+          animationIOS: starHuntChallenge?.file_animation_ios,
           title: starHuntChallenge?.screen_title,
           parameters: huntChallenge?.pin_challenge?.parameters,
           points: huntChallenge?.pin_challenge?.points || 10,
@@ -1097,7 +1109,9 @@ const ARScreen = ({route}) => {
       if (!sceneIsReady || !unityRef.current) return;
 
       const payload = {bundleURL};
-      const has3D = !!selectedSite?.scanChallenge?.file_3d;
+      const has3D =
+        !!selectedSite?.scanChallenge?.file_animation_android ||
+        !!selectedSite?.scanChallenge?.file_animation_ios;
 
       if (!has3D) {
         const img = selectedSite?.scanChallenge?.file_image || "";
@@ -1114,7 +1128,8 @@ const ARScreen = ({route}) => {
     selectedSite?.selectedMode?.mode,
     selectedSite?.scanChallenge?.file_animation_android,
     selectedSite?.scanChallenge?.file_animation_ios, //TODO Cuando exista
-    selectedSite?.scanChallenge?.file_3d,
+    selectedSite?.scanChallenge?.file_animation_android,
+    selectedSite?.scanChallenge?.file_animation_ios,
     selectedSite?.scanChallenge?.file_image,
   ]);
 
@@ -1139,7 +1154,10 @@ const ARScreen = ({route}) => {
       // );
 
       const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
-      const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
+      const has3DInScan =
+        !!selectedSite?.scanChallenge?.file_animation_android ||
+        !!selectedSite?.scanChallenge?.file_animation_ios;
+
       const run3D = mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
 
       const readyForModel = !!validUserLocation && !!starModels && !!textureBase;
@@ -1631,7 +1649,9 @@ const ARScreen = ({route}) => {
     const mode = selectedSite?.selectedMode?.mode;
     if (mode !== AR_MODES.SCAN_MODE) return;
 
-    const has3D = !!selectedSite?.scanChallenge?.file_3d;
+    const has3D =
+      !!selectedSite?.scanChallenge?.file_animation_android ||
+      !!selectedSite?.scanChallenge?.file_animation_ios;
     if (has3D) return;
 
     const animUrl = selectedSite?.scanChallenge?.file_animation;
@@ -1667,7 +1687,9 @@ const ARScreen = ({route}) => {
   useEffect(() => {
     const mode = selectedSite?.selectedMode?.mode;
 
-    const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
+    const has3DInScan =
+      !!selectedSite?.scanChallenge?.file_animation_android ||
+      !!selectedSite?.scanChallenge?.file_animation_ios;
     const modeSupported =
       mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
 
@@ -1728,7 +1750,8 @@ const ARScreen = ({route}) => {
     selectedSite?.huntChallenge?.elevation,
     selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation,
     selectedSite?.scanChallenge?.elevation,
-    selectedSite?.scanChallenge?.file_3d,
+    selectedSite?.scanChallenge?.file_animation_android,
+    selectedSite?.scanChallenge?.file_animation_ios,
     userLocation?.latitude,
     userLocation?.longitude,
   ]);
@@ -1758,7 +1781,6 @@ const ARScreen = ({route}) => {
       }
     }
     if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
-      console.log("selectedSite?.scanChallenge?.id", selectedSite?.scanChallenge?.id);
       try {
         const result = await getArScanExamples(selectedSite?.scanChallenge?.id);
         const examples = result?.data;

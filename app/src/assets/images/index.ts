@@ -35,6 +35,7 @@ const Images = {
   AppLogo: require("./AppIcon.jpg"),
   Done: require("./done.png"),
   retake: require("./retake.png"),
+  destination: require("./destination.png"),
 };
 
 export default Images;

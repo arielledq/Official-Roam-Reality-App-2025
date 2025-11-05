@@ -41,11 +41,13 @@ import useStyles from "./styles";
 import {GIFT_POINTS} from "../../constants";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useOneSignal} from "../../hooks/useOneSignal";
-import {heightPercentageToDP} from "react-native-responsive-screen";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import theme from "assets/theme";
 import Images from "assets/images";
 import {getProfilePicture} from "util/imageUtils";
 import FastImage from "react-native-fast-image";
+import {AppButton} from "components";
+import {Icons} from "assets/Icons";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -231,7 +233,14 @@ const GeoArChallenge = ({}) => {
               }}
             >
               <View style={{alignItems: "center", justifyContent: "center"}}>
-                <SiteIcon style={{width: 48, height: 48}} />
+                <AppButton
+                  containerStyle={_styles.shadowBoxImage}
+                  customColors={["#7a00cf", "#5532ff"]}
+                  showButton={false}
+                >
+                  <Icons.sites />
+                </AppButton>
+
                 <Text style={_styles.s_list_count}>{obj?.star_ar_sites_cnt || 0}</Text>
                 <Text style={_styles.s_list_text}>Sites</Text>
               </View>
@@ -243,20 +252,29 @@ const GeoArChallenge = ({}) => {
                   marginEnd: 10,
                 }}
               >
-                <Image
-                  source={Images.Neo_GR}
-                  style={{
-                    transform: [{scale: 2}],
-                    width: 48,
-                    height: 48,
-                  }}
-                />
-
+                <AppButton
+                  containerStyle={_styles.shadowBoxImage}
+                  customColors={["#7a00cf", "#5532ff"]}
+                  showButton={false}
+                >
+                  <FastImage
+                    source={Images.destination}
+                    style={{width: widthPercentageToDP(7), height: widthPercentageToDP(7)}}
+                    resizeMode="contain"
+                    defaultSource={Images.destination}
+                  />
+                </AppButton>
                 <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
                 <Text style={_styles.s_list_text}>Hunts</Text>
               </View>
               <View style={{alignItems: "center", justifyContent: "center"}}>
-                <ArIcon style={{width: 48, height: 48}} />
+                <AppButton
+                  containerStyle={_styles.shadowBoxImage}
+                  customColors={["#7a00cf", "#5532ff"]}
+                  showButton={false}
+                >
+                  <Icons.Ar />
+                </AppButton>
                 <Text style={_styles.s_list_count}>{obj?.unique_ar_sites_cnt || 0}</Text>
                 <Text style={_styles.s_list_text}>Non-Geo AR</Text>
               </View>

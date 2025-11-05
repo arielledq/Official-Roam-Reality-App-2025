@@ -458,10 +458,10 @@ export const getProfieARMemoriesAPI = () =>
     },
     logoutFunc
   );
-export const getPublicProfieARMemoriesAPI = user_id =>
+export const getPublicProfieARMemoriesAPI = (user_id, pageNo, page_size) =>
   Request.callWithToken(
     {
-      url: `modules/challenges/all-memories/public/?user_id=${user_id}`,
+      url: `modules/challenges/all-memories/public/?user_id=${user_id}&page=${pageNo}&page_size=${page_size}`,
       method: "GET",
     },
     logoutFunc

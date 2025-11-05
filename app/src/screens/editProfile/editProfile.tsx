@@ -289,8 +289,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
 
+      console.log("Setting formik values with userData:", extraInfo);
+
       let name = "";
-      if (accountNotComplete && extraInfo?.first_name !== "" && extraInfo?.last_name !== "") {
+      if (accountNotComplete && (extraInfo?.first_name !== "" || extraInfo?.last_name !== "")) {
         name = `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`;
       } else {
         name = userData?.user?.name ?? "";

@@ -472,9 +472,10 @@ const ScoreBoard = ({}) => {
         refreshing={refreshing}
         onRefresh={handlePullDownToRefresh}
         contentContainerStyle={{flexGrow: 1}}
-        initialNumToRender={20}
-        maxToRenderPerBatch={20}
-        // windowSize={10}
+        initialNumToRender={10}
+        maxToRenderPerBatch={5}
+        windowSize={5}
+        removeClippedSubviews
         onEndReachedThreshold={0.7}
         onEndReached={loadMore}
       />
