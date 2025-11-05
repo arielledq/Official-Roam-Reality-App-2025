@@ -647,10 +647,8 @@ class ScanPicture(models.Model):
 
     def clean(self):
         super().clean()
-        if not self.file_image and not self.file_3d:
-            raise ValidationError(_("Image or 3D File is required."))
-        if self.file_image and self.file_3d:
-            raise ValidationError(_("You can not upload image and 3D file, only one of them."))
+        if not self.file_image:
+            raise ValidationError(_("Image is required."))
 
     def __str__(self):
         return self.name
