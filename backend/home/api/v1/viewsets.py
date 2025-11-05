@@ -456,6 +456,7 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
                 )
             ).count() + 1
         
+        print("rank", rank)
         return Response({
             'my_rank': rank,
             'my_points': user_points

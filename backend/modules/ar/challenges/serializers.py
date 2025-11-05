@@ -251,7 +251,6 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
     file_animation_android = RandomDownloadNameS3FileField()
     file_animation_ios = RandomDownloadNameS3FileField()
-    file_3d = RandomDownloadNameS3FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
@@ -261,7 +260,7 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['id', 'name', 'screen_title', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
+        fields = ['id', 'name', 'screen_title', 'file_image', 'icon', 'file_animation_android', 'file_animation_ios',
                   'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation", 'parameters']
 
     def get_user_attempts(self, obj):
@@ -864,7 +863,9 @@ class GeoStarPointSerializer(GeoModelSerializer):
     hunt_captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
     image = serializers.ImageField()
-    model_file = serializers.FileField()
+    # model_file = serializers.FileField()
+    file_animation_android = serializers.FileField()
+    file_animation_ios = serializers.FileField()
     sponsors = SponsorSerializer(many=True)
 
     class Meta:
@@ -880,7 +881,9 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "hunt_captured_stars",
             "total_stars",
             "image",
-            "model_file",
+            # "model_file",
+            "file_animation_android",
+            "file_animation_ios",
             "title",
             "screen_title",
             "fun_facts",

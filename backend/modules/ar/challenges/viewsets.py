@@ -595,6 +595,7 @@ class ARProfileViewSet(ViewSet):
         from django.db.models import F, Window
         from django.db.models.functions import Rank
         user_id = request.data.get("user_id")
+        user = request.user
         qs = ARUserProfile.objects.all(
         ).annotate(
             rank=Window(
@@ -604,9 +605,12 @@ class ARProfileViewSet(ViewSet):
         )
         for item in qs:
             if item.user.id == user_id:
-                return Response({"rank": item.rank}, status=status.HTTP_200_OK)
+                user_profile = user.ar_user_profile_user
+                user_points = user_profile.points if user_profile.points is not None else 0
+                print("user_points", user_points)
+                return Response({"rank": item.rank, "points": user_points}, status=status.HTTP_200_OK)
 
-        return Response({"rank": 0}, status=status.HTTP_200_OK)
+        return Response({"rank": 0, "points": 0}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.queryset.get(pk=kwargs.get('pk'))
@@ -1058,17 +1062,67 @@ class MemoryCheckinViewSet(GenericViewSet):
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='user_id',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='User ID to filter memories',
+                required=True,
+                examples=[
+                    OpenApiExample(
+                        'user_id',
+                        summary='Get memories for user ID 123',
+                        value=123,
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Number of records to return per page',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page_size',
+                        summary='Show 10 records per page',
+                        value=10,
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='page',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Page number for pagination',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page',
+                        summary='Go to page 2',
+                        value=1,
+                    )
+                ]
+            ),
+        ]
+    )
     @action(detail=False, methods=['get'], url_path='public', name='AR Public')
     def public(self, request):
         try:
             user = request.GET.get("user_id")
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=user)
-            all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
+            all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'], privacy='public')
             result_list = sorted(
                 chain(all_user_check_in, all_user_memories),
                 key=attrgetter('created_at'),
                 reverse=True
             )
+            page = self.paginate_queryset(result_list)
+            if page is not None:
+                serializer = ARAllMemoriesSerializer(page, many=True, context={'request': request})
+                return self.get_paginated_response(serializer.data)
             serializer = ARAllMemoriesSerializer(
                 result_list,
                 many=True,
