@@ -167,6 +167,7 @@ const SignUp: ScreenStackComponent<RootStackParamList, "SignUp"> = () => {
               {/* Terms and Conditions */}
               <AppText style={_styles.termsAndConditionstext}>
                 {` By clicking "Sign up" you agree to our `}
+                {"\n"}
                 <AppText
                   style={_styles.TandCLink}
                   onPress={() => {

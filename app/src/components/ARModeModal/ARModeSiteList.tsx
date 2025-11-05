@@ -24,6 +24,8 @@ import ARChallengeItem from "./ARChallengeItem";
 import Toast from "react-native-toast-message";
 import theme from "assets/theme";
 import {checkHuntCoolDownAPI, checkScansCoolDownAPI} from "network";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
+import {FontSizes} from "util/FontUtils";
 
 interface ARModeSiteListProps {
   selectedMode: any;
@@ -73,10 +75,10 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   const {getSites, sites, getNextStar}: any = useArScreenHook();
   const [sponsorData, setSponsorData] = useState<any>([]);
   const [selectedSponsor, setSelectedSponsor] = useState(DEFAULT_SPONSOR);
-  const [expandedSites, setExpandedSites] = useState<string[]>([]);
   const [filteredSites, setFilteredSites] = useState<any>([]);
 
   const startChallengeHandler = async (site: any) => {
+    console.log("startChallengeHandler()", {site, selectedMode});
     let updatedSiteData = {
       ...site,
       selectedMode,
@@ -327,13 +329,20 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   }
 
   return (
-    <View style={{width: "100%", maxHeight: "85%"}}>
+    <View
+      style={{
+        width: "100%",
+        height: "100%",
+        paddingTop: heightPercentageToDP("20%"),
+        paddingHorizontal: widthPercentageToDP("4%"),
+      }}
+    >
       <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
         <View
           style={{
-            height: 75,
-            width: 75,
-            borderRadius: 110,
+            height: widthPercentageToDP("22%"),
+            width: widthPercentageToDP("22%"),
+            borderRadius: widthPercentageToDP("100%"),
             backgroundColor: theme.lightColors?.grey4,
             alignItems: "center",
             justifyContent: "center",
@@ -341,23 +350,35 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         >
           <Image
             source={!selectedSponsor?.value ? Images.AppIconLight : {uri: selectedSponsor?.image}}
-            style={{height: 60, width: 60, borderRadius: 110}}
+            style={{
+              height: widthPercentageToDP("20%"),
+              width: widthPercentageToDP("20%"),
+              borderRadius: 110,
+            }}
           />
         </View>
         <AppDropdown
           data={sponsorData}
+          customColors={[theme.lightColors?.grey4, theme.lightColors?.grey4]}
           maxHeight={300}
-          dropdownStyle={{zIndex: 100}}
+          dropdownStyle={{zIndex: 100, height: heightPercentageToDP("6%")}}
           containerStyle={{
-            flex: 1,
-            borderRadius: 0,
+            // flex: 1,
+
             marginTop: 0,
             backgroundColor: theme.lightColors?.black,
+            width: widthPercentageToDP("60%"),
+            borderRadius: 4,
           }}
           labelField="label"
           valueField="value"
           containerStyles={{marginTop: -35, width: 246}}
-          selectedTextStyle={{fontSize: 14, ...fontGroup.nunitoBold, fontWeight: "bold"}}
+          selectedTextStyle={{
+            ...fontGroup.nunitoBold,
+            fontWeight: "bold",
+            color: theme.lightColors?.grey0,
+            fontSize: FontSizes.S16,
+          }}
           itemTextStyle={{
             ...fontGroup.nunitoBold,
             textTransform: "uppercase",
@@ -365,12 +386,16 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             color: theme.lightColors?.white,
             fontSize: 14,
           }}
-          placeholder={selectedSponsor?.label || ""}
+          placeholder={"Search by brand"}
           placeholderStyle={{
             ...fontGroup.nunitoBold,
-            textTransform: "uppercase",
+            fontSize: FontSizes.S16,
             fontWeight: "bold",
+            color: theme.lightColors?.grey0,
           }}
+          renderRightIcon={() => (
+            <Icon name="chevron-down" family="ionicon" size={25} color={theme.lightColors?.white} />
+          )}
           activeColor={theme.lightColors?.magenta}
           value={selectedSponsor?.value?.toString().toUpperCase() || ""}
           onChange={item => {
@@ -387,216 +412,152 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           marginTop: 25,
         }}
       >
-        <Text style={{fontSize: 18, fontWeight: "bold", color: "white", flex: 1}}>
-          {selectedMode?.listLabel} Available
+        <Text style={{fontSize: FontSizes.S18, fontWeight: "bold", color: "white", flex: 1}}>
+          Ar available at this time
         </Text>
-        <View style={{width: 90, marginRight: 4}}>
+        <View style={{width: widthPercentageToDP("35%")}}>
           <AppButton
             // @ts-ignore
             customColors={[theme.lightColors?.grey4, theme.lightColors?.grey4]}
             containerStyle={{
               paddingVertical: 0,
               borderRadius: 4,
-              minHeight: 35,
+              // minHeight: heightPercentageToDP("6%"),
             }}
             iconContainerStyle={{
               padding: 0,
             }}
-            titleStyle={{fontSize: 12, color: "#7e8493", fontWeight: "bold", paddingRight: 4}}
+            titleStyle={{
+              fontSize: FontSizes.S18,
+              color: "#7e8493",
+              fontWeight: "bold",
+              paddingRight: widthPercentageToDP(2),
+              marginTop: heightPercentageToDP(0.5),
+            }}
             onPress={() => getSitesHandler()}
             title="Refresh"
-            icon={
-              <View style={{paddingHorizontal: 5}}>
-                <RefreshIcon />
-              </View>
-            }
+            iconPosition="right"
+            icon={<RefreshIcon width={widthPercentageToDP(20)} height={widthPercentageToDP(20)} />}
           />
         </View>
       </View>
 
-      <ScrollView style={{marginTop: 15}}>
-        {filteredSites?.length > 0 &&
-          filteredSites?.map((site: any, index: number) => {
-            if (!site?.name) return;
-            const siteId = site?.id || site?.name + index;
-            const siteName = site?.name;
-            let siteImage = {uri: site?.image};
-            let challengesAvailable;
-            const challengeDistance = "0 Miles away";
+      <FlatList
+        style={{marginTop: 15}}
+        data={
+          filteredSites?.reduce((allChallenges: any[], site: any) => {
+            if (!site?.name) return allChallenges;
+
             let challenges = [];
             switch (selectedMode?.mode) {
               case AR_MODES.GEO_TAG_MODE:
-                challengesAvailable = "1 Tag";
                 challenges = [site?.pin_challenge];
                 break;
               case AR_MODES.SCAN_MODE:
-                const numberChallengesAvailable = site?.scan_pictures?.length || 1;
-                challengesAvailable = `${numberChallengesAvailable} Gem${
-                  numberChallengesAvailable === 1 ? "" : "s"
-                }`;
-                siteImage = site?.image
-                  ? {uri: site.image}
-                  : require("../../assets/images/AppSettingsIcon.png");
-                challenges = site?.scan_pictures;
+                challenges = site?.scan_pictures || [];
                 break;
               case AR_MODES.HUNT_MODE:
-                challengesAvailable = "1 Hunt";
                 challenges = [site?.huntChallenge];
                 break;
             }
 
-            const isExpanded = expandedSites.includes(siteId);
+            // Add site reference to each challenge
+            const challengesWithSite = challenges.map((challenge: any, index: number) => ({
+              ...challenge,
+              site: site,
+              uniqueId: `${site?.id || site?.name}-${challenge?.id || challenge?.name || index}`,
+            }));
 
-            return (
-              <View key={siteId} style={{marginBottom: 15}}>
-                <TouchableOpacity
-                  onPress={() =>
-                    setExpandedSites(prev =>
-                      prev.includes(siteId) ? prev.filter(id => id !== siteId) : [...prev, siteId]
-                    )
-                  }
-                  style={{
-                    backgroundColor: theme.lightColors?.grey4,
-                    borderRadius: 4,
-                    padding: 12,
-                    flexDirection: "row",
-                    alignItems: "center",
-                  }}
-                >
-                  <Image
-                    source={siteImage}
-                    style={{width: 70, height: 50, borderRadius: 6, marginRight: 10}}
-                  />
-                  <View style={{flex: 1}}>
-                    <Text style={{color: "white", fontSize: 16, fontWeight: "bold"}}>
-                      {siteName}
-                    </Text>
-                    <View style={{flexDirection: "row", gap: 8}}>
-                      <View style={{flexDirection: "row", alignItems: "center", gap: 2}}>
-                        <Icon name="pinrosa" family="custom" size={15} />
-                        <Text style={{color: theme.lightColors?.grey0, fontSize: 10}}>
-                          {challengesAvailable}
-                        </Text>
-                      </View>
-                      <View style={{flexDirection: "row", alignItems: "center", gap: 2}}>
-                        <Icon
-                          name="walkingIcon"
-                          color={theme.lightColors?.magenta}
-                          family="custom"
-                          size={15}
-                        />
-                        <Text style={{color: theme.lightColors?.grey0, fontSize: 10}}>
-                          {challengeDistance}
-                        </Text>
-                      </View>
-                    </View>
-                  </View>
-                  <View>
-                    {isExpanded ? (
-                      <Icon name="up" size={20} color={theme.lightColors?.grey0} />
-                    ) : (
-                      <Icon name="down" size={20} color={theme.lightColors?.grey0} />
-                    )}
-                  </View>
-                </TouchableOpacity>
+            return [...allChallenges, ...challengesWithSite];
+          }, []) || []
+        }
+        keyExtractor={(item: any) => item?.uniqueId || item?.id || Math.random().toString()}
+        renderItem={({item}: {item: any}) => {
+          const site = item?.site;
+          let challengeTitle = "";
+          let attemptsDetails = "";
+          let sponsorImage = "";
+          const points = item?.points || 0;
+          let coolDownHours = 0;
+          let totalAttempts = 0;
+          let currentAttempts = 0;
+          let coolDownMin = 0;
+          let isDisabled = false;
+          let onPressHandler = () => startChallengeHandler(site);
 
-                {isExpanded && (
-                  <FlatList
-                    data={challenges}
-                    keyExtractor={(item: any, index: number) => item?.id || item?.name + index}
-                    renderItem={({item}: {item: any}) => {
-                      let challengeTitle = "";
-                      let attemptsDetails = "";
-                      let sponsorImage = "";
-                      const points = item?.points || 0;
-                      let coolDownHours = 0;
-                      let coolDownMin = 0;
-                      let isDisabled = false;
-                      let onPressHandler = () => startChallengeHandler(site);
-                      // console.log("Challenge item:", item);
-                      // console.log("Challenge SITE:", site);
-                      switch (selectedMode?.mode) {
-                        case AR_MODES.GEO_TAG_MODE:
-                          challengeTitle = item?.name;
-                          attemptsDetails = `${site?.user_attempts || 0}/${
-                            site?.challenge_attempt || 0
-                          } Check-Ins`;
-                          sponsorImage = site?.sponsor?.image;
-                          coolDownHours = formatCooldownTime(site?.checkin_cooldown) || 0;
-                          coolDownMin = getCooldownTotalMinutes(site?.checkin_cooldown) || 0;
-                          isDisabled = coolDownMin > 0;
-                          // coolDownHours = site?.checkin_cooldown || 8 ; // TODO: Missing cool down hours on the API response
-                          break;
-                        case AR_MODES.SCAN_MODE:
-                          challengeTitle = item?.name;
-                          attemptsDetails = `${item?.user_attempts || 0}/${
-                            item?.attempts || 0
-                          } Gems`;
-                          sponsorImage = item?.sponsor?.image;
-                          coolDownHours = formatCooldownTime(item.cooldown) || 0;
-                          coolDownMin = getCooldownTotalMinutes(item.cooldown) || 0;
-                          isDisabled = coolDownMin > 0;
-                          coolDownHours = formatCooldownTime(item?.cooldown) || 0;
-                          const updatedSite = {
-                            ...site,
-                            // Remove list of challenges
-                            scan_pictures: null,
-                            // Set the 'selected challenge'
-                            scanChallenge: {
-                              ...item,
-                            },
-                          };
-                          onPressHandler = () => startChallengeHandler(updatedSite);
-                          break;
-                        case AR_MODES.HUNT_MODE:
-                          challengeTitle = site?.ar_star?.name;
-                          attemptsDetails = `${site?.ar_star?.user_attempts || 0}/${
-                            site?.ar_star?.attempts || 0
-                          } Captures`;
-                          sponsorImage = site?.ar_star?.sponsored?.[0]?.image;
-                          coolDownHours = formatCooldownTime(site?.hunt_cooldownn) || 0;
-                          coolDownMin = getCooldownTotalMinutes(site?.hunt_cooldown) || 0;
-                          isDisabled = coolDownMin > 0;
-                          // coolDownHours = site?.hunt_cooldown || 8; // TODO: Missing cool down hours on the API response
-                          break;
-                      }
+          switch (selectedMode?.mode) {
+            case AR_MODES.GEO_TAG_MODE:
+              challengeTitle = item?.name;
+              attemptsDetails = `${site?.user_attempts || 0}/${
+                site?.challenge_attempt || 0
+              } Check-Ins`;
+              sponsorImage = site?.sponsor?.image;
+              coolDownHours = formatCooldownTime(site?.checkin_cooldown) || 0;
+              coolDownMin = getCooldownTotalMinutes(site?.checkin_cooldown) || 0;
+              isDisabled = coolDownMin > 0;
+              break;
+            case AR_MODES.SCAN_MODE:
+              challengeTitle = item?.name;
+              attemptsDetails = `${item?.user_attempts || 0}/${item?.attempts || 0}`;
+              totalAttempts = item?.attempts || 0;
+              currentAttempts = item?.user_attempts || 0;
+              sponsorImage = item?.sponsor?.image;
+              coolDownHours = formatCooldownTime(item.cooldown) || 0;
+              coolDownMin = getCooldownTotalMinutes(item.cooldown) || 0;
+              isDisabled = coolDownMin > 0;
+              const updatedSite = {
+                ...site,
+                scan_pictures: null,
+                scanChallenge: {
+                  ...item,
+                },
+              };
+              onPressHandler = () => startChallengeHandler(updatedSite);
+              break;
+            case AR_MODES.HUNT_MODE:
+              challengeTitle = site?.ar_star?.name;
+              attemptsDetails = `${site?.ar_star?.user_attempts || 0}/${
+                site?.ar_star?.attempts || 0
+              }`;
+              totalAttempts = site?.ar_star?.attempts || 0;
+              currentAttempts = site?.ar_star?.user_attempts || 0;
+              sponsorImage = site?.ar_star?.sponsored?.[0]?.image;
+              coolDownHours = formatCooldownTime(site?.hunt_cooldownn) || 0;
+              coolDownMin = getCooldownTotalMinutes(site?.hunt_cooldown) || 0;
+              isDisabled = coolDownMin > 0;
 
-                      return (
-                        <ARChallengeItem
-                          title={challengeTitle}
-                          points={points}
-                          attemptsDetails={attemptsDetails}
-                          coolDownHours={coolDownHours}
-                          sponsorImage={sponsorImage}
-                          onPress={onPressHandler}
-                          disabled={isDisabled}
-                        />
-                      );
-                    }}
-                  />
-                )}
-              </View>
-            );
-          })}
-        {!filteredSites || filteredSites.length === 0 ? (
+              break;
+          }
+
+          return (
+            <View style={{marginBottom: 10}}>
+              <ARChallengeItem
+                title={challengeTitle}
+                points={points}
+                attemptsDetails={attemptsDetails}
+                totalAttempts={totalAttempts}
+                currentAttempts={currentAttempts}
+                coolDownHours={coolDownHours}
+                sponsorImage={sponsorImage}
+                onPress={onPressHandler}
+                disabled={isDisabled}
+              />
+            </View>
+          );
+        }}
+        ListEmptyComponent={() => (
           <View style={{alignItems: "center", justifyContent: "center", paddingVertical: 20}}>
-            <ActivityIndicator size="small" color="#fff" />
-            <Text style={{color: "#fff", marginTop: 8}}>Loading Sites…</Text>
-          </View>
-        ) : (
-          <ScrollView style={{marginTop: 15}}>
-            {filteredSites?.length > 0 &&
-              filteredSites.map((site: any, index: number) => {
-                // ...tu render actual
-              })}
-            {(!filteredSites || filteredSites.length === 0) && (
-              <View style={{alignItems: "center", paddingVertical: 20}}>
-                <Text style={{color: "#7e8493"}}>No seats available</Text>
-              </View>
+            {!filteredSites || filteredSites.length === 0 ? (
+              <>
+                <ActivityIndicator size="small" color="#fff" />
+                <Text style={{color: "#fff", marginTop: 8}}>Loading Sites…</Text>
+              </>
+            ) : (
+              <Text style={{color: "#7e8493"}}>No challenges available</Text>
             )}
-          </ScrollView>
+          </View>
         )}
-      </ScrollView>
+      />
     </View>
   );
 };

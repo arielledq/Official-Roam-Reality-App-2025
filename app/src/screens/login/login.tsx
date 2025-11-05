@@ -79,7 +79,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader title={""} backgroundColor="transparent" hideBackButton />
-      <AppText style={[_styles.headerText]}>Welcome !</AppText>
+      <AppText style={[_styles.headerText]}>Welcome!</AppText>
       <AppText style={_styles.subHeaderText}>
         Login to ROAM a new dimension with captivating AR experiences.
       </AppText>
@@ -149,7 +149,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
                 <AppButton
                   buttonStyle={_styles.buttonStyle}
                   containerStyle={_styles.buttonContainerStyle}
-                  title={"LOGIN"}
+                  title={"Login"}
                   onPress={handleSubmit}
                   loading={isLoading}
                   disabled={isLoading}
@@ -157,7 +157,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
                 <AppButton
                   buttonStyle={_styles.buttonStyle}
                   containerStyle={_styles.buttonContainerStyle}
-                  title={"SIGN UP"}
+                  title={"Sign Up"}
                   onPress={navigateToSignUp}
                   disabled={isLoading}
                 />
@@ -222,6 +222,7 @@ const Login: ScreenStackComponent<RootStackParamList, "Login"> = ({navigation}) 
 
         <AppText style={_styles.termsAndConditionstext}>
           {` By clicking "Sign in" you agree to our `}
+          {"\n"}
           <AppText
             style={_styles.TandCLink}
             onPress={() => {

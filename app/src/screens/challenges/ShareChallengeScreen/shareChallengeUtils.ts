@@ -251,6 +251,7 @@ export const shareToRoamProfile = async (
           uri: capturedDataUri,
         };
         formData.append("memory_file", shareFile);
+        console.log("formData for GeoTag:", formData);
 
         res = await postGeoPinCheckIn(formData);
         break;

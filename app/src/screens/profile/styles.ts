@@ -78,7 +78,7 @@ const useStyles = makeStyles(theme => ({
   },
   buttonText: {
     ...fontGroup.nunitoBold,
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S10,
     lineHeight: FontLineHeights.LH16,
     marginLeft: 10,
   },
@@ -87,13 +87,16 @@ const useStyles = makeStyles(theme => ({
     marginBottom: 10,
   },
   editButtonContainer: {
-    position: "absolute",
+    // position: "absolute",
     right: 10,
     zIndex: 10,
-    top: heightPercentageToDP(1),
+    marginTop: heightPercentageToDP(0.3),
+
+    // top: heightPercentageToDP(1),
   },
   editButton: {
     marginVertical: 5,
+    width: widthPercentageToDP(22),
   },
   container_style: {
     paddingBottom: 50,

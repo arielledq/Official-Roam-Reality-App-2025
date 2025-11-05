@@ -21,6 +21,7 @@ const SocialSignin = ({setLoading}) => {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+
     try {
       await GoogleSignin.hasPlayServices();
       const userinfo = await GoogleSignin.signIn();
@@ -134,6 +135,7 @@ const SocialSignin = ({setLoading}) => {
       })
         .then(res => {
           if (res.status == 1) {
+            console.log("Facebook login response", res);
             dispatch(updateUserData(res));
             if (newUser) {
               dispatch(updateAsOldUser());
@@ -212,10 +214,13 @@ const SocialSignin = ({setLoading}) => {
       if (!appleAuthRequestResponse.identityToken) {
         throw new Error("Apple Sign-In failed - no identify token returned");
       }
+      // console.log("Apple auth response", appleAuthRequestResponse);
 
       const payload = {
         id_token: appleAuthRequestResponse.identityToken,
         access_token: appleAuthRequestResponse.authorizationCode,
+        first_name: appleAuthRequestResponse.fullName?.givenName || "apple",
+        last_name: appleAuthRequestResponse.fullName?.familyName || "user",
       };
 
       appleLogin(payload)

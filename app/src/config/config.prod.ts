@@ -8,10 +8,11 @@
 export default {
   APPLE_CLIENT_ID: "com.roam.reality.services",
   // BASE_URL: "https://travel-ar-app-42706-32103.azurewebsites.net/", // Production Azure
+  // PRODUCTION: https://api.roamreality.com
   // APPLE_REDIRECT_URL:
   // //   "https://travel-ar-app-42706-32103.azurewebsites.net/accounts/apple/login/callback/", // Production Azure
   // BASE_URL: "https://travel-ar-app-42706-staging.azurewebsites.net/", // Staging Azure
-  // BASE_URL: "https://faa1f97aa27d.ngrok-free.app", // Production Azure
+  // BASE_URL: "https://40a0612ad85e.ngrok-free.app/", // Production Azure
   BASE_URL: "https://roam-reality-dev-api.ropstam.dev/",
   APPLE_REDIRECT_URL:
     "https://travel-ar-app-42706-staging.azurewebsites.net/accounts/apple/login/callback/", // Staging Azure

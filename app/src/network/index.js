@@ -159,6 +159,14 @@ export const updateProfile = payload =>
     },
     logoutFunc
   );
+export const DeleteProfilePicture = payload =>
+  Request.multiPartCall(
+    {
+      url: `${commonApiRoute}account-setup/delete-profile-image/`,
+      method: "DELETE",
+    },
+    logoutFunc
+  );
 export const getARChallenges = () =>
   Request.callWithToken(
     {
@@ -238,12 +246,22 @@ export const getNextStar = payload =>
     },
     logoutFunc
   );
+
 export const starFoundAndSaveApi = payload =>
   Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-star-collect/`,
       method: "POST",
       data: payload,
+    },
+    logoutFunc
+  );
+
+export const getAvailableARModes = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}modes/`,
+      method: "GET",
     },
     logoutFunc
   );
@@ -440,10 +458,10 @@ export const getProfieARMemoriesAPI = () =>
     },
     logoutFunc
   );
-export const getPublicProfieARMemoriesAPI = user_id =>
+export const getPublicProfieARMemoriesAPI = (user_id, pageNo, page_size) =>
   Request.callWithToken(
     {
-      url: `modules/challenges/all-memories/public/?user_id=${user_id}`,
+      url: `modules/challenges/all-memories/public/?user_id=${user_id}&page=${pageNo}&page_size=${page_size}`,
       method: "GET",
     },
     logoutFunc

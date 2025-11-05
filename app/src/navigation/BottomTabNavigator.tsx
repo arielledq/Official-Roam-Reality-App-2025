@@ -12,6 +12,8 @@ import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
 import ARScreen from "screens/arScreen";
 import ARTipsScreen from "screens/arTips";
+import {AppButton} from "components";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -71,12 +73,20 @@ const BottomTabNavigator = () => {
           options={{
             tabBarLabel: "",
             tabBarIcon: ({focused}) => (
-              <Icon
-                name={"SelectedCamera"}
-                family="custom"
-                size={50}
-                style={styles.cameraTabStyle}
-              />
+              <AppButton
+                containerStyle={{
+                  width: widthPercentageToDP(13),
+                  height: widthPercentageToDP(13),
+                  borderRadius: widthPercentageToDP(100),
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: heightPercentageToDP(2),
+                }}
+                customColors={["#7a00cf", "#5532ff"]}
+                showButton={false}
+              >
+                <Icons.Arcamera />
+              </AppButton>
             ),
           }}
         />

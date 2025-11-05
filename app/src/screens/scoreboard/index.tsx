@@ -296,7 +296,7 @@ const ScoreBoard = ({}) => {
             }}
             resizeMode="stretch"
           >
-            <Image
+            <FastImage
               style={{
                 width: 40,
                 aspectRatio: 1,
@@ -304,7 +304,8 @@ const ScoreBoard = ({}) => {
                 height: 40,
               }}
               source={{uri: profilePicture}}
-              resizeMode="cover"
+              resizeMode={FastImage.resizeMode.cover}
+              defaultSource={Images.AppLogo}
             />
           </ImageBackground>
           <Text numberOfLines={2} style={_styles.nameText}>
@@ -319,7 +320,9 @@ const ScoreBoard = ({}) => {
     );
   });
 
-  const profilePicture = getProfilePicture(profileDetails?.image);
+  const profilePicture = getProfilePicture(
+    profileDetails?.image || userProfile?.user_profile?.image
+  );
 
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
@@ -413,7 +416,7 @@ const ScoreBoard = ({}) => {
               }}
               resizeMode="stretch"
             >
-              <Image
+              <FastImage
                 style={{
                   width: 40,
                   aspectRatio: 1,
@@ -421,7 +424,8 @@ const ScoreBoard = ({}) => {
                   height: 40,
                 }}
                 source={{uri: profilePicture}}
-                resizeMode="cover"
+                defaultSource={Images.AppLogo}
+                resizeMode={FastImage.resizeMode.cover}
               />
             </ImageBackground>
             <Text style={_styles.nameText}>{userProfile?.name ? userProfile?.name : "You"}</Text>
@@ -469,8 +473,9 @@ const ScoreBoard = ({}) => {
         onRefresh={handlePullDownToRefresh}
         contentContainerStyle={{flexGrow: 1}}
         initialNumToRender={10}
-        maxToRenderPerBatch={10}
+        maxToRenderPerBatch={5}
         windowSize={5}
+        removeClippedSubviews
         onEndReachedThreshold={0.7}
         onEndReached={loadMore}
       />

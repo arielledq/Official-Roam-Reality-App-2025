@@ -1,11 +1,11 @@
-import React, {useCallback, useState} from "react";
+import React, {useCallback, useRef, useState} from "react";
 import {FlatList, Image, Pressable, TouchableOpacity, View} from "react-native";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
-import {AppText} from "../../components";
+import {AppButton, AppText} from "../../components";
 import StatContainer from "../../components/statContainer";
 import BoxStatContainer from "../../components/boxStatContainer";
 import Images from "../../assets/images";
@@ -13,6 +13,7 @@ import MemoryContainer from "../../components/memoryContainer";
 import LinearGradient from "react-native-linear-gradient";
 import {
   getCountryCount,
+  getProfieDetails,
   getPublicARProfile,
   getPublicProfieARMemoriesAPI,
   getUserCollectedStarCount,
@@ -31,6 +32,8 @@ import ReportUserModal from "../reportUser/ReportUser";
 import {showMessage} from "../../util/helpers";
 import ConfirmationPopUp from "../../components/confirmationPopUp";
 import {getProfilePicture} from "util/imageUtils";
+import {heightPercentageToDP} from "react-native-responsive-screen";
+import Icon from "components/Icon";
 
 const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> = () => {
   const navigation = useNavigation();
@@ -38,9 +41,16 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   const _styles = useStyles();
   const dispatch = useDispatch();
   const userProfile = route?.params?.userData;
+  const [totalLength, setTotalLength] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const flatListRef = useRef(null);
+  const [showArMemories, setShowArMemories] = useState(true);
+  const [globalPoints, setGlobalPoints] = useState(0);
+  const [pageSize, setPageSize] = useState(30);
   const [arMemories, setARMemories] = useState([]);
   const [loading, setloading] = useState(true);
   const [arProfile, updateARUserData] = useState({});
+  const [profileDetails, setProfileDetails] = useState<any>(null);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const [modalVisible, setModalVisible] = useState(false);
   const [starsCount, setStarsCount] = useState(0);
@@ -60,10 +70,11 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
 
   const getProfieARMemories = async () => {
     try {
-      getPublicProfieARMemoriesAPI(userProfile?.id)
+      getPublicProfieARMemoriesAPI(userProfile?.id, currentPage, pageSize)
         .then(res => {
           if (res.status == 1) {
-            setARMemories(res.data);
+            setARMemories(res.results);
+            setTotalLength(res.total_record);
           } else {
             console.error("Error", "Error fetching ar memories: ");
           }
@@ -74,6 +85,23 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
         .finally(() => setloading(false));
     } catch (error) {
       console.error("Error", "Error fetching ar memories: ");
+    }
+  };
+
+  const lodeMoreData = () => {
+    if (arMemories.length < totalLength) {
+      setCurrentPage(prevPage => prevPage + 1);
+      getPublicProfieARMemoriesAPI(userProfile?.id, currentPage, pageSize)
+        .then(res => {
+          if (res.status == 1) {
+            setARMemories(prevMemories => [...prevMemories, ...res.results]);
+          } else {
+            console.error("Error", "Error fetching more memories: ");
+          }
+        })
+        .catch(err => {
+          console.error("Error", "Error fetching more memories: ", err);
+        });
     }
   };
 
@@ -99,6 +127,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       .then(res => {
         if (res.status == 1) {
           setGlobalRank(res.rank);
+          setGlobalPoints(response?.points || 0);
         }
       })
       .catch(err => {
@@ -132,8 +161,30 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       getUserCollectedStar();
       getRank();
       getCountry();
+      fetchProfileDetails();
     }, [])
   );
+
+  const fetchProfileDetails = async () => {
+    try {
+      getProfieDetails({
+        id: userProfile.user_profile.id,
+      })
+        .then(res => {
+          if (res.status == 1) {
+            setProfileDetails(res);
+          } else {
+            console.error("Error", "Error fetching profile details: ");
+          }
+        })
+        .catch(err => {
+          console.error("Error", "Error fetching profile details: ");
+        })
+        .finally(() => setloading(false));
+    } catch (error) {
+      console.error("Error", "Error fetching profile details: ");
+    }
+  };
 
   const data = [
     // {id: 1, value: arProfile?.check_ins, property: "Sites Visited"},
@@ -207,13 +258,28 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       </View>
 
       <View style={_styles.scroll}>
-        <UserReportCard
-          image={userProfile?.user_profile?.image ? true : false}
-          name={userProfile?.name}
-          email={userProfile?.email}
-          reportAction={() => setModalVisible(true)}
-          isVerified
-        />
+        <View
+          style={{
+            width: "100%",
+            flexDirection: "row",
+            marginTop: heightPercentageToDP(1),
+            justifyContent: "space-between",
+          }}
+        >
+          <View style={{width: "70%"}}>
+            <UserReportCard
+              image={userProfile?.user_profile?.image ? true : false}
+              name={userProfile?.name}
+              email={userProfile?.email}
+              reportAction={() => setModalVisible(true)}
+              isVerified
+            />
+          </View>
+
+          <Pressable style={_styles.removeBtnContainer} onPress={onRemoveFriendClick}>
+            <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
+          </Pressable>
+        </View>
         <View style={_styles.scoreboardContainer}>
           <AppText
             onPress={() => {
@@ -227,9 +293,9 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
           </AppText>
         </View>
         <View style={_styles.statContainerStyle}>
-          <StatContainer value={"" + globalRank} property={"Global Rank"} />
-          <StatContainer value={arProfile?.points} property={"Points"} />
-          <StatContainer value={arProfile?.check_ins} property={"Sites Visited"} />
+          <StatContainer value={globalRank?.toString()} property={"Global Rank"} />
+          <StatContainer value={globalPoints?.toString()} property={"Points"} />
+          <StatContainer value={profileDetails?.friends?.length} property={"Friends"} />
         </View>
         <ReportUserModal
           isVisible={modalVisible}
@@ -255,35 +321,43 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
     <View style={_styles.scroll}>
       <TouchableOpacity style={_styles.headingView}>
         <AppText style={_styles.heading}>My AR Adventures</AppText>
-        <View>
-          <Image source={Images.ForwardIcon} />
-        </View>
+        <AppButton
+          containerStyle={_styles.shadowBoxImage}
+          customColors={["#7a00cf", "#5532ff"]}
+          showButton={false}
+        >
+          <TouchableOpacity onPress={() => setShowArMemories(!showArMemories)}>
+            {showArMemories ? (
+              <Icon name="chevron-down" family="ionicon" size={26} color={"#fff"} />
+            ) : (
+              <Icon name="chevron-up" family="ionicon" size={26} color={"#fff"} />
+            )}
+          </TouchableOpacity>
+        </AppButton>
       </TouchableOpacity>
-      <View style={{marginHorizontal: -22}}>
+      {showArMemories && (
         <FlatList
-          scrollEventThrottle={32} // Adjust this value for performance
-          style={{width: "100%"}}
-          contentContainerStyle={{paddingHorizontal: 20, gap: 18}}
+          ref={flatListRef}
+          style={{
+            paddingHorizontal: 10,
+          }}
+          columnWrapperStyle={{
+            gap: heightPercentageToDP("2%"),
+            marginBottom: 10,
+          }}
           data={arMemories}
-          horizontal={true}
+          key={(item: any) => item?.id?.toString()}
+          numColumns={3}
+          onEndReachedThreshold={0.5}
+          onEndReached={lodeMoreData}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => (
-            <MemoryContainer
-              item={item}
-              onPressAction={() =>
-                navigateToShare(
-                  item?.memory_file,
-                  item?.challenge_details ?? null,
-                  item?.scan_picture ?? item?.challenges ?? null // scan_picture
-                )
-              }
-              cardStyle={{width: 115}}
-            />
+            <MemoryContainer item={item} onPressAction={navigateToShare} showPrivacy={false} />
           )}
           keyExtractor={(item: any) => item?.id?.toString()}
         />
-      </View>
+      )}
     </View>
   );
 
@@ -316,7 +390,6 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
           data={data}
           contentContainerStyle={_styles.container_style}
           keyExtractor={item => item.id.toString()}
-          renderItem={renderItem}
           ListHeaderComponent={renderHeader}
           numColumns={3}
           ListFooterComponent={renderFooter}
@@ -336,15 +409,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
             right: 0,
           }}
         />
-        <AppHeader
-          containerStyle={_styles.headerContainer}
-          title={""}
-          rightComponent={
-            <Pressable style={_styles.removeBtnContainer} onPress={onRemoveFriendClick}>
-              <AppText style={_styles.removeBtnText}>Remove Friend</AppText>
-            </Pressable>
-          }
-        />
+        <AppHeader containerStyle={_styles.headerContainer} title={""} />
       </View>
       <ConfirmationPopUp
         title={"Remove Friend"}

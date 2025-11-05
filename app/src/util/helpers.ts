@@ -221,11 +221,11 @@ export const accountSetupIsComplete = (userObj: any) => {
     userObj?.user?.email &&
     userObj?.user?.name &&
     userObj?.user?.user_profile?.account_setup &&
-    userObj?.user?.user_profile?.phone_number &&
-    userObj?.user?.user_profile?.home_address &&
-    userObj?.user?.user_profile?.gender &&
-    userObj?.user?.user_profile?.home_country &&
-    userObj?.date_of_birth
+    userObj?.user?.user_profile?.phone_number
+    // userObj?.user?.user_profile?.home_address &&
+    // userObj?.user?.user_profile?.gender &&
+    // userObj?.user?.user_profile?.home_country &&
+    // userObj?.date_of_birth
   ) {
     isComplete = true;
   }
