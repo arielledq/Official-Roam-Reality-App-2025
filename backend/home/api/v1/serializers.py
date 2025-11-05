@@ -263,7 +263,6 @@ class ScanMapSerializer(serializers.ModelSerializer):
     latitude = serializers.SerializerMethodField()
     longitude = serializers.SerializerMethodField()
     file_image = serializers.ImageField(required=False, allow_null=True)
-    file_3d = serializers.FileField(required=False, allow_null=True)
     file_animation_android = serializers.FileField(required=False, allow_null=True)
     file_animation_ios = serializers.FileField(required=False, allow_null=True)
     icon = serializers.ImageField(required=False, allow_null=True)
@@ -273,7 +272,7 @@ class ScanMapSerializer(serializers.ModelSerializer):
     class Meta:
         model = ScanPicture
         fields = [
-            'id', 'name', 'screen_title', 'file_image', 'file_3d', 
+            'id', 'name', 'screen_title', 'file_image', 
             'icon', 'file_animation_android', 'file_animation_ios',
             'sponsor', 'info', 'attempts', 'cooldown_hours', 'points', 
             'elevation', 'latitude', 'longitude', 'parameters'
