@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
 import os
 import io
 import environ
@@ -49,7 +48,7 @@ env.read_env(env_file)
 #     GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = False #env.bool("DEBUG", default=False)
 SENTRY_DSN = env.str("SENTRY_DSN", default="https://e8a6bfac5c5e45e98a6f9d96ef459795@sentry.innovatica.com.py//66")
 
 if SENTRY_DSN:
@@ -58,12 +57,7 @@ if SENTRY_DSN:
         integrations=[
             DjangoIntegration(),
         ],
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
         traces_sample_rate=1.0,
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
 
@@ -80,7 +74,6 @@ except (DefaultCredentialsError, PermissionDenied):
 
 
 try:
-    # Retrieve secrets from Azure Key Vault
     azure_credentials = DefaultAzureCredential()
     vault_url = env.str("AZURE_KEYVAULT_RESOURCEENDPOINT", "")
     vault_secret_name = env.str("AZURE_KEY_VAULT_SECRET_NAME", "secrets")
@@ -89,8 +82,6 @@ try:
     env.read_env(io.StringIO(secret.value))
 except Exception as e:
     pass
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str("SECRET_KEY")
@@ -291,7 +282,25 @@ EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
 EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 5  # Timeout in seconds for SMTP connections (reduced for faster failures)
 DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
+
+if EMAIL_HOST_PASSWORD:  # Only override if we have a password (API key)
+    EMAIL_HOST_USER = "apikey"
+
+USE_CONSOLE_EMAIL = env.bool("USE_CONSOLE_EMAIL", default=False)
+
+if USE_CONSOLE_EMAIL or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
+    if not DEBUG and not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
+        logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "home.email_backend.SendGridEmailBackend"
+    if EMAIL_HOST_PASSWORD and not EMAIL_HOST_PASSWORD.startswith("SG."):
+        logging.warning(
+            f"SendGrid API key doesn't start with 'SG.' - this might cause authentication issues. "
+            f"Current key starts with: {EMAIL_HOST_PASSWORD[:3] if len(EMAIL_HOST_PASSWORD) >= 3 else '***'}"
+        )
 
 
 # AWS S3 config
@@ -311,7 +320,7 @@ USE_S3 = (
     AWS_STORAGE_BUCKET_NAME and
     AWS_STORAGE_REGION
 )
-
+DOMAIN = 'roamtt.com'
 if USE_S3:
     AWS_S3_CUSTOM_DOMAIN = env.str("AWS_S3_CUSTOM_DOMAIN", "")
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
