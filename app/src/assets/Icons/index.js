@@ -49,6 +49,8 @@ import bin from "./bin.svg";
 import Ar from "./ar.svg";
 import sites from "./sites.svg";
 import Arcamera from "./Arcamera.svg";
+import currentLocation from "./currentLocationIcon.svg";
+import ArMarker from "./ArMarker.svg";
 
 export const Icons = {
   password,
@@ -102,4 +104,6 @@ export const Icons = {
   Ar,
   sites,
   Arcamera,
+  currentLocation,
+  ArMarker,
 };

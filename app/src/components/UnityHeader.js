@@ -1,6 +1,7 @@
 import theme from "assets/theme";
 import React from "react";
 import {View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar} from "react-native";
+import LinearGradient from "react-native-linear-gradient";
 import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import Icon from "react-native-vector-icons/Ionicons";
 import {FontSizes} from "util/FontUtils";
@@ -19,14 +20,21 @@ const UnityHeader = ({
     const isSelected = selectedMode === mode;
 
     return (
-      <TouchableOpacity
-        key={mode}
-        style={[styles.modeButton, isSelected && styles.selectedModeButton]}
-        onPress={() => onModeChange(mode)}
-      >
-        <Text style={[styles.modeButtonText, isSelected && styles.selectedModeButtonText]}>
-          {mode}
-        </Text>
+      <TouchableOpacity key={mode} onPress={() => onModeChange(mode)}>
+        <LinearGradient
+          style={[styles.modeButton]}
+          colors={
+            isSelected
+              ? ["#7a00cf", "#5532ff"]
+              : [theme.lightColors?.grey4, theme.lightColors?.grey4]
+          }
+          start={{x: 0, y: 1}}
+          end={{x: 1, y: 1}}
+        >
+          <Text style={[styles.modeButtonText, isSelected && styles.selectedModeButtonText]}>
+            {mode}
+          </Text>
+        </LinearGradient>
       </TouchableOpacity>
     );
   };
@@ -100,11 +108,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     height: widthPercentageToDP("10%"),
-    backgroundColor: theme.lightColors?.grey4,
   },
-  selectedModeButton: {
-    backgroundColor: "#5532ff",
-  },
+  selectedModeButton: {},
   modeButtonText: {
     color: theme.lightColors?.white,
     fontSize: FontSizes.S16,

@@ -24,7 +24,6 @@ const SideMenu = ({
 }) => {
   const [challengeDetials, setChallengeDetails] = React.useState(null);
   useEffect(() => {
-    console.log("adsad", selectedSite);
     if (selectedSite?.id) {
       let attemptsDetails = "";
       let sponsorImage = "";

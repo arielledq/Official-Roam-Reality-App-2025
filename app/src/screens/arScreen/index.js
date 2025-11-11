@@ -16,6 +16,7 @@ import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
 import UnityHeader from "components/UnityHeader";
 import SideMenu from "components/SideMenu";
+import ARMapView from "components/ARMapComponent/ARMapView";
 import {copyFileForDisplay, eraseFile, handleUnzipProcess, showMessage} from "../../util/helpers";
 
 import {
@@ -63,6 +64,7 @@ const ARScreen = ({route}) => {
   const [selectedSite, setSelectedSite] = useState(null);
   const navigation = useNavigation();
   const [selectedMode, setSelectedMode] = useState(null);
+  const [currentMode, setCurrentMode] = useState(null);
   const [challengeInformationView, setChallengeInformationView] = useState(false);
 
   const lastSentLocationRef = useRef(null);
@@ -728,12 +730,15 @@ const ARScreen = ({route}) => {
     }
 
     if (ButtonGeoTagMode) {
+      setCurrentMode(AR_MODES.GEO_TAG_MODE);
       setSelectedMode(AR_MODES_MENU[0]);
     }
     if (ButtonHuntMode) {
+      setCurrentMode(AR_MODES.HUNT_MODE);
       setSelectedMode(AR_MODES_MENU[2]);
     }
     if (ButtonScanMode) {
+      setCurrentMode(AR_MODES.SCAN_MODE);
       setSelectedMode(AR_MODES_MENU[1]);
     }
     if (
@@ -1836,7 +1841,7 @@ const ARScreen = ({route}) => {
             <SideMenu
               isVisible={isSideMenuVisible}
               onToggle={handleSideMenuToggle}
-              selectedSite={selectedSite}
+              selectedSite={selectedMode}
               onPressInfo={() => {
                 setIsSideMenuVisible(false);
                 setChallengeInformationView(true);
@@ -1865,19 +1870,66 @@ const ARScreen = ({route}) => {
 
           {/* Overlay for Map and List modes */}
           {showOverlay && (
-            <View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: theme.lightColors?.inputBG,
-                zIndex: 500,
-              }}
-            >
-              {selectedHeaderMode == "List" && (
+            <>
+              {selectedHeaderMode === "Map" && (
                 <>
+                  {userLocation || validUserLocation ? (
+                    <ARMapView
+                      userLocation={userLocation}
+                      validUserLocation={validUserLocation}
+                      selectedMode={selectedMode}
+                      onMarkerPress={site => {
+                        console.log("Marker pressed:", site);
+                      }}
+                      selectedSite={currentMode}
+                    />
+                  ) : (
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: theme.lightColors?.inputBG,
+                        zIndex: 500,
+                      }}
+                    >
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: theme.lightColors?.white,
+                            fontSize: FontSizes.S20,
+                            width: "80%",
+                            textAlign: "center",
+                          }}
+                        >
+                          Please enable location services to view the map.
+                        </Text>
+                      </View>
+                    </View>
+                  )}
+                </>
+              )}
+
+              {selectedHeaderMode === "List" && (
+                <View
+                  style={{
+                    position: "absolute",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    backgroundColor: theme.lightColors?.inputBG,
+                    zIndex: 500,
+                  }}
+                >
                   {selectedMode?.id ? (
                     <ARModeSiteList
                       selectedMode={selectedMode}
@@ -1903,9 +1955,9 @@ const ARScreen = ({route}) => {
                       </Text>
                     </View>
                   )}
-                </>
+                </View>
               )}
-            </View>
+            </>
           )}
 
           {/* <TouchableOpacity

@@ -266,6 +266,24 @@ export const getAvailableARModes = () =>
     logoutFunc
   );
 
+export const getAllHunts = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}map/hunts/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
+export const getAllScans = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}map/scans/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
 export const getArHuntExamples = id =>
   Request.callAR(
     {
