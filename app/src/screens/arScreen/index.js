@@ -9,7 +9,12 @@ import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
-import {AR_MODES_MENU, CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
+import {
+  AR_MODE_MESSAGES,
+  AR_MODES_MENU,
+  CAPTURE_CHALLENGE_TYPE,
+  CHALLENGES_TYPE,
+} from "../../constants";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
@@ -51,7 +56,8 @@ import {FontSizes} from "util/FontUtils";
 
 const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
-  const [screentitle, setSceenTitle] = useState("Choose your AR MODE");
+
+  const [screentitle, setSceenTitle] = useState(AR_MODE_MESSAGES.deafultView);
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
   const [textLoading, setTextLoading] = useState("Loading AR Experience");
@@ -162,7 +168,7 @@ const ARScreen = ({route}) => {
     if (isFocused && unityRef.current) {
       getAvailableModes();
       setSelectedMode(null);
-      setSceenTitle("Choose your AR MODE");
+      setSceenTitle(AR_MODE_MESSAGES.deafultView);
       setSelectedHeaderMode("Live");
       setShowOverlay(false);
       setIsSideMenuVisible(false);
@@ -175,13 +181,13 @@ const ARScreen = ({route}) => {
 
       if (currentMode == AR_MODES.HUNT_MODE) {
         const starHuntChallenge = selectedSite?.huntChallenge?.screen_title || "AR Hunt Challenge";
-        setSceenTitle(starHuntChallenge);
+        // setSceenTitle(starHuntChallenge);
 
         setSelectedMode(AR_MODES_MENU[2]);
       } else if (currentMode == AR_MODES.GEO_TAG_MODE) {
         setSelectedMode(AR_MODES_MENU[0]);
       } else if (currentMode == AR_MODES.SCAN_MODE) {
-        setSceenTitle(selectedSite.scanChallenge.screen_title || "AR Challenge");
+        // setSceenTitle(selectedSite.scanChallenge.screen_title || "AR Challenge");
         setSelectedMode(AR_MODES_MENU[1]);
       }
     }
@@ -492,6 +498,7 @@ const ARScreen = ({route}) => {
 
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+        setSceenTitle(AR_MODE_MESSAGES.CALIBRATION);
       }, 500);
 
       // setSendModelData(true);
@@ -621,6 +628,22 @@ const ARScreen = ({route}) => {
     setIsUnityLoaded(false);
   };
 
+  useEffect(() => {
+    if (selectedHeaderMode === "List") {
+      setSceenTitle(AR_MODE_MESSAGES.LIST_VIEW);
+    }
+    if (selectedHeaderMode === "Map") {
+      setSceenTitle(AR_MODE_MESSAGES.MAP_VIEW);
+    }
+    if (selectedHeaderMode === "Live") {
+      if (selectedSite) {
+        setSceenTitle(AR_MODE_MESSAGES.CALIBRATION);
+      } else {
+        setSceenTitle(AR_MODE_MESSAGES.deafultView);
+      }
+    }
+  }, [selectedHeaderMode]);
+
   const closeViewInfoButtonHandler = () => {
     setChallengeInformationView(false);
     setIsUnityLoaded(true);
@@ -724,7 +747,6 @@ const ARScreen = ({route}) => {
       setOpenModalARMode(true);
     }
     if (ButtonScanMode || ButtonHuntMode || ButtonGeoTagMode) {
-      setSceenTitle("Find AR at this site,in list format");
       setSelectedHeaderMode("List");
       setShowOverlay(true);
     }
@@ -989,8 +1011,6 @@ const ARScreen = ({route}) => {
   };
 
   const startChallengeHandler = async site => {
-    console.log("Starting challenge with site:", site);
-
     let mode = site?.selectedMode?.mode;
     let challengeData = {};
     switch (site?.selectedMode?.mode) {
@@ -1048,7 +1068,7 @@ const ARScreen = ({route}) => {
 
     setSelectedHeaderMode("Live");
     setShowOverlay(false);
-    setSceenTitle(challengeData.title || "AR Challenge");
+    // setSceenTitle(challengeData.title || "AR Challenge");
 
     setStarModels(null);
     setModelResource(null);
@@ -1878,9 +1898,6 @@ const ARScreen = ({route}) => {
                       userLocation={userLocation}
                       validUserLocation={validUserLocation}
                       selectedMode={selectedMode}
-                      onMarkerPress={site => {
-                        console.log("Marker pressed:", site);
-                      }}
                       selectedSite={currentMode}
                     />
                   ) : (

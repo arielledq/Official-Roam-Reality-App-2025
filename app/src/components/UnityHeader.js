@@ -1,6 +1,14 @@
 import theme from "assets/theme";
-import React from "react";
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar} from "react-native";
+import React, {useState, useEffect, useRef} from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  StatusBar,
+  FlatList,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -15,6 +23,74 @@ const UnityHeader = ({
   onModeChange,
 }) => {
   const modes = ["Map", "Live", "List"];
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const intervalRef = useRef(null);
+  const flatListRef = useRef(null);
+
+  // Determine if title is array or string
+  const isArrayTitle = Array.isArray(title);
+  const messages = isArrayTitle ? title : [];
+  // Calculate carousel width based on available space (total width - buttons - margins)
+  const carouselWidth =
+    screenWidth * 0.9 - widthPercentageToDP("8%") * 2 - widthPercentageToDP("8%");
+
+  // Auto-scroll functionality for array titles
+  useEffect(() => {
+    if (isArrayTitle && messages.length > 1) {
+      // Clear any existing interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      // Set new interval for auto-scroll every 10 seconds
+      intervalRef.current = setInterval(() => {
+        const nextIndex = currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
+        scrollToIndex(nextIndex);
+      }, 10000);
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [isArrayTitle, messages.length, currentMessageIndex]);
+
+  const scrollToIndex = index => {
+    if (flatListRef.current && isArrayTitle) {
+      flatListRef.current.scrollToIndex({
+        index,
+        animated: true,
+      });
+      setCurrentMessageIndex(index);
+    }
+  };
+
+  const goToPrevious = () => {
+    const newIndex = currentMessageIndex === 0 ? messages.length - 1 : currentMessageIndex - 1;
+    scrollToIndex(newIndex);
+  };
+
+  const goToNext = () => {
+    const newIndex = currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
+    scrollToIndex(newIndex);
+  };
+
+  const onScrollEnd = event => {
+    const slideSize = carouselWidth;
+    const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
+    if (index !== currentMessageIndex) {
+      setCurrentMessageIndex(index);
+    }
+  };
+
+  const renderMessageItem = ({item, index}) => (
+    <View style={[styles.messageSlide, {width: carouselWidth}]}>
+      <Text style={styles.titleText} numberOfLines={2} adjustsFontSizeToFit>
+        {item.message}
+      </Text>
+    </View>
+  );
 
   const renderModeButton = mode => {
     const isSelected = selectedMode === mode;
@@ -50,7 +126,49 @@ const UnityHeader = ({
       </View>
 
       <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>{title}</Text>
+        {isArrayTitle && messages.length > 1 ? (
+          <View style={styles.carouselContainer}>
+            <TouchableOpacity style={styles.carouselButton} onPress={goToPrevious}>
+              <Icon name="chevron-back" size={16} color="#ffffff" />
+            </TouchableOpacity>
+
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              renderItem={renderMessageItem}
+              keyExtractor={item => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              pagingEnabled
+              onMomentumScrollEnd={onScrollEnd}
+              scrollEventThrottle={16}
+              decelerationRate="fast"
+              snapToInterval={carouselWidth}
+              snapToAlignment="center"
+              contentContainerStyle={styles.flatListContainer}
+              style={styles.flatListStyle}
+              getItemLayout={(data, index) => ({
+                length: carouselWidth,
+                offset: carouselWidth * index,
+                index,
+              })}
+              bounces={false}
+              overScrollMode="never"
+            />
+
+            <TouchableOpacity style={styles.carouselButton} onPress={goToNext}>
+              <Icon name="chevron-forward" size={16} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Text style={styles.titleText}>
+            {typeof title === "string"
+              ? title
+              : isArrayTitle && messages[0]
+              ? messages[0].message
+              : "Choose your AR MODE"}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -119,6 +237,40 @@ const styles = StyleSheet.create({
   selectedModeButtonText: {
     color: "#ffffff",
     fontWeight: "700",
+  },
+  carouselContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    height: widthPercentageToDP("10%"),
+  },
+  carouselButton: {
+    width: widthPercentageToDP("8%"),
+    height: widthPercentageToDP("8%"),
+    backgroundColor: theme.lightColors?.grey4,
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  messageContainer: {
+    flex: 1,
+    marginHorizontal: widthPercentageToDP("2%"),
+    alignItems: "center",
+  },
+  flatListContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  flatListStyle: {
+    flex: 1,
+    maxHeight: widthPercentageToDP("10%"),
+  },
+  messageSlide: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: widthPercentageToDP("1%"),
+    height: widthPercentageToDP("10%"),
   },
 });
 
