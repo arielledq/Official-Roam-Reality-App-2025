@@ -1,6 +1,6 @@
-import React, {useEffect, useCallback, useMemo} from "react";
-import {View, Text, StyleSheet, Platform, Alert} from "react-native";
-import MapView, {Marker, Polyline, PROVIDER_GOOGLE} from "react-native-maps";
+import React, {useEffect, useCallback, useMemo, useState} from "react";
+import {View, Text, StyleSheet, Platform, Alert, Image} from "react-native";
+import MapView, {Callout, Marker, Polyline, PROVIDER_GOOGLE} from "react-native-maps";
 import {darkMapStyle} from "./darkMapStyle";
 import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import theme from "assets/theme";
@@ -8,10 +8,14 @@ import {TouchableOpacity} from "react-native";
 import {Icon} from "@rneui/themed";
 import {Icons} from "assets/Icons";
 import {AR_MODES} from "constants";
-import {getAllHunts, getAllScans} from "network";
+import {getAllHunts, getAllScans, getUserFriendList} from "network";
 import {getDistance} from "geolib";
 import {ActivityIndicator} from "react-native";
 import {FontSizes} from "util/FontUtils";
+import RNFS from "react-native-fs";
+import MarkerIcon from "components/marker";
+import {useNavigation} from "@react-navigation/native";
+import {pinColor} from "util/helpers";
 
 // Memoized marker component to prevent unnecessary re-renders
 const ARMarkerComponent = React.memo(({item, onPress, anchor, centerOffset, widthPercentage}) => {
@@ -28,7 +32,7 @@ const ARMarkerComponent = React.memo(({item, onPress, anchor, centerOffset, widt
       }}
       anchor={anchor}
       centerOffset={centerOffset}
-      tracksViewChanges={false} // Disable view tracking for better performance
+      tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
       flat={true}
       onPress={handlePress}
     >
@@ -74,6 +78,7 @@ const HuntPointMarkerComponent = React.memo(
 const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}) => {
   const [region, setRegion] = React.useState(null);
   const [AllHunts, setAllHunts] = React.useState([]);
+  const [androidTrackViewChnages, setAndroidTrackViewChanges] = useState(true);
   const [userLiveLocation, setUserLiveLocation] = React.useState(null);
   const [AllScans, setAllScans] = React.useState([]);
   const [polylineCoordinates, setPolylineCoordinates] = React.useState([]);
@@ -83,10 +88,14 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
 
   // State for tracking user movement and selected AR
   const [previousUserLocation, setPreviousUserLocation] = React.useState(null);
+  const [friendImageStates, setFriendImageStates] = useState({});
+  const [friendList, setFriendList] = React.useState([]);
+  const [loadingCustomMarkers, setLoadingCustomMarkers] = React.useState(false);
   const [lastPolylineUpdateLocation, setLastPolylineUpdateLocation] = React.useState(null);
   const [selectedAR, setSelectedAR] = React.useState(null);
   const [selectedHuntPoint, setSelectedHuntPoint] = React.useState(null);
   const [visibleHuntPoints, setVisibleHuntPoints] = React.useState([]);
+  const navigation = useNavigation();
 
   const mapRef = React.useRef(null);
   const regionSetCounterRef = React.useRef(0); // Counter to track if region has been set
@@ -109,6 +118,14 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
       regionSetCounterRef.current = 1;
     }
   }, [validUserLocation]);
+
+  useEffect(() => {
+    getFriends();
+  }, []);
+
+  setTimeout(() => {
+    setAndroidTrackViewChanges(false);
+  }, 10000);
 
   // Reset counter when component unmounts
   useEffect(() => {
@@ -411,6 +428,89 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
     return points;
   };
 
+  const getFriends = () => {
+    setLoadingCustomMarkers(true);
+    getUserFriendList()
+      .then(async response => {
+        if (response) {
+          const friends = response?.data[0]?.friends || [];
+
+          // Download and cache friend profile images
+          const friendsWithLocalImages = await Promise.all(
+            friends.map(async (friend, index) => {
+              if (friend?.user_profile?.image) {
+                try {
+                  const url = friend.user_profile.image;
+                  const fileName =
+                    `friend_${friend.id}_${index}_` +
+                    url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+                  const localFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+                  // Check if file already exists to avoid re-downloading
+                  const fileExists = await RNFS.exists(localFilePath);
+
+                  if (!fileExists) {
+                    const downloadResult = await RNFS.downloadFile({
+                      fromUrl: url,
+                      toFile: localFilePath,
+                      background: false,
+                      discretionary: true,
+                      cacheable: true,
+                    }).promise;
+
+                    if (downloadResult.statusCode === 200) {
+                      const updatedLocalFilePath =
+                        Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+                      return {
+                        ...friend,
+                        user_profile: {
+                          ...friend.user_profile,
+                          localImagePath: updatedLocalFilePath,
+                        },
+                      };
+                    } else {
+                      // Download failed, keep original
+                      return friend;
+                    }
+                  } else {
+                    // File exists, use cached version
+                    const updatedLocalFilePath =
+                      Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+                    return {
+                      ...friend,
+                      user_profile: {
+                        ...friend.user_profile,
+                        localImagePath: updatedLocalFilePath,
+                      },
+                    };
+                  }
+                } catch (error) {
+                  console.error("Error downloading friend image:", error);
+                  // Return original friend data if download fails
+                  return friend;
+                }
+              } else {
+                // No profile image, return as is
+                return friend;
+              }
+            })
+          );
+
+          // Reset friend image states for new friends
+          setFriendImageStates({});
+          setFriendList(friendsWithLocalImages);
+        }
+      })
+      .catch(error => {
+        console.error(error);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          setLoadingCustomMarkers(false);
+        }, 500);
+      });
+  };
+
   // Function to fetch walking directions from Google Directions API
   const fetchWalkingDirections = async (startLat, startLng, destLat, destLng) => {
     try {
@@ -599,6 +699,81 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
     [userLiveLocation, fetchWalkingDirections]
   );
 
+  const f_markerView = o => {
+    const friendHasLocation =
+      !!o?.ar_user_profile_user?.current_location &&
+      !!o?.ar_user_profile_user?.current_location?.coordinates?.length;
+
+    if (friendHasLocation) {
+      const friendLat = o?.ar_user_profile_user?.current_location.coordinates[1];
+      const friendLong = o?.ar_user_profile_user?.current_location.coordinates[0];
+
+      const hasUserImage = !!o?.user_profile?.image;
+      const localImagePath = o?.user_profile?.localImagePath;
+      const imageState = friendImageStates[o.id] || {loaded: false, error: false};
+      return (
+        <Marker
+          key={o.id}
+          coordinate={{
+            latitude: friendLat,
+            longitude: friendLong,
+          }}
+          title={o.name}
+          onCalloutPress={() => {
+            navigation.navigate("PublicProfile", {userData: o});
+          }}
+          pinColor={pinColor}
+          tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
+        >
+          {Platform.OS === "ios" && (
+            <Callout
+              onPress={() => {
+                navigation.navigate("PublicProfile", {userData: o});
+              }}
+              style={{
+                backgroundColor: "#fff",
+                minWidth: 100,
+                alignItems: "center",
+              }}
+            >
+              <Text>{o.name}</Text>
+            </Callout>
+          )}
+
+          <View
+            style={{
+              width: widthPercentageToDP(10),
+              height: widthPercentageToDP(10),
+              alignItems: "center",
+              justifyContent: "flex-start",
+            }}
+          >
+            <>
+              {/* Always show placeholder first, then actual image when loaded */}
+              <Image
+                resizeMode="cover"
+                style={{
+                  width: widthPercentageToDP(6.5),
+                  height: widthPercentageToDP(6.5),
+                  position: "absolute",
+                  top: 3,
+                  borderRadius: 100,
+                  zIndex: imageState.loaded && !imageState.error ? 998 : 999,
+                  backgroundColor: "#fff",
+                }}
+                source={localImagePath ? {uri: localImagePath} : {uri: o?.user_profile?.image}}
+              />
+            </>
+            <MarkerIcon
+              color={theme.lightColors.green}
+              width={widthPercentageToDP(10)}
+              height={widthPercentageToDP(10)}
+            />
+          </View>
+        </Marker>
+      );
+    }
+  };
   return (
     <View
       style={{
@@ -658,6 +833,11 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               widthPercentage={widthPercentageToDP(6)}
             />
           ))}
+
+          {friendList.length > 0 &&
+            friendList.map(o => {
+              return f_markerView(o);
+            })}
 
           {/* Polyline for walking route */}
           {polylineCoordinates.length > 0 && (

@@ -44,7 +44,7 @@ const CameraControls = ({
   return (
     <View
       style={{
-        backgroundColor: theme.darkColors?.background,
+        backgroundColor: "transparent",
         borderRadius: 16,
         paddingVertical: 8,
         paddingHorizontal: 16,

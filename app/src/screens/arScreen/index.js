@@ -2012,15 +2012,18 @@ const ARScreen = ({route}) => {
           )}
         </>
       )}
-      {!isUnityLoaded && (
-        <CameraControls
-          hasCapturedContent={!!capturedImage || !!capturedVideo}
-          onRetake={retakeButtonHandler}
-          onDone={doneButtonHandler}
-          isVideo={!!capturedVideo}
-          challengeHasFilters={challengeHasFilters}
-        />
-      )}
+
+      <View style={{position: "absolute", bottom: 20, width: "100%"}}>
+        {!isUnityLoaded && (
+          <CameraControls
+            hasCapturedContent={!!capturedImage || !!capturedVideo}
+            onRetake={retakeButtonHandler}
+            onDone={doneButtonHandler}
+            isVideo={!!capturedVideo}
+            challengeHasFilters={challengeHasFilters}
+          />
+        )}
+      </View>
       {/* 
       <ARModeModal
         isVisible={openModalARMode}
@@ -2029,13 +2032,13 @@ const ARScreen = ({route}) => {
         onStartChallenge={startChallengeHandler}
       /> */}
 
-      {selectedSite?.selectedMode?.mode && (
+      {/* {selectedSite?.selectedMode?.mode && (
         <NotificationModal
           isVisible={showNotification}
           onClose={() => setShowNotification(false)}
           selectedMode={selectedSite.selectedMode}
         />
-      )}
+      )} */}
     </ChallengeScreen>
   );
 };
