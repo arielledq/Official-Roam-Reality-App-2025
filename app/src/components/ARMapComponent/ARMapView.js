@@ -18,36 +18,38 @@ import {useNavigation} from "@react-navigation/native";
 import {pinColor} from "util/helpers";
 
 // Memoized marker component to prevent unnecessary re-renders
-const ARMarkerComponent = React.memo(({item, onPress, anchor, centerOffset, widthPercentage}) => {
-  const handlePress = useCallback(() => {
-    onPress(item);
-  }, [onPress, item]);
+const ARMarkerComponent = React.memo(
+  ({item, onPress, anchor, centerOffset, widthPercentage, androidTrackViewChnages}) => {
+    const handlePress = useCallback(() => {
+      onPress(item);
+    }, [onPress, item]);
 
-  return (
-    <Marker
-      key={`marker-${item.id}`}
-      coordinate={{
-        latitude: item.latitude,
-        longitude: item.longitude,
-      }}
-      anchor={anchor}
-      centerOffset={centerOffset}
-      tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
-      flat={true}
-      onPress={handlePress}
-    >
-      {item.isSelected ? (
-        <Icons.ArMarker width={widthPercentage} height={widthPercentage} />
-      ) : (
-        <Icons.disbaledMarker width={widthPercentage} height={widthPercentage} />
-      )}
-    </Marker>
-  );
-});
+    return (
+      <Marker
+        key={`marker-${item.id}`}
+        coordinate={{
+          latitude: item.latitude,
+          longitude: item.longitude,
+        }}
+        anchor={anchor}
+        centerOffset={centerOffset}
+        tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
+        flat={true}
+        onPress={handlePress}
+      >
+        {item.isSelected ? (
+          <Icons.ArMarker width={widthPercentage} height={widthPercentage} />
+        ) : (
+          <Icons.disbaledMarker width={widthPercentage} height={widthPercentage} />
+        )}
+      </Marker>
+    );
+  }
+);
 
 // Memoized hunt point marker component with separate functionality
 const HuntPointMarkerComponent = React.memo(
-  ({item, onPress, anchor, centerOffset, widthPercentage}) => {
+  ({item, onPress, anchor, centerOffset, widthPercentage, androidTrackViewChnages}) => {
     const handlePress = useCallback(() => {
       onPress(item);
     }, [onPress, item]);
@@ -61,7 +63,7 @@ const HuntPointMarkerComponent = React.memo(
         }}
         anchor={anchor}
         centerOffset={centerOffset}
-        tracksViewChanges={false}
+        tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
         flat={true}
         onPress={handlePress}
       >
@@ -125,7 +127,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
 
   setTimeout(() => {
     setAndroidTrackViewChanges(false);
-  }, 10000);
+  }, 1000);
 
   // Reset counter when component unmounts
   useEffect(() => {
@@ -809,6 +811,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               anchor={ANCHOR}
               centerOffset={CENTEROFFSET}
               widthPercentage={widthPercentageToDP(8)}
+              androidTrackViewChnages={androidTrackViewChnages}
             />
           ))}
           {AllHunts.map(hunt => (
@@ -819,6 +822,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               anchor={ANCHOR}
               centerOffset={CENTEROFFSET}
               widthPercentage={widthPercentageToDP(8)}
+              androidTrackViewChnages={androidTrackViewChnages}
             />
           ))}
 
@@ -831,6 +835,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               anchor={ANCHOR}
               centerOffset={CENTEROFFSET}
               widthPercentage={widthPercentageToDP(6)}
+              androidTrackViewChnages={androidTrackViewChnages}
             />
           ))}
 
