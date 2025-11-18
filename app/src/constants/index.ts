@@ -409,10 +409,7 @@ export const AR_MODE_MESSAGES = {
       id: 4,
       message: "After the 24hr cooldown period, attempts are reset",
     },
-    {
-      id: 5,
-      message: "To change the AR mode, return to LIST or MAP view",
-    },
+
     {
       id: 6,
       message: "Any inconsistencies, refresh the list",
@@ -420,10 +417,6 @@ export const AR_MODE_MESSAGES = {
     {
       id: 7,
       message: "List empty? Try changing modes",
-    },
-    {
-      id: 8,
-      message: "List empty in all modes? Then there's no AR available where you're located",
     },
   ],
   MAP_VIEW: [

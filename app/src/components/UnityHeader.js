@@ -34,6 +34,28 @@ const UnityHeader = ({
   const carouselWidth =
     screenWidth * 0.9 - widthPercentageToDP("8%") * 2 - widthPercentageToDP("8%");
 
+  // Reset message index when messages array changes (mode switching)
+  useEffect(() => {
+    if (isArrayTitle && messages.length > 0) {
+      // Reset to first message when switching modes or if current index is out of bounds
+      if (currentMessageIndex >= messages.length) {
+        setCurrentMessageIndex(0);
+        // Also scroll to the first item if FlatList is available
+        if (flatListRef.current) {
+          setTimeout(() => {
+            flatListRef.current.scrollToIndex({
+              index: 0,
+              animated: false, // No animation for reset
+            });
+          }, 100);
+        }
+      }
+    } else if (!isArrayTitle) {
+      // Reset index when switching to non-array title
+      setCurrentMessageIndex(0);
+    }
+  }, [messages, isArrayTitle, currentMessageIndex]);
+
   // Auto-scroll functionality for array titles
   useEffect(() => {
     if (isArrayTitle && messages.length > 1) {
@@ -44,8 +66,11 @@ const UnityHeader = ({
 
       // Set new interval for auto-scroll every 10 seconds
       intervalRef.current = setInterval(() => {
-        const nextIndex = currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
-        scrollToIndex(nextIndex);
+        if (messages.length > 0) {
+          const nextIndex =
+            currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
+          scrollToIndex(nextIndex);
+        }
       }, 10000);
 
       return () => {
@@ -57,30 +82,45 @@ const UnityHeader = ({
   }, [isArrayTitle, messages.length, currentMessageIndex]);
 
   const scrollToIndex = index => {
-    if (flatListRef.current && isArrayTitle) {
-      flatListRef.current.scrollToIndex({
-        index,
-        animated: true,
-      });
-      setCurrentMessageIndex(index);
+    if (flatListRef.current && isArrayTitle && messages.length > 0) {
+      // Safety check: ensure index is within bounds
+      const safeIndex = Math.max(0, Math.min(index, messages.length - 1));
+      try {
+        flatListRef.current.scrollToIndex({
+          index: safeIndex,
+          animated: true,
+        });
+        setCurrentMessageIndex(safeIndex);
+      } catch (error) {
+        console.warn("ScrollToIndex error:", error);
+        // Fallback: reset to first item
+        setCurrentMessageIndex(0);
+      }
     }
   };
 
   const goToPrevious = () => {
+    if (messages.length === 0) return;
     const newIndex = currentMessageIndex === 0 ? messages.length - 1 : currentMessageIndex - 1;
     scrollToIndex(newIndex);
   };
 
   const goToNext = () => {
+    if (messages.length === 0) return;
     const newIndex = currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
     scrollToIndex(newIndex);
   };
 
   const onScrollEnd = event => {
+    if (messages.length === 0) return;
+
     const slideSize = carouselWidth;
     const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
-    if (index !== currentMessageIndex) {
-      setCurrentMessageIndex(index);
+    // Safety check: ensure index is within bounds
+    const safeIndex = Math.max(0, Math.min(index, messages.length - 1));
+
+    if (safeIndex !== currentMessageIndex) {
+      setCurrentMessageIndex(safeIndex);
     }
   };
 

@@ -73,6 +73,7 @@ const SocialSignin = ({setLoading}) => {
   };
 
   const handleFBLogin = async () => {
+    console.log("Starting Facebook login");
     setLoading(true);
     try {
       LoginManager.logOut();
@@ -90,6 +91,7 @@ const SocialSignin = ({setLoading}) => {
         // Android standard login
         loginResult = await LoginManager.logInWithPermissions(["public_profile", "email"]);
       }
+      console.log("Facebook login result", loginResult);
 
       if (loginResult.isCancelled) {
         console.log("Login cancelled");
@@ -125,6 +127,7 @@ const SocialSignin = ({setLoading}) => {
         console.log("Android Access Token:", token.substring(0, 20) + "...");
       }
 
+      console.log("Proceeding to backend Facebook login", {tokenType, token});
       // Send to backend with platform context
       facebookLogin({
         access_token: token,
