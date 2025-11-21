@@ -395,7 +395,7 @@ export const AR_MODE_MESSAGES = {
   LIST_VIEW: [
     {
       id: 1,
-      message: "Access the AR at this site, in list format",
+      message: "Access the AR at this site\nin list format",
     },
     {
       id: 2,
@@ -403,7 +403,7 @@ export const AR_MODE_MESSAGES = {
     },
     {
       id: 3,
-      message: "Users have a limited # of attempts every 24hrs",
+      message: "Users have a limited # of\nattempts every 24hrs",
     },
     {
       id: 4,
@@ -412,7 +412,7 @@ export const AR_MODE_MESSAGES = {
 
     {
       id: 6,
-      message: "Any inconsistencies, refresh the list",
+      message: "Any inconsistencies, click refresh",
     },
     {
       id: 7,
@@ -422,7 +422,7 @@ export const AR_MODE_MESSAGES = {
   MAP_VIEW: [
     {
       id: 1,
-      message: "Map displays all the AR around you",
+      message: "Map displays all AR nearby",
     },
     {
       id: 2,
@@ -434,11 +434,11 @@ export const AR_MODE_MESSAGES = {
     },
     {
       id: 4,
-      message: "Users can zoom in, out or drag the map",
+      message: "Click the AR to load pathway",
     },
     {
       id: 5,
-      message: "Click the AR to load up your pathway",
+      message: "Users can zoom or drag the map",
     },
     {
       id: 6,
