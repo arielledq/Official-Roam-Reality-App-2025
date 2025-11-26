@@ -1,5 +1,5 @@
-import React, {useCallback, useRef, useState} from "react";
-import {FlatList, Image, Pressable, TouchableOpacity, View} from "react-native";
+import React, {useCallback, useEffect, useRef, useState} from "react";
+import {FlatList, Image, Pressable, RefreshControl, TouchableOpacity, View} from "react-native";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import useStyles from "./styles";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
@@ -22,7 +22,7 @@ import {
   reportContentOrUser,
 } from "../../network";
 import {useDispatch} from "react-redux";
-import {useFocusEffect, useNavigation, useRoute} from "@react-navigation/native";
+import {useNavigation, useRoute} from "@react-navigation/native";
 import FastImage from "react-native-fast-image";
 import {height} from "../../util/AppDimensions";
 import ScreenLoader from "../../components/screenLoader";
@@ -49,6 +49,9 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   const [pageSize, setPageSize] = useState(30);
   const [arMemories, setARMemories] = useState([]);
   const [loading, setloading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const onEndReachedCalledDuringMomentum = useRef(true); // Prevent multiple calls during momentum
   const [arProfile, updateARUserData] = useState({});
   const [profileDetails, setProfileDetails] = useState<any>(null);
   const [isTransitioning, setIsTransitioning] = useState(true);
@@ -88,22 +91,51 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
     }
   };
 
-  const lodeMoreData = () => {
-    if (arMemories.length < totalLength) {
-      setCurrentPage(prevPage => prevPage + 1);
-      getPublicProfieARMemoriesAPI(userProfile?.id, currentPage, pageSize)
-        .then(res => {
-          if (res.status == 1) {
-            setARMemories(prevMemories => [...prevMemories, ...res.results]);
-          } else {
-            console.error("Error", "Error fetching more memories: ");
-          }
-        })
-        .catch(err => {
-          console.error("Error", "Error fetching more memories: ", err);
-        });
+  const lodeMoreData = useCallback(() => {
+    // Prevent multiple simultaneous calls
+    if (isLoadingMore) {
+      console.log("Already loading, skipping...");
+      return;
     }
-  };
+
+    // Validate totalLength is set (data has been loaded)
+    if (totalLength === 0) {
+      console.log("Total length not set yet, skipping...");
+      return;
+    }
+
+    // Check if we have more data to load
+    if (arMemories.length >= totalLength) {
+      console.log("All data loaded, skipping...");
+      return;
+    }
+
+    console.log("lodeMoreData called", {
+      totalLength,
+      currentLength: arMemories.length,
+      currentPage,
+      nextPage: currentPage + 1,
+    });
+
+    setIsLoadingMore(true);
+    const nextPage = currentPage + 1;
+
+    getPublicProfieARMemoriesAPI(userProfile?.id, nextPage, pageSize)
+      .then(res => {
+        if (res.status == 1) {
+          setARMemories(prevMemories => [...prevMemories, ...res.results]);
+          setCurrentPage(nextPage);
+        } else {
+          console.error("Error", "Error fetching more memories: ");
+        }
+      })
+      .catch(err => {
+        console.error("Error", "Error fetching more memories: ", err);
+      })
+      .finally(() => {
+        setIsLoadingMore(false);
+      });
+  }, [isLoadingMore, totalLength, arMemories.length, currentPage, pageSize, userProfile?.id]);
 
   const getUserCollectedStar = async () => {
     getUserCollectedStarCount({
@@ -151,19 +183,52 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
       .finally(() => setloading(false));
   };
 
-  useFocusEffect(
-    useCallback(() => {
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 500);
-      getProfieARMemories();
-      fetchARUserProfile();
-      getUserCollectedStar();
-      getRank();
-      getCountry();
-      fetchProfileDetails();
-    }, [])
-  );
+  // Initial load only - runs once when component mounts
+  useEffect(() => {
+    setTimeout(() => {
+      setIsTransitioning(false);
+    }, 500);
+
+    // Initialize momentum ref
+    onEndReachedCalledDuringMomentum.current = true;
+
+    // Fetch initial data
+    getProfieARMemories();
+    fetchARUserProfile();
+    getUserCollectedStar();
+    getRank();
+    getCountry();
+    fetchProfileDetails();
+
+    // Cleanup function to prevent state updates after unmount
+    return () => {
+      setIsLoadingMore(false);
+      setRefreshing(false);
+    };
+  }, []); // Empty dependency array - runs only on mount
+
+  // Pull-to-refresh handler
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    // Reset pagination state
+    setCurrentPage(1);
+    setARMemories([]);
+    setIsLoadingMore(false);
+    onEndReachedCalledDuringMomentum.current = true; // Reset momentum flag
+
+    // Fetch fresh data
+    Promise.all([
+      getProfieARMemories(),
+      fetchARUserProfile(),
+      getUserCollectedStar(),
+      getRank(),
+      getCountry(),
+      fetchProfileDetails(),
+    ]).finally(() => {
+      setRefreshing(false);
+    });
+  }, []);
 
   const fetchProfileDetails = async () => {
     try {
@@ -346,10 +411,17 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
             marginBottom: 10,
           }}
           data={arMemories}
-          key={(item: any) => item?.id?.toString()}
           numColumns={3}
           onEndReachedThreshold={0.5}
-          onEndReached={lodeMoreData}
+          onEndReached={() => {
+            if (!onEndReachedCalledDuringMomentum.current) {
+              lodeMoreData();
+              onEndReachedCalledDuringMomentum.current = true;
+            }
+          }}
+          onMomentumScrollBegin={() => {
+            onEndReachedCalledDuringMomentum.current = false;
+          }}
           showsVerticalScrollIndicator={false}
           showsHorizontalScrollIndicator={false}
           renderItem={({item}) => (
@@ -384,19 +456,31 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       {loading ? (
-        <ScreenLoader />
+        <ScreenLoader style={{}} />
       ) : (
         <FlatList
           data={data}
           contentContainerStyle={_styles.container_style}
           keyExtractor={item => item.id.toString()}
+          renderItem={() => null} // No rendering needed, using header/footer
           ListHeaderComponent={renderHeader}
           numColumns={3}
           ListFooterComponent={renderFooter}
-          nestedScrollEnabled={false}
+          nestedScrollEnabled={true}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              tintColor="#7a00cf"
+              colors={["#7a00cf", "#5532ff"]}
+              title="Pull to refresh"
+              titleColor="#7a00cf"
+              progressViewOffset={0}
+            />
+          }
         />
       )}
-      <View style={_styles.blurView}>
+      <View style={_styles.blurView} pointerEvents="box-none">
         <BlurView
           blurType="light"
           overlayColor="#00000050"
@@ -408,6 +492,7 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
             bottom: 0,
             right: 0,
           }}
+          pointerEvents="none"
         />
         <AppHeader containerStyle={_styles.headerContainer} title={""} />
       </View>
