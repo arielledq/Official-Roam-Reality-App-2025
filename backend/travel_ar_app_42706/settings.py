@@ -48,7 +48,7 @@ env.read_env(env_file)
 #     GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False #env.bool("DEBUG", default=False)
+DEBUG = True #False #env.bool("DEBUG", default=False)
 SENTRY_DSN = env.str("SENTRY_DSN", default="https://e8a6bfac5c5e45e98a6f9d96ef459795@sentry.innovatica.com.py//66")
 
 if SENTRY_DSN:
@@ -92,7 +92,12 @@ SITE_ID = 1
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
 
-FACEBOOK_APP_ID = env.str("FACEBOOK_APP_ID", "")
+SOCIAL_AUTH_FACEBOOK_KEY = env.str("SOCIAL_AUTH_FACEBOOK_KEY", "")
+FACEBOOK_APP_ID = env.str("FACEBOOK_APP_ID", SOCIAL_AUTH_FACEBOOK_KEY)
+SOCIAL_AUTH_FACEBOOK_SECRET = env.str("SOCIAL_AUTH_FACEBOOK_SECRET", "")
+
+if not SOCIAL_AUTH_FACEBOOK_KEY:
+    SOCIAL_AUTH_FACEBOOK_KEY = FACEBOOK_APP_ID
 # Application definition
 
 INSTALLED_APPS = [
@@ -260,6 +265,20 @@ ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 ACCOUNT_ALLOW_REGISTRATION = env.bool("ACCOUNT_ALLOW_REGISTRATION", True)
 SOCIALACCOUNT_ALLOW_REGISTRATION = env.bool("SOCIALACCOUNT_ALLOW_REGISTRATION", True)
+
+SOCIALACCOUNT_PROVIDERS = {
+    "facebook": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "public_profile"],
+        "FIELDS": ["id", "email", "name", "first_name", "last_name"],
+        "APP": {
+            "client_id": SOCIAL_AUTH_FACEBOOK_KEY,
+            "secret": SOCIAL_AUTH_FACEBOOK_SECRET,
+            "key": SOCIAL_AUTH_FACEBOOK_KEY,
+        },
+    },
+}
+
 
 REST_AUTH_SERIALIZERS = {
     # Replace password reset serializer to fix 500 error
