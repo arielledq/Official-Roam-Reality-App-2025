@@ -16,6 +16,7 @@ import RNFS from "react-native-fs";
 import MarkerIcon from "components/marker";
 import {useNavigation} from "@react-navigation/native";
 import {pinColor} from "util/helpers";
+import BouncingMarker from "./BouncingMarker";
 
 // Memoized marker component to prevent unnecessary re-renders
 const ARMarkerComponent = React.memo(
@@ -38,7 +39,9 @@ const ARMarkerComponent = React.memo(
         onPress={handlePress}
       >
         {item.isSelected ? (
-          <Icons.ArMarker width={widthPercentage} height={widthPercentage} />
+          <BouncingMarker>
+            <Icons.ArMarker width={widthPercentage} height={widthPercentage} />
+          </BouncingMarker>
         ) : (
           <Icons.disbaledMarker width={widthPercentage} height={widthPercentage} />
         )}
@@ -79,6 +82,7 @@ const HuntPointMarkerComponent = React.memo(
 
 const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}) => {
   const [region, setRegion] = React.useState(null);
+  const [lastMileLine, setLastMileLine] = useState([]);
   const [AllHunts, setAllHunts] = React.useState([]);
   const [androidTrackViewChnages, setAndroidTrackViewChanges] = useState(true);
   const [userLiveLocation, setUserLiveLocation] = React.useState(null);
@@ -514,30 +518,80 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
   };
 
   // Function to fetch walking directions from Google Directions API
+  // const fetchWalkingDirections = async (startLat, startLng, destLat, destLng) => {
+  //   try {
+  //     setIsLoadingRoute(true);
+
+  //     // TODO: Replace with your actual Google Maps API key
+  //     // You can get this from Google Cloud Console: https://console.cloud.google.com/
+  //     // Enable the "Directions API" for your project
+  //     const GOOGLE_MAPS_API_KEY = "AIzaSyCrsgDowsVe8v8zbZ2yq0qkOr7ocQVztgc";
+
+  //     if (GOOGLE_MAPS_API_KEY === "YOUR_GOOGLE_MAPS_API_KEY") {
+  //       console.warn("Google Maps API key not configured. Using fallback straight line.");
+  //       // Clear walking time for fallback
+  //       setCurrentWalkingTime(null);
+  //       // Fallback: create a simple straight line
+  //       setPolylineCoordinates([
+  //         {latitude: startLat, longitude: startLng},
+  //         {latitude: destLat, longitude: destLng},
+  //       ]);
+  //       return;
+  //     }
+
+  //     const origin = `${startLat},${startLng}`;
+  //     const destination = `${destLat},${destLng}`;
+
+  //     const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&mode=walking&key=${GOOGLE_MAPS_API_KEY}`;
+
+  //     const response = await fetch(url);
+  //     const data = await response.json();
+
+  //     if (data.status === "OK" && data.routes.length > 0) {
+  //       const route = data.routes[0];
+  //       const points = decodePolyline(route.overview_polyline.points);
+  //       setPolylineCoordinates(points);
+
+  //       // Extract walking time from the API response
+  //       if (route.legs && route.legs.length > 0) {
+  //         const leg = route.legs[0];
+  //         const durationInSeconds = leg.duration.value;
+  //         const durationInMinutes = Math.ceil(durationInSeconds / 60); // Convert to minutes and round up
+
+  //         setCurrentWalkingTime(`${durationInMinutes} min`);
+  //       }
+  //     } else {
+  //       console.error("Directions API error:", data.status);
+  //       // Clear walking time for fallback
+  //       setCurrentWalkingTime(null);
+  //       // Fallback: create a simple straight line
+  //       setPolylineCoordinates([
+  //         {latitude: startLat, longitude: startLng},
+  //         {latitude: destLat, longitude: destLng},
+  //       ]);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching directions:", error);
+  //     // Clear walking time for error case
+  //     setCurrentWalkingTime(null);
+  //     // Fallback: create a simple straight line
+  //     setPolylineCoordinates([
+  //       {latitude: startLat, longitude: startLng},
+  //       {latitude: destLat, longitude: destLng},
+  //     ]);
+  //   } finally {
+  //     setIsLoadingRoute(false);
+  //   }
+  // };
   const fetchWalkingDirections = async (startLat, startLng, destLat, destLng) => {
     try {
       setIsLoadingRoute(true);
-
-      // TODO: Replace with your actual Google Maps API key
-      // You can get this from Google Cloud Console: https://console.cloud.google.com/
-      // Enable the "Directions API" for your project
+      // ... setup API key ...
       const GOOGLE_MAPS_API_KEY = "AIzaSyCrsgDowsVe8v8zbZ2yq0qkOr7ocQVztgc";
-
-      if (GOOGLE_MAPS_API_KEY === "YOUR_GOOGLE_MAPS_API_KEY") {
-        console.warn("Google Maps API key not configured. Using fallback straight line.");
-        // Clear walking time for fallback
-        setCurrentWalkingTime(null);
-        // Fallback: create a simple straight line
-        setPolylineCoordinates([
-          {latitude: startLat, longitude: startLng},
-          {latitude: destLat, longitude: destLng},
-        ]);
-        return;
-      }
-
       const origin = `${startLat},${startLng}`;
       const destination = `${destLat},${destLng}`;
 
+      // FETCH THE ROUTE
       const url = `https://maps.googleapis.com/maps/api/directions/json?origin=${origin}&destination=${destination}&mode=walking&key=${GOOGLE_MAPS_API_KEY}`;
 
       const response = await fetch(url);
@@ -546,37 +600,28 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
       if (data.status === "OK" && data.routes.length > 0) {
         const route = data.routes[0];
         const points = decodePolyline(route.overview_polyline.points);
+
+        // 1. Set the solid line (Road Path)
         setPolylineCoordinates(points);
 
-        // Extract walking time from the API response
-        if (route.legs && route.legs.length > 0) {
-          const leg = route.legs[0];
-          const durationInSeconds = leg.duration.value;
-          const durationInMinutes = Math.ceil(durationInSeconds / 60); // Convert to minutes and round up
+        // 2. Create the "Last Mile" dotted line
+        // Get the last point returned by Google (the road snap point)
+        const lastRoadPoint = points[points.length - 1];
 
-          setCurrentWalkingTime(`${durationInMinutes} min`);
-        }
+        setLastMileLine([
+          lastRoadPoint, // Start at the curb
+          {latitude: destLat, longitude: destLng}, // End at the AR site
+        ]);
       } else {
-        console.error("Directions API error:", data.status);
-        // Clear walking time for fallback
-        setCurrentWalkingTime(null);
-        // Fallback: create a simple straight line
-        setPolylineCoordinates([
+        // Fallback: Just draw a straight line if Google fails entirely
+        setPolylineCoordinates([]);
+        setLastMileLine([
           {latitude: startLat, longitude: startLng},
           {latitude: destLat, longitude: destLng},
         ]);
       }
     } catch (error) {
-      console.error("Error fetching directions:", error);
-      // Clear walking time for error case
-      setCurrentWalkingTime(null);
-      // Fallback: create a simple straight line
-      setPolylineCoordinates([
-        {latitude: startLat, longitude: startLng},
-        {latitude: destLat, longitude: destLng},
-      ]);
-    } finally {
-      setIsLoadingRoute(false);
+      console.error(error);
     }
   };
 
@@ -850,6 +895,15 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               coordinates={polylineCoordinates}
               strokeColor="#007AFF" // Blue color for the walking route
               strokeWidth={4}
+            />
+          )}
+
+          {lastMileLine.length > 0 && (
+            <Polyline
+              coordinates={lastMileLine}
+              strokeColor="#808080"
+              strokeWidth={3}
+              lineDashPattern={[10, 10]} // Dotted line pattern
             />
           )}
         </MapView>
