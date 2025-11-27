@@ -517,7 +517,7 @@ const ARScreen = ({route}) => {
       id: "1",
       latitude: -25.296442, // selectedSite?.scanChallenge?.coordinates[1] , // ||
       longitude: -57.58958, //selectedSite?.scanChallenge?.coordinates[0], //||
-      scale: huntParameters?.scale_object || 0.01,
+      scale: 20,
       // scale: 5,
       rotationSpeed: huntParameters?.rotation_speed,
       height: spawnHeight,
@@ -533,7 +533,7 @@ const ARScreen = ({route}) => {
         latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
         longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
         height: spawnHeight,
-        scale: huntParameters?.scale_object || 0.01,
+        scale: 20,
         isVisible: true,
         updateRadius: 14.0,
         isHuntMode: true,
@@ -549,7 +549,7 @@ const ARScreen = ({route}) => {
         isVisible: true,
         updateRadius: 14.0, // verificar
         isHuntMode: true,
-        scale: huntParameters?.scale_object || 0.01,
+        scale: 20,
         shouldRotate: false,
       };
     }
