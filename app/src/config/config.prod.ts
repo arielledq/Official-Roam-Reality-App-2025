@@ -23,4 +23,5 @@ export default {
   FACEBOOK_APP_ID: "1735456000569385",
   DEV_EMAIL: "",
   DEV_PASSWORD: "",
+  GOOGLE_MAPS_API_KEY: "AIzaSyCrsgDowsVe8v8zbZ2yq0qkOr7ocQVztgc",
 };

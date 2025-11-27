@@ -16,6 +16,7 @@ import RNFS from "react-native-fs";
 import MarkerIcon from "components/marker";
 import {useNavigation} from "@react-navigation/native";
 import {pinColor} from "util/helpers";
+import Config from "config";
 
 // Memoized marker component to prevent unnecessary re-renders
 const ARMarkerComponent = React.memo(
@@ -170,11 +171,9 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
     if (hasMovedSignificantly) {
       // Check if we have a selected hunt point (takes priority)
       if (selectedHuntPoint) {
-        console.log("Updating polyline for selected hunt point:", selectedHuntPoint.id);
         updatePolylineForMovement(currentLocation, selectedHuntPoint);
         setLastPolylineUpdateLocation(currentLocation);
       } else if (selectedAR) {
-        console.log("Updating polyline for selected AR:", selectedAR.id);
         updatePolylineForMovement(currentLocation, selectedAR);
         setLastPolylineUpdateLocation(currentLocation);
       }
@@ -214,7 +213,6 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
 
     // Check if user is within 100m of the selected AR hunt
     const distanceToSelectedAR = getDistance(userCoords, selectedARCoords);
-    console.log(`Distance to selected AR hunt: ${distanceToSelectedAR}m`);
 
     if (distanceToSelectedAR <= 100) {
       // User is within 100m, show hunt points
@@ -267,7 +265,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
     try {
       // Placeholder for fetching hunts logic
       const result = await getAllHunts();
-      console.log("resu", result);
+
       // Add isSelected property to each hunt
       const huntsWithSelection = (result?.data || []).map(hunt => ({
         ...hunt,
@@ -314,7 +312,6 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
       };
 
       const distanceInMeters = getDistance(currentCoords, previousCoords);
-      console.log(`User movement distance: ${distanceInMeters}m`);
 
       return distanceInMeters >= MOVEMENT_THRESHOLD;
     },
@@ -374,8 +371,6 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
     const distanceInMeters = getDistance(userCoords, markerCoords);
     // Convert to kilometers
     const distanceInKm = distanceInMeters / 1000;
-
-    console.log(`Distance to marker: ${distanceInKm.toFixed(2)} km`);
 
     // Check if within 5km radius
     if (distanceInKm <= 5) {
@@ -521,10 +516,9 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
       // TODO: Replace with your actual Google Maps API key
       // You can get this from Google Cloud Console: https://console.cloud.google.com/
       // Enable the "Directions API" for your project
-      const GOOGLE_MAPS_API_KEY = "AIzaSyCrsgDowsVe8v8zbZ2yq0qkOr7ocQVztgc";
+      const GOOGLE_MAPS_API_KEY = Config.GOOGLE_MAPS_API_KEY;
 
-      if (GOOGLE_MAPS_API_KEY === "YOUR_GOOGLE_MAPS_API_KEY") {
-        console.warn("Google Maps API key not configured. Using fallback straight line.");
+      if (GOOGLE_MAPS_API_KEY === null) {
         // Clear walking time for fallback
         setCurrentWalkingTime(null);
         // Fallback: create a simple straight line
@@ -585,8 +579,6 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
     async (currentUserLocation, selectedAR) => {
       if (!currentUserLocation || !selectedAR) return;
 
-      console.log("Updating polyline for movement - From:", currentUserLocation, "To:", selectedAR);
-
       try {
         await fetchWalkingDirections(
           currentUserLocation.latitude,
@@ -594,8 +586,6 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
           selectedAR.latitude,
           selectedAR.longitude
         );
-
-        console.log("Polyline updated successfully for user movement");
       } catch (error) {
         console.error("Error updating polyline for movement:", error);
       }
@@ -605,14 +595,11 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
 
   const onMarkerPress = useCallback(
     async site => {
-      console.log("Marker pressed:", site);
-
       // Check if user is within 5km of the marker
       const isWithinRange = checkDistanceToMarker(site.latitude, site.longitude);
 
       if (isWithinRange) {
         // User is within range, proceed with marker functionality
-        console.log("User is within range. Proceeding with AR selection.");
 
         // Update marker selection state
         const isScansMode = selectedSite === AR_MODES.SCAN_MODE;
@@ -689,7 +676,6 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
 
       // Draw polyline from user location to hunt point
       if (userLiveLocation) {
-        console.log("Drawing polyline to hunt point:", huntPoint.id);
         await fetchWalkingDirections(
           userLiveLocation.latitude,
           userLiveLocation.longitude,
