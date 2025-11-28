@@ -140,10 +140,8 @@ const ArChallengeShare = () => {
 
   const endShareProfileButtonHandler = async () => {
     if (hasSharedToRoamProfile) {
-      console.log("endExperience called directly");
       endExperience();
     } else {
-      console.log("shareToRoamProfile called first");
       shareToRoamProfile(
         endExperience,
         capturedDataUri,

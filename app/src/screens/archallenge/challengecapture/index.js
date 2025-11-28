@@ -212,9 +212,9 @@ const ArChallengeCapture = ({route, navigation}) => {
       setTimeout(() => {
         if (unityRef.current) {
           unityRef.current.postMessage(
-              "Scriptposition",
-              "SetVisibleNotification",
-              JSON.stringify({isNotification: false})
+            "Scriptposition",
+            "SetVisibleNotification",
+            JSON.stringify({isNotification: false})
           );
         }
       }, 5000);
@@ -319,8 +319,6 @@ const ArChallengeCapture = ({route, navigation}) => {
   }, []);
   useEffect(() => {
     if (!unitySceneLoaded || !unityRef.current || !isUnityLoaded) return;
-
-    console.log("🎯 Unity listo. Ejecutando setup...");
 
     pointsCount();
     isLoadingUnity();

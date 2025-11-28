@@ -403,7 +403,6 @@ const GeoArChallengeDetails = ({}) => {
     getUserFriendList()
       .then(async response => {
         if (response) {
-          console.log("Friend List Response:", response);
           const friends = response?.data[0]?.friends || [];
 
           // Download and cache friend profile images

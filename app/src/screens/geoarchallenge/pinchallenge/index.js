@@ -100,7 +100,6 @@ const PinChallenge = () => {
       setTextureEmission(extractedData.emissionTexture);
       setSourcesFiles(extractedData.sourcesFiles);
       setFoldefile(extractedData.foldefile);
-      console.log("Model file unzipped and state updated successfully.");
     } else {
       console.error("Failed to unzip model file:", extractedData.error);
 
@@ -133,10 +132,7 @@ const PinChallenge = () => {
         .catch(console.error);
     }
   };
-console.log(modelOBJ,
-    textureBase,
-    emissionValue,
-    challengeObjParameters)
+
   const sendModelDataToUnitySpawn = () => {
     if (
       unityRef.current &&
@@ -168,10 +164,10 @@ console.log(modelOBJ,
           y: parseFloat(challengeObjParameters.positionY) || 0,
           z: 2 || 0.4,
         },
-        allowScale: true
+        allowScale: true,
       };
       // setTimeout(() => {
-        unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
+      unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       // }, 500);
     }
   };
@@ -309,7 +305,6 @@ console.log(modelOBJ,
         setTimeout(() => {
           RNFS.readDir(basePath)
             .then(files => {
-
               if (Array.isArray(files) && files.length > 0) {
                 // Look for a file with the 'screenshot' prefix and '.png' extension
                 const foundFile = files.find(
@@ -487,13 +482,13 @@ console.log(modelOBJ,
     }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
       setUnitySceneLoaded(false);
-      const hide = ["Arrow", "loading", "Stars", "CompassArrow" ];
+      const hide = ["Arrow", "loading", "Stars", "CompassArrow"];
       const show = ELEMENTSUNITY.filter(name => !hide.includes(name));
 
       unityRef.current.postMessage(
-          "CanvasController",
-          "ShowHideElements",
-          JSON.stringify({ show, hide })
+        "CanvasController",
+        "ShowHideElements",
+        JSON.stringify({show, hide})
       );
     }
     if (data.photoVideoButton?.isPhoto && isMeInsideInSite) {
@@ -526,8 +521,6 @@ console.log(modelOBJ,
   useEffect(() => {
     setUnitySceneLoaded(true);
   }, []);
-
-
 
   useEffect(() => {
     if (unityRef.current) {
@@ -567,64 +560,68 @@ console.log(modelOBJ,
   }, [challengeObjParameters]);
 
   useFocusEffect(
-      useCallback(() => {
-        const timer = setTimeout(() => {
-          if (!unityRef.current) return;
+    useCallback(() => {
+      const timer = setTimeout(() => {
+        if (!unityRef.current) return;
 
-          PointsCount();
-          unityRef.current.postMessage(
-              "Scriptposition",
-              "SetVisibleButton",
-              JSON.stringify({ setVisibleButtonPosition: true })
-          );
+        PointsCount();
+        unityRef.current.postMessage(
+          "Scriptposition",
+          "SetVisibleButton",
+          JSON.stringify({setVisibleButtonPosition: true})
+        );
 
-          if (modelOBJ && textureBase && emissionValue && isUnityLoaded && !unitySceneLoaded) {
-            sendModelDataToUnitySpawn();
-            sendBloomValuesToUnity();
-          }
-          if (isUnityLoaded && isMeInsideInSite) {
-            enableButtonPhoto();
-          }
-        }, 700);
+        if (modelOBJ && textureBase && emissionValue && isUnityLoaded && !unitySceneLoaded) {
+          sendModelDataToUnitySpawn();
+          sendBloomValuesToUnity();
+        }
+        if (isUnityLoaded && isMeInsideInSite) {
+          enableButtonPhoto();
+        }
+      }, 700);
 
-        return () => clearTimeout(timer);
-      }, [
-        isUnityLoaded, unitySceneLoaded, modelOBJ, textureBase, emissionValue,
-        textureEmission, isMeInsideInSite
-      ])
+      return () => clearTimeout(timer);
+    }, [
+      isUnityLoaded,
+      unitySceneLoaded,
+      modelOBJ,
+      textureBase,
+      emissionValue,
+      textureEmission,
+      isMeInsideInSite,
+    ])
   );
 
-console.log("isUnityLoaded, unitySceneLoaded", isUnityLoaded, unitySceneLoaded)
   useFocusEffect(
-      useCallback(() => {
-        const timeout = setTimeout(() => {
-          if (!unitySceneLoaded) {
-            if (unityRef.current) {
-              PointsCount();
-              unityRef.current.postMessage(
-                "Scriptposition",
-                "SetVisibleButton",
-                JSON.stringify({
-                  setVisibleButtonPosition: true,
-                })
-              );
-            }
+    useCallback(() => {
+      const timeout = setTimeout(() => {
+        if (!unitySceneLoaded) {
+          if (unityRef.current) {
+            PointsCount();
+            unityRef.current.postMessage(
+              "Scriptposition",
+              "SetVisibleButton",
+              JSON.stringify({
+                setVisibleButtonPosition: true,
+              })
+            );
           }
-        }, 800);
-        if (isFocusedRef.current) {
-          return;
         }
+      }, 800);
+      if (isFocusedRef.current) {
+        return;
+      }
 
-        isFocusedRef.current = true;
-        setShouldRenderUnity(true);
-        return () => {
-          clearTimeout(timeout);
-          isFocusedRef.current = false;
-          setUnitySceneLoaded(false);
-          setShouldRenderUnity(false);
-          //
-        };
-      }, [])
+      isFocusedRef.current = true;
+      setShouldRenderUnity(true);
+      return () => {
+        clearTimeout(timeout);
+        isFocusedRef.current = false;
+        setUnitySceneLoaded(false);
+        setShouldRenderUnity(false);
+        //
+      };
+    }, [])
   );
 
   return (
@@ -643,40 +640,40 @@ console.log("isUnityLoaded, unitySceneLoaded", isUnityLoaded, unitySceneLoaded)
       scrollable={false}
     >
       {shouldRenderUnity && (
-          <>
-            <UnityARCamera
-                width="100%"
-                height="100%"
-                unityRef={unityRef}
-                isProcessingMedia={processingMedia}
-                isUnityLoaded={isUnityLoaded}
-                capturedImage={capturedImage}
-                capturedVideo={capturedVideo}
-                onUnityMessage={handleUnityMessage}
-                imageFilter={{
-                  challengeObj: {...challengeObj, challenge_type: CHALLENGES_TYPE.PIN_CHECK_IN},
-                  viewShotRef: viewShotRef,
-                }}
-            />
-            {unitySceneLoaded === true && (
-                <View
-                    style={{
-                      position: "absolute",
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      backgroundColor: "rgba(0,0,0,0.99)",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      zIndex: 999,
-                    }}
-                >
-                  <ActivityIndicator size="large" color="#fff" />
-                  <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience...</Text>
-                </View>
-            )}
-          </>
+        <>
+          <UnityARCamera
+            width="100%"
+            height="100%"
+            unityRef={unityRef}
+            isProcessingMedia={processingMedia}
+            isUnityLoaded={isUnityLoaded}
+            capturedImage={capturedImage}
+            capturedVideo={capturedVideo}
+            onUnityMessage={handleUnityMessage}
+            imageFilter={{
+              challengeObj: {...challengeObj, challenge_type: CHALLENGES_TYPE.PIN_CHECK_IN},
+              viewShotRef: viewShotRef,
+            }}
+          />
+          {unitySceneLoaded === true && (
+            <View
+              style={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.99)",
+                justifyContent: "center",
+                alignItems: "center",
+                zIndex: 999,
+              }}
+            >
+              <ActivityIndicator size="large" color="#fff" />
+              <Text style={{color: "#fff", marginTop: 10}}>Loading AR experience...</Text>
+            </View>
+          )}
+        </>
       )}
       {!isUnityLoaded && (
         <CameraControls

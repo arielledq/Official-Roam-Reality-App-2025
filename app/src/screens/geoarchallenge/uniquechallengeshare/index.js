@@ -72,7 +72,6 @@ const UniqueArChallengeShare = ({}) => {
       social_network,
     }).then(res => {
       if (res.status == 1) {
-        console.log(res.message);
       }
     });
   };
@@ -111,14 +110,10 @@ const UniqueArChallengeShare = ({}) => {
     try {
       const ShareResponse = await Share.shareSingle(shareContent);
       if (ShareResponse.success == true) {
-        console.log("ShareResponse true =>", ShareResponse);
         updateARSocialPoints("FACEBOOK");
       } else {
-        console.log("ShareResponse false =>", ShareResponse);
       }
-    } catch (error) {
-      console.log("Error =>", error);
-    }
+    } catch (error) {}
   };
 
   const checkPermission = () => {
