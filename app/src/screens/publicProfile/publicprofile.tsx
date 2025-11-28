@@ -94,28 +94,18 @@ const PublicProfile: ScreenStackComponent<RootStackParamList, "PublicProfile"> =
   const lodeMoreData = useCallback(() => {
     // Prevent multiple simultaneous calls
     if (isLoadingMore) {
-      console.log("Already loading, skipping...");
       return;
     }
 
     // Validate totalLength is set (data has been loaded)
     if (totalLength === 0) {
-      console.log("Total length not set yet, skipping...");
       return;
     }
 
     // Check if we have more data to load
     if (arMemories.length >= totalLength) {
-      console.log("All data loaded, skipping...");
       return;
     }
-
-    console.log("lodeMoreData called", {
-      totalLength,
-      currentLength: arMemories.length,
-      currentPage,
-      nextPage: currentPage + 1,
-    });
 
     setIsLoadingMore(true);
     const nextPage = currentPage + 1;

@@ -100,7 +100,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
     getMyRank(destination)
       .then(response => {
         if (response) {
-          console.log("My Rank Point", response);
           setGlobalRank(response?.my_rank || 0);
           setGlobalPoints(response?.my_points || 0);
 
@@ -129,7 +128,6 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
       })
         .then(res => {
           if (res.status == 1) {
-            console.log("res", res);
             setProfileDetails(res);
           } else {
             console.error("Error", "Error fetching profile details: ");
@@ -347,28 +345,18 @@ const Profile: ScreenStackComponent<RootStackParamList, "Profile"> = () => {
   const lodeMoreData = useCallback(() => {
     // Prevent multiple simultaneous calls
     if (isLoadingMore) {
-      console.log("Already loading, skipping...");
       return;
     }
 
     // Validate totalLength is set (data has been loaded)
     if (totalLength === 0) {
-      console.log("Total length not set yet, skipping...");
       return;
     }
 
     // Check if we have more data to load
     if (arMemories.length >= totalLength) {
-      console.log("All data loaded, skipping...");
       return;
     }
-
-    console.log("lodeMoreData called", {
-      totalLength,
-      currentLength: arMemories.length,
-      currentPage,
-      nextPage: currentPage + 1,
-    });
 
     setIsLoadingMore(true);
     const nextPage = currentPage + 1;

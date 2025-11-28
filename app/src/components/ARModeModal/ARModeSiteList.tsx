@@ -35,7 +35,6 @@ interface ARModeSiteListProps {
 async function checkHuntGate(starId: number) {
   try {
     const rsp = await checkHuntCoolDownAPI(starId);
-    console.log("[HUNT CHECK raw rsp]", rsp);
 
     if (rsp?.status === 1) {
       return {ok: true, reason: rsp?.message || "OK"};
@@ -56,7 +55,7 @@ async function checkHuntGate(starId: number) {
   } catch (e: any) {
     const status = e?.response?.status || e?.errorStatus || "n/a";
     const msg = e?.response?.data?.message || e?.message?.message || e?.message || "Blocked";
-    console.log("[HUNT CHECK thrown error]", status, e?.response?.data || e);
+
     return {ok: false, reason: `${msg} (status ${status})`};
   }
 }
@@ -78,19 +77,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   const [filteredSites, setFilteredSites] = useState<any>([]);
 
   const startChallengeHandler = async (site: any) => {
-    console.log("startChallengeHandler()", {site, selectedMode});
     let updatedSiteData = {
       ...site,
       selectedMode,
     };
     switch (selectedMode?.mode) {
       case AR_MODES.HUNT_MODE: {
-        console.log("[HUNT] startChallengeHandler()", {
-          siteId: site?.id,
-          starId: site?.ar_star?.id,
-          loc: initialUserLocation,
-        });
-
         const starId = Number(site?.ar_star?.id);
         const geoSiteId = site?.id;
 
@@ -105,7 +97,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         }
 
         const gate = await checkHuntGate(starId);
-        console.log("[HUNT CHECK] starId:", starId, "->", gate);
 
         if (!gate.ok) {
           Toast.show({
@@ -214,7 +205,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const getSitesHandler = (sponsorId: string = "") => {
     if (sponsorId) {
-      console.log("Filtering sites by sponsorId:", sponsorId);
       let updatedSites;
       if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
         updatedSites = sites.filter((site: any) => site?.sponsor?.id === Number(sponsorId));

@@ -229,7 +229,6 @@ const ARScreen = ({route}) => {
   };
 
   const downloadModelFile = (sourcePath, targetPath) => {
-    console.log("Downloading model file from:", modelFile, "to:", targetPath);
     setTextLoading("Downloading AR model...");
     RNFetchBlob.config({
       fileCache: true,
@@ -243,7 +242,6 @@ const ARScreen = ({route}) => {
   };
 
   const unzipModelFile = async (sourcePath, targetPath) => {
-    console.log("Unzipping model file from:", sourcePath, "to:", targetPath);
     setTextLoading("Unzipping AR model...");
     const extractedData = {
       success: true,
@@ -269,7 +267,6 @@ const ARScreen = ({route}) => {
   };
 
   const checkIfModelExist = () => {
-    console.log("Checking if model exists for file:", modelFile);
     if (!modelFile) return;
 
     const filename = modelFile.split("/").pop().split("?")[0];
@@ -439,7 +436,6 @@ const ARScreen = ({route}) => {
   };
 
   const sendModelDataToUnity = () => {
-    console.log("Attempting to send model data to Unity...");
     if (hasSentModelDataOnce) return;
     if (!unityRef.current || !textureBase || !starModels || !validUserLocation) return;
     if (
@@ -493,8 +489,6 @@ const ARScreen = ({route}) => {
         allowScale: true, //true
         // allowScale: true
       };
-
-      console.log("Model Data being sent to Unity:", modelData);
 
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
@@ -713,7 +707,7 @@ const ARScreen = ({route}) => {
     const ButtonHuntMode = data?.HuntMode;
     const ButtonScanMode = data?.ScanMode;
     const ButtonGeoTagMode = data?.GeoTagMode;
-    console.log("DATA FROM UNITY: ", data);
+
     let show = [];
     let hide = [];
     if (data?.sceneLoading === true) {
@@ -907,7 +901,7 @@ const ARScreen = ({route}) => {
       });
 
       const nextHunt = await getNextStarApi(geoSiteId, lat, lon);
-      console.log("NEXT HUNT STAR:", nextHunt);
+
       if (!nextHunt) {
         return;
       } else {
@@ -918,7 +912,6 @@ const ARScreen = ({route}) => {
           userAttempt: nextHunt.attempt_number,
         };
 
-        console.log("NEXT CHALLENGE OBJECT:", Challenge);
         setHuntChallenge(Challenge);
         startChallengeHandler(Challenge);
       }

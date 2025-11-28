@@ -149,7 +149,6 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
                 if (canShowVideo) {
                   const resultVideo = await ShareDialog.show(shareLinkContent);
                   if (!resultVideo.isCancelled) hasSharedToSSNN = true;
-                  console.log("resultVideo", resultVideo);
                 }
               }
             } else {

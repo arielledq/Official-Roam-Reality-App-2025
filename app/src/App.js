@@ -30,7 +30,6 @@ Geocoder.init(Config.GEOCODER_API_KEY);
 OneSignal.initialize(Config.ONE_SIGNAL_APP_ID);
 OneSignal.Notifications.requestPermission(true);
 OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
-  //  console.log("EVENTE NOTIFICATION ----------------",event)
   const notification = event.getNotification();
   event.complete(notification);
 });
@@ -40,9 +39,9 @@ OneSignal.Notifications.addEventListener("foregroundWillDisplay", event => {
 //    const id = await OneSignal.User.pushSubscription.getIdAsync();
 //    const token = await OneSignal.User.pushSubscription.getTokenAsync();
 //    const optedIn = await OneSignal.User.pushSubscription.getOptedInAsync();
-//    console.log("📣 pushSubscription change:", { id, hasToken: !!token, optedIn });
+
 //  } catch (e) {
-//    console.log("pushSubscription change error:", e);
+
 //  }
 //});
 
