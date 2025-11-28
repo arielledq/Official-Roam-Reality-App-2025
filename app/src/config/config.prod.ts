@@ -8,7 +8,7 @@
 export default {
   APPLE_CLIENT_ID: "com.roam.reality.services",
   // BASE_URL: "https://travel-ar-app-42706-32103.azurewebsites.net/", // Production Azure
-  // BASE_URL: "https://api.roamtt.com/",
+  BASE_URL: "https://api.roamtt.com/",
   // APPLE_REDIRECT_URL:
   // //   "https://travel-ar-app-42706-32103.azurewebsites.net/accounts/apple/login/callback/", // Production Azure
   // BASE_URL: "https://travel-ar-app-42706-staging.azurewebsites.net/", // Staging Azure

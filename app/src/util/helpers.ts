@@ -432,25 +432,11 @@ export const checkAppLatestUpdate = async () => {
       // Validate app version
       if (serverIOSProdVersionNumber === Config.APP_IOS_PROD_VERSION) {
         isUpdated = true;
-        console.info("App updated on PROD");
       } else {
-        console.info(
-          "App not updated on PROD:",
-          serverIOSProdVersionNumber,
-          "!==",
-          Config.APP_IOS_PROD_VERSION
-        );
       }
       if (serverIOSDevVersionNumber === Config.APP_IOS_DEV_VERSION) {
         isUpdated = true;
-        console.info("App updated on DEV");
       } else {
-        console.info(
-          "App not updated on DEV:",
-          serverIOSDevVersionNumber,
-          "!==",
-          Config.APP_IOS_DEV_VERSION
-        );
       }
     } catch (error) {
       console.error(error);
