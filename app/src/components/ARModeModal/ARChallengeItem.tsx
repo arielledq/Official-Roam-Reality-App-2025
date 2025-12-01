@@ -40,78 +40,59 @@ const ARChallengeItem = ({
     return Math.min((currentAttempts / totalAttempts) * 100, 100);
   };
   return (
-    <View style={{marginTop: 10}}>
+    <View>
       <TouchableOpacity
         activeOpacity={0.8}
         disabled={disabled}
         onPress={() => onPress()}
         style={{
           opacity: disabled ? 0.5 : 1,
-          backgroundColor: theme.lightColors?.grey4,
+          backgroundColor: "#0f101e",
           borderRadius: 4,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "space-between",
-          padding: 12,
-          marginBottom: 10,
+          paddingHorizontal: 12,
+          paddingVertical: 15,
+          marginBottom: 0,
         }}
       >
-        {/* <View style={{width: 50}}>
-          <AppButton
-            customColors={[
-              theme.lightColors?.pink || "",
-              theme.lightColors?.purple || "",
-              theme.lightColors?.inputBlue || "",
-            ]}
-            containerStyle={{
-              padding: 0,
-              margin: 0,
-              borderRadius: 4,
-              minHeight: 35,
-            }}
-            innerContainerStyle={{
-              paddingHorizontal: 0,
-            }}
-            iconContainerStyle={{
-              padding: 0,
-            }}
-            titleStyle={{fontSize: 12, color: theme.lightColors?.grey1, fontWeight: "bold"}}
-            disabled={true}
-            title={
-              <View
-                style={{
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Text style={{color: "white", fontSize: 14, fontWeight: "bold"}}>
-                  {points || 0}
-                </Text>
-                <Text style={{color: "white", fontSize: 10}}>Points</Text>
-              </View>
-            }
-          />
-        </View> */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "center",
             gap: 10,
             width: widthPercentageToDP("45%"),
+            flex: 1,
           }}
         >
+          <View style={styles.contBox}>
+            <Text style={styles.attemptsText}>Points</Text>
+            <Text
+              style={{
+                color: theme.lightColors?.white,
+                fontSize: FontSizes.S18,
+                fontWeight: "bold",
+
+                marginBottom: 2,
+              }}
+            >
+              {points || 0}
+            </Text>
+          </View>
           <Image
             source={{uri: sponsorImage}}
             style={{
-              width: widthPercentageToDP("14%"),
-              height: widthPercentageToDP("14%"),
-              borderRadius: 10,
+              width: widthPercentageToDP("10%"),
+              height: widthPercentageToDP("10%"),
+              borderRadius: 6,
+              marginLeft: widthPercentageToDP("2%"),
             }}
           />
           <Text
             style={{
               color: "white",
-              fontSize: FontSizes.S12,
+              fontSize: FontSizes.S13,
               fontWeight: "bold",
               width: widthPercentageToDP("25%"),
             }}
@@ -124,27 +105,13 @@ const ARChallengeItem = ({
         <View
           style={{
             alignItems: "center",
-            flex: 1,
+
             flexDirection: "row",
             gap: 10,
           }}
         >
           <View style={styles.contBox}>
-            <Text
-              style={{
-                color: theme.lightColors?.white,
-                fontSize: FontSizes.S18,
-                fontWeight: "bold",
-
-                marginBottom: 2,
-              }}
-            >
-              {points || 0}
-            </Text>
-
-            <Text style={styles.attemptsText}>Points</Text>
-          </View>
-          <View style={styles.contBox}>
+            <Text style={styles.attemptsText}>Attempts</Text>
             <HalfCircleProgress
               progress={calculateProgress()}
               radius={18}
@@ -152,9 +119,9 @@ const ARChallengeItem = ({
               text={attemptsDetails}
               textStyle={{color: theme.lightColors?.grey0, fontSize: 6, fontWeight: "bold"}}
             />
-            <Text style={styles.attemptsText}>Attempts</Text>
           </View>
           <View style={styles.contBox}>
+            <Text style={styles.attemptsText}>Cooldown</Text>
             <Text
               style={{
                 color: theme.lightColors?.white,
@@ -166,8 +133,6 @@ const ARChallengeItem = ({
             >
               {coolDownHours || 0}H
             </Text>
-
-            <Text style={styles.attemptsText}>Cooldown</Text>
           </View>
         </View>
       </TouchableOpacity>
@@ -179,17 +144,16 @@ export default ARChallengeItem;
 
 const styles = StyleSheet.create({
   contBox: {
-    width: heightPercentageToDP("5%"),
-    height: heightPercentageToDP("5%"),
-    borderRadius: 6,
+    padding: 4,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#000000c0",
+
+    gap: 4,
   },
   attemptsText: {
     color: theme.lightColors?.white,
-    fontSize: 7,
-    fontWeight: "bold",
+    fontSize: 8,
+    fontWeight: "regular",
     textAlign: "center",
   },
 });

@@ -43,7 +43,6 @@ const HuntModeView = ({
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
         };
-        console.log("Current location:", newLocation);
         setUserLocation(newLocation); // ✅ Local state
         updateUnityLocation(newLocation); // Send to Unity
       },

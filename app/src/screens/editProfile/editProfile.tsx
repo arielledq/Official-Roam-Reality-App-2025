@@ -67,7 +67,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const accountNotComplete = route?.params?.accountNotComplete;
   const onProfileUpdate = route?.params?.onProfileUpdate;
 
-  console.log("User Data in Edit Profile:", extraInfo, accountNotComplete);
   let dateOfBirth = null;
   if (userData?.date_of_birth) {
     const [year, month, day] = userData.date_of_birth.split("-").map(Number);
@@ -155,9 +154,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
       setFieldValue("pImage", croppedImage.path);
       uploadProfileImage(croppedImage);
-    } catch (error) {
-      console.log("Image picker cancelled or error:", error);
-    }
+    } catch (error) {}
   }
 
   const handleEditProfile = (values: any) => {
@@ -184,7 +181,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (!photoDetails?.default && photoDetails?.uri) {
       updatedProfileData.append("image", photoDetails);
     }
-    console.log("Updated Profile Data:", updatedProfileData);
+
     setIsLoading(true);
     updateProfile({
       id: userProfile.user_profile.id,
@@ -289,8 +286,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
 
-      console.log("Setting formik values with userData:", extraInfo);
-
       let name = "";
       if (accountNotComplete && (extraInfo?.first_name !== "" || extraInfo?.last_name !== "")) {
         name = `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`;
@@ -320,7 +315,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
   const handleDeleteAccount = async () => {
     const rest = await DeleteProfilePicture();
-    console.log("Delete Profile Picture Response:", rest);
   };
 
   return (
@@ -363,7 +357,6 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                         default: true,
                       });
                       const res = await DeleteProfilePicture();
-                      console.log("Delete Profile Picture Response:", res);
                     }}
                   />
 

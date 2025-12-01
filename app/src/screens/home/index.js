@@ -351,8 +351,6 @@ const GeoArChallenge = ({}) => {
     setOnesignalDevice();
 
     const clickListener = event => {
-      console.log("OneSignal: notification clicked:", event);
-
       const notification = event.getNotification();
       const additionalData = notification?.additionalData;
 

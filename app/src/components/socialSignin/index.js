@@ -73,7 +73,6 @@ const SocialSignin = ({setLoading}) => {
   };
 
   const handleFBLogin = async () => {
-    console.log("Starting Facebook login");
     setLoading(true);
     try {
       LoginManager.logOut();
@@ -91,10 +90,8 @@ const SocialSignin = ({setLoading}) => {
         // Android standard login
         loginResult = await LoginManager.logInWithPermissions(["public_profile", "email"]);
       }
-      console.log("Facebook login result", loginResult);
 
       if (loginResult.isCancelled) {
-        console.log("Login cancelled");
         setLoading(false);
         return;
       }
@@ -112,8 +109,6 @@ const SocialSignin = ({setLoading}) => {
         if (!token) {
           throw new Error("Failed to get authentication token on iOS");
         }
-
-        console.log("iOS OIDC Token:", token.substring(0, 20) + "...");
       } else {
         // Get Access Token for Android
         const accessTokenData = await AccessToken.getCurrentAccessToken();
@@ -123,11 +118,8 @@ const SocialSignin = ({setLoading}) => {
         if (!token) {
           throw new Error("Failed to get access token on Android");
         }
-
-        console.log("Android Access Token:", token.substring(0, 20) + "...");
       }
 
-      console.log("Proceeding to backend Facebook login", {tokenType, token});
       // Send to backend with platform context
       facebookLogin({
         access_token: token,
@@ -138,7 +130,6 @@ const SocialSignin = ({setLoading}) => {
       })
         .then(res => {
           if (res.status == 1) {
-            console.log("Facebook login response", res);
             dispatch(updateUserData(res));
             if (newUser) {
               dispatch(updateAsOldUser());

@@ -620,7 +620,6 @@ export const getScoreboardList = (pageNumber = 1, destination = "", sponsor = ""
     (sponsor ? `&sponsor=${sponsor}` : "") +
     (destination ? `&destination=${destination}` : "");
 
-  console.log("Scoreboard Query Params:", queryParams);
   return Request.callWithToken(
     {
       url: `${commonApiRoute}scoreboard/${queryParams}`,

@@ -1,5 +1,5 @@
-import '@rneui/themed';
-declare module '@rneui/themed' {
+import "@rneui/themed";
+declare module "@rneui/themed" {
   export interface Colors {
     white: string;
     inputBG: string;
@@ -14,12 +14,13 @@ declare module '@rneui/themed' {
     lightGrey: string;
     statBG: string;
     boxStatBG: string;
-    toggleOff:  string;
+    toggleOff: string;
     grey: string;
     grey31: string;
-    drawerBG : string;
+    drawerBG: string;
     magenta: string;
     green: string;
     inputRed: string;
+    Bg: string;
   }
 }

@@ -41,13 +41,9 @@ const useCheckAppUpdates = () => {
               };
             }
             inAppUpdates.addStatusUpdateListener(downloadStatus => {
-              console.log("download status", downloadStatus);
               if (downloadStatus.status === IAUInstallStatus.DOWNLOADED) {
-                console.log("downloaded");
                 inAppUpdates.installUpdate();
-                inAppUpdates.removeStatusUpdateListener(finalStatus => {
-                  console.log("final status", finalStatus);
-                });
+                inAppUpdates.removeStatusUpdateListener(finalStatus => {});
               }
             });
             inAppUpdates.startUpdate(updateOptions);

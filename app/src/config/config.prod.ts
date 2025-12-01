@@ -12,7 +12,7 @@ export default {
   // APPLE_REDIRECT_URL:
   // //   "https://travel-ar-app-42706-32103.azurewebsites.net/accounts/apple/login/callback/", // Production Azure
   // BASE_URL: "https://travel-ar-app-42706-staging.azurewebsites.net/", // Staging Azure
-  // BASE_URL: "https://9858cd051319.ngrok-free.app/", // Production Azure
+  // BASE_URL: "https://506b730e3e75.ngrok-free.app/", // Production Azure
   BASE_URL: "https://roam-reality-dev-api.ropstam.dev/",
   // APPLE_REDIRECT_URL:
   //   "https://travel-ar-app-42706-staging.azurewebsites.net/accounts/apple/login/callback/", // Staging Azure
@@ -23,4 +23,5 @@ export default {
   FACEBOOK_APP_ID: "1735456000569385",
   DEV_EMAIL: "",
   DEV_PASSWORD: "",
+  GOOGLE_MAPS_API_KEY: "AIzaSyCrsgDowsVe8v8zbZ2yq0qkOr7ocQVztgc",
 };
