@@ -857,7 +857,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               onPress={onMarkerPress}
               anchor={ANCHOR}
               centerOffset={CENTEROFFSET}
-              widthPercentage={widthPercentageToDP(8)}
+              widthPercentage={widthPercentageToDP(12)}
               androidTrackViewChnages={androidTrackViewChnages}
             />
           ))}
@@ -868,7 +868,7 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
               onPress={onMarkerPress}
               anchor={ANCHOR}
               centerOffset={CENTEROFFSET}
-              widthPercentage={widthPercentageToDP(8)}
+              widthPercentage={widthPercentageToDP(12)}
               androidTrackViewChnages={androidTrackViewChnages}
             />
           ))}
@@ -895,18 +895,13 @@ const ARMapView = ({userLocation, validUserLocation, selectedMode, selectedSite}
           {polylineCoordinates.length > 0 && (
             <Polyline
               coordinates={polylineCoordinates}
-              strokeColor="#007AFF" // Blue color for the walking route
-              strokeWidth={4}
+              strokeColor="#34c303" // Blue color for the walking route
+              strokeWidth={6}
             />
           )}
 
           {lastMileLine.length > 0 && (
-            <Polyline
-              coordinates={lastMileLine}
-              strokeColor="#808080"
-              strokeWidth={3}
-              lineDashPattern={[10, 10]} // Dotted line pattern
-            />
+            <Polyline coordinates={lastMileLine} strokeColor="#34c303" strokeWidth={6} />
           )}
         </MapView>
       ) : (
