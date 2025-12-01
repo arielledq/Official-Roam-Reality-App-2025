@@ -54,7 +54,7 @@ import theme from "assets/theme";
 import ARModeSiteList from "components/ARModeModal/ARModeSiteList";
 import {FontSizes} from "util/FontUtils";
 
-const ARScreen = ({route}) => {
+const  ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
 
   const [screentitle, setSceenTitle] = useState(AR_MODE_MESSAGES.deafultView);
@@ -1936,7 +1936,7 @@ const ARScreen = ({route}) => {
                     left: 0,
                     right: 0,
                     bottom: 0,
-                    backgroundColor: theme.lightColors?.inputBG,
+                    backgroundColor: theme.lightColors?.Bg,
                     zIndex: 500,
                   }}
                 >

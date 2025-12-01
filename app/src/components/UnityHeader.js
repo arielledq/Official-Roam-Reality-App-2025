@@ -32,7 +32,7 @@ const UnityHeader = ({
   const messages = isArrayTitle ? title : [];
   // Calculate carousel width based on available space (total width - buttons - margins)
   const carouselWidth =
-    screenWidth * 0.9 - widthPercentageToDP("8%") * 2 - widthPercentageToDP("8%");
+    screenWidth * 0.9 - widthPercentageToDP("6%") * 2 - widthPercentageToDP("6%");
 
   // Reset message index when messages array changes (mode switching)
   useEffect(() => {
@@ -142,7 +142,7 @@ const UnityHeader = ({
           colors={
             isSelected
               ? ["#7a00cf", "#5532ff"]
-              : [theme.lightColors?.grey4, theme.lightColors?.grey4]
+              : [theme.lightColors?.grey5, theme.lightColors?.grey5]
           }
           start={{x: 0, y: 1}}
           end={{x: 1, y: 1}}
@@ -221,10 +221,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: "rgba(56, 55, 55, 0.95)", // More solid background like in screenshot
+    backgroundColor: "#000000", // More solid background like in screenshot
     paddingVertical: "4%",
     paddingHorizontal: "4%",
-    marginHorizontal: "5%",
+    marginHorizontal: "3.5%",
     borderRadius: 12,
 
     alignSelf: "center",
@@ -240,7 +240,7 @@ const styles = StyleSheet.create({
   backButton: {
     width: widthPercentageToDP("12%"),
     height: widthPercentageToDP("10%"),
-    backgroundColor: theme.lightColors?.grey4,
+    backgroundColor: theme.lightColors?.grey5,
     borderRadius: 6,
     justifyContent: "center",
     alignItems: "center",
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
   carouselButton: {
     width: widthPercentageToDP("8%"),
     height: widthPercentageToDP("8%"),
-    backgroundColor: theme.lightColors?.grey4,
+    backgroundColor: theme.lightColors?.grey5,
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
