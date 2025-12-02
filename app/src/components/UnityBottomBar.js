@@ -178,7 +178,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#000000",
     paddingVertical: heightPercentageToDP("2%"),
     paddingHorizontal: widthPercentageToDP("5%"),
-
+    paddingBottom: heightPercentageToDP("3%"),
     zIndex: 100,
   },
   buttonsRow: {
