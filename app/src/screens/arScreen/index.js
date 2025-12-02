@@ -4,7 +4,7 @@ import {Platform, View, ActivityIndicator, Text, TouchableOpacity} from "react-n
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
-import {useSelector} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
@@ -20,6 +20,7 @@ import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
 import UnityHeader from "components/UnityHeader";
+import UnityBottomBar from "components/UnityBottomBar";
 import SideMenu from "components/SideMenu";
 import ARMapView from "components/ARMapComponent/ARMapView";
 import {copyFileForDisplay, eraseFile, handleUnzipProcess, showMessage} from "../../util/helpers";
@@ -53,10 +54,12 @@ import {useIsFocused} from "@react-navigation/native";
 import theme from "assets/theme";
 import ARModeSiteList from "components/ARModeModal/ARModeSiteList";
 import {FontSizes} from "util/FontUtils";
+import {setHideBottomBar} from "../../redux/AR";
 
-const  ARScreen = ({route}) => {
+const ARScreen = ({route}) => {
+  const dispatch = useDispatch();
   const destinationData = useSelector(state => state.ar.destinationData);
-
+  const [modeLabel, setModeLabel] = useState(null);
   const [screentitle, setSceenTitle] = useState(AR_MODE_MESSAGES.deafultView);
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
@@ -164,6 +167,8 @@ const  ARScreen = ({route}) => {
   // Side Menu states
   const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
 
+  // Hide tab bar when screen is focused
+
   useEffect(() => {
     if (isFocused && unityRef.current) {
       getAvailableModes();
@@ -177,20 +182,23 @@ const  ARScreen = ({route}) => {
 
   useEffect(() => {
     if (selectedSite && isFocused && unityRef.current) {
-      console.log("Selected Site changed:", selectedSite);
       const currentMode = selectedSite.selectedMode.mode;
 
       if (currentMode == AR_MODES.HUNT_MODE) {
         const starHuntChallenge = selectedSite?.huntChallenge?.screen_title || "AR Hunt Challenge";
         // setSceenTitle(starHuntChallenge);
-
+        setModeLabel("Hunt Mode");
         setSelectedMode(AR_MODES_MENU[2]);
       } else if (currentMode == AR_MODES.GEO_TAG_MODE) {
         setSelectedMode(AR_MODES_MENU[0]);
       } else if (currentMode == AR_MODES.SCAN_MODE) {
+        setModeLabel("Scan Mode");
         // setSceenTitle(selectedSite.scanChallenge.screen_title || "AR Challenge");
         setSelectedMode(AR_MODES_MENU[1]);
       }
+    } else {
+      console.log("Resetting mode label to default");
+      setModeLabel("Mode");
     }
   }, [selectedSite, isFocused, unityRef.current]);
 
@@ -663,6 +671,54 @@ const  ARScreen = ({route}) => {
 
   const handleSideMenuToggle = () => {
     setIsSideMenuVisible(!isSideMenuVisible);
+  };
+
+  // Bottom bar handlers
+  const handleBottomBarModeSelect = option => {
+    console.log("Bottom bar mode selected:", option);
+    const label = option?.label || "Mode";
+
+    const ButtonScanMode = label === "Scan Mode";
+    const ButtonHuntMode = label === "Hunt Mode";
+    const ButtonGeoTagMode = label === "GeoTag Mode";
+
+    if ((ButtonScanMode || ButtonHuntMode || ButtonGeoTagMode) && selectedHeaderMode == "Live") {
+      setSelectedHeaderMode("List");
+      setShowOverlay(true);
+    }
+
+    if (ButtonGeoTagMode) {
+      setCurrentMode(AR_MODES.GEO_TAG_MODE);
+      setSelectedMode(AR_MODES_MENU[0]);
+    }
+    if (ButtonHuntMode) {
+      setCurrentMode(AR_MODES.HUNT_MODE);
+      setSelectedMode(AR_MODES_MENU[2]);
+    }
+    if (ButtonScanMode) {
+      setCurrentMode(AR_MODES.SCAN_MODE);
+      setSelectedMode(AR_MODES_MENU[1]);
+    }
+
+    // Add your logic here for mode change
+    // For example, you might want to call APIs or update Unity state
+  };
+
+  const handleMoreInfoPress = () => {
+    console.log("More Info pressed");
+    // Add your logic here for showing more info
+    setChallengeInformationView(true);
+  };
+
+  const handleResetARPress = () => {
+    console.log("Reset AR pressed");
+    // Add your logic here for resetting AR
+    // For example, reset Unity state or reload the AR scene
+  };
+
+  const handleRefreshPress = () => {
+    console.log("Refresh pressed");
+    // Add your logic here for refreshing the map or list
   };
 
   const HIDE_ARROW_MS = 3000;
@@ -1426,7 +1482,8 @@ const  ARScreen = ({route}) => {
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
       position => {
-        const {latitude, longitude} = position.coords;
+        const {latitude, longitude, heading} = position.coords;
+
         if (
           position.coords.latitude === 0 ||
           position.coords.longitude === 0 ||
@@ -1439,6 +1496,7 @@ const  ARScreen = ({route}) => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
+          heading: heading || 0,
         };
         setUserLocation(newLocation);
         if (
@@ -1567,6 +1625,9 @@ const  ARScreen = ({route}) => {
 
   useFocusEffect(
     useCallback(() => {
+      // Hide bottom tab bar when screen is focused
+      dispatch(setHideBottomBar(true));
+
       const timeout = setTimeout(() => {
         if (!unitySceneLoaded) {
           const mode = selectedSite?.selectedMode?.mode;
@@ -1592,6 +1653,9 @@ const  ARScreen = ({route}) => {
       setUnitySceneLoaded(true);
 
       return () => {
+        // Show bottom tab bar when screen is unfocused
+        dispatch(setHideBottomBar(false));
+
         clearTimeout(timeout);
         const mode = selectedSite?.selectedMode?.mode;
 
@@ -1632,10 +1696,10 @@ const  ARScreen = ({route}) => {
 
     Geolocation.getCurrentPosition(
       pos => {
-        const {latitude, longitude, accuracy} = pos.coords || {};
-        console.log("Initial position:", latitude, longitude);
+        const {latitude, longitude, accuracy, heading} = pos.coords || {};
+
         if (latitude && longitude) {
-          const firstLoc = {latitude, longitude, accuracy};
+          const firstLoc = {latitude, longitude, accuracy, heading};
           setUserLocation(firstLoc);
           setValidUserLocation(firstLoc);
           updateUnityLocation(firstLoc);
@@ -1817,96 +1881,139 @@ const  ARScreen = ({route}) => {
   };
 
   return (
-    <ChallengeScreen
-      title="AR Star Hunt "
-      appHeader={false}
-      style={{
-        paddingHorizontal: 0,
-        paddingBottom: 0,
-        flex: 1,
-        backgroundColor: "#000",
-      }}
-      modals={modals}
-      // headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
-      scrollable={false}
-    >
-      {shouldRenderUnity && (
-        <>
-          {/*/TODO TEST BUTTON*/}
-          {/*<View style={{position:'absolute', left: 100, top: 250, zIndex:9999 }}>*/}
-          {/*<Button*/}
-          {/*    mode="contained"*/}
-          {/* onPress={resetArTest}*/}
-          {/* children={'resetArTest'}>*/}
-          {/*</Button>*/}
-          {/*</View>*/}
+    <View style={{flex: 1}}>
+      <ChallengeScreen
+        title="AR Star Hunt "
+        appHeader={false}
+        style={{
+          paddingHorizontal: 0,
+          paddingBottom: 0,
+          flex: 1,
+          backgroundColor: "#000",
+        }}
+        modals={modals}
+        // headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
+        scrollable={false}
+      >
+        {shouldRenderUnity && (
+          <>
+            {/*/TODO TEST BUTTON*/}
+            {/*<View style={{position:'absolute', left: 100, top: 250, zIndex:9999 }}>*/}
+            {/*<Button*/}
+            {/*    mode="contained"*/}
+            {/* onPress={resetArTest}*/}
+            {/* children={'resetArTest'}>*/}
+            {/*</Button>*/}
+            {/*</View>*/}
 
-          {/* Unity Header Component */}
-          {isUnityLoaded && (
-            <UnityHeader
-              title={screentitle}
-              selectedMode={selectedHeaderMode}
-              onModeChange={handleModeChange}
-              onBackPress={handleBackPress}
-            />
-          )}
+            {/* Unity Header Component */}
+            {isUnityLoaded && (
+              <UnityHeader
+                title={screentitle}
+                selectedMode={selectedHeaderMode}
+                onModeChange={handleModeChange}
+                onBackPress={handleBackPress}
+              />
+            )}
 
-          {/* Side Menu Component */}
-          {isUnityLoaded && selectedSite?.id && selectedHeaderMode != "List" && (
-            <SideMenu
-              isVisible={isSideMenuVisible}
-              onToggle={handleSideMenuToggle}
-              selectedSite={selectedMode}
-              onPressInfo={() => {
-                setIsSideMenuVisible(false);
-                setChallengeInformationView(true);
+            {/* Side Menu Component */}
+            {isUnityLoaded && selectedSite?.id && selectedHeaderMode != "List" && (
+              <SideMenu
+                isVisible={isSideMenuVisible}
+                onToggle={handleSideMenuToggle}
+                selectedSite={selectedMode}
+                onPressInfo={() => {
+                  setIsSideMenuVisible(false);
+                  setChallengeInformationView(true);
+                }}
+              />
+            )}
+
+            <UnityARCamera
+              width={"100%"}
+              height={"100%"}
+              unityRef={unityRef}
+              isProcessingMedia={processingMedia}
+              onUnityMessage={handleUnityMessage}
+              isUnityLoaded={isUnityLoaded}
+              capturedImage={capturedImage}
+              capturedVideo={capturedVideo}
+              // imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
+              imageFilter={{
+                challengeObj: {
+                  ...selectedSite,
+                  challenge_type: challenge_type_value,
+                },
+                viewShotRef: viewShotRef,
               }}
             />
-          )}
 
-          <UnityARCamera
-            width={"100%"}
-            height={"100%"}
-            unityRef={unityRef}
-            isProcessingMedia={processingMedia}
-            onUnityMessage={handleUnityMessage}
-            isUnityLoaded={isUnityLoaded}
-            capturedImage={capturedImage}
-            capturedVideo={capturedVideo}
-            // imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
-            imageFilter={{
-              challengeObj: {
-                ...selectedSite,
-                challenge_type: challenge_type_value,
-              },
-              viewShotRef: viewShotRef,
-            }}
-          />
+            {/* Overlay for Map and List modes */}
+            {showOverlay && (
+              <>
+                {selectedHeaderMode === "Map" && (
+                  <>
+                    {userLocation || validUserLocation ? (
+                      <ARMapView
+                        userLocation={userLocation}
+                        validUserLocation={validUserLocation}
+                        selectedMode={selectedMode}
+                        selectedSite={currentMode}
+                        onSwitchToLiveView={() => setSelectedHeaderMode("Live")}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: theme.lightColors?.inputBG,
+                          zIndex: 500,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: theme.lightColors?.white,
+                              fontSize: FontSizes.S20,
+                              width: "80%",
+                              textAlign: "center",
+                            }}
+                          >
+                            Please enable location services to view the map.
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </>
+                )}
 
-          {/* Overlay for Map and List modes */}
-          {showOverlay && (
-            <>
-              {selectedHeaderMode === "Map" && (
-                <>
-                  {userLocation || validUserLocation ? (
-                    <ARMapView
-                      userLocation={userLocation}
-                      validUserLocation={validUserLocation}
-                      selectedMode={selectedMode}
-                      selectedSite={currentMode}
-                    />
-                  ) : (
-                    <View
-                      style={{
-                        position: "absolute",
-                        top: 0,
-                        left: 0,
-                        right: 0,
-                        bottom: 0,
-                        backgroundColor: theme.lightColors?.inputBG,
-                        zIndex: 500,
-                      }}
-                    >
+                {selectedHeaderMode === "List" && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: theme.lightColors?.Bg,
+                      zIndex: 500,
+                    }}
+                  >
+                    {selectedMode?.id ? (
+                      <ARModeSiteList
+                        selectedMode={selectedMode}
+                        onStartChallenge={startChallengeHandler}
+                      />
+                    ) : (
                       <View
                         style={{
                           flex: 1,
@@ -1922,57 +2029,16 @@ const  ARScreen = ({route}) => {
                             textAlign: "center",
                           }}
                         >
-                          Please enable location services to view the map.
+                          Please select an AR Mode to see available sites.
                         </Text>
                       </View>
-                    </View>
-                  )}
-                </>
-              )}
+                    )}
+                  </View>
+                )}
+              </>
+            )}
 
-              {selectedHeaderMode === "List" && (
-                <View
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    backgroundColor: theme.lightColors?.Bg,
-                    zIndex: 500,
-                  }}
-                >
-                  {selectedMode?.id ? (
-                    <ARModeSiteList
-                      selectedMode={selectedMode}
-                      onStartChallenge={startChallengeHandler}
-                    />
-                  ) : (
-                    <View
-                      style={{
-                        flex: 1,
-                        justifyContent: "center",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: theme.lightColors?.white,
-                          fontSize: FontSizes.S20,
-                          width: "80%",
-                          textAlign: "center",
-                        }}
-                      >
-                        Please select an AR Mode to see available sites.
-                      </Text>
-                    </View>
-                  )}
-                </View>
-              )}
-            </>
-          )}
-
-          {/* <TouchableOpacity
+            {/* <TouchableOpacity
             style={{
               position: "absolute",
               top: 40,
@@ -1987,54 +2053,67 @@ const  ARScreen = ({route}) => {
             <Text style={{color: "#fff", fontSize: 16}}>Examples</Text>
           </TouchableOpacity> */}
 
-          {unitySceneLoaded === true && (
-            <View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.99)",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 999,
-              }}
-            >
-              <ActivityIndicator size="large" color="#fff" />
-              <Text style={{color: "#fff", marginTop: 10}}>Loading AR Experience</Text>
-            </View>
-          )}
-        </>
-      )}
-
-      <View style={{position: "absolute", bottom: 20, width: "100%"}}>
-        {!isUnityLoaded && (
-          <CameraControls
-            hasCapturedContent={!!capturedImage || !!capturedVideo}
-            onRetake={retakeButtonHandler}
-            onDone={doneButtonHandler}
-            isVideo={!!capturedVideo}
-            challengeHasFilters={challengeHasFilters}
-          />
+            {unitySceneLoaded === true && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0,0,0,0.99)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 999,
+                }}
+              >
+                <ActivityIndicator size="large" color="#fff" />
+                <Text style={{color: "#fff", marginTop: 10}}>Loading AR Experience</Text>
+              </View>
+            )}
+          </>
         )}
-      </View>
-      {/* 
-      <ARModeModal
+
+        <View style={{position: "absolute", bottom: 20, width: "100%"}}>
+          {!isUnityLoaded && (
+            <CameraControls
+              hasCapturedContent={!!capturedImage || !!capturedVideo}
+              onRetake={retakeButtonHandler}
+              onDone={doneButtonHandler}
+              isVideo={!!capturedVideo}
+              challengeHasFilters={challengeHasFilters}
+            />
+          )}
+        </View>
+
+        {/* Unity Bottom Bar - placed at bottom without absolute positioning */}
+
+        {/* <ARModeModal
         isVisible={openModalARMode}
         onClose={closeModalARMode}
         selectedDestination={destinationData}
         onStartChallenge={startChallengeHandler}
       /> */}
 
-      {/* {selectedSite?.selectedMode?.mode && (
+        {/* {selectedSite?.selectedMode?.mode && (
         <NotificationModal
           isVisible={showNotification}
           onClose={() => setShowNotification(false)}
           selectedMode={selectedSite.selectedMode}
         />
       )} */}
-    </ChallengeScreen>
+      </ChallengeScreen>
+      {isUnityLoaded && (
+        <UnityBottomBar
+          selectedMode={selectedHeaderMode}
+          onModeSelect={handleBottomBarModeSelect}
+          onMoreInfoPress={handleMoreInfoPress}
+          onResetARPress={handleResetARPress}
+          onRefreshPress={handleRefreshPress}
+          modeLabel={modeLabel}
+        />
+      )}
+    </View>
   );
 };
 

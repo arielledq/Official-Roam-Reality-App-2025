@@ -14,6 +14,7 @@ const initialState = {
   starSitesCount: {},
 
   sponsors: [],
+  hideBottomBar: false,
 };
 
 export const sliceAR = createSlice({
@@ -78,6 +79,9 @@ export const sliceAR = createSlice({
     updateSponsors: (state, action) => {
       state.sponsors = action.payload;
     },
+    setHideBottomBar: (state, action) => {
+      state.hideBottomBar = action.payload;
+    },
   },
 });
 
@@ -96,4 +100,5 @@ export const {
   updateDestinationData,
   updateStarSitesCount,
   updateSponsors,
+  setHideBottomBar,
 } = sliceAR.actions;

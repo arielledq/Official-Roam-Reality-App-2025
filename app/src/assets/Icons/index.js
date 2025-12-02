@@ -53,6 +53,7 @@ import currentLocation from "./currentLocationIcon.svg";
 import ArMarker from "./ArMarker.svg";
 import disbaledMarker from "./disabledMarker.svg";
 import walk from "./walk.svg";
+import compass from "./compass.svg";
 
 export const Icons = {
   password,
@@ -110,4 +111,5 @@ export const Icons = {
   ArMarker,
   disbaledMarker,
   walk,
+  compass,
 };
