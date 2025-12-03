@@ -251,7 +251,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     color: theme.lightColors?.white,
-    fontSize: FontSizes.S16,
+    fontSize: FontSizes.S14,
     fontWeight: "600",
     textAlign: "center",
   },

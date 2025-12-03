@@ -12,7 +12,7 @@ export default {
   // APPLE_REDIRECT_URL:
   // //   "https://travel-ar-app-42706-32103.azurewebsites.net/accounts/apple/login/callback/", // Production Azure
   // BASE_URL: "https://travel-ar-app-42706-staging.azurewebsites.net/", // Staging Azure
-  // BASE_URL: "https://506b730e3e75.ngrok-free.app/", // Production Azure
+  // BASE_URL: "https://f1265a611a7d.ngrok-free.app/", // Production Azure
   BASE_URL: "https://roam-reality-dev-api.ropstam.dev/",
   // APPLE_REDIRECT_URL:
   //   "https://travel-ar-app-42706-staging.azurewebsites.net/accounts/apple/login/callback/", // Staging Azure

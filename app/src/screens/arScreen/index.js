@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState, useCallback} from "react";
-import {Platform, View, ActivityIndicator, Text, TouchableOpacity} from "react-native";
+import {Platform, View, ActivityIndicator, Text, TouchableOpacity, Alert} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
@@ -61,6 +61,8 @@ const ARScreen = ({route}) => {
   const destinationData = useSelector(state => state.ar.destinationData);
   const [modeLabel, setModeLabel] = useState(null);
   const [screentitle, setSceenTitle] = useState(AR_MODE_MESSAGES.deafultView);
+  const [refreshListMode, setRefreshListMode] = useState(false);
+  const [refreshMapMode, setRefreshMapMode] = useState(false);
   const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
   const [textLoading, setTextLoading] = useState("Loading AR Experience");
@@ -183,24 +185,91 @@ const ARScreen = ({route}) => {
   useEffect(() => {
     if (selectedSite && isFocused && unityRef.current) {
       const currentMode = selectedSite.selectedMode.mode;
-
+      console.log("Setting mode label based on selected site and mode:", selectedSite);
       if (currentMode == AR_MODES.HUNT_MODE) {
         const starHuntChallenge = selectedSite?.huntChallenge?.screen_title || "AR Hunt Challenge";
-        // setSceenTitle(starHuntChallenge);
+
         setModeLabel("Hunt Mode");
         setSelectedMode(AR_MODES_MENU[2]);
       } else if (currentMode == AR_MODES.GEO_TAG_MODE) {
         setSelectedMode(AR_MODES_MENU[0]);
       } else if (currentMode == AR_MODES.SCAN_MODE) {
         setModeLabel("Scan Mode");
-        // setSceenTitle(selectedSite.scanChallenge.screen_title || "AR Challenge");
+
         setSelectedMode(AR_MODES_MENU[1]);
       }
     } else {
+      setRefreshListMode(false);
+      setRefreshMapMode(false);
       console.log("Resetting mode label to default");
       setModeLabel("Mode");
     }
   }, [selectedSite, isFocused, unityRef.current]);
+
+  // Check distance and set screen title when within 20 meters
+  useEffect(() => {
+    if (!selectedSite || !userLocation) return;
+
+    const currentMode = selectedSite?.selectedMode?.mode;
+
+    // Only process for SCAN_MODE and HUNT_MODE
+    if (currentMode !== AR_MODES.SCAN_MODE && currentMode !== AR_MODES.HUNT_MODE) {
+      return;
+    }
+
+    let targetLocation = null;
+    let screenTitleArray = null;
+
+    // Get coordinates and screen_title based on mode
+    if (currentMode === AR_MODES.SCAN_MODE) {
+      const scanCoordinates = selectedSite?.scanChallenge?.coordinates?.coordinates;
+      if (scanCoordinates && scanCoordinates.length >= 2) {
+        targetLocation = {
+          latitude: scanCoordinates[1],
+          longitude: scanCoordinates[0],
+        };
+        screenTitleArray = selectedSite?.scanChallenge?.screen_title;
+      }
+    } else if (currentMode === AR_MODES.HUNT_MODE) {
+      const huntCoordinates =
+        selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates;
+      if (huntCoordinates && huntCoordinates.length >= 2) {
+        targetLocation = {
+          latitude: huntCoordinates[1],
+          longitude: huntCoordinates[0],
+        };
+        screenTitleArray = selectedSite?.huntChallenge?.screen_title;
+      }
+    }
+
+    // Calculate distance if we have both locations
+    if (targetLocation && userLocation.latitude && userLocation.longitude) {
+      const distance = getLocationDistance(
+        {latitude: userLocation.latitude, longitude: userLocation.longitude},
+        targetLocation
+      );
+
+      // If within 15 meters, set the screen title
+      if (distance <= 15) {
+        if (screenTitleArray && Array.isArray(screenTitleArray)) {
+          // Transform the array to match AR_MODE_MESSAGES format
+          const transformedArray = screenTitleArray.map((item, index) => ({
+            id: index + 1,
+            message: typeof item === "string" ? item : item?.message || item?.text || "",
+          }));
+
+          setSceenTitle(transformedArray);
+        } else {
+          // Fallback to default messages if screen_title is not an array
+          if (currentMode === AR_MODES.SCAN_MODE) {
+            setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_SCAN_MODE);
+          } else if (currentMode === AR_MODES.HUNT_MODE) {
+            setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_HUNT_MODE);
+          }
+        }
+      }
+    }
+  }, [selectedSite, userLocation]);
 
   const getAvailableModes = async () => {
     try {
@@ -386,6 +455,7 @@ const ARScreen = ({route}) => {
           scaleFactor: 1,
           smoothingFactor: 5,
         });
+        // console.log("Updating Unity Locatn:", jsonData);
         unityRef.current.postMessage("ObjectSpawner", "SetUserLocationFromReact", jsonData);
       }
     }
@@ -501,7 +571,6 @@ const ARScreen = ({route}) => {
 
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
-        setSceenTitle(AR_MODE_MESSAGES.CALIBRATION);
       }, 500);
 
       // setSendModelData(true);
@@ -699,26 +768,22 @@ const ARScreen = ({route}) => {
       setCurrentMode(AR_MODES.SCAN_MODE);
       setSelectedMode(AR_MODES_MENU[1]);
     }
-
-    // Add your logic here for mode change
-    // For example, you might want to call APIs or update Unity state
   };
 
   const handleMoreInfoPress = () => {
-    console.log("More Info pressed");
-    // Add your logic here for showing more info
+    if (!selectedSite) {
+      Alert.alert("No site selected", "Please select a site to view information.");
+      return;
+    }
     setChallengeInformationView(true);
   };
 
-  const handleResetARPress = () => {
-    console.log("Reset AR pressed");
-    // Add your logic here for resetting AR
-    // For example, reset Unity state or reload the AR scene
-  };
-
   const handleRefreshPress = () => {
-    console.log("Refresh pressed");
-    // Add your logic here for refreshing the map or list
+    if (selectedHeaderMode === "List") {
+      setRefreshListMode(true);
+    } else if (selectedHeaderMode === "Map") {
+      setRefreshMapMode(true);
+    }
   };
 
   const HIDE_ARROW_MS = 3000;
@@ -759,12 +824,14 @@ const ARScreen = ({route}) => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
+    // console.log("Message from Unity:", data);
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
     const ButtonHuntMode = data?.HuntMode;
     const ButtonScanMode = data?.ScanMode;
     const ButtonGeoTagMode = data?.GeoTagMode;
+    const isObjectSpawned = data?.spawnedObject?.objectSpawned;
 
     let show = [];
     let hide = [];
@@ -798,6 +865,20 @@ const ARScreen = ({route}) => {
     if (buttonARMode) {
       setOpenModalARMode(true);
     }
+
+    if (isObjectSpawned) {
+      let mode = selectedSite?.selectedMode?.mode;
+
+      if (mode === AR_MODES.SCAN_MODE) {
+        console.log("Setting screen title for Scan Mode");
+        setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_SCAN_MODE);
+      }
+      if (mode === AR_MODES.HUNT_MODE) {
+        console.log("Setting screen title for Hunt Mode");
+        setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_HUNT_MODE);
+      }
+    }
+
     if (ButtonScanMode || ButtonHuntMode || ButtonGeoTagMode) {
       setSelectedHeaderMode("List");
       setShowOverlay(true);
@@ -1747,26 +1828,9 @@ const ARScreen = ({route}) => {
     // 🔽 your existing function
   }, [sceneIsReady, selectedSite?.selectedMode?.mode, selectedSite?.scanChallenge?.file_animation]);
 
-  // const resetArTest = () => {
-  //   let show = ["Back", "Details", "ArMode",];
-  //   let hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-  //
-  //   unityRef.current.postMessage(
-  //       "CanvasController",
-  //       "ShowHideElements",
-  //       JSON.stringify({show, hide})
-  //   );
-  //   unityRef.current.postMessage(
-  //       "ArMode",
-  //       "SetTextArModal",
-  //       JSON.stringify({titleARMode: "AR MODE", textlabel: " ", visibleLabel: true})
-  //   );
-
-  // unityRef.current.postMessage("ARResetController", "ResetARState","");
-  //   setSelectedSite(null)
-  //   setSelectedChallengeOverride(null)
-  //   console.log("se presiono ARTestReset")
-  // };
+  const resetAr = () => {
+    unityRef.current.postMessage("OBJImport", "RepositionObjectFromButton", "");
+  };
 
   useEffect(() => {
     const mode = selectedSite?.selectedMode?.mode;
@@ -1921,7 +1985,7 @@ const ARScreen = ({route}) => {
               <SideMenu
                 isVisible={isSideMenuVisible}
                 onToggle={handleSideMenuToggle}
-                selectedSite={selectedMode}
+                selectedSite={selectedSite}
                 onPressInfo={() => {
                   setIsSideMenuVisible(false);
                   setChallengeInformationView(true);
@@ -1960,6 +2024,10 @@ const ARScreen = ({route}) => {
                         selectedMode={selectedMode}
                         selectedSite={currentMode}
                         onSwitchToLiveView={() => setSelectedHeaderMode("Live")}
+                        refresh={refreshMapMode}
+                        sendRefreshSignal={() => {
+                          setRefreshMapMode(false);
+                        }}
                       />
                     ) : (
                       <View
@@ -2012,6 +2080,10 @@ const ARScreen = ({route}) => {
                       <ARModeSiteList
                         selectedMode={selectedMode}
                         onStartChallenge={startChallengeHandler}
+                        refresh={refreshListMode}
+                        sendRefreshSignal={() => {
+                          setRefreshListMode(false);
+                        }}
                       />
                     ) : (
                       <View
@@ -2039,19 +2111,19 @@ const ARScreen = ({route}) => {
             )}
 
             {/* <TouchableOpacity
-            style={{
-              position: "absolute",
-              top: 40,
-              left: 20,
-              backgroundColor: "rgba(0,0,0,0.5)",
-              padding: 10,
-              borderRadius: 5,
-              zIndex: 1000,
-            }}
-            onPress={handleNextHunt}
-          >
-            <Text style={{color: "#fff", fontSize: 16}}>Examples</Text>
-          </TouchableOpacity> */}
+              style={{
+                position: "absolute",
+                top: 40,
+                left: 20,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                padding: 10,
+                borderRadius: 5,
+                zIndex: 1000,
+              }}
+              onPress={handleNextHunt}
+            >
+              <Text style={{color: "#fff", fontSize: 16}}>Examples</Text>
+            </TouchableOpacity> */}
 
             {unitySceneLoaded === true && (
               <View
@@ -2108,7 +2180,7 @@ const ARScreen = ({route}) => {
           selectedMode={selectedHeaderMode}
           onModeSelect={handleBottomBarModeSelect}
           onMoreInfoPress={handleMoreInfoPress}
-          onResetARPress={handleResetARPress}
+          onResetARPress={resetAr}
           onRefreshPress={handleRefreshPress}
           modeLabel={modeLabel}
         />

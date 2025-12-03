@@ -227,6 +227,8 @@ const ARMapView = ({
   selectedMode,
   selectedSite,
   onSwitchToLiveView,
+  refresh,
+  sendRefreshSignal,
 }) => {
   const [region, setRegion] = React.useState(null);
   const [lastMileLine, setLastMileLine] = useState([]);
@@ -276,6 +278,12 @@ const ARMapView = ({
   const hasShownProximityAlertRef = React.useRef(false); // Track if we've shown proximity alert for current selection
   const currentSelectionIdRef = React.useRef(null); // Track the current selected item ID
   const MOVEMENT_THRESHOLD = 5; // meters
+
+  useEffect(() => {
+    if (refresh) {
+      resetAll();
+    }
+  }, [refresh]);
 
   useEffect(() => {
     // Only set region once when component mounts and validUserLocation is available
@@ -443,9 +451,9 @@ const ARMapView = ({
     // Calculate distance to target
     const distanceToTarget = getDistance(userCoords, targetCoords);
 
-    // If within 50 meters, zoom in to show both user and target clearly
+    // If within 20 meters, zoom in to show both user and target clearly
     // Only show alert if we haven't shown it before for this selection
-    if (distanceToTarget <= 50 && mapRef.current && !hasShownProximityAlertRef.current) {
+    if (distanceToTarget <= 20 && mapRef.current && !hasShownProximityAlertRef.current) {
       // Mark that we've auto-zoomed
       hasAutoZoomedRef.current = true;
 
@@ -1236,6 +1244,7 @@ const ARMapView = ({
 
     // Hide proximity alert
     setShowProximityAlert(false);
+    sendRefreshSignal();
   };
   return (
     <View

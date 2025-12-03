@@ -23,6 +23,15 @@ const SideMenu = ({
   onPressInfo,
 }) => {
   const [challengeDetials, setChallengeDetails] = React.useState(null);
+
+  function formatCooldownTime(cooldown) {
+    if (!cooldown) return 0;
+
+    const [hourStr] = cooldown.split(":");
+    const hours = parseInt(hourStr, 10);
+
+    return isNaN(hours) ? 0 : hours;
+  }
   useEffect(() => {
     if (selectedSite?.id) {
       let attemptsDetails = "";
@@ -38,6 +47,7 @@ const SideMenu = ({
 
           totalAttempts = site?.challenge_attempt || 0;
           currentAttempts = site?.user_attempts || 0;
+          coolDownHours = formatCooldownTime(site?.checkin_cooldown) || 0;
 
           break;
         case AR_MODES.SCAN_MODE:
@@ -46,6 +56,8 @@ const SideMenu = ({
           attemptsDetails = `${item?.user_attempts || 0}/${item?.attempts || 0}`;
           totalAttempts = item?.attempts || 0;
           currentAttempts = item?.user_attempts || 0;
+          coolDownHours = formatCooldownTime(item.cooldown) || 0;
+
           break;
         case AR_MODES.HUNT_MODE:
           const site = selectedSite;
@@ -54,6 +66,7 @@ const SideMenu = ({
           }`;
           totalAttempts = site?.ar_star?.attempts || 0;
           currentAttempts = site?.userAttempt ?? site?.ar_star?.user_attempts ?? 0;
+          coolDownHours = formatCooldownTime(site?.hunt_cooldownn) || 0;
           break;
         default:
           break;
@@ -64,6 +77,7 @@ const SideMenu = ({
         totalAttempts,
         currentAttempts,
         points,
+        coolDownHours,
       });
     }
   }, [selectedSite]);
@@ -79,7 +93,7 @@ const SideMenu = ({
     <View style={styles.mainToggle}>
       {/* Toggle Button */}
       <TouchableOpacity style={styles.toggleButton} onPress={onToggle}>
-        <Icon name={isVisible ? "chevron-forward" : "chevron-back"} size={40} color="#ffffff" />
+        <Icon name={isVisible ? "chevron-forward" : "chevron-back"} size={30} color="#ffffff" />
       </TouchableOpacity>
 
       {/* Side Menu */}
@@ -88,14 +102,22 @@ const SideMenu = ({
           {/* Points Section */}
           <View style={styles.menuSection}>
             <View style={styles.pointsBox}>
-              <Text style={styles.pointsNumber}>{challengeDetials?.points || 0}</Text>
               <Text style={styles.pointsLabel}>Points</Text>
+              <Text style={styles.pointsNumber}>{challengeDetials?.points || 0}</Text>
+            </View>
+          </View>
+
+          <View style={styles.menuSection}>
+            <View style={styles.pointsBox}>
+              <Text style={styles.pointsLabel}>Cooldown</Text>
+              <Text style={styles.pointsNumber}>{challengeDetials?.coolDownHours || 0}H</Text>
             </View>
           </View>
 
           {/* Progress Section */}
           <View style={styles.menuSection}>
             <View style={styles.progressBox}>
+              <Text style={styles.attemptsText}>Attempts</Text>
               <HalfCircleProgress
                 progress={calculateProgress()}
                 radius={18}
@@ -103,16 +125,10 @@ const SideMenu = ({
                 text={challengeDetials?.attemptsDetails || ""}
                 textStyle={{color: theme.lightColors?.grey0, fontSize: 6, fontWeight: "bold"}}
               />
-              <Text style={styles.attemptsText}>Completed</Text>
             </View>
           </View>
 
           {/* Info Section */}
-          <TouchableOpacity style={styles.menuSection}>
-            <TouchableOpacity style={styles.infoBox} onPress={() => onPressInfo()}>
-              <Icon name="information-circle" size={40} color="#ffffff" />
-            </TouchableOpacity>
-          </TouchableOpacity>
         </View>
       )}
     </View>
@@ -126,50 +142,51 @@ const styles = StyleSheet.create({
     top: screenHeight / 2 - heightPercentageToDP("20%"), // Adjust based on your layout
   },
   toggleButton: {
-    width: widthPercentageToDP("14%"),
-    height: widthPercentageToDP("14%"),
+    width: widthPercentageToDP("10%"),
+    height: widthPercentageToDP("12%"),
     alignSelf: "flex-end",
-    backgroundColor: theme.lightColors?.grey4,
+    backgroundColor: "#000000",
 
     justifyContent: "center",
     alignItems: "center",
     zIndex: 1001,
   },
   menuContainer: {
-    width: widthPercentageToDP("30%"),
-    backgroundColor: "rgba(56, 55, 55, 0.95)",
+    width: widthPercentageToDP("18%"),
+    backgroundColor: "rgba(1, 0, 0, 0.9)",
+    marginTop: heightPercentageToDP("2%"),
     // borderRadius: 12,
     paddingVertical: heightPercentageToDP("2%"),
-    paddingHorizontal: widthPercentageToDP("3%"),
+
     zIndex: 1000, // Lower z-index so toggle button appears on top
-    gap: heightPercentageToDP("2%"),
+    borderRadius: 8,
   },
   menuSection: {
     alignItems: "center",
   },
   pointsBox: {
-    width: widthPercentageToDP("15%"),
-    height: widthPercentageToDP("15%"),
-    backgroundColor: "#000000",
+    width: widthPercentageToDP("12%"),
+    height: widthPercentageToDP("12%"),
 
     justifyContent: "center",
     alignItems: "center",
+    gap: 4,
   },
   pointsNumber: {
     color: "#ffffff",
-    fontSize: FontSizes.S26,
-    fontFamily: fonts.nutinoExtraBold,
+    fontSize: FontSizes.S18,
+    fontFamily: fonts.nunitoBold,
   },
   pointsLabel: {
     color: "#ffffff",
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S8,
     fontWeight: "600",
   },
   progressBox: {
     alignItems: "center",
-    width: widthPercentageToDP("15%"),
-    height: widthPercentageToDP("15%"),
-    backgroundColor: "#000000",
+    width: widthPercentageToDP("12%"),
+    height: widthPercentageToDP("12%"),
+    gap: 6,
 
     justifyContent: "center",
   },
@@ -196,7 +213,6 @@ const styles = StyleSheet.create({
   infoBox: {
     width: widthPercentageToDP("15%"),
     height: widthPercentageToDP("15%"),
-    backgroundColor: "#000000",
 
     justifyContent: "center",
     alignItems: "center",

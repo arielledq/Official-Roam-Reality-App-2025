@@ -33,6 +33,8 @@ interface ARModeSiteListProps {
   selectedMode: any;
   onStartChallenge: (site: any) => void;
   onClose: () => void;
+  refresh?: boolean;
+  sendRefreshSignal?: () => void;
 }
 async function checkHuntGate(starId: number) {
   try {
@@ -62,7 +64,13 @@ async function checkHuntGate(starId: number) {
   }
 }
 
-const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteListProps) => {
+const ARModeSiteList = ({
+  selectedMode,
+  onStartChallenge,
+  onClose,
+  refresh,
+  sendRefreshSignal,
+}: ARModeSiteListProps) => {
   const DEFAULT_SPONSOR = {
     label: `ALL ${selectedMode?.listLabel?.toUpperCase()}`,
     value: 0,
@@ -236,6 +244,9 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         );
       }
     }
+    if (typeof sendRefreshSignal === "function") {
+      sendRefreshSignal();
+    }
   };
 
   useEffect(() => {
@@ -319,6 +330,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
     return hours * 60 + minutes;
   }
+
+  useEffect(() => {
+    if (refresh) {
+      getSitesHandler();
+    }
+  }, [refresh]);
 
   return (
     <View
