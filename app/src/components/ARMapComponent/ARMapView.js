@@ -1272,6 +1272,7 @@ const ARMapView = ({
           showsUserLocation={true}
           showsMyLocationButton={false}
           showsCompass={false}
+          toolbarEnabled={false}
           onRegionChange={handleRegionChange}
           onPanDrag={handlePanDrag}
         >
