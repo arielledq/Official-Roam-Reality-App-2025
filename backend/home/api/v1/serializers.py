@@ -206,6 +206,7 @@ class StarPointMapSerializer(serializers.ModelSerializer):
     longitude = serializers.SerializerMethodField()
     image = serializers.ImageField(required=False, allow_null=True)
     model_file = serializers.FileField(required=False, allow_null=True)
+    screen_title = serializers.SerializerMethodField()
     
     class Meta:
         model = GeoARStarPoint
@@ -224,6 +225,20 @@ class StarPointMapSerializer(serializers.ModelSerializer):
         if obj.location:
             return obj.location.coords[0]  # lng is x coordinate
         return None
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
 
 
 class HuntMapSerializer(serializers.ModelSerializer):

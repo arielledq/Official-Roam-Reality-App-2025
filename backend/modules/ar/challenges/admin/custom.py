@@ -23,6 +23,7 @@ from django.urls import reverse
 from django.utils.http import urlencode
 from django import forms
 from django.utils.html import format_html
+import json
 
 
 class ARExperienceAdminForm(forms.ModelForm):
@@ -206,8 +207,94 @@ class PointFieldForm(forms.ModelForm):
         return cleaned_data
 
 
+class MultipleTitleWidget(forms.Widget):
+    """Widget for multiple title inputs"""
+    template_name = 'admin/widgets/multiple_title_widget.html'
+    
+    def __init__(self, attrs=None):
+        super().__init__(attrs)
+        self.attrs = attrs or {}
+    
+    def get_context(self, name, value, attrs):
+        """Get context for rendering the widget"""
+        context = super().get_context(name, value, attrs)
+        # Convert value to list for template rendering
+        titles = []
+        if value is not None:
+            if isinstance(value, str):
+                try:
+                    titles = json.loads(value)
+                    if not isinstance(titles, list):
+                        titles = [titles]
+                except (json.JSONDecodeError, TypeError):
+                    titles = []
+            elif isinstance(value, list):
+                titles = value
+        # Always show at least one empty input
+        context['widget']['value'] = titles if titles else ['']
+        return context
+    
+    def value_from_datadict(self, data, files, name):
+        """Extract values from form data and return as list"""
+        values = []
+        index = 0
+        while True:
+            field_name = f'{name}_{index}'
+            if field_name not in data:
+                break
+            value = data.get(field_name, '').strip()
+            if value:
+                values.append(value)
+            index += 1
+        return values if values else None
+
+
+class MultipleTitleField(forms.Field):
+    """Custom form field for multiple titles"""
+    widget = MultipleTitleWidget
+    
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('required', False)
+        super().__init__(*args, **kwargs)
+    
+    def to_python(self, value):
+        """Convert value to Python list"""
+        if value is None or value == '':
+            return None
+        if isinstance(value, list):
+            return value
+        if isinstance(value, str):
+            try:
+                parsed = json.loads(value)
+                return parsed if isinstance(parsed, list) else [parsed]
+            except (json.JSONDecodeError, TypeError):
+                return [value] if value else None
+        return value
+
+
 class ScanPictureForm(PointFieldForm, forms.ModelForm):
     point_field_name = 'coordinates'
+    
+    screen_title = MultipleTitleField(
+        label="Screen Title",
+        required=False,
+        help_text="Enter multiple titles (one per line)"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The widget will handle the value conversion automatically
+    
+    def clean_screen_title(self):
+        """Ensure screen_title is stored as a list"""
+        value = self.cleaned_data.get('screen_title')
+        if value is None:
+            return None
+        if isinstance(value, list):
+            # Filter out empty strings
+            value = [v.strip() for v in value if v and v.strip()]
+            return value if value else None
+        return value
 
     class Meta:
         model = ScanPicture
@@ -239,12 +326,33 @@ class ScanPictureAdmin(admin.ModelAdmin):
 
 class GeoARStarPointForm(PointFieldForm, forms.ModelForm):
     point_field_name = 'location'
+    
+    screen_title = MultipleTitleField(
+        label="Screen Title",
+        required=False,
+        help_text="Enter multiple titles (one per line)"
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The widget will handle the value conversion automatically
 
     def clean_sponsors(self):
         sponsors = self.cleaned_data.get('sponsors')
         if sponsors and sponsors.count() > 3:
             raise ValidationError("No more than 3 sponsor per star.")
         return sponsors
+    
+    def clean_screen_title(self):
+        """Ensure screen_title is stored as a list"""
+        value = self.cleaned_data.get('screen_title')
+        if value is None:
+            return None
+        if isinstance(value, list):
+            # Filter out empty strings
+            value = [v.strip() for v in value if v and v.strip()]
+            return value if value else None
+        return value
 
     class Meta:
         model = GeoARStarPoint
