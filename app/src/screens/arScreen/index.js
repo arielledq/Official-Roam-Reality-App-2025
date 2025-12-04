@@ -824,7 +824,7 @@ const ARScreen = ({route}) => {
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
-    // console.log("Message from Unity:", data);
+    console.log("Message from Unity:", data);
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
@@ -1830,6 +1830,12 @@ const ARScreen = ({route}) => {
 
   const resetAr = () => {
     unityRef.current.postMessage("OBJImport", "RepositionObjectFromButton", "");
+    if (
+      selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
+      (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge)
+    ) {
+      startChallengeHandler(selectedSite);
+    }
   };
 
   useEffect(() => {
