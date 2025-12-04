@@ -246,9 +246,9 @@
 //   const [dataGeoStar, setDataGeoStar] = useState({})
 //
 //
-//   console.log("selectedChallengeData", selectedChallengeData);
+//
 //   const destinationData = selectedDestination
-//   console.log("selectedDestinationAAAAAAAA",selectedDestination);
+
 //   const [mode, setMode] = useState<ModeType>(MODES.AR);
 //   const MODE_TITLES: Record<ModeType, string> = {
 //     ar: "AR MODE",
@@ -375,7 +375,7 @@
 //             })
 //         );
 //
-//         console.log("⭐ Updated sponsors with stars:", updatedData);
+
 //         setUpdatedSponsorsData(updatedData);
 //       }
 //     };

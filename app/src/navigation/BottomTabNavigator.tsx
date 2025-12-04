@@ -2,6 +2,7 @@ import {StyleSheet, Text, View, Image} from "react-native";
 import {createMaterialBottomTabNavigator} from "react-native-paper/react-navigation";
 import {useTheme} from "react-native-paper";
 import {SafeAreaProvider} from "react-native-safe-area-context";
+import {useSelector} from "react-redux";
 
 import Profile from "../screens/profile/profile";
 import Rally from "../screens/rally";
@@ -21,6 +22,9 @@ const BottomTabNavigator = () => {
   const theme = useTheme();
   theme.colors.secondaryContainer = "transparent";
 
+  // Get hideBottomBar state from Redux
+  const hideBottomBar = useSelector((state: any) => state.ar.hideBottomBar);
+
   const glowEffect = () => {
     return (
       <Image
@@ -33,7 +37,7 @@ const BottomTabNavigator = () => {
   return (
     <SafeAreaProvider style={styles.container}>
       <Tab.Navigator
-        barStyle={styles.tabBarStyle}
+        barStyle={{...styles.tabBarStyle, display: hideBottomBar ? "none" : "flex"}}
         activeColor="#FFFFFF"
         inactiveColor="#FFFFFF"
         theme={theme}
@@ -56,7 +60,6 @@ const BottomTabNavigator = () => {
           name="Scores"
           component={ScoreBoard}
           options={{
-            // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
             tabBarIcon: ({focused}) => (
               <View style={{position: "relative"}}>
@@ -72,6 +75,7 @@ const BottomTabNavigator = () => {
           component={ARScreen}
           options={{
             tabBarLabel: "",
+
             tabBarIcon: ({focused}) => (
               <AppButton
                 containerStyle={{

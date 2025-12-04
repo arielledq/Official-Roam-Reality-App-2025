@@ -1,15 +1,15 @@
-document.addEventListener('DOMContentLoaded', function(){
-  const elevField = document.getElementById('id_elevation');
-  const btn = document.createElement('button');
-  btn.type = 'button';
-  btn.textContent = 'Get elevation';
-  btn.style.marginLeft = '8px';
+document.addEventListener("DOMContentLoaded", function () {
+  const elevField = document.getElementById("id_elevation");
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.textContent = "Get elevation";
+  btn.style.marginLeft = "8px";
   elevField.parentNode.insertBefore(btn, elevField.nextSibling);
 
-  btn.addEventListener('click', function(){
-    const lat = document.getElementById('id_latitude').value;
-    const lng = document.getElementById('id_longitude').value;
-    console.log("lat", lat, "lng", lng);
+  btn.addEventListener("click", function () {
+    const lat = document.getElementById("id_latitude").value;
+    const lng = document.getElementById("id_longitude").value;
+
     // const raw = document.getElementById('id_location').value;
     // const point = JSON.parse(raw);
     // const [x, y] = point.coordinates;
@@ -23,19 +23,18 @@ document.addEventListener('DOMContentLoaded', function(){
       `&access_token=${mapboxgl.accessToken}`;
 
     fetch(url)
-      .then(r => r.json())
-      .then(data => {
-        console.log("data", data)
+      .then((r) => r.json())
+      .then((data) => {
         if (data.features && data.features.length) {
-          const elevs = data.features.map(f => f.properties.ele);
+          const elevs = data.features.map((f) => f.properties.ele);
           elevField.value = Math.max(...elevs);
         } else {
-          alert('No elevation data found for this point.');
+          alert("No elevation data found for this point.");
         }
       })
-      .catch(err => {
+      .catch((err) => {
         console.error(err);
-        alert('Error fetching elevation: ' + err.message);
+        alert("Error fetching elevation: " + err.message);
       });
   });
 });

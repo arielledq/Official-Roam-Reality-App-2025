@@ -38,19 +38,19 @@ const HalfCircleProgress: React.FC<HalfCircleProgressProps> = ({
         {/* Background half circle */}
         <Path
           d={createHalfCirclePath(normalizedRadius)}
-          stroke={theme.lightColors?.grey5 || "#c2b2b2ff"}
+          stroke={theme.lightColors?.white || "#c2b2b2ff"}
           strokeWidth={strokeWidth}
           fill="none"
-          strokeLinecap="round"
+          strokeLinecap="square"
         />
         {/* Progress half circle - only render if progress > 0 */}
         {progress > 0 && (
           <Path
             d={createHalfCirclePath(normalizedRadius)}
-            stroke={"#733ff6ff"}
+            stroke={"#8000ff"}
             strokeWidth={strokeWidth}
             fill="none"
-            strokeLinecap="round"
+            strokeLinecap="square"
             strokeDasharray={`${progressLength} ${circumference}`}
             strokeDashoffset={0}
           />

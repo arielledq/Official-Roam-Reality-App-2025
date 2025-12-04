@@ -159,12 +159,10 @@ const UniqueArChallengeCapture = () => {
     } else {
       ("NOOOOO NEEEEEE");
     }
-    console.log("NADA DE NADA onUnityMessages {", unityRef?.current?.onUnityMessage, "}");
   };
 
   // Function to handle the Unity message
   const handleUnityMessage = result => {
-    console.log("Mensaje recibido desde Unity:", result.nativeEvent.message);
     Alert.alert("Mensaje de Unity", result.nativeEvent.message);
   };
 

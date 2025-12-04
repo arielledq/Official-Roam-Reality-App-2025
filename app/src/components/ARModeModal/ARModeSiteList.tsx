@@ -10,6 +10,7 @@ import {
   RefreshControl,
   ActivityIndicator,
 } from "react-native";
+import LinearGradient from "react-native-linear-gradient";
 import AppDropdown from "components/Dropdown";
 import {AppButton} from "components";
 import RefreshIcon from "assets/svg/Refresh.tsx";
@@ -26,16 +27,18 @@ import theme from "assets/theme";
 import {checkHuntCoolDownAPI, checkScansCoolDownAPI} from "network";
 import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import {FontSizes} from "util/FontUtils";
+import {Dropdown} from "react-native-element-dropdown";
 
 interface ARModeSiteListProps {
   selectedMode: any;
   onStartChallenge: (site: any) => void;
   onClose: () => void;
+  refresh?: boolean;
+  sendRefreshSignal?: () => void;
 }
 async function checkHuntGate(starId: number) {
   try {
     const rsp = await checkHuntCoolDownAPI(starId);
-    console.log("[HUNT CHECK raw rsp]", rsp);
 
     if (rsp?.status === 1) {
       return {ok: true, reason: rsp?.message || "OK"};
@@ -56,12 +59,18 @@ async function checkHuntGate(starId: number) {
   } catch (e: any) {
     const status = e?.response?.status || e?.errorStatus || "n/a";
     const msg = e?.response?.data?.message || e?.message?.message || e?.message || "Blocked";
-    console.log("[HUNT CHECK thrown error]", status, e?.response?.data || e);
+
     return {ok: false, reason: `${msg} (status ${status})`};
   }
 }
 
-const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteListProps) => {
+const ARModeSiteList = ({
+  selectedMode,
+  onStartChallenge,
+  onClose,
+  refresh,
+  sendRefreshSignal,
+}: ARModeSiteListProps) => {
   const DEFAULT_SPONSOR = {
     label: `ALL ${selectedMode?.listLabel?.toUpperCase()}`,
     value: 0,
@@ -78,19 +87,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
   const [filteredSites, setFilteredSites] = useState<any>([]);
 
   const startChallengeHandler = async (site: any) => {
-    console.log("startChallengeHandler()", {site, selectedMode});
     let updatedSiteData = {
       ...site,
       selectedMode,
     };
     switch (selectedMode?.mode) {
       case AR_MODES.HUNT_MODE: {
-        console.log("[HUNT] startChallengeHandler()", {
-          siteId: site?.id,
-          starId: site?.ar_star?.id,
-          loc: initialUserLocation,
-        });
-
         const starId = Number(site?.ar_star?.id);
         const geoSiteId = site?.id;
 
@@ -105,7 +107,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         }
 
         const gate = await checkHuntGate(starId);
-        console.log("[HUNT CHECK] starId:", starId, "->", gate);
 
         if (!gate.ok) {
           Toast.show({
@@ -214,7 +215,6 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
 
   const getSitesHandler = (sponsorId: string = "") => {
     if (sponsorId) {
-      console.log("Filtering sites by sponsorId:", sponsorId);
       let updatedSites;
       if (selectedMode?.mode === AR_MODES.SCAN_MODE) {
         updatedSites = sites.filter((site: any) => site?.sponsor?.id === Number(sponsorId));
@@ -243,6 +243,9 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
           sponsorData.find((sponsor: any) => sponsor.value === Number(sponsorId)) || DEFAULT_SPONSOR
         );
       }
+    }
+    if (typeof sendRefreshSignal === "function") {
+      sendRefreshSignal();
     }
   };
 
@@ -328,6 +331,12 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
     return hours * 60 + minutes;
   }
 
+  useEffect(() => {
+    if (refresh) {
+      getSitesHandler();
+    }
+  }, [refresh]);
+
   return (
     <View
       style={{
@@ -337,46 +346,56 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
         paddingHorizontal: widthPercentageToDP("4%"),
       }}
     >
-      <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-between"}}>
+      <LinearGradient
+        colors={["#7a00cf", "#5532ff"]}
+        start={{x: 0, y: 0}}
+        end={{x: 1, y: 0}}
+        style={{
+          flexDirection: "row",
+          height: heightPercentageToDP("7%"),
+          alignItems: "center",
+          borderRadius: 8,
+          marginVertical: heightPercentageToDP(2),
+        }}
+      >
         <View
           style={{
-            height: widthPercentageToDP("22%"),
-            width: widthPercentageToDP("22%"),
-            borderRadius: widthPercentageToDP("100%"),
-            backgroundColor: theme.lightColors?.grey4,
+            width: "20%",
+            height: "100%",
+
             alignItems: "center",
             justifyContent: "center",
           }}
         >
           <Image
-            source={!selectedSponsor?.value ? Images.AppIconLight : {uri: selectedSponsor?.image}}
+            source={!selectedSponsor?.value ? Images.AppLogo : {uri: selectedSponsor?.image}}
             style={{
-              height: widthPercentageToDP("20%"),
-              width: widthPercentageToDP("20%"),
-              borderRadius: 110,
+              height: "70%",
+              width: "70%",
+              borderRadius: 10,
             }}
+            resizeMode="contain"
           />
         </View>
-        <AppDropdown
-          data={sponsorData}
-          customColors={[theme.lightColors?.grey4, theme.lightColors?.grey4]}
-          maxHeight={300}
-          dropdownStyle={{zIndex: 100, height: heightPercentageToDP("6%")}}
-          containerStyle={{
-            // flex: 1,
 
-            marginTop: 0,
-            backgroundColor: theme.lightColors?.black,
-            width: widthPercentageToDP("60%"),
-            borderRadius: 4,
+        <Dropdown
+          style={{
+            width: "75%",
+            height: "100%",
+            backgroundColor: "transparent",
           }}
+          data={sponsorData}
+          containerStyle={{
+            borderWidth: 0,
+            backgroundColor: theme.lightColors?.inputBG || "#222",
+          }}
+          maxHeight={500}
           labelField="label"
           valueField="value"
-          containerStyles={{marginTop: -35, width: 246}}
           selectedTextStyle={{
             ...fontGroup.nunitoBold,
             fontWeight: "bold",
-            color: theme.lightColors?.grey0,
+            color: theme.lightColors?.white,
             fontSize: FontSizes.S16,
           }}
           itemTextStyle={{
@@ -386,25 +405,25 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             color: theme.lightColors?.white,
             fontSize: 14,
           }}
-          placeholder={"Search by brand"}
+          placeholder={"Filter AR by brand"}
           placeholderStyle={{
             ...fontGroup.nunitoBold,
             fontSize: FontSizes.S16,
             fontWeight: "bold",
-            color: theme.lightColors?.grey0,
+            color: theme.lightColors?.white,
           }}
           renderRightIcon={() => (
             <Icon name="chevron-down" family="ionicon" size={25} color={theme.lightColors?.white} />
           )}
-          activeColor={theme.lightColors?.magenta}
+          activeColor={theme.lightColors?.inputBG}
           value={selectedSponsor?.value?.toString().toUpperCase() || ""}
           onChange={item => {
             setSelectedSponsor(item);
           }}
         />
-      </View>
+      </LinearGradient>
 
-      <View
+      {/* <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
@@ -440,10 +459,10 @@ const ARModeSiteList = ({selectedMode, onStartChallenge, onClose}: ARModeSiteLis
             icon={<RefreshIcon width={widthPercentageToDP(20)} height={widthPercentageToDP(20)} />}
           />
         </View>
-      </View>
+      </View> */}
 
       <FlatList
-        style={{marginTop: 15}}
+        style={{marginTop: 10}}
         data={
           filteredSites?.reduce((allChallenges: any[], site: any) => {
             if (!site?.name) return allChallenges;

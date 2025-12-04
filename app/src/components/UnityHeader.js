@@ -1,6 +1,14 @@
 import theme from "assets/theme";
-import React from "react";
-import {View, Text, TouchableOpacity, StyleSheet, Dimensions, StatusBar} from "react-native";
+import React, {useState, useEffect, useRef} from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Dimensions,
+  StatusBar,
+  FlatList,
+} from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -15,6 +23,114 @@ const UnityHeader = ({
   onModeChange,
 }) => {
   const modes = ["Map", "Live", "List"];
+  const [currentMessageIndex, setCurrentMessageIndex] = useState(0);
+  const intervalRef = useRef(null);
+  const flatListRef = useRef(null);
+
+  // Determine if title is array or string
+  const isArrayTitle = Array.isArray(title);
+  const messages = isArrayTitle ? title : [];
+  // Calculate carousel width based on available space (total width - buttons - margins)
+  const carouselWidth =
+    screenWidth * 0.9 - widthPercentageToDP("6%") * 2 - widthPercentageToDP("6%");
+
+  // Reset message index when messages array changes (mode switching)
+  useEffect(() => {
+    if (isArrayTitle && messages.length > 0) {
+      // Reset to first message when switching modes or if current index is out of bounds
+      if (currentMessageIndex >= messages.length) {
+        setCurrentMessageIndex(0);
+        // Also scroll to the first item if FlatList is available
+        if (flatListRef.current) {
+          setTimeout(() => {
+            flatListRef.current.scrollToIndex({
+              index: 0,
+              animated: false, // No animation for reset
+            });
+          }, 100);
+        }
+      }
+    } else if (!isArrayTitle) {
+      // Reset index when switching to non-array title
+      setCurrentMessageIndex(0);
+    }
+  }, [messages, isArrayTitle, currentMessageIndex]);
+
+  // Auto-scroll functionality for array titles
+  useEffect(() => {
+    if (isArrayTitle && messages.length > 1) {
+      // Clear any existing interval
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+
+      // Set new interval for auto-scroll every 10 seconds
+      intervalRef.current = setInterval(() => {
+        if (messages.length > 0) {
+          const nextIndex =
+            currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
+          scrollToIndex(nextIndex);
+        }
+      }, 10000);
+
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+        }
+      };
+    }
+  }, [isArrayTitle, messages.length, currentMessageIndex]);
+
+  const scrollToIndex = index => {
+    if (flatListRef.current && isArrayTitle && messages.length > 0) {
+      // Safety check: ensure index is within bounds
+      const safeIndex = Math.max(0, Math.min(index, messages.length - 1));
+      try {
+        flatListRef.current.scrollToIndex({
+          index: safeIndex,
+          animated: true,
+        });
+        setCurrentMessageIndex(safeIndex);
+      } catch (error) {
+        console.warn("ScrollToIndex error:", error);
+        // Fallback: reset to first item
+        setCurrentMessageIndex(0);
+      }
+    }
+  };
+
+  const goToPrevious = () => {
+    if (messages.length === 0) return;
+    const newIndex = currentMessageIndex === 0 ? messages.length - 1 : currentMessageIndex - 1;
+    scrollToIndex(newIndex);
+  };
+
+  const goToNext = () => {
+    if (messages.length === 0) return;
+    const newIndex = currentMessageIndex === messages.length - 1 ? 0 : currentMessageIndex + 1;
+    scrollToIndex(newIndex);
+  };
+
+  const onScrollEnd = event => {
+    if (messages.length === 0) return;
+
+    const slideSize = carouselWidth;
+    const index = Math.round(event.nativeEvent.contentOffset.x / slideSize);
+    // Safety check: ensure index is within bounds
+    const safeIndex = Math.max(0, Math.min(index, messages.length - 1));
+
+    if (safeIndex !== currentMessageIndex) {
+      setCurrentMessageIndex(safeIndex);
+    }
+  };
+
+  const renderMessageItem = ({item, index}) => (
+    <View style={[styles.messageSlide, {width: carouselWidth}]}>
+      <Text style={styles.titleText} numberOfLines={2} adjustsFontSizeToFit>
+        {item.message}
+      </Text>
+    </View>
+  );
 
   const renderModeButton = mode => {
     const isSelected = selectedMode === mode;
@@ -26,7 +142,7 @@ const UnityHeader = ({
           colors={
             isSelected
               ? ["#7a00cf", "#5532ff"]
-              : [theme.lightColors?.grey4, theme.lightColors?.grey4]
+              : [theme.lightColors?.grey5, theme.lightColors?.grey5]
           }
           start={{x: 0, y: 1}}
           end={{x: 1, y: 1}}
@@ -50,7 +166,49 @@ const UnityHeader = ({
       </View>
 
       <View style={styles.titleContainer}>
-        <Text style={styles.titleText}>{title}</Text>
+        {isArrayTitle && messages.length > 1 ? (
+          <View style={styles.carouselContainer}>
+            <TouchableOpacity style={styles.carouselButton} onPress={goToPrevious}>
+              <Icon name="chevron-back" size={16} color="#ffffff" />
+            </TouchableOpacity>
+
+            <FlatList
+              ref={flatListRef}
+              data={messages}
+              renderItem={renderMessageItem}
+              keyExtractor={item => item.id.toString()}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              pagingEnabled
+              onMomentumScrollEnd={onScrollEnd}
+              scrollEventThrottle={16}
+              decelerationRate="fast"
+              snapToInterval={carouselWidth}
+              snapToAlignment="center"
+              contentContainerStyle={styles.flatListContainer}
+              style={styles.flatListStyle}
+              getItemLayout={(data, index) => ({
+                length: carouselWidth,
+                offset: carouselWidth * index,
+                index,
+              })}
+              bounces={false}
+              overScrollMode="never"
+            />
+
+            <TouchableOpacity style={styles.carouselButton} onPress={goToNext}>
+              <Icon name="chevron-forward" size={16} color="#ffffff" />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <Text style={styles.titleText}>
+            {typeof title === "string"
+              ? title
+              : isArrayTitle && messages[0]
+              ? messages[0].message
+              : "Choose your AR MODE"}
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -63,10 +221,10 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     zIndex: 1000,
-    backgroundColor: "rgba(56, 55, 55, 0.95)", // More solid background like in screenshot
+    backgroundColor: "#000000", // More solid background like in screenshot
     paddingVertical: "4%",
     paddingHorizontal: "4%",
-    marginHorizontal: "5%",
+    marginHorizontal: "3.5%",
     borderRadius: 12,
 
     alignSelf: "center",
@@ -82,7 +240,7 @@ const styles = StyleSheet.create({
   backButton: {
     width: widthPercentageToDP("12%"),
     height: widthPercentageToDP("10%"),
-    backgroundColor: theme.lightColors?.grey4,
+    backgroundColor: theme.lightColors?.grey5,
     borderRadius: 6,
     justifyContent: "center",
     alignItems: "center",
@@ -93,7 +251,7 @@ const styles = StyleSheet.create({
   },
   titleText: {
     color: theme.lightColors?.white,
-    fontSize: FontSizes.S16,
+    fontSize: FontSizes.S14,
     fontWeight: "600",
     textAlign: "center",
   },
@@ -119,6 +277,40 @@ const styles = StyleSheet.create({
   selectedModeButtonText: {
     color: "#ffffff",
     fontWeight: "700",
+  },
+  carouselContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    width: "100%",
+    height: widthPercentageToDP("10%"),
+  },
+  carouselButton: {
+    width: widthPercentageToDP("8%"),
+    height: widthPercentageToDP("8%"),
+    backgroundColor: theme.lightColors?.grey5,
+    borderRadius: 4,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  messageContainer: {
+    flex: 1,
+    marginHorizontal: widthPercentageToDP("2%"),
+    alignItems: "center",
+  },
+  flatListContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  flatListStyle: {
+    flex: 1,
+    maxHeight: widthPercentageToDP("10%"),
+  },
+  messageSlide: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: widthPercentageToDP("1%"),
+    height: widthPercentageToDP("10%"),
   },
 });
 

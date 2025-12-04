@@ -5,14 +5,14 @@
 
 <defs>
   <!-- Gradient for depth effect -->
-  <linearGradient id="greenGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-    <stop offset="0%" style="stop-color:#5dff2d;stop-opacity:1" />
-    <stop offset="50%" style="stop-color:#34c303;stop-opacity:1" />
-    <stop offset="100%" style="stop-color:#268902;stop-opacity:1" />
+  <linearGradient id="purpleGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" style="stop-color:#a64dff;stop-opacity:1" />
+    <stop offset="50%" style="stop-color:#8000ff;stop-opacity:1" />
+    <stop offset="100%" style="stop-color:#5d00b3;stop-opacity:1" />
   </linearGradient>
   
   <!-- Shadow filter for 3D effect -->
-  <filter id="shadow" x="-50%" y="-50%" width="200%" height="200%">
+  <filter id="shadowPurple" x="-50%" y="-50%" width="200%" height="200%">
     <feGaussianBlur in="SourceAlpha" stdDeviation="0.8"/>
     <feOffset dx="0" dy="1.5" result="offsetblur"/>
     <feComponentTransfer>
@@ -25,7 +25,7 @@
   </filter>
   
   <!-- Inner shadow for depth -->
-  <filter id="innerShadow">
+  <filter id="innerShadowPurple">
     <feGaussianBlur in="SourceAlpha" stdDeviation="0.3"/>
     <feOffset dx="0" dy="0.5" result="offsetblur"/>
     <feFlood flood-color="#000000" flood-opacity="0.3"/>
@@ -41,13 +41,13 @@
 
 <g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"/>
 
-<g id="SVGRepo_iconCarrier" filter="url(#shadow)">
+<g id="SVGRepo_iconCarrier" filter="url(#shadowPurple)">
   <!-- Main pin shape with gradient -->
-  <path fill="url(#greenGradient)" stroke="#34c303" stroke-width="0.3" d="m8.075 23.52c-6.811-9.878-8.075-10.891-8.075-14.52 0-4.971 4.029-9 9-9s9 4.029 9 9c0 3.629-1.264 4.64-8.075 14.516-.206.294-.543.484-.925.484s-.719-.19-.922-.48l-.002-.004z"/>
+  <path fill="url(#purpleGradient)" stroke="#4400a6" stroke-width="0.3" d="m8.075 23.52c-6.811-9.878-8.075-10.891-8.075-14.52 0-4.971 4.029-9 9-9s9 4.029 9 9c0 3.629-1.264 4.64-8.075 14.516-.206.294-.543.484-.925.484s-.719-.19-.922-.48l-.002-.004z"/>
   
   <!-- Inner circle with white glow for depth -->
   <circle cx="9" cy="9" r="4.2" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.4"/>
-  <circle cx="9" cy="9" r="3.75" fill="rgba(255,255,255,0.9)" filter="url(#innerShadow)"/>
+  <circle cx="9" cy="9" r="3.75" fill="rgba(255,255,255,0.9)" filter="url(#innerShadowPurple)"/>
   
   <!-- Highlight for glossy effect -->
   <ellipse cx="8" cy="7.5" rx="2" ry="1.5" fill="rgba(255,255,255,0.4)"/>

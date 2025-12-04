@@ -36,7 +36,7 @@ const GeoArOutdoor = ({route}: any) => {
   const account_setup = useSelector(
     (state: any) => state.login?.data?.user?.user_profile?.account_setup
   );
-  console.log("account_setup:", account_setup);
+
   const selectedDestination = useSelector((state: any) => state.ar?.selectedDestination);
 
   const bottomSheetRef = useRef<BottomSheet>(null);

@@ -10,4 +10,5 @@ export {
   updateDestinationData,
   updateStarSitesCount,
   updateSponsors,
+  setHideBottomBar,
 } from "./reducer";
