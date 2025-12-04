@@ -605,8 +605,8 @@ class ScanPicture(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
-    screen_title = models.CharField(
-        _("Screen Title"), max_length=200, blank=True, null=True, help_text="Title to display on the screen"
+    screen_title = models.JSONField(
+        _("Screen Title"), blank=True, null=True, help_text="Multiple titles to display on the screen (stored as a list)"
     )
     file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/", null=True, blank=True)
     #file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
@@ -797,8 +797,8 @@ class GeoARStarPoint(models.Model):
                                           null=True, blank=True)
 
     title = models.CharField(_("Title"), max_length=255, blank=True, null=True)
-    screen_title = models.CharField(
-        _("Screen Title"), max_length=200, blank=True, null=True, help_text="Title to display on the screen"
+    screen_title = models.JSONField(
+        _("Screen Title"), blank=True, null=True, help_text="Multiple titles to display on the screen (stored as a list)"
     )
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
     elevation = models.IntegerField(_("Elevation"), null=True, blank=True, help_text="Elevation for this AR point")

@@ -94,10 +94,25 @@ class SimpleGeoARStarPointSerializer(serializers.ModelSerializer):
     """Simplified serializer for GeoARStarPoint in ARExample context"""
     image = serializers.ImageField()
     model_file = serializers.FileField()
+    screen_title = serializers.SerializerMethodField()
     
     class Meta:
         model = GeoARStarPoint
-        fields = ["id", "title", "image", "model_file", "fun_facts", "elevation", "points", "order"]
+        fields = ["id", "title", "screen_title", "image", "model_file", "fun_facts", "elevation", "points", "order"]
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
 
 
 class ExamplesSerializer(serializers.ModelSerializer):
@@ -256,12 +271,27 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     user_attempts = serializers.SerializerMethodField()
     cooldown = serializers.SerializerMethodField()
+    screen_title = serializers.SerializerMethodField()
 
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
         fields = ['id', 'name', 'screen_title', 'file_image', 'icon', 'file_animation_android', 'file_animation_ios',
                   'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation", 'parameters']
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
@@ -867,6 +897,7 @@ class GeoStarPointSerializer(GeoModelSerializer):
     file_animation_android = serializers.FileField()
     file_animation_ios = serializers.FileField()
     sponsors = SponsorSerializer(many=True)
+    screen_title = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoARStarPoint
@@ -891,6 +922,20 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "sponsors",
             'points',
         )
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
 
     def get_remaining_stars(self, instance):
         ar_star = instance.geo_ar_star
