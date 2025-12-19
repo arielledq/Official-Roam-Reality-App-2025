@@ -179,6 +179,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
 
 class FriendshipRequestSerializer(serializers.ModelSerializer):
     from_user = UserSerializer()
+    from_user_id = serializers.IntegerField(source='from_user.id', read_only=True)
     to_user = UserSerializer()
 
     class Meta:

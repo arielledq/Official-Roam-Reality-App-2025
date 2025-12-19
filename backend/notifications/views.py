@@ -57,3 +57,12 @@ class NotificationsView(viewsets.ModelViewSet):
         notifications_to_mark_as_read = Notification.objects.filter(targets=request.user, is_read=False)
         notifications_to_mark_as_read.update(is_read=True)
         return Response()
+    
+    def destroy(self, request, *args, **kwargs):
+        """Delete a notification"""
+        instance = self.get_object()
+        # Only allow deleting notifications that belong to the user
+        if request.user in instance.targets.all():
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        return Response({"message": "You don't have permission to delete this notification."}, status=status.HTTP_403_FORBIDDEN)

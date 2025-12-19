@@ -479,9 +479,19 @@ class FriendshipViewSet(ModelViewSet):
             if existing_request:
                 return Response({"message": "Friendship request already sent."}, status=status.HTTP_400_BAD_REQUEST)
 
-            FriendshipRequest.objects.create(from_user=from_user, to_user=to_user)
-            send_notification(NotificationTypes.FRIEND_REQUEST_SENT, to_user)
-            return Response({"message": "Friendship request sent."}, status=status.HTTP_200_OK)
+            friendship_request = FriendshipRequest.objects.create(from_user=from_user, to_user=to_user)
+            send_notification(
+                NotificationTypes.FRIEND_REQUEST_SENT, 
+                to_user, 
+                {'from_user': from_user}, 
+                {
+                    'from_user_id': from_user.id,
+                    'friendship_request_id': friendship_request.id,
+                    'kind': 'friend_request',
+                    'action': 'view_request'
+                }
+            )
+            return Response({"message": "Friendship request sent.", "friendship_request_id": friendship_request.id}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -495,6 +505,15 @@ class FriendshipViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            from_user = instance.from_user
+            to_user = request.user
+            # Delete friend request notification when rejected
+            from notifications.models import Notification
+            Notification.objects.filter(
+                type=NotificationTypes.FRIEND_REQUEST_SENT,
+                from_user=from_user,
+                targets=to_user
+            ).delete()
             super().destroy(request, *args, **kwargs)
             return Response({"message": "Friendship request rejected."}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -509,19 +528,19 @@ class FriendshipViewSet(ModelViewSet):
             friendship_request.delete()
             to_user.user_profile.friends.add(from_user)
             from_user.user_profile.friends.add(to_user)
+            # Delete friend request notification for the user who accepted
+            from notifications.models import Notification
+            Notification.objects.filter(
+                type=NotificationTypes.FRIEND_REQUEST_SENT,
+                from_user=from_user,
+                targets=to_user
+            ).delete()
             send_notification(
                 NotificationTypes.FRIEND_REQUEST_ACCEPTED,
                 from_user,
                 {},
                 {'friend_name': to_user.get_full_name()}
             )
-            # Notification.objects.create(
-            # sender=from_user,
-            # receiver=from_user,
-            # title="Friend Request",
-            # message=f"{to_user.name} accpeted your friend request",
-            # notification_type=Notification.FRIEND_REQUEST,
-            #  )
             return Response({"message": "Friendship request accepted."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

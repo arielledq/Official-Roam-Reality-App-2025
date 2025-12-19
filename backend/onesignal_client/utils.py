@@ -1,5 +1,6 @@
 from notifications.models import Notification, NotificationTypes
 
+import json
 
 def send_notification(notification_type, user, data=None, extra_data=None, title=None, description=None):
     if data is None:
@@ -54,11 +55,18 @@ def send_notification(notification_type, user, data=None, extra_data=None, title
     # Get the notification details based on the type
     notification_details = notification_mapping.get(notification_type)
 
+    # Get from_user from data if provided (for friend requests)
+    from_user = data.get('from_user') if data else None
+    
+    # Convert extra_data dict to string for storage
+    extra_data_str = json.dumps(extra_data) if extra_data else None
+    
     notification = Notification.objects.create(
         title=notification_details['title'],
         description=notification_details['description'],
-        extra_data=extra_data,
+        extra_data=extra_data_str,
         type=notification_type,
+        from_user=from_user,
     )
     notification.targets.set([user])
     notification.send()
