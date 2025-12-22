@@ -53,10 +53,17 @@ class OneSignalClient:
             **extra_data_dict
         }
         
-        # Add from_user_id if available
+        # Add from_user_id and profile image if available
         if notification.from_user:
             data["from_user_id"] = notification.from_user.id
             data["from_user_name"] = notification.from_user.name or notification.from_user.username
+            
+            # Add user profile image if available
+            if hasattr(notification.from_user, 'user_profile'):
+                profile = notification.from_user.user_profile
+                data["from_user_profile"] = {
+                    "image": profile.get_image_url(),
+                }
 
         # Build notification payload
         notification_payload = {
