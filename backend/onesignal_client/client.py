@@ -5,6 +5,9 @@ from onesignal_sdk.client import Client
 import json
 import logging
 
+# Local
+from users.models import get_placeholder_image_base64
+
 
 LOGGER = logging.getLogger('django')
 
@@ -53,17 +56,30 @@ class OneSignalClient:
             **extra_data_dict
         }
         
-        # Add from_user_id and profile image if available
+        # Add from_user, from_user_id and profile image if available
+        # These fields override any values from extra_data_dict to ensure consistency
         if notification.from_user:
+            data["from_user"] = notification.from_user.name or notification.from_user.username
             data["from_user_id"] = notification.from_user.id
-            data["from_user_name"] = notification.from_user.name or notification.from_user.username
-            
-            # Add user profile image if available
-            if hasattr(notification.from_user, 'user_profile'):
-                profile = notification.from_user.user_profile
+
+            # Add user profile image if available; always include a value (placeholder if missing)
+            profile_image_url = None
+            try:
+                profile = notification.from_user.user_profile  # may raise RelatedObjectDoesNotExist
+                profile_image_url = profile.get_image_url()
+            except Exception as e:
+                LOGGER.warning(f"User {notification.from_user.id} has no profile image, using placeholder: {e}")
+                profile_image_url = get_placeholder_image_base64()
+
+            if profile_image_url:
                 data["from_user_profile"] = {
-                    "image": profile.get_image_url(),
+                    "image": profile_image_url,
                 }
+                LOGGER.info(f"Added from_user_profile with image: {profile_image_url}")
+
+            LOGGER.info(f"Added from_user data - from_user: {data['from_user']}, from_user_id: {data['from_user_id']}")
+        else:
+            LOGGER.info("Notification has no from_user")
 
         # Build notification payload
         notification_payload = {

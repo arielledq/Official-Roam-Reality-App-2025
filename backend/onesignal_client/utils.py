@@ -57,10 +57,15 @@ def send_notification(notification_type, user, data=None, extra_data=None, title
 
     # Get from_user from data if provided (for friend requests)
     from_user = data.get('from_user') if data else None
-    
+
+    # If a profile image URL is passed in data, place it into extra_data so it travels with the notification
+    profile_image_url = data.get('profile_image_url') if data else None
+    if profile_image_url:
+        extra_data = {**extra_data, "from_user_profile": {"image": profile_image_url}}
+
     # Convert extra_data dict to string for storage
     extra_data_str = json.dumps(extra_data) if extra_data else None
-    
+    LOGGER.info(f"from_user: {from_user}")
     notification = Notification.objects.create(
         title=notification_details['title'],
         description=notification_details['description'],
