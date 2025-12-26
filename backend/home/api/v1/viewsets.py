@@ -469,6 +469,13 @@ class FriendshipViewSet(ModelViewSet):
     serializer_class = FriendshipRequestSerializer
     queryset = FriendshipRequest.objects.all()
 
+    def get_queryset(self):
+        """
+        Filter queryset to only show friendship requests sent to the current user.
+        This ensures users can only reject/accept requests that were sent to them.
+        """
+        return FriendshipRequest.objects.filter(to_user=self.request.user)
+
     def create(self, request, *args, **kwargs):
         try:
             from_user = request.user
