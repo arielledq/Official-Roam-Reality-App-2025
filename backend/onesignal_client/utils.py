@@ -65,7 +65,6 @@ def send_notification(notification_type, user, data=None, extra_data=None, title
 
     # Convert extra_data dict to string for storage
     extra_data_str = json.dumps(extra_data) if extra_data else None
-    LOGGER.info(f"from_user: {from_user}")
     notification = Notification.objects.create(
         title=notification_details['title'],
         description=notification_details['description'],
