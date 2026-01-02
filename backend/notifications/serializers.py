@@ -1,5 +1,7 @@
 import ast
 from rest_framework import serializers
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
 
 from notifications.models import Notification
 
@@ -61,6 +63,36 @@ class NotificationSerializer(serializers.ModelSerializer):
         try:
             parsed = ast.literal_eval(raw)
             if isinstance(parsed, dict):
+                # Handle memory_file_key: generate fresh presigned URL
+                if 'memory_file_key' in parsed and parsed['memory_file_key']:
+                    try:
+                        if settings.USE_S3:
+                            storage = S3Boto3Storage()
+                            parsed['image'] = storage.url(parsed['memory_file_key'])
+                        else:
+                            # For local storage, construct URL manually
+                            parsed['image'] = f"{settings.MEDIA_URL}{parsed['memory_file_key']}"
+                    except Exception as e:
+                        # If URL generation fails, remove the key
+                        parsed.pop('memory_file_key', None)
+
+                # Handle expired URLs: detect and regenerate
+                if 'image' in parsed and parsed['image']:
+                    image_url = parsed['image']
+                    # Check if URL contains expiration parameters and might be expired
+                    if 'X-Amz-Expires=' in image_url and ('X-Amz-Date=' in image_url or 'X-Amz-Signature=' in image_url):
+                        try:
+                            # Extract the file key from the URL to regenerate
+                            # URL format: https://bucket.s3.region.amazonaws.com/media/ar/memories/filename.ext?params
+                            if settings.USE_S3 and 'amazonaws.com' in image_url:
+                                # Extract path after bucket
+                                url_parts = image_url.split('amazonaws.com/')[1].split('?')[0]
+                                storage = S3Boto3Storage()
+                                parsed['image'] = storage.url(url_parts)
+                        except Exception as e:
+                            # Keep original URL if regeneration fails
+                            pass
+
                 return parsed
         except (ValueError, SyntaxError):
             pass

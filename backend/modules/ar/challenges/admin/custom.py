@@ -87,7 +87,7 @@ def reject_and_notify(self, request, queryset):
                 type=NotificationTypes.POINTS_REVOKED,
                 channel=Notification.NotificationChannel.PUSH,
                 extra_data={
-                    "image": memory_checkin.memory_file.url if memory_checkin.memory_file else None,
+                    "memory_file_key": memory_checkin.memory_file.name if memory_checkin.memory_file else None,
                 },
             )
             notification.targets.set([user])
