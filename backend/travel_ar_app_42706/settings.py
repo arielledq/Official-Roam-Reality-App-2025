@@ -119,6 +119,7 @@ LOCAL_APPS = [
     'onesignal_client',
     'configuration',
     'slide_pictures',
+    'randomizer_challenge',
 ]
 THIRD_PARTY_APPS = [
     'corsheaders',
