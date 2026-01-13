@@ -135,7 +135,7 @@ class RandomizerChallengeCreateSerializer(serializers.ModelSerializer):
 
     def validate_tracks(self, value):
         """Validate tracks data"""
-        # Maximum 5 tracks per challenge
-        if len(value) > 5:
-            raise serializers.ValidationError("A challenge can have a maximum of 5 tracks.")
+        # Maximum 8 tracks per challenge
+        if len(value) > 8:
+            raise serializers.ValidationError("A challenge can have a maximum of 8 tracks.")
         return value

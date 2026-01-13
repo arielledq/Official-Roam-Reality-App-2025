@@ -146,11 +146,11 @@ class RandomizerTrack(models.Model):
         if self.track_number < 1:
             raise ValidationError('Track number must be positive')
 
-        # Validate maximum 5 tracks per challenge
+        # Validate maximum 8 tracks per challenge
         if not self.pk:  # New track
             current_track_count = RandomizerTrack.objects.filter(challenge=self.challenge).count()
-            if current_track_count >= 5:
-                raise ValidationError("A challenge can have a maximum of 5 tracks.")
+            if current_track_count >= 8:
+                raise ValidationError("A challenge can have a maximum of 8 tracks.")
 
         # Validate track number uniqueness within challenge
         if self.pk:  # Existing track

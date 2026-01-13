@@ -5,7 +5,7 @@ from .models import RandomizerChallenge, RandomizerTrack
 class RandomizerTrackInline(admin.TabularInline):
     model = RandomizerTrack
     extra = 1  # Show 1 empty form for adding new tracks
-    max_num = 5  # Maximum 5 tracks per challenge
+    max_num = 8  # Maximum 8 tracks per challenge
     fields = ['track_number', 'title', 'image', 'audio', 'ranking']
     readonly_fields = []  # Allow editing track numbers
 
@@ -14,7 +14,7 @@ class RandomizerTrackInline(admin.TabularInline):
         formfield = super().formfield_for_dbfield(db_field, **kwargs)
         if db_field.name == 'track_number':
             # Add help text for track number
-            formfield.help_text = "Unique number within this challenge (1-5)"
+            formfield.help_text = "Unique number within this challenge (1-8)"
         elif db_field.name == 'title':
             formfield.help_text = "Required: Track title"
         elif db_field.name == 'image':
@@ -55,7 +55,7 @@ class RandomizerChallengeAdmin(admin.ModelAdmin):
 
     def tracks_count(self, obj):
         count = obj.tracks.count()
-        return f"{count}/5 tracks"
+        return f"{count}/8 tracks"
     tracks_count.short_description = "Tracks"
 
     def has_add_permission(self, request):
@@ -94,7 +94,7 @@ class RandomizerTrackAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Track Information', {
             'fields': ('track_number',),
-            'description': 'Assign a unique track number (1-5) for this track in the main challenge.'
+            'description': 'Assign a unique track number (1-8) for this track in the main challenge.'
         }),
         ('Content', {
             'fields': ('title', 'image', 'audio'),
@@ -137,7 +137,7 @@ class RandomizerTrackAdmin(admin.ModelAdmin):
         if db_field.name == 'challenge':
             formfield.help_text = "Select the challenge this track belongs to"
         elif db_field.name == 'track_number':
-            formfield.help_text = "Unique number within the selected challenge (1-5). Check existing tracks to avoid conflicts."
+            formfield.help_text = "Unique number within the selected challenge (1-8). Check existing tracks to avoid conflicts."
         elif db_field.name == 'title':
             formfield.help_text = "Required: Descriptive title for this track"
         elif db_field.name == 'image':
@@ -150,7 +150,7 @@ class RandomizerTrackAdmin(admin.ModelAdmin):
         """Customize form for new tracks"""
         form = super().get_form(request, obj, **kwargs)
         if not obj:  # New track
-            form.base_fields['track_number'].help_text = "Choose a track number (1-5) that doesn't conflict with existing tracks in the selected challenge"
+            form.base_fields['track_number'].help_text = "Choose a track number (1-8) that doesn't conflict with existing tracks in the selected challenge"
         return form
 
     def has_image(self, obj):
