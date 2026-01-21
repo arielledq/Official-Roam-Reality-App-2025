@@ -633,14 +633,14 @@ class FindFriendsAPIView(APIView):
 
 class ModeViewSet(ModelViewSet):
     """
-    ViewSet for managing Modes (Geo-tag, Band, Hunt, Scans)
-    Provides list and retrieve actions.
+    ViewSet for managing Modes (Geo-tag, Band, Hunt, Scans, Free Range)
+    Provides full CRUD operations for admin management.
     """
     serializer_class = ModeSerializer
     queryset = Mode.objects.all()
     permission_classes = []
     authentication_classes = []
-    http_method_names = ['get']  # Only allow GET requests (list and retrieve)
+    http_method_names = ['get', 'post', 'put', 'patch']  # Allow full CRUD operations
     
     def get_queryset(self):
         """Return all modes, optionally filter by status"""

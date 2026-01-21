@@ -98,6 +98,14 @@ SOCIAL_AUTH_FACEBOOK_SECRET = env.str("SOCIAL_AUTH_FACEBOOK_SECRET", "")
 
 if not SOCIAL_AUTH_FACEBOOK_KEY:
     SOCIAL_AUTH_FACEBOOK_KEY = FACEBOOK_APP_ID
+
+# Google OAuth Configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", "")
+GOOGLE_CLIENT_ID = env.str("GOOGLE_CLIENT_ID", SOCIAL_AUTH_GOOGLE_OAUTH2_KEY)
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", "")
+
+if not SOCIAL_AUTH_GOOGLE_OAUTH2_KEY:
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = GOOGLE_CLIENT_ID
 # Application definition
 
 INSTALLED_APPS = [
@@ -278,6 +286,26 @@ SOCIALACCOUNT_PROVIDERS = {
             "client_id": SOCIAL_AUTH_FACEBOOK_KEY,
             "secret": SOCIAL_AUTH_FACEBOOK_SECRET,
             "key": SOCIAL_AUTH_FACEBOOK_KEY,
+        },
+    },
+    "google": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "profile"],
+        "FIELDS": ["id", "email", "name", "given_name", "family_name"],
+        "APP": {
+            "client_id": SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+            "secret": SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+            "key": SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+        },
+    },
+    "apple": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "name"],
+        "FIELDS": ["id", "email", "name"],
+        "APP": {
+            "client_id": env.str("SOCIAL_AUTH_APPLE_ID", ""),
+            "secret": env.str("SOCIAL_AUTH_APPLE_SECRET", ""),
+            "key": env.str("SOCIAL_AUTH_APPLE_ID", ""),
         },
     },
 }
