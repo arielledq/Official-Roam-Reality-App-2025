@@ -1,4 +1,7 @@
 from rest_framework import serializers
+from django.conf import settings
+from storages.backends.s3boto3 import S3Boto3Storage
+
 from .models import RandomizerChallenge, RandomizerTrack, validate_ranking
 
 
@@ -16,12 +19,38 @@ class RandomizerTrackSerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'challenge', 'created_at', 'updated_at']
 
     def get_image_url(self, obj):
-        """Return the image URL"""
-        return obj.image_url
+        """Return the image URL with fresh presigned URL generation"""
+        if not obj.image:
+            return None
+
+        # Generate fresh presigned URL from file key
+        try:
+            if settings.USE_S3:
+                storage = S3Boto3Storage()
+                return storage.url(obj.image.name)
+            else:
+                # For local storage, construct URL manually
+                return f"{settings.MEDIA_URL}{obj.image.name}"
+        except Exception as e:
+            # Fallback to original method if URL generation fails
+            return obj.image_url
 
     def get_audio_url(self, obj):
-        """Return the audio URL"""
-        return obj.audio_url
+        """Return the audio URL with fresh presigned URL generation"""
+        if not obj.audio:
+            return None
+
+        # Generate fresh presigned URL from file key
+        try:
+            if settings.USE_S3:
+                storage = S3Boto3Storage()
+                return storage.url(obj.audio.name)
+            else:
+                # For local storage, construct URL manually
+                return f"{settings.MEDIA_URL}{obj.audio.name}"
+        except Exception as e:
+            # Fallback to original method if URL generation fails
+            return obj.audio_url
 
     def validate_track_number(self, value):
         """Validate track number is positive"""
