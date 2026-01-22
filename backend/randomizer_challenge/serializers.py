@@ -24,16 +24,15 @@ class RandomizerTrackSerializer(serializers.ModelSerializer):
             return None
 
         # Generate fresh presigned URL from file key
-        try:
-            if settings.USE_S3:
+        if settings.USE_S3:
+            try:
                 storage = S3Boto3Storage()
                 return storage.url(obj.image.name)
-            else:
-                # For local storage, construct URL manually
-                return f"{settings.MEDIA_URL}{obj.image.name}"
-        except Exception as e:
-            # Fallback to original method if URL generation fails
-            return obj.image_url
+            except Exception as e:
+                return None
+        else:
+            # For local storage, construct URL manually
+            return f"{settings.MEDIA_URL}{obj.image.name}"
 
     def get_audio_url(self, obj):
         """Return the audio URL with fresh presigned URL generation"""
@@ -41,16 +40,15 @@ class RandomizerTrackSerializer(serializers.ModelSerializer):
             return None
 
         # Generate fresh presigned URL from file key
-        try:
-            if settings.USE_S3:
+        if settings.USE_S3:
+            try:
                 storage = S3Boto3Storage()
                 return storage.url(obj.audio.name)
-            else:
-                # For local storage, construct URL manually
-                return f"{settings.MEDIA_URL}{obj.audio.name}"
-        except Exception as e:
-            # Fallback to original method if URL generation fails
-            return obj.audio_url
+            except Exception as e:
+                return None
+        else:
+            # For local storage, construct URL manually
+            return f"{settings.MEDIA_URL}{obj.audio.name}"
 
     def validate_track_number(self, value):
         """Validate track number is positive"""
