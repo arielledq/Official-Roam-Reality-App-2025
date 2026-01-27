@@ -262,6 +262,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+# File Size
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB (50 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
+
 # allauth / users
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
