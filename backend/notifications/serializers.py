@@ -67,8 +67,7 @@ class NotificationSerializer(serializers.ModelSerializer):
                 if 'memory_file_key' in parsed and parsed['memory_file_key']:
                     try:
                         if settings.USE_S3:
-                            storage = S3Boto3Storage()
-                            parsed['image'] = storage.url(parsed['memory_file_key'])
+                            parsed['image'] = default_storage.url(parsed['memory_file_key'])
                         else:
                             # For local storage, construct URL manually
                             parsed['image'] = f"{settings.MEDIA_URL}{parsed['memory_file_key']}"
