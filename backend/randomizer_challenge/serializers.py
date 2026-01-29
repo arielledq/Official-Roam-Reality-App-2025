@@ -1,6 +1,5 @@
 from rest_framework import serializers
 from django.conf import settings
-from storages.backends.s3boto3 import S3Boto3Storage
 
 from .models import RandomizerChallenge, RandomizerTrack, ChallengeVideo, validate_ranking
 from modules.ar.challenges.serializers import SponsorSerializer
@@ -24,32 +23,24 @@ class RandomizerTrackSerializer(serializers.ModelSerializer):
         if not obj.image:
             return None
 
-        # Generate fresh presigned URL from file key
-        if settings.USE_S3:
-            try:
-                storage = S3Boto3Storage()
-                return storage.url(obj.image.name)
-            except Exception as e:
-                return None
-        else:
-            # For local storage, construct URL manually
-            return f"{settings.MEDIA_URL}{obj.image.name}"
+        # Use the file's own storage backend to generate URL
+        # This ensures the correct AWS_MEDIA_LOCATION (media/) is included
+        try:
+            return obj.image.url
+        except Exception as e:
+            return None
 
     def get_audio_url(self, obj):
         """Return the audio URL with fresh presigned URL generation"""
         if not obj.audio:
             return None
 
-        # Generate fresh presigned URL from file key
-        if settings.USE_S3:
-            try:
-                storage = S3Boto3Storage()
-                return storage.url(obj.audio.name)
-            except Exception as e:
-                return None
-        else:
-            # For local storage, construct URL manually
-            return f"{settings.MEDIA_URL}{obj.audio.name}"
+        # Use the file's own storage backend to generate URL
+        # This ensures the correct AWS_MEDIA_LOCATION (media/) is included
+        try:
+            return obj.audio.url
+        except Exception as e:
+            return None
 
     def validate_track_number(self, value):
         """Validate track number is positive"""
@@ -125,16 +116,12 @@ class RandomizerChallengeSerializer(serializers.ModelSerializer):
         if not obj.thumbnail:
             return None
 
-        # Generate fresh presigned URL from file key
-        if settings.USE_S3:
-            try:
-                storage = S3Boto3Storage()
-                return storage.url(obj.thumbnail.name)
-            except Exception as e:
-                return None
-        else:
-            # For local storage, construct URL manually
-            return f"{settings.MEDIA_URL}{obj.thumbnail.name}"
+        # Use the file's own storage backend to generate URL
+        # This ensures the correct AWS_MEDIA_LOCATION (media/) is included
+        try:
+            return obj.thumbnail.url
+        except Exception as e:
+            return None
 
 
 class RandomizerTrackCreateSerializer(RandomizerTrackSerializer):
@@ -210,13 +197,9 @@ class ChallengeVideoSerializer(serializers.ModelSerializer):
         if not obj.video:
             return None
 
-        # Generate fresh presigned URL from file key
-        if settings.USE_S3:
-            try:
-                storage = S3Boto3Storage()
-                return storage.url(obj.video.name)
-            except Exception as e:
-                return None
-        else:
-            # For local storage, construct URL manually
-            return f"{settings.MEDIA_URL}{obj.video.name}"
+        # Use the file's own storage backend to generate URL
+        # This ensures the correct AWS_MEDIA_LOCATION (media/) is included
+        try:
+            return obj.video.url
+        except Exception as e:
+            return None
