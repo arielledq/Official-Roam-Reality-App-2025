@@ -37,8 +37,9 @@ class RandomizerChallengeViewSet(viewsets.ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [AdminCreateUserViewAndRank]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    search_fields = ['name', 'screen_title']
-    ordering_fields = ['name', 'created_at']
+    filterset_fields = ['is_active', 'sponsor']
+    search_fields = ['name', 'screen_title', 'description']
+    ordering_fields = ['name', 'created_at', 'points']
     ordering = ['-created_at']
     pagination_class = GenericPagination
 

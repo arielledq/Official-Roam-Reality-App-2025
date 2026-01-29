@@ -3,6 +3,8 @@ from django.core.validators import FileExtensionValidator
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from core.utils import get_file_path
+from modules.ar.challenges.models import Sponsor
+from ckeditor.fields import RichTextField
 import json
 
 
@@ -50,6 +52,39 @@ class RandomizerChallenge(models.Model):
         help_text="Multiple titles to display on the screen (stored as a list)"
     )
 
+    # Challenge details
+    thumbnail = models.ImageField(
+        upload_to='randomizer/thumbnails/',
+        blank=True,
+        null=True,
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ],
+        help_text="Thumbnail image for the challenge"
+    )
+    points = models.IntegerField(
+        default=0,
+        help_text='Points awarded for completing this challenge'
+    )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='randomizer_challenges',
+        help_text="Challenge sponsor"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text='Whether this challenge is visible and active'
+    )
+    description = RichTextField(
+        blank=True,
+        null=True,
+        help_text='Detailed description of the challenge'
+    )
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -61,6 +96,13 @@ class RandomizerChallenge(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def thumbnail_url(self):
+        """Return the thumbnail URL"""
+        if self.thumbnail and hasattr(self.thumbnail, 'url'):
+            return self.thumbnail.url
+        return None
 
 
 class RandomizerTrack(models.Model):

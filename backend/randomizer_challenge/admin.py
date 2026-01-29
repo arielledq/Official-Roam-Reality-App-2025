@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.utils.html import format_html
 from .models import RandomizerChallenge, RandomizerTrack
 
 
@@ -6,7 +7,7 @@ class RandomizerTrackInline(admin.TabularInline):
     model = RandomizerTrack
     extra = 1  # Show 1 empty form for adding new tracks
     max_num = 8  # Maximum 8 tracks per challenge
-    fields = ['track_number', 'title', 'image', 'audio', 'ranking']
+    fields = ['track_number', 'title', 'image', 'audio']
     readonly_fields = []  # Allow editing track numbers
 
     def formfield_for_dbfield(self, db_field, **kwargs):
@@ -26,8 +27,9 @@ class RandomizerTrackInline(admin.TabularInline):
 
 @admin.register(RandomizerChallenge)
 class RandomizerChallengeAdmin(admin.ModelAdmin):
-    list_display = ['name', 'tracks_count', 'created_at', 'updated_at']
-    search_fields = ['name', 'screen_title']
+    list_display = ['name', 'thumbnail_preview', 'points', 'sponsor', 'is_active', 'tracks_count', 'created_at', 'updated_at']
+    list_filter = ['is_active', 'sponsor', 'created_at']
+    search_fields = ['name', 'screen_title', 'description']
     ordering = ['-created_at']
     inlines = [RandomizerTrackInline]
 
@@ -42,8 +44,12 @@ class RandomizerChallengeAdmin(admin.ModelAdmin):
 
     fieldsets = (
         ('Basic Information', {
-            'fields': ('name', 'screen_title'),
+            'fields': ('name', 'screen_title', 'description'),
             'description': 'Create or edit a randomizer challenge. Add tracks below using the inline form.'
+        }),
+        ('Challenge Details', {
+            'fields': ('thumbnail', 'points', 'sponsor', 'is_active'),
+            'description': 'Configure challenge thumbnail, points, sponsor, and active status.'
         }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
@@ -52,6 +58,13 @@ class RandomizerChallengeAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ['created_at', 'updated_at']
+
+    def thumbnail_preview(self, obj):
+        """Display thumbnail as image preview"""
+        if obj.thumbnail:
+            return format_html('<img src="{}" width="50" height="50" style="object-fit: cover;" />', obj.thumbnail.url)
+        return "No thumbnail"
+    thumbnail_preview.short_description = "Thumbnail"
 
     def tracks_count(self, obj):
         count = obj.tracks.count()

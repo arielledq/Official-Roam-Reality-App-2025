@@ -3,6 +3,7 @@ from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
 
 from .models import RandomizerChallenge, RandomizerTrack, validate_ranking
+from modules.ar.challenges.serializers import SponsorSerializer
 
 
 class RandomizerTrackSerializer(serializers.ModelSerializer):
@@ -103,18 +104,37 @@ class RandomizerChallengeSerializer(serializers.ModelSerializer):
     """Serializer for RandomizerChallenge model"""
     tracks = RandomizerTrackSerializer(many=True, read_only=True)
     tracks_count = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    sponsor = SponsorSerializer(read_only=True)
 
     class Meta:
         model = RandomizerChallenge
         fields = [
-            'id', 'name', 'screen_title', 'tracks', 'tracks_count',
-            'created_at', 'updated_at'
+            'id', 'name', 'screen_title', 'thumbnail', 'thumbnail_url',
+            'points', 'sponsor', 'is_active', 'description',
+            'tracks', 'tracks_count', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'tracks', 'tracks_count', 'created_at', 'updated_at']
 
     def get_tracks_count(self, obj):
         """Return the number of tracks for this challenge"""
         return obj.tracks.count()
+
+    def get_thumbnail_url(self, obj):
+        """Return the thumbnail URL with fresh presigned URL generation"""
+        if not obj.thumbnail:
+            return None
+
+        # Generate fresh presigned URL from file key
+        if settings.USE_S3:
+            try:
+                storage = S3Boto3Storage()
+                return storage.url(obj.thumbnail.name)
+            except Exception as e:
+                return None
+        else:
+            # For local storage, construct URL manually
+            return f"{settings.MEDIA_URL}{obj.thumbnail.name}"
 
 
 class RandomizerTrackCreateSerializer(RandomizerTrackSerializer):
@@ -148,7 +168,10 @@ class RandomizerChallengeCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = RandomizerChallenge
-        fields = ['id', 'name', 'screen_title', 'tracks']
+        fields = [
+            'id', 'name', 'screen_title', 'thumbnail', 'points',
+            'sponsor', 'is_active', 'description', 'tracks'
+        ]
 
     def create(self, validated_data):
         tracks_data = validated_data.pop('tracks', [])
