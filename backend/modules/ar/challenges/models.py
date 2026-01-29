@@ -587,9 +587,10 @@ class ARMemories(models.Model):
             )
 
     def __str__(self):
-        return str(
-            self.user.name + " " + str(self.memory_file)
-        )
+        user_name = self.user.name if self.user and self.user.name else ''
+        memory_file_str = str(self.memory_file) if self.memory_file else ''
+        parts = [user_name, memory_file_str]
+        return ' '.join(filter(None, parts))
 
 
 class ARSettings(models.Model):

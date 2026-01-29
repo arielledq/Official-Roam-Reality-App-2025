@@ -1,6 +1,7 @@
 import ast
 from rest_framework import serializers
 from django.conf import settings
+from django.core.files.storage import default_storage
 from storages.backends.s3boto3 import S3Boto3Storage
 
 from notifications.models import Notification
