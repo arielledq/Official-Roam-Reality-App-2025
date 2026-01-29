@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import RandomizerChallenge, RandomizerTrack
+from .models import RandomizerChallenge, RandomizerTrack, ChallengeVideo
 
 
 class RandomizerTrackInline(admin.TabularInline):
@@ -182,3 +182,63 @@ class RandomizerTrackAdmin(admin.ModelAdmin):
             return "No ranking"
         return ", ".join(f"{k}: {v}" for k, v in obj.ranking.items())
     ranking_display.short_description = "Ranking Details"
+
+
+@admin.register(ChallengeVideo)
+class ChallengeVideoAdmin(admin.ModelAdmin):
+    """Admin interface for Challenge Videos"""
+    list_display = ['name', 'video_preview', 'challenge', 'is_active', 'file_size', 'created_at', 'updated_at']
+    list_filter = ['is_active', 'challenge', 'created_at']
+    search_fields = ['name', 'description']
+    ordering = ['-created_at']
+
+    fieldsets = (
+        ('Video Information', {
+            'fields': ('name', 'description'),
+            'description': 'Provide a name and optional description for this video.'
+        }),
+        ('Video File', {
+            'fields': ('video',),
+            'description': 'Upload video file (MP4, MOV, AVI, WebM, MKV) - max 50MB'
+        }),
+        ('Settings', {
+            'fields': ('challenge', 'is_active'),
+            'description': 'Optionally link to a specific challenge. Leave blank for default video.'
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    readonly_fields = ['created_at', 'updated_at']
+
+    def video_preview(self, obj):
+        """Display video preview or placeholder"""
+        if obj.video:
+            return format_html(
+                '<video width="100" height="100" controls><source src="{}" type="video/mp4"></video>',
+                obj.video.url
+            )
+        return "No video"
+    video_preview.short_description = "Preview"
+
+    def file_size(self, obj):
+        """Display file size in MB"""
+        if obj.video:
+            try:
+                size_mb = obj.video.size / (1024 * 1024)
+                return f"{size_mb:.2f} MB"
+            except:
+                return "Unknown"
+        return "No file"
+    file_size.short_description = "File Size"
+
+    def get_form(self, request, obj=None, **kwargs):
+        """Customize form with helpful information"""
+        form = super().get_form(request, obj, **kwargs)
+        form.base_fields['name'].help_text = "Descriptive name for this video (e.g., 'Challenge Completion Video')"
+        form.base_fields['video'].help_text = "Upload video file - Recommended: MP4 format, max 50MB"
+        form.base_fields['challenge'].help_text = "Optional: Link to specific challenge. Leave blank for default completion video."
+        form.base_fields['is_active'].help_text = "Only active videos are returned by the API"
+        return form

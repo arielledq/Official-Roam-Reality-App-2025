@@ -9,7 +9,7 @@ import json
 
 
 def validate_file_size(value):
-    """Validate file size - 10MB for images, 50MB for audio"""
+    """Validate file size - 10MB for images, 50MB for audio/video"""
     max_size = 10 * 1024 * 1024  # 10MB default
 
     # Check file extension to determine max size
@@ -17,6 +17,8 @@ def validate_file_size(value):
         file_name = value.name.lower()
         if file_name.endswith(('.mp3', '.wav', '.m4a', '.aac', '.ogg')):
             max_size = 50 * 1024 * 1024  # 50MB for audio files
+        elif file_name.endswith(('.mp4', '.mov', '.avi', '.webm', '.mkv')):
+            max_size = 50 * 1024 * 1024  # 50MB for video files
 
     if value.size > max_size:
         from django.core.exceptions import ValidationError
@@ -209,3 +211,57 @@ class RandomizerTrack(models.Model):
                 raise ValidationError(f"Track number {self.track_number} already exists for this challenge.")
 
         super().save(*args, **kwargs)
+
+
+class ChallengeVideo(models.Model):
+    """Video that plays after challenge completion"""
+    name = models.CharField(
+        max_length=255,
+        help_text="Name/identifier for this video"
+    )
+    video = models.FileField(
+        upload_to='challenge/videos/',
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'avi', 'webm', 'mkv'])
+        ],
+        help_text="Video file to play after challenge completion"
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Optional description of the video"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this video is active and available"
+    )
+
+    # Optional: Link to specific challenge
+    challenge = models.ForeignKey(
+        RandomizerChallenge,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='completion_videos',
+        help_text="Optional: Link to a specific challenge. Leave blank for default video."
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Challenge Video'
+        verbose_name_plural = 'Challenge Videos'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def video_url(self):
+        """Return the video URL"""
+        if self.video and hasattr(self.video, 'url'):
+            return self.video.url
+        return None

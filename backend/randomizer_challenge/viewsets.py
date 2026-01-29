@@ -9,10 +9,11 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 
-from .models import RandomizerChallenge, RandomizerTrack
+from .models import RandomizerChallenge, RandomizerTrack, ChallengeVideo
 from .serializers import (
     RandomizerChallengeSerializer, RandomizerChallengeCreateSerializer,
-    RandomizerTrackSerializer, RandomizerTrackCreateSerializer, RandomizerTrackUpdateSerializer
+    RandomizerTrackSerializer, RandomizerTrackCreateSerializer, RandomizerTrackUpdateSerializer,
+    ChallengeVideoSerializer
 )
 from .permissions import AdminCreateUserViewAndRank
 from utils.pagination import GenericPagination
@@ -241,3 +242,112 @@ class RandomizerTrackViewSet(viewsets.ModelViewSet):
             return Response(serializer.data)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class ChallengeVideoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for managing Challenge Videos.
+
+    Permissions:
+    - Only admins can create/update/delete videos
+    - All authenticated users can view videos
+
+    Features:
+    - Upload videos that play after challenge completion
+    - Get video URL for streaming
+    - Optional link to specific challenges
+    - Get active videos only
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [AdminCreateUserViewAndRank]
+    serializer_class = ChallengeVideoSerializer
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
+    filterset_fields = ['is_active', 'challenge']
+    search_fields = ['name', 'description']
+    ordering_fields = ['name', 'created_at']
+    ordering = ['-created_at']
+    pagination_class = GenericPagination
+
+    def get_queryset(self):
+        """Return all videos or filter by active status"""
+        queryset = ChallengeVideo.objects.select_related('challenge')
+
+        # Optionally filter by active status (default: show all)
+        is_active = self.request.query_params.get('is_active')
+        if is_active is not None:
+            queryset = queryset.filter(is_active=is_active.lower() == 'true')
+
+        return queryset
+
+    @extend_schema(
+        summary="List challenge videos",
+        description="Get paginated list of all challenge videos. Use ?is_active=true to get only active videos."
+    )
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Create challenge video (Admin Only)",
+        description="Upload a new video for challenge completion (Admin Only)"
+    )
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Get video details",
+        description="Get details of a specific video including the video URL"
+    )
+    def retrieve(self, request, *args, **kwargs):
+        return super().retrieve(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Update video (Admin Only)",
+        description="Update video details or replace the video file (Admin Only)"
+    )
+    def update(self, request, *args, **kwargs):
+        return super().update(request, *args, **kwargs)
+
+    @extend_schema(
+        summary="Delete video (Admin Only)",
+        description="Delete a challenge video (Admin Only)"
+    )
+    def destroy(self, request, *args, **kwargs):
+        return super().destroy(request, *args, **kwargs)
+
+    @action(detail=False, methods=['get'], url_path='active')
+    @extend_schema(
+        summary="Get active videos",
+        description="Get all active challenge videos"
+    )
+    def active_videos(self, request):
+        """Get all active videos"""
+        videos = self.get_queryset().filter(is_active=True)
+        serializer = self.get_serializer(videos, many=True)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='by-challenge/(?P<challenge_id>[^/.]+)')
+    @extend_schema(
+        summary="Get videos by challenge",
+        description="Get all videos linked to a specific challenge",
+        parameters=[
+            OpenApiParameter(
+                name='challenge_id',
+                type=int,
+                location=OpenApiParameter.PATH,
+                description='Challenge ID'
+            )
+        ]
+    )
+    def videos_by_challenge(self, request, challenge_id=None):
+        """Get all videos for a specific challenge"""
+        try:
+            challenge = RandomizerChallenge.objects.get(id=challenge_id)
+            videos = self.get_queryset().filter(challenge=challenge, is_active=True)
+            serializer = self.get_serializer(videos, many=True)
+            return Response(serializer.data)
+        except RandomizerChallenge.DoesNotExist:
+            return Response(
+                {"error": "Challenge not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )

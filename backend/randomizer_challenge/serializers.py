@@ -2,7 +2,7 @@ from rest_framework import serializers
 from django.conf import settings
 from storages.backends.s3boto3 import S3Boto3Storage
 
-from .models import RandomizerChallenge, RandomizerTrack, validate_ranking
+from .models import RandomizerChallenge, RandomizerTrack, ChallengeVideo, validate_ranking
 from modules.ar.challenges.serializers import SponsorSerializer
 
 
@@ -189,3 +189,34 @@ class RandomizerChallengeCreateSerializer(serializers.ModelSerializer):
         if len(value) > 8:
             raise serializers.ValidationError("A challenge can have a maximum of 8 tracks.")
         return value
+
+
+class ChallengeVideoSerializer(serializers.ModelSerializer):
+    """Serializer for ChallengeVideo model"""
+    video_url = serializers.SerializerMethodField()
+    challenge_name = serializers.CharField(source='challenge.name', read_only=True, allow_null=True)
+
+    class Meta:
+        model = ChallengeVideo
+        fields = [
+            'id', 'name', 'video', 'video_url', 'description',
+            'is_active', 'challenge', 'challenge_name',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_video_url(self, obj):
+        """Return the video URL with fresh presigned URL generation"""
+        if not obj.video:
+            return None
+
+        # Generate fresh presigned URL from file key
+        if settings.USE_S3:
+            try:
+                storage = S3Boto3Storage()
+                return storage.url(obj.video.name)
+            except Exception as e:
+                return None
+        else:
+            # For local storage, construct URL manually
+            return f"{settings.MEDIA_URL}{obj.video.name}"
