@@ -5,7 +5,10 @@ from django.core.exceptions import ValidationError
 from core.utils import get_file_path
 from modules.ar.challenges.models import Sponsor
 from ckeditor.fields import RichTextField
+from django.contrib.auth import get_user_model
 import json
+
+User = get_user_model()
 
 
 def validate_file_size(value):
@@ -264,4 +267,159 @@ class ChallengeVideo(models.Model):
         """Return the video URL"""
         if self.video and hasattr(self.video, 'url'):
             return self.video.url
+        return None
+
+
+class RandomizerUserProfile(models.Model):
+    """User profile for Randomizer challenges - separate from AR profile"""
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='randomizer_profile'
+    )
+    points = models.BigIntegerField(
+        verbose_name="Randomizer Challenge Points",
+        default=0
+    )
+    challenges_completed = models.IntegerField(
+        verbose_name="Challenges Completed",
+        default=0
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Randomizer User Profile'
+        verbose_name_plural = 'Randomizer User Profiles'
+
+    def __str__(self):
+        return f"{self.user.name} - Randomizer Profile"
+
+
+class RandomizerSubmission(models.Model):
+    """User submissions for Randomizer challenges - similar to ARMemories"""
+
+    SUBMISSION_TYPE_CHOICES = (
+        ('COMPLETION', 'Challenge Completion'),
+        ('SOCIAL_POINTS', 'Social Sharing Points'),
+    )
+
+    APPROVAL_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    )
+
+    PRIVACY_CHOICES = (
+        ('public', 'Public'),
+        ('private', 'Private'),
+    )
+
+    # Core relationships
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='randomizer_submissions'
+    )
+    challenge = models.ForeignKey(
+        RandomizerChallenge,
+        on_delete=models.CASCADE,
+        related_name='submissions',
+        null=True,
+        blank=True
+    )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='randomizer_submissions'
+    )
+
+    # Submission data
+    submission_type = models.CharField(
+        max_length=50,
+        choices=SUBMISSION_TYPE_CHOICES,
+        default='COMPLETION'
+    )
+    result_file = models.FileField(
+        upload_to='randomizer/submissions/',
+        blank=True,
+        null=True,
+        validators=[validate_file_size],
+        help_text="User's created audio/video mix or screenshot"
+    )
+    thumbnail = models.ImageField(
+        upload_to='randomizer/thumbnails/',
+        blank=True,
+        null=True,
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ]
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="User's description or notes"
+    )
+    completion_data = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="Store track selections, scores, mix details, etc."
+    )
+
+    # Points tracking
+    points = models.IntegerField(
+        verbose_name="Points",
+        default=0
+    )
+
+    # Approval workflow
+    approval_status = models.CharField(
+        max_length=50,
+        choices=APPROVAL_CHOICES,
+        default='PENDING'
+    )
+    declined_reason = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Reason for rejection"
+    )
+
+    # Privacy
+    privacy = models.CharField(
+        max_length=10,
+        choices=PRIVACY_CHOICES,
+        default='public',
+        help_text='Control whether this submission is public or private'
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Randomizer Submission'
+        verbose_name_plural = 'Randomizer Submissions'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        challenge_name = self.challenge.name if self.challenge else 'No Challenge'
+        return f"{self.user.name} - {challenge_name} - {self.submission_type}"
+
+    @property
+    def result_file_url(self):
+        """Return the result file URL"""
+        if self.result_file and hasattr(self.result_file, 'url'):
+            return self.result_file.url
+        return None
+
+    @property
+    def thumbnail_url(self):
+        """Return the thumbnail URL"""
+        if self.thumbnail and hasattr(self.thumbnail, 'url'):
+            return self.thumbnail.url
         return None

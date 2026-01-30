@@ -1,7 +1,11 @@
 from rest_framework import serializers
 from django.conf import settings
 
-from .models import RandomizerChallenge, RandomizerTrack, ChallengeVideo, validate_ranking
+from .models import (
+    RandomizerChallenge, RandomizerTrack, ChallengeVideo,
+    RandomizerUserProfile, RandomizerSubmission,
+    validate_ranking
+)
 from modules.ar.challenges.serializers import SponsorSerializer
 
 
@@ -203,3 +207,60 @@ class ChallengeVideoSerializer(serializers.ModelSerializer):
             return obj.video.url
         except Exception as e:
             return None
+
+
+class RandomizerUserProfileSerializer(serializers.ModelSerializer):
+    """Serializer for RandomizerUserProfile - similar to ARUserProfileSerializer"""
+    user_id = serializers.IntegerField(source='user.id', read_only=True)
+    user_name = serializers.CharField(source='user.name', read_only=True)
+
+    class Meta:
+        model = RandomizerUserProfile
+        fields = [
+            'id', 'user_id', 'user_name', 'points',
+            'challenges_completed', 'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'user_id', 'user_name', 'created_at', 'updated_at']
+
+
+class RandomizerSubmissionSerializer(serializers.ModelSerializer):
+    """Serializer for creating RandomizerSubmission - similar to ARMemoriesSerializer"""
+    result_file_url = serializers.SerializerMethodField()
+    thumbnail_url = serializers.SerializerMethodField()
+    challenge_details = RandomizerChallengeSerializer(source='challenge', read_only=True)
+    sponsor_details = SponsorSerializer(source='sponsor', read_only=True)
+
+    class Meta:
+        model = RandomizerSubmission
+        fields = [
+            'id', 'user', 'challenge', 'challenge_details',
+            'sponsor', 'sponsor_details', 'submission_type',
+            'result_file', 'result_file_url', 'thumbnail', 'thumbnail_url',
+            'description', 'completion_data', 'points',
+            'approval_status', 'declined_reason', 'privacy',
+            'created_at', 'updated_at'
+        ]
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+    def get_result_file_url(self, obj):
+        """Return the result file URL with fresh presigned URL generation"""
+        if not obj.result_file:
+            return None
+        try:
+            return obj.result_file.url
+        except Exception as e:
+            return None
+
+    def get_thumbnail_url(self, obj):
+        """Return the thumbnail URL with fresh presigned URL generation"""
+        if not obj.thumbnail:
+            return None
+        try:
+            return obj.thumbnail.url
+        except Exception as e:
+            return None
+
+
+class RandomizerSubmissionGetSerializer(RandomizerSubmissionSerializer):
+    """Serializer for retrieving submissions with full details"""
+    pass

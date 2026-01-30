@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import RandomizerChallenge, RandomizerTrack, ChallengeVideo
+from .models import (
+    RandomizerChallenge, RandomizerTrack, ChallengeVideo,
+    RandomizerUserProfile, RandomizerSubmission
+)
 
 
 class RandomizerTrackInline(admin.TabularInline):
@@ -242,3 +245,136 @@ class ChallengeVideoAdmin(admin.ModelAdmin):
         form.base_fields['challenge'].help_text = "Optional: Link to specific challenge. Leave blank for default completion video."
         form.base_fields['is_active'].help_text = "Only active videos are returned by the API"
         return form
+
+
+@admin.register(RandomizerUserProfile)
+class RandomizerUserProfileAdmin(admin.ModelAdmin):
+    """Admin interface for Randomizer User Profiles - similar to ARUserProfile"""
+    list_display = ['user_name', 'points', 'challenges_completed', 'created_at', 'updated_at']
+    list_filter = ['created_at']
+    search_fields = ['user__name', 'user__email']
+    ordering = ['-points', '-created_at']
+    readonly_fields = ['user', 'created_at', 'updated_at']
+
+    fieldsets = (
+        ('User Information', {
+            'fields': ('user',),
+            'description': 'User associated with this profile'
+        }),
+        ('Statistics', {
+            'fields': ('points', 'challenges_completed'),
+            'description': 'User points and completion stats'
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def user_name(self, obj):
+        return obj.user.name if hasattr(obj.user, 'name') else obj.user.username
+    user_name.short_description = "User"
+    user_name.admin_order_field = 'user__name'
+
+    def has_add_permission(self, request):
+        """Profiles are auto-created via API"""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Allow deletion of profiles"""
+        return True
+
+
+@admin.register(RandomizerSubmission)
+class RandomizerSubmissionAdmin(admin.ModelAdmin):
+    """Admin interface for Randomizer Submissions - similar to ARMemories"""
+    list_display = [
+        'user_name', 'challenge', 'submission_type',
+        'points', 'approval_status', 'privacy',
+        'file_preview', 'created_at'
+    ]
+    list_filter = ['submission_type', 'approval_status', 'privacy', 'created_at', 'challenge']
+    search_fields = ['user__name', 'user__email', 'challenge__name', 'description']
+    ordering = ['-created_at']
+    readonly_fields = ['user', 'created_at', 'updated_at', 'result_file_preview', 'thumbnail_preview']
+
+    actions = ['approve_submissions', 'reject_submissions']
+
+    fieldsets = (
+        ('Submission Information', {
+            'fields': ('user', 'challenge', 'sponsor', 'submission_type'),
+            'description': 'Basic information about this submission'
+        }),
+        ('Content', {
+            'fields': ('result_file', 'result_file_preview', 'thumbnail', 'thumbnail_preview', 'description', 'completion_data'),
+            'description': 'User-submitted content and data'
+        }),
+        ('Points & Approval', {
+            'fields': ('points', 'approval_status', 'declined_reason'),
+            'description': 'Points awarded and approval workflow'
+        }),
+        ('Privacy', {
+            'fields': ('privacy',),
+        }),
+        ('Timestamps', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def user_name(self, obj):
+        return obj.user.name if hasattr(obj.user, 'name') else obj.user.username
+    user_name.short_description = "User"
+    user_name.admin_order_field = 'user__name'
+
+    def file_preview(self, obj):
+        """Display file preview icon"""
+        if obj.result_file:
+            return format_html('<span style="color: green;">✓ File</span>')
+        return format_html('<span style="color: gray;">No file</span>')
+    file_preview.short_description = "File"
+
+    def result_file_preview(self, obj):
+        """Display result file preview in detail view"""
+        if obj.result_file:
+            file_url = obj.result_file.url
+            if file_url.lower().endswith(('.mp4', '.mov', '.avi', '.webm', '.mkv')):
+                return format_html(
+                    '<video width="400" controls><source src="{}" type="video/mp4"></video>',
+                    file_url
+                )
+            elif file_url.lower().endswith(('.mp3', '.wav', '.m4a', '.aac', '.ogg')):
+                return format_html(
+                    '<audio controls><source src="{}" type="audio/mpeg"></audio>',
+                    file_url
+                )
+            else:
+                return format_html('<a href="{}" target="_blank">Download File</a>', file_url)
+        return "No file"
+    result_file_preview.short_description = "Result File Preview"
+
+    def thumbnail_preview(self, obj):
+        """Display thumbnail preview"""
+        if obj.thumbnail:
+            return format_html(
+                '<img src="{}" width="200" style="object-fit: cover;" />',
+                obj.thumbnail.url
+            )
+        return "No thumbnail"
+    thumbnail_preview.short_description = "Thumbnail Preview"
+
+    def approve_submissions(self, request, queryset):
+        """Bulk action to approve submissions"""
+        updated = queryset.update(approval_status='APPROVED')
+        self.message_user(request, f"{updated} submission(s) approved successfully.")
+    approve_submissions.short_description = "Approve selected submissions"
+
+    def reject_submissions(self, request, queryset):
+        """Bulk action to reject submissions"""
+        updated = queryset.update(approval_status='REJECTED')
+        self.message_user(request, f"{updated} submission(s) rejected.")
+    reject_submissions.short_description = "Reject selected submissions"
+
+    def has_add_permission(self, request):
+        """Submissions are created via API"""
+        return False
