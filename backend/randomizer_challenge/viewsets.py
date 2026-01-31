@@ -155,6 +155,26 @@ class RandomizerChallengeViewSet(viewsets.ModelViewSet):
             'app_url': links['app_url'],
         })
 
+    @action(detail=False, methods=['get'], url_path='randomizer-link')
+    @extend_schema(
+        summary="Get general randomizer deep link",
+        description="Get deep link to open randomizer home screen (not a specific challenge)"
+    )
+    def get_randomizer_link(self, request):
+        """Get general randomizer home link"""
+        from .deep_link_utils import generate_web_url, generate_app_url
+
+        web_url = generate_web_url('/randomizer')
+        app_url = generate_app_url('randomizer')
+
+        # Track the link generation
+        track_deep_link_click('randomizer_home', 0, 'general')
+
+        return Response({
+            'web_url': web_url,
+            'app_url': app_url,
+        })
+
 
 
 @method_decorator(csrf_exempt, name='dispatch')

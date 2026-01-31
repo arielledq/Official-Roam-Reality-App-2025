@@ -531,6 +531,7 @@ APPLE_TEAM_ID = env.str("APPLE_TEAM_ID", "AB35BNBR3J")
 
 # Deep link paths for randomizer
 RANDOMIZER_DEEP_LINK_PATHS = [
+    '/randomizer/'
     '/randomizer/challenge/*',
     '/randomizer/submission/*',
     '/randomizer/profile/*',
