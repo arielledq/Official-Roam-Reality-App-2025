@@ -1,0 +1,25 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "AB35BNBR3J.com.roam.reality",
+        "paths": [
+          "/randomizer",
+          "/randomizer/challenge/*",
+          "/randomizer/submission/*",
+          "/randomizer/profile/*",
+          "/randomizer/invite/*",
+          "/randomizer/share/*",
+          "/randomizer/leaderboard",
+          "/randomizer/video/*"
+        ]
+      }
+    ]
+  },
+  "webcredentials": {
+    "apps": [
+      "AB35BNBR3J.com.roam.reality"
+    ]
+  }
+}

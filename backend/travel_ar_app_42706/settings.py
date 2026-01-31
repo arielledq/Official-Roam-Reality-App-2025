@@ -86,7 +86,7 @@ except Exception as e:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str("SECRET_KEY")
 
-ALLOWED_HOSTS = env.list("HOST", default=["*"])
+ALLOWED_HOSTS = env.list("HOST", default=["*"]) + ["0.0.0.0", "localhost", "127.0.0.1", "88b219f5942e.ngrok-free.app"]
 SITE_ID = 1
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -520,4 +520,22 @@ CORS_ALLOW_METHODS = [
     'PATCH',
     'POST',
     'PUT',
+]
+
+# Deep Link Configuration
+DEEP_LINK_DOMAIN = env.str("DEEP_LINK_DOMAIN", f"https://{DOMAIN}")
+APP_SCHEME = env.str("APP_SCHEME", "roamreality")
+APP_BUNDLE_ID = env.str("APP_BUNDLE_ID", "com.roam.reality")
+APP_PACKAGE_NAME = env.str("APP_PACKAGE_NAME", "com.roam_reality")
+APPLE_TEAM_ID = env.str("APPLE_TEAM_ID", "AB35BNBR3J")
+
+# Deep link paths for randomizer
+RANDOMIZER_DEEP_LINK_PATHS = [
+    '/randomizer/challenge/*',
+    '/randomizer/submission/*',
+    '/randomizer/profile/*',
+    '/randomizer/invite/*',
+    '/randomizer/share/*',
+    '/randomizer/leaderboard',
+    '/randomizer/video/*',
 ]

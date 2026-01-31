@@ -25,6 +25,15 @@ from .serializers import (
 )
 from .permissions import AdminCreateUserViewAndRank
 from utils.pagination import GenericPagination
+from .deep_link_utils import (
+    generate_challenge_deep_link,
+    generate_submission_share_link,
+    generate_profile_deep_link,
+    generate_invite_link,
+    generate_leaderboard_deep_link,
+    generate_video_deep_link,
+    track_deep_link_click
+)
 
 # Social points constant - matching AR challenges
 SOCIAL_POINTS = 1
@@ -98,6 +107,53 @@ class RandomizerChallengeViewSet(viewsets.ModelViewSet):
     )
     def destroy(self, request, *args, **kwargs):
         return super().destroy(request, *args, **kwargs)
+
+    @action(detail=True, methods=['get'], url_path='deep-link')
+    @extend_schema(
+        summary="Get challenge deep link",
+        description="Get deep link URLs (web and app) for this challenge"
+    )
+    def get_deep_link(self, request, pk=None):
+        """Get deep link URLs for sharing this challenge"""
+        challenge = self.get_object()
+
+        # Track the link generation
+        source = request.query_params.get('source', 'direct')
+        track_deep_link_click('challenge', challenge.id, source)
+
+        # Generate deep links
+        links = generate_challenge_deep_link(
+            challenge.id,
+            query_params={'ref': source}
+        )
+
+        return Response({
+            'challenge_id': challenge.id,
+            'challenge_name': challenge.name,
+            'web_url': links['web_url'],
+            'app_url': links['app_url'],
+        })
+
+    @action(detail=True, methods=['get'], url_path='invite-link')
+    @extend_schema(
+        summary="Generate challenge invite link",
+        description="Generate an invite link for this challenge to share with friends"
+    )
+    def get_invite_link(self, request, pk=None):
+        """Generate invite link for this challenge"""
+        challenge = self.get_object()
+        inviter_id = request.user.id
+
+        # Generate invite link
+        links = generate_invite_link(challenge.id, inviter_id)
+
+        return Response({
+            'challenge_id': challenge.id,
+            'challenge_name': challenge.name,
+            'inviter_id': inviter_id,
+            'web_url': links['web_url'],
+            'app_url': links['app_url'],
+        })
 
 
 
@@ -363,6 +419,30 @@ class ChallengeVideoViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_404_NOT_FOUND
             )
 
+    @action(detail=True, methods=['get'], url_path='deep-link')
+    @extend_schema(
+        summary="Get video deep link",
+        description="Get deep link URLs for this video"
+    )
+    def get_deep_link(self, request, pk=None):
+        """Get deep link URLs for sharing this video"""
+        video = self.get_object()
+
+        # Generate deep links
+        links = generate_video_deep_link(video.id)
+
+        # Track the link generation
+        source = request.query_params.get('source', 'direct')
+        track_deep_link_click('video', video.id, source)
+
+        return Response({
+            'video_id': video.id,
+            'video_name': video.name,
+            'challenge_id': video.challenge.id if video.challenge else None,
+            'web_url': links['web_url'],
+            'app_url': links['app_url'],
+        })
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class RandomizerSubmissionViewSet(ViewSet):
@@ -507,6 +587,70 @@ class RandomizerSubmissionViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='share-link', name='Get Share Link')
+    @extend_schema(
+        summary="Get submission share link",
+        description="Get shareable deep link URLs for this submission"
+    )
+    def get_share_link(self, request, pk=None):
+        """Get shareable link for this submission"""
+        try:
+            submission = self.queryset.get(pk=pk)
+
+            # Check if user has permission to share this submission
+            if submission.privacy == 'private' and submission.user != request.user:
+                return Response(
+                    {'error': 'This submission is private and cannot be shared'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Track the share
+            source = request.query_params.get('source', 'app')
+            track_deep_link_click('submission_share', submission.id, source)
+
+            # Generate share links
+            links = generate_submission_share_link(
+                submission.id,
+                query_params={'utm_campaign': f'challenge_{submission.challenge.id}'}
+            )
+
+            return Response({
+                'submission_id': submission.id,
+                'challenge_id': submission.challenge.id if submission.challenge else None,
+                'challenge_name': submission.challenge.name if submission.challenge else None,
+                'web_url': links['web_url'],
+                'app_url': links['app_url'],
+            })
+
+        except RandomizerSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Submission not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=True, methods=['get'], url_path='view-shared', name='View Shared Submission')
+    @extend_schema(
+        summary="View shared submission (public access)",
+        description="View a submission via deep link (only if public)"
+    )
+    def view_shared(self, request, pk=None):
+        """View a submission that was shared via deep link"""
+        try:
+            submission = self.queryset.get(pk=pk, privacy='public')
+
+            # Track the view
+            source = request.query_params.get('utm_source', 'unknown')
+            track_deep_link_click('submission_view', submission.id, source)
+
+            serializer = RandomizerSubmissionGetSerializer(submission)
+            return Response(serializer.data)
+
+        except RandomizerSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Submission not found or is private'},
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -654,3 +798,81 @@ class RandomizerProfileViewSet(ViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='my-profile-link', name='My Profile Link')
+    @extend_schema(
+        summary="Get my profile deep link",
+        description="Get deep link URLs for sharing your profile"
+    )
+    def get_my_profile_link(self, request):
+        """Get shareable link for user's own profile"""
+        user_id = request.user.id
+
+        # Generate profile links
+        links = generate_profile_deep_link(user_id)
+
+        # Track the link generation
+        track_deep_link_click('profile_share', user_id, 'self')
+
+        return Response({
+            'user_id': user_id,
+            'web_url': links['web_url'],
+            'app_url': links['app_url'],
+        })
+
+    @action(detail=False, methods=['get'], url_path='leaderboard-link', name='Leaderboard Link')
+    @extend_schema(
+        summary="Get leaderboard deep link",
+        description="Get deep link URLs for the leaderboard"
+    )
+    def get_leaderboard_link(self, request):
+        """Get shareable link for the leaderboard"""
+        # Get optional filter parameters
+        period = request.query_params.get('period', 'all')
+
+        # Generate leaderboard links
+        links = generate_leaderboard_deep_link(
+            query_params={'period': period} if period != 'all' else None
+        )
+
+        return Response({
+            'web_url': links['web_url'],
+            'app_url': links['app_url'],
+            'period': period,
+        })
+
+    @action(detail=False, methods=['get'], url_path='leaderboard', name='Leaderboard')
+    @extend_schema(
+        summary="Get leaderboard data",
+        description="Get ranked list of users for the leaderboard"
+    )
+    def leaderboard(self, request):
+        """Get leaderboard with ranked users"""
+        from django.db.models import Window
+        from django.db.models.functions import Rank
+
+        # Get top users with ranking
+        limit = int(request.query_params.get('limit', 100))
+
+        qs = RandomizerUserProfile.objects.select_related('user').annotate(
+            rank=Window(
+                expression=Rank(),
+                order_by=F('points').desc(),
+            )
+        ).order_by('rank')[:limit]
+
+        # Format the response
+        leaderboard_data = []
+        for profile in qs:
+            leaderboard_data.append({
+                'rank': profile.rank,
+                'user_id': profile.user.id,
+                'user_name': profile.user.name,
+                'points': profile.points if profile.points else 0,
+                'challenges_completed': profile.challenges_completed,
+            })
+
+        return Response({
+            'leaderboard': leaderboard_data,
+            'total_users': RandomizerUserProfile.objects.count(),
+        })

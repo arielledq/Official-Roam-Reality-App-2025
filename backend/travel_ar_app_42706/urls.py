@@ -21,6 +21,7 @@ from django.views.generic.base import TemplateView
 from allauth.account.views import confirm_email
 from rest_framework import permissions
 from drf_spectacular.views import SpectacularJSONAPIView, SpectacularSwaggerView
+from home.deep_link_views import AppleAppSiteAssociationView, AssetLinksView
 
 urlpatterns = [
     
@@ -52,5 +53,11 @@ urlpatterns += [
     path("api-docs/", SpectacularSwaggerView.as_view(url_name='schema'), name="api_docs")
 ]
 
+# Deep linking - Apple App Site Association and Android Asset Links
+# These must be served before the catch-all pattern
+urlpatterns += [
+    path('.well-known/apple-app-site-association', AppleAppSiteAssociationView.as_view(), name='apple-app-site-association'),
+    path('.well-known/assetlinks.json', AssetLinksView.as_view(), name='assetlinks'),
+]
 
 urlpatterns += [re_path(r".*",TemplateView.as_view(template_name='index.html'))]
