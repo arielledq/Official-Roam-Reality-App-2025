@@ -4,6 +4,7 @@ from .models import (
     RandomizerChallenge, RandomizerTrack, ChallengeVideo,
     RandomizerUserProfile, RandomizerSubmission
 )
+from .deep_link_utils import generate_challenge_deep_link
 
 
 class RandomizerTrackInline(admin.TabularInline):
@@ -54,13 +55,17 @@ class RandomizerChallengeAdmin(admin.ModelAdmin):
             'fields': ('thumbnail', 'points', 'sponsor', 'is_active'),
             'description': 'Configure challenge thumbnail, points, sponsor, and active status.'
         }),
+        ('Deep Links', {
+            'fields': ('deep_link_display',),
+            'description': 'Share these links with users to access this challenge directly in the app or web browser.'
+        }),
         ('Timestamps', {
             'fields': ('created_at', 'updated_at'),
             'classes': ('collapse',)
         }),
     )
 
-    readonly_fields = ['created_at', 'updated_at']
+    readonly_fields = ['created_at', 'updated_at', 'deep_link_display']
 
     def thumbnail_preview(self, obj):
         """Display thumbnail as image preview"""
@@ -73,6 +78,151 @@ class RandomizerChallengeAdmin(admin.ModelAdmin):
         count = obj.tracks.count()
         return f"{count}/8 tracks"
     tracks_count.short_description = "Tracks"
+
+    def deep_link_display(self, obj):
+        """Display app deep link with copy-to-clipboard functionality"""
+        if not obj.id:
+            return format_html('<p style="color: #666;">Save the challenge first to generate the deep link.</p>')
+
+        try:
+            # Generate app deep link
+            links = generate_challenge_deep_link(obj.id)
+            app_url = links.get('app_url', '')
+
+            return format_html(
+                '''
+                <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 700px;">
+                    <style>
+                        .deep-link-container {{
+                            background: #e7f3ff;
+                            border: 2px solid #0066cc;
+                            border-radius: 8px;
+                            padding: 20px;
+                            margin: 10px 0;
+                        }}
+                        .link-label {{
+                            font-weight: 600;
+                            color: #0066cc;
+                            margin-bottom: 10px;
+                            font-size: 15px;
+                        }}
+                        .link-box {{
+                            display: flex;
+                            align-items: center;
+                            background: white;
+                            border: 1px solid #ced4da;
+                            border-radius: 4px;
+                            overflow: hidden;
+                        }}
+                        .link-text {{
+                            flex: 1;
+                            padding: 12px 15px;
+                            font-family: 'Monaco', 'Menlo', 'Consolas', monospace;
+                            font-size: 13px;
+                            color: #0066cc;
+                            word-break: break-all;
+                            user-select: all;
+                        }}
+                        .copy-btn {{
+                            background: #0066cc;
+                            color: white;
+                            border: none;
+                            padding: 12px 24px;
+                            cursor: pointer;
+                            font-size: 14px;
+                            font-weight: 500;
+                            transition: background 0.2s;
+                            white-space: nowrap;
+                        }}
+                        .copy-btn:hover {{
+                            background: #0052a3;
+                        }}
+                        .copy-btn:active {{
+                            background: #004080;
+                        }}
+                        .copy-btn.copied {{
+                            background: #28a745;
+                        }}
+                        .help-text {{
+                            margin-top: 8px;
+                            font-size: 13px;
+                            color: #004999;
+                            font-weight: 500;
+                        }}
+                    </style>
+
+                    <div class="deep-link-container">
+                        <div class="link-label">📱 App Share Link</div>
+                        <div class="link-box">
+                            <div class="link-text" id="app-url-{id}">{app_url}</div>
+                            <button class="copy-btn" onclick="copyToClipboard('app-url-{id}', this); return false;">
+                                Copy Link
+                            </button>
+                        </div>
+                        <div class="help-text">✨ Share this link to open the challenge directly in the Roam Reality app</div>
+                    </div>
+
+                    <script>
+                    function copyToClipboard(elementId, button) {{
+                        const element = document.getElementById(elementId);
+                        const text = element.textContent;
+
+                        // Modern clipboard API
+                        if (navigator.clipboard && navigator.clipboard.writeText) {{
+                            navigator.clipboard.writeText(text).then(function() {{
+                                // Success feedback
+                                const originalText = button.textContent;
+                                button.textContent = '✓ Copied!';
+                                button.classList.add('copied');
+
+                                setTimeout(function() {{
+                                    button.textContent = originalText;
+                                    button.classList.remove('copied');
+                                }}, 2000);
+                            }}).catch(function(err) {{
+                                console.error('Failed to copy: ', err);
+                                fallbackCopy(text, button);
+                            }});
+                        }} else {{
+                            fallbackCopy(text, button);
+                        }}
+                    }}
+
+                    function fallbackCopy(text, button) {{
+                        // Fallback for older browsers
+                        const textArea = document.createElement('textarea');
+                        textArea.value = text;
+                        textArea.style.position = 'fixed';
+                        textArea.style.left = '-999999px';
+                        document.body.appendChild(textArea);
+                        textArea.select();
+
+                        try {{
+                            document.execCommand('copy');
+                            const originalText = button.textContent;
+                            button.textContent = '✓ Copied!';
+                            button.classList.add('copied');
+
+                            setTimeout(function() {{
+                                button.textContent = originalText;
+                                button.classList.remove('copied');
+                            }}, 2000);
+                        }} catch (err) {{
+                            alert('Failed to copy. Please copy manually.');
+                        }}
+
+                        document.body.removeChild(textArea);
+                    }}
+                    </script>
+                </div>
+                ''',
+                id=obj.id,
+                app_url=app_url
+            )
+        except Exception as e:
+            return format_html('<p style="color: #dc3545;">Error generating deep link: {}</p>', str(e))
+
+    deep_link_display.short_description = "App Share Link"
 
     def has_add_permission(self, request):
         """Only allow adding a challenge if none exists"""
