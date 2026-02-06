@@ -144,9 +144,6 @@
                     <a href="{{ android_play_store_url }}" class="btn">Google Play</a>
                 </div>
             {% endif %}
-
-            <br><br>
-            <a href="{{ deep_link_url }}" class="btn btn-secondary" id="retry-open">Open in App</a>
         </div>
     </div>
 
@@ -156,44 +153,76 @@
         const appStoreUrl = "{{ app_store_url }}";
         const platform = "{{ platform }}";
 
-        // Try to open the app
-        window.location.href = deepLinkUrl;
+        let appOpened = false;
+        let startTime = Date.now();
 
-        // If app doesn't open within 2.5 seconds, show fallback
-        const fallbackTimer = setTimeout(function() {
-            document.getElementById('loading-content').style.display = 'none';
-            document.getElementById('fallback-content').style.display = 'block';
-        }, 2500);
+        // Function to try opening the app
+        function tryOpenApp() {
+            // Method 1: Use iframe (more reliable for custom URL schemes)
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = deepLinkUrl;
+            document.body.appendChild(iframe);
 
-        // Clear timer if page is hidden (app opened successfully)
-        document.addEventListener('visibilitychange', function() {
-            if (document.hidden) {
-                clearTimeout(fallbackTimer);
-            }
-        });
-
-        // Handle blur event (app might have opened)
-        window.addEventListener('blur', function() {
-            clearTimeout(fallbackTimer);
-        });
-
-        // Retry open in app
-        document.addEventListener('DOMContentLoaded', function() {
-            const retryBtn = document.getElementById('retry-open');
-            if (retryBtn) {
-                retryBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
+            // Method 2: Also try window.location as fallback
+            setTimeout(function() {
+                if (!appOpened) {
                     window.location.href = deepLinkUrl;
+                }
+            }, 100);
 
-                    // After 1 second, if still here, app is not installed
-                    setTimeout(function() {
-                        if (appStoreUrl && appStoreUrl !== 'None') {
-                            window.location.href = appStoreUrl;
-                        }
-                    }, 1000);
-                });
+            // Clean up iframe
+            setTimeout(function() {
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+
+        // Detect if app opened successfully
+        function detectAppLaunch() {
+            // Check if page was hidden (app opened)
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    appOpened = true;
+                    clearTimeout(fallbackTimer);
+                }
+            });
+
+            // Check if window lost focus (app might have opened)
+            window.addEventListener('blur', function() {
+                appOpened = true;
+                clearTimeout(fallbackTimer);
+            });
+
+            // Check if user returned after some time
+            window.addEventListener('focus', function() {
+                const timeElapsed = Date.now() - startTime;
+                // If more than 2 seconds elapsed, app likely opened
+                if (timeElapsed > 2000) {
+                    appOpened = true;
+                    clearTimeout(fallbackTimer);
+                }
+            });
+
+            // iOS specific: pagehide event
+            window.addEventListener('pagehide', function() {
+                appOpened = true;
+                clearTimeout(fallbackTimer);
+            });
+        }
+
+        // Set up detection
+        detectAppLaunch();
+
+        // Try to open the app
+        tryOpenApp();
+
+        // If app doesn't open within 3 seconds, show fallback
+        const fallbackTimer = setTimeout(function() {
+            if (!appOpened) {
+                document.getElementById('loading-content').style.display = 'none';
+                document.getElementById('fallback-content').style.display = 'block';
             }
-        });
+        }, 3000);
     </script>
 </body>
 </html>

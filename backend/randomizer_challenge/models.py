@@ -271,7 +271,19 @@ class ChallengeVideo(models.Model):
 
 
 class RandomizerUserProfile(models.Model):
-    """User profile for Randomizer challenges - separate from AR profile"""
+    """
+    DEPRECATED: This model is deprecated and will be removed in a future release.
+
+    Use ARUserProfile instead (modules.ar.challenges.models.ARUserProfile).
+    All functionality has been migrated to ARUserProfile to consolidate
+    both AR and Randomizer challenge points into a single profile.
+
+    This model is kept temporarily for rollback purposes only.
+    DO NOT create new instances of this model.
+    All new code should use ARUserProfile.randomizer_challenge_completed instead.
+
+    Migration: Data has been merged into ARUserProfile via migration 0184_merge_randomizer_profiles_data
+    """
     user = models.OneToOneField(
         User,
         on_delete=models.CASCADE,
@@ -381,7 +393,7 @@ class RandomizerSubmission(models.Model):
     approval_status = models.CharField(
         max_length=50,
         choices=APPROVAL_CHOICES,
-        default='PENDING'
+        default='UNAPPROVED'  # Changed from PENDING to match AR memories behavior
     )
     declined_reason = models.TextField(
         blank=True,

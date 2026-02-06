@@ -650,10 +650,12 @@ class RandomizerSubmissionViewSet(ViewSet):
                 )
 
                 # Update user profile (fast - atomic DB operation)
+                # Now using unified ARUserProfile for both AR and Randomizer challenges
                 profile_update_start = time.time()
-                profile, created = RandomizerUserProfile.objects.get_or_create(user=request.user)
+                from modules.ar.challenges.models import ARUserProfile
+                profile, created = ARUserProfile.objects.get_or_create(user=request.user)
                 profile.points = F('points') + challenge.points
-                profile.challenges_completed = F('challenges_completed') + 1
+                profile.randomizer_challenge_completed = F('randomizer_challenge_completed') + 1
                 profile.save()
                 # Refresh from database to get actual integer values (Issue #1 fix)
                 profile.refresh_from_db()
@@ -661,7 +663,7 @@ class RandomizerSubmissionViewSet(ViewSet):
 
                 logger.info(
                     f"Profile updated in {profile_update_time:.2f}s "
-                    f"(user {user_id}, new points: {profile.points}, challenges: {profile.challenges_completed})"
+                    f"(user {user_id}, new points: {profile.points}, randomizer challenges: {profile.randomizer_challenge_completed})"
                 )
 
                 # If large video exists, upload to S3 asynchronously
@@ -830,10 +832,21 @@ class RandomizerProfileViewSet(ViewSet):
         description="Get the authenticated user's randomizer profile"
     )
     def list(self, request):
-        """Get user's profile"""
-        profile, created = RandomizerUserProfile.objects.get_or_create(user=request.user)
-        serializer = RandomizerUserProfileSerializer(profile)
-        return Response(serializer.data)
+        """Get user's profile (now uses ARUserProfile)"""
+        from modules.ar.challenges.models import ARUserProfile
+
+        profile, created = ARUserProfile.objects.get_or_create(user=request.user)
+
+        # Return data in expected format for backward compatibility
+        return Response({
+            'id': profile.id,
+            'user_id': profile.user.id,
+            'user_name': profile.user.name,
+            'points': profile.points,
+            'challenges_completed': profile.randomizer_challenge_completed,
+            'created_at': profile.created_at,
+            'updated_at': profile.updated_at,
+        })
 
     @extend_schema(
         summary="Get public profile",
@@ -841,7 +854,9 @@ class RandomizerProfileViewSet(ViewSet):
     )
     @action(detail=False, methods=['get'], url_path='public', name='Public Profile')
     def public(self, request):
-        """Get public profile for any user"""
+        """Get public profile for any user (now uses ARUserProfile)"""
+        from modules.ar.challenges.models import ARUserProfile
+
         user_id = request.GET.get("user_id")
         if not user_id:
             return Response(
@@ -849,9 +864,18 @@ class RandomizerProfileViewSet(ViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        profile, created = RandomizerUserProfile.objects.get_or_create(user_id=user_id)
-        serializer = RandomizerUserProfileSerializer(profile)
-        return Response(serializer.data)
+        profile, created = ARUserProfile.objects.get_or_create(user_id=user_id)
+
+        # Return data in expected format for backward compatibility
+        return Response({
+            'id': profile.id,
+            'user_id': profile.user.id,
+            'user_name': profile.user.name,
+            'points': profile.points,
+            'challenges_completed': profile.randomizer_challenge_completed,
+            'created_at': profile.created_at,
+            'updated_at': profile.updated_at,
+        })
 
     @extend_schema(
         summary="Update user points",
@@ -859,9 +883,11 @@ class RandomizerProfileViewSet(ViewSet):
     )
     @action(detail=False, methods=['post'], url_path='update-user-point', name='Update Points')
     def update_user_points(self, request):
-        """Update user points manually"""
+        """Update user points manually (now uses ARUserProfile)"""
+        from modules.ar.challenges.models import ARUserProfile
+
         points = request.data.get("points", 0)
-        profile, created = RandomizerUserProfile.objects.get_or_create(user=request.user)
+        profile, created = ARUserProfile.objects.get_or_create(user=request.user)
         profile.points = F('points') + points
         profile.save()
         # Refresh from database to get actual integer values (Issue #1 fix)
@@ -901,8 +927,9 @@ class RandomizerProfileViewSet(ViewSet):
                 points=SOCIAL_POINTS,
             )
 
-            # Update user profile
-            profile, created = RandomizerUserProfile.objects.get_or_create(user=request.user)
+            # Update user profile (now uses ARUserProfile)
+            from modules.ar.challenges.models import ARUserProfile
+            profile, created = ARUserProfile.objects.get_or_create(user=request.user)
             profile.points = F('points') + SOCIAL_POINTS
             profile.save()
             # Refresh from database to get actual integer values (Issue #1 fix)
@@ -1006,14 +1033,15 @@ class RandomizerProfileViewSet(ViewSet):
         description="Get ranked list of users for the leaderboard"
     )
     def leaderboard(self, request):
-        """Get leaderboard with ranked users"""
+        """Get leaderboard with ranked users (now uses ARUserProfile)"""
         from django.db.models import Window
         from django.db.models.functions import Rank
+        from modules.ar.challenges.models import ARUserProfile
 
         # Get top users with ranking
         limit = int(request.query_params.get('limit', 100))
 
-        qs = RandomizerUserProfile.objects.select_related('user').annotate(
+        qs = ARUserProfile.objects.select_related('user').annotate(
             rank=Window(
                 expression=Rank(),
                 order_by=F('points').desc(),
@@ -1028,10 +1056,10 @@ class RandomizerProfileViewSet(ViewSet):
                 'user_id': profile.user.id,
                 'user_name': profile.user.name,
                 'points': profile.points if profile.points else 0,
-                'challenges_completed': profile.challenges_completed,
+                'challenges_completed': profile.randomizer_challenge_completed,  # Randomizer challenges
             })
 
         return Response({
             'leaderboard': leaderboard_data,
-            'total_users': RandomizerUserProfile.objects.count(),
+            'total_users': ARUserProfile.objects.count(),
         })

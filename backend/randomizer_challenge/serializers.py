@@ -209,18 +209,43 @@ class ChallengeVideoSerializer(serializers.ModelSerializer):
             return None
 
 
-class RandomizerUserProfileSerializer(serializers.ModelSerializer):
-    """Serializer for RandomizerUserProfile - similar to ARUserProfileSerializer"""
+class RandomizerUserProfileSerializer(serializers.Serializer):
+    """
+    DEPRECATED: This serializer now proxies to ARUserProfile for backward compatibility.
+    RandomizerUserProfile model has been deprecated - all data is now in ARUserProfile.
+    New code should use ARUserProfileSerializer directly from modules.ar.challenges.serializers.
+
+    This serializer is kept to maintain API backward compatibility.
+    """
+    id = serializers.IntegerField(read_only=True)
     user_id = serializers.IntegerField(source='user.id', read_only=True)
     user_name = serializers.CharField(source='user.name', read_only=True)
+    points = serializers.IntegerField(read_only=True)
+    challenges_completed = serializers.IntegerField(
+        source='randomizer_challenge_completed',
+        read_only=True
+    )
+    created_at = serializers.DateTimeField(read_only=True)
+    updated_at = serializers.DateTimeField(read_only=True)
 
-    class Meta:
-        model = RandomizerUserProfile
-        fields = [
-            'id', 'user_id', 'user_name', 'points',
-            'challenges_completed', 'created_at', 'updated_at'
-        ]
-        read_only_fields = ['id', 'user_id', 'user_name', 'created_at', 'updated_at']
+    def to_representation(self, instance):
+        """Convert ARUserProfile instance to expected RandomizerUserProfile format"""
+        from modules.ar.challenges.models import ARUserProfile
+
+        # If instance is ARUserProfile, map fields correctly
+        if isinstance(instance, ARUserProfile):
+            return {
+                'id': instance.id,
+                'user_id': instance.user.id,
+                'user_name': instance.user.name,
+                'points': instance.points,
+                'challenges_completed': instance.randomizer_challenge_completed,
+                'created_at': instance.created_at,
+                'updated_at': instance.updated_at,
+            }
+
+        # Fallback for legacy RandomizerUserProfile (shouldn't happen)
+        return super().to_representation(instance)
 
 
 class RandomizerSubmissionSerializer(serializers.ModelSerializer):

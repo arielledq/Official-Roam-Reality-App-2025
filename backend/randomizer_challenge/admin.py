@@ -546,18 +546,19 @@ class RandomizerSubmissionAdmin(admin.ModelAdmin):
                     submission.approval_status = 'REJECTED'
                     submission.save()
 
-                    # DEDUCT POINTS from user profile
+                    # DEDUCT POINTS from user profile (now using ARUserProfile)
                     # Points were added when submission was created, now remove them
                     try:
-                        profile = user.randomizer_profile
+                        from modules.ar.challenges.models import ARUserProfile
+                        profile = user.ar_user_profile_user
                         # Use F() for atomic decrement
                         profile.points = F('points') - submission.points
                         # Also decrement challenges_completed if submission was COMPLETION type
                         if submission.submission_type == 'COMPLETION':
-                            profile.challenges_completed = F('challenges_completed') - 1
+                            profile.randomizer_challenge_completed = F('randomizer_challenge_completed') - 1
                         profile.save()
                         profile.refresh_from_db()  # Refresh to get actual values
-                    except RandomizerUserProfile.DoesNotExist:
+                    except ARUserProfile.DoesNotExist:
                         # Edge case: profile doesn't exist (shouldn't happen, but handle it)
                         pass
 

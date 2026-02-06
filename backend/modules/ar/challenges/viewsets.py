@@ -15,6 +15,7 @@ from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
     DestinationFacts, PanicMessage, GeoArSiteCategory, ScanPicture, GeoARStarPoint
+from randomizer_challenge.models import RandomizerSubmission
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
@@ -1048,8 +1049,13 @@ class MemoryCheckinViewSet(GenericViewSet):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
             all_user_memories = ARMemories.objects.filter(user=request.user.id)
+            all_randomizer_submissions = RandomizerSubmission.objects.filter(
+                user=request.user.id,
+                submission_type='COMPLETION'
+            ).select_related('challenge', 'sponsor')
+
             result_list = sorted(
-                chain(all_user_check_in, all_user_memories),
+                chain(all_user_check_in, all_user_memories, all_randomizer_submissions),
                 key=attrgetter('created_at'),
                 reverse=True
             )
@@ -1114,8 +1120,14 @@ class MemoryCheckinViewSet(GenericViewSet):
             user = request.GET.get("user_id")
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=user)
             all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'], privacy='public')
+            all_randomizer_submissions = RandomizerSubmission.objects.filter(
+                user=user,
+                submission_type='COMPLETION',
+                privacy='public'
+            ).select_related('challenge', 'sponsor')
+
             result_list = sorted(
-                chain(all_user_check_in, all_user_memories),
+                chain(all_user_check_in, all_user_memories, all_randomizer_submissions),
                 key=attrgetter('created_at'),
                 reverse=True
             )

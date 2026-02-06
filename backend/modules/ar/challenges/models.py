@@ -461,6 +461,10 @@ class ARUserProfile(models.Model):
     points = models.BigIntegerField(verbose_name="Challenge Points", default=0)
     check_ins = models.BigIntegerField(verbose_name="Check-ins", default=0)
     challenge_completed = models.IntegerField(verbose_name="Challenge Completed", default=0)
+    randomizer_challenge_completed = models.IntegerField(
+        verbose_name="Randomizer Challenges Completed",
+        default=0
+    )
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="ar_user_profile_user"
     )
