@@ -60,4 +60,24 @@ urlpatterns += [
     path('.well-known/assetlinks.json', AssetLinksView.as_view(), name='assetlinks'),
 ]
 
+# Randomizer web fallback routes (for when app is NOT installed)
+# These handle deep links like https://roamtt.com/randomizer/challenge/123
+# MUST be before the catch-all pattern to avoid 404 errors
+from randomizer_challenge.web_fallback_views import (
+    ChallengeDeepLinkView,
+    SubmissionDeepLinkView,
+    ProfileDeepLinkView,
+    LeaderboardDeepLinkView,
+    InviteDeepLinkView,
+)
+
+urlpatterns += [
+    path('randomizer/challenge/<int:challenge_id>/', ChallengeDeepLinkView.as_view(), name='randomizer-challenge-fallback'),
+    path('randomizer/submission/<int:submission_id>/', SubmissionDeepLinkView.as_view(), name='randomizer-submission-fallback'),
+    path('randomizer/profile/<int:user_id>/', ProfileDeepLinkView.as_view(), name='randomizer-profile-fallback'),
+    path('randomizer/leaderboard/', LeaderboardDeepLinkView.as_view(), name='randomizer-leaderboard-fallback'),
+    path('randomizer/invite/<int:challenge_id>/', InviteDeepLinkView.as_view(), name='randomizer-invite-fallback'),
+]
+
+# Catch-all pattern for React app - MUST be last
 urlpatterns += [re_path(r".*",TemplateView.as_view(template_name='index.html'))]

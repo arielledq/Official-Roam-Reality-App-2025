@@ -176,6 +176,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'web_build'),
             os.path.join(BASE_DIR, 'modules', 'ar', 'challenges', 'templates'),
+            os.path.join(BASE_DIR, 'randomizer_challenge', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -262,9 +263,9 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
-# File Size
-DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB (50 * 1024 * 1024)
-FILE_UPLOAD_MAX_MEMORY_SIZE = 52428800 # 50 MB
+# File Size - Increased for 90-second video uploads (typical size: 100-200 MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 MB (200 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 MB
 
 # allauth / users
 ACCOUNT_EMAIL_REQUIRED = True
@@ -529,9 +530,13 @@ APP_BUNDLE_ID = env.str("APP_BUNDLE_ID", "com.roam.reality")
 APP_PACKAGE_NAME = env.str("APP_PACKAGE_NAME", "com.roam_reality")
 APPLE_TEAM_ID = env.str("APPLE_TEAM_ID", "AB35BNBR3J")
 
+# App Store URLs for deep linking fallback (when app is not installed)
+IOS_APP_STORE_URL = env.str("IOS_APP_STORE_URL", "https://apps.apple.com/us/app/roam-reality/id6477857812")
+ANDROID_PLAY_STORE_URL = env.str("ANDROID_PLAY_STORE_URL", "https://play.google.com/store/apps/details?id=com.roam_reality")
+
 # Deep link paths for randomizer
 RANDOMIZER_DEEP_LINK_PATHS = [
-    '/randomizer/'
+    '/randomizer/',
     '/randomizer/challenge/*',
     '/randomizer/submission/*',
     '/randomizer/profile/*',

@@ -1,10 +1,14 @@
 from django.contrib import admin
 from django.utils.html import format_html
+from django.db import transaction
+from django.db.models import F
+from django.conf import settings
 from .models import (
     RandomizerChallenge, RandomizerTrack, ChallengeVideo,
     RandomizerUserProfile, RandomizerSubmission
 )
 from .deep_link_utils import generate_challenge_deep_link
+from notifications.models import Notification, NotificationTypes
 
 
 class RandomizerTrackInline(admin.TabularInline):
@@ -520,10 +524,82 @@ class RandomizerSubmissionAdmin(admin.ModelAdmin):
     approve_submissions.short_description = "Approve selected submissions"
 
     def reject_submissions(self, request, queryset):
-        """Bulk action to reject submissions"""
-        updated = queryset.update(approval_status='REJECTED')
-        self.message_user(request, f"{updated} submission(s) rejected.")
-    reject_submissions.short_description = "Reject selected submissions"
+        """
+        Bulk action to reject submissions with notification.
+        Similar to AR Memory reject_and_notify action.
+
+        This method:
+        - Updates submission approval status to REJECTED
+        - Deducts points from user profile
+        - Decrements challenges_completed for COMPLETION submissions
+        - Sends push notification to user with submission details
+        """
+        rejected_count = 0
+
+        with transaction.atomic():
+            for submission in queryset:
+                user = submission.user
+
+                # Only process if not already rejected (prevent double deduction)
+                if submission.approval_status != 'REJECTED':
+                    # Update approval status
+                    submission.approval_status = 'REJECTED'
+                    submission.save()
+
+                    # DEDUCT POINTS from user profile
+                    # Points were added when submission was created, now remove them
+                    try:
+                        profile = user.randomizer_profile
+                        # Use F() for atomic decrement
+                        profile.points = F('points') - submission.points
+                        # Also decrement challenges_completed if submission was COMPLETION type
+                        if submission.submission_type == 'COMPLETION':
+                            profile.challenges_completed = F('challenges_completed') - 1
+                        profile.save()
+                        profile.refresh_from_db()  # Refresh to get actual values
+                    except RandomizerUserProfile.DoesNotExist:
+                        # Edge case: profile doesn't exist (shouldn't happen, but handle it)
+                        pass
+
+                    rejected_count += 1
+
+                # Generate fresh presigned URL for the submission file
+                submission_file_url = None
+                if submission.result_file:
+                    from django.core.files.storage import default_storage
+
+                    if settings.USE_S3:
+                        try:
+                            submission_file_url = default_storage.url(submission.result_file.name)
+                        except Exception:
+                            submission_file_url = None
+                    else:
+                        submission_file_url = f"{settings.MEDIA_URL}{submission.result_file.name}"
+
+                # CREATE NOTIFICATION
+                notification = Notification.objects.create(
+                    title="Your Randomizer submission was declined",
+                    description=submission.declined_reason if submission.declined_reason else 'Your submission was rejected',
+                    type=NotificationTypes.POINTS_REVOKED,
+                    channel=Notification.NotificationChannel.PUSH,
+                    extra_data={
+                        "submission_id": submission.id,
+                        "challenge_id": submission.challenge.id if submission.challenge else None,
+                        "challenge_name": submission.challenge.name if submission.challenge else None,
+                        "result_file_key": submission.result_file.name if submission.result_file else None,
+                        "image": submission_file_url,  # Fresh presigned URL
+                        "points_deducted": submission.points,
+                        "submission_type": submission.submission_type,
+                    },
+                )
+                notification.targets.set([user])
+                notification.send()
+
+        self.message_user(
+            request,
+            f"{rejected_count} submission(s) rejected and users notified."
+        )
+    reject_submissions.short_description = "Reject selected submissions and notify users"
 
     def has_add_permission(self, request):
         """Submissions are created via API"""
