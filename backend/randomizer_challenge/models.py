@@ -409,6 +409,22 @@ class RandomizerSubmission(models.Model):
         help_text='Control whether this submission is public or private'
     )
 
+    # Video upload status tracking
+    upload_status = models.CharField(
+        max_length=20,
+        choices=(
+            ('uploading', 'Uploading'),
+            ('complete', 'Complete'),
+            ('failed', 'Failed'),
+        ),
+        default='complete',
+        help_text='Status of video file upload to S3'
+    )
+    upload_attempts = models.IntegerField(
+        default=0,
+        help_text='Number of upload attempts made'
+    )
+
     # Metadata
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

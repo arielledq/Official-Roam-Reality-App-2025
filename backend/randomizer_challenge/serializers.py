@@ -263,9 +263,10 @@ class RandomizerSubmissionSerializer(serializers.ModelSerializer):
             'result_file', 'result_file_url', 'thumbnail', 'thumbnail_url',
             'description', 'completion_data', 'points',
             'approval_status', 'declined_reason', 'privacy',
+            'upload_status', 'upload_attempts',  # Video upload tracking
             'created_at', 'updated_at'
         ]
-        read_only_fields = ['id', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']  # Removed upload_status and upload_attempts
 
     def get_result_file_url(self, obj):
         """Return the result file URL with fresh presigned URL generation"""

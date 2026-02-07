@@ -585,8 +585,8 @@ class RandomizerSubmissionViewSet(ViewSet):
                         status=status.HTTP_400_BAD_REQUEST
                     )
 
-                # For files > 10 MB, use async upload to avoid blocking
-                if video_file.size > 10 * 1024 * 1024:  # 10 MB threshold
+                # For files > 1 MB, use async upload to avoid blocking
+                if video_file.size > 1 * 1024 * 1024:  # 1 MB threshold
                     has_large_video = True
                     # Read file into memory (happens anyway, but now we control it)
                     video_file_content = video_file.read()
@@ -632,6 +632,12 @@ class RandomizerSubmissionViewSet(ViewSet):
             data['points'] = challenge.points
             data['challenge'] = challenge.id
 
+            # Set upload status based on whether we have a large video
+            if has_large_video:
+                data['upload_status'] = 'uploading'
+            else:
+                data['upload_status'] = 'complete'
+
             # Add sponsor if challenge has one
             if challenge.sponsor:
                 data['sponsor'] = challenge.sponsor.id
@@ -666,33 +672,71 @@ class RandomizerSubmissionViewSet(ViewSet):
                     f"(user {user_id}, new points: {profile.points}, randomizer challenges: {profile.randomizer_challenge_completed})"
                 )
 
-                # If large video exists, upload to S3 asynchronously
+                # If large video exists, upload to S3 asynchronously with retry
                 if has_large_video and video_file_content:
-                    def upload_video_to_s3():
-                        """Background thread function to upload video to S3"""
-                        upload_start = time.time()
-                        try:
-                            # Save video file to S3
-                            submission.result_file.save(
-                                video_file_name,
-                                ContentFile(video_file_content),
-                                save=True
-                            )
-                            upload_time = time.time() - upload_start
-                            logger.info(
-                                f"S3 upload completed in {upload_time:.2f}s "
-                                f"for submission {submission.id} (user {user_id})"
-                            )
-                        except Exception as e:
-                            # Log error but don't crash - submission still exists
-                            logger.error(
-                                f"S3 upload FAILED for submission {submission.id}: {str(e)}",
-                                exc_info=True
-                            )
-                            # TODO: Consider marking submission for retry or notifying admin
+                    def upload_video_to_s3_with_retry():
+                        """Background thread function to upload video to S3 with automatic retry (3 attempts)"""
+                        max_attempts = 3
 
-                    # Start background upload thread
-                    upload_thread = threading.Thread(target=upload_video_to_s3, daemon=True)
+                        for attempt in range(1, max_attempts + 1):
+                            upload_start = time.time()
+
+                            try:
+                                # Refresh submission from database to avoid stale data
+                                submission.refresh_from_db()
+
+                                # Update attempt counter
+                                submission.upload_attempts = attempt
+                                submission.save(update_fields=['upload_attempts'])
+
+                                logger.info(
+                                    f"S3 upload attempt {attempt}/{max_attempts} for submission {submission.id}"
+                                )
+
+                                # Save video file to S3
+                                submission.result_file.save(
+                                    video_file_name,
+                                    ContentFile(video_file_content),
+                                    save=False  # Don't save model yet
+                                )
+
+                                # Success - mark as complete and save both file and status
+                                submission.upload_status = 'complete'
+                                submission.save(update_fields=['upload_status', 'result_file'])
+
+                                upload_time = time.time() - upload_start
+                                logger.info(
+                                    f"✅ S3 upload SUCCESS on attempt {attempt}/{max_attempts} "
+                                    f"in {upload_time:.2f}s for submission {submission.id} (user {user_id})"
+                                )
+                                return  # Exit on success
+
+                            except Exception as e:
+                                upload_time = time.time() - upload_start
+                                logger.error(
+                                    f"❌ S3 upload FAILED on attempt {attempt}/{max_attempts} "
+                                    f"after {upload_time:.2f}s for submission {submission.id}: {str(e)}",
+                                    exc_info=True
+                                )
+
+                                # Refresh to get latest state
+                                submission.refresh_from_db()
+
+                                if attempt == max_attempts:
+                                    # Final attempt failed - mark as failed
+                                    submission.upload_status = 'failed'
+                                    submission.save(update_fields=['upload_status'])
+                                    logger.error(
+                                        f"❌ S3 upload PERMANENTLY FAILED for submission {submission.id} "
+                                        f"after {max_attempts} attempts"
+                                    )
+                                else:
+                                    # Wait 10 seconds before retry
+                                    logger.info(f"⏳ Retrying upload for submission {submission.id} in 10 seconds...")
+                                    time.sleep(10)
+
+                    # Start background upload thread with retry logic
+                    upload_thread = threading.Thread(target=upload_video_to_s3_with_retry, daemon=True)
                     upload_thread.start()
 
                     logger.info(
@@ -706,12 +750,9 @@ class RandomizerSubmissionViewSet(ViewSet):
                 # Prepare response data
                 response_data = serializer.data
 
-                # Add upload status indicator if async upload is happening
+                # Add message if async upload is happening
                 if has_large_video:
-                    response_data['upload_status'] = 'processing'
                     response_data['message'] = 'Submission created successfully. Video is being uploaded in the background.'
-                else:
-                    response_data['upload_status'] = 'complete'
 
                 logger.info(
                     f"Total request time: {total_request_time:.2f}s "
@@ -807,6 +848,161 @@ class RandomizerSubmissionViewSet(ViewSet):
             return Response(
                 {'error': 'Submission not found or is private'},
                 status=status.HTTP_404_NOT_FOUND
+            )
+
+    @action(detail=True, methods=['post'], url_path='retry-upload', name='Retry Upload')
+    @extend_schema(
+        summary="Retry failed video upload",
+        description="Manually retry uploading a failed video submission. User must provide the video file again."
+    )
+    def retry_upload(self, request, pk=None):
+        """
+        Manual retry endpoint for failed uploads.
+        User must re-upload the video file.
+
+        Usage: POST /randomizer/submissions/{id}/retry-upload/
+        Body: multipart/form-data with 'result_file' field
+        """
+        try:
+            submission = self.queryset.get(pk=pk)
+
+            # Verify user owns this submission
+            if submission.user != request.user and not request.user.is_staff:
+                return Response(
+                    {'error': 'You can only retry your own submissions'},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+            # Check if retry is possible
+            if submission.upload_status != 'failed':
+                return Response(
+                    {
+                        'error': f'Cannot retry upload. Current status: {submission.upload_status}',
+                        'message': 'Only failed uploads can be retried'
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Check if video file provided
+            video_file = request.FILES.get('result_file')
+            if not video_file:
+                return Response(
+                    {'error': 'Video file is required. Please provide result_file in the request.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Validate file size
+            if video_file.size > MAX_VIDEO_SIZE:
+                file_size_mb = video_file.size / (1024 * 1024)
+                max_size_mb = MAX_VIDEO_SIZE / (1024 * 1024)
+                return Response(
+                    {
+                        'message': f'Video file too large. Maximum size is {max_size_mb:.0f} MB. '
+                                  f'Your file is {file_size_mb:.1f} MB.',
+                        'error_code': 'FILE_TOO_LARGE',
+                        'max_size_mb': max_size_mb,
+                        'your_file_size_mb': round(file_size_mb, 1)
+                    },
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Read video content
+            video_content = video_file.read()
+            video_name = video_file.name
+            video_content_type = video_file.content_type
+
+            # Reset upload status
+            submission.upload_status = 'uploading'
+            submission.upload_attempts = 0
+            submission.save(update_fields=['upload_status', 'upload_attempts'])
+
+            logger.info(
+                f"Manual retry requested for submission {submission.id} by user {request.user.id} "
+                f"(video size: {len(video_content) / (1024*1024):.1f} MB)"
+            )
+
+            # Start background upload with retry logic
+            def retry_upload_background():
+                """Background thread for retry upload with 3 attempts"""
+                max_attempts = 3
+
+                for attempt in range(1, max_attempts + 1):
+                    upload_start = time.time()
+
+                    try:
+                        # Refresh submission from database to avoid stale data
+                        submission.refresh_from_db()
+
+                        # Update attempt counter
+                        submission.upload_attempts = attempt
+                        submission.save(update_fields=['upload_attempts'])
+
+                        logger.info(
+                            f"Retry upload attempt {attempt}/{max_attempts} for submission {submission.id}"
+                        )
+
+                        # Upload video to S3
+                        submission.result_file.save(
+                            video_name,
+                            ContentFile(video_content),
+                            save=False  # Don't save model yet
+                        )
+
+                        # Success - save both file and status
+                        submission.upload_status = 'complete'
+                        submission.save(update_fields=['upload_status', 'result_file'])
+
+                        upload_time = time.time() - upload_start
+                        logger.info(
+                            f"✅ Retry upload SUCCESS on attempt {attempt}/{max_attempts} "
+                            f"in {upload_time:.2f}s for submission {submission.id}"
+                        )
+                        return
+
+                    except Exception as e:
+                        upload_time = time.time() - upload_start
+                        logger.error(
+                            f"❌ Retry upload FAILED on attempt {attempt}/{max_attempts} "
+                            f"after {upload_time:.2f}s for submission {submission.id}: {str(e)}",
+                            exc_info=True
+                        )
+
+                        # Refresh to get latest state
+                        submission.refresh_from_db()
+
+                        if attempt == max_attempts:
+                            # Final failure
+                            submission.upload_status = 'failed'
+                            submission.save(update_fields=['upload_status'])
+                            logger.error(
+                                f"❌ Retry upload PERMANENTLY FAILED for submission {submission.id}"
+                            )
+                        else:
+                            # Wait before retry
+                            logger.info(f"⏳ Retrying upload in 10 seconds...")
+                            time.sleep(10)
+
+            # Start background thread
+            upload_thread = threading.Thread(target=retry_upload_background, daemon=True)
+            upload_thread.start()
+
+            return Response({
+                'message': 'Upload retry started in background',
+                'submission_id': submission.id,
+                'upload_status': 'uploading',
+                'upload_attempts': 0
+            }, status=status.HTTP_202_ACCEPTED)
+
+        except RandomizerSubmission.DoesNotExist:
+            return Response(
+                {'error': 'Submission not found'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except Exception as e:
+            logger.error(f"Retry upload failed for submission {pk}: {str(e)}", exc_info=True)
+            return Response(
+                {'error': f'Retry failed: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
 
 
