@@ -80,6 +80,21 @@ def reject_and_notify(self, request, queryset):
 
                 user.ar_user_profile_user.points -= memory_checkin.points
                 user.ar_user_profile_user.save()
+            
+            # Generate fresh presigned URL for the memory file
+            memory_file_url = None
+            if memory_checkin.memory_file:
+                from django.conf import settings
+                if settings.USE_S3:
+                    try:
+                        # Use the default storage which is MediaStorage with correct location
+                        from django.core.files.storage import default_storage
+                        memory_file_url = default_storage.url(memory_checkin.memory_file.name)
+                    except Exception:
+                        memory_file_url = None
+                else:
+                    memory_file_url = f"{settings.MEDIA_URL}{memory_checkin.memory_file.name}"
+            
             notification = Notification.objects.create(
                 title="Your submission was declined",
                 description=memory_checkin.declined_reason if memory_checkin.declined_reason else 'Your submission '
@@ -87,7 +102,8 @@ def reject_and_notify(self, request, queryset):
                 type=NotificationTypes.POINTS_REVOKED,
                 channel=Notification.NotificationChannel.PUSH,
                 extra_data={
-                    "image": memory_checkin.memory_file.url if memory_checkin.memory_file else None,
+                    "memory_file_key": memory_checkin.memory_file.name if memory_checkin.memory_file else None,
+                    "image": memory_file_url,  # Fresh presigned URL
                 },
             )
             notification.targets.set([user])

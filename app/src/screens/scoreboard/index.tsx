@@ -23,15 +23,20 @@ import {FontSizes} from "util/FontUtils";
 import RankBG from "../../assets/geoar/rank_bg.svg";
 import useScoreboardHook from "hooks/useScoreboardHook";
 import {getProfilePicture} from "util/imageUtils";
+import LinearGradient from "react-native-linear-gradient";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 const ITEM_WIDTH = 60;
 
 const ScoreBoard = ({}) => {
   const [users, setUsers] = React.useState<any>([]);
+  const [pageNumber, setPageNumber] = React.useState(1);
+  const [pageSize, setPageSize] = React.useState(30);
+  const [total_record, setTotalLength] = React.useState(0);
   const [rankMine, setRankMine] = useState<any>();
   const [destinations, setDestinations] = useState<any>();
   const [selectedDestination, setSelectedDestination] = useState<any>();
-  const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.DESTINATION);
+  const [challengeChoice, setChallengeChoice] = useState(SCOREBOARD_TYPE.SPONSOR);
   const [refreshing, setRefreshing] = useState(false);
   const [profileDetails, setProfileDetails] = useState<any>();
   const {sponsors} = useScoreboardHook();
@@ -60,7 +65,7 @@ const ScoreBoard = ({}) => {
         (_: any, index: number) => index !== selectedDestinationIndex
       );
       // Insert the selected item at position 1
-      filtersData = [filteredData[0], selectedDestinationItem, ...filteredData.slice(1)];
+      // filtersData = [filteredData[0], selectedDestinationItem, ...filteredData.slice(1)];
     }
   }
 
@@ -98,9 +103,11 @@ const ScoreBoard = ({}) => {
     try {
       const scoreBoardResponse = await getScoreboardList(pageNumber, destination, sponsor);
       const scoreboardUsers = scoreBoardResponse?.results || [];
+
       setUsers((prevUsers: any) =>
         pageNumber === 1 ? scoreboardUsers : [...prevUsers, ...scoreboardUsers]
       );
+      setTotalLength(scoreBoardResponse?.total_record || 0);
     } catch (error) {
       console.error(error);
     } finally {
@@ -109,8 +116,10 @@ const ScoreBoard = ({}) => {
   };
 
   const filterDestinations = (o: any) => {
+    let pageToSet = 1;
+    setPageNumber(pageToSet);
     setSelectedDestination(o);
-    const newPage = 1;
+
     let destination = "";
     let sponsor = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
@@ -118,7 +127,7 @@ const ScoreBoard = ({}) => {
     } else {
       sponsor = o.id || "";
     }
-    getScoreboard(newPage, destination, sponsor);
+    getScoreboard(pageToSet, destination, sponsor);
   };
 
   const handleMenuButton = () => {
@@ -134,6 +143,7 @@ const ScoreBoard = ({}) => {
 
   const handlePullDownToRefresh = () => {
     const newPage = 1;
+    setPageNumber(newPage);
     let destination = "";
     let sponsor = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
@@ -158,6 +168,7 @@ const ScoreBoard = ({}) => {
 
   const getInitialData = () => {
     const newPage = 1;
+    setPageNumber(newPage);
     let destination = "";
     let sponsor = "";
     if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
@@ -239,6 +250,21 @@ const ScoreBoard = ({}) => {
     );
   });
 
+  const loadMore = () => {
+    if (users.length < total_record) {
+      const newPage = pageNumber + 1;
+      setPageNumber(newPage);
+      let destination = "";
+      let sponsor = "";
+      if (challengeChoice === SCOREBOARD_TYPE.DESTINATION) {
+        destination = selectedDestination?.id || "";
+      } else {
+        sponsor = selectedDestination?.id || "";
+      }
+      getScoreboard(newPage, destination, sponsor);
+    }
+  };
+
   const Item = React.memo(({obj, index}: {obj: any; index: number}) => {
     const userPosition = index + 1;
     const userRank = userPosition;
@@ -270,7 +296,7 @@ const ScoreBoard = ({}) => {
             }}
             resizeMode="stretch"
           >
-            <Image
+            <FastImage
               style={{
                 width: 40,
                 aspectRatio: 1,
@@ -278,7 +304,8 @@ const ScoreBoard = ({}) => {
                 height: 40,
               }}
               source={{uri: profilePicture}}
-              resizeMode="cover"
+              resizeMode={FastImage.resizeMode.cover}
+              defaultSource={Images.AppLogo}
             />
           </ImageBackground>
           <Text numberOfLines={2} style={_styles.nameText}>
@@ -293,7 +320,9 @@ const ScoreBoard = ({}) => {
     );
   });
 
-  const profilePicture = getProfilePicture(profileDetails?.image);
+  const profilePicture = getProfilePicture(
+    profileDetails?.image || userProfile?.user_profile?.image
+  );
 
   const ListHeaderComponent = () => (
     <View style={_styles.listHeaderContainer}>
@@ -356,17 +385,23 @@ const ScoreBoard = ({}) => {
 
       <Text style={_styles.rankTitle}>Your Rank</Text>
       <View style={{height: 68, width: "100%"}}>
-        <RankBG style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: -1}} />
-        <View
+        {/* <RankBG style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0, zIndex: -1}} /> */}
+        <LinearGradient
           style={{
-            flex: 1,
-            paddingHorizontal: 16,
             flexDirection: "row",
             alignItems: "center",
             justifyContent: "space-between",
+            width: "100%",
+            borderRadius: 6,
+            height: heightPercentageToDP(8),
           }}
+          colors={["#7a00cf", "#5532ff"]}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 0}}
         >
-          <View style={{flexDirection: "row", alignItems: "center"}}>
+          <View
+            style={{marginLeft: widthPercentageToDP(4), flexDirection: "row", alignItems: "center"}}
+          >
             <View style={{alignItems: "center"}}>
               <Text style={_styles.rankText}>Rank</Text>
               <Text style={_styles.rankTextPosition}>{rankMine?.my_rank}</Text>
@@ -381,7 +416,7 @@ const ScoreBoard = ({}) => {
               }}
               resizeMode="stretch"
             >
-              <Image
+              <FastImage
                 style={{
                   width: 40,
                   aspectRatio: 1,
@@ -389,16 +424,17 @@ const ScoreBoard = ({}) => {
                   height: 40,
                 }}
                 source={{uri: profilePicture}}
-                resizeMode="cover"
+                defaultSource={Images.AppLogo}
+                resizeMode={FastImage.resizeMode.cover}
               />
             </ImageBackground>
             <Text style={_styles.nameText}>{userProfile?.name ? userProfile?.name : "You"}</Text>
           </View>
-          <View style={{marginEnd: 10, alignItems: "center"}}>
+          <View style={{marginEnd: widthPercentageToDP(6), alignItems: "center"}}>
             <Text style={_styles.rankText}>Points</Text>
             <Text style={_styles.pointsText}>{rankMine?.my_points}</Text>
           </View>
-        </View>
+        </LinearGradient>
       </View>
 
       <Text style={_styles.leaderboardTitle}>Leaderboard</Text>
@@ -437,8 +473,11 @@ const ScoreBoard = ({}) => {
         onRefresh={handlePullDownToRefresh}
         contentContainerStyle={{flexGrow: 1}}
         initialNumToRender={10}
-        maxToRenderPerBatch={10}
+        maxToRenderPerBatch={5}
         windowSize={5}
+        removeClippedSubviews
+        onEndReachedThreshold={0.7}
+        onEndReached={loadMore}
       />
     </ScreenContainer>
   );

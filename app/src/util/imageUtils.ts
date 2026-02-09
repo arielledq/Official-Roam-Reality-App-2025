@@ -47,5 +47,6 @@ export const getProfilePicture = (imageUrl?: string): string => {
   if (imageUrl) {
     return imageUrl;
   }
+
   return ProfilePlaceholder;
 };

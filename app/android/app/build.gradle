@@ -95,12 +95,16 @@ android {
             keyPassword 'android'
         }
         release {
-            if (project.hasProperty('ROOM_AR_UPLOAD_STORE_FILE')) {
-                storeFile file(ROOM_AR_UPLOAD_STORE_FILE)
-                storePassword ROOM_AR_UPLOAD_STORE_PASSWORD
-                keyAlias ROOM_AR_UPLOAD_KEY_ALIAS
-                keyPassword ROOM_AR_UPLOAD_KEY_PASSWORD
-            }
+            // if (project.hasProperty('ROOM_AR_UPLOAD_STORE_FILE')) {
+            //     storeFile file(ROOM_AR_UPLOAD_STORE_FILE)
+            //     storePassword ROOM_AR_UPLOAD_STORE_PASSWORD
+            //     keyAlias ROOM_AR_UPLOAD_KEY_ALIAS
+            //     keyPassword ROOM_AR_UPLOAD_KEY_PASSWORD
+            // }
+               storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
         }
     }
     buildTypes {
@@ -110,7 +114,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.release
+            signingConfig signingConfigs.debug
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -139,6 +143,12 @@ dependencies {
             }
     }
 
+     implementation(name: 'MvnCorder', ext:'aar')
+    implementation(name: 'arcore_client', ext:'aar')
+    implementation(name: 'ARPresto', ext:'aar')
+    implementation(name: 'unityandroidpermissions', ext:'aar')
+    implementation(name: 'UnityARCore', ext:'aar')
+
     configurations.all {
         resolutionStrategy {
             force 'androidx.viewpager2:viewpager2:1.0.0' // Compatible with compileSdkVersion 33
@@ -147,4 +157,9 @@ dependencies {
     }
 }
 
+repositories {
+    flatDir {
+        dirs '../../unity/builds/android/unityLibrary/libs'
+    }
+}
 apply from: file('../../node_modules/react-native-vector-icons/fonts.gradle')

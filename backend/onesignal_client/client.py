@@ -5,6 +5,9 @@ from onesignal_sdk.client import Client
 import json
 import logging
 
+# Local
+from users.models import get_placeholder_image_base64
+
 
 LOGGER = logging.getLogger('django')
 
@@ -35,21 +38,78 @@ class OneSignalClient:
         if devices_ids is not None and not len(devices_ids):
             return
 
-        notification = {
+        # Parse extra_data if it's a string
+        extra_data_dict = {}
+        if notification.extra_data:
+            try:
+                if isinstance(notification.extra_data, str):
+                    extra_data_dict = json.loads(notification.extra_data)
+                else:
+                    extra_data_dict = notification.extra_data
+            except (json.JSONDecodeError, TypeError):
+                extra_data_dict = {}
+
+        # Add notification type and from_user_id to data
+        data = {
+            "notification_type": notification.type,
+            "notification_id": notification.id,
+            **extra_data_dict
+        }
+        
+        # Add from_user, from_user_id and profile image if available
+        # These fields override any values from extra_data_dict to ensure consistency
+        if notification.from_user:
+            data["from_user"] = notification.from_user.name or notification.from_user.username
+            data["from_user_id"] = notification.from_user.id
+
+            # Add user profile image if available; always include a value (placeholder if missing)
+            profile_image_url = None
+            try:
+                profile = notification.from_user.user_profile  # may raise RelatedObjectDoesNotExist
+                profile_image_url = profile.get_image_url()
+            except Exception as e:
+                LOGGER.warning(f"User {notification.from_user.id} has no profile image, using placeholder: {e}")
+                profile_image_url = get_placeholder_image_base64()
+
+            if profile_image_url:
+                data["from_user_profile"] = {
+                    "image": profile_image_url,
+                }
+                LOGGER.info(f"Added from_user_profile with image: {profile_image_url}")
+
+            LOGGER.info(f"Added from_user data - from_user: {data['from_user']}, from_user_id: {data['from_user_id']}")
+        else:
+            LOGGER.info("Notification has no from_user")
+
+        # Build notification payload
+        notification_payload = {
             "headings": {"en": notification.title, "es": notification.title},
             "contents": {"en": notification.description, "es": notification.description},
             "content_available": True,
-            "data": json.loads(json.dumps(notification.extra_data)) if notification.extra_data != '' else {}
+            "data": data
         }
+
+        # Add action buttons for friend request notifications
+        from notifications.models import NotificationTypes
+        if notification.type == NotificationTypes.FRIEND_REQUEST_SENT:
+            notification_payload["buttons"] = [
+                {"id": "accept", "text": "Accept"},
+                {"id": "reject", "text": "Reject"}
+            ]
+            notification_payload["data"]["action"] = "friend_request"
+            notification_payload["data"]["kind"] = "friend_request"
+
         if devices_ids:
-            notification.update({"include_player_ids": devices_ids})
+            notification_payload.update({"include_player_ids": devices_ids})
         else:
-            notification.update({"included_segments": ['Subscribed Users']})
+            notification_payload.update({"included_segments": ['Subscribed Users']})
+        
         try:
-            self.os_client.send_notification(notification)
-            LOGGER.info('Notification sent. notification: {}'.format(json.dumps(notification)))
+            self.os_client.send_notification(notification_payload)
+            LOGGER.info('Notification sent. notification: {}'.format(json.dumps(notification_payload)))
         except Exception as e:
             print('print Push sending failed: {}'.format(e))
             LOGGER.info('logger Push sending failed: {}'.format(e))
-            LOGGER.info('logger message Push sending failed: {}'.format(e.message))
+            if hasattr(e, 'message'):
+                LOGGER.info('logger message Push sending failed: {}'.format(e.message))
             raise e

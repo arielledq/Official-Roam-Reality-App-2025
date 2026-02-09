@@ -1,7 +1,10 @@
+import {Platform} from "react-native";
+
 const fonts = {
-  nunitoLight: "Nunito Sans 10pt ExtraLight",
-  nunitoRegular: "Nunito Sans 10pt",
-  nunitoBold: "Nunito Sans 10pt",
+  nunitoLight: Platform.OS === "ios" ? "NunitoSans10pt-ExtraLight" : "Nunito Sans 10pt ExtraLight",
+  nunitoRegular: Platform.OS === "ios" ? "NunitoSans10pt-Regular" : "Nunito Sans 10pt",
+  nunitoBold: Platform.OS === "ios" ? "NunitoSans10pt-Bold" : "Nunito Sans 10pt Bold",
+  nutinoExtraBold: Platform.OS === "ios" ? "NunitoSans7ptCondensed-Black" : "Nunito Sans 7pt Bold",
 };
 
 const fontGroup = {
@@ -17,8 +20,12 @@ const fontGroup = {
     fontFamily: fonts.nunitoBold,
     fontWeight: "700",
   },
+  nutinoExtraBold: {
+    fontFamily: fonts.nutinoExtraBold,
+    fontWeight: "800",
+  },
 };
 
 export default fontGroup;
 
-export { fonts };
+export {fonts};

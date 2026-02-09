@@ -1,5 +1,6 @@
-import { makeStyles } from "@rneui/themed";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
+import {makeStyles} from "@rneui/themed";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -12,10 +13,10 @@ const useStyles = makeStyles(theme => ({
     lineHeight: FontLineHeights.LH25,
     ...fontGroup.nunitoBold,
     color: theme.colors.white,
-    marginTop: 5,
+    marginTop: heightPercentageToDP("1.5%"),
     textAlign: "center",
   },
-  container: { marginTop: "10%" },
+  container: {marginTop: "10%"},
   headerText: {
     ...fontGroup.nunitoBold,
     fontSize: FontSizes.S24,
@@ -113,6 +114,19 @@ const useStyles = makeStyles(theme => ({
     bottom: 0,
     left: 0,
     right: 0,
+  },
+  profileImage: {
+    width: heightPercentageToDP("6%"),
+    height: heightPercentageToDP("6%"),
+    borderRadius: 100,
+  },
+  shadowBoxImage: {
+    width: widthPercentageToDP(12),
+    height: widthPercentageToDP(12),
+    borderRadius: widthPercentageToDP(100),
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: heightPercentageToDP(0.2),
   },
 }));
 

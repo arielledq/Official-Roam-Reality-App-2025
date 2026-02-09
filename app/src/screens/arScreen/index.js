@@ -1,22 +1,37 @@
 import React, {useEffect, useRef, useState, useCallback} from "react";
-import {Platform, View, ActivityIndicator, Text} from "react-native";
+import {Platform, View, ActivityIndicator, Text, TouchableOpacity, Alert} from "react-native";
 
 import {useFocusEffect, useNavigation} from "@react-navigation/native";
 import {requestMultiple, PERMISSIONS} from "react-native-permissions";
 import RNFetchBlob from "rn-fetch-blob";
-import {useSelector} from "react-redux";
+import {useSelector, useDispatch} from "react-redux";
 import RNFS from "react-native-fs";
 import Sound from "react-native-sound";
 import Geolocation from "react-native-geolocation-service";
 
-import {CAPTURE_CHALLENGE_TYPE, CHALLENGES_TYPE} from "../../constants";
+import {
+  AR_MODE_MESSAGES,
+  AR_MODES_MENU,
+  CAPTURE_CHALLENGE_TYPE,
+  CHALLENGES_TYPE,
+} from "../../constants";
 
 import UnityARCamera from "components/UnityArView";
 import ChallengeScreen from "components/ChallengeScreen";
 import ARModeModal from "components/ARModeModal/index.tsx";
-import {copyFileForDisplay, eraseFile, handleUnzipProcess} from "../../util/helpers";
+import UnityHeader from "components/UnityHeader";
+import UnityBottomBar from "components/UnityBottomBar";
+import SideMenu from "components/SideMenu";
+import ARMapView from "components/ARMapComponent/ARMapView";
+import {copyFileForDisplay, eraseFile, handleUnzipProcess, showMessage} from "../../util/helpers";
 
-import { getElevationAPI } from "../../network";
+import {
+  getArHuntExamples,
+  getArScanExamples,
+  getAvailableARModes,
+  getElevationAPI,
+  starFoundAndSaveApi,
+} from "../../network";
 
 import NotificationModal from "components/ARModeModal/NotificationModal";
 import {AR_MODES} from "constants";
@@ -33,9 +48,22 @@ import {
   getLocationDistance,
   isLocationPointInPolygon,
 } from "util/LocationLib";
+import useArScreenHook from "../../hooks/useArScreenHook";
+import {title} from "process";
+import {useIsFocused} from "@react-navigation/native";
+import theme from "assets/theme";
+import ARModeSiteList from "components/ARModeModal/ARModeSiteList";
+import {FontSizes} from "util/FontUtils";
+import {setHideBottomBar} from "../../redux/AR";
 
 const ARScreen = ({route}) => {
+  const dispatch = useDispatch();
   const destinationData = useSelector(state => state.ar.destinationData);
+  const [modeLabel, setModeLabel] = useState(null);
+  const [screentitle, setSceenTitle] = useState(AR_MODE_MESSAGES.deafultView);
+  const [refreshListMode, setRefreshListMode] = useState(false);
+  const [refreshMapMode, setRefreshMapMode] = useState(false);
+  const {getNextStar: getNextStarApi} = useArScreenHook();
   const selectedDestination = useSelector(state => state.ar);
   const [textLoading, setTextLoading] = useState("Loading AR Experience");
   const [openModalARMode, setOpenModalARMode] = useState(false);
@@ -46,6 +74,8 @@ const ARScreen = ({route}) => {
   const [notificationMode, setNotificationMode] = useState("scan");
   const [selectedSite, setSelectedSite] = useState(null);
   const navigation = useNavigation();
+  const [selectedMode, setSelectedMode] = useState(null);
+  const [currentMode, setCurrentMode] = useState(null);
   const [challengeInformationView, setChallengeInformationView] = useState(false);
 
   const lastSentLocationRef = useRef(null);
@@ -79,18 +109,21 @@ const ARScreen = ({route}) => {
   const isGeoTagMode = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE;
   const isScanMode = selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE;
   const modelFile =
-      challengeObj?.model_file ||
-      selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
+    challengeObj?.model_file ||
+    selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.pin_challenge?.model_file;
   const challengeHasFilters = selectedSite?.ar_filters?.length > 0;
 
   const initialCheckDoneRef = useRef(false);
-  const [modal, setModal] = useState(true)
+  const [modal, setModal] = useState(true);
 
   // const huntChallenge = TEST_HUNT_CHALLENGE;
-  const [huntChallenge, setHuntChallenge] = useState(route?.params?.huntChallenge)
+  const [huntChallenge, setHuntChallenge] = useState(route?.params?.huntChallenge);
   // const huntChallenge = route.params?.huntChallenge;
   const huntChallengeFinished = route.params?.huntChallengeFinished;
   const isContinuingHuntChallenge = !!huntChallenge;
+
+  const [continueHuntChallenge, setContinuingHuntChallenge] = useState(false);
+
   const [bundleFile, setBundleFile] = useState(null);
   const SCENE_NAME = "ARReactNative 1"; // tu escena
   const [sceneIsReady, setSceneIsReady] = useState(false);
@@ -102,7 +135,11 @@ const ARScreen = ({route}) => {
   const shouldRun3DFlow = mode => {
     if (!mode) return false;
     if (mode === AR_MODES.HUNT_MODE) return true;
-    if (mode === AR_MODES.SCAN_MODE) return !!selectedSite?.scanChallenge?.file_3d; // solo si hay 3D
+    if (mode === AR_MODES.SCAN_MODE)
+      return (
+        !!selectedSite?.scanChallenge?.file_animation_android ||
+        !!selectedSite?.scanChallenge?.file_animation_ios
+      ); // solo si hay 3D
     return false; // GEO doesn't enter here (handled separately)
   };
   const [loading, setLoading] = useState(false);
@@ -114,16 +151,141 @@ const ARScreen = ({route}) => {
   const sceneCycleRef = useRef(0);
   const sendBundleTimerRef = useRef(null);
   const loadArContentSentRef = useRef(false);
-  const challenge_type_value = selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
-  ? CHALLENGES_TYPE.PIN_CHECK_IN
-  : null;
+  const isFocused = useIsFocused();
+  const challenge_type_value =
+    selectedSite?.selectedMode?.mode === AR_MODES.GEO_TAG_MODE
+      ? CHALLENGES_TYPE.PIN_CHECK_IN
+      : null;
   const huntParameters = isHuntMode
-      ? selectedSite?.ar_star?.parameters
-      : (
-          selectedSite?.huntChallenge?.geo_ar_star?.challenges?.parameters ||
-          selectedSite?.pin_challenge?.parameters
-      );
+    ? selectedSite?.ar_star?.parameters
+    : selectedSite?.huntChallenge?.geo_ar_star?.challenges?.parameters ||
+      selectedSite?.pin_challenge?.parameters;
   const showNotificationTimerRef = useRef(null);
+
+  // Unity Header states
+  const [selectedHeaderMode, setSelectedHeaderMode] = useState("Live");
+  const [showOverlay, setShowOverlay] = useState(false);
+
+  // Side Menu states
+  const [isSideMenuVisible, setIsSideMenuVisible] = useState(false);
+
+  // Hide tab bar when screen is focused
+
+  useEffect(() => {
+    if (isFocused && unityRef.current) {
+      getAvailableModes();
+      setSelectedMode(null);
+      setSceenTitle(AR_MODE_MESSAGES.deafultView);
+      setSelectedHeaderMode("Live");
+      setShowOverlay(false);
+      setIsSideMenuVisible(false);
+    }
+  }, [isFocused, unityRef.current]);
+
+  useEffect(() => {
+    if (selectedSite && isFocused && unityRef.current) {
+      const currentMode = selectedSite.selectedMode.mode;
+      console.log("Setting mode label based on selected site and mode:", selectedSite);
+      if (currentMode == AR_MODES.HUNT_MODE) {
+        const starHuntChallenge = selectedSite?.huntChallenge?.screen_title || "AR Hunt Challenge";
+
+        setModeLabel("Hunt Mode");
+        setSelectedMode(AR_MODES_MENU[2]);
+      } else if (currentMode == AR_MODES.GEO_TAG_MODE) {
+        setSelectedMode(AR_MODES_MENU[0]);
+      } else if (currentMode == AR_MODES.SCAN_MODE) {
+        setModeLabel("Scan Mode");
+
+        setSelectedMode(AR_MODES_MENU[1]);
+      }
+    } else {
+      setRefreshListMode(false);
+      setRefreshMapMode(false);
+      console.log("Resetting mode label to default");
+      setModeLabel("Mode");
+    }
+  }, [selectedSite, isFocused, unityRef.current]);
+
+  // Check distance and set screen title when within 20 meters
+  useEffect(() => {
+    if (!selectedSite || !userLocation) return;
+
+    const currentMode = selectedSite?.selectedMode?.mode;
+
+    // Only process for SCAN_MODE and HUNT_MODE
+    if (currentMode !== AR_MODES.SCAN_MODE && currentMode !== AR_MODES.HUNT_MODE) {
+      return;
+    }
+
+    let targetLocation = null;
+    let screenTitleArray = null;
+
+    // Get coordinates and screen_title based on mode
+    if (currentMode === AR_MODES.SCAN_MODE) {
+      const scanCoordinates = selectedSite?.scanChallenge?.coordinates?.coordinates;
+      if (scanCoordinates && scanCoordinates.length >= 2) {
+        targetLocation = {
+          latitude: scanCoordinates[1],
+          longitude: scanCoordinates[0],
+        };
+        screenTitleArray = selectedSite?.scanChallenge?.screen_title;
+      }
+    } else if (currentMode === AR_MODES.HUNT_MODE) {
+      const huntCoordinates =
+        selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates;
+      if (huntCoordinates && huntCoordinates.length >= 2) {
+        targetLocation = {
+          latitude: huntCoordinates[1],
+          longitude: huntCoordinates[0],
+        };
+        screenTitleArray = selectedSite?.huntChallenge?.screen_title;
+      }
+    }
+
+    // Calculate distance if we have both locations
+    if (targetLocation && userLocation.latitude && userLocation.longitude) {
+      const distance = getLocationDistance(
+        {latitude: userLocation.latitude, longitude: userLocation.longitude},
+        targetLocation
+      );
+
+      // If within 15 meters, set the screen title
+      if (distance <= 15) {
+        if (screenTitleArray && Array.isArray(screenTitleArray)) {
+          // Transform the array to match AR_MODE_MESSAGES format
+          const transformedArray = screenTitleArray.map((item, index) => ({
+            id: index + 1,
+            message: typeof item === "string" ? item : item?.message || item?.text || "",
+          }));
+
+          setSceenTitle(transformedArray);
+        } else {
+          // Fallback to default messages if screen_title is not an array
+          if (currentMode === AR_MODES.SCAN_MODE) {
+            setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_SCAN_MODE);
+          } else if (currentMode === AR_MODES.HUNT_MODE) {
+            setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_HUNT_MODE);
+          }
+        }
+      }
+    }
+  }, [selectedSite, userLocation]);
+
+  const getAvailableModes = async () => {
+    try {
+      let response = await getAvailableARModes();
+
+      // Check if the response is successful
+      if (response?.status === 1) {
+      } else {
+        console.error("API Error:", response?.message || response?.error);
+        showMessage("Failed to fetch available AR modes.", "error");
+      }
+    } catch (error) {
+      console.error("Network Error:", error);
+      showMessage("Failed to fetch available AR modes.", "error");
+    }
+  };
 
   const checkPermission = () => {
     if (Platform.OS === "android") {
@@ -159,7 +321,13 @@ const ARScreen = ({route}) => {
 
   const unzipModelFile = async (sourcePath, targetPath) => {
     setTextLoading("Unzipping AR model...");
-    const extractedData = await handleUnzipProcess(sourcePath, targetPath);
+    const extractedData = {
+      success: true,
+      objFile: "travelApp/models/star.obj",
+      mtlFile: " travelApp/models/star.mtl",
+      baseTexture: "travelApp/models/star_base.png",
+      emissionTexture: "travelApp/models/star_emission.png",
+    };
 
     if (extractedData.success) {
       setStarModels(extractedData.objFile);
@@ -167,14 +335,13 @@ const ARScreen = ({route}) => {
       setTextureBase(extractedData.baseTexture);
       setTextureEmission(extractedData.emissionTexture);
       setTextLoading("Loading AR Experience...");
-      setUnitySceneLoaded(false)
+      setUnitySceneLoaded(false);
     } else {
       console.error("Failed to unzip model file:", extractedData.error);
       setModelResource(null);
       setTextureBase(null);
       setTextureEmission(null);
     }
-
   };
 
   const checkIfModelExist = () => {
@@ -185,24 +352,26 @@ const ARScreen = ({route}) => {
     const sourcePath = `${RNFS.DocumentDirectoryPath}/${filename}`;
     const targetPath = `${RNFS.DocumentDirectoryPath}/${withoutExtFilename}`;
 
-    RNFS.exists(targetPath).then(async (unzipped) => {
-      if (unzipped) {
-        setTextLoading("Loading AR Experience...");
-        setUnitySceneLoaded(false);
-        await unzipModelFile(sourcePath, targetPath);
-        return;
-      }
-
-      RNFS.exists(sourcePath).then(exists => {
-        if (exists) {
-          setTextLoading("Unzipping AR model...");
-          unzipModelFile(sourcePath, targetPath);
-        } else {
-          setTextLoading("Downloading AR model...");
-          downloadModelFile(sourcePath, targetPath);
+    RNFS.exists(targetPath)
+      .then(async unzipped => {
+        if (unzipped) {
+          setTextLoading("Loading AR Experience...");
+          setUnitySceneLoaded(false);
+          await unzipModelFile(sourcePath, targetPath);
+          return;
         }
-      });
-    }).catch(console.error);
+
+        RNFS.exists(sourcePath).then(exists => {
+          if (exists) {
+            setTextLoading("Unzipping AR model...");
+            unzipModelFile(sourcePath, targetPath);
+          } else {
+            setTextLoading("Downloading AR model...");
+            downloadModelFile(sourcePath, targetPath);
+          }
+        });
+      })
+      .catch(console.error);
   };
 
   const playCameraSound = () => {
@@ -286,6 +455,7 @@ const ARScreen = ({route}) => {
           scaleFactor: 1,
           smoothingFactor: 5,
         });
+        // console.log("Updating Unity Locatn:", jsonData);
         unityRef.current.postMessage("ObjectSpawner", "SetUserLocationFromReact", jsonData);
       }
     }
@@ -356,16 +526,23 @@ const ARScreen = ({route}) => {
       // !hasSentModelDataOnce &&
       // (isGeoTagMode || isHuntMode ) //TODO Verificar
     ) {
-      const huntLike = isHuntMode || (isScanMode && !!selectedSite?.scanChallenge?.file_3d);
+      const huntLike =
+        isHuntMode ||
+        (isScanMode && !!selectedSite?.scanChallenge?.file_animation_android) ||
+        !!selectedSite?.scanChallenge?.file_animation_ios;
       const modelData = {
         objFile: starModels.replace("file://", ""),
+        url: selectedChallengeOverride.model_file || "",
+        url_android: selectedChallengeOverride?.animationAndroid,
+        url_ios: selectedChallengeOverride?.animationIOS,
+        title: selectedChallengeOverride.title || "",
         mtlFile: modelResource ? modelResource.replace("file://", "") : "",
         textureBase: textureBase ? textureBase.replace("file://", "") : "",
         textureEmission: textureEmission ? textureEmission.replace("file://", "") : "",
         scale: {
-          x: 1,
-          y: 1,
-          z: 1,
+          x: 5,
+          y: 5,
+          z: 5,
         },
         // rotation: {x: 0, y: 0, z: 0},
         emissionIntensity: parseFloat(selectedChallengeOverride?.parameters?.emission_value) || 1,
@@ -391,11 +568,13 @@ const ARScreen = ({route}) => {
         allowScale: true, //true
         // allowScale: true
       };
+
       setTimeout(() => {
         unityRef.current.postMessage("OBJImport", "LoadModelFromReact", JSON.stringify(modelData));
       }, 500);
+
       // setSendModelData(true);
-        unityRef.current.postMessage(
+      unityRef.current.postMessage(
         "OBJImport",
         "SetLoadingVisibility",
         JSON.stringify({isVisible: false})
@@ -410,14 +589,14 @@ const ARScreen = ({route}) => {
       id: "1",
       latitude: -25.296442, // selectedSite?.scanChallenge?.coordinates[1] , // ||
       longitude: -57.58958, //selectedSite?.scanChallenge?.coordinates[0], //||
-      scale: huntParameters?.scale_object || 0.01,
+      scale: 20,
       // scale: 5,
       rotationSpeed: huntParameters?.rotation_speed,
       height: spawnHeight,
       isVisible: true,
       updateRadius: 14.0,
       isHuntMode: true,
-      shouldRotate: true
+      shouldRotate: true,
     };
 
     if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
@@ -426,7 +605,7 @@ const ARScreen = ({route}) => {
         latitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[1], // ||  -25.296442,
         longitude: selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.lat_long?.coordinates[0], //||  -57.589580,
         height: spawnHeight,
-        scale: huntParameters?.scale_object || 0.01,
+        scale: 20,
         isVisible: true,
         updateRadius: 14.0,
         isHuntMode: true,
@@ -442,7 +621,7 @@ const ARScreen = ({route}) => {
         isVisible: true,
         updateRadius: 14.0, // verificar
         isHuntMode: true,
-        scale: huntParameters?.scale_object || 0.01,
+        scale: 20,
         shouldRotate: false,
       };
     }
@@ -453,6 +632,7 @@ const ARScreen = ({route}) => {
         },
       ],
     };
+    console.log("Spawn Data being sent to Unity:", spawnData);
     unityRef.current.postMessage(
       "ObjectSpawner",
       "SpawnObjectsFromReact",
@@ -472,33 +652,32 @@ const ARScreen = ({route}) => {
   };
 
   //TODO Pending
-const unityStarsCount = () => {
-  if (unityRef?.current && selectedSite?.huntChallenge) {
-    const hunt = selectedSite.huntChallenge;
+  const unityStarsCount = () => {
+    if (unityRef?.current && selectedSite?.huntChallenge) {
+      const hunt = selectedSite.huntChallenge;
 
-    const total = hunt?.total_stars || 4;
-    const captured = hunt?.hunt_captured_stars || 0;
+      const total = hunt?.total_stars || 4;
+      const captured = hunt?.hunt_captured_stars || 0;
 
-    let capturedThisAttempt = hunt.hunt_captured_stars % hunt.total_stars;
-    if (capturedThisAttempt === 0 && hunt.hunt_captured_stars > 0) {
-      capturedThisAttempt = hunt.total_stars;
+      let capturedThisAttempt = hunt.hunt_captured_stars % hunt.total_stars;
+      if (capturedThisAttempt === 0 && hunt.hunt_captured_stars > 0) {
+        capturedThisAttempt = hunt.total_stars;
+      }
+
+      const displayCaptured = capturedThisAttempt;
+
+      unityRef.current.postMessage(
+        "Scriptposition",
+        "SetVisibleStars",
+        JSON.stringify({
+          stars: `${displayCaptured}/${total}`,
+          isStarsView: true,
+        })
+      );
     }
-
-    const displayCaptured = capturedThisAttempt
-
-    unityRef.current.postMessage(
-      "Scriptposition",
-      "SetVisibleStars",
-      JSON.stringify({
-        stars: `${displayCaptured}/${total}`,
-        isStarsView: true,
-      })
-    );
-  }
-};
+  };
 
   useEffect(() => {
-
     if (modal && !unitySceneLoaded && sceneIsReady && selectedSite === null) {
       setOpenModalARMode(true);
     }
@@ -522,53 +701,138 @@ const unityStarsCount = () => {
     setIsUnityLoaded(false);
   };
 
+  useEffect(() => {
+    if (selectedHeaderMode === "List") {
+      setSceenTitle(AR_MODE_MESSAGES.LIST_VIEW);
+    }
+    if (selectedHeaderMode === "Map") {
+      setSceenTitle(AR_MODE_MESSAGES.MAP_VIEW);
+    }
+    if (selectedHeaderMode === "Live") {
+      if (selectedSite) {
+        setSceenTitle(AR_MODE_MESSAGES.CALIBRATION);
+      } else {
+        setSceenTitle(AR_MODE_MESSAGES.deafultView);
+      }
+    }
+  }, [selectedHeaderMode]);
+
   const closeViewInfoButtonHandler = () => {
     setChallengeInformationView(false);
     setIsUnityLoaded(true);
   };
 
-const HIDE_ARROW_MS = 3000;
-const hideArrowTimerRef = useRef(null);
+  // Unity Header handlers
+  const handleModeChange = mode => {
+    setSelectedHeaderMode(mode);
 
-const setArrowVisible = visible => {
-  if (unityRef.current) {
-    unityRef.current.postMessage("CompassTester", "SetArrowVisible", visible ? "false" : "true");
-  }
-};
-
-const scheduleHideArrow = () => {
-  if (hideArrowTimerRef.current) {
-    clearTimeout(hideArrowTimerRef.current);
-  }
-  hideArrowTimerRef.current = setTimeout(() => {
-    setArrowVisible(false);
-    if (unityRef.current) {
-      unityRef.current.postMessage("Main Camera", "HideARObject", "");
-    }
-    hideArrowTimerRef.current = null;
-  }, HIDE_ARROW_MS);
-};
-
-const onObjectDetected = () => {
-  setArrowVisible(true);
-  scheduleHideArrow();
-};
-
-useEffect(() => {
-  return () => {
-    if (hideArrowTimerRef.current) {
-      clearTimeout(hideArrowTimerRef.current);
-      hideArrowTimerRef.current = null;
+    // Show overlay for Map and List modes, hide for Live mode
+    if (mode === "Map" || mode === "List") {
+      setShowOverlay(true);
+    } else {
+      setShowOverlay(false);
     }
   };
-}, []);
 
+  const handleBackPress = () => {
+    navigation.goBack();
+  };
+
+  const handleSideMenuToggle = () => {
+    setIsSideMenuVisible(!isSideMenuVisible);
+  };
+
+  // Bottom bar handlers
+  const handleBottomBarModeSelect = option => {
+    console.log("Bottom bar mode selected:", option);
+    const label = option?.label || "Mode";
+
+    const ButtonScanMode = label === "Scan Mode";
+    const ButtonHuntMode = label === "Hunt Mode";
+    const ButtonGeoTagMode = label === "GeoTag Mode";
+
+    if ((ButtonScanMode || ButtonHuntMode || ButtonGeoTagMode) && selectedHeaderMode == "Live") {
+      setSelectedHeaderMode("List");
+      setShowOverlay(true);
+    }
+
+    if (ButtonGeoTagMode) {
+      setCurrentMode(AR_MODES.GEO_TAG_MODE);
+      setSelectedMode(AR_MODES_MENU[0]);
+    }
+    if (ButtonHuntMode) {
+      setCurrentMode(AR_MODES.HUNT_MODE);
+      setSelectedMode(AR_MODES_MENU[2]);
+    }
+    if (ButtonScanMode) {
+      setCurrentMode(AR_MODES.SCAN_MODE);
+      setSelectedMode(AR_MODES_MENU[1]);
+    }
+  };
+
+  const handleMoreInfoPress = () => {
+    if (!selectedSite) {
+      Alert.alert("No site selected", "Please select a site to view information.");
+      return;
+    }
+    setChallengeInformationView(true);
+  };
+
+  const handleRefreshPress = () => {
+    if (selectedHeaderMode === "List") {
+      setRefreshListMode(true);
+    } else if (selectedHeaderMode === "Map") {
+      setRefreshMapMode(true);
+    }
+  };
+
+  const HIDE_ARROW_MS = 3000;
+  const hideArrowTimerRef = useRef(null);
+
+  const setArrowVisible = visible => {
+    if (unityRef.current) {
+      unityRef.current.postMessage("CompassTester", "SetArrowVisible", visible ? "false" : "true");
+    }
+  };
+
+  const scheduleHideArrow = () => {
+    if (hideArrowTimerRef.current) {
+      clearTimeout(hideArrowTimerRef.current);
+    }
+    hideArrowTimerRef.current = setTimeout(() => {
+      setArrowVisible(false);
+      if (unityRef.current) {
+        // unityRef.current.postMessage("Main Camera", "HideARObject", "");
+      }
+      hideArrowTimerRef.current = null;
+    }, HIDE_ARROW_MS);
+  };
+
+  const onObjectDetected = () => {
+    setArrowVisible(true);
+    scheduleHideArrow();
+  };
+
+  useEffect(() => {
+    return () => {
+      if (hideArrowTimerRef.current) {
+        clearTimeout(hideArrowTimerRef.current);
+        hideArrowTimerRef.current = null;
+      }
+    };
+  }, []);
 
   const handleUnityMessage = result => {
     const data = JSON.parse(result.nativeEvent.message);
+    console.log("Message from Unity:", data);
 
     const buttonBack = data.backPress;
     const buttonARMode = data?.ARMode;
+    const ButtonHuntMode = data?.HuntMode;
+    const ButtonScanMode = data?.ScanMode;
+    const ButtonGeoTagMode = data?.GeoTagMode;
+    const isObjectSpawned = data?.spawnedObject?.objectSpawned;
+
     let show = [];
     let hide = [];
     if (data?.sceneLoading === true) {
@@ -584,7 +848,7 @@ useEffect(() => {
         selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
         selectedSite?.scanChallenge?.file_3d
       ) {
-        unityRef.current.postMessage("Main Camera", "ShowARObject", "");
+        // unityRef.current.postMessage("Main Camera", "ShowARObject", "");
         onObjectDetected();
       }
     }
@@ -597,16 +861,49 @@ useEffect(() => {
         setShouldRenderUnity(false);
       }
     }
+
     if (buttonARMode) {
       setOpenModalARMode(true);
     }
-    if (data?.["Reset-AR"] && (
-          selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
-          (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge?.file_3d)
-        ))
-        {
-        startChallengeHandler(selectedSite);
-        }
+
+    if (isObjectSpawned) {
+      let mode = selectedSite?.selectedMode?.mode;
+
+      if (mode === AR_MODES.SCAN_MODE) {
+        console.log("Setting screen title for Scan Mode");
+        setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_SCAN_MODE);
+      }
+      if (mode === AR_MODES.HUNT_MODE) {
+        console.log("Setting screen title for Hunt Mode");
+        setSceenTitle(AR_MODE_MESSAGES.LIVE_VIEW_HUNT_MODE);
+      }
+    }
+
+    if (ButtonScanMode || ButtonHuntMode || ButtonGeoTagMode) {
+      setSelectedHeaderMode("List");
+      setShowOverlay(true);
+    }
+
+    if (ButtonGeoTagMode) {
+      setCurrentMode(AR_MODES.GEO_TAG_MODE);
+      setSelectedMode(AR_MODES_MENU[0]);
+    }
+    if (ButtonHuntMode) {
+      setCurrentMode(AR_MODES.HUNT_MODE);
+      setSelectedMode(AR_MODES_MENU[2]);
+    }
+    if (ButtonScanMode) {
+      setCurrentMode(AR_MODES.SCAN_MODE);
+      setSelectedMode(AR_MODES_MENU[1]);
+    }
+    if (
+      data?.["Reset-AR"] &&
+      (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
+        (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE &&
+          selectedSite?.scanChallenge?.file_3d))
+    ) {
+      startChallengeHandler(selectedSite);
+    }
     if (data?.sceneLoaded && data.sceneName === "ARReactNative") {
       unityRef.current.postMessage("SceneLoader", "LoadSpecificScene", "ARReactNative 1");
     }
@@ -649,19 +946,19 @@ useEffect(() => {
 
       // }
       if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
-        navigation.navigate({
-          name: "FunFactsScreen",
-          params: {
-            challengeObj: selectedSite,
-          },
-        });
+        unityRef.current.postMessage("OBJImport", "SpawnCollectionEffect", "");
+        // navigation.navigate({
+        //   name: "FunFactsScreen",
+        //   params: {
+        //     challengeObj: selectedSite,
+        //   },
+        // });
+        handleNextHunt();
       }
     }
 
     switch (selectedSite?.selectedMode?.mode) {
       case AR_MODES.GEO_TAG_MODE:
-
-
         if (!isMeInsideInSite && data?.ispressed) {
           Toast.show({
             type: "info",
@@ -671,7 +968,7 @@ useEffect(() => {
         }
 
         if (data?.photoVideoButton?.isPhoto) {
-          setHasSentModelDataOnce(false)
+          setHasSentModelDataOnce(false);
           setCapturedImage(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
@@ -680,7 +977,7 @@ useEffect(() => {
         }
 
         if (data?.photoVideoButton?.isPhoto == false) {
-          setHasSentModelDataOnce(false)
+          setHasSentModelDataOnce(false);
           setCapturedVideo(data.photoVideoButton?.filepath);
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
@@ -695,8 +992,8 @@ useEffect(() => {
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
           setUnitySceneLoaded(false);
-          setSendSpawnModelData(false)
-          setHasSentModelDataOnce(false)
+          setSendSpawnModelData(false);
+          setHasSentModelDataOnce(false);
           eraseFile();
         }
         if (data?.photoVideoButton?.isPhoto == false) {
@@ -704,8 +1001,8 @@ useEffect(() => {
           setIsUnityLoaded(false);
           setShouldRenderUnity(true);
           setUnitySceneLoaded(false);
-          setSendSpawnModelData(false)
-          setHasSentModelDataOnce(false)
+          setSendSpawnModelData(false);
+          setHasSentModelDataOnce(false);
           eraseFile();
         }
         unityRef.current.postMessage(
@@ -726,9 +1023,45 @@ useEffect(() => {
     }
   };
 
+  const handleNextHunt = async () => {
+    const geoSiteId = selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.id;
+    const challengeId = selectedSite?.huntChallenge?.geo_ar_star?.id;
+    const starPointId = selectedSite?.huntChallenge?.id;
+    const lat = selectedSite?.lat_long?.coordinates[1];
+    const lon = selectedSite?.lat_long?.coordinates[0];
+
+    try {
+      await starFoundAndSaveApi({
+        geo_site: geoSiteId,
+        geo_ar_star: challengeId,
+        geo_ar_star_point: starPointId,
+        latitude: lat,
+        longitude: lon,
+      });
+
+      const nextHunt = await getNextStarApi(geoSiteId, lat, lon);
+
+      if (!nextHunt) {
+        return;
+      } else {
+        const Challenge = {
+          ...selectedSite,
+          selectedMode: AR_MODES_MENU[2],
+          huntChallenge: nextHunt,
+          userAttempt: nextHunt.attempt_number,
+        };
+
+        setHuntChallenge(Challenge);
+        startChallengeHandler(Challenge);
+      }
+    } catch (error) {
+      console.error("Error saving star found:", error);
+    }
+  };
+
   const retakeButtonHandler = () => {
-    setHasSentModelDataOnce(false)
-    setSendSpawnModelData(false)
+    setHasSentModelDataOnce(false);
+    setSendSpawnModelData(false);
     setCapturedImage(null);
     setCapturedVideo(null);
     setIsUnityLoaded(true);
@@ -787,6 +1120,11 @@ useEffect(() => {
       isVisible={challengeInformationView}
       onClose={closeViewInfoButtonHandler}
       content={viewInfoModalContent()}
+      onPressExample={() => {
+        setChallengeInformationView(false);
+        setIsUnityLoaded(true);
+        openExample();
+      }}
     />
   );
   const notificationUnity = (title, text) => {
@@ -822,8 +1160,11 @@ useEffect(() => {
       case AR_MODES.SCAN_MODE:
         const scanChallenge = site?.scanChallenge;
         challengeData = {
-          model_file: scanChallenge?.file_3d,
+          model_file: scanChallenge?.file_animation_ios || scanChallenge?.file_animation_android,
+          animationAndroid: scanChallenge?.file_animation_android,
+          animationIOS: scanChallenge?.file_animation_ios,
           lat_long: scanChallenge?.coordinates,
+          title: scanChallenge?.screen_title,
           challenge_requirement: site?.pin_challenge?.challenge_requirement,
           arChallenge: true,
           isLocation: false,
@@ -833,26 +1174,34 @@ useEffect(() => {
           selectedMode: "Scan",
           setVisibleButtonPosition: false,
         };
-
         break;
       case AR_MODES.HUNT_MODE:
         const huntChallenge = site?.huntChallenge?.geo_ar_star?.geo_site;
+        const starHuntChallenge = site?.huntChallenge;
+
         challengeData = {
           lat_long: huntChallenge?.lat_long,
           challenge_requirement: huntChallenge?.pin_challenge?.challenge_requirement,
           challenge_id: huntChallenge?.pin_challenge?.id,
-          model_file: site?.ar_star?.model_file,
+          model_file: starHuntChallenge?.model_file,
+          animationAndroid: starHuntChallenge?.file_animation_android,
+          animationIOS: starHuntChallenge?.file_animation_ios,
+          title: starHuntChallenge?.screen_title,
           parameters: huntChallenge?.pin_challenge?.parameters,
           points: huntChallenge?.pin_challenge?.points || 10,
           setVisibleButtonPosition: false,
           arChallenge: false,
           isLocation: true,
         };
-
         break;
       default:
         break;
     }
+
+    setSelectedHeaderMode("Live");
+    setShowOverlay(false);
+    // setSceenTitle(challengeData.title || "AR Challenge");
+
     setStarModels(null);
     setModelResource(null);
     setTextureBase(null);
@@ -867,7 +1216,8 @@ useEffect(() => {
     setUnitySceneLoaded(true);
     closeModalARMode();
     if (unityRef.current) {
-      unityRef.current?.postMessage("SceneLoader", "LoadSpecificSceneForce", SCENE_NAME);}
+      unityRef.current?.postMessage("SceneLoader", "LoadSpecificSceneForce", SCENE_NAME);
+    }
 
     if (showNotificationTimerRef.current) {
       clearTimeout(showNotificationTimerRef.current);
@@ -916,13 +1266,15 @@ useEffect(() => {
       if (!sceneIsReady || !unityRef.current) return;
 
       const payload = {bundleURL};
-      const has3D = !!selectedSite?.scanChallenge?.file_3d;
+      const has3D =
+        !!selectedSite?.scanChallenge?.file_animation_android ||
+        !!selectedSite?.scanChallenge?.file_animation_ios;
 
       if (!has3D) {
         const img = selectedSite?.scanChallenge?.file_image || "";
         if (img) payload.localImagePath = img;
       }
-      unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
+      // unityRef.current.postMessage("Main Camera", "LoadARContent", JSON.stringify(payload));
       loadArContentSentRef.current = true;
     }, AFTER_SCENE_COOLDOWN_MS);
 
@@ -933,7 +1285,8 @@ useEffect(() => {
     selectedSite?.selectedMode?.mode,
     selectedSite?.scanChallenge?.file_animation_android,
     selectedSite?.scanChallenge?.file_animation_ios, //TODO Cuando exista
-    selectedSite?.scanChallenge?.file_3d,
+    selectedSite?.scanChallenge?.file_animation_android,
+    selectedSite?.scanChallenge?.file_animation_ios,
     selectedSite?.scanChallenge?.file_image,
   ]);
 
@@ -951,14 +1304,17 @@ useEffect(() => {
       if (sceneCycleRef.current !== cycleAtSchedule) return;
       if (!unityRef.current || !sceneIsReady) return;
 
-      unityRef.current.postMessage(
-          "Main Camera",
-          "SetDetectObjectState",
-          JSON.stringify({isDetectionEnabled: true, detectionDistance: 50})
-      );
+      // unityRef.current.postMessage(
+      //   "Main Camera",
+      //   "SetDetectObjectState",
+      //   JSON.stringify({isDetectionEnabled: true, detectionDistance: 50})
+      // );
 
-      const mode = (pendingMode ?? selectedSite?.selectedMode?.mode);
-      const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
+      const mode = pendingMode ?? selectedSite?.selectedMode?.mode;
+      const has3DInScan =
+        !!selectedSite?.scanChallenge?.file_animation_android ||
+        !!selectedSite?.scanChallenge?.file_animation_ios;
+
       const run3D = mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
 
       const readyForModel = !!validUserLocation && !!starModels && !!textureBase;
@@ -967,8 +1323,14 @@ useEffect(() => {
         if (!hasSentModelDataOnce && readyForModel) {
           sendModelDataToUnity();
           sendBloomValuesToUnity();
-          unityRef.current.postMessage("screen", "SetTypeChallenge",
-              JSON.stringify({ typeChallenge: "PHOTOVIDEO", arChallenge: false, isLocation: !!isMeInsideInSite })
+          unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "PHOTOVIDEO",
+              arChallenge: false,
+              isLocation: !!isMeInsideInSite,
+            })
           );
         }
         return;
@@ -1086,51 +1448,51 @@ useEffect(() => {
           isDetectionEnabled: true,
           detectionDistance: 50,
         };
-        unityRef.current.postMessage(
-          "Main Camera",
-          "SetDetectObjectState",
-          JSON.stringify(distanceDetect)
-        );
+        // unityRef.current.postMessage(
+        //   "Main Camera",
+        //   "SetDetectObjectState",
+        //   JSON.stringify(distanceDetect)
+        // );
         setTimeout(() => {
-        // const has3DModel = selectedSite?.scanChallenge?.file_3d;
-        show = ["Back", "Details", "ArMode", "screen", "points", "position"];
-        hide = ELEMENTSUNITY.filter(name => !show.includes(name));
+          // const has3DModel = selectedSite?.scanChallenge?.file_3d;
+          show = ["Back", "Details", "ArMode", "screen", "points", "position"];
+          hide = ELEMENTSUNITY.filter(name => !show.includes(name));
 
-        unityRef.current.postMessage(
-          "CanvasController",
-          "ShowHideElements",
-          JSON.stringify({show, hide})
-        );
+          unityRef.current.postMessage(
+            "CanvasController",
+            "ShowHideElements",
+            JSON.stringify({show, hide})
+          );
 
-        unityRef.current.postMessage(
-          "Scriptposition",
-          "SetTextReAnchor",
-          JSON.stringify({
-            titleARMode: "RESET AR",
-            textlabel: "",
-            visibleLabel: false,
-          })
-        );
+          unityRef.current.postMessage(
+            "Scriptposition",
+            "SetTextReAnchor",
+            JSON.stringify({
+              titleARMode: "RESET AR",
+              textlabel: "",
+              visibleLabel: false,
+            })
+          );
 
-        unityRef.current.postMessage(
-          "ArMode",
-          "SetTextArModal",
-          JSON.stringify({
-            titleARMode: "Scan Mode",
-            textlabel: "",
-            visibleLabel: false,
-          })
-        );
-        PointsCount();
-             unityRef.current.postMessage(
-          "screen",
-          "SetTypeChallenge",
-          JSON.stringify({
-            typeChallenge: "PHOTOVIDEO",
-            arChallenge: true,
-            isLocation: false,
-          })
-        );
+          unityRef.current.postMessage(
+            "ArMode",
+            "SetTextArModal",
+            JSON.stringify({
+              titleARMode: "Scan Mode",
+              textlabel: "",
+              visibleLabel: false,
+            })
+          );
+          PointsCount();
+          unityRef.current.postMessage(
+            "screen",
+            "SetTypeChallenge",
+            JSON.stringify({
+              typeChallenge: "PHOTOVIDEO",
+              arChallenge: true,
+              isLocation: false,
+            })
+          );
         }, 300);
 
         break;
@@ -1167,11 +1529,11 @@ useEffect(() => {
             isDetectionEnabled: true,
             detectionDistance: 50,
           };
-          unityRef.current.postMessage(
-            "Main Camera",
-            "SetDetectObjectState",
-            JSON.stringify(distanceDetect)
-          );
+          // unityRef.current.postMessage(
+          //   "Main Camera",
+          //   "SetDetectObjectState",
+          //   JSON.stringify(distanceDetect)
+          // );
           PointsCount();
         }, 1000);
         break;
@@ -1201,7 +1563,8 @@ useEffect(() => {
   useEffect(() => {
     const watchId = Geolocation.watchPosition(
       position => {
-        const {latitude, longitude} = position.coords;
+        const {latitude, longitude, heading} = position.coords;
+
         if (
           position.coords.latitude === 0 ||
           position.coords.longitude === 0 ||
@@ -1214,6 +1577,7 @@ useEffect(() => {
           latitude: position.coords.latitude,
           longitude: position.coords.longitude,
           accuracy: position.coords.accuracy,
+          heading: heading || 0,
         };
         setUserLocation(newLocation);
         if (
@@ -1252,7 +1616,7 @@ useEffect(() => {
 
   useEffect(() => {
     if (selectedSite) {
-      setThreshold(parseFloat(huntParameters?.bloom_threshold)|| 0.9);
+      setThreshold(parseFloat(huntParameters?.bloom_threshold) || 0.9);
       setIntensity(parseFloat(huntParameters?.bloom_intensity) || 1);
     }
   }, [selectedSite]);
@@ -1274,15 +1638,15 @@ useEffect(() => {
           })
         );
 
-          unityRef.current.postMessage(
-            "screen",
-            "SetTypeChallenge",
-            JSON.stringify({
-              typeChallenge: "PHOTOVIDEO",
-              arChallenge: selectedChallengeOverride?.arChallenge,
-              isLocation: selectedChallengeOverride?.isLocation,
-            })
-          );
+        unityRef.current.postMessage(
+          "screen",
+          "SetTypeChallenge",
+          JSON.stringify({
+            typeChallenge: "PHOTOVIDEO",
+            arChallenge: selectedChallengeOverride?.arChallenge,
+            isLocation: selectedChallengeOverride?.isLocation,
+          })
+        );
       }, 500);
 
       return () => clearTimeout(timer);
@@ -1342,6 +1706,9 @@ useEffect(() => {
 
   useFocusEffect(
     useCallback(() => {
+      // Hide bottom tab bar when screen is focused
+      dispatch(setHideBottomBar(true));
+
       const timeout = setTimeout(() => {
         if (!unitySceneLoaded) {
           const mode = selectedSite?.selectedMode?.mode;
@@ -1367,6 +1734,9 @@ useEffect(() => {
       setUnitySceneLoaded(true);
 
       return () => {
+        // Show bottom tab bar when screen is unfocused
+        dispatch(setHideBottomBar(false));
+
         clearTimeout(timeout);
         const mode = selectedSite?.selectedMode?.mode;
 
@@ -1382,7 +1752,6 @@ useEffect(() => {
           setSelectedSite(null);
           setHuntChallenge(null);
           setModal(false);
-
         }
         if (showNotificationTimerRef.current) {
           clearTimeout(showNotificationTimerRef.current);
@@ -1399,45 +1768,45 @@ useEffect(() => {
         setUnityLoading(false);
         // initialCheckDoneRef.current = false;
         setModal(false);
-
       };
     }, [])
   );
 
   useEffect(() => {
-  if (!sceneIsReady) return;
+    if (!sceneIsReady) return;
 
-  Geolocation.getCurrentPosition(
-    pos => {
-      const { latitude, longitude, accuracy } = pos.coords || {};
-      if (latitude && longitude) {
-        const firstLoc = { latitude, longitude, accuracy };
-        setUserLocation(firstLoc);
-        setValidUserLocation(firstLoc);
-        updateUnityLocation(firstLoc);
-        lastSentLocationRef.current = firstLoc;
+    Geolocation.getCurrentPosition(
+      pos => {
+        const {latitude, longitude, accuracy, heading} = pos.coords || {};
+
+        if (latitude && longitude) {
+          const firstLoc = {latitude, longitude, accuracy, heading};
+          setUserLocation(firstLoc);
+          setValidUserLocation(firstLoc);
+          updateUnityLocation(firstLoc);
+          lastSentLocationRef.current = firstLoc;
+        }
+      },
+      err => {
+        // opcional: log
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
       }
-    },
-    err => {
-      // opcional: log
-    },
-    {
-      enableHighAccuracy: true,
-      timeout: 10000,
-      maximumAge: 0,
-    }
-  );
-}, [sceneIsReady]);
+    );
+  }, [sceneIsReady]);
 
-useEffect(() => {
-  if (loading === true && unityRef.current){
-     unityRef.current.postMessage(
+  useEffect(() => {
+    if (loading === true && unityRef.current) {
+      unityRef.current.postMessage(
         "OBJImport",
         "SetLoadingVisibility",
         JSON.stringify({isVisible: true})
       );
-  }
-}, [loading, unityRef.current]);
+    }
+  }, [loading, unityRef.current]);
 
   useEffect(() => {
     if (!sceneIsReady || !unityRef.current) return;
@@ -1445,7 +1814,9 @@ useEffect(() => {
     const mode = selectedSite?.selectedMode?.mode;
     if (mode !== AR_MODES.SCAN_MODE) return;
 
-    const has3D = !!selectedSite?.scanChallenge?.file_3d;
+    const has3D =
+      !!selectedSite?.scanChallenge?.file_animation_android ||
+      !!selectedSite?.scanChallenge?.file_animation_ios;
     if (has3D) return;
 
     const animUrl = selectedSite?.scanChallenge?.file_animation;
@@ -1457,94 +1828,87 @@ useEffect(() => {
     // 🔽 your existing function
   }, [sceneIsReady, selectedSite?.selectedMode?.mode, selectedSite?.scanChallenge?.file_animation]);
 
-  // const resetArTest = () => {
-  //   let show = ["Back", "Details", "ArMode",];
-  //   let hide = ELEMENTSUNITY.filter(name => !show.includes(name));
-  //
-  //   unityRef.current.postMessage(
-  //       "CanvasController",
-  //       "ShowHideElements",
-  //       JSON.stringify({show, hide})
-  //   );
-  //   unityRef.current.postMessage(
-  //       "ArMode",
-  //       "SetTextArModal",
-  //       JSON.stringify({titleARMode: "AR MODE", textlabel: " ", visibleLabel: true})
-  //   );
+  const resetAr = () => {
+    unityRef.current.postMessage("OBJImport", "RepositionObjectFromButton", "");
+    if (
+      selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE ||
+      (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE && selectedSite?.scanChallenge)
+    ) {
+      startChallengeHandler(selectedSite);
+    }
+  };
 
-  // unityRef.current.postMessage("ARResetController", "ResetARState","");
-  //   setSelectedSite(null)
-  //   setSelectedChallengeOverride(null)
-  //   console.log("se presiono ARTestReset")
-  // };
+  useEffect(() => {
+    const mode = selectedSite?.selectedMode?.mode;
 
-useEffect(() => {
-  const mode = selectedSite?.selectedMode?.mode;
+    const has3DInScan =
+      !!selectedSite?.scanChallenge?.file_animation_android ||
+      !!selectedSite?.scanChallenge?.file_animation_ios;
+    const modeSupported =
+      mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
 
-  const has3DInScan = !!selectedSite?.scanChallenge?.file_3d;
-  const modeSupported =
-    mode === AR_MODES.HUNT_MODE || (mode === AR_MODES.SCAN_MODE && has3DInScan);
-
-  if (!modeSupported) {
-    setSpawnHeight(1);
-    setHeightReady(true);
-    return;
-  }
-
-  const siteElevation =
-    (mode === AR_MODES.HUNT_MODE
-      ? (selectedSite?.huntChallenge?.elevation ??
-         selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation)
-      : (selectedSite?.scanChallenge?.elevation)) ?? 0;
-
-
-  if (!siteElevation || Number(siteElevation) === 0) {
-    setSpawnHeight(1);
-    setHeightReady(true);
-    return;
-  }
-
-  if (!userLocation?.latitude || !userLocation?.longitude) {
-    setHeightReady(false);
-    return;
-  }
-
-  let cancelled = false;
-  (async () => {
-    try {
-      const { latitude, longitude } = userLocation;
-
-      const res = await getElevationAPI({ lat: latitude, lng: longitude });
-
-      const myElevation = typeof res?.elevation === "number" ? res.elevation : null;
-      if (cancelled) return;
-
-      if (myElevation == null) {
-        setSpawnHeight(1);
-        setHeightReady(true);
-        return;
-      }
-
-      let delta = Math.round(Number(siteElevation - myElevation));
-
-      setSpawnHeight(delta);
-      setHeightReady(true);
-    } catch (e) {
+    if (!modeSupported) {
       setSpawnHeight(1);
       setHeightReady(true);
+      return;
     }
-  })();
 
-  return () => { cancelled = true; };
-}, [
-  selectedSite?.selectedMode?.mode,
-  selectedSite?.huntChallenge?.elevation,
-  selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation,
-  selectedSite?.scanChallenge?.elevation,
-  selectedSite?.scanChallenge?.file_3d,
-  userLocation?.latitude,
-  userLocation?.longitude
-]);
+    const siteElevation =
+      (mode === AR_MODES.HUNT_MODE
+        ? selectedSite?.huntChallenge?.elevation ??
+          selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation
+        : selectedSite?.scanChallenge?.elevation) ?? 0;
+
+    if (!siteElevation || Number(siteElevation) === 0) {
+      setSpawnHeight(1);
+      setHeightReady(true);
+      return;
+    }
+
+    if (!userLocation?.latitude || !userLocation?.longitude) {
+      setHeightReady(false);
+      return;
+    }
+
+    let cancelled = false;
+    (async () => {
+      try {
+        const {latitude, longitude} = userLocation;
+
+        const res = await getElevationAPI({lat: latitude, lng: longitude});
+
+        const myElevation = typeof res?.elevation === "number" ? res.elevation : null;
+        if (cancelled) return;
+
+        if (myElevation == null) {
+          setSpawnHeight(1);
+          setHeightReady(true);
+          return;
+        }
+
+        let delta = Math.round(Number(siteElevation - myElevation));
+
+        setSpawnHeight(delta);
+        setHeightReady(true);
+      } catch (e) {
+        setSpawnHeight(1);
+        setHeightReady(true);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    selectedSite?.selectedMode?.mode,
+    selectedSite?.huntChallenge?.elevation,
+    selectedSite?.huntChallenge?.geo_ar_star?.geo_site?.elevation,
+    selectedSite?.scanChallenge?.elevation,
+    selectedSite?.scanChallenge?.file_animation_android,
+    selectedSite?.scanChallenge?.file_animation_ios,
+    userLocation?.latitude,
+    userLocation?.longitude,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -1555,97 +1919,279 @@ useEffect(() => {
     };
   }, []);
 
+  const openExample = async () => {
+    if (selectedSite?.selectedMode?.mode === AR_MODES.HUNT_MODE) {
+      try {
+        const result = await getArHuntExamples(selectedSite?.ar_star?.id);
+        const examples = result?.data;
+        const examplesList = examples?.length ? examples[0] : null;
+        if (examplesList) {
+          navigation.navigate("ChallengeExamples", {examples: examplesList});
+        } else {
+          showMessage("We are working on adding examples to this challenge.", "info");
+        }
+      } catch (error) {
+        showMessage("Error fetching examples. Please try again later.", "danger");
+      }
+    }
+    if (selectedSite?.selectedMode?.mode === AR_MODES.SCAN_MODE) {
+      try {
+        const result = await getArScanExamples(selectedSite?.scanChallenge?.id);
+        const examples = result?.data;
+        const examplesList = examples?.length ? examples[0] : null;
+        if (examplesList) {
+          navigation.navigate("ChallengeExamples", {examples: examplesList});
+        } else {
+          showMessage("We are working on adding examples to this challenge.", "info");
+        }
+      } catch (error) {
+        showMessage("Error fetching examples. Please try again later.", "danger");
+      }
+    }
+  };
+
   return (
-    <ChallengeScreen
-      title="AR Star Hunt "
-      appHeader={false}
-      style={{
-        paddingHorizontal: 0,
-        paddingBottom: 0,
-        flex: 1,
-        backgroundColor: "#000",
-      }}
-      modals={modals}
-      headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
-      scrollable={false}
-    >
-      {shouldRenderUnity && (
-        <>
-          {/*/TODO TEST BUTTON*/}
-          {/*<View style={{position:'absolute', left: 100, top: 250, zIndex:9999 }}>*/}
-          {/*<Button*/}
-          {/*    mode="contained"*/}
-          {/* onPress={resetArTest}*/}
-          {/* children={'resetArTest'}>*/}
-          {/*</Button>*/}
-          {/*</View>*/}
-          <UnityARCamera
-            width={"100%"}
-            height={"100%"}
-            unityRef={unityRef}
-            isProcessingMedia={processingMedia}
-            onUnityMessage={handleUnityMessage}
-            isUnityLoaded={isUnityLoaded}
-            capturedImage={capturedImage}
-            capturedVideo={capturedVideo}
+    <View style={{flex: 1}}>
+      <ChallengeScreen
+        title="AR Star Hunt "
+        appHeader={false}
+        style={{
+          paddingHorizontal: 0,
+          paddingBottom: 0,
+          flex: 1,
+          backgroundColor: "#000",
+        }}
+        modals={modals}
+        // headerRightComponent={<ViewInfoButton onPress={viewInfoButtonHandler} showOnHeader />}
+        scrollable={false}
+      >
+        {shouldRenderUnity && (
+          <>
+            {/*/TODO TEST BUTTON*/}
+            {/*<View style={{position:'absolute', left: 100, top: 250, zIndex:9999 }}>*/}
+            {/*<Button*/}
+            {/*    mode="contained"*/}
+            {/* onPress={resetArTest}*/}
+            {/* children={'resetArTest'}>*/}
+            {/*</Button>*/}
+            {/*</View>*/}
+
+            {/* Unity Header Component */}
+            {isUnityLoaded && (
+              <UnityHeader
+                title={screentitle}
+                selectedMode={selectedHeaderMode}
+                onModeChange={handleModeChange}
+                onBackPress={handleBackPress}
+              />
+            )}
+
+            {/* Side Menu Component */}
+            {isUnityLoaded && selectedSite?.id && selectedHeaderMode != "List" && (
+              <SideMenu
+                isVisible={isSideMenuVisible}
+                onToggle={handleSideMenuToggle}
+                selectedSite={selectedSite}
+                onPressInfo={() => {
+                  setIsSideMenuVisible(false);
+                  setChallengeInformationView(true);
+                }}
+              />
+            )}
+
+            <UnityARCamera
+              width={"100%"}
+              height={"100%"}
+              unityRef={unityRef}
+              isProcessingMedia={processingMedia}
+              onUnityMessage={handleUnityMessage}
+              isUnityLoaded={isUnityLoaded}
+              capturedImage={capturedImage}
+              capturedVideo={capturedVideo}
               // imageFilter={{challengeObj: selectedSite, viewShotRef: viewShotRef}}
-            imageFilter={{
-            challengeObj: {
-              ...selectedSite,
-              challenge_type: challenge_type_value,
-            },
-            viewShotRef: viewShotRef,
-            }}
+              imageFilter={{
+                challengeObj: {
+                  ...selectedSite,
+                  challenge_type: challenge_type_value,
+                },
+                viewShotRef: viewShotRef,
+              }}
+            />
 
-          />
+            {/* Overlay for Map and List modes */}
+            {showOverlay && (
+              <>
+                {selectedHeaderMode === "Map" && (
+                  <>
+                    {userLocation || validUserLocation ? (
+                      <ARMapView
+                        userLocation={userLocation}
+                        validUserLocation={validUserLocation}
+                        selectedMode={selectedMode}
+                        selectedSite={currentMode}
+                        onSwitchToLiveView={() => setSelectedHeaderMode("Live")}
+                        refresh={refreshMapMode}
+                        sendRefreshSignal={() => {
+                          setRefreshMapMode(false);
+                        }}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 0,
+                          left: 0,
+                          right: 0,
+                          bottom: 0,
+                          backgroundColor: theme.lightColors?.inputBG,
+                          zIndex: 500,
+                        }}
+                      >
+                        <View
+                          style={{
+                            flex: 1,
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          <Text
+                            style={{
+                              color: theme.lightColors?.white,
+                              fontSize: FontSizes.S20,
+                              width: "80%",
+                              textAlign: "center",
+                            }}
+                          >
+                            Please enable location services to view the map.
+                          </Text>
+                        </View>
+                      </View>
+                    )}
+                  </>
+                )}
 
-          {unitySceneLoaded === true && (
-            <View
+                {selectedHeaderMode === "List" && (
+                  <View
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                      backgroundColor: theme.lightColors?.Bg,
+                      zIndex: 500,
+                    }}
+                  >
+                    {selectedMode?.id ? (
+                      <ARModeSiteList
+                        selectedMode={selectedMode}
+                        onStartChallenge={startChallengeHandler}
+                        refresh={refreshListMode}
+                        sendRefreshSignal={() => {
+                          setRefreshListMode(false);
+                        }}
+                      />
+                    ) : (
+                      <View
+                        style={{
+                          flex: 1,
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: theme.lightColors?.white,
+                            fontSize: FontSizes.S20,
+                            width: "80%",
+                            textAlign: "center",
+                          }}
+                        >
+                          Please select an AR Mode to see available sites.
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+                )}
+              </>
+            )}
+
+            {/* <TouchableOpacity
               style={{
                 position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                backgroundColor: "rgba(0,0,0,0.99)",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 999,
+                top: 40,
+                left: 20,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                padding: 10,
+                borderRadius: 5,
+                zIndex: 1000,
               }}
+              onPress={handleNextHunt}
             >
-              <ActivityIndicator size="large" color="#fff" />
-              <Text style={{color: "#fff", marginTop: 10}}>Loading AR Experience</Text>
-            </View>
-          )}
-        </>
-      )}
-      {!isUnityLoaded && (
-        <CameraControls
-          hasCapturedContent={!!capturedImage || !!capturedVideo}
-          onRetake={
-            retakeButtonHandler
-          }
-          onDone={doneButtonHandler}
-          isVideo={!!capturedVideo}
-          challengeHasFilters={challengeHasFilters}
-        />
-      )}
+              <Text style={{color: "#fff", fontSize: 16}}>Examples</Text>
+            </TouchableOpacity> */}
 
-      <ARModeModal
+            {unitySceneLoaded === true && (
+              <View
+                style={{
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  backgroundColor: "rgba(0,0,0,0.99)",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  zIndex: 999,
+                }}
+              >
+                <ActivityIndicator size="large" color="#fff" />
+                <Text style={{color: "#fff", marginTop: 10}}>Loading AR Experience</Text>
+              </View>
+            )}
+          </>
+        )}
+
+        <View style={{position: "absolute", bottom: 20, width: "100%"}}>
+          {!isUnityLoaded && (
+            <CameraControls
+              hasCapturedContent={!!capturedImage || !!capturedVideo}
+              onRetake={retakeButtonHandler}
+              onDone={doneButtonHandler}
+              isVideo={!!capturedVideo}
+              challengeHasFilters={challengeHasFilters}
+            />
+          )}
+        </View>
+
+        {/* Unity Bottom Bar - placed at bottom without absolute positioning */}
+
+        {/* <ARModeModal
         isVisible={openModalARMode}
         onClose={closeModalARMode}
         selectedDestination={destinationData}
         onStartChallenge={startChallengeHandler}
-      />
+      /> */}
 
-      {selectedSite?.selectedMode?.mode && (
-          <NotificationModal
-              isVisible={showNotification}
-              onClose={() => setShowNotification(false)}
-              selectedMode={selectedSite.selectedMode}
-          />
+        {/* {selectedSite?.selectedMode?.mode && (
+        <NotificationModal
+          isVisible={showNotification}
+          onClose={() => setShowNotification(false)}
+          selectedMode={selectedSite.selectedMode}
+        />
+      )} */}
+      </ChallengeScreen>
+      {isUnityLoaded && (
+        <UnityBottomBar
+          selectedMode={selectedHeaderMode}
+          onModeSelect={handleBottomBarModeSelect}
+          onMoreInfoPress={handleMoreInfoPress}
+          onResetARPress={resetAr}
+          onRefreshPress={handleRefreshPress}
+          modeLabel={modeLabel}
+        />
       )}
-    </ChallengeScreen>
+    </View>
   );
 };
 

@@ -91,13 +91,25 @@ class UserProfile(CommonModel):
     friends = models.ManyToManyField(User, related_name='friends')
     instagram_handle = models.CharField(max_length=255, blank=True, null=True)
     def get_image_url(self):
-        """Return the image URL or placeholder if no image is set"""
-        if self.image and hasattr(self.image, 'url'):
-            return self.image.url
-        
-        # Return the exact PNG placeholder image as a base64 data URL
-        # return get_placeholder_image_base64()
-        return configs.DEFAULT_IMAGE.get("image_url")
+            """Return the image URL or placeholder if no image is set"""
+            if self.image and hasattr(self.image, 'url'):
+                return self.image.url
+            
+            # Handle DEFAULT_IMAGE which can be either a dict or a string
+            default_image = configs.DEFAULT_IMAGE
+            if isinstance(default_image, dict) and "image_url" in default_image:
+                return default_image.get("image_url")
+            elif isinstance(default_image, str) and default_image:
+                return default_image
+            
+            # Fallback to placeholder if DEFAULT_IMAGE is empty or invalid
+            return get_placeholder_image_base64()        # Handle DEFAULT_IMAGE which can be a dict (if image_value exists) or a string
+            default_image = configs.DEFAULT_IMAGE
+            if isinstance(default_image, dict) and "image_url" in default_image:
+                return default_image.get("image_url")
+            
+            # Fallback to placeholder image if DEFAULT_IMAGE is not configured properly
+            return get_placeholder_image_base64()
 
     def __str__(self):
         return self.user.email

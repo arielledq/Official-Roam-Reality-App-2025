@@ -1,8 +1,9 @@
 import React from "react";
-import {Image, TouchableOpacity, View} from "react-native";
+import {Image, ImageBackground, TouchableOpacity, View} from "react-native";
 import useStyles from "./styles";
 import AppText from "../text";
 import Images from "../../assets/images";
+import AppButton from "components/button";
 
 const StatContainer = ({
   value,
@@ -15,28 +16,26 @@ const StatContainer = ({
 }) => {
   const styles = useStyles();
 
-  const getIcon = () => {
-    switch (property) {
-      case "Global Rank":
-        return Images.GlobalIcon;
-      case "Points":
-        return Images.PointsIcon;
-      case "Sites Visited":
-        return Images.SitesIcon;
-      default:
-        break;
-    }
-  };
+  // const getIcon = () => {
+  //   switch (property) {
+  //     case "Global Rank":
+  //       return Images.GlobalIcon;
+  //     case "Points":
+  //       return Images.PointsIcon;
+  //     case "TT Rank":
+  //       return Images.RankIcon;
+  //     default:
+  //       break;
+  //   }
+  // };
 
   return (
     <TouchableOpacity style={styles.cardContainer} onPress={onPressAction}>
-      <View style={styles.cardInner}>
-        <Image style={styles.iconStyle} source={getIcon()} />
-        <View style={styles.cardBottomContent}>
-          <AppText style={styles.Text}>{property}</AppText>
-          <AppText style={styles.valueStyle}>{value}</AppText>
-        </View>
-      </View>
+      <AppButton containerStyle={styles.iconStyle} showButton={false}>
+        <AppText style={styles.valueStyle}>{value}</AppText>
+      </AppButton>
+
+      <AppText style={styles.Text}>{property}</AppText>
     </TouchableOpacity>
   );
 };

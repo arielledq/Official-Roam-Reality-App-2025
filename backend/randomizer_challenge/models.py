@@ -1,0 +1,453 @@
+from django.db import models
+from django.core.validators import FileExtensionValidator
+from django.conf import settings
+from django.core.exceptions import ValidationError
+from core.utils import get_file_path
+from modules.ar.challenges.models import Sponsor
+from ckeditor.fields import RichTextField
+from django.contrib.auth import get_user_model
+import json
+
+User = get_user_model()
+
+
+def validate_file_size(value):
+    """Validate file size - 10MB for images, 50MB for audio/video"""
+    max_size = 10 * 1024 * 1024  # 10MB default
+
+    # Check file extension to determine max size
+    if hasattr(value, 'name'):
+        file_name = value.name.lower()
+        if file_name.endswith(('.mp3', '.wav', '.m4a', '.aac', '.ogg')):
+            max_size = 50 * 1024 * 1024  # 50MB for audio files
+        elif file_name.endswith(('.mp4', '.mov', '.avi', '.webm', '.mkv')):
+            max_size = 50 * 1024 * 1024  # 50MB for video files
+
+    if value.size > max_size:
+        from django.core.exceptions import ValidationError
+        raise ValidationError(f'File size must be under {max_size/(1024*1024):.0f}MB')
+
+
+def validate_ranking(value):
+    """Validate ranking JSON structure"""
+    if value is None:
+        return
+
+    if not isinstance(value, dict):
+        raise ValidationError('Ranking must be a JSON object/dictionary')
+
+    # Validate that all values are numbers (int or float)
+    for key, val in value.items():
+        if not isinstance(key, str):
+            raise ValidationError('Ranking keys must be strings')
+        if not isinstance(val, (int, float)):
+            raise ValidationError(f'Ranking value for "{key}" must be a number')
+        if val < 0:
+            raise ValidationError(f'Ranking value for "{key}" cannot be negative')
+
+
+class RandomizerChallenge(models.Model):
+    """Main Randomizer Challenge model"""
+    name = models.CharField(
+        max_length=255,
+        help_text="Name of the randomizer challenge"
+    )
+    screen_title = models.JSONField(
+        blank=True, null=True,
+        help_text="Multiple titles to display on the screen (stored as a list)"
+    )
+
+    # Challenge details
+    thumbnail = models.ImageField(
+        upload_to='randomizer/thumbnails/',
+        blank=True,
+        null=True,
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ],
+        help_text="Thumbnail image for the challenge"
+    )
+    points = models.IntegerField(
+        default=0,
+        help_text='Points awarded for completing this challenge'
+    )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='randomizer_challenges',
+        help_text="Challenge sponsor"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text='Whether this challenge is visible and active'
+    )
+    description = RichTextField(
+        blank=True,
+        null=True,
+        help_text='Detailed description of the challenge'
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Randomizer Challenge'
+        verbose_name_plural = 'Randomizer Challenges'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def thumbnail_url(self):
+        """Return the thumbnail URL"""
+        if self.thumbnail and hasattr(self.thumbnail, 'url'):
+            return self.thumbnail.url
+        return None
+
+
+class RandomizerTrack(models.Model):
+    """Individual tracks/items within a Randomizer Challenge (flexible number)"""
+    challenge = models.ForeignKey(
+        RandomizerChallenge,
+        on_delete=models.CASCADE,
+        related_name='tracks'
+    )
+
+    # Track number (sequential, unique per challenge)
+    track_number = models.PositiveIntegerField(
+        help_text="Track number (must be unique within challenge)"
+    )
+
+    # Content fields
+    title = models.CharField(
+        max_length=255,
+        help_text="Title for this track"
+    )
+    image = models.ImageField(
+        upload_to="randomizer/images/",
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ]
+    )
+    audio = models.FileField(
+        upload_to="randomizer/audio/",
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['mp3', 'wav', 'm4a', 'aac', 'ogg'])
+        ]
+    )
+
+    # Ranking for individual tracks
+    ranking = models.JSONField(
+        default=dict,
+        blank=True,
+        validators=[validate_ranking],
+        help_text="Dynamic ranking object for this track (e.g., {'quality': 8, 'engagement': 6})"
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Randomizer Track'
+        verbose_name_plural = 'Randomizer Tracks'
+        ordering = ['challenge', 'track_number']
+        unique_together = ['challenge', 'track_number']
+
+    def __str__(self):
+        return f"{self.challenge.name} - Track {self.track_number}: {self.title or 'Untitled'}"
+
+    @property
+    def primary_ranking_score(self):
+        """Get the primary ranking score (sum of all ranking values or default to 0)"""
+        if not self.ranking:
+            return 0
+        try:
+            return sum(float(v) for v in self.ranking.values() if isinstance(v, (int, float)))
+        except (TypeError, ValueError):
+            return 0
+
+    @property
+    def image_url(self):
+        """Return the image URL"""
+        if self.image and hasattr(self.image, 'url'):
+            return self.image.url
+        return None
+
+    @property
+    def audio_url(self):
+        """Return the audio URL"""
+        if self.audio and hasattr(self.audio, 'url'):
+            return self.audio.url
+        return None
+
+    def save(self, *args, **kwargs):
+        # Validate track number is positive
+        if self.track_number < 1:
+            raise ValidationError('Track number must be positive')
+
+        # Validate maximum 8 tracks per challenge
+        if not self.pk:  # New track
+            current_track_count = RandomizerTrack.objects.filter(challenge=self.challenge).count()
+            if current_track_count >= 8:
+                raise ValidationError("A challenge can have a maximum of 8 tracks.")
+
+        # Validate track number uniqueness within challenge
+        if self.pk:  # Existing track
+            if RandomizerTrack.objects.filter(
+                challenge=self.challenge,
+                track_number=self.track_number
+            ).exclude(pk=self.pk).exists():
+                raise ValidationError(f"Track number {self.track_number} already exists for this challenge.")
+        else:  # New track
+            if RandomizerTrack.objects.filter(
+                challenge=self.challenge,
+                track_number=self.track_number
+            ).exists():
+                raise ValidationError(f"Track number {self.track_number} already exists for this challenge.")
+
+        super().save(*args, **kwargs)
+
+
+class ChallengeVideo(models.Model):
+    """Video that plays after challenge completion"""
+    name = models.CharField(
+        max_length=255,
+        help_text="Name/identifier for this video"
+    )
+    video = models.FileField(
+        upload_to='challenge/videos/',
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['mp4', 'mov', 'avi', 'webm', 'mkv'])
+        ],
+        help_text="Video file to play after challenge completion"
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Optional description of the video"
+    )
+    is_active = models.BooleanField(
+        default=True,
+        help_text="Whether this video is active and available"
+    )
+
+    # Optional: Link to specific challenge
+    challenge = models.ForeignKey(
+        RandomizerChallenge,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='completion_videos',
+        help_text="Optional: Link to a specific challenge. Leave blank for default video."
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Challenge Video'
+        verbose_name_plural = 'Challenge Videos'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return self.name
+
+    @property
+    def video_url(self):
+        """Return the video URL"""
+        if self.video and hasattr(self.video, 'url'):
+            return self.video.url
+        return None
+
+
+class RandomizerUserProfile(models.Model):
+    """
+    DEPRECATED: This model is deprecated and will be removed in a future release.
+
+    Use ARUserProfile instead (modules.ar.challenges.models.ARUserProfile).
+    All functionality has been migrated to ARUserProfile to consolidate
+    both AR and Randomizer challenge points into a single profile.
+
+    This model is kept temporarily for rollback purposes only.
+    DO NOT create new instances of this model.
+    All new code should use ARUserProfile.randomizer_challenge_completed instead.
+
+    Migration: Data has been merged into ARUserProfile via migration 0184_merge_randomizer_profiles_data
+    """
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+        related_name='randomizer_profile'
+    )
+    points = models.BigIntegerField(
+        verbose_name="Randomizer Challenge Points",
+        default=0
+    )
+    challenges_completed = models.IntegerField(
+        verbose_name="Challenges Completed",
+        default=0
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Randomizer User Profile'
+        verbose_name_plural = 'Randomizer User Profiles'
+
+    def __str__(self):
+        return f"{self.user.name} - Randomizer Profile"
+
+
+class RandomizerSubmission(models.Model):
+    """User submissions for Randomizer challenges - similar to ARMemories"""
+
+    SUBMISSION_TYPE_CHOICES = (
+        ('COMPLETION', 'Challenge Completion'),
+        ('SOCIAL_POINTS', 'Social Sharing Points'),
+    )
+
+    APPROVAL_CHOICES = (
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('REJECTED', 'Rejected'),
+    )
+
+    PRIVACY_CHOICES = (
+        ('public', 'Public'),
+        ('private', 'Private'),
+    )
+
+    # Core relationships
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='randomizer_submissions'
+    )
+    challenge = models.ForeignKey(
+        RandomizerChallenge,
+        on_delete=models.CASCADE,
+        related_name='submissions',
+        null=True,
+        blank=True
+    )
+    sponsor = models.ForeignKey(
+        Sponsor,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='randomizer_submissions'
+    )
+
+    # Submission data
+    submission_type = models.CharField(
+        max_length=50,
+        choices=SUBMISSION_TYPE_CHOICES,
+        default='COMPLETION'
+    )
+    result_file = models.FileField(
+        upload_to='randomizer/submissions/',
+        blank=True,
+        null=True,
+        validators=[validate_file_size],
+        help_text="User's created audio/video mix or screenshot"
+    )
+    thumbnail = models.ImageField(
+        upload_to='randomizer/thumbnails/',
+        blank=True,
+        null=True,
+        validators=[
+            validate_file_size,
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'gif', 'webp'])
+        ]
+    )
+    description = models.TextField(
+        blank=True,
+        null=True,
+        help_text="User's description or notes"
+    )
+    completion_data = models.JSONField(
+        blank=True,
+        null=True,
+        help_text="Store track selections, scores, mix details, etc."
+    )
+
+    # Points tracking
+    points = models.IntegerField(
+        verbose_name="Points",
+        default=0
+    )
+
+    # Approval workflow
+    approval_status = models.CharField(
+        max_length=50,
+        choices=APPROVAL_CHOICES,
+        default='UNAPPROVED'  # Changed from PENDING to match AR memories behavior
+    )
+    declined_reason = models.TextField(
+        blank=True,
+        null=True,
+        help_text="Reason for rejection"
+    )
+
+    # Privacy
+    privacy = models.CharField(
+        max_length=10,
+        choices=PRIVACY_CHOICES,
+        default='public',
+        help_text='Control whether this submission is public or private'
+    )
+
+    # Video upload status tracking
+    upload_status = models.CharField(
+        max_length=20,
+        choices=(
+            ('uploading', 'Uploading'),
+            ('complete', 'Complete'),
+            ('failed', 'Failed'),
+        ),
+        default='complete',
+        help_text='Status of video file upload to S3'
+    )
+    upload_attempts = models.IntegerField(
+        default=0,
+        help_text='Number of upload attempts made'
+    )
+
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Randomizer Submission'
+        verbose_name_plural = 'Randomizer Submissions'
+        ordering = ['-created_at']
+
+    def __str__(self):
+        challenge_name = self.challenge.name if self.challenge else 'No Challenge'
+        return f"{self.user.name} - {challenge_name} - {self.submission_type}"
+
+    @property
+    def result_file_url(self):
+        """Return the result file URL"""
+        if self.result_file and hasattr(self.result_file, 'url'):
+            return self.result_file.url
+        return None
+
+    @property
+    def thumbnail_url(self):
+        """Return the thumbnail URL"""
+        if self.thumbnail and hasattr(self.thumbnail, 'url'):
+            return self.thumbnail.url
+        return None

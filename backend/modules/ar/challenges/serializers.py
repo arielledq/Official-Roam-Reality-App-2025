@@ -1067,10 +1067,17 @@ class PanicMessageSerializer(GeoModelSerializer):
 
 class ARAllMemoriesSerializer(serializers.Serializer):
     def to_representation(self, instance):
+        from randomizer_challenge.models import RandomizerSubmission
+        from randomizer_challenge.serializers import RandomizerSubmissionSerializer
+
         if isinstance(instance, ARMemories):
             return ARMemoriesSerializerGet(instance, context=self.context).data
         elif isinstance(instance, ARSitePinCheckIn):
             return ARSitePinCheckInSerializer(instance, context=self.context).data
+        elif isinstance(instance, RandomizerSubmission):
+            data = RandomizerSubmissionSerializer(instance, context=self.context).data
+            data['memory_source'] = 'randomizer'
+            return data
         return {}
 
 

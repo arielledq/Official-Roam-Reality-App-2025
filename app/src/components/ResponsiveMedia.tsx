@@ -15,14 +15,13 @@ const ResponsiveMedia = ({
         <Image
           source={source}
           style={[styles.image, {height: containerHeight}, imageStyle]}
-          resizeMode="contain"
           onLoadEnd={onLoadEnd}
+          resizeMode="stretch"
         />
       ) : (
         <Video
           source={source}
           style={[styles.image, {height: containerHeight}, imageStyle]}
-          resizeMode="contain"
           onReadyForDisplay={onLoadEnd}
           repeat={true}
         />
@@ -41,5 +40,8 @@ const styles = StyleSheet.create({
   image: {
     width: "100%",
     height: undefined,
+    borderTopStartRadius: 20,
+    borderTopEndRadius: 20,
+    overflow: "hidden",
   },
 });

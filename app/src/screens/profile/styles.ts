@@ -1,6 +1,7 @@
 import {makeStyles} from "@rneui/themed";
 import {screenHorizontalPadding} from "../../util/AppDimensions";
 import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -23,8 +24,9 @@ const useStyles = makeStyles(theme => ({
   },
   headingView: {
     flexDirection: "row",
-    marginTop: 24,
-    marginBottom: 8,
+    paddingHorizontal: screenHorizontalPadding,
+    marginBottom: widthPercentageToDP(8),
+
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -36,7 +38,6 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     flex: 1,
     alignItems: "center",
-    marginLeft: 16,
   },
   menuIcon: {
     paddingLeft: 5,
@@ -60,6 +61,8 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+
+    padding: 10,
   },
   boxstatContainerStyle: {
     flexDirection: "row",
@@ -75,21 +78,25 @@ const useStyles = makeStyles(theme => ({
   },
   buttonText: {
     ...fontGroup.nunitoBold,
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S10,
     lineHeight: FontLineHeights.LH16,
     marginLeft: 10,
   },
   avatarContainer: {
     position: "relative",
+    marginBottom: 10,
   },
   editButtonContainer: {
-    position: "absolute",
+    // position: "absolute",
     right: 10,
     zIndex: 10,
-    top: 60,
+    marginTop: heightPercentageToDP(0.3),
+
+    // top: heightPercentageToDP(1),
   },
   editButton: {
     marginVertical: 5,
+    width: widthPercentageToDP(22),
   },
   container_style: {
     paddingBottom: 50,
@@ -100,6 +107,12 @@ const useStyles = makeStyles(theme => ({
     top: 0,
     zIndex: 10,
     backgroundColor: "transparent",
+  },
+  shadowBoxImage: {
+    width: widthPercentageToDP(12),
+    height: widthPercentageToDP(12),
+    justifyContent: "center",
+    alignItems: "center",
   },
 }));
 

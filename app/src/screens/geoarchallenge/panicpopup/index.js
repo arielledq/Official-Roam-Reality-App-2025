@@ -12,9 +12,11 @@ import {panicMessageAPI} from "../../../network";
 import {getDeviceCurrentLocation} from "../../../util/LocationLib";
 import {showMessage} from "../../../util/helpers";
 import {BackArrowIcon} from "assets/svg";
+import {useNavigation} from "@react-navigation/native";
 
 const PanicPopUp = ({onClose}) => {
   const _styles = useStyles();
+  const Navigation = useNavigation();
   const [isMessageInputFocused, setMessageInputFocused] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -29,7 +31,7 @@ const PanicPopUp = ({onClose}) => {
         .then(res => {
           if (res.status == 1) {
             showMessage("Message submitted successfully!");
-            onClose();
+            Navigation.goBack();
           } else {
             showMessage(res.message.error, "error");
           }
@@ -45,7 +47,7 @@ const PanicPopUp = ({onClose}) => {
       <AppHeader
         title={"Emergency Message"}
         leftComponent={
-          <TouchableOpacity onPress={() => onClose()}>
+          <TouchableOpacity onPress={() => Navigation.goBack()}>
             <BackArrowIcon />
           </TouchableOpacity>
         }
@@ -110,7 +112,7 @@ const PanicPopUp = ({onClose}) => {
               />
               <TouchableOpacity
                 onPress={() => {
-                  onClose();
+                  Navigation.goBack();
                 }}
               >
                 <Text style={_styles.notShareBottomText}>Cancel</Text>

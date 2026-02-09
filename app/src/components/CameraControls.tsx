@@ -1,11 +1,14 @@
 import * as React from "react";
-import { Text, TextStyle, TouchableOpacity, View, ViewStyle } from "react-native";
-import { FontSizes } from "../util/FontUtils";
+import {Text, TextStyle, TouchableOpacity, View, ViewStyle} from "react-native";
+import {FontSizes} from "../util/FontUtils";
 import fontGroup from "../assets/fonts";
 import theme from "../assets/theme";
 
 // @ts-ignore
 import CaptureIcon from "../assets/geoar/capture_icon.svg";
+import FastImage from "react-native-fast-image";
+import Images from "assets/images";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 interface CameraControlsProps {
   hasCapturedContent: boolean;
@@ -41,7 +44,7 @@ const CameraControls = ({
   return (
     <View
       style={{
-        backgroundColor: theme.darkColors?.background,
+        backgroundColor: "transparent",
         borderRadius: 16,
         paddingVertical: 8,
         paddingHorizontal: 16,
@@ -54,10 +57,14 @@ const CameraControls = ({
         {!hasCapturedContent && <Text style={$instructionsText}>{instructionText}</Text>}
       </View>
 
-      <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-evenly" }}>
+      <View style={{flexDirection: "row", alignItems: "center", justifyContent: "space-evenly"}}>
         {hasCapturedContent && !!onRetake && (
           <TouchableOpacity onPress={onRetake} activeOpacity={0.8} style={$actionButtons}>
-            <Text style={$bottomButtonText}>Retake</Text>
+            <FastImage
+              source={Images.retake}
+              style={{width: widthPercentageToDP("16%"), height: widthPercentageToDP("16%")}}
+              resizeMode={FastImage.resizeMode.contain}
+            />
           </TouchableOpacity>
         )}
 
@@ -83,7 +90,11 @@ const CameraControls = ({
 
         {hasCapturedContent && !!onDone && (
           <TouchableOpacity onPress={onDone} activeOpacity={0.8} style={$actionButtons}>
-            <Text style={$bottomButtonText}>Done</Text>
+            <FastImage
+              source={Images.Done}
+              style={{width: widthPercentageToDP("16%"), height: widthPercentageToDP("16%")}}
+              resizeMode={FastImage.resizeMode.contain}
+            />
           </TouchableOpacity>
         )}
       </View>
@@ -99,12 +110,9 @@ const $cameraButton: ViewStyle = {
 };
 
 const $actionButtons: ViewStyle = {
-  borderRadius: 8,
-  backgroundColor: "#FFFFFF40",
   alignItems: "center",
   justifyContent: "center",
-  width: 96,
-  height: 40,
+
   marginVertical: 4,
 };
 

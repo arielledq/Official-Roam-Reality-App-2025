@@ -1,6 +1,7 @@
 import {makeStyles} from "@rneui/themed";
 import {screenHorizontalPadding} from "../../util/AppDimensions";
 import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -18,7 +19,7 @@ const useStyles = makeStyles(theme => ({
     flex: 1,
     marginTop: -15,
   },
-  buttonContainer: {marginBottom: "10%"},
+  buttonContainer: {marginBottom: "4%"},
   buttonStyle: {height: 50},
   input: {
     ...fontGroup.nunitoRegular,
@@ -106,7 +107,7 @@ const useStyles = makeStyles(theme => ({
     flexDirection: "row",
     // paddingHorizontal: 20,
     paddingRight: screenHorizontalPadding + 30,
-    marginVertical: "7%",
+    marginBottom: 20,
   },
   privacyText: {
     ...fontGroup.nunitoRegular,

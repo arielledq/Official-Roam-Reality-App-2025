@@ -45,6 +45,15 @@ import scan from "./scan.svg";
 import huntMode from "./huntMode.svg";
 import pinlocation from "./pinlocation.svg";
 import clock from "./clock.svg";
+import bin from "./bin.svg";
+import Ar from "./ar.svg";
+import sites from "./sites.svg";
+import Arcamera from "./Arcamera.svg";
+import currentLocation from "./currentLocationIcon.svg";
+import ArMarker from "./ArMarker.svg";
+import disbaledMarker from "./disabledMarker.svg";
+import walk from "./walk.svg";
+import compass from "./compass.svg";
 
 export const Icons = {
   password,
@@ -94,4 +103,13 @@ export const Icons = {
   huntMode,
   pinlocation,
   clock,
+  bin,
+  Ar,
+  sites,
+  Arcamera,
+  currentLocation,
+  ArMarker,
+  disbaledMarker,
+  walk,
+  compass,
 };

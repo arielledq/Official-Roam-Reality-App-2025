@@ -86,7 +86,7 @@ except Exception as e:
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str("SECRET_KEY")
 
-ALLOWED_HOSTS = env.list("HOST", default=["*"])
+ALLOWED_HOSTS = env.list("HOST", default=["*"]) + ["0.0.0.0", "localhost", "127.0.0.1", "88b219f5942e.ngrok-free.app"]
 SITE_ID = 1
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -98,6 +98,14 @@ SOCIAL_AUTH_FACEBOOK_SECRET = env.str("SOCIAL_AUTH_FACEBOOK_SECRET", "")
 
 if not SOCIAL_AUTH_FACEBOOK_KEY:
     SOCIAL_AUTH_FACEBOOK_KEY = FACEBOOK_APP_ID
+
+# Google OAuth Configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", "")
+GOOGLE_CLIENT_ID = env.str("GOOGLE_CLIENT_ID", SOCIAL_AUTH_GOOGLE_OAUTH2_KEY)
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", "")
+
+if not SOCIAL_AUTH_GOOGLE_OAUTH2_KEY:
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = GOOGLE_CLIENT_ID
 # Application definition
 
 INSTALLED_APPS = [
@@ -119,8 +127,10 @@ LOCAL_APPS = [
     'onesignal_client',
     'configuration',
     'slide_pictures',
+    'randomizer_challenge',
 ]
 THIRD_PARTY_APPS = [
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
@@ -149,6 +159,7 @@ INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS + MODULES_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -165,6 +176,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'web_build'),
             os.path.join(BASE_DIR, 'modules', 'ar', 'challenges', 'templates'),
+            os.path.join(BASE_DIR, 'randomizer_challenge', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -251,6 +263,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+# File Size - Increased for 90-second video uploads (typical size: 100-200 MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 MB (200 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 MB
+
 # allauth / users
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -275,6 +291,26 @@ SOCIALACCOUNT_PROVIDERS = {
             "client_id": SOCIAL_AUTH_FACEBOOK_KEY,
             "secret": SOCIAL_AUTH_FACEBOOK_SECRET,
             "key": SOCIAL_AUTH_FACEBOOK_KEY,
+        },
+    },
+    "google": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "profile"],
+        "FIELDS": ["id", "email", "name", "given_name", "family_name"],
+        "APP": {
+            "client_id": SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+            "secret": SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+            "key": SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+        },
+    },
+    "apple": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "name"],
+        "FIELDS": ["id", "email", "name"],
+        "APP": {
+            "client_id": env.str("SOCIAL_AUTH_APPLE_ID", ""),
+            "secret": env.str("SOCIAL_AUTH_APPLE_SECRET", ""),
+            "key": env.str("SOCIAL_AUTH_APPLE_ID", ""),
         },
     },
 }
@@ -451,3 +487,61 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 MAPBOX_TOKEN = env.str("MAPBOX_TOKEN", "")
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://f3216f95c92f.ngrok-free.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# Allow credentials (cookies, authorization headers)
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow common headers including Content-Type
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Allow common HTTP methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Deep Link Configuration
+DEEP_LINK_DOMAIN = env.str("DEEP_LINK_DOMAIN", f"https://{DOMAIN}")
+APP_SCHEME = env.str("APP_SCHEME", "roamreality")
+APP_BUNDLE_ID = env.str("APP_BUNDLE_ID", "com.roam.reality")
+APP_PACKAGE_NAME = env.str("APP_PACKAGE_NAME", "com.roam_reality")
+APPLE_TEAM_ID = env.str("APPLE_TEAM_ID", "AB35BNBR3J")
+
+# App Store URLs for deep linking fallback (when app is not installed)
+IOS_APP_STORE_URL = env.str("IOS_APP_STORE_URL", "https://apps.apple.com/us/app/roam-reality/id6477857812")
+ANDROID_PLAY_STORE_URL = env.str("ANDROID_PLAY_STORE_URL", "https://play.google.com/store/apps/details?id=com.roam_reality")
+
+# Deep link paths for randomizer
+RANDOMIZER_DEEP_LINK_PATHS = [
+    '/randomizer/',
+    '/randomizer/challenge/*',
+    '/randomizer/submission/*',
+    '/randomizer/profile/*',
+    '/randomizer/invite/*',
+    '/randomizer/share/*',
+    '/randomizer/leaderboard',
+    '/randomizer/video/*',
+]

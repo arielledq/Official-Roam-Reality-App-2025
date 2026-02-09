@@ -21,6 +21,7 @@ from django.views.generic.base import TemplateView
 from allauth.account.views import confirm_email
 from rest_framework import permissions
 from drf_spectacular.views import SpectacularJSONAPIView, SpectacularSwaggerView
+from home.deep_link_views import AppleAppSiteAssociationView, AssetLinksView
 
 urlpatterns = [
     
@@ -30,6 +31,7 @@ urlpatterns = [
     path("api/v1/", include("feedback.api.v1.urls")),
     path("api/v1/", include("notifications.urls")),
     path("api/v1/", include("slide_pictures.urls")),
+    path("api/v1/band/", include("modules.band_tracking.urls")),
     path("admin/", admin.site.urls),
     path("users/", include("users.urls", namespace="users")),
     path("rest-auth/", include("rest_auth.urls")),
@@ -51,5 +53,31 @@ urlpatterns += [
     path("api-docs/", SpectacularSwaggerView.as_view(url_name='schema'), name="api_docs")
 ]
 
+# Deep linking - Apple App Site Association and Android Asset Links
+# These must be served before the catch-all pattern
+urlpatterns += [
+    path('.well-known/apple-app-site-association', AppleAppSiteAssociationView.as_view(), name='apple-app-site-association'),
+    path('.well-known/assetlinks.json', AssetLinksView.as_view(), name='assetlinks'),
+]
 
+# Randomizer web fallback routes (for when app is NOT installed)
+# These handle deep links like https://roamtt.com/randomizer/challenge/123
+# MUST be before the catch-all pattern to avoid 404 errors
+from randomizer_challenge.web_fallback_views import (
+    ChallengeDeepLinkView,
+    SubmissionDeepLinkView,
+    ProfileDeepLinkView,
+    LeaderboardDeepLinkView,
+    InviteDeepLinkView,
+)
+
+urlpatterns += [
+    path('randomizer/challenge/<int:challenge_id>/', ChallengeDeepLinkView.as_view(), name='randomizer-challenge-fallback'),
+    path('randomizer/submission/<int:submission_id>/', SubmissionDeepLinkView.as_view(), name='randomizer-submission-fallback'),
+    path('randomizer/profile/<int:user_id>/', ProfileDeepLinkView.as_view(), name='randomizer-profile-fallback'),
+    path('randomizer/leaderboard/', LeaderboardDeepLinkView.as_view(), name='randomizer-leaderboard-fallback'),
+    path('randomizer/invite/<int:challenge_id>/', InviteDeepLinkView.as_view(), name='randomizer-invite-fallback'),
+]
+
+# Catch-all pattern for React app - MUST be last
 urlpatterns += [re_path(r".*",TemplateView.as_view(template_name='index.html'))]

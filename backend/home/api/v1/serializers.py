@@ -179,6 +179,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
 
 class FriendshipRequestSerializer(serializers.ModelSerializer):
     from_user = UserSerializer()
+    from_user_id = serializers.IntegerField(source='from_user.id', read_only=True)
     to_user = UserSerializer()
 
     class Meta:
@@ -196,7 +197,7 @@ class NotificationSerializer(serializers.ModelSerializer):
 class ModeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Mode
-        fields = ['id', 'name', 'status', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'status', 'description', 'sort_order', 'created_at', 'updated_at']
         read_only_fields = ['id', 'created_at', 'updated_at']
 
 

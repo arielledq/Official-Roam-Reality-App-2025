@@ -1,24 +1,16 @@
-import React from 'react';
-import Svg, { Path } from 'react-native-svg';
+import React from "react";
+import Svg, {Path} from "react-native-svg";
 
-const MarkerIcon = ({ color = '#B14FE9', size = 28, ...props }) => {
+const MarkerIcon = ({color = "#B14FE9", size = 28, ...props}) => {
   return (
-
-    <Svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      {...props}
-      >
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none" {...props}>
       <Path
         d="M17.9207 16.6113C19.5535 15.0371 20.5706 12.8185 20.5706 10.3603C20.5706 5.58523 16.733 1.71429 11.9992 1.71429C7.2653 1.71429 3.42773 5.58523 3.42773 10.3603C3.42773 12.8187 4.445 15.0376 6.07811 16.6118L10.3426 21.4497C11.2244 22.4501 12.774 22.4501 13.6558 21.4497L17.9207 16.6113ZM19.3883 10.3603C19.3883 14.4767 16.0801 17.8137 11.9992 17.8137C7.91825 17.8137 4.61 14.4767 4.61 10.3603C4.61 6.24385 7.91825 2.90684 11.9992 2.90684C16.0801 2.90684 19.3883 6.24385 19.3883 10.3603Z"
         fill={color}
-        
       />
     </Svg>
-    
-        // <Svg
+
+    // <Svg
     //   width={size}
     //   height={size}
     //   viewBox="3.33 1.67 13.33 16.1"
@@ -30,7 +22,6 @@ const MarkerIcon = ({ color = '#B14FE9', size = 28, ...props }) => {
     //     fill={color}
     //   />
     // </Svg>
-    
   );
 };
 

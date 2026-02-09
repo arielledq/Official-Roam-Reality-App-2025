@@ -1,10 +1,12 @@
 import {makeStyles} from "@rneui/themed";
 import {FontFamily, FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {widthPercentageToDP} from "react-native-responsive-screen";
 
 const useStyles = makeStyles(theme => ({
   row: {
     flexDirection: "row",
     alignItems: "center",
+    paddingLeft: widthPercentageToDP(4),
   },
   nameContainer: {flex: 1},
   name: {
@@ -12,6 +14,13 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH40,
+  },
+  name1: {
+    ...fontGroup.nunitoBold,
+    color: theme.colors.white,
+    fontSize: FontSizes.S30,
+    lineHeight: FontLineHeights.LH40,
+    // marginTop: 150,
   },
   userName: {
     ...fontGroup.nunitoRegular,
@@ -21,8 +30,8 @@ const useStyles = makeStyles(theme => ({
   },
   containerBottom: {
     flexDirection: "row",
-    alignItems: "center",
-    marginTop: "6%",
+
+    // marginTop: "6%",
   },
   verificationIcon: {
     marginHorizontal: 5,
@@ -33,10 +42,7 @@ const useStyles = makeStyles(theme => ({
     fontSize: FontSizes.S10,
     lineHeight: FontLineHeights.LH14,
   },
-  verifyNowContainer: {
-    flex: 1,
-    alignItems: "flex-end",
-  },
+  verifyNowContainer: {},
   verifyNow: {
     ...fontGroup.nunitoBold,
     color: theme.colors.inputRed,
@@ -45,7 +51,7 @@ const useStyles = makeStyles(theme => ({
   },
   verifyAccountText: {
     ...fontGroup.nunitoBold,
-    color: theme.colors.yellow,
+    color: theme.colors.green,
     fontSize: FontSizes.S14,
     lineHeight: FontLineHeights.LH20,
   },

@@ -207,16 +207,20 @@ class ScoreboardAdmin(admin.ModelAdmin):
 
 @admin.register(Mode)
 class ModeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'status', 'created_at', 'updated_at')
+    list_display = ('name', 'status', 'description', 'sort_order', 'created_at', 'updated_at')
     list_filter = ('status',)
-    search_fields = ('name',)
-    
-    # Make the admin read-only
+    search_fields = ('name', 'description')
+    list_editable = ('status', 'description', 'sort_order')
+    ordering = ('sort_order', 'name')
+
+    # Allow adding new modes
     def has_add_permission(self, request):
-        return False
-    
-    # def has_change_permission(self, request, obj=None):
-    #     return False
-    
+        return True
+
+    # Allow editing
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    # Allow deleting (be careful with this)
     def has_delete_permission(self, request, obj=None):
-        return False
+        return True

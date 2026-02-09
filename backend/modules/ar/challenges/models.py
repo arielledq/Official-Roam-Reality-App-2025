@@ -461,6 +461,10 @@ class ARUserProfile(models.Model):
     points = models.BigIntegerField(verbose_name="Challenge Points", default=0)
     check_ins = models.BigIntegerField(verbose_name="Check-ins", default=0)
     challenge_completed = models.IntegerField(verbose_name="Challenge Completed", default=0)
+    randomizer_challenge_completed = models.IntegerField(
+        verbose_name="Randomizer Challenges Completed",
+        default=0
+    )
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="ar_user_profile_user"
     )
@@ -587,9 +591,10 @@ class ARMemories(models.Model):
             )
 
     def __str__(self):
-        return str(
-            self.user.name + " " + str(self.memory_file)
-        )
+        user_name = self.user.name if self.user and self.user.name else ''
+        memory_file_str = str(self.memory_file) if self.memory_file else ''
+        parts = [user_name, memory_file_str]
+        return ' '.join(filter(None, parts))
 
 
 class ARSettings(models.Model):

@@ -29,6 +29,13 @@ const Images = {
   CloseModal: require("./closeModal.png"),
   TikTokShare: require("./tiktok-share.png"),
   Earth: require("./Earth.png"),
+  WAVE: require("./wave.png"),
+  Neo_GR: require("./neoGr.png"),
+  Person: require("./person.png"),
+  AppLogo: require("./AppIcon.jpg"),
+  Done: require("./done.png"),
+  retake: require("./retake.png"),
+  destination: require("./destination.png"),
 };
 
 export default Images;

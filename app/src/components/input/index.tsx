@@ -1,12 +1,12 @@
-import { Input } from "@rneui/themed";
-import React, { FC, useState } from "react";
-import { Platform, StyleSheet } from "react-native";
+import {Input} from "@rneui/themed";
+import React, {FC, useState} from "react";
+import {Platform, StyleSheet} from "react-native";
 import theme from "../../assets/theme";
-import { FontLineHeights, FontSizes, fontGroup } from "../../util/FontUtils";
-import { TextInputProps } from "./type";
+import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {TextInputProps} from "./type";
 
 const AppInput: FC<TextInputProps> = (props: TextInputProps) => {
-  const { containerStyle = {}, inputStyle = {}, inputContainerStyle, ...otherProps } = props;
+  const {containerStyle = {}, inputStyle = {}, inputContainerStyle, ...otherProps} = props;
   const [focus, setFocus] = useState(false);
 
   return (
@@ -34,7 +34,7 @@ const AppInput: FC<TextInputProps> = (props: TextInputProps) => {
 };
 
 const styles = StyleSheet.create({
-  container: { paddingHorizontal: 0, paddingVertical: 0 },
+  container: {paddingHorizontal: 0, paddingVertical: 0},
   text: {
     fontSize: FontSizes.S14,
     ...fontGroup.nunitoRegular,

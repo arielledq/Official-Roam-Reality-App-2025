@@ -16,6 +16,9 @@ from home.api.v1.viewsets import (
     HuntMapViewSet,
 )
 
+# Import randomizer_challenge URLs
+from randomizer_challenge import urls as randomizer_urls
+
 router = DefaultRouter()
 router.register("signup", SignupViewSet, basename="signup")
 router.register("login", LoginViewSet, basename="login")
@@ -38,5 +41,8 @@ urlpatterns = [
     path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
     path("invite-friend/", InviteFriendAPIview.as_view(), name="invite_friend"),
     path("find-friends/", FindFriendsAPIView.as_view(), name="find-friends"),
+
+    # Randomizer Challenge URLs
+    path("", include(randomizer_urls)),
 
 ]

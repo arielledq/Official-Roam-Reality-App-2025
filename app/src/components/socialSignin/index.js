@@ -21,6 +21,7 @@ const SocialSignin = ({setLoading}) => {
 
   const handleGoogleLogin = async () => {
     setLoading(true);
+
     try {
       await GoogleSignin.hasPlayServices();
       const userinfo = await GoogleSignin.signIn();
@@ -91,7 +92,6 @@ const SocialSignin = ({setLoading}) => {
       }
 
       if (loginResult.isCancelled) {
-        console.log("Login cancelled");
         setLoading(false);
         return;
       }
@@ -109,8 +109,6 @@ const SocialSignin = ({setLoading}) => {
         if (!token) {
           throw new Error("Failed to get authentication token on iOS");
         }
-
-        console.log("iOS OIDC Token:", token.substring(0, 20) + "...");
       } else {
         // Get Access Token for Android
         const accessTokenData = await AccessToken.getCurrentAccessToken();
@@ -120,8 +118,6 @@ const SocialSignin = ({setLoading}) => {
         if (!token) {
           throw new Error("Failed to get access token on Android");
         }
-
-        console.log("Android Access Token:", token.substring(0, 20) + "...");
       }
 
       // Send to backend with platform context
@@ -212,10 +208,13 @@ const SocialSignin = ({setLoading}) => {
       if (!appleAuthRequestResponse.identityToken) {
         throw new Error("Apple Sign-In failed - no identify token returned");
       }
+      // console.log("Apple auth response", appleAuthRequestResponse);
 
       const payload = {
         id_token: appleAuthRequestResponse.identityToken,
         access_token: appleAuthRequestResponse.authorizationCode,
+        first_name: appleAuthRequestResponse.fullName?.givenName || "apple",
+        last_name: appleAuthRequestResponse.fullName?.familyName || "user",
       };
 
       appleLogin(payload)

@@ -36,6 +36,9 @@ import {EXPERIENCE_TYPE_CHOICES} from "../../../constants";
 import RNFS from "react-native-fs";
 import theme from "assets/theme";
 import MapSkeletonLoader from "components/MapSkeletonLoader";
+import TransparentSearchBar from "components/transparentSearchBar";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
+import Images from "assets/images";
 
 const SCROLL_AMOUNT = 70;
 const BAND_LOCATION_UPDATE_INTERVAL_SECONDS = 1000 * 60; // 60 seconds
@@ -58,6 +61,7 @@ const GeoArChallengeDetails = ({}) => {
   const navigation = useNavigation();
   const mapView = useRef();
   const selectedDestination = useSelector(state => state.ar?.selectedDestination);
+  const [androidTrackViewChnages, setAndroidTrackViewChanges] = useState(true);
   const regions = selectedDestination?.regions;
   const [fullRegion, setFullRegion] = useState(null);
   const [friendList, setFriendList] = useState([]);
@@ -69,6 +73,11 @@ const GeoArChallengeDetails = ({}) => {
   const [filteredUpdatedMarkers, setFilteredUpdatedMarkers] = useState([]);
   const [loadingCustomMarkers, setLoadingCustomMarkers] = useState(false);
   const [shouldShowMap, setShouldShowMap] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [markersFullyLoaded, setMarkersFullyLoaded] = useState(false);
+  const markerRefs = useRef({});
+  const autoTooltipShownRef = useRef(false);
+  const [friendImageStates, setFriendImageStates] = useState({});
 
   const bandLocationUpdatesIntervalId = useRef(null);
   const friendsLocationUpdatesIntervalId = useRef(null);
@@ -192,13 +201,28 @@ const GeoArChallengeDetails = ({}) => {
       .finally(() => {});
   };
 
+  const updateFriendImageState = (friendId, updates) => {
+    setFriendImageStates(prev => ({
+      ...prev,
+      [friendId]: {
+        ...prev[friendId],
+        ...updates,
+      },
+    }));
+  };
+
   const f_markerView = o => {
     const friendHasLocation =
       !!o?.ar_user_profile_user?.current_location &&
       !!o?.ar_user_profile_user?.current_location?.coordinates?.length;
+
     if (friendHasLocation) {
       const friendLat = o?.ar_user_profile_user?.current_location.coordinates[1];
       const friendLong = o?.ar_user_profile_user?.current_location.coordinates[0];
+
+      const hasUserImage = !!o?.user_profile?.image;
+      const localImagePath = o?.user_profile?.localImagePath;
+      const imageState = friendImageStates[o.id] || {loaded: false, error: false};
       return (
         <Marker
           key={o.id}
@@ -211,7 +235,7 @@ const GeoArChallengeDetails = ({}) => {
             navigation.navigate("PublicProfile", {userData: o});
           }}
           pinColor={pinColor}
-          tracksViewChanges={tracksViewChanges}
+          tracksViewChanges={Platform.OS == "android" ? androidTrackViewChnages : false}
         >
           {Platform.OS === "ios" && (
             <Callout
@@ -228,8 +252,35 @@ const GeoArChallengeDetails = ({}) => {
             </Callout>
           )}
           {useCustomMarkers && (
-            <View style={{width: 30, height: 30}}>
-              <FriendsMarkerIcon />
+            <View
+              style={{
+                width: widthPercentageToDP(10),
+                height: widthPercentageToDP(10),
+                alignItems: "center",
+                justifyContent: "flex-start",
+              }}
+            >
+              <>
+                {/* Always show placeholder first, then actual image when loaded */}
+                <Image
+                  resizeMode="cover"
+                  style={{
+                    width: widthPercentageToDP(6.5),
+                    height: widthPercentageToDP(6.5),
+                    position: "absolute",
+                    top: 3,
+                    borderRadius: 100,
+                    zIndex: imageState.loaded && !imageState.error ? 998 : 999,
+                    backgroundColor: "#fff",
+                  }}
+                  source={localImagePath ? {uri: localImagePath} : {uri: o?.user_profile?.image}}
+                />
+              </>
+              <MarkerIcon
+                color={theme.lightColors.green}
+                width={widthPercentageToDP(10)}
+                height={widthPercentageToDP(10)}
+              />
             </View>
           )}
         </Marker>
@@ -249,6 +300,11 @@ const GeoArChallengeDetails = ({}) => {
     if (o?.lat_long) {
       return (
         <Marker
+          ref={ref => {
+            if (ref) {
+              markerRefs.current[`marker-${o.id}`] = ref;
+            }
+          }}
           key={`marker-${o.id}`}
           coordinate={{
             latitude: o?.lat_long.coordinates[1],
@@ -274,8 +330,8 @@ const GeoArChallengeDetails = ({}) => {
           {useCustomMarkers && (
             <View
               style={{
-                width: 30,
-                height: 30,
+                width: widthPercentageToDP(10),
+                height: widthPercentageToDP(10),
                 alignItems: "center",
                 justifyContent: "flex-start",
               }}
@@ -283,15 +339,19 @@ const GeoArChallengeDetails = ({}) => {
               <Image
                 resizeMode="cover"
                 style={{
-                  width: 19,
-                  height: 19,
+                  width: widthPercentageToDP(7),
+                  height: widthPercentageToDP(7),
                   position: "absolute",
                   top: 2.5,
                   borderRadius: 100,
                 }}
                 source={{uri: o.localFilePath}}
               />
-              <MarkerIcon color={o?.category?.color} />
+              <MarkerIcon
+                color={o?.category?.color}
+                width={widthPercentageToDP(10)}
+                height={widthPercentageToDP(10)}
+              />
             </View>
           )}
         </Marker>
@@ -341,9 +401,74 @@ const GeoArChallengeDetails = ({}) => {
   const getFriends = () => {
     setLoadingCustomMarkers(true);
     getUserFriendList()
-      .then(response => {
+      .then(async response => {
         if (response) {
-          setFriendList(response?.data[0]?.friends || []);
+          const friends = response?.data[0]?.friends || [];
+
+          // Download and cache friend profile images
+          const friendsWithLocalImages = await Promise.all(
+            friends.map(async (friend, index) => {
+              if (friend?.user_profile?.image) {
+                try {
+                  const url = friend.user_profile.image;
+                  const fileName =
+                    `friend_${friend.id}_${index}_` +
+                    url.substring(url.lastIndexOf("/") + 1).split("?")[0];
+                  const localFilePath = `${RNFS.DocumentDirectoryPath}/${fileName}`;
+
+                  // Check if file already exists to avoid re-downloading
+                  const fileExists = await RNFS.exists(localFilePath);
+
+                  if (!fileExists) {
+                    const downloadResult = await RNFS.downloadFile({
+                      fromUrl: url,
+                      toFile: localFilePath,
+                      background: false,
+                      discretionary: true,
+                      cacheable: true,
+                    }).promise;
+
+                    if (downloadResult.statusCode === 200) {
+                      const updatedLocalFilePath =
+                        Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+                      return {
+                        ...friend,
+                        user_profile: {
+                          ...friend.user_profile,
+                          localImagePath: updatedLocalFilePath,
+                        },
+                      };
+                    } else {
+                      // Download failed, keep original
+                      return friend;
+                    }
+                  } else {
+                    // File exists, use cached version
+                    const updatedLocalFilePath =
+                      Platform.OS === "android" ? `file://${localFilePath}` : localFilePath;
+                    return {
+                      ...friend,
+                      user_profile: {
+                        ...friend.user_profile,
+                        localImagePath: updatedLocalFilePath,
+                      },
+                    };
+                  }
+                } catch (error) {
+                  console.error("Error downloading friend image:", error);
+                  // Return original friend data if download fails
+                  return friend;
+                }
+              } else {
+                // No profile image, return as is
+                return friend;
+              }
+            })
+          );
+
+          // Reset friend image states for new friends
+          setFriendImageStates({});
+          setFriendList(friendsWithLocalImages);
         }
       })
       .catch(error => {
@@ -433,9 +558,70 @@ const GeoArChallengeDetails = ({}) => {
     initialRegion.longitude = Number(full_latitude_longitude.longitude);
   }
 
+  const showAutoTooltipOnFirstMarker = () => {
+    if (filteredUpdatedMarkers.length > 0 && !autoTooltipShownRef.current) {
+      // Function to calculate distance between two coordinates (in meters)
+      const calculateDistance = (lat1, lon1, lat2, lon2) => {
+        const R = 6371e3; // Earth's radius in meters
+        const φ1 = (lat1 * Math.PI) / 180;
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lon2 - lon1) * Math.PI) / 180;
+
+        const a =
+          Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+          Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+      };
+
+      // Find a marker that has no friends nearby
+      const markerWithoutNearbyFriends = filteredUpdatedMarkers.find(marker => {
+        if (!marker?.lat_long) return false;
+
+        const markerLat = marker.lat_long.coordinates[1];
+        const markerLon = marker.lat_long.coordinates[0];
+
+        // Check if any friend is nearby (within 100 meters)
+        const hasNearbyFriend = friendList.some(friend => {
+          const friendHasLocation =
+            !!friend?.ar_user_profile_user?.current_location &&
+            !!friend?.ar_user_profile_user?.current_location?.coordinates?.length;
+
+          if (!friendHasLocation) return false;
+
+          const friendLat = friend.ar_user_profile_user.current_location.coordinates[1];
+          const friendLon = friend.ar_user_profile_user.current_location.coordinates[0];
+
+          const distance = calculateDistance(markerLat, markerLon, friendLat, friendLon);
+          return distance <= 100; // 100 meters threshold
+        });
+
+        return !hasNearbyFriend;
+      });
+
+      // If no marker without nearby friends found, fallback to first valid marker
+      const targetMarker =
+        markerWithoutNearbyFriends || filteredUpdatedMarkers.find(marker => marker?.lat_long);
+
+      if (targetMarker) {
+        const markerRef = markerRefs.current[`marker-${targetMarker.id}`];
+        if (markerRef) {
+          // Delay to ensure marker is rendered and ready
+          setTimeout(() => {
+            markerRef.showCallout();
+            autoTooltipShownRef.current = true;
+          }, 800);
+        }
+      }
+    }
+  };
+
   const debounceSetMarkersData = markers => {
     setUpdatedMarkers(markers);
     setFilteredUpdatedMarkers(markers);
+    setMarkersFullyLoaded(false);
 
     setTimeout(() => {
       setFilteredUpdatedMarkers([]);
@@ -444,6 +630,7 @@ const GeoArChallengeDetails = ({}) => {
     setTimeout(() => {
       setLoadingCustomMarkers(false);
       setFilteredUpdatedMarkers(markers);
+      setMarkersFullyLoaded(true);
     }, 500);
   };
 
@@ -455,6 +642,41 @@ const GeoArChallengeDetails = ({}) => {
     );
     getBandLocationUpdates();
   };
+
+  const searchLocation = () => {
+    if (!searchQuery.trim() || !filteredUpdatedMarkers.length) return;
+
+    const lowercaseQuery = searchQuery.trim().toLowerCase();
+    const matchedMarker = filteredUpdatedMarkers.find(
+      marker => marker.name && marker.name.toLowerCase().includes(lowercaseQuery)
+    );
+
+    if (matchedMarker && matchedMarker.lat_long) {
+      const markerCoordinate = {
+        latitude: matchedMarker.lat_long.coordinates[1],
+        longitude: matchedMarker.lat_long.coordinates[0],
+        latitudeDelta: 0.01, // Closer zoom for better visibility of the marker
+        longitudeDelta: 0.01,
+      };
+
+      // First animate to the marker location
+      mapView.current?.animateToRegion(markerCoordinate, 1000);
+
+      // After animation completes, show the callout
+      setTimeout(() => {
+        const markerRef = markerRefs.current[`marker-${matchedMarker.id}`];
+        if (markerRef) {
+          markerRef.showCallout();
+        }
+      }, 1500); // Wait a bit after animation to show callout
+    } else {
+      showMessage("No locations found matching your search.", "error", "Search failed");
+    }
+  };
+
+  setTimeout(() => {
+    setAndroidTrackViewChanges(false);
+  }, 10000);
 
   useEffect(() => {
     if (
@@ -577,9 +799,19 @@ const GeoArChallengeDetails = ({}) => {
     }
   }, [arSitesOn]);
 
+  // Auto show tooltip when all markers are fully loaded
+  useEffect(() => {
+    if (markersFullyLoaded && filteredUpdatedMarkers.length > 0 && !loadingCustomMarkers) {
+      showAutoTooltipOnFirstMarker();
+    }
+  }, [markersFullyLoaded, filteredUpdatedMarkers, loadingCustomMarkers]);
+
   useFocusEffect(
     useCallback(() => {
       setShouldShowMap(true);
+      // Reset auto tooltip flag when screen is focused
+      autoTooltipShownRef.current = false;
+      setMarkersFullyLoaded(false);
 
       return () => {
         setShouldShowMap(false);
@@ -599,15 +831,32 @@ const GeoArChallengeDetails = ({}) => {
 
       <View
         style={{
+          width: "100%",
+          paddingTop: heightPercentageToDP(2),
+          paddingBottom: heightPercentageToDP(2),
+          alignItems: "center",
+          flexDirection: "row",
+          gap: 10,
+        }}
+      >
+        <TransparentSearchBar
+          placeholder="Search Locations"
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          onSubmitEditing={searchLocation}
+        />
+        <TouchableOpacity onPress={scrollRegionsPressHandler} style={_styles.scrollButton}>
+          <Icon name={"doubleright"} family="antdesign" size={25} color="gray" />
+        </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
           marginBottom: 10,
           alignItems: "flex-end",
           gap: 10,
         }}
       >
-        <TouchableOpacity onPress={scrollRegionsPressHandler}>
-          <Icon name={"doubleright"} family="antdesign" size={25} color="gray" />
-        </TouchableOpacity>
-
         {isEvent ? (
           <FlatList
             style={{width: "100%", height: 50}}
@@ -753,56 +1002,11 @@ const GeoArChallengeDetails = ({}) => {
         )}
       </View>
       <View>
-        <Text style={_styles.s_list_text}>Tap the pin to see more details</Text>
-      </View>
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          width: "100%",
-          alignItems: "flex-start",
-          marginTop: 20,
-          marginBottom: 30,
-        }}
-      >
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 70,
-          }}
-        >
-          <ARSiteCountBG style={{width: 48, height: 48}}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>
-            {isEvent
-              ? selectedDestination?.ar_event_sites?.length
-              : selectedDestination?.star_ar_sites?.length}
-          </Text>
-          <Text style={_styles.s_list_text}>Sites</Text>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 70,
-          }}
-        >
-          <ARSiteCountBG style={{width: 48, height: 48}}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{starsSites}</Text>
-          <Text style={_styles.s_list_text}>Star Sites</Text>
-        </View>
-        <View
-          style={{
-            alignItems: "center",
-            justifyContent: "center",
-            width: 100,
-          }}
-        >
-          <ARSiteCountBG style={{width: 48, height: 48}}></ARSiteCountBG>
-          <Text style={_styles.s_list_count}>{selectedDestination.unique_ar_sites.length}</Text>
-          <Text style={_styles.s_list_text}>AR Experiences</Text>
+        <View style={_styles.textView}>
+          <Text style={_styles.s_list_text}>Click the pins to see more details.</Text>
         </View>
       </View>
+
       {popUpFacts && (
         <View style={{position: "absolute", top: 0, bottom: 0, left: 0, right: 0}}>
           <DestinationFactPopUp
