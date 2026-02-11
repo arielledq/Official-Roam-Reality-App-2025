@@ -588,10 +588,10 @@ class BandLocationService:
                 pass
 
             # Get active user devices
-            from users.models import UserDevice
+            from onesignal_client.models import UserDevice
             devices = UserDevice.objects.filter(
                 user__is_active=True,
-                is_active=True
+                active=True
             ).values_list('device_id', flat=True)
 
             device_ids = list(devices)
