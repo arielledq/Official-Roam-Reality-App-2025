@@ -145,13 +145,13 @@ class BroadcastService:
         """
         try:
             # Import here to avoid circular imports
-            from users.models import UserDevice
+            from onesignal_client.models import UserDevice
             from notifications.services import OneSignalClient
 
             # Get active devices for users
             devices = UserDevice.objects.filter(
                 user__in=users,
-                is_active=True
+                active=True
             ).select_related('user')
 
             if not devices.exists():
