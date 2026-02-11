@@ -113,3 +113,63 @@ class OneSignalClient:
             if hasattr(e, 'message'):
                 LOGGER.info('logger message Push sending failed: {}'.format(e.message))
             raise e
+
+    def send_silent_data(self, device_ids, data, included_segments=None):
+        """
+        Send a silent data-only notification (no popup, no sound).
+        Perfect for real-time location updates without disturbing the user.
+
+        Args:
+            device_ids (list): List of device IDs to target
+            data (dict): Data payload to send to the app
+            included_segments (list, optional): Segments to target if device_ids not provided
+
+        Returns:
+            dict: OneSignal response or None if failed
+
+        Example:
+            client.send_silent_data(
+                device_ids=['player_id_1', 'player_id_2'],
+                data={
+                    'type': 'location_update',
+                    'band_id': 1,
+                    'band_name': 'Band 1',
+                    'latitude': 40.7128,
+                    'longitude': -74.0060,
+                    'timestamp': '2024-01-15T10:03:00Z'
+                }
+            )
+        """
+        if not device_ids and not included_segments:
+            LOGGER.warning("No device_ids or segments provided for silent notification")
+            return None
+
+        if device_ids is not None and not len(device_ids):
+            LOGGER.warning("Empty device_ids list provided for silent notification")
+            return None
+
+        # Silent notification payload
+        # Key: NO "headings" or "contents" = no popup!
+        notification_payload = {
+            "content_available": True,  # iOS: wake app in background
+            "priority": 10,              # Android: high priority for immediate delivery
+            "data": data,                # Custom data payload
+            "ios_badgeType": "None",     # Don't update badge count
+            "android_channel_id": "silent_updates"  # Use silent channel
+        }
+
+        # Target devices or segments
+        if device_ids:
+            notification_payload["include_player_ids"] = device_ids
+        elif included_segments:
+            notification_payload["included_segments"] = included_segments
+
+        try:
+            response = self.os_client.send_notification(notification_payload)
+            LOGGER.info(f'Silent data notification sent to {len(device_ids) if device_ids else "all"} devices. Data: {json.dumps(data)}')
+            return response
+        except Exception as e:
+            LOGGER.error(f'Silent notification sending failed: {e}')
+            if hasattr(e, 'message'):
+                LOGGER.error(f'Error message: {e.message}')
+            return None

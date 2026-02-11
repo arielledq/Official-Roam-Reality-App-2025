@@ -73,8 +73,14 @@ class BroadcastService:
                     'message_id': message.id
                 }
 
-            # Get all active users
+            # Get all active users (exclude sender if message has created_by)
             users = User.objects.filter(is_active=True)
+
+            # Exclude sender from receiving their own broadcast
+            if message.created_by:
+                users = users.exclude(id=message.created_by.id)
+                self.logger.info(f"Excluding sender {message.created_by.email} from broadcast")
+
             user_count = users.count()
 
             if user_count == 0:
@@ -88,7 +94,7 @@ class BroadcastService:
                     'message_id': message.id,
                     'recipients': 0,
                     'delivered': 0,
-                    'warning': 'No active users in system'
+                    'warning': 'No active users in system (or only sender exists)'
                 }
 
             # Create notification history for each user (bulk create for performance)
@@ -379,11 +385,11 @@ class BandLocationService:
                     speed=metadata.get('speed')
                 )
 
-            # Auto-broadcast if moved significantly
+            # Send silent location update if moved significantly
             notification_sent = False
             if auto_notify and moved_significantly:
-                notification_sent = self._auto_broadcast_movement(
-                    band, new_location, distance_meters
+                notification_sent = self._send_silent_location_update(
+                    band, lat, lng, distance_meters
                 )
 
             return {
@@ -532,21 +538,30 @@ class BandLocationService:
 
         return distance_meters
 
-    def _auto_broadcast_movement(
+    def _send_silent_location_update(
         self,
         band: GeoArSite,
-        new_location: Point,
+        latitude: float,
+        longitude: float,
         distance_meters: float
     ) -> bool:
         """
-        Auto-send broadcast notification when band moves significantly.
+        Send silent data notification with GPS coordinates.
+        NO popup, NO broadcast message - just real-time location update to client.
 
-        Now checks:
-        - If auto-notify is enabled (from settings)
-        - If band is in cooldown period (prevents spam)
+        This is called when:
+        - Auto-notify is enabled
+        - Band moved significantly (>threshold)
+        - NOT in cooldown period
+
+        Args:
+            band: The band that moved
+            latitude: New latitude
+            longitude: New longitude
+            distance_meters: How far the band moved
 
         Returns:
-            bool: True if notification was sent successfully
+            bool: True if silent notification sent successfully
         """
         try:
             # Get settings
@@ -555,7 +570,7 @@ class BandLocationService:
             # Check if auto-notify is enabled
             if not settings.auto_notify_enabled:
                 self.logger.info(
-                    f"Auto-notify is disabled in settings. Skipping notification for {band.name}"
+                    f"Auto-notify disabled. Skipping silent notification for {band.name}"
                 )
                 return False
 
@@ -564,48 +579,70 @@ class BandLocationService:
                 cooldown = BandNotificationCooldown.objects.get(band=band)
                 if cooldown.is_in_cooldown(settings.cooldown_minutes):
                     self.logger.info(
-                        f"Band {band.name} is in cooldown period. Skipping notification. "
-                        f"Last notification: {cooldown.last_notification_at}"
+                        f"Band {band.name} in cooldown. Skipping silent notification. "
+                        f"Last sent: {cooldown.last_notification_at}"
                     )
                     return False
             except BandNotificationCooldown.DoesNotExist:
                 # No cooldown record exists yet, can proceed
                 pass
 
-            # Create message
-            message = BroadcastMessage.objects.create(
-                title=f"{band.name} is on the move!",
-                content=f"{band.name} has moved to a new location (moved {distance_meters:.0f}m). Check the map to see where they are now!",
-                created_by=None  # System-generated
-            )
+            # Get active user devices
+            from users.models import UserDevice
+            devices = UserDevice.objects.filter(
+                user__is_active=True,
+                is_active=True
+            ).values_list('device_id', flat=True)
 
-            # Send broadcast
-            broadcast_service = BroadcastService()
-            result = broadcast_service.send_broadcast(message)
+            device_ids = list(devices)
 
-            if result.get('success'):
-                # Update/create cooldown record
+            if not device_ids:
+                self.logger.warning(
+                    f"No active devices found. Silent notification not sent for {band.name}"
+                )
+                return False
+
+            # Prepare silent data payload
+            data = {
+                'type': 'silent_location_update',
+                'band_id': band.id,
+                'band_name': band.name,
+                'latitude': latitude,
+                'longitude': longitude,
+                'distance_moved': round(distance_meters, 2),
+                'timestamp': timezone.now().isoformat(),
+                'is_tracking': True
+            }
+
+            # Send silent notification via OneSignal
+            from onesignal_client.client import OneSignalClient
+            client = OneSignalClient()
+            response = client.send_silent_data(device_ids=device_ids, data=data)
+
+            if response:
+                # Update cooldown record
                 BandNotificationCooldown.objects.update_or_create(
                     band=band,
                     defaults={
                         'last_notification_at': timezone.now(),
-                        'last_notification_message': message
+                        'last_notification_message': None  # No broadcast message created
                     }
                 )
 
                 self.logger.info(
-                    f"Auto-broadcast sent for {band.name} movement: message_id={message.id}. "
-                    f"Next notification available in {settings.cooldown_minutes} minutes."
+                    f"✅ Silent location update sent for {band.name} to {len(device_ids)} devices. "
+                    f"Moved {distance_meters:.1f}m to ({latitude:.6f}, {longitude:.6f}). "
+                    f"Next update available in {settings.cooldown_minutes} minutes."
                 )
                 return True
             else:
                 self.logger.error(
-                    f"Auto-broadcast failed for {band.name}: {result.get('error')}"
+                    f"❌ Silent notification failed for {band.name}"
                 )
                 return False
 
         except Exception as e:
-            self.logger.error(f"Auto-broadcast error: {str(e)}", exc_info=True)
+            self.logger.error(f"Silent notification error: {str(e)}", exc_info=True)
             return False
 
     def get_band_location_history(

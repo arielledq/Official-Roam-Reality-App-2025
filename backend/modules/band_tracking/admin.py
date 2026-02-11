@@ -27,6 +27,9 @@ class BroadcastMessageAdmin(admin.ModelAdmin):
     """
     Admin interface for broadcast messages.
 
+    IMPORTANT: These are MANUAL broadcasts only (with popup notifications).
+    Location updates are sent SILENTLY (no popup, no broadcast message).
+
     Features:
     - Create messages with simple form
     - Send messages with one click

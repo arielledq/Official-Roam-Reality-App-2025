@@ -327,8 +327,9 @@ class BandTrackingSettings(models.Model):
     """
     auto_notify_enabled = models.BooleanField(
         _("Enable Auto-Notifications"),
-        default=True,
-        help_text="Master switch: automatically send notifications when bands move significantly"
+        default=False,
+        help_text="Master switch: automatically send SILENT location updates to all users when bands move significantly. "
+                  "Silent updates = no popup, just real-time map updates. Does NOT create broadcast messages."
     )
     distance_threshold_meters = models.IntegerField(
         _("Distance Threshold (meters)"),
