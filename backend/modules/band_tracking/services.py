@@ -23,7 +23,13 @@ from django.core.exceptions import ValidationError
 
 from users.models import User
 from modules.ar.challenges.models import GeoArSite
-from .models import BroadcastMessage, NotificationHistory, BandLocation
+from .models import (
+    BroadcastMessage,
+    NotificationHistory,
+    BandLocation,
+    BandTrackingSettings,
+    BandNotificationCooldown
+)
 
 logger = logging.getLogger(__name__)
 
@@ -247,10 +253,12 @@ class BandLocationService:
     """
     Handle GPS location updates from bands.
     Parses various GPS formats and triggers notifications on significant movement.
-    """
 
-    # Movement threshold in degrees (~111 meters at equator)
-    MOVEMENT_THRESHOLD_DEGREES = 0.001
+    Now uses database settings for:
+    - Distance threshold (configurable, default 111m)
+    - Auto-notify enable/disable
+    - Cooldown period between notifications
+    """
 
     # Supported GPS formats
     GPS_FORMAT_SIMPLE = 'simple'  # "lat,lng"
@@ -332,6 +340,9 @@ class BandLocationService:
             # Create Point (note: Point(x, y) = Point(lng, lat))
             new_location = Point(lng, lat)
 
+            # Get settings from database
+            settings = BandTrackingSettings.get_settings()
+
             # Check for significant movement
             old_location = band.lat_long
             moved_significantly = False
@@ -339,15 +350,17 @@ class BandLocationService:
 
             if old_location:
                 distance_meters = self._calculate_distance(old_location, new_location)
-                # Check if moved more than threshold
-                if distance_meters > (self.MOVEMENT_THRESHOLD_DEGREES * 111000):  # Convert to meters
+                # Check if moved more than threshold (from database settings)
+                if distance_meters > settings.distance_threshold_meters:
                     moved_significantly = True
                     self.logger.info(
-                        f"Band {band.name} moved {distance_meters:.2f} meters"
+                        f"Band {band.name} moved {distance_meters:.2f} meters "
+                        f"(threshold: {settings.distance_threshold_meters}m)"
                     )
                 else:
                     self.logger.debug(
-                        f"Band {band.name} movement too small: {distance_meters:.2f} meters"
+                        f"Band {band.name} movement too small: {distance_meters:.2f} meters "
+                        f"(threshold: {settings.distance_threshold_meters}m)"
                     )
 
             # Use transaction for atomic update
@@ -528,10 +541,37 @@ class BandLocationService:
         """
         Auto-send broadcast notification when band moves significantly.
 
+        Now checks:
+        - If auto-notify is enabled (from settings)
+        - If band is in cooldown period (prevents spam)
+
         Returns:
             bool: True if notification was sent successfully
         """
         try:
+            # Get settings
+            settings = BandTrackingSettings.get_settings()
+
+            # Check if auto-notify is enabled
+            if not settings.auto_notify_enabled:
+                self.logger.info(
+                    f"Auto-notify is disabled in settings. Skipping notification for {band.name}"
+                )
+                return False
+
+            # Check cooldown period
+            try:
+                cooldown = BandNotificationCooldown.objects.get(band=band)
+                if cooldown.is_in_cooldown(settings.cooldown_minutes):
+                    self.logger.info(
+                        f"Band {band.name} is in cooldown period. Skipping notification. "
+                        f"Last notification: {cooldown.last_notification_at}"
+                    )
+                    return False
+            except BandNotificationCooldown.DoesNotExist:
+                # No cooldown record exists yet, can proceed
+                pass
+
             # Create message
             message = BroadcastMessage.objects.create(
                 title=f"{band.name} is on the move!",
@@ -544,8 +584,18 @@ class BandLocationService:
             result = broadcast_service.send_broadcast(message)
 
             if result.get('success'):
+                # Update/create cooldown record
+                BandNotificationCooldown.objects.update_or_create(
+                    band=band,
+                    defaults={
+                        'last_notification_at': timezone.now(),
+                        'last_notification_message': message
+                    }
+                )
+
                 self.logger.info(
-                    f"Auto-broadcast sent for {band.name} movement: message_id={message.id}"
+                    f"Auto-broadcast sent for {band.name} movement: message_id={message.id}. "
+                    f"Next notification available in {settings.cooldown_minutes} minutes."
                 )
                 return True
             else:
@@ -593,4 +643,94 @@ class BandLocationService:
 
         except Exception as e:
             self.logger.error(f"Error fetching location history: {str(e)}")
+            return []
+
+    def get_all_current_locations(self, stale_threshold_minutes: int = 60) -> List[Dict]:
+        """
+        Get current location for all bands being tracked.
+
+        Edge cases handled:
+        - Bands with no location data (never received GPS update)
+        - Stale location data (last update too old)
+        - Bands with lat_long = None
+        - Database errors
+        - Empty result set
+
+        Args:
+            stale_threshold_minutes: Consider location stale if older than this (default: 60 min)
+
+        Returns:
+            List of dicts with band location info:
+            [
+                {
+                    'band_id': 1,
+                    'band_name': 'Lost Tribe - Main Stage',
+                    'latitude': 40.7128,
+                    'longitude': -74.0060,
+                    'last_updated': datetime,
+                    'is_tracking': True,
+                    'staleness_minutes': 15
+                }
+            ]
+        """
+        try:
+            from datetime import timedelta
+
+            # Get all bands (GeoArSite)
+            bands = GeoArSite.objects.all()
+
+            if not bands.exists():
+                self.logger.warning("No bands found in database")
+                return []
+
+            results = []
+            current_time = timezone.now()
+            stale_threshold = current_time - timedelta(minutes=stale_threshold_minutes)
+
+            for band in bands:
+                # Get latest location from history
+                latest_location = BandLocation.objects.filter(
+                    band=band
+                ).order_by('-timestamp').first()
+
+                # Determine if band is actively being tracked
+                is_tracking = False
+                staleness_minutes = None
+
+                if latest_location and latest_location.timestamp:
+                    time_diff = current_time - latest_location.timestamp
+                    staleness_minutes = int(time_diff.total_seconds() / 60)
+                    is_tracking = latest_location.timestamp >= stale_threshold
+
+                # Extract current coordinates
+                latitude = None
+                longitude = None
+                last_updated = None
+
+                if band.lat_long:
+                    # Use band's current location (updated by UDP listener)
+                    latitude = band.lat_long.y
+                    longitude = band.lat_long.x
+                    if latest_location:
+                        last_updated = latest_location.timestamp
+
+                results.append({
+                    'band_id': band.id,
+                    'band_name': band.name,
+                    'latitude': latitude,
+                    'longitude': longitude,
+                    'last_updated': last_updated,
+                    'is_tracking': is_tracking,
+                    'staleness_minutes': staleness_minutes
+                })
+
+            self.logger.info(
+                f"Fetched current locations for {len(results)} bands. "
+                f"Tracking: {sum(1 for r in results if r['is_tracking'])}"
+            )
+
+            return results
+
+        except Exception as e:
+            self.logger.error(f"Error fetching all current locations: {str(e)}", exc_info=True)
             return []

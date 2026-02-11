@@ -256,3 +256,174 @@ class BandLocation(models.Model):
         # Use GeoDjango's distance calculation
         from django.contrib.gis.measure import Distance
         return self.location.distance(other_location) * Distance(km=111.0).m
+
+
+class VehicleWhitelist(models.Model):
+    """
+    Whitelist of vehicle IDs that are allowed to send GPS updates.
+    Admin-configurable to avoid hardcoding vehicle IDs in code.
+    """
+    vehicle_id = models.CharField(
+        _("Vehicle ID"),
+        max_length=50,
+        unique=True,
+        help_text="Unique identifier from third-party GPS provider (e.g., LT01)"
+    )
+    band = models.ForeignKey(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        related_name='vehicles',
+        help_text="The band this vehicle is tracking"
+    )
+    is_active = models.BooleanField(
+        _("Active"),
+        default=True,
+        help_text="Enable/disable this vehicle without deleting"
+    )
+    description = models.CharField(
+        _("Description"),
+        max_length=200,
+        blank=True,
+        help_text="Optional description (e.g., 'Lost Tribe Truck 1 - Main Stage')"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['vehicle_id']
+        verbose_name = _("Vehicle Whitelist")
+        verbose_name_plural = _("Vehicle Whitelists")
+        indexes = [
+            models.Index(fields=['vehicle_id', 'is_active']),
+            models.Index(fields=['band']),
+        ]
+
+    def __str__(self):
+        status = "✓" if self.is_active else "✗"
+        return f"{status} {self.vehicle_id} → {self.band.name}"
+
+    def save(self, *args, **kwargs):
+        """Validate before saving"""
+        # Trim whitespace and convert to uppercase for consistency
+        if self.vehicle_id:
+            self.vehicle_id = self.vehicle_id.strip().upper()
+
+        # Validate vehicle_id is not empty
+        if not self.vehicle_id:
+            raise ValueError("Vehicle ID cannot be empty")
+
+        super().save(*args, **kwargs)
+
+
+class BandTrackingSettings(models.Model):
+    """
+    Singleton model for band tracking configuration.
+    Only one instance exists - settings for the entire system.
+
+    Allows admin to configure:
+    - Auto-notification on/off
+    - Distance threshold for notifications
+    - Cooldown period between notifications
+    """
+    auto_notify_enabled = models.BooleanField(
+        _("Enable Auto-Notifications"),
+        default=True,
+        help_text="Master switch: automatically send notifications when bands move significantly"
+    )
+    distance_threshold_meters = models.IntegerField(
+        _("Distance Threshold (meters)"),
+        default=111,
+        validators=[MinValueValidator(1), MaxValueValidator(10000)],
+        help_text="Minimum distance (in meters) band must move to trigger notification. Default: 111m"
+    )
+    cooldown_minutes = models.IntegerField(
+        _("Cooldown Period (minutes)"),
+        default=15,
+        validators=[MinValueValidator(0), MaxValueValidator(1440)],
+        help_text="Minimum time (in minutes) between notifications for the same band. Default: 15 min"
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Band Tracking Settings")
+        verbose_name_plural = _("Band Tracking Settings")
+
+    def __str__(self):
+        status = "ON" if self.auto_notify_enabled else "OFF"
+        return f"Band Tracking Settings (Auto-notify: {status}, Threshold: {self.distance_threshold_meters}m)"
+
+    def save(self, *args, **kwargs):
+        """Ensure singleton pattern - only one settings instance"""
+        self.pk = 1
+        super().save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """Prevent deletion of settings"""
+        pass
+
+    @classmethod
+    def get_settings(cls):
+        """Get or create the singleton settings instance"""
+        obj, created = cls.objects.get_or_create(
+            pk=1,
+            defaults={
+                'auto_notify_enabled': True,
+                'distance_threshold_meters': 111,
+                'cooldown_minutes': 15
+            }
+        )
+        return obj
+
+
+class BandNotificationCooldown(models.Model):
+    """
+    Track last notification time for each band to implement cooldown.
+    Prevents notification spam when band moves frequently.
+    """
+    band = models.OneToOneField(
+        GeoArSite,
+        on_delete=models.CASCADE,
+        related_name='notification_cooldown',
+        primary_key=True,
+        help_text="The band this cooldown record belongs to"
+    )
+    last_notification_at = models.DateTimeField(
+        _("Last Notification At"),
+        help_text="When the last auto-notification was sent for this band"
+    )
+    last_notification_message = models.ForeignKey(
+        BroadcastMessage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='cooldown_records',
+        help_text="Reference to the last notification message sent"
+    )
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = _("Band Notification Cooldown")
+        verbose_name_plural = _("Band Notification Cooldowns")
+
+    def __str__(self):
+        return f"{self.band.name} - Last notified: {self.last_notification_at.strftime('%Y-%m-%d %H:%M')}"
+
+    def is_in_cooldown(self, cooldown_minutes: int) -> bool:
+        """
+        Check if band is still in cooldown period.
+
+        Args:
+            cooldown_minutes: Cooldown duration in minutes
+
+        Returns:
+            True if still in cooldown, False if can send notification
+        """
+        from django.utils import timezone
+        from datetime import timedelta
+
+        if not self.last_notification_at:
+            return False
+
+        cooldown_until = self.last_notification_at + timedelta(minutes=cooldown_minutes)
+        return timezone.now() < cooldown_until
