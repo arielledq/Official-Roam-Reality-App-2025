@@ -146,7 +146,7 @@ class BroadcastService:
         try:
             # Import here to avoid circular imports
             from onesignal_client.models import UserDevice
-            from notifications.services import OneSignalClient
+            from onesignal_client.client import OneSignalClient
 
             # Get active devices for users
             devices = UserDevice.objects.filter(

@@ -114,6 +114,69 @@ class OneSignalClient:
                 LOGGER.info('logger message Push sending failed: {}'.format(e.message))
             raise e
 
+    def send_notification(self, device_ids, title, content, data=None, included_segments=None):
+        """
+        Send a standard push notification with popup.
+        Generic method for sending notifications without requiring a Notification model object.
+
+        Args:
+            device_ids (list): List of device IDs to target
+            title (str): Notification title/heading
+            content (str): Notification content/body
+            data (dict, optional): Additional data payload
+            included_segments (list, optional): Segments to target if device_ids not provided
+
+        Returns:
+            dict: OneSignal response or None if failed
+
+        Example:
+            client.send_notification(
+                device_ids=['player_id_1', 'player_id_2'],
+                title='Band 1 is moving!',
+                content='Check the map to see their new location',
+                data={'message_id': 123, 'type': 'broadcast'}
+            )
+        """
+        if not device_ids and not included_segments:
+            LOGGER.warning("No device_ids or segments provided for notification")
+            return None
+
+        if device_ids is not None and not len(device_ids):
+            LOGGER.warning("Empty device_ids list provided for notification")
+            return None
+
+        # Build notification payload
+        notification_payload = {
+            "headings": {"en": title},
+            "contents": {"en": content},
+            "content_available": True,
+            "data": data or {}
+        }
+
+        # Target devices or segments
+        if device_ids:
+            notification_payload["include_player_ids"] = device_ids
+        elif included_segments:
+            notification_payload["included_segments"] = included_segments
+
+        try:
+            response = self.os_client.send_notification(notification_payload)
+            LOGGER.info(f'Notification sent to {len(device_ids) if device_ids else "all"} devices. Title: {title}')
+
+            # Convert response object to dict
+            if response:
+                return {
+                    'id': getattr(response, 'id', None),
+                    'recipients': getattr(response, 'recipients', 0),
+                    'external_id': getattr(response, 'external_id', None)
+                }
+            return None
+        except Exception as e:
+            LOGGER.error(f'Notification sending failed: {e}')
+            if hasattr(e, 'message'):
+                LOGGER.error(f'Error message: {e.message}')
+            return None
+
     def send_silent_data(self, device_ids, data, included_segments=None):
         """
         Send a silent data-only notification (no popup, no sound).
@@ -167,7 +230,15 @@ class OneSignalClient:
         try:
             response = self.os_client.send_notification(notification_payload)
             LOGGER.info(f'Silent data notification sent to {len(device_ids) if device_ids else "all"} devices. Data: {json.dumps(data)}')
-            return response
+
+            # Convert response object to dict
+            if response:
+                return {
+                    'id': getattr(response, 'id', None),
+                    'recipients': getattr(response, 'recipients', 0),
+                    'external_id': getattr(response, 'external_id', None)
+                }
+            return None
         except Exception as e:
             LOGGER.error(f'Silent notification sending failed: {e}')
             if hasattr(e, 'message'):
