@@ -38,6 +38,48 @@ def reverse_remove_indexes(apps, schema_editor):
     pass  # We don't need to recreate old indexes on reverse
 
 
+def add_new_indexes_if_not_exist(apps, schema_editor):
+    """Safely add new indexes only if they don't exist"""
+
+    # Define indexes to add: (table_name, index_name, create_sql)
+    indexes_to_add = [
+        ('band_tracking_bandlocation', 'band_tracki_band_id_fddf76_idx',
+         'CREATE INDEX band_tracki_band_id_fddf76_idx ON band_tracking_bandlocation (band_id, timestamp DESC)'),
+        ('band_tracking_bandlocation', 'band_tracki_timesta_4790de_idx',
+         'CREATE INDEX band_tracki_timesta_4790de_idx ON band_tracking_bandlocation (timestamp DESC)'),
+        ('band_tracking_broadcastmessage', 'band_tracki_created_162c24_idx',
+         'CREATE INDEX band_tracki_created_162c24_idx ON band_tracking_broadcastmessage (created_at DESC)'),
+        ('band_tracking_broadcastmessage', 'band_tracki_sent_at_6971c3_idx',
+         'CREATE INDEX band_tracki_sent_at_6971c3_idx ON band_tracking_broadcastmessage (sent_at)'),
+        ('band_tracking_broadcastmessage', 'band_tracki_is_dele_3a36c1_idx',
+         'CREATE INDEX band_tracki_is_dele_3a36c1_idx ON band_tracking_broadcastmessage (is_deleted, created_at DESC)'),
+        ('band_tracking_notificationhistory', 'band_tracki_message_1d926d_idx',
+         'CREATE INDEX band_tracki_message_1d926d_idx ON band_tracking_notificationhistory (message_id, user_id)'),
+        ('band_tracking_notificationhistory', 'band_tracki_user_id_599386_idx',
+         'CREATE INDEX band_tracki_user_id_599386_idx ON band_tracking_notificationhistory (user_id, created_at DESC)'),
+        ('band_tracking_notificationhistory', 'band_tracki_deliver_80e02a_idx',
+         'CREATE INDEX band_tracki_deliver_80e02a_idx ON band_tracking_notificationhistory (delivered, read)'),
+    ]
+
+    with schema_editor.connection.cursor() as cursor:
+        for table_name, index_name, create_sql in indexes_to_add:
+            # Check if index exists
+            cursor.execute("""
+                SELECT 1
+                FROM pg_indexes
+                WHERE indexname = %s
+            """, [index_name])
+
+            if not cursor.fetchone():
+                # Index doesn't exist, create it
+                cursor.execute(create_sql)
+
+
+def reverse_add_indexes(apps, schema_editor):
+    """Reverse migration - drop new indexes if needed"""
+    pass
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -65,36 +107,9 @@ class Migration(migrations.Migration):
             name='id',
             field=models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID'),
         ),
-        migrations.AddIndex(
-            model_name='bandlocation',
-            index=models.Index(fields=['band', '-timestamp'], name='band_tracki_band_id_fddf76_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='bandlocation',
-            index=models.Index(fields=['-timestamp'], name='band_tracki_timesta_4790de_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='broadcastmessage',
-            index=models.Index(fields=['-created_at'], name='band_tracki_created_162c24_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='broadcastmessage',
-            index=models.Index(fields=['sent_at'], name='band_tracki_sent_at_6971c3_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='broadcastmessage',
-            index=models.Index(fields=['is_deleted', '-created_at'], name='band_tracki_is_dele_3a36c1_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='notificationhistory',
-            index=models.Index(fields=['message', 'user'], name='band_tracki_message_1d926d_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='notificationhistory',
-            index=models.Index(fields=['user', '-created_at'], name='band_tracki_user_id_599386_idx'),
-        ),
-        migrations.AddIndex(
-            model_name='notificationhistory',
-            index=models.Index(fields=['delivered', 'read'], name='band_tracki_deliver_80e02a_idx'),
+        # Safely add new indexes using custom function
+        migrations.RunPython(
+            add_new_indexes_if_not_exist,
+            reverse_add_indexes,
         ),
     ]
