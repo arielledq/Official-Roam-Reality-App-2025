@@ -32,7 +32,7 @@ def reverse_populate_modes(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0002_mode'),
+        ('home', '0004_add_mode_fields'),
     ]
 
     operations = [

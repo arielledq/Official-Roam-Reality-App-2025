@@ -23,7 +23,7 @@ def reverse_free_range_mode(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('home', '0004_add_mode_fields'),
+        ('home', '0003_populate_modes'),
     ]
 
     operations = [
