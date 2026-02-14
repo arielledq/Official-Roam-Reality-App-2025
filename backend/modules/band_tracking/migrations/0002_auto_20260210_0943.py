@@ -3,6 +3,41 @@
 from django.db import migrations, models
 
 
+def remove_old_indexes_if_exist(apps, schema_editor):
+    """Safely remove old indexes only if they exist"""
+    db_alias = schema_editor.connection.alias
+
+    # Define indexes to remove: (table_name, index_name)
+    indexes_to_remove = [
+        ('band_tracking_bandlocation', 'band_tracki_band_id_9c3f5a_idx'),
+        ('band_tracking_bandlocation', 'band_tracki_timesta_6e8b2d_idx'),
+        ('band_tracking_broadcastmessage', 'band_tracki_created_3e7aae_idx'),
+        ('band_tracking_broadcastmessage', 'band_tracki_sent_at_95c3c1_idx'),
+        ('band_tracking_broadcastmessage', 'band_tracki_is_dele_f8b2e3_idx'),
+        ('band_tracking_notificationhistory', 'band_tracki_message_7a9c8d_idx'),
+        ('band_tracking_notificationhistory', 'band_tracki_user_id_2b4f6e_idx'),
+        ('band_tracking_notificationhistory', 'band_tracki_deliver_e5d7a2_idx'),
+    ]
+
+    with schema_editor.connection.cursor() as cursor:
+        for table_name, index_name in indexes_to_remove:
+            # Check if index exists
+            cursor.execute("""
+                SELECT 1
+                FROM pg_indexes
+                WHERE indexname = %s
+            """, [index_name])
+
+            if cursor.fetchone():
+                # Index exists, drop it
+                cursor.execute(f"DROP INDEX IF EXISTS {index_name}")
+
+
+def reverse_remove_indexes(apps, schema_editor):
+    """Reverse migration - recreate old indexes if needed"""
+    pass  # We don't need to recreate old indexes on reverse
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,37 +45,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveIndex(
-            model_name='bandlocation',
-            name='band_tracki_band_id_9c3f5a_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='bandlocation',
-            name='band_tracki_timesta_6e8b2d_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='broadcastmessage',
-            name='band_tracki_created_3e7aae_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='broadcastmessage',
-            name='band_tracki_sent_at_95c3c1_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='broadcastmessage',
-            name='band_tracki_is_dele_f8b2e3_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='notificationhistory',
-            name='band_tracki_message_7a9c8d_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='notificationhistory',
-            name='band_tracki_user_id_2b4f6e_idx',
-        ),
-        migrations.RemoveIndex(
-            model_name='notificationhistory',
-            name='band_tracki_deliver_e5d7a2_idx',
+        # Safely remove old indexes using custom function
+        migrations.RunPython(
+            remove_old_indexes_if_exist,
+            reverse_remove_indexes,
         ),
         migrations.AlterField(
             model_name='bandlocation',
