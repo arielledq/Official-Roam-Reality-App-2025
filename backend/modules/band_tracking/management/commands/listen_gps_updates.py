@@ -156,33 +156,43 @@ class Command(BaseCommand):
         """
         Process a GPS packet.
 
-        Expected format: VEHICLE_ID:GPS_STRING
-        Example: LT01:40.7128,-74.0060
+        Supported formats:
+        1. VEHICLE_ID:GPS_STRING (e.g., LT01:40.7128,-74.0060)
+        2. Raw NMEA with embedded vehicle ID (e.g., $GPRMC,...,TR01*60)
 
         Args:
             packet_str: The decoded packet string
             addr: Tuple of (ip_address, port)
         """
         try:
-            # Validate packet format
-            if ':' not in packet_str:
-                logger.warning(
-                    f"Invalid packet format (missing ':'): {packet_str[:100]} from {addr[0]}"
-                )
-                return
+            # Check if packet has VEHICLE_ID:GPS_STRING format
+            if ':' in packet_str and not packet_str.startswith('$'):
+                # Format: VEHICLE_ID:GPS_STRING
+                parts = packet_str.split(':', 1)
+                if len(parts) != 2:
+                    logger.warning(
+                        f"Invalid packet format (expected VEHICLE_ID:GPS_STRING): {packet_str[:100]}"
+                    )
+                    return
 
-            # Split into vehicle ID and GPS string
-            parts = packet_str.split(':', 1)
-            if len(parts) != 2:
-                logger.warning(
-                    f"Invalid packet format (expected VEHICLE_ID:GPS_STRING): {packet_str[:100]}"
-                )
-                return
+                vehicle_id = parts[0].strip().upper()
+                gps_string = parts[1].strip()
 
-            vehicle_id = parts[0].strip().upper()
-            gps_string = parts[1].strip()
+                logger.debug(f"Parsed prefixed format - Vehicle ID: {vehicle_id}, GPS: {gps_string[:50]}")
 
-            logger.debug(f"Parsed - Vehicle ID: {vehicle_id}, GPS: {gps_string[:50]}")
+            else:
+                # Format: Raw NMEA sentence with embedded vehicle ID
+                # Extract vehicle ID from NMEA sentence
+                vehicle_id = self._extract_vehicle_id_from_nmea(packet_str)
+
+                if not vehicle_id:
+                    logger.warning(
+                        f"Could not extract vehicle ID from NMEA: {packet_str[:100]} from {addr[0]}"
+                    )
+                    return
+
+                gps_string = packet_str
+                logger.debug(f"Parsed NMEA format - Vehicle ID: {vehicle_id}, GPS: {gps_string[:50]}")
 
             # Validate vehicle ID against whitelist (from database)
             try:
@@ -237,6 +247,56 @@ class Command(BaseCommand):
 
         except Exception as e:
             logger.error(f"Error processing GPS packet: {e}", exc_info=True)
+
+    def _extract_vehicle_id_from_nmea(self, nmea_string: str) -> str:
+        """
+        Extract vehicle ID from NMEA sentence.
+
+        GPRMC format includes vehicle ID before checksum:
+        $GPRMC,time,status,lat,N/S,lon,E/W,speed,track,date,mag_var,E/W,mode,nav_status,VEHICLE_ID*checksum
+
+        Example: $GPRMC,160814.00,A,1014.769380,N,06128.027412,W,0.0,44.6,120226,13.7,W,A,V,TR01*60
+                                                                                              ^^^^
+        Args:
+            nmea_string: NMEA sentence string
+
+        Returns:
+            Vehicle ID (uppercase) or None if not found
+        """
+        try:
+            # Check if it's a GPRMC sentence
+            if not nmea_string.startswith('$GPRMC'):
+                logger.warning(f"Not a GPRMC sentence: {nmea_string[:20]}")
+                return None
+
+            # Split by comma
+            parts = nmea_string.split(',')
+
+            if len(parts) < 14:
+                logger.warning(f"GPRMC sentence too short: {len(parts)} fields")
+                return None
+
+            # Vehicle ID is typically in the last field before checksum
+            # Format: "VEHICLE_ID*CHECKSUM"
+            last_field = parts[-1]
+
+            if '*' not in last_field:
+                logger.warning(f"No checksum delimiter found in: {last_field}")
+                return None
+
+            # Extract vehicle ID (everything before the *)
+            vehicle_id = last_field.split('*')[0].strip().upper()
+
+            if not vehicle_id:
+                logger.warning(f"Empty vehicle ID extracted from: {last_field}")
+                return None
+
+            logger.debug(f"Extracted vehicle ID: {vehicle_id} from GPRMC sentence")
+            return vehicle_id
+
+        except Exception as e:
+            logger.error(f"Error extracting vehicle ID from NMEA: {e}", exc_info=True)
+            return None
 
     def _log_vehicle_whitelist(self):
         """Log current vehicle whitelist at startup"""

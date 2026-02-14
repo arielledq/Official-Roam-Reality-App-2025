@@ -436,7 +436,7 @@ class BandLocationService:
                 except (ValueError, InvalidOperation):
                     pass
 
-        # Try NMEA format: $GPGGA,...
+        # Try NMEA format: $GPGGA,... or $GPRMC,...
         if gps_string.startswith('$GP'):
             return self._parse_nmea(gps_string)
 
@@ -445,7 +445,24 @@ class BandLocationService:
 
     def _parse_nmea(self, nmea_string: str) -> Tuple[Optional[float], Optional[float], Dict]:
         """
-        Parse NMEA GPS format.
+        Parse NMEA GPS format. Routes to appropriate parser based on sentence type.
+
+        Supported formats:
+        - $GPGGA: Global Positioning System Fix Data
+        - $GPRMC: Recommended Minimum Specific GPS/Transit Data
+        """
+        # Route to appropriate parser based on sentence type
+        if nmea_string.startswith('$GPRMC'):
+            return self._parse_gprmc(nmea_string)
+        elif nmea_string.startswith('$GPGGA'):
+            return self._parse_gpgga(nmea_string)
+        else:
+            self.logger.warning(f"Unsupported NMEA sentence type: {nmea_string[:10]}")
+            return None, None, {}
+
+    def _parse_gpgga(self, nmea_string: str) -> Tuple[Optional[float], Optional[float], Dict]:
+        """
+        Parse GPGGA NMEA format (Global Positioning System Fix Data).
 
         Example: $GPGGA,123519,4807.038,N,01131.000,E,1,08,0.9,545.4,M,46.9,M,,*47
         Format: $GPGGA,time,lat,N/S,lng,E/W,quality,satellites,hdop,altitude,M,geoid,M,age,station*checksum
@@ -499,7 +516,122 @@ class BandLocationService:
             return lat, lng, metadata
 
         except (ValueError, IndexError, AttributeError) as e:
-            self.logger.error(f"NMEA parsing error: {str(e)}")
+            self.logger.error(f"GPGGA parsing error: {str(e)}")
+            return None, None, {}
+
+    def _parse_gprmc(self, nmea_string: str) -> Tuple[Optional[float], Optional[float], Dict]:
+        """
+        Parse GPRMC NMEA format (Recommended Minimum Specific GPS/Transit Data).
+
+        Example: $GPRMC,160814.00,A,1014.769380,N,06128.027412,W,0.0,44.6,120226,13.7,W,A,V,TR01*60
+        Format: $GPRMC,time,status,lat,N/S,lon,E/W,speed,track,date,mag_var,E/W,mode,nav_status,vehicle_id*checksum
+
+        Field positions:
+        [0] = $GPRMC (sentence type)
+        [1] = 160814.00 (time in UTC: HHMMSS.SS)
+        [2] = A (status: A=active/valid, V=void/invalid)
+        [3] = 1014.769380 (latitude: DDMM.MMMMMM)
+        [4] = N (latitude direction: N=North, S=South)
+        [5] = 06128.027412 (longitude: DDDMM.MMMMMM)
+        [6] = W (longitude direction: E=East, W=West)
+        [7] = 0.0 (speed over ground in knots)
+        [8] = 44.6 (track angle in degrees)
+        [9] = 120226 (date: DDMMYY)
+        [10] = 13.7 (magnetic variation)
+        [11] = W (magnetic variation direction: E/W)
+        [12] = A (mode indicator)
+        [13] = V (navigation status)
+        [14] = TR01*60 (vehicle_id*checksum)
+
+        Returns:
+            Tuple[lat, lng, metadata_dict]
+        """
+        try:
+            parts = nmea_string.split(',')
+
+            # Validate minimum number of fields (at least lat, lon, and directions)
+            if len(parts) < 7:
+                self.logger.warning(f"GPRMC sentence too short: {len(parts)} fields")
+                return None, None, {}
+
+            # Check status field (index 2): A=valid, V=void
+            status = parts[2] if len(parts) > 2 else ''
+            if status != 'A':
+                self.logger.warning(f"GPRMC status invalid: {status} (expected 'A')")
+                # Continue parsing anyway, but log the warning
+
+            # Extract latitude (format: DDMM.MMMMMM at index 3)
+            lat_raw = parts[3]
+            lat_dir = parts[4]  # N or S
+
+            if not lat_raw or not lat_dir:
+                return None, None, {}
+
+            # Convert from DDMM.MMMMMM to decimal degrees
+            lat_decimal = float(lat_raw)
+            lat_deg = int(lat_decimal / 100)
+            lat_min = lat_decimal - (lat_deg * 100)
+            lat = lat_deg + (lat_min / 60.0)
+
+            if lat_dir == 'S':
+                lat = -lat
+
+            # Extract longitude (format: DDDMM.MMMMMM at index 5)
+            lng_raw = parts[5]
+            lng_dir = parts[6]  # E or W
+
+            if not lng_raw or not lng_dir:
+                return None, None, {}
+
+            # Convert from DDDMM.MMMMMM to decimal degrees
+            lng_decimal = float(lng_raw)
+            lng_deg = int(lng_decimal / 100)
+            lng_min = lng_decimal - (lng_deg * 100)
+            lng = lng_deg + (lng_min / 60.0)
+
+            if lng_dir == 'W':
+                lng = -lng
+
+            # Extract metadata
+            metadata = {}
+            try:
+                # Speed over ground (knots) - convert to km/h
+                if len(parts) > 7 and parts[7]:
+                    speed_knots = float(parts[7])
+                    metadata['speed'] = speed_knots * 1.852  # Convert knots to km/h
+
+                # Track angle (degrees)
+                if len(parts) > 8 and parts[8]:
+                    metadata['track_angle'] = float(parts[8])
+
+                # Date (DDMMYY)
+                if len(parts) > 9 and parts[9]:
+                    date_str = parts[9]
+                    if len(date_str) == 6:
+                        metadata['date'] = f"20{date_str[4:6]}-{date_str[2:4]}-{date_str[0:2]}"  # YYMMDD -> YYYY-MM-DD
+
+                # Vehicle ID (before checksum in last field)
+                if len(parts) > 14:
+                    last_field = parts[-1]
+                    if '*' in last_field:
+                        vehicle_id = last_field.split('*')[0].strip()
+                        if vehicle_id:
+                            metadata['vehicle_id'] = vehicle_id
+
+            except (ValueError, IndexError) as e:
+                self.logger.debug(f"Could not parse GPRMC metadata: {e}")
+                pass
+
+            self.logger.debug(
+                f"GPRMC parsed: lat={lat:.6f}, lng={lng:.6f}, "
+                f"speed={metadata.get('speed', 0):.1f}km/h, "
+                f"vehicle={metadata.get('vehicle_id', 'N/A')}"
+            )
+
+            return lat, lng, metadata
+
+        except (ValueError, IndexError, AttributeError) as e:
+            self.logger.error(f"GPRMC parsing error: {str(e)}")
             return None, None, {}
 
     def _validate_coordinates(self, lat: float, lng: float) -> bool:
@@ -713,8 +845,8 @@ class BandLocationService:
         try:
             from datetime import timedelta
 
-            # Get all bands (GeoArSite)
-            bands = GeoArSite.objects.all()
+            # Get all bands (GeoArSite) - only sites with band_user (actual bands, not regular AR sites)
+            bands = GeoArSite.objects.filter(band_user__isnull=False).select_related('band_user')
 
             if not bands.exists():
                 self.logger.warning("No bands found in database")
