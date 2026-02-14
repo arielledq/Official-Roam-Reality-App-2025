@@ -11,7 +11,14 @@ from django.utils.html import format_html
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages as django_messages
-from .models import BroadcastMessage, NotificationHistory, BandLocation
+from .models import (
+    BroadcastMessage,
+    NotificationHistory,
+    BandLocation,
+    VehicleWhitelist,
+    BandTrackingSettings,
+    BandNotificationCooldown
+)
 from .services import BroadcastService
 
 
@@ -19,6 +26,9 @@ from .services import BroadcastService
 class BroadcastMessageAdmin(admin.ModelAdmin):
     """
     Admin interface for broadcast messages.
+
+    IMPORTANT: These are MANUAL broadcasts only (with popup notifications).
+    Location updates are sent SILENTLY (no popup, no broadcast message).
 
     Features:
     - Create messages with simple form
@@ -328,11 +338,16 @@ class BandLocationAdmin(admin.ModelAdmin):
 
     def band_name(self, obj):
         """Display band name with link"""
-        return format_html(
-            '<a href="{}">{}</a>',
-            reverse('admin:ar_challenges_geoarsite_change', args=[obj.band.id]),
-            obj.band.name
-        )
+        try:
+            # Use model meta to get correct app_label
+            from modules.ar.challenges.models import GeoArSite
+            app_label = GeoArSite._meta.app_label
+            model_name = GeoArSite._meta.model_name
+            url = reverse(f'admin:{app_label}_{model_name}_change', args=[obj.band.id])
+            return format_html('<a href="{}">{}</a>', url, obj.band.name)
+        except Exception:
+            # Fallback to just the name if URL reverse fails
+            return obj.band.name
     band_name.short_description = 'Band'
 
     def latitude_display(self, obj):
@@ -395,3 +410,291 @@ def get_urls():
 
 
 admin.site.get_urls = get_urls
+
+
+@admin.register(VehicleWhitelist)
+class VehicleWhitelistAdmin(admin.ModelAdmin):
+    """
+    Admin interface for managing vehicle whitelist.
+
+    Allows admin to:
+    - Add/remove vehicle IDs
+    - Map vehicles to bands
+    - Enable/disable vehicles
+    - No code deployment needed!
+    """
+    list_display = [
+        'vehicle_id',
+        'band_name',
+        'is_active_badge',
+        'description',
+        'created_at'
+    ]
+    list_filter = ['is_active', 'band', 'created_at']
+    search_fields = ['vehicle_id', 'description', 'band__name']
+    autocomplete_fields = ['band']
+
+    fieldsets = (
+        ('Vehicle Information', {
+            'fields': ('vehicle_id', 'band', 'is_active')
+        }),
+        ('Details', {
+            'fields': ('description',)
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    readonly_fields = ['created_at', 'updated_at']
+
+    def get_queryset(self, request):
+        """Optimize queries"""
+        qs = super().get_queryset(request)
+        return qs.select_related('band')
+
+    def band_name(self, obj):
+        """Display band name"""
+        return obj.band.name
+    band_name.short_description = 'Band'
+    band_name.admin_order_field = 'band__name'
+
+    def is_active_badge(self, obj):
+        """Display active status with badge"""
+        if obj.is_active:
+            return format_html(
+                '<span style="color: green; font-weight: bold;">✓ Active</span>'
+            )
+        else:
+            return format_html(
+                '<span style="color: red; font-weight: bold;">✗ Disabled</span>'
+            )
+    is_active_badge.short_description = 'Status'
+
+    def save_model(self, request, obj, form, change):
+        """Show success message with instructions"""
+        super().save_model(request, obj, form, change)
+
+        if not change:
+            self.message_user(
+                request,
+                f'Vehicle {obj.vehicle_id} added successfully! '
+                f'The UDP listener will now accept updates from this vehicle.',
+                level=django_messages.SUCCESS
+            )
+        else:
+            if 'is_active' in form.changed_data:
+                status = "enabled" if obj.is_active else "disabled"
+                self.message_user(
+                    request,
+                    f'Vehicle {obj.vehicle_id} has been {status}.',
+                    level=django_messages.INFO
+                )
+
+
+@admin.register(BandTrackingSettings)
+class BandTrackingSettingsAdmin(admin.ModelAdmin):
+    """
+    Admin interface for band tracking settings.
+
+    Singleton model - only one settings instance exists.
+    Changes take effect immediately without restarting services!
+    """
+    list_display = [
+        'settings_summary',
+        'auto_notify_status',
+        'distance_threshold_meters',
+        'cooldown_minutes',
+        'updated_at'
+    ]
+
+    fieldsets = (
+        ('Auto-Notification Settings', {
+            'fields': ('auto_notify_enabled', 'distance_threshold_meters', 'cooldown_minutes'),
+            'description': 'Configure automatic notifications when bands move. Changes take effect immediately.'
+        }),
+        ('Metadata', {
+            'fields': ('created_at', 'updated_at'),
+            'classes': ('collapse',)
+        }),
+    )
+
+    readonly_fields = ['created_at', 'updated_at']
+
+    def has_add_permission(self, request):
+        """Only one settings instance allowed"""
+        return not BandTrackingSettings.objects.exists()
+
+    def has_delete_permission(self, request, obj=None):
+        """Prevent deletion of settings"""
+        return False
+
+    def settings_summary(self, obj):
+        """Display settings summary"""
+        return "Band Tracking Configuration"
+    settings_summary.short_description = 'Settings'
+
+    def auto_notify_status(self, obj):
+        """Display auto-notify status with badge"""
+        if obj.auto_notify_enabled:
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 10px; border-radius: 3px;">ON</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #dc3545; color: white; padding: 3px 10px; border-radius: 3px;">OFF</span>'
+            )
+    auto_notify_status.short_description = 'Auto-Notify'
+
+    def changelist_view(self, request, extra_context=None):
+        """Auto-redirect to change view if settings exist"""
+        try:
+            obj = BandTrackingSettings.objects.get(pk=1)
+            from django.http import HttpResponseRedirect
+            return HttpResponseRedirect(
+                reverse('admin:band_tracking_bandtrackingsettings_change', args=[obj.pk])
+            )
+        except BandTrackingSettings.DoesNotExist:
+            pass
+        return super().changelist_view(request, extra_context)
+
+    def save_model(self, request, obj, form, change):
+        """Show informative message after save"""
+        super().save_model(request, obj, form, change)
+
+        changes = []
+        if 'auto_notify_enabled' in form.changed_data:
+            status = "enabled" if obj.auto_notify_enabled else "disabled"
+            changes.append(f"Auto-notifications {status}")
+
+        if 'distance_threshold_meters' in form.changed_data:
+            changes.append(f"Distance threshold set to {obj.distance_threshold_meters}m")
+
+        if 'cooldown_minutes' in form.changed_data:
+            changes.append(f"Cooldown period set to {obj.cooldown_minutes} minutes")
+
+        if changes:
+            message = "Settings updated: " + ", ".join(changes) + ". Changes are active immediately!"
+            self.message_user(request, message, level=django_messages.SUCCESS)
+        else:
+            self.message_user(
+                request,
+                'Settings saved successfully.',
+                level=django_messages.SUCCESS
+            )
+
+
+@admin.register(BandNotificationCooldown)
+class BandNotificationCooldownAdmin(admin.ModelAdmin):
+    """
+    Admin interface for viewing band notification cooldowns.
+
+    Read-only - shows when each band was last notified.
+    Helps admin understand why notifications might not be sending.
+    """
+    list_display = [
+        'band_name',
+        'last_notification_at',
+        'time_since_notification',
+        'cooldown_status'
+    ]
+    list_filter = ['last_notification_at']
+    search_fields = ['band__name']
+    readonly_fields = [
+        'band',
+        'last_notification_at',
+        'last_notification_message',
+        'time_since_notification',
+        'cooldown_status_display',
+        'updated_at'
+    ]
+
+    fieldsets = (
+        ('Band Information', {
+            'fields': ('band',)
+        }),
+        ('Cooldown Status', {
+            'fields': ('last_notification_at', 'time_since_notification', 'cooldown_status_display')
+        }),
+        ('Last Notification', {
+            'fields': ('last_notification_message',)
+        }),
+        ('Metadata', {
+            'fields': ('updated_at',),
+            'classes': ('collapse',)
+        }),
+    )
+
+    def has_add_permission(self, request):
+        """Disable add - cooldowns are auto-created"""
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        """Disable edit - cooldowns are auto-managed"""
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        """Allow delete to reset cooldown if needed"""
+        return request.user.is_superuser
+
+    def get_queryset(self, request):
+        """Optimize queries"""
+        qs = super().get_queryset(request)
+        return qs.select_related('band', 'last_notification_message')
+
+    def band_name(self, obj):
+        """Display band name"""
+        return obj.band.name
+    band_name.short_description = 'Band'
+
+    def time_since_notification(self, obj):
+        """Display time since last notification"""
+        from django.utils import timezone
+        delta = timezone.now() - obj.last_notification_at
+        hours = delta.seconds // 3600
+        minutes = (delta.seconds % 3600) // 60
+
+        if delta.days > 0:
+            return f"{delta.days} days, {hours} hours ago"
+        elif hours > 0:
+            return f"{hours} hours, {minutes} minutes ago"
+        else:
+            return f"{minutes} minutes ago"
+    time_since_notification.short_description = 'Time Since Last Notification'
+
+    def cooldown_status(self, obj):
+        """Display cooldown status badge"""
+        settings = BandTrackingSettings.get_settings()
+        if obj.is_in_cooldown(settings.cooldown_minutes):
+            return format_html(
+                '<span style="background-color: #ffc107; color: black; padding: 3px 10px; border-radius: 3px;">IN COOLDOWN</span>'
+            )
+        else:
+            return format_html(
+                '<span style="background-color: #28a745; color: white; padding: 3px 10px; border-radius: 3px;">READY</span>'
+            )
+    cooldown_status.short_description = 'Status'
+
+    def cooldown_status_display(self, obj):
+        """Display detailed cooldown status"""
+        from django.utils import timezone
+        from datetime import timedelta
+
+        settings = BandTrackingSettings.get_settings()
+        cooldown_until = obj.last_notification_at + timedelta(minutes=settings.cooldown_minutes)
+
+        if obj.is_in_cooldown(settings.cooldown_minutes):
+            remaining = cooldown_until - timezone.now()
+            minutes_left = remaining.seconds // 60
+            return format_html(
+                '<div style="color: orange; font-weight: bold;">⏳ In cooldown - {} minutes remaining<br>'
+                '<small>Can send notification after {}</small></div>',
+                minutes_left,
+                cooldown_until.strftime('%Y-%m-%d %H:%M:%S')
+            )
+        else:
+            return format_html(
+                '<div style="color: green; font-weight: bold;">✓ Ready to send notifications</div>'
+            )
+    cooldown_status_display.short_description = 'Cooldown Status'

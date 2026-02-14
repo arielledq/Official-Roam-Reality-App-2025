@@ -298,3 +298,29 @@ class BandLocationStatsSerializer(serializers.Serializer):
     total_updates = serializers.IntegerField()
     last_update = serializers.DateTimeField()
     current_location = serializers.DictField()
+
+
+class BandCurrentLocationSerializer(serializers.Serializer):
+    """
+    Serializer for current band location (for map display).
+
+    Used by GET /api/v1/band/locations/current/ endpoint.
+    """
+    band_id = serializers.IntegerField()
+    band_name = serializers.CharField()
+    latitude = serializers.FloatField(allow_null=True)
+    longitude = serializers.FloatField(allow_null=True)
+    last_updated = serializers.DateTimeField(allow_null=True)
+    is_tracking = serializers.BooleanField()
+    staleness_minutes = serializers.IntegerField(allow_null=True, help_text="Minutes since last update")
+
+
+class AllBandLocationsResponseSerializer(serializers.Serializer):
+    """
+    Response serializer for all band current locations.
+    """
+    success = serializers.BooleanField(default=True)
+    timestamp = serializers.DateTimeField()
+    total_bands = serializers.IntegerField()
+    tracking_bands = serializers.IntegerField()
+    bands = BandCurrentLocationSerializer(many=True)

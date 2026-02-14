@@ -17,6 +17,7 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
+from django.utils import timezone
 
 from .models import BroadcastMessage, NotificationHistory, BandLocation
 from .serializers import (
@@ -496,6 +497,91 @@ def band_location_history(request, band_id):
             {
                 'success': False,
                 'error': 'An error occurred'
+            },
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+        )
+
+
+@api_view(['GET'])
+@authentication_classes([TokenAuthentication])
+@permission_classes([IsAuthenticated])
+def all_band_locations_current(request):
+    """
+    Get current location for ALL bands (for map display).
+
+    GET /band/locations/current/
+
+    Query params:
+    - stale_minutes: Consider location stale if older than this (default: 60)
+
+    Returns:
+    {
+        "success": true,
+        "timestamp": "2024-01-15T10:30:00Z",
+        "total_bands": 4,
+        "tracking_bands": 3,
+        "bands": [
+            {
+                "band_id": 1,
+                "band_name": "Lost Tribe - Main Stage",
+                "latitude": 40.7128,
+                "longitude": -74.0060,
+                "last_updated": "2024-01-15T10:29:45Z",
+                "is_tracking": true,
+                "staleness_minutes": 1
+            }
+        ]
+    }
+
+    Edge cases handled:
+    - No bands in database
+    - Bands without GPS data (returns null lat/lng)
+    - Stale location data (is_tracking = false)
+    - Service failures
+    """
+    try:
+        # Get stale threshold from query params
+        stale_minutes = int(request.GET.get('stale_minutes', 60))
+        stale_minutes = max(1, min(stale_minutes, 1440))  # Clamp between 1 and 1440 (24 hours)
+
+        # Fetch all current locations
+        service = BandLocationService()
+        bands_data = service.get_all_current_locations(stale_threshold_minutes=stale_minutes)
+
+        # Count tracking bands
+        tracking_count = sum(1 for band in bands_data if band['is_tracking'])
+
+        response_data = {
+            'success': True,
+            'timestamp': timezone.now(),
+            'total_bands': len(bands_data),
+            'tracking_bands': tracking_count,
+            'bands': bands_data
+        }
+
+        # Use serializer for validation and consistent format
+        from .serializers import AllBandLocationsResponseSerializer
+        serializer = AllBandLocationsResponseSerializer(response_data)
+
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    except ValueError as e:
+        # Invalid query param
+        logger.error(f"Invalid query parameter: {str(e)}")
+        return Response(
+            {
+                'success': False,
+                'error': 'Invalid query parameter'
+            },
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
+    except Exception as e:
+        logger.error(f"Error fetching all band locations: {str(e)}", exc_info=True)
+        return Response(
+            {
+                'success': False,
+                'error': 'An error occurred while fetching band locations'
             },
             status=status.HTTP_500_INTERNAL_SERVER_ERROR
         )

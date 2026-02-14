@@ -38,6 +38,11 @@ urlpatterns = [
         views.band_location_history,
         name='band-location-history'
     ),
+    path(
+        'locations/current/',
+        views.all_band_locations_current,
+        name='all-band-locations-current'
+    ),
 ]
 
 """
@@ -61,7 +66,8 @@ User Endpoints:
 - POST   /api/v1/band/notifications/{id}/mark-read/  - Mark notification as read
 - GET    /api/v1/band/user/notifications/            - User's notifications
 
-Band Location (for 3rd party):
-- POST   /api/v1/band/location/                      - Update band location
-- GET    /api/v1/band/location/{band_id}/history/    - Location history
+Band Location:
+- POST   /api/v1/band/location/                      - Update band location (3rd party)
+- GET    /api/v1/band/location/{band_id}/history/    - Location history for one band
+- GET    /api/v1/band/locations/current/             - Current locations for ALL bands (for map)
 """
