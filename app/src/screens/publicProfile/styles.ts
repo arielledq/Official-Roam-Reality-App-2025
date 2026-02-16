@@ -1,6 +1,7 @@
 import {makeStyles} from "@rneui/themed";
 import {screenHorizontalPadding} from "../../util/AppDimensions";
 import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -23,7 +24,9 @@ const useStyles = makeStyles(theme => ({
   },
   headingView: {
     flexDirection: "row",
-    marginTop: 4,
+    paddingHorizontal: screenHorizontalPadding,
+    marginBottom: widthPercentageToDP(8),
+
     alignItems: "center",
     justifyContent: "space-between",
   },
@@ -34,7 +37,12 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     flex: 1,
     alignItems: "center",
-    marginLeft: 16,
+  },
+  shadowBoxImage: {
+    width: widthPercentageToDP(12),
+    height: widthPercentageToDP(12),
+    justifyContent: "center",
+    alignItems: "center",
   },
   menuIcon: {
     paddingLeft: 5,
@@ -110,6 +118,7 @@ const useStyles = makeStyles(theme => ({
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 8,
+    marginTop: heightPercentageToDP(1),
   },
   removeBtnText: {
     ...fontGroup.nunitoBold,

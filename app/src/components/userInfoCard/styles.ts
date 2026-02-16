@@ -20,7 +20,7 @@ const useStyles = makeStyles(theme => ({
     color: theme.colors.white,
     fontSize: FontSizes.S30,
     lineHeight: FontLineHeights.LH40,
-    marginTop: 150,
+    // marginTop: 150,
   },
   userName: {
     ...fontGroup.nunitoRegular,
@@ -31,7 +31,7 @@ const useStyles = makeStyles(theme => ({
   containerBottom: {
     flexDirection: "row",
 
-    marginTop: "6%",
+    // marginTop: "6%",
   },
   verificationIcon: {
     marginHorizontal: 5,

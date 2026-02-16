@@ -461,6 +461,10 @@ class ARUserProfile(models.Model):
     points = models.BigIntegerField(verbose_name="Challenge Points", default=0)
     check_ins = models.BigIntegerField(verbose_name="Check-ins", default=0)
     challenge_completed = models.IntegerField(verbose_name="Challenge Completed", default=0)
+    randomizer_challenge_completed = models.IntegerField(
+        verbose_name="Randomizer Challenges Completed",
+        default=0
+    )
     user = models.OneToOneField(
         User, on_delete=models.CASCADE, related_name="ar_user_profile_user"
     )
@@ -483,19 +487,6 @@ class ARUserProfileScoreboard(ARUserProfile):
 
 
 
-class ARChallengeModels(models.Model):
-    class Meta:
-        verbose_name_plural = "AR Challenge Models"
-        verbose_name = "AR Challenge Models"
-        db_table = "ar_challenge_models"
-
-    name = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    image = models.ImageField(upload_to="ar/img/", null=True, blank=True)
-    model_file = models.FileField(upload_to="ar/model/", null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.name
 
 class ARMemories(models.Model):
     memory_file = models.FileField(upload_to="ar/memories/", blank=True, null=True)
@@ -600,9 +591,10 @@ class ARMemories(models.Model):
             )
 
     def __str__(self):
-        return str(
-            self.user.name + " " + str(self.memory_file)
-        )
+        user_name = self.user.name if self.user and self.user.name else ''
+        memory_file_str = str(self.memory_file) if self.memory_file else ''
+        parts = [user_name, memory_file_str]
+        return ' '.join(filter(None, parts))
 
 
 class ARSettings(models.Model):
@@ -613,60 +605,21 @@ class ARSettings(models.Model):
     waiver_details = RichTextField(_("Waiver Details"), blank=True, null=True)
 
 
-class ARExample(models.Model):
-    class Meta:
-        verbose_name_plural = "AR Example"
-
-    name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
-    # image = models.ImageField(
-    #     upload_to="ar/example/",
-    #     blank=True,
-    #     null=True,
-    # )
-    # video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
-    description = RichTextField(_("Example Details"), blank=True, null=True)
-    any_where_challenges = models.ManyToManyField(Challenges, verbose_name="Any Where AR Challenges",
-                                                  related_name="ar_example_challenge", blank=True, default=None)
-    geo_challenges = models.ManyToManyField(GeoARChallenges, verbose_name="Geo AR Challenges",
-                                            related_name="geo_ar_example_challenge", blank=True, default=None)
-
-    def __str__(self):
-        return str(
-            self.name
-        )
-
-
-class ARExampleImage(models.Model):
-    ar_example = models.ForeignKey(ARExample, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(
-        upload_to="ar/example/",
-        blank=True,
-        null=True,
-    )
-
-    def __str__(self):
-        return f'AR Example Image Id: {self.id} - {self.ar_example.name}'
-
-
-class ARExampleVideo(models.Model):
-    ar_example = models.ForeignKey(ARExample, on_delete=models.CASCADE, related_name="videos")
-    video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
-
-    def __str__(self):
-        return f'AR Example Video Id: {self.id} - {self.ar_example.name}'
-
 
 class ScanPicture(models.Model):
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
+    screen_title = models.JSONField(
+        _("Screen Title"), blank=True, null=True, help_text="Multiple titles to display on the screen (stored as a list)"
+    )
     file_image = models.ImageField(_("Image"), upload_to="scanpicture/img/", null=True, blank=True)
-    file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
+    #file_3d = models.FileField(_("3D File"), upload_to="scanpicture/3d/", null=True, blank=True)
     icon = models.ImageField(_("Icon"), upload_to="scanpicture/icon/", null=True, blank=True)
     file_animation_android = models.FileField(_("Animation android"), upload_to="scanpicture/animation_android/",
-                                              null=True, blank=False)
+                                              null=True, blank=True)
     file_animation_ios = models.FileField(_("Animation ios"), upload_to="scanpicture/animation_ios/",
-                                          null=True, blank=False)
+                                          null=True, blank=True)
     sponsor = models.ForeignKey(
         Sponsor,
         on_delete=models.CASCADE,
@@ -683,6 +636,15 @@ class ScanPicture(models.Model):
     )
     points = models.IntegerField(verbose_name="Points", default=0)
     elevation = models.IntegerField(null=True, blank=True)
+    parameter_settings = models.ForeignKey(
+        ARChallengeParameterSettings,
+        on_delete=models.CASCADE,
+        default=None,
+        null=True,
+        blank=True,
+        related_name="parameter_settings_scan_picture",
+        verbose_name=_("Parameter Settings")
+    )
 
     class Meta:
         verbose_name_plural = "Scans"
@@ -690,10 +652,8 @@ class ScanPicture(models.Model):
 
     def clean(self):
         super().clean()
-        if not self.file_image and not self.file_3d:
-            raise ValidationError(_("Image or 3D File is required."))
-        if self.file_image and self.file_3d:
-            raise ValidationError(_("You can not upload image and 3D file, only one of them."))
+        if not self.file_image:
+            raise ValidationError(_("Image is required."))
 
     def __str__(self):
         return self.name
@@ -765,14 +725,12 @@ class GeoArSite(models.Model):
     def __str__(self):
         return self.name
 
-
 class GeoARStar(models.Model):
 
     name = models.CharField(
         _("Name"), default=None, null=False, blank=False, max_length=255
     )
 
-    model_file = models.FileField(_("3D Model"), upload_to="ar/geo_star/", null=True, blank=True)
     parameter_settings = models.ForeignKey(
         ARChallengeParameterSettings, on_delete=models.CASCADE,
         related_name="geo_ar_stars", null=True, blank=True, verbose_name=_("Parameter Settings")
@@ -815,12 +773,11 @@ class GeoARStar(models.Model):
     )
 
     class Meta:
-        verbose_name_plural = "Geo AR Stars"
-        verbose_name = "Geo AR Star"
+        verbose_name_plural = "Geo AR Hunts"
+        verbose_name = "Geo AR Hunts"
 
     def __str__(self):
         return self.name
-
 
 class GeoARStarPoint(models.Model):
     geo_ar_star = models.ForeignKey(
@@ -836,18 +793,88 @@ class GeoARStarPoint(models.Model):
         help_text="Order of the star when following mode is 'SPECIFIC ORDER'"
     )
     image = models.FileField(upload_to="ar/geo_star_point/", blank=True, null=True)
+    #model_file = models.FileField(_("3D Model"), upload_to="ar/geo_star_point/", null=True, blank=True)
+    
+    
+    file_animation_android = models.FileField(_("Animation android"), upload_to="ar/geo_star_point/animation_android/",
+                                              null=True, blank=True)
+    file_animation_ios = models.FileField(_("Animation ios"), upload_to="ar/geo_star_point/animation_ios/",
+                                          null=True, blank=True)
+
     title = models.CharField(_("Title"), max_length=255, blank=True, null=True)
+    screen_title = models.JSONField(
+        _("Screen Title"), blank=True, null=True, help_text="Multiple titles to display on the screen (stored as a list)"
+    )
     fun_facts = RichTextField(_("Fun Facts"), blank=True, null=True)
-    elevation = models.IntegerField(null=True, blank=True)
+    elevation = models.IntegerField(_("Elevation"), null=True, blank=True, help_text="Elevation for this AR point")
     sponsors = models.ManyToManyField(Sponsor, related_name="stars", blank=True)
     points = models.IntegerField(verbose_name="Points", default=0)
 
     class Meta:
-        verbose_name_plural = "Geo AR Star Points"
-        verbose_name = "Geo AR Star Point"
+        verbose_name_plural = "Geo AR Hunt Points"
+        verbose_name = "Geo AR Hunt Point"
 
     def __str__(self):
         return f"{self.geo_ar_star.name} - Star #{self.order}"
+
+class ARExample(models.Model):
+    class Meta:
+        verbose_name_plural = "AR Example"
+
+    name = models.CharField(_("Name"), blank=True, null=True, max_length=255)
+    # image = models.ImageField(
+    #     upload_to="ar/example/",
+    #     blank=True,
+    #     null=True,
+    # )
+    # video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
+    description = RichTextField(_("Example Details"), blank=True, null=True)
+    any_where_challenges = models.ManyToManyField(Challenges, verbose_name="Any Where AR Challenges",
+                                                  related_name="ar_example_challenge", blank=True, default=None)
+    geo_challenges = models.ManyToManyField(GeoARChallenges, verbose_name="Geo AR Challenges",
+                                            related_name="geo_ar_example_challenge", blank=True, default=None)
+    geo_ar_scan = models.ManyToManyField(ScanPicture, verbose_name="Geo AR Scan",
+                                            related_name="geo_ar_scan", blank=True, default=None)
+
+    geo_ar_hunt = models.ManyToManyField(GeoARStar, verbose_name="Geo AR Hunt",
+                                            related_name="geo_ar_hunt", blank=True, default=None)
+
+    def __str__(self):
+        return str(
+            self.name
+        )
+
+
+class ARExampleImage(models.Model):
+    ar_example = models.ForeignKey(ARExample, on_delete=models.CASCADE, related_name="images")
+    image = models.ImageField(
+        upload_to="ar/example/",
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return f'AR Example Image Id: {self.id} - {self.ar_example.name}'
+
+
+class ARExampleVideo(models.Model):
+    ar_example = models.ForeignKey(ARExample, on_delete=models.CASCADE, related_name="videos")
+    video_file = models.FileField(upload_to="ar/example/", blank=True, null=True)
+
+    def __str__(self):
+        return f'AR Example Video Id: {self.id} - {self.ar_example.name}'
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 class GeoARSpecificSiteRoute(models.Model):

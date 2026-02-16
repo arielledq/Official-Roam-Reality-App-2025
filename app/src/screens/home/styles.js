@@ -1,6 +1,6 @@
 import {makeStyles} from "@rneui/themed";
 import {FontLineHeights, FontSizes, fontGroup} from "../../util/FontUtils";
-import {heightPercentageToDP} from "react-native-responsive-screen";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 /**
  *  Using makeStyles to set colors with theme.
@@ -119,6 +119,14 @@ const useStyles = makeStyles(theme => ({
     width: heightPercentageToDP("6%"),
     height: heightPercentageToDP("6%"),
     borderRadius: 100,
+  },
+  shadowBoxImage: {
+    width: widthPercentageToDP(12),
+    height: widthPercentageToDP(12),
+    borderRadius: widthPercentageToDP(100),
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: heightPercentageToDP(0.2),
   },
 }));
 

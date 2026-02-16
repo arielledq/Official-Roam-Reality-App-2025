@@ -1,0 +1,42 @@
+[Unit]
+Description=GPS UDP Listener for Band Tracking
+Documentation=file:///path/to/BAND_TRACKING_COMPLETE_GUIDE.md
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/path/to/Official-Roam-Reality-App-2025/backend
+Environment="PATH=/path/to/venv/bin:/usr/local/bin:/usr/bin:/bin"
+Environment="PYTHONPATH=/path/to/Official-Roam-Reality-App-2025/backend"
+Environment="DJANGO_SETTINGS_MODULE=travel_ar_app_42706.settings"
+
+# Use python3 explicitly
+ExecStart=/path/to/venv/bin/python3 manage.py listen_gps_updates --port 8001
+
+# Restart policy
+Restart=always
+RestartSec=10
+StartLimitBurst=5
+StartLimitIntervalSec=60
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=gps-listener
+
+# Security hardening (optional but recommended)
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/log/django
+
+# Resource limits (optional)
+LimitNOFILE=4096
+MemoryMax=512M
+
+[Install]
+WantedBy=multi-user.target

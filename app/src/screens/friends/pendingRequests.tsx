@@ -103,7 +103,7 @@ const renderFriendItem = (item: any, onAccept: any, onReject: any) => {
         alignItems: "center",
         backgroundColor: theme.lightColors?.inputBG,
         paddingVertical: 10,
-        paddingHorizontal: 20,
+        paddingHorizontal: 0,
         borderRadius: 10,
         marginVertical: 5,
       }}
@@ -123,11 +123,18 @@ const renderFriendItem = (item: any, onAccept: any, onReject: any) => {
           <Text style={{color: theme.lightColors?.white}}>{truncateText(from_user.email, 18)}</Text>
         </View>
       </View>
-      <View style={{flexDirection: "row"}}>
-        <Pressable style={{marginRight: 20, padding: 8}} onPress={() => onReject(item)}>
+      <View
+        style={{
+          flexDirection: "row",
+          marginRight: 20,
+
+          gap: 20,
+        }}
+      >
+        <Pressable onPress={() => onReject(item)}>
           <Icon name="close" type="antdesign" color="red" size={25} />
         </Pressable>
-        <Pressable onPress={() => onAccept(item)} style={{padding: 8}}>
+        <Pressable onPress={() => onAccept(item)}>
           <Icon name="check" type="antdesign" color="green" size={25} />
         </Pressable>
       </View>

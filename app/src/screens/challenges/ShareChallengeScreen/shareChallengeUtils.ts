@@ -58,9 +58,6 @@ export const challengeData = (
     );
   };
 
-  console.log("challengeType", challengeType);
-  console.log("challengeObj", challengeObj);
-
   switch (challengeType) {
     case CHALLENGES_TYPE.PHOTO_VIDEO:
       screenTitle = CHALLENGES_TYPE.PHOTO_VIDEO_TITLE;

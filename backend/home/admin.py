@@ -15,6 +15,7 @@ from modules.ar.challenges.models import (
     ARUserProfileScoreboard as ScoreboardModel, ARMemories,
     ARSitePinCheckIn, GeoLocation, Sponsor
 )
+from home.models import Mode
 
 
 class DestinationFilter(admin.SimpleListFilter):
@@ -202,3 +203,24 @@ class ScoreboardAdmin(admin.ModelAdmin):
 
     add_ar_memory.short_description = "Add AR Memory"
     add_ar_memory.allow_tags = True
+
+
+@admin.register(Mode)
+class ModeAdmin(admin.ModelAdmin):
+    list_display = ('name', 'status', 'description', 'sort_order', 'created_at', 'updated_at')
+    list_filter = ('status',)
+    search_fields = ('name', 'description')
+    list_editable = ('status', 'description', 'sort_order')
+    ordering = ('sort_order', 'name')
+
+    # Allow adding new modes
+    def has_add_permission(self, request):
+        return True
+
+    # Allow editing
+    def has_change_permission(self, request, obj=None):
+        return True
+
+    # Allow deleting (be careful with this)
+    def has_delete_permission(self, request, obj=None):
+        return True

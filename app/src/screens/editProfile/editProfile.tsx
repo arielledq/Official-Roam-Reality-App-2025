@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from "react";
-import {Image, Keyboard, Pressable, Text, View} from "react-native";
+import {Image, Keyboard, Pressable, Text, TextInput, View} from "react-native";
 import {Formik} from "formik";
 import {KeyboardAwareScrollView} from "react-native-keyboard-aware-scroll-view";
 import {Dropdown} from "react-native-element-dropdown";
@@ -12,7 +12,7 @@ import {Button, Dialog, Portal} from "react-native-paper";
 import {RootStackParamList, ScreenStackComponent} from "../../constants/types";
 import {DateFormat, formatDate} from "../../util/DateUtils";
 import {FontSizes} from "../../util/FontUtils";
-import {updateProfile} from "../../network";
+import {DeleteProfilePicture, updateProfile} from "../../network";
 import {accountSetupIsComplete, handleError, showMessage} from "../../util/helpers";
 import {updateAccountFlag} from "../../redux/Login";
 import {EditProfileSchema} from "../../util/ValidationSchemas";
@@ -34,7 +34,7 @@ import {ProfilePlaceholder} from "assets/base64";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useFocusEffect} from "@react-navigation/native";
 import ImagePicker from "react-native-image-crop-picker";
-import {widthPercentageToDP} from "react-native-responsive-screen";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import {height} from "util/AppDimensions";
 interface ImageData {
   uri: string | undefined;
@@ -63,6 +63,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 }) => {
   const edit = route?.params?.edit;
   const userData = route?.params?.profileDetails;
+  const extraInfo = route?.params?.extraInfo;
+  const accountNotComplete = route?.params?.accountNotComplete;
   const onProfileUpdate = route?.params?.onProfileUpdate;
 
   let dateOfBirth = null;
@@ -70,9 +72,12 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     const [year, month, day] = userData.date_of_birth.split("-").map(Number);
     dateOfBirth = new Date(year, month - 1, day);
   }
+
   const initialFormValues = {
     pImage: userData?.image ?? undefined,
-    name: userData?.user?.name ?? "",
+    name: accountNotComplete
+      ? `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`
+      : userData?.user?.name ?? "",
     gender: userData?.gender ?? undefined,
     phoneNumber: userData?.phone_number ?? "",
     address: userData?.home_address ?? "",
@@ -89,6 +94,8 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   const [isGenderDropDownFocused, setGenderDropDownFocused] = useState(false);
   const [photoDetails, setPhotoDetails] = useState<ImageData | null>(null);
   const [countryData, setCountryData] = useState<[]>([]);
+  const [filteredCountryData, setFilteredCountryData] = useState<[]>([]);
+  const [countrySearchText, setCountrySearchText] = useState("");
   const [bDate, setBDate] = useState<Date>(dateOfBirth);
   const [isLoading, setIsLoading] = useState(false);
   const [gender, setGender] = useState({
@@ -147,9 +154,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
       setFieldValue("pImage", croppedImage.path);
       uploadProfileImage(croppedImage);
-    } catch (error) {
-      console.log("Image picker cancelled or error:", error);
-    }
+    } catch (error) {}
   }
 
   const handleEditProfile = (values: any) => {
@@ -176,7 +181,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     if (!photoDetails?.default && photoDetails?.uri) {
       updatedProfileData.append("image", photoDetails);
     }
-    console.log("Updated Profile Data:", updatedProfileData);
+
     setIsLoading(true);
     updateProfile({
       id: userProfile.user_profile.id,
@@ -206,6 +211,18 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     const cleaned = input.replace(/\D/g, "");
 
     return cleaned;
+  };
+
+  const filterCountries = (searchText: string) => {
+    if (!searchText.trim()) {
+      setFilteredCountryData(countryData);
+      return;
+    }
+
+    const filtered = countryData.filter((country: any) =>
+      country.label.toLowerCase().startsWith(searchText.toLowerCase())
+    );
+    setFilteredCountryData(filtered);
   };
 
   const acceptWaiverButtonHandler = () => {
@@ -245,6 +262,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
           });
         }
         setCountryData(countryArray);
+        setFilteredCountryData(countryArray);
       })
       .catch(function (error) {
         console.error(error);
@@ -252,6 +270,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
 
     return () => {
       setCountryData([]);
+      setFilteredCountryData([]);
     };
   }, []);
 
@@ -266,10 +285,18 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
   useEffect(() => {
     if (userData && formikRef.current && !accountSetupIsComplete(userData)) {
       const dob = userData.date_of_birth ? new Date(userData.date_of_birth) : "";
+
+      let name = "";
+      if (accountNotComplete && (extraInfo?.first_name !== "" || extraInfo?.last_name !== "")) {
+        name = `${extraInfo?.first_name || ""} ${extraInfo?.last_name || ""}`;
+      } else {
+        name = userData?.user?.name ?? "";
+      }
       // @ts-ignore
+
       formikRef.current.setValues({
         pImage: userData?.image,
-        name: userData?.user?.name || "",
+        name: name,
         gender: userData?.gender || undefined,
         phoneNumber: userData?.phone_number || "",
         address: userData?.home_address || "",
@@ -286,6 +313,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
     }
   }, [userData]);
 
+  const handleDeleteAccount = async () => {
+    const rest = await DeleteProfilePicture();
+  };
+
   return (
     <BackgroundWithImage style={_styles.mainContainer}>
       <AppHeader
@@ -294,7 +325,7 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
         backgroundColor="transparent"
       />
 
-      <KeyboardAwareScrollView nestedScrollEnabled>
+      <KeyboardAwareScrollView>
         <Formik
           innerRef={formikRef}
           initialValues={initialFormValues}
@@ -317,6 +348,16 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <ProfileAvatar
                     onChangeProfilePic={() => pickImage(setFieldValue)}
                     avatarUrl={values.pImage}
+                    onDeleteProfilePic={async () => {
+                      setFieldValue("pImage", undefined);
+                      setPhotoDetails({
+                        uri: undefined,
+                        type: undefined,
+                        name: "",
+                        default: true,
+                      });
+                      const res = await DeleteProfilePicture();
+                    }}
                   />
 
                   {/* Name */}
@@ -496,8 +537,10 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                   <View style={_styles.dropdownParentView}>
                     <Dropdown
                       autoScroll={false}
+                      mode="default"
                       style={[
                         _styles.dropdown,
+
                         touched.country && errors?.country && !values.country
                           ? _styles.inputError
                           : {},
@@ -512,24 +555,49 @@ const EditProfile: ScreenStackComponent<RootStackParamList, "EditProfile"> = ({
                       }}
                       containerStyle={{
                         borderWidth: 0,
-                        backgroundColor: "transparent",
+                        backgroundColor: theme.lightColors?.grey4,
+                        marginTop: heightPercentageToDP("0.5%"),
                       }}
-                      inputSearchStyle={{
-                        color: theme.lightColors?.white,
-                        fontSize: FontSizes.S14,
-                        borderWidth: 0,
-                        borderBottomWidth: 1,
-                        backgroundColor: theme.lightColors?.inputBG,
-                      }}
+                      // inputSearchStyle={{
+                      //   color: theme.lightColors?.white,
+                      //   fontSize: FontSizes.S14,
+                      //   borderWidth: 1,
+                      //   borderBottomWidth: 0,
+                      //   backgroundColor: theme.lightColors?.inputBG,
+
+                      // }}
+                      renderInputSearch={() => (
+                        <TextInput
+                          style={{
+                            ..._styles.input,
+                            backgroundColor: theme.lightColors?.inputBG,
+                            borderWidth: 1,
+                            borderColor: theme.lightColors?.white,
+                            color: theme.lightColors?.white,
+                          }}
+                          placeholder="Search Country"
+                          placeholderTextColor={theme.lightColors?.grey0}
+                          selectionColor={"white"}
+                          autoCapitalize="none"
+                          value={countrySearchText}
+                          onChangeText={text => {
+                            setCountrySearchText(text);
+                            filterCountries(text);
+                          }}
+                        />
+                      )}
                       searchPlaceholder="Search Country"
                       searchPlaceholderTextColor={theme.lightColors?.grey0}
                       activeColor={theme.lightColors?.inputBlue}
-                      itemContainerStyle={_styles.itemContainerStyle}
+                      itemContainerStyle={{
+                        color: theme.lightColors?.grey0,
+                      }}
+                      keyboardAvoiding={true}
                       itemTextStyle={_styles.placeholderStyle}
                       selectedTextStyle={_styles.selectedTextStyle}
                       iconStyle={_styles.iconStyle}
-                      data={countryData}
-                      maxHeight={300}
+                      data={filteredCountryData}
+                      // maxHeight={300}
                       labelField="label"
                       placeholder="Home Country"
                       search

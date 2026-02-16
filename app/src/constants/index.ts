@@ -46,7 +46,8 @@ export const ELEMENTSUNITY = [
   "Details",
   "CompassArrow",
   "Distancia",
-  "Arrow",]
+  "Arrow",
+];
 
 export const EXPERIENCE_TYPE_CHOICES = {
   AR_CHALLENGE: "AR_CHALLENGE",
@@ -140,7 +141,6 @@ export const AR_MODES_MENU = [
 ];
 
 export type ARModeMenuType = (typeof AR_MODES_MENU)[keyof typeof AR_MODES_MENU];
-
 
 export const TEST_HUNT_CHALLENGE = {
   id: 102,
@@ -332,4 +332,121 @@ export const TEST_HUNT_CHALLENGE = {
     modeSubTitle2: "TAP the AR to Capture",
     icon: "huntMode",
   },
+};
+
+export const AR_MODE_MESSAGES = {
+  deafultView: [
+    {
+      id: 1,
+      message: "Choose your AR MODE",
+    },
+    {
+      id: 2,
+      message: "Be aware of your surroundings",
+    },
+  ],
+  CALIBRATION: [
+    {
+      id: 1,
+      message: "Proper calibration prevents Geo-AR inconsistencies",
+    },
+    {
+      id: 2,
+      message:
+        "Inconsistencies in cell service can lead to variations in Geo-AR position, up to 15M",
+    },
+    {
+      id: 3,
+      message: "Geo-AR works best in wide open outdoor areas, away from buildings or objects",
+    },
+    {
+      id: 4,
+      message: "Click RESET to re-calibrate at any point",
+    },
+  ],
+  LIVE_VIEW_HUNT_MODE: [
+    {
+      id: 1,
+      message: "Go on a guided hunt to find hidden AR",
+    },
+    {
+      id: 2,
+      message: "Find the AR, and tap/click it.",
+    },
+    {
+      id: 3,
+      message: "Any inconsistencies, click reset to re-calibrate.",
+    },
+  ],
+  LIVE_VIEW_SCAN_MODE: [
+    {
+      id: 1,
+      message: "Find the AR, capture image or video",
+    },
+    {
+      id: 2,
+      message: "Tap for photo or press for video",
+    },
+    {
+      id: 3,
+      message: "Any inconsistencies, click reset to re-calibrate",
+    },
+  ],
+  LIST_VIEW: [
+    {
+      id: 1,
+      message: "Access the AR at this site\nin list format",
+    },
+    {
+      id: 2,
+      message: "Access a full list, or filter by brand",
+    },
+    {
+      id: 3,
+      message: "Users have a limited # of\nattempts every 24hrs",
+    },
+    {
+      id: 4,
+      message: "After the 24hr cooldown period, attempts are reset",
+    },
+
+    {
+      id: 6,
+      message: "Any inconsistencies, click refresh",
+    },
+    {
+      id: 7,
+      message: "List empty? Try changing modes",
+    },
+  ],
+  MAP_VIEW: [
+    {
+      id: 1,
+      message: "Map displays all AR nearby",
+    },
+    {
+      id: 2,
+      message: "Map shows AR related to the selected mode only",
+    },
+    {
+      id: 3,
+      message: "Users can change modes to update the AR displayed",
+    },
+    {
+      id: 4,
+      message: "Click the AR to load pathway",
+    },
+    {
+      id: 5,
+      message: "Users can zoom or drag the map",
+    },
+    {
+      id: 6,
+      message: "When nearby, switch to LIVE view, to engage the AR",
+    },
+    {
+      id: 7,
+      message: "Any inconsistencies, click reset",
+    },
+  ],
 };

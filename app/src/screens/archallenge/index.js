@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 
 import {
   ActivityIndicator,
@@ -9,18 +9,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { handleError } from "../../util/helpers";
-import { getARChallenges, getARProfile, getARStettings, getMyRank } from "../../network";
+import {handleError} from "../../util/helpers";
+import {getARChallenges, getARProfile, getARStettings, getMyRank} from "../../network";
 import BackgroundWithImage from "../../components/background";
 import AppHeader from "../../components/header";
 import AppText from "../../components/text";
-import { useNavigation } from "@react-navigation/native";
+import {useNavigation} from "@react-navigation/native";
 import PointBoardBG from "../../assets/ar/point_board_bg.png";
-import { updateARUserData, updateARSettings } from "../../redux/AR";
+import {updateARUserData, updateARSettings} from "../../redux/AR";
 
-import { useDispatch, useSelector } from "react-redux";
+import {useDispatch, useSelector} from "react-redux";
 import useStyles from "./styles";
-import { EXPERIENCE_TYPE_CHOICES } from "constants";
+import {EXPERIENCE_TYPE_CHOICES} from "constants";
 
 const ArChallenge = ({}) => {
   const _styles = useStyles();
@@ -31,8 +31,8 @@ const ArChallenge = ({}) => {
   const [sponsoredData, setSponsoredData] = useState([]);
   const arProfile = useSelector(state => state.ar?.arProfile);
   const navigation = useNavigation();
-  const [globalPoints, setGlobalPoints] = useState(0)
-  const [globalRank, setGlobalRank] = useState(0)
+  const [globalPoints, setGlobalPoints] = useState(0);
+  const [globalRank, setGlobalRank] = useState(0);
 
   const ARSposored = () => {
     setIsLoading(true);
@@ -97,7 +97,6 @@ const ArChallenge = ({}) => {
     getMyRank(destination)
       .then(response => {
         if (response) {
-          console.log("response", JSON.stringify(response, null, 2));
           setGlobalRank(response?.my_rank || 0);
           setGlobalPoints(response?.my_points || 0);
 
@@ -112,7 +111,7 @@ const ArChallenge = ({}) => {
     ARSposored();
     ARUserProfile();
     getSettings();
-    getMyRankPoints()
+    getMyRankPoints();
   }, []);
 
   const navigateToChallengeDetails = obj => {
@@ -123,10 +122,10 @@ const ArChallenge = ({}) => {
     });
   };
 
-  const Item = ({ obj }) => (
+  const Item = ({obj}) => (
     <TouchableOpacity onPress={() => navigateToChallengeDetails(obj)} style={_styles.list_item}>
-      <Image style={_styles.list_image} resizeMode="stretch" source={{ uri: obj.image }} />
-      <View style={[_styles.list_image, { backgroundColor: "#00000080" }]} />
+      <Image style={_styles.list_image} resizeMode="stretch" source={{uri: obj.image}} />
+      <View style={[_styles.list_image, {backgroundColor: "#00000080"}]} />
       <Text style={_styles.list_title}>{obj.name}</Text>
       <Text style={_styles.s_list_title}>Sponsored By {obj.sponsored.name}</Text>
     </TouchableOpacity>
@@ -142,7 +141,7 @@ const ArChallenge = ({}) => {
         backgroundColor="transparent"
       />
       <View style={_styles.rowView}>
-        <View style={{ flex: 0.5 }}>
+        <View style={{flex: 0.5}}>
           <AppText style={[_styles.headerText]}>Choose Your AR Challenge</AppText>
           <AppText style={[_styles.subHeaderText]}>Sponsored</AppText>
         </View>
@@ -183,10 +182,10 @@ const ArChallenge = ({}) => {
 
       {isLoading && <ActivityIndicator size="large" />}
       <FlatList
-        style={{ flex: 1, marginVertical: 15 }}
+        style={{flex: 1, marginVertical: 15}}
         data={sponsoredData}
         numColumns={2}
-        renderItem={({ item }) => <Item obj={item} />}
+        renderItem={({item}) => <Item obj={item} />}
         keyExtractor={item => item.id}
       />
     </BackgroundWithImage>

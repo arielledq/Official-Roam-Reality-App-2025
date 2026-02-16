@@ -154,7 +154,7 @@ const styles = StyleSheet.create({
   modalContent: {
     backgroundColor: "transparent",
     borderRadius: 8,
-    paddingHorizontal: 16,
+    // paddingHorizontal: 16,
     paddingVertical: 24,
     alignItems: "center",
     gap: 16,

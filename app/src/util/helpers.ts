@@ -221,11 +221,11 @@ export const accountSetupIsComplete = (userObj: any) => {
     userObj?.user?.email &&
     userObj?.user?.name &&
     userObj?.user?.user_profile?.account_setup &&
-    userObj?.user?.user_profile?.phone_number &&
-    userObj?.user?.user_profile?.home_address &&
-    userObj?.user?.user_profile?.gender &&
-    userObj?.user?.user_profile?.home_country &&
-    userObj?.date_of_birth
+    userObj?.user?.user_profile?.phone_number
+    // userObj?.user?.user_profile?.home_address &&
+    // userObj?.user?.user_profile?.gender &&
+    // userObj?.user?.user_profile?.home_country &&
+    // userObj?.date_of_birth
   ) {
     isComplete = true;
   }
@@ -391,7 +391,7 @@ export const saveToGallery = async (
         // Clean up the temporary downloaded file
         setTimeout(() => {
           RNFS.unlink(tempFilePath)
-            .then(() => console.log("Temporary file deleted."))
+            .then(() => {})
             .catch(err => console.log("Error deleting temporary file:", err));
         }, 1000);
       } else {
@@ -416,7 +416,6 @@ export const checkAppLatestUpdate = async () => {
 
       // Extract app version from API response
       const configurations = await getConfiguration();
-
       const configurationItemKeys = Object.keys(configurations);
       configurationItemKeys.forEach(configItemKey => {
         const configurationContent = Object.keys(configurations[configItemKey]);
@@ -433,30 +432,16 @@ export const checkAppLatestUpdate = async () => {
       // Validate app version
       if (serverIOSProdVersionNumber === Config.APP_IOS_PROD_VERSION) {
         isUpdated = true;
-        console.info("App updated on PROD");
       } else {
-        console.info(
-          "App not updated on PROD:",
-          serverIOSProdVersionNumber,
-          "!==",
-          Config.APP_IOS_PROD_VERSION
-        );
       }
       if (serverIOSDevVersionNumber === Config.APP_IOS_DEV_VERSION) {
         isUpdated = true;
-        console.info("App updated on DEV");
       } else {
-        console.info(
-          "App not updated on DEV:",
-          serverIOSDevVersionNumber,
-          "!==",
-          Config.APP_IOS_DEV_VERSION
-        );
       }
     } catch (error) {
       console.error(error);
     }
-    console.log("isUpdated", isUpdated);
+
     return isUpdated;
   } else {
     return true;
@@ -487,10 +472,9 @@ export const copyFileForDisplay = async (capturedDataUri: string | null) => {
   const newPath = `${RNFS.CachesDirectoryPath}/${newFileName}`;
 
   try {
-    console.log(`Attempting to copy from ${sourceUri} to ${newPath}`);
     await RNFS.copyFile(sourceUri, newPath);
     const fileUriForDisplay = `file://${newPath}`; // Ensure file:// prefix for Image source
-    console.log("Media copied successfully to:", fileUriForDisplay);
+
     return fileUriForDisplay; // Return the new URI for the Image source
   } catch (error) {
     console.error(`Error copying media from ${sourceUri} to ${newPath}:`, error);
@@ -504,15 +488,12 @@ export const handleUnzipProcess = async (sourcePath, targetPath) => {
   try {
     // Ensure the target directory exists
     await RNFS.mkdir(targetPath);
-    console.log(`Target directory created/exists at: ${targetPath}`);
 
     // 1. Read the zip file content using react-native-fs
     const zipContentBase64 = await RNFS.readFile(sourcePath, "base64");
-    console.log(`Zip file "${sourcePath}" read into memory.`);
 
     // 2. Load the content into JSZip
     const zip = await JSZip.loadAsync(zipContentBase64, {base64: true});
-    console.log("Zip content loaded into JSZip.");
 
     const fileExtractionPromises = [];
 
@@ -529,9 +510,7 @@ export const handleUnzipProcess = async (sourcePath, targetPath) => {
               // Extract the file content as base64
               return zipEntry.async("base64").then(fileContentBase64 => {
                 // 4. Write the extracted file content to the target path
-                return RNFS.writeFile(fullTargetPath, fileContentBase64, "base64").then(() => {
-                  console.log(`Extracted and wrote: ${relativePath} to ${fullTargetPath}`);
-                });
+                return RNFS.writeFile(fullTargetPath, fileContentBase64, "base64").then(() => {});
               });
             })
             .catch(mkdirErr => {
@@ -540,17 +519,14 @@ export const handleUnzipProcess = async (sourcePath, targetPath) => {
             })
         );
       } else {
-        console.log(`Skipping directory entry: ${relativePath}`); // Optional: log directories
       }
     });
 
     // 5. Wait for all file extraction and writing promises to complete
     await Promise.all(fileExtractionPromises);
-    console.log("All files extracted and written to target directory.");
 
     // 6. Read the contents of the target directory
     const result = await RNFS.readDir(targetPath); // Await readDir
-    console.log("Reading target directory:", targetPath);
 
     const sourcesArray = [];
     let objFile = null;
@@ -560,7 +536,6 @@ export const handleUnzipProcess = async (sourcePath, targetPath) => {
 
     result.forEach(file => {
       const filePath = Platform.OS === "android" ? `file://${file.path}` : file.path;
-      console.log(`Found file in target directory: ${file.name} at ${filePath}`);
 
       if (file.name.includes(".obj")) {
         objFile = filePath;

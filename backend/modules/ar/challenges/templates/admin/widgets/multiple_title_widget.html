@@ -1,0 +1,89 @@
+<div class="multiple-title-widget" data-field-name="{{ widget.name }}">
+    <div id="title-inputs-container">
+        {% for title in widget.value %}
+            <div class="title-input-row" style="margin-bottom: 10px;">
+                <input type="text" 
+                       name="{{ widget.name }}_{{ forloop.counter0 }}" 
+                       value="{{ title }}" 
+                       class="title-input" 
+                       placeholder="Enter title {{ forloop.counter }}"
+                       style="width: 70%; padding: 8px; margin-right: 10px;">
+                <button type="button" 
+                        class="remove-title-btn" 
+                        style="padding: 8px 15px; background-color: #ba2121; color: white; border: none; cursor: pointer; border-radius: 4px;">
+                    Remove
+                </button>
+            </div>
+        {% endfor %}
+    </div>
+    <button type="button" 
+            id="add-title-btn" 
+            style="margin-top: 10px; padding: 10px 20px; background-color: #417690; color: white; border: none; cursor: pointer; border-radius: 4px;">
+        + Add Another Title
+    </button>
+</div>
+
+<script>
+(function() {
+    const container = document.querySelector('.multiple-title-widget[data-field-name="{{ widget.name }}"]');
+    if (!container) return;
+    
+    const addBtn = container.querySelector('#add-title-btn');
+    const inputsContainer = container.querySelector('#title-inputs-container');
+    const fieldName = container.getAttribute('data-field-name');
+    
+    let inputIndex = inputsContainer.querySelectorAll('.title-input-row').length;
+    
+    // Add new title input
+    addBtn.addEventListener('click', function() {
+        const row = document.createElement('div');
+        row.className = 'title-input-row';
+        row.style.marginBottom = '10px';
+        
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.name = fieldName + '_' + inputIndex;
+        input.className = 'title-input';
+        input.placeholder = 'Enter title ' + (inputIndex + 1);
+        input.style.width = '70%';
+        input.style.padding = '8px';
+        input.style.marginRight = '10px';
+        
+        const removeBtn = document.createElement('button');
+        removeBtn.type = 'button';
+        removeBtn.className = 'remove-title-btn';
+        removeBtn.textContent = 'Remove';
+        removeBtn.style.padding = '8px 15px';
+        removeBtn.style.backgroundColor = '#ba2121';
+        removeBtn.style.color = 'white';
+        removeBtn.style.border = 'none';
+        removeBtn.style.cursor = 'pointer';
+        removeBtn.style.borderRadius = '4px';
+        
+        removeBtn.addEventListener('click', function() {
+            const rows = inputsContainer.querySelectorAll('.title-input-row');
+            // Don't allow removing the last input
+            if (rows.length > 1) {
+                row.remove();
+            }
+        });
+        
+        row.appendChild(input);
+        row.appendChild(removeBtn);
+        inputsContainer.appendChild(row);
+        inputIndex++;
+    });
+    
+    // Remove title input
+    container.querySelectorAll('.remove-title-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            const rows = inputsContainer.querySelectorAll('.title-input-row');
+            // Don't allow removing the last input
+            if (rows.length > 1) {
+                this.closest('.title-input-row').remove();
+            }
+        });
+    });
+})();
+</script>
+

@@ -11,7 +11,13 @@ from home.api.v1.viewsets import (
     SendEmailOtpViewset,
     SignupViewSet,
     LoginViewSet, ScoreViewSet,
+    ModeViewSet,
+    ScanMapViewSet,
+    HuntMapViewSet,
 )
+
+# Import randomizer_challenge URLs
+from randomizer_challenge import urls as randomizer_urls
 
 router = DefaultRouter()
 router.register("signup", SignupViewSet, basename="signup")
@@ -21,6 +27,9 @@ router.register("confirm-email-otp", ConfirmEmailOtpViewset, basename="confirm_e
 router.register("account-setup", AccountSetupViewset, basename="account-setup")
 router.register("scoreboard", ScoreViewSet, basename="scoreboard")
 router.register("friends", FriendshipViewSet, basename="friends")
+router.register("modes", ModeViewSet, basename="modes")
+router.register("map/scans", ScanMapViewSet, basename="map-scans")
+router.register("map/hunts", HuntMapViewSet, basename="map-hunts")
 
 urlpatterns = [
     path("", include(router.urls)),
@@ -32,5 +41,8 @@ urlpatterns = [
     path("reset-password/", ResetPasswordView.as_view(), name="reset-password"),
     path("invite-friend/", InviteFriendAPIview.as_view(), name="invite_friend"),
     path("find-friends/", FindFriendsAPIView.as_view(), name="find-friends"),
+
+    # Randomizer Challenge URLs
+    path("", include(randomizer_urls)),
 
 ]

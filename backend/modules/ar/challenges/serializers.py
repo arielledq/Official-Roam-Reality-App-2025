@@ -80,13 +80,50 @@ class ExampleVideoSerializer(serializers.ModelSerializer):
         fields = ["id", "ar_example", "video_file",]
 
 
+class SimpleScanPictureSerializer(serializers.ModelSerializer):
+    """Simplified serializer for ScanPicture in ARExample context"""
+    file_image = serializers.ImageField()
+    icon = serializers.ImageField()
+    
+    class Meta:
+        model = ScanPicture
+        fields = ["id", "name", "file_image", "icon", "info", "coordinates", "points"]
+
+
+class SimpleGeoARStarPointSerializer(serializers.ModelSerializer):
+    """Simplified serializer for GeoARStarPoint in ARExample context"""
+    image = serializers.ImageField()
+    model_file = serializers.FileField()
+    screen_title = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = GeoARStarPoint
+        fields = ["id", "title", "screen_title", "image", "model_file", "fun_facts", "elevation", "points", "order"]
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
+
+
 class ExamplesSerializer(serializers.ModelSerializer):
     images = ExampleImageSerializer(many=True)
     videos = ExampleVideoSerializer(many=True)
+    geo_ar_scan = SimpleScanPictureSerializer(many=True, read_only=True)
+    geo_ar_hunt_point = SimpleGeoARStarPointSerializer(many=True, read_only=True)
 
     class Meta:
         model = ARExample
-        fields = ["id", "name", "description", "any_where_challenges", "geo_challenges", "images", "videos",]
+        fields = ["id", "name", "description", "any_where_challenges", "geo_challenges", "images", "videos", "geo_ar_scan", "geo_ar_hunt_point",]
 
 
 class ARChallengeParameterSettingsSerializer(serializers.ModelSerializer):
@@ -229,17 +266,32 @@ class ScanPictureSerializer(serializers.ModelSerializer):
     file_image = serializers.ImageField()
     file_animation_android = RandomDownloadNameS3FileField()
     file_animation_ios = RandomDownloadNameS3FileField()
-    file_3d = RandomDownloadNameS3FileField()
     icon = serializers.ImageField()
     sponsor = SponsorSerializer()
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
     user_attempts = serializers.SerializerMethodField()
     cooldown = serializers.SerializerMethodField()
+    screen_title = serializers.SerializerMethodField()
 
     class Meta:
         model = ScanPicture
         geo_field = ('coordinates',)
-        fields = ['id', 'name', 'file_image', 'file_3d', 'icon', 'file_animation_android', 'file_animation_ios',
-                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation",]
+        fields = ['id', 'name', 'screen_title', 'file_image', 'icon', 'file_animation_android', 'file_animation_ios',
+                  'sponsor', 'info', 'coordinates', 'attempts', 'points', "user_attempts", "cooldown", "elevation", 'parameters']
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
 
     def get_user_attempts(self, obj):
         request = self.context.get('request', None)
@@ -428,7 +480,6 @@ class GeoStarSimpleSerializer(GeoModelSerializer):
             "following_mode",
             'attempts',
             'user_attempts',
-            "model_file",
             "parameters",
 
         )
@@ -842,7 +893,11 @@ class GeoStarPointSerializer(GeoModelSerializer):
     hunt_captured_stars = serializers.SerializerMethodField()
     total_stars = serializers.SerializerMethodField()
     image = serializers.ImageField()
+    # model_file = serializers.FileField()
+    file_animation_android = serializers.FileField()
+    file_animation_ios = serializers.FileField()
     sponsors = SponsorSerializer(many=True)
+    screen_title = serializers.SerializerMethodField()
 
     class Meta:
         model = GeoARStarPoint
@@ -857,12 +912,30 @@ class GeoStarPointSerializer(GeoModelSerializer):
             "hunt_captured_stars",
             "total_stars",
             "image",
+            # "model_file",
+            "file_animation_android",
+            "file_animation_ios",
             "title",
+            "screen_title",
             "fun_facts",
             "elevation",
             "sponsors",
             'points',
         )
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
 
     def get_remaining_stars(self, instance):
         ar_star = instance.geo_ar_star
@@ -994,10 +1067,17 @@ class PanicMessageSerializer(GeoModelSerializer):
 
 class ARAllMemoriesSerializer(serializers.Serializer):
     def to_representation(self, instance):
+        from randomizer_challenge.models import RandomizerSubmission
+        from randomizer_challenge.serializers import RandomizerSubmissionSerializer
+
         if isinstance(instance, ARMemories):
             return ARMemoriesSerializerGet(instance, context=self.context).data
         elif isinstance(instance, ARSitePinCheckIn):
             return ARSitePinCheckInSerializer(instance, context=self.context).data
+        elif isinstance(instance, RandomizerSubmission):
+            data = RandomizerSubmissionSerializer(instance, context=self.context).data
+            data['memory_source'] = 'randomizer'
+            return data
         return {}
 
 

@@ -159,6 +159,14 @@ export const updateProfile = payload =>
     },
     logoutFunc
   );
+export const DeleteProfilePicture = payload =>
+  Request.multiPartCall(
+    {
+      url: `${commonApiRoute}account-setup/delete-profile-image/`,
+      method: "DELETE",
+    },
+    logoutFunc
+  );
 export const getARChallenges = () =>
   Request.callWithToken(
     {
@@ -238,12 +246,57 @@ export const getNextStar = payload =>
     },
     logoutFunc
   );
+
 export const starFoundAndSaveApi = payload =>
   Request.callWithToken(
     {
       url: `modules/challenges/geo-ar-star-collect/`,
       method: "POST",
       data: payload,
+    },
+    logoutFunc
+  );
+
+export const getAvailableARModes = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}modes/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
+export const getAllHunts = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}map/hunts/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
+export const getAllScans = () =>
+  Request.callWithToken(
+    {
+      url: `${commonApiRoute}map/scans/`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+
+export const getArHuntExamples = id =>
+  Request.callAR(
+    {
+      url: `modules/challenges/examples/get-by-hunt-id/?id=${id}`,
+      method: "GET",
+    },
+    logoutFunc
+  );
+export const getArScanExamples = id =>
+  Request.callAR(
+    {
+      url: `modules/challenges/examples/get-by-scan-id/?id=${id}`,
+      method: "GET",
     },
     logoutFunc
   );
@@ -423,10 +476,10 @@ export const getProfieARMemoriesAPI = () =>
     },
     logoutFunc
   );
-export const getPublicProfieARMemoriesAPI = user_id =>
+export const getPublicProfieARMemoriesAPI = (user_id, pageNo, page_size) =>
   Request.callWithToken(
     {
-      url: `modules/challenges/all-memories/public/?user_id=${user_id}`,
+      url: `modules/challenges/all-memories/public/?user_id=${user_id}&page=${pageNo}&page_size=${page_size}`,
       method: "GET",
     },
     logoutFunc
@@ -567,7 +620,6 @@ export const getScoreboardList = (pageNumber = 1, destination = "", sponsor = ""
     (sponsor ? `&sponsor=${sponsor}` : "") +
     (destination ? `&destination=${destination}` : "");
 
-  console.log("Scoreboard Query Params:", queryParams);
   return Request.callWithToken(
     {
       url: `${commonApiRoute}scoreboard/${queryParams}`,

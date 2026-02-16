@@ -15,6 +15,9 @@ from users.models import FriendshipRequest, Notification, UserProfile
 from rest_framework.authtoken.models import Token
 
 from home.utils import EmailOTP
+from home.models import Mode
+from modules.ar.challenges.models import ScanPicture, GeoARStar, GeoARStarPoint
+from modules.ar.challenges.serializers import SponsorSerializer, ARChallengeParameterSettingsSerializer
 
 
 User = get_user_model()
@@ -91,7 +94,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['id', 'email', 'name', 'user_profile', 'ar_user_profile_user', 'type', 'geo_ar_site_band_user',
+        fields = ['id', 'email', 'name', 'first_name','last_name', 'user_profile', 'ar_user_profile_user', 'type', 'geo_ar_site_band_user',
                   'is_band_location_active', 'has_receive_points',]
 
     def get_is_band_location_active(self, instance):
@@ -176,6 +179,7 @@ class AccountSetupSerializer(serializers.ModelSerializer):
 
 class FriendshipRequestSerializer(serializers.ModelSerializer):
     from_user = UserSerializer()
+    from_user_id = serializers.IntegerField(source='from_user.id', read_only=True)
     to_user = UserSerializer()
 
     class Meta:
@@ -188,3 +192,114 @@ class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
         fields = '__all__'
+
+
+class ModeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Mode
+        fields = ['id', 'name', 'status', 'description', 'sort_order', 'created_at', 'updated_at']
+        read_only_fields = ['id', 'created_at', 'updated_at']
+
+
+class StarPointMapSerializer(serializers.ModelSerializer):
+    """Serializer for star points in map view"""
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    image = serializers.ImageField(required=False, allow_null=True)
+    model_file = serializers.FileField(required=False, allow_null=True)
+    screen_title = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = GeoARStarPoint
+        fields = [
+            'id', 'title', 'screen_title', 'image', 'model_file', 
+            'fun_facts', 'elevation', 'points', 'order', 
+            'latitude', 'longitude'
+        ]
+    
+    def get_latitude(self, obj):
+        if obj.location:
+            return obj.location.coords[1]  # lat is y coordinate
+        return None
+    
+    def get_longitude(self, obj):
+        if obj.location:
+            return obj.location.coords[0]  # lng is x coordinate
+        return None
+    
+    def get_screen_title(self, obj):
+        """Ensure screen_title is always returned as a list"""
+        if obj.screen_title is None:
+            return []
+        if isinstance(obj.screen_title, list):
+            return obj.screen_title
+        if isinstance(obj.screen_title, str):
+            import json
+            try:
+                return json.loads(obj.screen_title)
+            except (json.JSONDecodeError, TypeError):
+                return []
+        return []
+
+
+class HuntMapSerializer(serializers.ModelSerializer):
+    """Serializer for hunts in map view"""
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    star_points = serializers.SerializerMethodField()
+    sponsor = SponsorSerializer(source='sponsors', many=True, read_only=True)
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True)
+    
+    class Meta:
+        model = GeoARStar
+        fields = [
+            'id', 'name', 'fun_facts', 'info', 'visibility_radius',
+            'following_mode', 'attempts', 'cooldown_hours',
+            'latitude', 'longitude', 'star_points', 'sponsor', 'parameters'
+        ]
+    
+    def get_latitude(self, obj):
+        if obj.geo_site and obj.geo_site.lat_long:
+            return obj.geo_site.lat_long.coords[1]  # lat is y coordinate
+        return None
+    
+    def get_longitude(self, obj):
+        if obj.geo_site and obj.geo_site.lat_long:
+            return obj.geo_site.lat_long.coords[0]  # lng is x coordinate
+        return None
+    
+    def get_star_points(self, obj):
+        """Get all star points for this hunt"""
+        star_points = obj.stars.all().order_by('order')
+        return StarPointMapSerializer(star_points, many=True, context=self.context).data
+
+
+class ScanMapSerializer(serializers.ModelSerializer):
+    """Serializer for scans in map view"""
+    latitude = serializers.SerializerMethodField()
+    longitude = serializers.SerializerMethodField()
+    file_image = serializers.ImageField(required=False, allow_null=True)
+    file_animation_android = serializers.FileField(required=False, allow_null=True)
+    file_animation_ios = serializers.FileField(required=False, allow_null=True)
+    icon = serializers.ImageField(required=False, allow_null=True)
+    sponsor = SponsorSerializer(required=False, allow_null=True)
+    parameters = ARChallengeParameterSettingsSerializer(source='parameter_settings', read_only=True, allow_null=True)
+    
+    class Meta:
+        model = ScanPicture
+        fields = [
+            'id', 'name', 'screen_title', 'file_image', 
+            'icon', 'file_animation_android', 'file_animation_ios',
+            'sponsor', 'info', 'attempts', 'cooldown_hours', 'points', 
+            'elevation', 'latitude', 'longitude', 'parameters'
+        ]
+    
+    def get_latitude(self, obj):
+        if obj.coordinates:
+            return obj.coordinates.coords[1]  # lat is y coordinate
+        return None
+    
+    def get_longitude(self, obj):
+        if obj.coordinates:
+            return obj.coordinates.coords[0]  # lng is x coordinate
+        return None

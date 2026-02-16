@@ -6,7 +6,6 @@ from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExampl
 from rest_framework.filters import SearchFilter
 from rest_framework.mixins import ListModelMixin
 from rest_framework.pagination import PageNumberPagination
-
 from feedback.models import ReportedContent
 from rest_framework.authtoken.serializers import AuthTokenSerializer
 from rest_framework.viewsets import ModelViewSet, ViewSet, GenericViewSet
@@ -21,7 +20,7 @@ from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import viewsets
 from home.api.v1.filters import ScoreFilterSet
-from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation, ARSitePinCheckIn
+from modules.ar.challenges.models import ARUserProfile, ARMemories, Sponsor, GeoLocation, ARSitePinCheckIn, ScanPicture, GeoARStar
 from notifications.models import NotificationTypes
 from onesignal_client.utils import send_notification
 from users.models import FriendshipRequest, Notification, UserProfile
@@ -41,7 +40,11 @@ from home.api.v1.serializers import (
     SignupSerializer,
     UserProfileSerializer,
     UserSerializer,
+    ModeSerializer,
+    ScanMapSerializer,
+    HuntMapSerializer,
 )
+from home.models import Mode
 from django.db.models import Q
 import re
 from functools import reduce
@@ -73,16 +76,17 @@ class SignupViewSet(ModelViewSet):
             if configs.NUMBER_USER_POINT_GIFT < configs.LIMIT_USER_POINT_GIFT:
                 profileObj.points += configs.POINTS_GIFT
                 profileObj.save()
-                sponsor = Sponsor.objects.get(name='BONUS')
-                geo_location = GeoLocation.objects.get(name='BONUS')
-                ARMemories.objects.create(
-                    points=configs.POINTS_GIFT,
-                    sponsor=sponsor,
-                    geo_location=geo_location,
-                    memory_type='BONUS',
-                    user=user,
-                )
-                configs.NUMBER_USER_POINT_GIFT += 1
+                # sponsor = Sponsor.objects.get(name='BONUS')
+                # geo_location = GeoLocation.objects.get(name='BONUS')
+                # ARMemories.objects.create(
+                #     points=configs.POINTS_GIFT,
+                #     sponsor=sponsor,
+                #     geo_location=geo_location,
+                #     memory_type='BONUS',
+                #     user=user,
+                # )
+                
+                # configs.NUMBER_USER_POINT_GIFT += 1
 
                 send_notification(
                     NotificationTypes.DEFAULT,
@@ -213,7 +217,7 @@ class AccountSetupViewset(ModelViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
     serializer_class = AccountSetupSerializer
-    http_method_names = ["get", "patch"]
+    http_method_names = ["get", "patch", "delete"]
 
     def get_queryset(self):
         user_id = self.kwargs.get('pk')
@@ -221,6 +225,43 @@ class AccountSetupViewset(ModelViewSet):
             return UserProfile.objects.filter(pk=user_id)
         else:
             return UserProfile.objects.filter(user=self.request.user)
+
+    @action(detail=False, methods=['delete'], url_path='delete-profile-image')
+    def delete_profile_image(self, request):
+        """
+        Delete user's profile image
+        """
+        try:
+            user_profile = UserProfile.objects.get(user=request.user)
+            
+            # Delete the image file if it exists
+            if user_profile.image:
+                # Delete the file from storage
+                user_profile.image.delete(save=False)
+                # Set the image field to None
+                user_profile.image = None
+                user_profile.save()
+                
+                return Response({
+                    "message": "Profile image deleted successfully",
+                    "status": "success"
+                }, status=status.HTTP_200_OK)
+            else:
+                return Response({
+                    "message": "No profile image found to delete",
+                    "status": "info"
+                }, status=status.HTTP_404_NOT_FOUND)
+                
+        except UserProfile.DoesNotExist:
+            return Response({
+                "message": "User profile not found",
+                "status": "error"
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                "message": f"Error deleting profile image: {str(e)}",
+                "status": "error"
+            }, status=status.HTTP_400_BAD_REQUEST)
 
 
 class CustomScoreboardPagination(PageNumberPagination):
@@ -258,6 +299,14 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
 
 
     def get_queryset(self):
+        """
+        Get scoreboard queryset with combined points from:
+        - AR Memories (photos, videos, scans, etc.)
+        - AR Site Check-ins
+        - Randomizer Challenge Submissions
+        """
+        from randomizer_challenge.models import RandomizerSubmission
+
         qs = super().get_queryset().exclude(
             id__in=configs.SCOREBOARD_EXCLUDED_USER_IDS
         )
@@ -293,7 +342,20 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
             .values('total')
         )
 
-        # Sum
+        # Subquery RandomizerSubmission
+        # Include approved and unapproved randomizer submissions (matching AR logic)
+        randomizer_sq = (
+            RandomizerSubmission.objects
+            .filter(
+                user=OuterRef('pk'),
+                approval_status__in=["UNAPPROVED", "APPROVED"],
+            )
+            .values('user')
+            .annotate(total=Sum('points'))
+            .values('total')
+        )
+
+        # Sum all point sources
         qs = qs.annotate(
             memories_points=Coalesce(
                 Subquery(memories_sq, output_field=IntegerField()),
@@ -303,8 +365,13 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
                 Subquery(checkins_sq, output_field=IntegerField()),
                 Value(0)
             ),
+            randomizer_points=Coalesce(
+                Subquery(randomizer_sq, output_field=IntegerField()),
+                Value(0)
+            ),
         ).annotate(
-            calculated_points=F('memories_points') + F('checkin_points')
+            # Combined total: AR memories + AR checkins + Randomizer submissions
+            calculated_points=F('memories_points') + F('checkin_points') + F('randomizer_points')
         )
 
         return qs.order_by('-calculated_points', '-ar_user_profile_user__updated_at', 'id')  #, 'id'
@@ -353,20 +420,80 @@ class ScoreViewSet(GenericViewSet, ListModelMixin):
 
     @action(detail=False, methods=['get'], url_path='my-rank')
     def my_rank(self, request):
-        qs = self.filter_queryset(self.get_queryset()).values_list('pk', 'calculated_points')
+        """
+        Get current user's rank and points (from unified ARUserProfile).
+        Now uses single profile for both AR and Randomizer challenges.
+        """
         user = request.user
 
+        # Get the filtered queryset (this may exclude the current user)
+        filtered_qs = self.filter_queryset(self.get_queryset())
+
+        # Get the full queryset to ensure we can find the user
+        full_qs = self.get_queryset()
+
+        # Get user points from unified ARUserProfile (now includes both AR and Randomizer)
+        try:
+            user_profile = user.ar_user_profile_user
+            user_points = user_profile.points if user_profile.points is not None else 0
+            ar_updated_at = user_profile.updated_at
+        except ARUserProfile.DoesNotExist:
+            # No profile - return early
+            return Response({
+                'my_rank': None,
+                'my_points': 0
+            })
+
+        # Note: No need to add randomizer_profile.points anymore - it's all in ar_user_profile_user.points
+
+        # Check if user is in the filtered queryset
+        user_in_filtered = filtered_qs.filter(pk=user.id).exists()
+
+        # Get the queryset to use for ranking (filtered or full)
+        qs_for_rank = filtered_qs if user_in_filtered else full_qs
+
+        # Calculate rank based on unified points (no need for subquery anymore)
+        # All points (AR + Randomizer) are now in ar_user_profile_user.points
+        ranked_qs = qs_for_rank.annotate(
+            combined_points=Coalesce(F('ar_user_profile_user__points'), Value(0))
+        ).select_related('ar_user_profile_user').order_by(
+            '-combined_points',  # Primary: Sort by combined points (descending)
+            '-ar_user_profile_user__updated_at',  # Tiebreaker: Most recently updated
+            'id'  # Final tiebreaker: Lower user ID wins
+        )
+
+        # Convert to list to find rank
+        users_list = list(ranked_qs.values_list(
+            'pk',
+            'combined_points',
+            'ar_user_profile_user__updated_at',
+            'id'
+        ))
+
         rank = None
-        points = 0
-        for idx, user_data in enumerate(qs, start=1):
-            if user_data[0] == user.id:
+        for idx, (user_pk, points, updated_at, user_id) in enumerate(users_list, start=1):
+            if user_pk == user.id:
                 rank = idx
-                points = user_data[1]
                 break
 
+        # If user not found in queryset, calculate rank using count
+        if rank is None:
+            # Count users with more combined points, or same points but better tiebreakers
+            rank = ranked_qs.filter(
+                Q(combined_points__gt=user_points) |
+                (
+                    Q(combined_points=user_points) &
+                    (
+                        Q(ar_user_profile_user__updated_at__gt=ar_updated_at) |
+                        (Q(ar_user_profile_user__updated_at=ar_updated_at) & Q(id__lt=user.id))
+                    )
+                )
+            ).count() + 1
+
+        print("rank", rank)
         return Response({
             'my_rank': rank,
-            'my_points': points
+            'my_points': user_points
         })
 
 
@@ -375,6 +502,13 @@ class FriendshipViewSet(ModelViewSet):
     permission_classes = [IsAuthenticated]
     serializer_class = FriendshipRequestSerializer
     queryset = FriendshipRequest.objects.all()
+
+    def get_queryset(self):
+        """
+        Filter queryset to only show friendship requests sent to the current user.
+        This ensures users can only reject/accept requests that were sent to them.
+        """
+        return FriendshipRequest.objects.filter(to_user=self.request.user)
 
     def create(self, request, *args, **kwargs):
         try:
@@ -386,9 +520,19 @@ class FriendshipViewSet(ModelViewSet):
             if existing_request:
                 return Response({"message": "Friendship request already sent."}, status=status.HTTP_400_BAD_REQUEST)
 
-            FriendshipRequest.objects.create(from_user=from_user, to_user=to_user)
-            send_notification(NotificationTypes.FRIEND_REQUEST_SENT, to_user)
-            return Response({"message": "Friendship request sent."}, status=status.HTTP_200_OK)
+            friendship_request = FriendshipRequest.objects.create(from_user=from_user, to_user=to_user)
+            send_notification(
+                NotificationTypes.FRIEND_REQUEST_SENT, 
+                to_user, 
+                {'from_user': from_user}, 
+                {
+                    'from_user_id': from_user.id,
+                    'friendship_request_id': friendship_request.id,
+                    'kind': 'friend_request',
+                    'action': 'view_request'
+                }
+            )
+            return Response({"message": "Friendship request sent.", "friendship_request_id": friendship_request.id}, status=status.HTTP_200_OK)
         except User.DoesNotExist:
             return Response({"message": "User does not exist."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
@@ -402,6 +546,15 @@ class FriendshipViewSet(ModelViewSet):
     def destroy(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
+            from_user = instance.from_user
+            to_user = request.user
+            # Delete friend request notification when rejected
+            from notifications.models import Notification
+            Notification.objects.filter(
+                type=NotificationTypes.FRIEND_REQUEST_SENT,
+                from_user=from_user,
+                targets=to_user
+            ).delete()
             super().destroy(request, *args, **kwargs)
             return Response({"message": "Friendship request rejected."}, status=status.HTTP_200_OK)
         except Exception as e:
@@ -416,19 +569,19 @@ class FriendshipViewSet(ModelViewSet):
             friendship_request.delete()
             to_user.user_profile.friends.add(from_user)
             from_user.user_profile.friends.add(to_user)
+            # Delete friend request notification for the user who accepted
+            from notifications.models import Notification
+            Notification.objects.filter(
+                type=NotificationTypes.FRIEND_REQUEST_SENT,
+                from_user=from_user,
+                targets=to_user
+            ).delete()
             send_notification(
                 NotificationTypes.FRIEND_REQUEST_ACCEPTED,
                 from_user,
                 {},
                 {'friend_name': to_user.get_full_name()}
             )
-            # Notification.objects.create(
-            # sender=from_user,
-            # receiver=from_user,
-            # title="Friend Request",
-            # message=f"{to_user.name} accpeted your friend request",
-            # notification_type=Notification.FRIEND_REQUEST,
-            #  )
             return Response({"message": "Friendship request accepted."}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
@@ -510,3 +663,149 @@ class FindFriendsAPIView(APIView):
 
         except Exception as e:
             return Response({'message': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ModeViewSet(ModelViewSet):
+    """
+    ViewSet for managing Modes (Geo-tag, Band, Hunt, Scans, Free Range)
+    Provides full CRUD operations for admin management.
+    """
+    serializer_class = ModeSerializer
+    queryset = Mode.objects.all()
+    permission_classes = []
+    authentication_classes = []
+    http_method_names = ['get', 'post', 'put', 'patch']  # Allow full CRUD operations
+    
+    def get_queryset(self):
+        """Return all modes, optionally filter by status"""
+        queryset = Mode.objects.all()
+        status_param = self.request.query_params.get('status', None)
+        if status_param:
+            queryset = queryset.filter(status=status_param)
+        return queryset
+
+
+class ScanMapViewSet(GenericViewSet, ListModelMixin):
+    """
+    API endpoint for Scan mode - returns all scans with latitude, longitude and details.
+    Used for map display in Scan mode.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = ScanMapSerializer
+    http_method_names = ['get']
+    queryset = ScanPicture.objects.filter(coordinates__isnull=False).select_related('sponsor', 'parameter_settings')
+    
+    def get_queryset(self):
+        """Return all scans that have coordinates (lat/long)"""
+        return self.queryset.all()
+    
+    @extend_schema(
+        operation_id="map_scans_list",
+        summary="Get all scans for map view",
+        description="Returns all scans with their latitude, longitude coordinates and details for map display in Scan mode. "
+                   "Only scans with valid coordinates are returned.",
+        tags=["Map"],
+        responses={
+            200: ScanMapSerializer(many=True),
+            401: {"description": "Authentication credentials were not provided."},
+        },
+        examples=[
+            OpenApiExample(
+                "Example Response",
+                value=[
+                    {
+                        "id": 1,
+                        "name": "Scan Name",
+                        "screen_title": "Screen Title",
+                        "latitude": 36.9075,
+                        "longitude": -76.3077,
+                        "points": 100,
+                        "attempts": 3,
+                        "cooldown_hours": 24,
+                        "elevation": 10,
+                        "info": "Scan information",
+                        "sponsor": None,
+                        "parameters": None
+                    }
+                ],
+                response_only=True
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List all scans with coordinates for map view"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class HuntMapViewSet(GenericViewSet, ListModelMixin):
+    """
+    API endpoint for Hunt mode - returns all hunts with latitude, longitude, star points and details.
+    Used for map display in Hunt mode.
+    """
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    serializer_class = HuntMapSerializer
+    http_method_names = ['get']
+    queryset = GeoARStar.objects.filter(
+        geo_site__lat_long__isnull=False
+    ).select_related('geo_site', 'parameter_settings').prefetch_related('stars', 'sponsors')
+    
+    def get_queryset(self):
+        """Return all hunts that have a geo_site with coordinates (lat/long)"""
+        return self.queryset.all()
+    
+    @extend_schema(
+        operation_id="map_hunts_list",
+        summary="Get all hunts for map view",
+        description="Returns all hunts with their latitude, longitude coordinates, star points and details for map display in Hunt mode. "
+                   "Each hunt includes all associated star points with their own coordinates. "
+                   "Only hunts with valid geo_site coordinates are returned.",
+        tags=["Map"],
+        responses={
+            200: HuntMapSerializer(many=True),
+            401: {"description": "Authentication credentials were not provided."},
+        },
+        examples=[
+            OpenApiExample(
+                "Example Response",
+                value=[
+                    {
+                        "id": 1,
+                        "name": "Hunt Name",
+                        "latitude": 36.9075,
+                        "longitude": -76.3077,
+                        "fun_facts": "Fun facts about the hunt",
+                        "info": "Hunt information",
+                        "visibility_radius": 50,
+                        "following_mode": "PROXIMITY",
+                        "attempts": 1,
+                        "cooldown_hours": 24,
+                        "sponsor": [],
+                        "parameters": None,
+                        "star_points": [
+                            {
+                                "id": 1,
+                                "title": "Star Point 1",
+                                "screen_title": "Screen Title",
+                                "latitude": 36.9076,
+                                "longitude": -76.3078,
+                                "order": 1,
+                                "points": 50,
+                                "elevation": 10,
+                                "fun_facts": "Star point fun facts"
+                            }
+                        ]
+                    }
+                ],
+                response_only=True
+            )
+        ]
+    )
+    def list(self, request, *args, **kwargs):
+        """List all hunts with coordinates and star points for map view"""
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)

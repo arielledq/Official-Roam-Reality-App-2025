@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }} - Roam Reality</title>
+
+    <!-- iOS Smart App Banner -->
+    {% if platform == 'ios' %}
+    <meta name="apple-itunes-app" content="app-id=6477857812, app-argument={{ deep_link_url }}">
+    {% endif %}
+
+    <!-- Open Graph for social sharing -->
+    <meta property="og:title" content="{{ title }}">
+    <meta property="og:description" content="{{ description }}">
+    <meta property="og:type" content="website">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 20px;
+            background: #667eea;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            color: white;
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 15px 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: transform 0.2s;
+            margin: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #999;
+            font-size: 14px;
+        }
+
+        #fallback-content {
+            display: none;
+        }
+
+        .platform-buttons {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎮</div>
+
+        <!-- Loading state (shown initially) -->
+        <div id="loading-content">
+            <div class="spinner"></div>
+            <p class="loading-text">Opening Roam Reality...</p>
+        </div>
+
+        <!-- Fallback content (shown if app doesn't open) -->
+        <div id="fallback-content">
+            <h1>{{ title }}</h1>
+            <p>{{ description }}</p>
+
+            {% if platform == 'ios' %}
+                <a href="{{ ios_app_store_url }}" class="btn">Download on App Store</a>
+            {% elif platform == 'android' %}
+                <a href="{{ android_play_store_url }}" class="btn">Get it on Google Play</a>
+            {% else %}
+                <div class="platform-buttons">
+                    <a href="{{ ios_app_store_url }}" class="btn">iOS App Store</a>
+                    <a href="{{ android_play_store_url }}" class="btn">Google Play</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Attempt to open the app with deep link
+        const deepLinkUrl = "{{ deep_link_url }}";
+        const appStoreUrl = "{{ app_store_url }}";
+        const platform = "{{ platform }}";
+
+        let appOpened = false;
+        let startTime = Date.now();
+
+        // Function to try opening the app
+        function tryOpenApp() {
+            // Method 1: Use iframe (more reliable for custom URL schemes)
+            const iframe = document.createElement('iframe');
+            iframe.style.display = 'none';
+            iframe.src = deepLinkUrl;
+            document.body.appendChild(iframe);
+
+            // Method 2: Also try window.location as fallback
+            setTimeout(function() {
+                if (!appOpened) {
+                    window.location.href = deepLinkUrl;
+                }
+            }, 100);
+
+            // Clean up iframe
+            setTimeout(function() {
+                document.body.removeChild(iframe);
+            }, 1000);
+        }
+
+        // Detect if app opened successfully
+        function detectAppLaunch() {
+            // Check if page was hidden (app opened)
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    appOpened = true;
+                    clearTimeout(fallbackTimer);
+                }
+            });
+
+            // Check if window lost focus (app might have opened)
+            window.addEventListener('blur', function() {
+                appOpened = true;
+                clearTimeout(fallbackTimer);
+            });
+
+            // Check if user returned after some time
+            window.addEventListener('focus', function() {
+                const timeElapsed = Date.now() - startTime;
+                // If more than 2 seconds elapsed, app likely opened
+                if (timeElapsed > 2000) {
+                    appOpened = true;
+                    clearTimeout(fallbackTimer);
+                }
+            });
+
+            // iOS specific: pagehide event
+            window.addEventListener('pagehide', function() {
+                appOpened = true;
+                clearTimeout(fallbackTimer);
+            });
+        }
+
+        // Set up detection
+        detectAppLaunch();
+
+        // Try to open the app
+        tryOpenApp();
+
+        // If app doesn't open within 3 seconds, show fallback
+        const fallbackTimer = setTimeout(function() {
+            if (!appOpened) {
+                document.getElementById('loading-content').style.display = 'none';
+                document.getElementById('fallback-content').style.display = 'block';
+            }
+        }, 3000);
+    </script>
+</body>
+</html>

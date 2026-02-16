@@ -1,5 +1,6 @@
 import json
 import math
+import logging
 from itertools import chain
 from operator import attrgetter
 import requests
@@ -14,6 +15,7 @@ from .filters import CategoryFilterSet, ArSiteFilterSet
 from .models import Challenges, Sponsor, ARUserProfile, ARMemories, ARSettings, ARExample, \
     GeoArSite, GeoLocation, GeoARStar, ARSitePinCheckIn, GeoARChallenges, StarCollection, GeoARGoldStar, \
     DestinationFacts, PanicMessage, GeoArSiteCategory, ScanPicture, GeoARStarPoint
+from randomizer_challenge.models import RandomizerSubmission
 from .serializers import ARMemoriesSerializerGet, \
     ChallengesSerializer, ChallengesUploadSerializer, SponsorSerializer, \
     ARUserProfileSerializer, ARMemoriesSerializer, SettingsSerializer, ExamplesSerializer, GeoStarSerializer, \
@@ -86,6 +88,69 @@ class ARExamplesViewSet(viewsets.ModelViewSet):
         serializer = ExamplesSerializer(objs, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='Scan ID to filter AR examples',
+                examples=[
+                    OpenApiExample(
+                        'Example 1',
+                        summary='Get AR examples for scan ID 123',
+                        value=123
+                    )
+                ]
+            )
+        ],
+        responses={200: ExamplesSerializer(many=True)},
+        summary='Get AR examples by scan ID',
+        description='Retrieve AR examples associated with a specific scan ID'
+    )
+    @action(detail=False, methods=['get'], url_path='get-by-scan-id', name='AR Scan')
+    def get_by_scan(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_ar_scan=id)
+        serializer = ExamplesSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @action(detail=False, methods=['get'], url_path='get-by-hunt-point-id', name='AR Hunt Point')
+    def get_by_hunt_point(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_ar_hunt_point=id)
+        serializer = ExamplesSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='id',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='Hunt ID to filter AR examples',
+                examples=[
+                    OpenApiExample(
+                        'Example 1',
+                        summary='Get AR examples for hunt ID 456',
+                        value=456
+                    )
+                ]
+            )
+        ],
+        responses={200: ExamplesSerializer(many=True)},
+        summary='Get AR examples by hunt ID',
+        description='Retrieve AR examples associated with a specific hunt ID'
+    )
+    @action(detail=False, methods=['get'], url_path='get-by-hunt-id', name='AR Hunt')
+    def get_by_hunt_id(self, request):
+        id = request.GET.get("id")
+        objs = self.queryset.filter(geo_ar_hunt=id)
+        serializer = ExamplesSerializer(objs, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class PanicMessageViewSet(ViewSet):
     """
@@ -98,14 +163,16 @@ class PanicMessageViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         user_id = self.request.user.id
-        request.data['user'] = user_id
-        latitude = request.data.get("latitude")
-        longitude = request.data.get("longitude")
+        # Create a mutable copy of request.data
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        data['user'] = user_id
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
         if latitude and longitude:
             from django.contrib.gis.geos import Point
             pnt = Point(longitude, latitude)
-            request.data['location'] = pnt
-        serializer = PanicMessageSerializer(data=request.data, partial=True)
+            data['location'] = pnt
+        serializer = PanicMessageSerializer(data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -278,43 +345,171 @@ class ARMemoriesViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='check-geo-challenge-create', name='Create Geo Challenge')
     def create_geo(self, request, *args, **kwargs):
-        user_id = self.request.user.id
-        request.data['user'] = user_id
-        geo_challenge_id = request.data.get("geo_challenge")
-        criterion1 = Q(user=user_id)
-        criterion2 = Q(geo_challenge=geo_challenge_id)
-        results = ARMemories.objects.filter(criterion1 & criterion2)
-        challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
-        request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
-        serializer = ARMemoriesSerializer(data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_id = self.request.user.id
+            # Create a mutable copy of request.data
+            data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+            data['user'] = user_id
+            geo_challenge_id = data.get("geo_challenge")
+            
+            if not geo_challenge_id:
+                return Response(
+                    {'message': 'Geo challenge ID is required.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            criterion1 = Q(user=user_id)
+            criterion2 = Q(geo_challenge=geo_challenge_id)
+            results = ARMemories.objects.filter(criterion1 & criterion2)
+            
+            try:
+                challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
+            except GeoARChallenges.DoesNotExist:
+                return Response(
+                    {'message': f'Geo challenge with ID {geo_challenge_id} does not exist.'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            if not challengeObj.ar_experience:
+                return Response(
+                    {'message': 'Geo challenge does not have an associated AR experience.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if not challengeObj.ar_experience.geo_location:
+                return Response(
+                    {'message': 'Geo challenge AR experience does not have an associated geo location.'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            data['geo_location'] = challengeObj.ar_experience.geo_location.id
+            serializer = ARMemoriesSerializer(data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except exceptions.ValidationError as e:
+            return Response(
+                {'message': 'Validation error', 'details': str(e.detail) if hasattr(e, 'detail') else str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            return Response(
+                {'message': f'There was an error creating geo challenge memory: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
     def create(self, request, *args, **kwargs):
-        user_id = self.request.user.id
-        request.data['user'] = user_id
-        memory_type = request.data.get("memory_type", None)
-        if memory_type in ['PHOTO', 'VIDEO',]:
-            challenges_id = request.data.get("challenges")
-            criterion1 = Q(user=user_id)
-            criterion2 = Q(challenges=challenges_id)
-            results = ARMemories.objects.filter(criterion1 & criterion2)
-            challengeObj = Challenges.objects.get(pk=challenges_id)
-            # if len(results) < challengeObj.challenge_attempt:
-            request.data['points'] = challengeObj.points
-            request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
-        elif memory_type == 'SCAN_PHOTO':
-            scan_id = request.data.get("scan_id")
-            scan = ScanPicture.objects.get(pk=scan_id)
-            request.data['points'] = scan.points
-            request.data['scan_picture'] = scan_id
-        serializer = ARMemoriesSerializer(data=request.data, partial=True)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            user_id = self.request.user.id
+            memory_type = request.data.get("memory_type", None)
+            
+            # Prepare additional data to pass to serializer
+            extra_data = {'user': user_id}
+            
+            if memory_type in ['PHOTO', 'VIDEO',]:
+                challenges_id = request.data.get("challenges")
+                if not challenges_id:
+                    return Response(
+                        {'message': 'Challenge ID is required for PHOTO/VIDEO memory type.'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                try:
+                    challengeObj = Challenges.objects.get(pk=challenges_id)
+                except Challenges.DoesNotExist:
+                    return Response(
+                        {'message': f'Challenge with ID {challenges_id} does not exist.'},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                if not challengeObj.ar_experience:
+                    return Response(
+                        {'message': 'Challenge does not have an associated AR experience.'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                if not challengeObj.ar_experience.geo_location:
+                    return Response(
+                        {'message': 'Challenge AR experience does not have an associated geo location.'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                criterion1 = Q(user=user_id)
+                criterion2 = Q(challenges=challenges_id)
+                results = ARMemories.objects.filter(criterion1 & criterion2)
+                # if len(results) < challengeObj.challenge_attempt:
+                extra_data['points'] = challengeObj.points
+                extra_data['geo_location'] = challengeObj.ar_experience.geo_location.id
+            elif memory_type == 'SCAN_PHOTO':
+                scan_id = request.data.get("scan_id")
+                if not scan_id:
+                    return Response(
+                        {'message': 'Scan ID is required for SCAN_PHOTO memory type.'},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+                try:
+                    scan = ScanPicture.objects.get(pk=scan_id)
+                except ScanPicture.DoesNotExist:
+                    return Response(
+                        {'message': f'Scan picture with ID {scan_id} does not exist.'},
+                        status=status.HTTP_404_NOT_FOUND
+                    )
+                
+                extra_data['points'] = scan.points
+                extra_data['scan_picture'] = scan_id
+            
+            # Merge extra_data with request.data for serializer
+            # Create a new mutable QueryDict and manually copy fields to avoid deepcopying file objects
+            from django.http import QueryDict
+            data = QueryDict(mutable=True)
+            
+            # Copy non-file fields from request.data (avoid copying file objects)
+            file_keys = set()
+            if hasattr(request, 'FILES'):
+                file_keys = set(request.FILES.keys())
+            
+            for key in request.data:
+                # Skip file keys - we'll add them directly from request.FILES
+                if key not in file_keys:
+                    # For QueryDict, use getlist to preserve all values
+                    if isinstance(request.data, QueryDict):
+                        values = request.data.getlist(key)
+                        if len(values) == 1:
+                            data[key] = values[0]
+                        else:
+                            data.setlist(key, values)
+                    else:
+                        data[key] = request.data[key]
+            
+            # Add files directly from request.FILES (without copying/deepcopying)
+            if hasattr(request, 'FILES') and request.FILES:
+                for key in request.FILES:
+                    data[key] = request.FILES[key]
+            
+            # Add extra_data fields
+            for key, value in extra_data.items():
+                data[key] = value
+            
+            serializer = ARMemoriesSerializer(data=data, partial=True)
+            if serializer.is_valid(raise_exception=True):
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except exceptions.ValidationError as e:
+            return Response(
+                {'message': 'Validation error', 'details': str(e.detail) if hasattr(e, 'detail') else str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        except Exception as e:
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error in ARMemoriesViewSet.create: {str(e)}", exc_info=True)
+            return Response(
+                {'message': f'There was an error sharing your challenge: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         # else:
         #     return Response({'message': "Challenge experience already submitted and can't submitted more."}, status=403)
 
@@ -373,10 +568,12 @@ class ARProfileViewSet(ViewSet):
     @action(detail=False, methods=['post'], url_path='update-user-location', name='Update User Location')
     def update_user_location(self, request, *args, **kwargs):
         user_id = self.request.user.id
-        request.data['user'] = user_id
+        # Create a mutable copy of request.data
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        data['user'] = user_id
         profileObj, created = ARUserProfile.objects.get_or_create(user=self.request.user)
-        latitude = request.data.get("latitude")
-        longitude = request.data.get("longitude")
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
         from django.contrib.gis.geos import Point
         pnt = Point(longitude, latitude)
         profileObj.current_location = pnt
@@ -399,6 +596,7 @@ class ARProfileViewSet(ViewSet):
         from django.db.models import F, Window
         from django.db.models.functions import Rank
         user_id = request.data.get("user_id")
+        user = request.user
         qs = ARUserProfile.objects.all(
         ).annotate(
             rank=Window(
@@ -407,12 +605,13 @@ class ARProfileViewSet(ViewSet):
             )
         )
         for item in qs:
-            print(item.rank)
-            print(item.user.id)
             if item.user.id == user_id:
-                return Response({"rank": item.rank}, status=status.HTTP_200_OK)
+                user_profile = user.ar_user_profile_user
+                user_points = user_profile.points if user_profile.points is not None else 0
+                print("user_points", user_points)
+                return Response({"rank": item.rank, "points": user_points}, status=status.HTTP_200_OK)
 
-        return Response({"rank": 0}, status=status.HTTP_200_OK)
+        return Response({"rank": 0, "points": 0}, status=status.HTTP_200_OK)
 
     def partial_update(self, request, *args, **kwargs):
         instance = self.queryset.get(pk=kwargs.get('pk'))
@@ -662,17 +861,19 @@ class ARSitePinCheckInViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         user_id = self.request.user.id
-        request.data['user'] = user_id
-        geo_site = request.data.get("geo_site")
-        geo_challenge_id = request.data.get("geo_challenge")
+        # Create a mutable copy of request.data
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        data['user'] = user_id
+        geo_site = data.get("geo_site")
+        geo_challenge_id = data.get("geo_challenge")
         criterion1 = Q(user=user_id)
         criterion2 = Q(geo_site=geo_site)
         results = ARSitePinCheckIn.objects.filter(criterion1 & criterion2)
         challengeObj = GeoARChallenges.objects.get(pk=geo_challenge_id)
         geosite = GeoArSite.objects.get(pk=geo_site)
-        request.data['points'] = challengeObj.points
-        request.data['geo_location'] = challengeObj.ar_experience.geo_location.id
-        serializer = ARSitePinCheckInSerializer(data=request.data, partial=True)
+        data['points'] = challengeObj.points
+        data['geo_location'] = challengeObj.ar_experience.geo_location.id
+        serializer = ARSitePinCheckInSerializer(data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             geosite.check_ins = F('check_ins') + 1
@@ -715,7 +916,7 @@ class StarCollectionViewSet(ViewSet):
 
     @action(detail=False, methods=['post'], url_path='user-stars-count', name='Check all-count')
     def star_call_count(self, request):
-        user_id = request.data.get("user_id")
+        user_id = self.request.user.id
         criterion1 = Q(user=user_id)
         count = StarCollection.objects.filter(criterion1).count()
         return Response({'count': count}, status=status.HTTP_200_OK)
@@ -727,15 +928,17 @@ class StarCollectionViewSet(ViewSet):
 
     def create(self, request, *args, **kwargs):
         user_id = self.request.user.id
-        request.data['user'] = user_id
-        geo_site = request.data.get("geo_site")
-        geo_ar_star = request.data.get("geo_ar_star")
-        geo_ar_star_point = request.data.get("geo_ar_star_point")
-        latitude = request.data.get("latitude")
-        longitude = request.data.get("longitude")
+        # Create a mutable copy of request.data
+        data = request.data.copy() if hasattr(request.data, 'copy') else dict(request.data)
+        data['user'] = user_id
+        geo_site = data.get("geo_site")
+        geo_ar_star = data.get("geo_ar_star")
+        geo_ar_star_point = data.get("geo_ar_star_point")
+        latitude = data.get("latitude")
+        longitude = data.get("longitude")
         pnt = Point(longitude, latitude)
-        request.data['point'] = pnt
-        serializer = StarCollectionSerializer(data=request.data, partial=True)
+        data['point'] = pnt
+        serializer = StarCollectionSerializer(data=data, partial=True)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             star_point = GeoARStarPoint.objects.filter(id=geo_ar_star_point).first()
@@ -846,8 +1049,13 @@ class MemoryCheckinViewSet(GenericViewSet):
         try:
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=request.user.id)
             all_user_memories = ARMemories.objects.filter(user=request.user.id)
+            all_randomizer_submissions = RandomizerSubmission.objects.filter(
+                user=request.user.id,
+                submission_type='COMPLETION'
+            ).select_related('challenge', 'sponsor')
+
             result_list = sorted(
-                chain(all_user_check_in, all_user_memories),
+                chain(all_user_check_in, all_user_memories, all_randomizer_submissions),
                 key=attrgetter('created_at'),
                 reverse=True
             )
@@ -860,17 +1068,73 @@ class MemoryCheckinViewSet(GenericViewSet):
         except Exception as e:
             return Response({"message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='user_id',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='User ID to filter memories',
+                required=True,
+                examples=[
+                    OpenApiExample(
+                        'user_id',
+                        summary='Get memories for user ID 123',
+                        value=123,
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='page_size',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Number of records to return per page',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page_size',
+                        summary='Show 10 records per page',
+                        value=10,
+                    )
+                ]
+            ),
+            OpenApiParameter(
+                name='page',
+                type=int,
+                location=OpenApiParameter.QUERY,
+                description='Page number for pagination',
+                required=False,
+                examples=[
+                    OpenApiExample(
+                        'page',
+                        summary='Go to page 2',
+                        value=1,
+                    )
+                ]
+            ),
+        ]
+    )
     @action(detail=False, methods=['get'], url_path='public', name='AR Public')
     def public(self, request):
         try:
             user = request.GET.get("user_id")
             all_user_check_in = ARSitePinCheckIn.objects.filter(user=user)
-            all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'])
+            all_user_memories = ARMemories.objects.filter(user=user, memory_type__in=['PHOTO', 'VIDEO', 'SCAN_PHOTO'], privacy='public')
+            all_randomizer_submissions = RandomizerSubmission.objects.filter(
+                user=user,
+                submission_type='COMPLETION',
+                privacy='public'
+            ).select_related('challenge', 'sponsor')
+
             result_list = sorted(
-                chain(all_user_check_in, all_user_memories),
+                chain(all_user_check_in, all_user_memories, all_randomizer_submissions),
                 key=attrgetter('created_at'),
                 reverse=True
             )
+            page = self.paginate_queryset(result_list)
+            if page is not None:
+                serializer = ARAllMemoriesSerializer(page, many=True, context={'request': request})
+                return self.get_paginated_response(serializer.data)
             serializer = ARAllMemoriesSerializer(
                 result_list,
                 many=True,

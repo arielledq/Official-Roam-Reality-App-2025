@@ -10,6 +10,7 @@ import FullScreenLoadingSpinner from "components/FullScreenLoadingSpinner";
 import Icon from "components/Icon";
 
 const MemoryContainer = ({
+  showPrivacy = true,
   item,
   onPressAction,
   onChnagePrivacy = (item: any, privacy: any) => {
@@ -17,6 +18,7 @@ const MemoryContainer = ({
   },
   cardStyle = {},
 }: {
+  showPrivacy?: boolean;
   item: any;
   onPressAction?: (file: any, details: any) => void;
   onChnagePrivacy?: (item: any, privacy: any) => void;
@@ -70,23 +72,24 @@ const MemoryContainer = ({
         <AppText numberOfLines={1} style={styles.title}>
           {item?.challenge_details?.name}
         </AppText>
-
-        <TouchableOpacity
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-          onPress={() => onChnagePrivacy(item, item?.privacy === "public" ? "private" : "public")}
-        >
-          <AppText style={styles.buttonText}>Privacy</AppText>
-          {item?.privacy == "public" ? (
-            <Icon name="eye-outline" family="ionicon" size={15} color={"#fff"} />
-          ) : (
-            <Icon name="eye-off-outline" family="ionicon" size={15} color={"#fff"} />
-          )}
-        </TouchableOpacity>
+        {showPrivacy && (
+          <TouchableOpacity
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+            }}
+            onPress={() => onChnagePrivacy(item, item?.privacy === "public" ? "private" : "public")}
+          >
+            <AppText style={styles.buttonText}>Privacy</AppText>
+            {item?.privacy == "public" ? (
+              <Icon name="eye-outline" family="ionicon" size={15} color={"#fff"} />
+            ) : (
+              <Icon name="eye-off-outline" family="ionicon" size={15} color={"#fff"} />
+            )}
+          </TouchableOpacity>
+        )}
 
         <TouchableOpacity
           style={{

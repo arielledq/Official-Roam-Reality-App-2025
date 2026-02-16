@@ -103,7 +103,7 @@ const DrawerLayout = ({icon, label, description, navigateTo, isLastItem, index, 
         </View>
         {navigateTo === "toggleLocation" ? (
           <AppSwitch
-            onValueChange={toggleLiveLocationButtonHandler}
+            onValueChange={toggleUserLocation}
             value={locationIsEnabled}
             loading={loading}
           />

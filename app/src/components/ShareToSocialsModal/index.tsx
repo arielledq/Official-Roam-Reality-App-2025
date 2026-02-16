@@ -82,6 +82,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
   };
 
   const share = async (selectedSSNN: SSNN_TYPE) => {
+    console.info(" Sharing to social network: ", selectedSSNN);
     const ext = normalizeFileExt(fileExt);
 
     try {
@@ -121,7 +122,7 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
 
         case SSNN.FACEBOOK: {
           try {
-            if (Platform.OS === "ios") {
+            if (Platform.OS === "android" || Platform.OS === "ios") {
               const shareLinkContent: any = {};
               if (ext !== "mp4") {
                 shareLinkContent.contentType = "photo";
@@ -136,7 +137,19 @@ const ShareToSocialsModal: React.FC<ShareToSocialsModalProps> = ({
                   if (!result.isCancelled) hasSharedToSSNN = true;
                 }
               } else {
-                await shareToOtherHandler();
+                // await shareToOtherHandler();
+
+                shareLinkContent.contentType = "video";
+                shareLinkContent.video = {localUrl: updatedFileUri};
+                shareLinkContent.commonParameters = firstHashtag
+                  ? {hashtag: firstHashtag}
+                  : undefined;
+
+                const canShowVideo = await ShareDialog.canShow(shareLinkContent);
+                if (canShowVideo) {
+                  const resultVideo = await ShareDialog.show(shareLinkContent);
+                  if (!resultVideo.isCancelled) hasSharedToSSNN = true;
+                }
               }
             } else {
               await shareToOtherHandler();

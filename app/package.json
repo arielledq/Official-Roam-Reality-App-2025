@@ -12,7 +12,9 @@
     "build-aab": "./scripts/build-aab.sh",
     "build-apk": "./scripts/build-apk.sh",
     "clean": "./scripts/clean.sh",
-    "reinstall": "./scripts/reinstall.sh"
+    "reinstall": "./scripts/reinstall.sh",
+    "switch:ios": "git checkout develop_basit && rm -rf node_modules && yarn install",
+    "switch:android": "git checkout PatchAndroid && git fetch origin && git merge origin/develop_basit && rm -rf node_modules && cd android && ./gradlew clean && cd .. && yarn install"
   },
   "dependencies": {
     "@azesmway/react-native-unity": "^1.0.11",
@@ -73,7 +75,7 @@
     "react-native-maps": "1.24.3",
     "react-native-modal": "^14.0.0-rc.1",
     "react-native-onesignal": "^5.2.11",
-    "react-native-pager-view": "^6.7.1",
+    "react-native-pager-view": "6.7.1",
     "react-native-paper": "^5.13.3",
     "react-native-permissions": "^5.3.0",
     "react-native-radio-buttons-group": "^3.1.0",

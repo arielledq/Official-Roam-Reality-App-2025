@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
 import os
 import io
 import environ
@@ -49,7 +48,7 @@ env.read_env(env_file)
 #     GDAL_LIBRARY_PATH = r'C:\OSGeo4W\bin\gdal308.dll'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.bool("DEBUG", default=False)
+DEBUG = True #False #env.bool("DEBUG", default=False)
 SENTRY_DSN = env.str("SENTRY_DSN", default="https://e8a6bfac5c5e45e98a6f9d96ef459795@sentry.innovatica.com.py//66")
 
 if SENTRY_DSN:
@@ -58,12 +57,7 @@ if SENTRY_DSN:
         integrations=[
             DjangoIntegration(),
         ],
-        # Set traces_sample_rate to 1.0 to capture 100%
-        # of transactions for performance monitoring.
-        # We recommend adjusting this value in production.
         traces_sample_rate=1.0,
-        # If you wish to associate users to errors (assuming you are using
-        # django.contrib.auth) you may enable sending PII data.
         send_default_pii=True
     )
 
@@ -80,7 +74,6 @@ except (DefaultCredentialsError, PermissionDenied):
 
 
 try:
-    # Retrieve secrets from Azure Key Vault
     azure_credentials = DefaultAzureCredential()
     vault_url = env.str("AZURE_KEYVAULT_RESOURCEENDPOINT", "")
     vault_secret_name = env.str("AZURE_KEY_VAULT_SECRET_NAME", "secrets")
@@ -89,19 +82,30 @@ try:
     env.read_env(io.StringIO(secret.value))
 except Exception as e:
     pass
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/2.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = env.str("SECRET_KEY")
 
-ALLOWED_HOSTS = env.list("HOST", default=["*"])
+ALLOWED_HOSTS = env.list("HOST", default=["*"]) + ["0.0.0.0", "localhost", "127.0.0.1", "88b219f5942e.ngrok-free.app"]
 SITE_ID = 1
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 SECURE_SSL_REDIRECT = env.bool("SECURE_REDIRECT", default=False)
 
-FACEBOOK_APP_ID = env.str("FACEBOOK_APP_ID", "")
+SOCIAL_AUTH_FACEBOOK_KEY = env.str("SOCIAL_AUTH_FACEBOOK_KEY", "")
+FACEBOOK_APP_ID = env.str("FACEBOOK_APP_ID", SOCIAL_AUTH_FACEBOOK_KEY)
+SOCIAL_AUTH_FACEBOOK_SECRET = env.str("SOCIAL_AUTH_FACEBOOK_SECRET", "")
+
+if not SOCIAL_AUTH_FACEBOOK_KEY:
+    SOCIAL_AUTH_FACEBOOK_KEY = FACEBOOK_APP_ID
+
+# Google OAuth Configuration
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_KEY", "")
+GOOGLE_CLIENT_ID = env.str("GOOGLE_CLIENT_ID", SOCIAL_AUTH_GOOGLE_OAUTH2_KEY)
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env.str("SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET", "")
+
+if not SOCIAL_AUTH_GOOGLE_OAUTH2_KEY:
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = GOOGLE_CLIENT_ID
 # Application definition
 
 INSTALLED_APPS = [
@@ -123,8 +127,10 @@ LOCAL_APPS = [
     'onesignal_client',
     'configuration',
     'slide_pictures',
+    'randomizer_challenge',
 ]
 THIRD_PARTY_APPS = [
+    'corsheaders',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_auth',
@@ -153,6 +159,7 @@ INSTALLED_APPS += LOCAL_APPS + THIRD_PARTY_APPS + MODULES_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -169,6 +176,7 @@ TEMPLATES = [
         'DIRS': [
             os.path.join(BASE_DIR, 'web_build'),
             os.path.join(BASE_DIR, 'modules', 'ar', 'challenges', 'templates'),
+            os.path.join(BASE_DIR, 'randomizer_challenge', 'templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -255,6 +263,10 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 MEDIA_URL = '/mediafiles/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles')
+# File Size - Increased for 90-second video uploads (typical size: 100-200 MB)
+DATA_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 MB (200 * 1024 * 1024)
+FILE_UPLOAD_MAX_MEMORY_SIZE = 209715200  # 200 MB
+
 # allauth / users
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
@@ -269,6 +281,40 @@ ACCOUNT_ADAPTER = "users.adapters.AccountAdapter"
 SOCIALACCOUNT_ADAPTER = "users.adapters.SocialAccountAdapter"
 ACCOUNT_ALLOW_REGISTRATION = env.bool("ACCOUNT_ALLOW_REGISTRATION", True)
 SOCIALACCOUNT_ALLOW_REGISTRATION = env.bool("SOCIALACCOUNT_ALLOW_REGISTRATION", True)
+
+SOCIALACCOUNT_PROVIDERS = {
+    "facebook": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "public_profile"],
+        "FIELDS": ["id", "email", "name", "first_name", "last_name"],
+        "APP": {
+            "client_id": SOCIAL_AUTH_FACEBOOK_KEY,
+            "secret": SOCIAL_AUTH_FACEBOOK_SECRET,
+            "key": SOCIAL_AUTH_FACEBOOK_KEY,
+        },
+    },
+    "google": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "profile"],
+        "FIELDS": ["id", "email", "name", "given_name", "family_name"],
+        "APP": {
+            "client_id": SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+            "secret": SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET,
+            "key": SOCIAL_AUTH_GOOGLE_OAUTH2_KEY,
+        },
+    },
+    "apple": {
+        "METHOD": "oauth2",
+        "SCOPE": ["email", "name"],
+        "FIELDS": ["id", "email", "name"],
+        "APP": {
+            "client_id": env.str("SOCIAL_AUTH_APPLE_ID", ""),
+            "secret": env.str("SOCIAL_AUTH_APPLE_SECRET", ""),
+            "key": env.str("SOCIAL_AUTH_APPLE_ID", ""),
+        },
+    },
+}
+
 
 REST_AUTH_SERIALIZERS = {
     # Replace password reset serializer to fix 500 error
@@ -291,7 +337,25 @@ EMAIL_HOST_USER = env.str("SENDGRID_USERNAME", "")
 EMAIL_HOST_PASSWORD = env.str("SENDGRID_PASSWORD", "")
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
+EMAIL_TIMEOUT = 5  # Timeout in seconds for SMTP connections (reduced for faster failures)
 DEFAULT_FROM_EMAIL = env.str("DEFAULT_FROM_EMAIL", "")
+
+if EMAIL_HOST_PASSWORD:  # Only override if we have a password (API key)
+    EMAIL_HOST_USER = "apikey"
+
+USE_CONSOLE_EMAIL = env.bool("USE_CONSOLE_EMAIL", default=False)
+
+if USE_CONSOLE_EMAIL or not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
+    if not DEBUG and not (EMAIL_HOST_USER and EMAIL_HOST_PASSWORD):
+        logging.warning("You should setup `SENDGRID_USERNAME` and `SENDGRID_PASSWORD` env vars to send emails.")
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+else:
+    EMAIL_BACKEND = "home.email_backend.SendGridEmailBackend"
+    if EMAIL_HOST_PASSWORD and not EMAIL_HOST_PASSWORD.startswith("SG."):
+        logging.warning(
+            f"SendGrid API key doesn't start with 'SG.' - this might cause authentication issues. "
+            f"Current key starts with: {EMAIL_HOST_PASSWORD[:3] if len(EMAIL_HOST_PASSWORD) >= 3 else '***'}"
+        )
 
 
 # AWS S3 config
@@ -311,7 +375,7 @@ USE_S3 = (
     AWS_STORAGE_BUCKET_NAME and
     AWS_STORAGE_REGION
 )
-
+DOMAIN = 'roamtt.com'
 if USE_S3:
     AWS_S3_CUSTOM_DOMAIN = env.str("AWS_S3_CUSTOM_DOMAIN", "")
     AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
@@ -423,3 +487,61 @@ JAZZMIN_UI_TWEAKS = {
 }
 
 MAPBOX_TOKEN = env.str("MAPBOX_TOKEN", "")
+
+# CORS Configuration
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "https://f3216f95c92f.ngrok-free.app",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+]
+
+# Allow credentials (cookies, authorization headers)
+CORS_ALLOW_CREDENTIALS = True
+
+# Allow common headers including Content-Type
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+# Allow common HTTP methods
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Deep Link Configuration
+DEEP_LINK_DOMAIN = env.str("DEEP_LINK_DOMAIN", f"https://{DOMAIN}")
+APP_SCHEME = env.str("APP_SCHEME", "roamreality")
+APP_BUNDLE_ID = env.str("APP_BUNDLE_ID", "com.roam.reality")
+APP_PACKAGE_NAME = env.str("APP_PACKAGE_NAME", "com.roam_reality")
+APPLE_TEAM_ID = env.str("APPLE_TEAM_ID", "AB35BNBR3J")
+
+# App Store URLs for deep linking fallback (when app is not installed)
+IOS_APP_STORE_URL = env.str("IOS_APP_STORE_URL", "https://apps.apple.com/us/app/roam-reality/id6477857812")
+ANDROID_PLAY_STORE_URL = env.str("ANDROID_PLAY_STORE_URL", "https://play.google.com/store/apps/details?id=com.roam_reality")
+
+# Deep link paths for randomizer
+RANDOMIZER_DEEP_LINK_PATHS = [
+    '/randomizer/',
+    '/randomizer/challenge/*',
+    '/randomizer/submission/*',
+    '/randomizer/profile/*',
+    '/randomizer/invite/*',
+    '/randomizer/share/*',
+    '/randomizer/leaderboard',
+    '/randomizer/video/*',
+]

@@ -41,9 +41,13 @@ import useStyles from "./styles";
 import {GIFT_POINTS} from "../../constants";
 import {updateUserProperties} from "redux/Login/reducer";
 import {useOneSignal} from "../../hooks/useOneSignal";
-import {heightPercentageToDP} from "react-native-responsive-screen";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 import theme from "assets/theme";
 import Images from "assets/images";
+import {getProfilePicture} from "util/imageUtils";
+import FastImage from "react-native-fast-image";
+import {AppButton} from "components";
+import {Icons} from "assets/Icons";
 
 const GeoArChallenge = ({}) => {
   const _styles = useStyles();
@@ -51,6 +55,7 @@ const GeoArChallenge = ({}) => {
   const [isLoading, setIsLoading] = useState(false);
   const [destinationDataMini, setDestinationDataMini] = useState([]);
   const [userPofileImage, setUserPofileImage] = useState("");
+
   const [starSitesCount, setStarSitesCount] = useState({});
   const [openPanicPopUp, setOpenPanicPopup] = useState(false);
   const navigation = useNavigation();
@@ -228,7 +233,14 @@ const GeoArChallenge = ({}) => {
               }}
             >
               <View style={{alignItems: "center", justifyContent: "center"}}>
-                <SiteIcon style={{width: 48, height: 48}} />
+                <AppButton
+                  containerStyle={_styles.shadowBoxImage}
+                  customColors={["#7a00cf", "#5532ff"]}
+                  showButton={false}
+                >
+                  <Icons.sites />
+                </AppButton>
+
                 <Text style={_styles.s_list_count}>{obj?.star_ar_sites_cnt || 0}</Text>
                 <Text style={_styles.s_list_text}>Sites</Text>
               </View>
@@ -240,20 +252,29 @@ const GeoArChallenge = ({}) => {
                   marginEnd: 10,
                 }}
               >
-                <Image
-                  source={Images.Neo_GR}
-                  style={{
-                    transform: [{scale: 2}],
-                    width: 48,
-                    height: 48,
-                  }}
-                />
-
+                <AppButton
+                  containerStyle={_styles.shadowBoxImage}
+                  customColors={["#7a00cf", "#5532ff"]}
+                  showButton={false}
+                >
+                  <FastImage
+                    source={Images.destination}
+                    style={{width: widthPercentageToDP(7), height: widthPercentageToDP(7)}}
+                    resizeMode="contain"
+                    defaultSource={Images.destination}
+                  />
+                </AppButton>
                 <Text style={_styles.s_list_count}>{getStarCount(obj.id)}</Text>
                 <Text style={_styles.s_list_text}>Hunts</Text>
               </View>
               <View style={{alignItems: "center", justifyContent: "center"}}>
-                <ArIcon style={{width: 48, height: 48}} />
+                <AppButton
+                  containerStyle={_styles.shadowBoxImage}
+                  customColors={["#7a00cf", "#5532ff"]}
+                  showButton={false}
+                >
+                  <Icons.Ar />
+                </AppButton>
                 <Text style={_styles.s_list_count}>{obj?.unique_ar_sites_cnt || 0}</Text>
                 <Text style={_styles.s_list_text}>Non-Geo AR</Text>
               </View>
@@ -275,6 +296,7 @@ const GeoArChallenge = ({}) => {
   };
 
   const MenuRightComponent = () => {
+    const profilePicture = getProfilePicture(userPofileImage?.image || user?.user_profile?.image);
     return (
       <TouchableOpacity
         onPress={() => {
@@ -282,15 +304,18 @@ const GeoArChallenge = ({}) => {
         }}
       >
         {userPofileImage ? (
-          <Image source={{uri: userPofileImage}} style={_styles.profileImage} />
+          <FastImage
+            source={{uri: profilePicture}}
+            style={_styles.profileImage}
+            resizeMode={FastImage.resizeMode.cover}
+            defaultSource={Images.AppLogo}
+          />
         ) : (
           <View
             style={{
               marginTop: heightPercentageToDP("1%"),
             }}
-          >
-            <Icon name={"user"} family={"antdesign"} size={30} color={theme.lightColors.white} />
-          </View>
+          ></View>
         )}
       </TouchableOpacity>
     );
@@ -301,12 +326,16 @@ const GeoArChallenge = ({}) => {
       const response = await getProfieDetails({id: userProfileId});
 
       if (response.status == 1) {
-        setUserPofileImage(response.image);
+        setUserPofileImage(response);
         const accountIsComplete = accountSetupIsComplete(response);
         if (!accountIsComplete) {
           setTimeout(() => {
             // @ts-ignore
-            navigation.replace("EditProfile", {profileDetails: response});
+            navigation.replace("EditProfile", {
+              profileDetails: response,
+              accountNotComplete: true,
+              extraInfo: user,
+            });
           }, 300);
         }
       } else {
@@ -322,8 +351,6 @@ const GeoArChallenge = ({}) => {
     setOnesignalDevice();
 
     const clickListener = event => {
-      console.log("OneSignal: notification clicked:", event);
-
       const notification = event.getNotification();
       const additionalData = notification?.additionalData;
 

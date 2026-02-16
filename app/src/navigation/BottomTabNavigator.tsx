@@ -2,6 +2,7 @@ import {StyleSheet, Text, View, Image} from "react-native";
 import {createMaterialBottomTabNavigator} from "react-native-paper/react-navigation";
 import {useTheme} from "react-native-paper";
 import {SafeAreaProvider} from "react-native-safe-area-context";
+import {useSelector} from "react-redux";
 
 import Profile from "../screens/profile/profile";
 import Rally from "../screens/rally";
@@ -12,12 +13,17 @@ import Icon from "../components/Icon";
 import {Icons} from "../assets/Icons";
 import ARScreen from "screens/arScreen";
 import ARTipsScreen from "screens/arTips";
+import {AppButton} from "components";
+import {heightPercentageToDP, widthPercentageToDP} from "react-native-responsive-screen";
 
 const Tab = createMaterialBottomTabNavigator();
 
 const BottomTabNavigator = () => {
   const theme = useTheme();
   theme.colors.secondaryContainer = "transparent";
+
+  // Get hideBottomBar state from Redux
+  const hideBottomBar = useSelector((state: any) => state.ar.hideBottomBar);
 
   const glowEffect = () => {
     return (
@@ -31,7 +37,7 @@ const BottomTabNavigator = () => {
   return (
     <SafeAreaProvider style={styles.container}>
       <Tab.Navigator
-        barStyle={styles.tabBarStyle}
+        barStyle={{...styles.tabBarStyle, display: hideBottomBar ? "none" : "flex"}}
         activeColor="#FFFFFF"
         inactiveColor="#FFFFFF"
         theme={theme}
@@ -54,7 +60,6 @@ const BottomTabNavigator = () => {
           name="Scores"
           component={ScoreBoard}
           options={{
-            // @ts-ignore
             tabBarLabel: <Text style={styles.tabBarLabelStyle}>Scores</Text>,
             tabBarIcon: ({focused}) => (
               <View style={{position: "relative"}}>
@@ -70,13 +75,22 @@ const BottomTabNavigator = () => {
           component={ARScreen}
           options={{
             tabBarLabel: "",
+
             tabBarIcon: ({focused}) => (
-              <Icon
-                name={"SelectedCamera"}
-                family="custom"
-                size={50}
-                style={styles.cameraTabStyle}
-              />
+              <AppButton
+                containerStyle={{
+                  width: widthPercentageToDP(13),
+                  height: widthPercentageToDP(13),
+                  borderRadius: widthPercentageToDP(100),
+                  justifyContent: "center",
+                  alignItems: "center",
+                  marginBottom: heightPercentageToDP(2),
+                }}
+                customColors={["#7a00cf", "#5532ff"]}
+                showButton={false}
+              >
+                <Icons.Arcamera />
+              </AppButton>
             ),
           }}
         />

@@ -56,15 +56,15 @@ const useStyles = makeStyles(theme => ({
   },
   termsAndConditionstext: {
     ...fontGroup.nunitoRegular,
-    fontSize: FontSizes.S12,
-    lineHeight: FontLineHeights.LH20,
+    fontSize: FontSizes.S15,
+    lineHeight: FontLineHeights.LH22,
     color: theme.colors.white,
     textAlign: "center",
     marginTop: "5%",
   },
   TandCLink: {
     ...fontGroup.nunitoRegular,
-    fontSize: FontSizes.S12,
+    fontSize: FontSizes.S13,
     color: theme.colors.purple,
     textDecorationLine: "underline",
   },
